@@ -307,3 +307,54 @@ describe("ProposalCreateForm template state", () => {
     expect(container.querySelectorAll("tbody tr")).toHaveLength(0);
   });
 });
+
+describe("ProposalCreateForm from an event (PL-CATALOGS AC-221, AC-222)", () => {
+  it("starts from the template made for the event's service style", async () => {
+    templates.push({
+      _id: "template-full",
+      status: "active",
+      name: "Full service house terms",
+      defaultTerms: "Staffed service: servers stay through cleanup.",
+      defaultTaxRate: 0,
+      defaultServiceChargePercent: null,
+      visibleSections: [],
+      serviceStyleId: "style-full",
+    } as (typeof templates)[number]);
+    await act(async () => root.unmount());
+    root = createRoot(container);
+    await act(async () =>
+      root.render(
+        createElement(ProposalCreateForm, {
+          open: true,
+          fromEvent: {
+            _id: "event-1",
+            clientId: "client-1",
+            title: "Gala",
+            expectedHeadcount: 80,
+            serviceStyleId: "style-full",
+            serviceStyleName: "Full Service",
+          },
+          clients: [],
+          activeClients: [{ _id: "client-1" }],
+          busy: null,
+          run: async (_key: string, work: () => Promise<void>) => work(),
+          onFailure: vi.fn(),
+          onNotice: vi.fn(),
+          onClose: vi.fn(),
+        } as any),
+      ),
+    );
+    templates.pop();
+    const select = container.querySelector(
+      'select[aria-label="Proposal template"]',
+    ) as HTMLSelectElement;
+    expect(select.value).toBe("template-full");
+    expect(
+      (container.querySelector('textarea[name="terms"]') as HTMLTextAreaElement)
+        .value,
+    ).toBe("Staffed service: servers stay through cleanup.");
+    expect(container.textContent).toContain(
+      "Picked because this event is Full Service.",
+    );
+  });
+});

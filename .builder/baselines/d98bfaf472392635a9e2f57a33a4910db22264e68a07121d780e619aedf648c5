@@ -50122,6 +50122,7 @@ export const ProposalTemplate_archive = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runProposalTemplateArchive(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -50130,7 +50131,7 @@ export const ProposalTemplate_archive = mutation({
   },
 });
 
-async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, version }: any, __creation = false) {
+async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -50159,6 +50160,7 @@ async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, desc
       defaultTaxRate: defaultTaxRate,
       defaultServiceChargePercent: defaultServiceChargePercent,
       validityDays: validityDays,
+      serviceStyleId: serviceStyleId,
       definedAt: Date.now(),
       definedById: user.id,
       version: ((doc as any).version ?? 0) + 1
@@ -50184,6 +50186,7 @@ export const ProposalTemplate_define = mutation({
     defaultServiceChargePercent: v.optional(v.number()),
     validityDays: v.optional(v.number()),
     sectionOrder: v.optional(v.array(v.string())),
+    serviceStyleId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -50194,6 +50197,7 @@ export const ProposalTemplate_define = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runProposalTemplateDefine(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -50213,6 +50217,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     defaultServiceChargePercent: v.optional(v.number()),
     validityDays: v.optional(v.number()),
     sectionOrder: v.optional(v.array(v.string())),
+    serviceStyleId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -50222,9 +50227,10 @@ export const ProposalTemplate_createViaDefine = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder } = args;
+    const { name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       visibleSections: args.visibleSections !== undefined ? args.visibleSections : [],
@@ -50238,6 +50244,7 @@ export const ProposalTemplate_createViaDefine = mutation({
       defaultTerms: args.defaultTerms,
       description: args.description,
       name: args.name,
+      serviceStyleId: args.serviceStyleId,
       validityDays: args.validityDays
     };
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal templates");
@@ -50263,6 +50270,7 @@ export const ProposalTemplate_createViaDefine = mutation({
     doc.defaultTaxRate = defaultTaxRate;
     doc.defaultServiceChargePercent = defaultServiceChargePercent;
     doc.validityDays = validityDays;
+    doc.serviceStyleId = serviceStyleId;
     doc.definedAt = Date.now();
     doc.definedById = user.id;
     const docId = await ctx.db.insert("proposalTemplates", doc as any);
@@ -50335,6 +50343,7 @@ export const ProposalTemplate_reactivate = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runProposalTemplateReactivate(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -50343,7 +50352,7 @@ export const ProposalTemplate_reactivate = mutation({
   },
 });
 
-async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, version }: any, __creation = false) {
+async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -50373,6 +50382,7 @@ async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, desc
       defaultTaxRate: defaultTaxRate,
       defaultServiceChargePercent: defaultServiceChargePercent,
       validityDays: validityDays,
+      serviceStyleId: serviceStyleId,
       updatedAt: Date.now(),
       updatedById: user.id,
       version: ((doc as any).version ?? 0) + 1
@@ -50398,6 +50408,7 @@ export const ProposalTemplate_revise = mutation({
     defaultServiceChargePercent: v.optional(v.number()),
     validityDays: v.optional(v.number()),
     sectionOrder: v.optional(v.array(v.string())),
+    serviceStyleId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -50408,6 +50419,7 @@ export const ProposalTemplate_revise = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"serviceStyleId","table":"serviceStyles"}]);
     const __result = await __runProposalTemplateRevise(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);

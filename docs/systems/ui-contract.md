@@ -332,7 +332,7 @@ Screens (23): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 ## 2. Proposal
 
-Screens (28): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplatesPage.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+Screens (29): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
 
 ### Generated reads
 
@@ -349,6 +349,7 @@ Screens (28): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listProposalLineItem` - live read
 - `queries.listProposalRevision` - live read
 - `queries.listProposalTemplate` - live read
+- `queries.listServiceStyle` - live read
 - `queries.listShareLink` - live read
 - `queries.listSignatureRequest` - live read
 - `queries.listVenue` - live read
@@ -410,28 +411,28 @@ Screens (28): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: ProposalTemplateArchived
-  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
 - `mutations.ProposalTemplate_createViaDefine` (ProposalTemplate.define)
-  - inputs from the screen: name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder; filled by the server: none
+  - inputs from the screen: name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: ProposalTemplateDefined
-  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
 - `mutations.ProposalTemplate_reactivate` (ProposalTemplate.reactivate)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: ProposalTemplateReactivated
-  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
 - `mutations.ProposalTemplate_revise` (ProposalTemplate.revise)
-  - inputs from the screen: name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder; filled by the server: none
+  - inputs from the screen: name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
   - effects: ProposalTemplateRevised
-  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
 - `mutations.Proposal_accept` (Proposal.accept)
   - inputs from the screen: eventId, acceptedRevisionId; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

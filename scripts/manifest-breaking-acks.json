@@ -2016,6 +2016,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-01",
       "reason": "Site comment #421: optional; unset reads as the default (only the sales lock is by hand). Stored companies need no backfill."
+    },
+    {
+      "path": "ProposalTemplate.serviceStyleId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "PL-CATALOGS AC-221/AC-222: optional; unset = the template is for any service style, which is what every saved template is today. No backfill."
     }
   ]
 }

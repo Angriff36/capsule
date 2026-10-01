@@ -3339,6 +3339,7 @@ export const ProposalTemplateSchema = z.object({
   defaultTaxRate: z.number().nullable().optional(),
   defaultServiceChargePercent: z.number().nullable().optional(),
   validityDays: z.number().int().nullable().optional(),
+  serviceStyleId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "archived"]).default("active"),
   definedAt: z.coerce.date().nullable().optional(),
   definedById: z.string().uuid().nullable().optional(),
@@ -10372,6 +10373,7 @@ export const ProposalTemplateDefineParamsSchema = z.object({
   defaultServiceChargePercent: z.number().optional(),
   validityDays: z.number().int().optional(),
   sectionOrder: z.array(z.string()).optional(),
+  serviceStyleId: z.string().min(1).optional(),
 });
 
 export type ProposalTemplateDefineParams = z.infer<typeof ProposalTemplateDefineParamsSchema>;
@@ -10392,6 +10394,7 @@ export const ProposalTemplateReviseParamsSchema = z.object({
   defaultServiceChargePercent: z.number().optional(),
   validityDays: z.number().int().optional(),
   sectionOrder: z.array(z.string()).optional(),
+  serviceStyleId: z.string().min(1).optional(),
 });
 
 export type ProposalTemplateReviseParams = z.infer<typeof ProposalTemplateReviseParamsSchema>;

@@ -3216,8 +3216,8 @@ const COMMAND_DISPATCH = {
   },
   "ProposalTemplate.define": {
     ref: api.mutations.ProposalTemplate_createViaDefine,
-    params: ["name","description","visibleSections","defaultTerms","defaultNotes","defaultTaxRate","defaultServiceChargePercent","validityDays","sectionOrder","idempotencyKey"] as const,
-    paramMeta: [{"name":"name","type":"string","required":true},{"name":"description","type":"string","required":false},{"name":"visibleSections","type":"list<string>","required":false},{"name":"defaultTerms","type":"string","required":false},{"name":"defaultNotes","type":"string","required":false},{"name":"defaultTaxRate","type":"decimal","required":false},{"name":"defaultServiceChargePercent","type":"decimal","required":false},{"name":"validityDays","type":"int","required":false},{"name":"sectionOrder","type":"list<string>","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["name","description","visibleSections","defaultTerms","defaultNotes","defaultTaxRate","defaultServiceChargePercent","validityDays","sectionOrder","serviceStyleId","idempotencyKey"] as const,
+    paramMeta: [{"name":"name","type":"string","required":true},{"name":"description","type":"string","required":false},{"name":"visibleSections","type":"list<string>","required":false},{"name":"defaultTerms","type":"string","required":false},{"name":"defaultNotes","type":"string","required":false},{"name":"defaultTaxRate","type":"decimal","required":false},{"name":"defaultServiceChargePercent","type":"decimal","required":false},{"name":"validityDays","type":"int","required":false},{"name":"sectionOrder","type":"list<string>","required":false},{"name":"serviceStyleId","type":"uuid","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "ProposalTemplate.reactivate": {
     ref: api.mutations.ProposalTemplate_reactivate,
@@ -3226,8 +3226,8 @@ const COMMAND_DISPATCH = {
   },
   "ProposalTemplate.revise": {
     ref: api.mutations.ProposalTemplate_revise,
-    params: ["docId","name","description","visibleSections","defaultTerms","defaultNotes","defaultTaxRate","defaultServiceChargePercent","validityDays","sectionOrder","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"name","type":"string","required":true},{"name":"description","type":"string","required":false},{"name":"visibleSections","type":"list<string>","required":false},{"name":"defaultTerms","type":"string","required":false},{"name":"defaultNotes","type":"string","required":false},{"name":"defaultTaxRate","type":"decimal","required":false},{"name":"defaultServiceChargePercent","type":"decimal","required":false},{"name":"validityDays","type":"int","required":false},{"name":"sectionOrder","type":"list<string>","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","name","description","visibleSections","defaultTerms","defaultNotes","defaultTaxRate","defaultServiceChargePercent","validityDays","sectionOrder","serviceStyleId","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"name","type":"string","required":true},{"name":"description","type":"string","required":false},{"name":"visibleSections","type":"list<string>","required":false},{"name":"defaultTerms","type":"string","required":false},{"name":"defaultNotes","type":"string","required":false},{"name":"defaultTaxRate","type":"decimal","required":false},{"name":"defaultServiceChargePercent","type":"decimal","required":false},{"name":"validityDays","type":"int","required":false},{"name":"sectionOrder","type":"list<string>","required":false},{"name":"serviceStyleId","type":"uuid","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "PurchaseNeed.assignToDraft": {
     ref: api.mutations.PurchaseNeed_assignToDraft,

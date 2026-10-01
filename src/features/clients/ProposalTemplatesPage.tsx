@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { ProposalTemplateServiceStyleField } from "./ProposalTemplateServiceStyleField";
 import {
   useCreateProposalTemplate,
   useProposalTemplateArchive,
@@ -137,6 +138,7 @@ export function ProposalTemplatesPage() {
           validityDays: data.get("validityDays")
             ? Number.parseInt(String(data.get("validityDays")), 10)
             : undefined,
+          serviceStyleId: String(data.get("serviceStyleId") || "") || undefined,
         });
         form.reset();
         closeForm();
@@ -172,6 +174,7 @@ export function ProposalTemplatesPage() {
           validityDays: data.get("validityDays")
             ? Number.parseInt(String(data.get("validityDays")), 10)
             : undefined,
+          serviceStyleId: String(data.get("serviceStyleId") || "") || undefined,
         });
         closeForm();
       } catch (error) {
@@ -409,6 +412,10 @@ export function ProposalTemplatesPage() {
                 Days until proposal expires. Leave blank for no default.
               </span>
             </label>
+            <ProposalTemplateServiceStyleField
+              key={editingId ?? "new"}
+              value={editingTemplate?.serviceStyleId}
+            />
           </div>
           <div className="supply-form-actions">
             <button

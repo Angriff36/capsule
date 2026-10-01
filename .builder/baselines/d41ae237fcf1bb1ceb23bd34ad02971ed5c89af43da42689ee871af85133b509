@@ -3088,6 +3088,7 @@ export default defineSchema({
     defaultTaxRate: v.optional(v.union(v.number(), v.null())),
     defaultServiceChargePercent: v.optional(v.union(v.number(), v.null())),
     validityDays: v.optional(v.union(v.number(), v.null())),
+    serviceStyleId: v.optional(v.union(v.id("serviceStyles"), v.null())),
     status: v.union(v.literal("active"), v.literal("archived")),
     definedAt: v.optional(v.union(v.number(), v.null())),
     definedById: v.optional(v.union(v.string(), v.null())),
@@ -3102,6 +3103,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_serviceStyleId", ["serviceStyleId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   purchaseNeeds: defineTable({
     tenantId: v.string(),
