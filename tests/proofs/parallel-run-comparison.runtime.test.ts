@@ -93,7 +93,7 @@ async function seed(t: ReturnType<typeof convexTest>) {
     const rows = {
       e1: tppRow("7001", e1Start, {
         ExpectedCount: 120,
-        TotalRevenue: "$5,000.00",
+        TotalRevenue: 5000,
         EventStatus: "Approved",
         SalespersonID: "S9",
         EventType: "Wedding",
@@ -102,7 +102,7 @@ async function seed(t: ReturnType<typeof convexTest>) {
       }),
       e2: tppRow("7002", e2Start, {
         ExpectedCount: 80,
-        TotalRevenue: "2400",
+        TotalRevenue: 2400,
         EventStatus: "Approved",
         SalespersonID: "S9",
         EventType: "Corporate",
@@ -110,11 +110,11 @@ async function seed(t: ReturnType<typeof convexTest>) {
         VenueName: "Hall A",
       }),
       e3: tppRow("7003", now + 7 * DAY, {
-        TotalRevenue: "900",
+        TotalRevenue: 900,
         EventStatus: "Quote",
         EventType: "Birthday",
       }),
-      old: tppRow("6999", now - 60 * DAY, { TotalRevenue: "100" }),
+      old: tppRow("6999", now - 60 * DAY, { TotalRevenue: 100 }),
     };
     const parsed = {
       e1: parseTppEvent(rows.e1),
@@ -164,6 +164,17 @@ async function seed(t: ReturnType<typeof convexTest>) {
         version: 1,
         ...fields,
       } as never) as Promise<Id<"externalRecordLinks">>;
+    const run = await ctx.db.insert("importRuns", {
+      tenantId,
+      sourceSystem: "tpp_legacy",
+      datasetType: "events",
+      status: "completed",
+      recordCounts: "{}",
+      actorId: "pr-owner",
+      startTime: now - DAY,
+      completionTime: now - DAY + 1,
+      version: 1,
+    } as never);
     await link({
       recordType: "person",
       capsuleEntity: "person",
@@ -175,6 +186,7 @@ async function seed(t: ReturnType<typeof convexTest>) {
       capsuleEntity: "event_record",
       externalId: "7001",
       capsuleId: c1,
+      sourceImportRunId: run,
       rawSourceData: rawOf(rows.e1),
     });
     await link({
@@ -199,7 +211,7 @@ async function seed(t: ReturnType<typeof convexTest>) {
       capsuleId: "",
       rawSourceData: rawOf(rows.old),
     });
-    return { olive, sam, kim, c1, c2, l1 };
+    return { olive, sam, kim, c1, c2, l1, run };
   });
 }
 
@@ -214,7 +226,7 @@ async function differences(t: ReturnType<typeof convexTest>) {
 describe("runtime proof: the daily TPP comparison (PL-CUTOVER)", () => {
   it("compares by identity with real TPP numbers, and every difference can be assigned and settled", async () => {
     const t = convexTest(schema, modules);
-    const { olive, sam, kim, c1, l1 } = await seed(t);
+    const { olive, sam, kim, c1, l1, run } = await seed(t);
     const owner = t.withIdentity({ subject: "pr-owner", tenantId });
     const kitchen = t.withIdentity({ subject: "pr-kitchen", tenantId });
     const otherOwner = t.withIdentity({
@@ -277,6 +289,7 @@ describe("runtime proof: the daily TPP comparison (PL-CUTOVER)", () => {
     const listed = view!.differences.find((row) => row.field === "guests")!;
     expect(listed.externalId).toBe("7001");
     expect(listed.tppTitle).toBe("TPP event 7001");
+    expect(listed.importRunId).toBe(String(run));
     expect(listed.eventId).toBe(String(c1));
     expect(listed.eventTitle).toBe("Capsule 7001");
 

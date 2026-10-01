@@ -380,6 +380,8 @@ export interface ParallelRunDifferenceRow {
   capsuleValue: string | null;
   externalId: string;
   tppTitle: string | null;
+  /** The import that last read this TPP event (its source rows). */
+  importRunId: string | null;
   eventId: string | null;
   eventTitle: string | null;
   assignedToPersonId: string | null;
@@ -438,6 +440,10 @@ export const overview = query({
         capsuleValue: row.capsuleValue ?? null,
         externalId: row.externalId,
         tppTitle: tpp?.title ?? null,
+        importRunId:
+          link && link.tenantId === tenantId
+            ? (link.lastSeenImportRunId ?? link.sourceImportRunId ?? null)
+            : null,
         eventId: ownEvent ? String(ownEvent._id) : null,
         eventTitle: ownEvent?.title ?? null,
         assignedToPersonId: row.assignedToPersonId
