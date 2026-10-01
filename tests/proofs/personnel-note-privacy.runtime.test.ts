@@ -122,10 +122,9 @@ describe("AC-129 personnel notes stay with staff managers", () => {
     expect(await hr.query(api.queries.listOneOnOne, {})).toHaveLength(1);
 
     // The cook keeps their operational event access...
-    const assignments = await cook.query(
-      api.queries.listEventAssignment as never,
-      {} as never,
-    );
+    const assignments = await (
+      cook.query as (fn: unknown, args: object) => Promise<unknown>
+    )(api.queries.listEventAssignment, {});
     expect(Array.isArray(assignments)).toBe(true);
 
     // ...but reads no review list, no one-on-one and no action.

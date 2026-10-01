@@ -99,7 +99,8 @@ describe("runtime proof: switch check reads follow the import read policies (AC-
         recordType: "event",
         capsuleEntity: "event_record",
         verified: false,
-        conflictStatus: "resolved",
+        // PL-CUTOVER: an open item is one on the match-up page's queue.
+        conflictStatus: "pending_conflict",
         version: 1,
       };
       // A live match from before the field existed: no deletedAt at all.

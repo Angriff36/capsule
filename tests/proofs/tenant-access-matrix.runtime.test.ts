@@ -160,6 +160,7 @@ const LINK_TABLE: Record<string, string> = {
   authorAuthSubjectId: "@sign-in",
   authorId: "@sign-in",
   brandLogoStorageId: "@file",
+  businessApprovedById: "@sign-in",
   cancelledById: "@sign-in",
   capsuleId: "events",
   capturedByAuthSubjectId: "@sign-in",
@@ -227,6 +228,7 @@ const LINK_TABLE: Record<string, string> = {
   observationId: "@outside",
   openedByAuthSubjectId: "@sign-in",
   openedById: "@sign-in",
+  openingStockConfirmedById: "@sign-in",
   otherPersonId: "people",
   overrideOfDishTaskId: "dishTasks",
   ownerId: "@sign-in",
@@ -245,6 +247,8 @@ const LINK_TABLE: Record<string, string> = {
   // office; who signed, checked or chased is the signed-in person.
   responsiblePersonId: "people",
   secondPersonId: "people",
+  // A text list of the import runs a switch decision rests on.
+  finalImportRunIds: "importRuns",
   formCompletedById: "people",
   formCheckedById: "people",
   formEscalatedById: "people",

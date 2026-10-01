@@ -8556,6 +8556,18 @@ async function __runCutoverDecisionCreate(ctx: MutationCtx, args: any) {
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       tppReadOnlyAt: args.tppReadOnlyAt,
+      businessApprovedById: args.businessApprovedById,
+      businessApprovedAt: args.businessApprovedAt,
+      businessEvidence: args.businessEvidence,
+      sourceFrozenAt: args.sourceFrozenAt,
+      openingStockAsOf: args.openingStockAsOf,
+      openingStockCount: args.openingStockCount,
+      openingStockConfirmedById: args.openingStockConfirmedById,
+      financialMode: args.financialMode,
+      backupEvidence: args.backupEvidence,
+      finalImportRunIds: args.finalImportRunIds,
+      scheduledImportsDisabledAt: args.scheduledImportsDisabledAt,
+      scheduledImportsNote: args.scheduledImportsNote,
       status: "not_started",
       decidedAt: Date.now(),
       decidedBy: user.id,
@@ -8580,6 +8592,18 @@ async function __runCutoverDecisionCreate(ctx: MutationCtx, args: any) {
 export const CutoverDecision_create = mutation({
   args: {
     tppReadOnlyAt: v.optional(v.union(v.number(), v.null())),
+    businessApprovedById: v.optional(v.union(v.string(), v.null())),
+    businessApprovedAt: v.optional(v.union(v.number(), v.null())),
+    businessEvidence: v.optional(v.union(v.string(), v.null())),
+    sourceFrozenAt: v.optional(v.union(v.number(), v.null())),
+    openingStockAsOf: v.optional(v.union(v.number(), v.null())),
+    openingStockCount: v.optional(v.union(v.number(), v.null())),
+    openingStockConfirmedById: v.optional(v.union(v.string(), v.null())),
+    financialMode: v.optional(v.union(v.literal("reference_history"), v.literal("ledger_reconstruction"), v.null())),
+    backupEvidence: v.optional(v.union(v.string(), v.null())),
+    finalImportRunIds: v.optional(v.union(v.string(), v.null())),
+    scheduledImportsDisabledAt: v.optional(v.union(v.number(), v.null())),
+    scheduledImportsNote: v.optional(v.union(v.string(), v.null())),
     reason: v.string(),
     rollbackPlan: v.string(),
     businessApproved: v.optional(v.boolean()),
@@ -8647,7 +8671,7 @@ export const CutoverDecision_execute = mutation({
   },
 });
 
-async function __runCutoverDecisionRecordApprovals(ctx: MutationCtx, { docId, businessApproved, rollbackPlan }: any, __creation = false) {
+async function __runCutoverDecisionRecordApprovals(ctx: MutationCtx, { docId, businessApproved, rollbackPlan, businessEvidence }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -8660,6 +8684,9 @@ async function __runCutoverDecisionRecordApprovals(ctx: MutationCtx, { docId, bu
     const updates = {
       businessApproved: businessApproved,
       rollbackPlan: rollbackPlan,
+      businessEvidence: businessEvidence,
+      businessApprovedById: (businessApproved ? user.id : null),
+      businessApprovedAt: (businessApproved ? Date.now() : null),
       decidedAt: Date.now(),
       decidedBy: user.id
     };
@@ -8677,6 +8704,7 @@ export const CutoverDecision_recordApprovals = mutation({
     docId: v.id("cutoverDecisions"),
     businessApproved: v.boolean(),
     rollbackPlan: v.string(),
+    businessEvidence: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {

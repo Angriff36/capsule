@@ -22,6 +22,7 @@ import { formatCountNoun, formatDate } from "@/lib/format";
 import { useAuthStatus } from "@/lib/useAuthStatus";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionFailure, useActionNotice } from "../../../ui/action-result";
+import { CutoverFactsCard } from "./CutoverFactsCard";
 
 interface ValidationCheck {
   passed: boolean;
@@ -50,13 +51,42 @@ export function CutoverPage() {
   const executeDecision = useMutation(api.cutover.executeCutoverDecision);
   const setTppReadOnly = useMutation(api.cutover.setTppReadOnly);
   const rollbackCutoverMutation = useMutation(api.cutover.rollbackCutover);
+  const recordApprovals = useMutation(api.cutover.recordCutoverApprovals);
 
-  // Local state
-  const [localApproval, setLocalApproval] = useState(false);
-  const [localRollbackPlan, setLocalRollbackPlan] = useState("");
+  // Local state; null = untouched, show what is saved.
+  const [approvalDraft, setLocalApproval] = useState<boolean | null>(null);
+  const [planDraft, setLocalRollbackPlan] = useState<string | null>(null);
+  const [evidenceDraft, setEvidence] = useState<string | null>(null);
+  const localApproval =
+    approvalDraft ?? cutoverStatus?.businessApproved ?? false;
+  const localRollbackPlan = planDraft ?? cutoverStatus?.rollbackPlan ?? "";
+  const evidence = evidenceDraft ?? cutoverStatus?.businessEvidence ?? "";
   const { error, setError } = useActionFailure();
   const { setNotice } = useActionNotice();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // AC-289: the sign-off is saved with who, when and what was checked; the
+  // checklist turns green from the saved sign-off, never from the tick box.
+  const handleSaveSignOff = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await recordApprovals({
+        businessApproved: localApproval,
+        rollbackPlan: localRollbackPlan,
+        businessEvidence: evidence,
+      });
+      setLocalApproval(null);
+      setLocalRollbackPlan(null);
+      setEvidence(null);
+      setNotice("Sign-off saved.");
+    } catch (err) {
+      const failure = classifyCommandFailure(err);
+      setError(`${failure.title}: ${failure.detail}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Execute go/no-go decision
   const handleExecuteDecision = async (decision: "go" | "no_go") => {
@@ -234,6 +264,11 @@ export function CutoverPage() {
               The switch from TPP was approved on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
+            {cutoverStatus.scheduledImportsNote && (
+              <p className="text-xs text-ink-2">
+                {cutoverStatus.scheduledImportsNote}
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -350,11 +385,30 @@ export function CutoverPage() {
               ) : null
             }
           />
+          {validation.openItems.length > 0 && (
+            <ul className="border rounded-sm p-3 text-xs space-y-1">
+              {validation.openItems.map((item) => (
+                <li key={item.id} className="flex justify-between gap-2">
+                  <span>
+                    {item.kind === "field_difference"
+                      ? `${item.recordType} ${item.externalId}: "${item.field}" differs between TPP and Capsule`
+                      : `${item.recordType} ${item.externalId} still needs matching`}
+                  </span>
+                  <Link to="/admin/reconcile" className="text-info shrink-0">
+                    Open
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
 
           <ValidationCard
             title="Manager sign-off"
             check={validation.checks.businessValidation}
-            details="A manager still needs to sign off"
+            details={
+              validation.checks.businessValidation.details ??
+              "A manager still needs to sign off"
+            }
             action={
               <label className="flex items-center gap-2 text-xs">
                 <input
@@ -392,6 +446,23 @@ export function CutoverPage() {
               </button>
             }
           />
+
+          <ValidationCard
+            title="Opening stock"
+            check={validation.checks.openingStock}
+            details={validation.checks.openingStock.details}
+          />
+
+          <ValidationCard
+            title="Old invoices and payments"
+            check={validation.checks.financialMode}
+          />
+
+          <ValidationCard
+            title="Backup"
+            check={validation.checks.backup}
+            details={validation.checks.backup.details}
+          />
         </div>
 
         {/* Rollback plan input */}
@@ -407,7 +478,38 @@ export function CutoverPage() {
             onChange={(e) => setLocalRollbackPlan(e.target.value)}
             disabled={!isAdmin}
           />
+          <label className="flex items-center gap-2 font-medium text-xs">
+            What you checked
+          </label>
+          <textarea
+            className="w-full border rounded-sm p-2 text-xs min-h-[60px]"
+            placeholder="The events, menus and reports you walked through in Capsule next to TPP"
+            value={evidence}
+            onChange={(e) => setEvidence(e.target.value)}
+            disabled={!isAdmin}
+          />
+          <button
+            type="button"
+            className="btn btn-sm"
+            disabled={!isAdmin || isSubmitting}
+            onClick={handleSaveSignOff}
+          >
+            Save sign-off and plan
+          </button>
         </div>
+
+        <CutoverFactsCard
+          saved={{
+            sourceFrozenAt: cutoverStatus.sourceFrozenAt,
+            openingStockAsOf: cutoverStatus.openingStockAsOf,
+            openingStockCount: cutoverStatus.openingStockCount,
+            financialMode: cutoverStatus.financialMode,
+            backupEvidence: cutoverStatus.backupEvidence,
+          }}
+          canEdit={!!isAdmin}
+          onSaved={setNotice}
+          onError={setError}
+        />
       </div>
 
       {/* Cutover actions */}
@@ -493,9 +595,11 @@ export function CutoverPage() {
       <div className="text-xs text-ink-2 space-y-1">
         <p className="font-medium">How the final switch works:</p>
         <ol className="list-decimal list-inside space-y-1">
+          <li>Stop new entries in TPP and write down when</li>
           <li>Do one last import to catch anything new in TPP</li>
           <li>Match up every leftover imported item</li>
           <li>Write down the plan for switching back, just in case</li>
+          <li>Confirm opening stock, old money records and the backup</li>
           <li>Get sign-off from the business</li>
           <li>Approve the switch</li>
           <li>Set TPP to read-only</li>

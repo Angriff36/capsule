@@ -562,6 +562,18 @@ export default defineSchema({
     rollbackPlan: v.string(),
     businessApproved: v.optional(v.boolean()),
     tppReadOnlyAt: v.optional(v.union(v.number(), v.null())),
+    businessApprovedById: v.optional(v.union(v.string(), v.null())),
+    businessApprovedAt: v.optional(v.union(v.number(), v.null())),
+    businessEvidence: v.optional(v.union(v.string(), v.null())),
+    sourceFrozenAt: v.optional(v.union(v.number(), v.null())),
+    openingStockAsOf: v.optional(v.union(v.number(), v.null())),
+    openingStockCount: v.optional(v.union(v.number(), v.null())),
+    openingStockConfirmedById: v.optional(v.union(v.string(), v.null())),
+    financialMode: v.optional(v.union(v.literal("reference_history"), v.literal("ledger_reconstruction"), v.null())),
+    backupEvidence: v.optional(v.union(v.string(), v.null())),
+    finalImportRunIds: v.optional(v.union(v.string(), v.null())),
+    scheduledImportsDisabledAt: v.optional(v.union(v.number(), v.null())),
+    scheduledImportsNote: v.optional(v.union(v.string(), v.null())),
   })
     .index("by_tenantId", ["tenantId"]),
   deliveries: defineTable({

@@ -2172,6 +2172,78 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-HR AC-327: optional; unset = the meeting used no scorecard, which is true of every stored meeting. No backfill."
+    },
+    {
+      "path": "CutoverDecision.businessApprovedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional; unset = not signed off with the new attributable sign-off, so the switch check asks for it again. No backfill."
+    },
+    {
+      "path": "CutoverDecision.businessApprovedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional; unset = no attributable sign-off yet. No backfill."
+    },
+    {
+      "path": "CutoverDecision.businessEvidence",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional; unset = nothing written about what was checked. No backfill."
+    },
+    {
+      "path": "CutoverDecision.sourceFrozenAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-287: optional; unset = nobody said when TPP stopped taking entries, which the switch check asks for. No backfill."
+    },
+    {
+      "path": "CutoverDecision.openingStockAsOf",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; unset = opening stock not confirmed. No backfill."
+    },
+    {
+      "path": "CutoverDecision.openingStockCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; set together with openingStockAsOf. No backfill."
+    },
+    {
+      "path": "CutoverDecision.openingStockConfirmedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; set together with openingStockAsOf. No backfill."
+    },
+    {
+      "path": "CutoverDecision.financialMode",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; unset = not chosen yet, which the switch check asks for. No backfill."
+    },
+    {
+      "path": "CutoverDecision.backupEvidence",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; unset = no backup written down. No backfill."
+    },
+    {
+      "path": "CutoverDecision.finalImportRunIds",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-287: optional; stamped at go only. No backfill."
+    },
+    {
+      "path": "CutoverDecision.scheduledImportsDisabledAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-292: optional; stamped at go only. No backfill."
+    },
+    {
+      "path": "CutoverDecision.scheduledImportsNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-292: optional; stamped at go only. No backfill."
     }
   ]
 }

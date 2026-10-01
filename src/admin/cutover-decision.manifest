@@ -12,6 +12,12 @@ enum CutoverDecisionType {
   no_go
 }
 
+// PL-CUTOVER (AC-632): how old money records live in Capsule after the switch.
+enum CutoverFinancialMode {
+  reference_history
+  ledger_reconstruction
+}
+
 entity CutoverDecision mixin TenantScoped {
   key [tenantId, id]
   property required status: CutoverStatus = "not_started"
@@ -21,6 +27,26 @@ entity CutoverDecision mixin TenantScoped {
   property required rollbackPlan: string
   property businessApproved: boolean = false
   property tppReadOnlyAt: int?
+  // PL-CUTOVER (AC-287..AC-292, AC-632): the facts the go decision rests on.
+  // Sign-off is attributable: who, when, and what they checked.
+  property businessApprovedById: string?
+  property businessApprovedAt: int?
+  property businessEvidence: string?
+  // When TPP stopped taking new entries; the last import of every dataset
+  // must start after it (source as-of evidence, no fixed age rule).
+  property sourceFrozenAt: int?
+  // Owner-confirmed opening stock: the as-of time and how many counts it holds.
+  property openingStockAsOf: int?
+  property openingStockCount: int?
+  property openingStockConfirmedById: string?
+  property financialMode: CutoverFinancialMode?
+  // Where the production backup is and when a restore was tried.
+  property backupEvidence: string?
+  // Stamped at go: the import runs the decision rests on, and the record
+  // that scheduled TPP imports are off.
+  property finalImportRunIds: string?
+  property scheduledImportsDisabledAt: int?
+  property scheduledImportsNote: string?
   default policy cutoverDecisionRead read: user.id != null "Signed-in staff may see cutover decisions"
   default policy cutoverDecisionWrite write: user.id != null "Signed-in staff may update cutover decisions"
   default policy cutoverDecisionExecute execute: user.id != null "Signed-in staff may change cutover decisions"
@@ -52,10 +78,17 @@ entity CutoverDecision mixin TenantScoped {
   // reads now(), which is undefined on Convex MutationCtx at
   // runtime (it typechecks only because of the `as any`) — writing undefined
   // into the required `int` timestamp fields silently breaks the command.
-  command recordApprovals(businessApproved: boolean, rollbackPlan: string) {
+  command recordApprovals(
+    businessApproved: boolean,
+    rollbackPlan: string,
+    optional businessEvidence: string
+  ) {
     guard roleAllows(user.role, "adminAccess")
     mutate businessApproved = businessApproved
     mutate rollbackPlan = rollbackPlan
+    mutate businessEvidence = businessEvidence
+    mutate businessApprovedById = businessApproved ? user.id : null
+    mutate businessApprovedAt = businessApproved ? now() : null
     mutate decidedAt = now()
     mutate decidedBy = user.id
     emit CutoverDecisionApprovalsRecorded {

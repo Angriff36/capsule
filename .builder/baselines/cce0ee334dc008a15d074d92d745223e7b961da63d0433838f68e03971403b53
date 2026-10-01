@@ -531,8 +531,8 @@ const COMMAND_DISPATCH = {
   },
   "CutoverDecision.recordApprovals": {
     ref: api.mutations.CutoverDecision_recordApprovals,
-    params: ["docId","businessApproved","rollbackPlan","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"businessApproved","type":"boolean","required":true},{"name":"rollbackPlan","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","businessApproved","rollbackPlan","businessEvidence","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"businessApproved","type":"boolean","required":true},{"name":"rollbackPlan","type":"string","required":true},{"name":"businessEvidence","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "CutoverDecision.rollback": {
     ref: api.mutations.CutoverDecision_rollback,

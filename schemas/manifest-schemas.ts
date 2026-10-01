@@ -601,6 +601,18 @@ export const CutoverDecisionSchema = z.object({
   rollbackPlan: z.string(),
   businessApproved: z.boolean().optional().default(false),
   tppReadOnlyAt: z.number().int().nullable().optional(),
+  businessApprovedById: z.string().nullable().optional(),
+  businessApprovedAt: z.number().int().nullable().optional(),
+  businessEvidence: z.string().nullable().optional(),
+  sourceFrozenAt: z.number().int().nullable().optional(),
+  openingStockAsOf: z.number().int().nullable().optional(),
+  openingStockCount: z.number().int().nullable().optional(),
+  openingStockConfirmedById: z.string().nullable().optional(),
+  financialMode: z.enum(["reference_history", "ledger_reconstruction"]).nullable().optional(),
+  backupEvidence: z.string().nullable().optional(),
+  finalImportRunIds: z.string().nullable().optional(),
+  scheduledImportsDisabledAt: z.number().int().nullable().optional(),
+  scheduledImportsNote: z.string().nullable().optional(),
 });
 
 export type CutoverDecision = z.infer<typeof CutoverDecisionSchema>;
@@ -5740,6 +5752,7 @@ export type CutoverDecisionExecuteParams = z.infer<typeof CutoverDecisionExecute
 export const CutoverDecisionRecordApprovalsParamsSchema = z.object({
   businessApproved: z.boolean(),
   rollbackPlan: z.string(),
+  businessEvidence: z.string().optional(),
 });
 
 export type CutoverDecisionRecordApprovalsParams = z.infer<typeof CutoverDecisionRecordApprovalsParamsSchema>;
