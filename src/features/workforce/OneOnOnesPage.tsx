@@ -5,6 +5,7 @@ import {
   useListOneOnOne,
   useListOneOnOneAction,
   useListPerson,
+  useListRoleScorecard,
   useOneOnOneActionClose,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -13,6 +14,8 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { openActionsForNextMeeting } from "./oneOnOneCarryOver";
+import { effectiveScorecard } from "./scorecardVersions";
 
 // goals/decisions are JSON string arrays on the entity (additive shape, like
 // RoleScorecard.expectations) so the captured lists can grow without a schema
@@ -39,12 +42,14 @@ export function OneOnOnesPage() {
   const meetings = useListOneOnOne();
   const actions = useListOneOnOneAction();
   const people = useListPerson();
+  const scorecards = useListRoleScorecard();
   const holdMeeting = useCreateOneOnOne();
   const captureAction = useCreateOneOnOneAction();
   const closeAction = useOneOnOneActionClose();
 
   const [open, setOpen] = useState(false);
   const [staffDraft, setStaffDraft] = useState("");
+  const [scorecardId, setScorecardId] = useState("");
   const [goals, setGoals] = useState<string[]>([""]);
   const [decisions, setDecisions] = useState<string[]>([""]);
   const [busy, setBusy] = useState(false);
@@ -66,23 +71,29 @@ export function OneOnOnesPage() {
     .sort((a, b) => (b.meetingDate ?? 0) - (a.meetingDate ?? 0));
   const liveActions = (actions ?? []).filter((row) => row.deletedAt == null);
 
-  // "Open actions appear in the next meeting" (spec §9.5): surface the
-  // still-open follow-ups from the selected staff member's PRIOR meetings —
-  // matched by the meeting's id, not by action owner (a follow-up from their
-  // meeting may be owned by the manager or another participant).
-  const priorMeetingIds = new Set(
-    heldMeetings
-      .filter((meeting) => meeting.staffMemberId === staffDraft)
-      .map((meeting) => meeting._id),
+  const priorOpenActions = openActionsForNextMeeting(
+    heldMeetings,
+    liveActions,
+    staffDraft,
   );
-  const priorOpenActions = staffDraft
-    ? liveActions.filter(
-        (row) => priorMeetingIds.has(row.oneOnOneId) && row.status === "open",
-      )
-    : [];
+
+  const definedScorecards = (scorecards ?? []).filter(
+    (row) => row.deletedAt == null && row.definedAt != null,
+  );
+  const scorecardTitle = (id: string | null | undefined) =>
+    id
+      ? (definedScorecards.find((row) => row._id === id)?.title ?? null)
+      : null;
+
+  const pickStaff = (id: string) => {
+    setStaffDraft(id);
+    const role = activePeople.find((row) => row._id === id)?.role;
+    setScorecardId(effectiveScorecard(scorecards, role, Date.now())?._id ?? "");
+  };
 
   const startNew = () => {
     setStaffDraft("");
+    setScorecardId("");
     setGoals([""]);
     setDecisions([""]);
     setOpen(true);
@@ -112,12 +123,14 @@ export function OneOnOnesPage() {
           wins: String(data.get("wins") || ""),
           opportunities: String(data.get("opportunities") || ""),
           decisions: JSON.stringify(decisions.filter((row) => row.trim())),
+          scorecardId: scorecardId || undefined,
         });
         form.reset();
         setOpen(false);
         setGoals([""]);
         setDecisions([""]);
         setStaffDraft("");
+        setScorecardId("");
       } catch (error) {
         setFailure(error);
       } finally {
@@ -215,12 +228,29 @@ export function OneOnOnesPage() {
                 className="input"
                 required
                 value={staffDraft}
-                onChange={(e) => setStaffDraft(e.target.value)}
+                onChange={(e) => pickStaff(e.target.value)}
               >
                 <option value="">Select staff member</option>
                 {activePeople.map((person) => (
                   <option key={person._id} value={person._id}>
                     {person.givenName} {person.familyName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
+              Scorecard
+              <select
+                name="scorecardId"
+                className="input"
+                value={scorecardId}
+                onChange={(e) => setScorecardId(e.target.value)}
+              >
+                <option value="">No scorecard</option>
+                {definedScorecards.map((row) => (
+                  <option key={row._id} value={row._id}>
+                    {row.title}
+                    {row.status === "archived" ? " (old version)" : ""}
                   </option>
                 ))}
               </select>
@@ -429,6 +459,12 @@ export function OneOnOnesPage() {
                   </span>
                 </div>
                 <div className="supply-form-grid">
+                  {scorecardTitle(meeting.scorecardId) ? (
+                    <p className="col-span-2">
+                      <strong>Scorecard:</strong>{" "}
+                      {scorecardTitle(meeting.scorecardId)}
+                    </p>
+                  ) : null}
                   {meeting.agenda ? (
                     <p className="col-span-2">
                       <strong>Agenda:</strong> {meeting.agenda}

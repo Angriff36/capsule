@@ -307,6 +307,7 @@ const LINK_TABLE: Record<string, string> = {
   revokedByPersonId: "people",
   rideVehicleAssignmentId: "eventVehicleAssignments",
   salespersonId: "people",
+  scorecardId: "roleScorecards",
   senderAuthSubjectId: "@sign-in",
   sentInsteadByPersonId: "people",
   sequenceAfterDishTaskId: "dishTasks",

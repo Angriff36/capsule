@@ -2130,6 +2130,48 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-CULINARY-CATALOG AC-452: optional; blank = not on file. No backfill."
+    },
+    {
+      "path": "PerformanceReview.scorecardId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-327/AC-329: optional; unset = the review used no scorecard, which is true of every stored review. No backfill."
+    },
+    {
+      "path": "PerformanceReview.strengths",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional shared feedback; blank = none written. No backfill."
+    },
+    {
+      "path": "PerformanceReview.opportunities",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional shared feedback; blank = none written. No backfill."
+    },
+    {
+      "path": "PerformanceReview.comments",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional comments for the person reviewed; blank = none written. No backfill."
+    },
+    {
+      "path": "PerformanceReview.followUp",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional follow-up step; blank = none set. No backfill."
+    },
+    {
+      "path": "PerformanceReview.followUpDue",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional follow-up date; unset = no date. No backfill."
+    },
+    {
+      "path": "OneOnOne.scorecardId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-327: optional; unset = the meeting used no scorecard, which is true of every stored meeting. No backfill."
     }
   ]
 }

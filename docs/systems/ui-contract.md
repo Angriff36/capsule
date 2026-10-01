@@ -2283,7 +2283,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 
 ## 6. Staffing and My Day
 
-Screens (65): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
+Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
 
 ### Generated reads
 
@@ -2535,12 +2535,12 @@ Screens (65): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - effects: OneOnOneActionCaptured
   - refresh: live reads update by themselves; reads affected: OneOnOneAction.list, OneOnOneAction.get, OneOnOne.list, OneOnOne.get, Person.list, Person.get
 - `mutations.OneOnOne_createViaHold` (OneOnOne.hold)
-  - inputs from the screen: leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions; filled by the server: none
+  - inputs from the screen: leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions, scorecardId; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Workforce managers may see one-on-ones"; "Workforce managers may update one-on-ones"; "Workforce managers may change one-on-ones"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"
   - effects: OneOnOneHeld
-  - refresh: live reads update by themselves; reads affected: OneOnOne.list, OneOnOne.get, OneOnOneAction.list, OneOnOneAction.get, Person.list, Person.get
+  - refresh: live reads update by themselves; reads affected: OneOnOne.list, OneOnOne.get, OneOnOneAction.list, OneOnOneAction.get, Person.list, Person.get, RoleScorecard.list, RoleScorecard.get
 - `mutations.PackListItem_markMissing` (PackListItem.markMissing)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -2556,12 +2556,12 @@ Screens (65): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - effects: PackListItemPacked
   - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 6 more
 - `mutations.PerformanceReview_createViaRecord` (PerformanceReview.record)
-  - inputs from the screen: personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes; filled by the server: none
+  - inputs from the screen: personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes, scorecardId, strengths, opportunities, comments, followUp, followUpDue; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Managers may see performance reviews"; "Workforce managers may update performance reviews"; "Workforce managers may change performance reviews"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - refusals (role, stage and rules): "Workforce managers may see performance reviews"; "Workforce managers may update performance reviews"; "Workforce managers may change performance reviews"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
   - effects: PerformanceReviewRecorded
-  - refresh: live reads update by themselves; reads affected: PerformanceReview.list, PerformanceReview.get, Event.list, Event.get, Person.list, Person.get
+  - refresh: live reads update by themselves; reads affected: PerformanceReview.list, PerformanceReview.get, Event.list, Event.get, Person.list, Person.get, RoleScorecard.list, RoleScorecard.get
 - `mutations.Person_setPayRate` (Person.setPayRate)
   - inputs from the screen: hourlyRate; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -2666,21 +2666,21 @@ Screens (65): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce managers may see role scorecards"; "Workforce managers may update role scorecards"; "Workforce managers may change role scorecards"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: RoleScorecardArchived
-  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get
+  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get, OneOnOne.list, OneOnOne.get, PerformanceReview.list, PerformanceReview.get
 - `mutations.RoleScorecard_createViaDefine` (RoleScorecard.define)
   - inputs from the screen: role, title, expectations, effectiveFrom; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Workforce managers may see role scorecards"; "Workforce managers may update role scorecards"; "Workforce managers may change role scorecards"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 1 more
   - effects: RoleScorecardDefined
-  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get
+  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get, OneOnOne.list, OneOnOne.get, PerformanceReview.list, PerformanceReview.get
 - `mutations.RoleScorecard_reactivate` (RoleScorecard.reactivate)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce managers may see role scorecards"; "Workforce managers may update role scorecards"; "Workforce managers may change role scorecards"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: RoleScorecardReactivated
-  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get
+  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get, OneOnOne.list, OneOnOne.get, PerformanceReview.list, PerformanceReview.get
 - `mutations.ShiftSwapRequest_accept` (ShiftSwapRequest.accept)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

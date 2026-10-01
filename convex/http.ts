@@ -2286,8 +2286,8 @@ const COMMAND_DISPATCH = {
   },
   "OneOnOne.hold": {
     ref: api.mutations.OneOnOne_createViaHold,
-    params: ["leadPersonId","staffMemberId","meetingDate","agenda","goals","wins","opportunities","decisions","idempotencyKey"] as const,
-    paramMeta: [{"name":"leadPersonId","type":"uuid","required":true},{"name":"staffMemberId","type":"uuid","required":true},{"name":"meetingDate","type":"datetime","required":true},{"name":"agenda","type":"string","required":false},{"name":"goals","type":"string","required":false},{"name":"wins","type":"string","required":false},{"name":"opportunities","type":"string","required":false},{"name":"decisions","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["leadPersonId","staffMemberId","meetingDate","agenda","goals","wins","opportunities","decisions","scorecardId","idempotencyKey"] as const,
+    paramMeta: [{"name":"leadPersonId","type":"uuid","required":true},{"name":"staffMemberId","type":"uuid","required":true},{"name":"meetingDate","type":"datetime","required":true},{"name":"agenda","type":"string","required":false},{"name":"goals","type":"string","required":false},{"name":"wins","type":"string","required":false},{"name":"opportunities","type":"string","required":false},{"name":"decisions","type":"string","required":false},{"name":"scorecardId","type":"uuid","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "OneOnOneAction.capture": {
     ref: api.mutations.OneOnOneAction_createViaCapture,
@@ -2791,8 +2791,8 @@ const COMMAND_DISPATCH = {
   },
   "PerformanceReview.record": {
     ref: api.mutations.PerformanceReview_createViaRecord,
-    params: ["personId","reviewerId","eventId","reviewDate","reliabilityRating","qualityRating","teamworkRating","notes","idempotencyKey"] as const,
-    paramMeta: [{"name":"personId","type":"uuid","required":true},{"name":"reviewerId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"reviewDate","type":"datetime","required":true},{"name":"reliabilityRating","type":"int","required":true},{"name":"qualityRating","type":"int","required":true},{"name":"teamworkRating","type":"int","required":true},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["personId","reviewerId","eventId","reviewDate","reliabilityRating","qualityRating","teamworkRating","notes","scorecardId","strengths","opportunities","comments","followUp","followUpDue","idempotencyKey"] as const,
+    paramMeta: [{"name":"personId","type":"uuid","required":true},{"name":"reviewerId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"reviewDate","type":"datetime","required":true},{"name":"reliabilityRating","type":"int","required":true},{"name":"qualityRating","type":"int","required":true},{"name":"teamworkRating","type":"int","required":true},{"name":"notes","type":"string","required":false},{"name":"scorecardId","type":"uuid","required":false},{"name":"strengths","type":"string","required":false},{"name":"opportunities","type":"string","required":false},{"name":"comments","type":"string","required":false},{"name":"followUp","type":"string","required":false},{"name":"followUpDue","type":"datetime","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Person.assignRole": {
     ref: api.mutations.Person_assignRole,

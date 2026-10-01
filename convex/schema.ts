@@ -2257,6 +2257,7 @@ export default defineSchema({
     wins: v.string(),
     opportunities: v.string(),
     decisions: v.string(),
+    scorecardId: v.optional(v.union(v.id("roleScorecards"), v.null())),
     heldAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
@@ -2264,7 +2265,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_leadPersonId", ["leadPersonId"])
-    .index("by_staffMemberId", ["staffMemberId"]),
+    .index("by_staffMemberId", ["staffMemberId"])
+    .index("by_scorecardId", ["scorecardId"]),
   oneOnOneActions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2694,6 +2696,12 @@ export default defineSchema({
     qualityRating: v.number(),
     teamworkRating: v.number(),
     notes: v.optional(v.union(v.string(), v.null())),
+    scorecardId: v.optional(v.union(v.id("roleScorecards"), v.null())),
+    strengths: v.optional(v.union(v.string(), v.null())),
+    opportunities: v.optional(v.union(v.string(), v.null())),
+    comments: v.optional(v.union(v.string(), v.null())),
+    followUp: v.optional(v.union(v.string(), v.null())),
+    followUpDue: v.optional(v.union(v.number(), v.null())),
     recordedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
@@ -2702,7 +2710,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
     .index("by_reviewerId", ["reviewerId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_scorecardId", ["scorecardId"]),
   people: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

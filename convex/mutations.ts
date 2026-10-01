@@ -35781,7 +35781,7 @@ export const Occasion_reviseDetails = mutation({
   },
 });
 
-async function __runOneOnOneHold(ctx: MutationCtx, { docId, leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions, version }: any, __creation = false) {
+async function __runOneOnOneHold(ctx: MutationCtx, { docId, leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions, scorecardId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -35805,6 +35805,7 @@ async function __runOneOnOneHold(ctx: MutationCtx, { docId, leadPersonId, staffM
       wins: ((wins != null) ? wins : ""),
       opportunities: ((opportunities != null) ? opportunities : ""),
       decisions: ((decisions != null) ? decisions : "[]"),
+      scorecardId: scorecardId,
       heldAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -35828,6 +35829,7 @@ export const OneOnOne_hold = mutation({
     wins: v.optional(v.string()),
     opportunities: v.optional(v.string()),
     decisions: v.optional(v.string()),
+    scorecardId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -35838,7 +35840,7 @@ export const OneOnOne_hold = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"leadPersonId","table":"people"},{"name":"staffMemberId","table":"people"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"leadPersonId","table":"people"},{"name":"staffMemberId","table":"people"},{"name":"scorecardId","table":"roleScorecards"}]);
     const __result = await __runOneOnOneHold(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -35857,6 +35859,7 @@ export const OneOnOne_createViaHold = mutation({
     wins: v.optional(v.string()),
     opportunities: v.optional(v.string()),
     decisions: v.optional(v.string()),
+    scorecardId: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -35866,10 +35869,10 @@ export const OneOnOne_createViaHold = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"leadPersonId","table":"people"},{"name":"staffMemberId","table":"people"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"leadPersonId","table":"people"},{"name":"staffMemberId","table":"people"},{"name":"scorecardId","table":"roleScorecards"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions } = args;
+    const { leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions, scorecardId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       agenda: args.agenda !== undefined ? args.agenda : "",
@@ -35881,6 +35884,7 @@ export const OneOnOne_createViaHold = mutation({
       updatedAt: Date.now(),
       leadPersonId: args.leadPersonId,
       meetingDate: args.meetingDate,
+      scorecardId: args.scorecardId,
       staffMemberId: args.staffMemberId
     };
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may see one-on-ones");
@@ -35901,6 +35905,7 @@ export const OneOnOne_createViaHold = mutation({
     doc.wins = ((wins != null) ? wins : "");
     doc.opportunities = ((opportunities != null) ? opportunities : "");
     doc.decisions = ((decisions != null) ? decisions : "[]");
+    doc.scorecardId = scorecardId;
     doc.heldAt = Date.now();
     const docId = await ctx.db.insert("oneOnOnes", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, oneOnOneId: docId, tenantId: doc.tenantId, leadPersonId: leadPersonId, staffMemberId: staffMemberId, meetingDate: meetingDate, _subject: { entity: "OneOnOne", command: "hold", id: docId } };
@@ -43551,7 +43556,7 @@ export const PayrollInput_createViaPrepare = mutation({
   },
 });
 
-async function __runPerformanceReviewRecord(ctx: MutationCtx, { docId, personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes, version }: any, __creation = false) {
+async function __runPerformanceReviewRecord(ctx: MutationCtx, { docId, personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes, scorecardId, strengths, opportunities, comments, followUp, followUpDue, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -43560,7 +43565,7 @@ async function __runPerformanceReviewRecord(ctx: MutationCtx, { docId, personId,
     const doc = await __decryptDoc(ctx, "PerformanceReview", ["notes"], __storedDoc) as Record<string, any>;
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see performance reviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may see performance reviews");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update performance reviews");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change performance reviews");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -43583,6 +43588,12 @@ async function __runPerformanceReviewRecord(ctx: MutationCtx, { docId, personId,
       qualityRating: qualityRating,
       teamworkRating: teamworkRating,
       notes: notes,
+      scorecardId: scorecardId,
+      strengths: strengths,
+      opportunities: opportunities,
+      comments: comments,
+      followUp: followUp,
+      followUpDue: followUpDue,
       recordedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -43607,6 +43618,12 @@ export const PerformanceReview_record = mutation({
     qualityRating: v.number(),
     teamworkRating: v.number(),
     notes: v.optional(v.string()),
+    scorecardId: v.optional(v.string()),
+    strengths: v.optional(v.string()),
+    opportunities: v.optional(v.string()),
+    comments: v.optional(v.string()),
+    followUp: v.optional(v.string()),
+    followUpDue: v.optional(v.number()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -43617,7 +43634,7 @@ export const PerformanceReview_record = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"reviewerId","table":"people"},{"name":"eventId","table":"events"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"reviewerId","table":"people"},{"name":"eventId","table":"events"},{"name":"scorecardId","table":"roleScorecards"}]);
     const __result = await __runPerformanceReviewRecord(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -43636,6 +43653,12 @@ export const PerformanceReview_createViaRecord = mutation({
     qualityRating: v.number(),
     teamworkRating: v.number(),
     notes: v.optional(v.string()),
+    scorecardId: v.optional(v.string()),
+    strengths: v.optional(v.string()),
+    opportunities: v.optional(v.string()),
+    comments: v.optional(v.string()),
+    followUp: v.optional(v.string()),
+    followUpDue: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -43645,25 +43668,31 @@ export const PerformanceReview_createViaRecord = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"reviewerId","table":"people"},{"name":"eventId","table":"events"}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"personId","table":"people"},{"name":"reviewerId","table":"people"},{"name":"eventId","table":"events"},{"name":"scorecardId","table":"roleScorecards"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes } = args;
+    const { personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes, scorecardId, strengths, opportunities, comments, followUp, followUpDue } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      comments: args.comments,
       eventId: args.eventId,
+      followUp: args.followUp,
+      followUpDue: args.followUpDue,
       notes: args.notes,
+      opportunities: args.opportunities,
       personId: args.personId,
       qualityRating: args.qualityRating,
       reliabilityRating: args.reliabilityRating,
       reviewDate: args.reviewDate,
       reviewerId: args.reviewerId,
+      scorecardId: args.scorecardId,
+      strengths: args.strengths,
       teamworkRating: args.teamworkRating
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see performance reviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may see performance reviews");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update performance reviews");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change performance reviews");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -43686,6 +43715,12 @@ export const PerformanceReview_createViaRecord = mutation({
     doc.qualityRating = qualityRating;
     doc.teamworkRating = teamworkRating;
     doc.notes = notes;
+    doc.scorecardId = scorecardId;
+    doc.strengths = strengths;
+    doc.opportunities = opportunities;
+    doc.comments = comments;
+    doc.followUp = followUp;
+    doc.followUpDue = followUpDue;
     doc.recordedAt = Date.now();
     const __storedDoc = await __encryptDoc(ctx, "PerformanceReview", ["notes"], doc);
     const docId = await ctx.db.insert("performanceReviews", __storedDoc as any);

@@ -2454,6 +2454,7 @@ export const OneOnOneSchema = z.object({
   wins: z.string().default(""),
   opportunities: z.string().default(""),
   decisions: z.string().default("[]"),
+  scorecardId: z.string().uuid().nullable().optional(),
   heldAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -2932,6 +2933,12 @@ export const PerformanceReviewSchema = z.object({
   qualityRating: z.number().int().default(0),
   teamworkRating: z.number().int().default(0),
   notes: z.string().nullable().optional(),
+  scorecardId: z.string().uuid().nullable().optional(),
+  strengths: z.string().nullable().optional(),
+  opportunities: z.string().nullable().optional(),
+  comments: z.string().nullable().optional(),
+  followUp: z.string().nullable().optional(),
+  followUpDue: z.coerce.date().nullable().optional(),
   recordedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -8841,6 +8848,7 @@ export const OneOnOneHoldParamsSchema = z.object({
   wins: z.string().optional(),
   opportunities: z.string().optional(),
   decisions: z.string().optional(),
+  scorecardId: z.string().min(1).optional(),
 });
 
 export type OneOnOneHoldParams = z.infer<typeof OneOnOneHoldParamsSchema>;
@@ -9709,6 +9717,12 @@ export const PerformanceReviewRecordParamsSchema = z.object({
   qualityRating: z.number().int(),
   teamworkRating: z.number().int(),
   notes: z.string().optional(),
+  scorecardId: z.string().min(1).optional(),
+  strengths: z.string().optional(),
+  opportunities: z.string().optional(),
+  comments: z.string().optional(),
+  followUp: z.string().optional(),
+  followUpDue: z.coerce.date().optional(),
 });
 
 export type PerformanceReviewRecordParams = z.infer<typeof PerformanceReviewRecordParamsSchema>;
