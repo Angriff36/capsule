@@ -45,8 +45,11 @@ export function EventDashboard(props: Props) {
   const location = useLocation();
 
   // Old "Edit" links land on #event-setup-basics: open the edit sheet.
+  // Tracker "Question" links land on #event-questions: open the stage sheet,
+  // which lists the event's open questions.
   useEffect(() => {
     if (location.hash === "#event-setup-basics") setSheet("edit");
+    if (location.hash === "#event-questions") setSheet("stage");
   }, [location.hash]);
 
   const onTab = (tab: EventDetailTab) => {
