@@ -43,6 +43,16 @@ export interface CreateEventFromProposalResult {
   docId: LinkedEventId;
 }
 
+/**
+ * Booking result (BE-18.4): the generated envelope (`docId`) plus whether this
+ * call made the Event or found the one an earlier call made, and its version,
+ * so a retried booking opens the same Event and shows no second success.
+ */
+export interface BookingResult extends CreateEventFromProposalResult {
+  outcome: "created" | "reused";
+  version: number;
+}
+
 export const createEventFromAcceptedProposal = mutation({
   args: {
     proposalId: v.id("proposals"),
@@ -76,7 +86,7 @@ export const createEventFromAcceptedProposal = mutation({
       referralSourceId: v.optional(v.string()),
     }),
   },
-  handler: async (ctx, args): Promise<CreateEventFromProposalResult> => {
+  handler: async (ctx, args): Promise<BookingResult> => {
     // Non-disclosing tenant check before anything else (same shape as
     // sendProposalWithRevisionCapture): a foreign proposal id must look
     // exactly like a missing one.
@@ -104,7 +114,11 @@ export const createEventFromAcceptedProposal = mutation({
         String(linked.clientId) === String(proposal.clientId) &&
         linked.stage !== "cancelled"
       ) {
-        return { docId: proposal.eventId };
+        return {
+          docId: proposal.eventId,
+          outcome: "reused",
+          version: linked.version,
+        };
       }
       if (linked != null && linked.stage === "cancelled") {
         throw new Error(
@@ -175,7 +189,12 @@ export const createEventFromAcceptedProposal = mutation({
       docId: args.proposalId,
     });
 
-    return { docId: created.docId };
+    const booked = await ctx.db.get(created.docId);
+    return {
+      docId: created.docId,
+      outcome: "created",
+      version: booked?.version ?? 1,
+    };
   },
 });
 
