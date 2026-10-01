@@ -1,0 +1,140 @@
+import { useMemo, useState } from "react";
+import {
+  useListEquipment,
+  useListEquipmentIssue,
+  useListEquipmentReservation,
+  useListEvent,
+  useListRentalOrderLine,
+} from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
+import { rentalReport, type RentalReport } from "../logistics/rentalReporting";
+
+const monthValue = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+function monthRange(value: string): [number, number] {
+  const [year, month] = value.split("-").map(Number);
+  return [
+    new Date(year, month - 1, 1).getTime(),
+    new Date(year, month, 1).getTime(),
+  ];
+}
+
+const percent = (share: number) => `${Math.round(share * 100)}%`;
+
+/** Rows to print for one month's rental and equipment roll-up. */
+export function rentalReportRows(
+  report: RentalReport,
+): Array<[string, string, string]> {
+  return [
+    [
+      "Equipment charged to clients",
+      formatMoneyExact(report.equipmentCharged),
+      report.unpricedHolds > 0
+        ? `${report.unpricedHolds} hold(s) on items with no client price - not counted.`
+        : "Every hold is on a priced item.",
+    ],
+    [
+      "Vendor rental cost",
+      formatMoneyExact(report.vendorCost),
+      `${report.vendorLines} rental line(s) from vendors.`,
+    ],
+    [
+      "Lost or damaged",
+      `${report.lostOrDamagedUnits} unit(s), ${formatMoneyExact(report.lossCost)}`,
+      report.lossCostUnknown > 0
+        ? `${report.lossCostUnknown} problem(s) with no cost on file - not counted.`
+        : "Every problem has a cost on file.",
+    ],
+    [
+      "Charged back to client or vendor",
+      formatMoneyExact(report.recovered),
+      "Lost or damaged items someone else pays for.",
+    ],
+    [
+      "Our equipment in use",
+      report.averageUse == null ? "No owned items" : percent(report.averageUse),
+      report.busiest.length > 0
+        ? `Busiest: ${report.busiest
+            .slice(0, 3)
+            .map((row) => `${row.name} ${percent(row.share)}`)
+            .join(", ")}`
+        : "Share of the month each item was out on events.",
+    ],
+  ];
+}
+
+/** Rental revenue, vendor cost, loss and damage, and equipment use by month. */
+export function RentalReportCard() {
+  const events = useListEvent();
+  const equipment = useListEquipment();
+  const holds = useListEquipmentReservation();
+  const lines = useListRentalOrderLine();
+  const issues = useListEquipmentIssue();
+  const [month, setMonth] = useState(() => monthValue(new Date()));
+  const report = useMemo(() => {
+    if (!events || !equipment || !holds || !lines || !issues) return null;
+    const [start, end] = monthRange(month);
+    return rentalReport(
+      {
+        events: events.map((row) => ({ ...row, _id: String(row._id) })),
+        equipment: equipment.map((row) => ({
+          ...row,
+          _id: String(row._id),
+          quantity: Number(row.quantity),
+        })),
+        holds: holds.map((row) => ({
+          ...row,
+          equipmentId: String(row.equipmentId),
+          eventId: String(row.eventId),
+          quantity: Number(row.quantity),
+        })),
+        lines: lines.map((row) => ({
+          ...row,
+          eventId: String(row.eventId),
+          vendorCost: Number(row.vendorCost),
+        })),
+        issues: issues.map((row) => ({
+          ...row,
+          quantity: Number(row.quantity),
+        })),
+      },
+      start,
+      end,
+    );
+  }, [events, equipment, holds, lines, issues, month]);
+
+  return (
+    <section className="card p-5" data-testid="rental-report-card">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h2 className="text-lg font-semibold text-ink">
+          Rentals and equipment
+        </h2>
+        <label className="field-label">
+          Month
+          <input
+            type="month"
+            className="input"
+            value={month}
+            onChange={(event) =>
+              event.target.value && setMonth(event.target.value)
+            }
+          />
+        </label>
+      </div>
+      {report == null ? (
+        <p className="mt-3 text-sm text-ink-3">Loading...</p>
+      ) : (
+        <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+          {rentalReportRows(report).map(([label, value, hint]) => (
+            <div key={label}>
+              <dt className="text-sm text-ink-2">{label}</dt>
+              <dd className="text-base font-semibold text-ink">{value}</dd>
+              <dd className="text-xs text-ink-3">{hint}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </section>
+  );
+}
