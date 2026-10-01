@@ -18,6 +18,7 @@ import type * as assistantTurn from "../assistantTurn.js";
 import type * as authLink from "../authLink.js";
 import type * as authProvision from "../authProvision.js";
 import type * as authStatus from "../authStatus.js";
+import type * as automaticExplanations from "../automaticExplanations.js";
 import type * as brandLogo from "../brandLogo.js";
 import type * as candidateHireRevocation from "../candidateHireRevocation.js";
 import type * as candidateToTeam from "../candidateToTeam.js";
@@ -281,6 +282,7 @@ declare const fullApi: ApiFromModules<{
   authLink: typeof authLink;
   authProvision: typeof authProvision;
   authStatus: typeof authStatus;
+  automaticExplanations: typeof automaticExplanations;
   brandLogo: typeof brandLogo;
   candidateHireRevocation: typeof candidateHireRevocation;
   candidateToTeam: typeof candidateToTeam;
