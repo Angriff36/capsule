@@ -830,6 +830,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Vendor_createViaOnboard, { "name": "Vendor 1", "email": "user1@example.com", "phone": "demo-phone-1", "addressLine1": "demo-addressLine1-1", "city": "demo-city-1", "region": "demo-region-1", "postalCode": "demo-postalCode-1", "countryCode": "demo-countryCode-1", "paymentTermsDays": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Vendor_createViaOnboard, { "name": "Vendor 2", "email": "user2@example.com", "phone": "demo-phone-2", "addressLine1": "demo-addressLine1-2", "city": "demo-city-2", "region": "demo-region-2", "postalCode": "demo-postalCode-2", "countryCode": "demo-countryCode-2", "paymentTermsDays": 2, "notes": "demo-notes-2" } as any);
+  // skip VendorBillMatch: no creation command in IR (2 rows unused)
   // VendorContact has multiple initialization commands (add, remove, update); using the selected initialization command: add.
   // VendorContact → api.mutations.VendorContact_createViaAdd
   rowsAttempted += 1;
@@ -1765,6 +1766,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "Vendor",
       "createMutation": "Vendor_createViaOnboard",
+      "rowCount": 2
+    },
+    {
+      "entity": "VendorBillMatch",
+      "createMutation": null,
       "rowCount": 2
     },
     {

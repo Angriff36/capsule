@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:104817e9436d077c12278247f0b59a33724d88996732b5707a58ceb1f9944102:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:143e4c2a5a90e98fef6f835bb95290478f72f3e734ee36c1a5e2c19c6cf2ff57:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:25693d35ebc40dd39ede1464d6be1ec679ae96a98e7660d3e4037ec21e9a4fda:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3309b4f20badbf95e9472b35c025b0de4cbce132d3186c7f52cabc345419691e:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:341cbd399566fbe8977768d10762e3833777c75f35f1252be5c134a537c680f7:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:576b0f06b733b7f80d53e28d168698e1b262bb879a21c58913cee1712feeff40:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:690c2a1e500c5794fb8191eaab50d3545d902b2e63ffe52957a1e18ca83bb82e:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:78b3a3a832bea3a3dc8749a1c9e6ad1ffe8e0ac08d496c4f0aef7f7bf106cf78:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:880f4205365a0a0f170a2fe0a18a33a6ed08bd269d6f8d261bc9ac4443a327bc:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a134e201aae4a0a2a8d9ce9f3f28ee67cb100d1885392139c546ef1bbd292b78:a3b3072899bd6273b74a17dde35d7af6ae2f3e9e379b21b23b88ebc047fca499:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ac27fd41bb38267f1a6a5afd09a6d5f17098a6113587a316891dd2cba6f1979d:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b51ce6741292ad2fb52cee22257eadcc158fe6c25069c51eb8346febcbe98ba5:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b5ff8c556963d803836d6d34baba38f02806f60e6c35414c750b895ef4a90b46:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:cbf9591973e2054963904f1755eb64f37fe1e0d99159843ebc1023f9a76fa0a3:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:104817e9436d077c12278247f0b59a33724d88996732b5707a58ceb1f9944102:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:143e4c2a5a90e98fef6f835bb95290478f72f3e734ee36c1a5e2c19c6cf2ff57:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:25693d35ebc40dd39ede1464d6be1ec679ae96a98e7660d3e4037ec21e9a4fda:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3309b4f20badbf95e9472b35c025b0de4cbce132d3186c7f52cabc345419691e:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:341cbd399566fbe8977768d10762e3833777c75f35f1252be5c134a537c680f7:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:576b0f06b733b7f80d53e28d168698e1b262bb879a21c58913cee1712feeff40:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:690c2a1e500c5794fb8191eaab50d3545d902b2e63ffe52957a1e18ca83bb82e:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:78b3a3a832bea3a3dc8749a1c9e6ad1ffe8e0ac08d496c4f0aef7f7bf106cf78:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:880f4205365a0a0f170a2fe0a18a33a6ed08bd269d6f8d261bc9ac4443a327bc:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a134e201aae4a0a2a8d9ce9f3f28ee67cb100d1885392139c546ef1bbd292b78:a3b3072899bd6273b74a17dde35d7af6ae2f3e9e379b21b23b88ebc047fca499:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b113b2f80135e1fba798a24b2d9391dd7ee3daef944a9a4752d50fcede719521:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b51ce6741292ad2fb52cee22257eadcc158fe6c25069c51eb8346febcbe98ba5:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b5ff8c556963d803836d6d34baba38f02806f60e6c35414c750b895ef4a90b46:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:cbf9591973e2054963904f1755eb64f37fe1e0d99159843ebc1023f9a76fa0a3:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -90543,6 +90543,20 @@ export const IngredientClassifyAllergensInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -90916,6 +90930,20 @@ export const IngredientClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -91238,6 +91266,20 @@ export const IngredientConfigureSubstitutesInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -91570,6 +91612,20 @@ export const IngredientDiscontinueInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -91926,6 +91982,20 @@ export const IngredientIntroduceInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -92438,6 +92508,20 @@ export const IngredientLinkAsEditionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -92772,6 +92856,20 @@ export const IngredientMergeIntoInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -93127,6 +93225,20 @@ export const IngredientPurgeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -93463,6 +93575,20 @@ export const IngredientReinstateInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -93822,6 +93948,20 @@ export const IngredientSetNutritionInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -94198,6 +94338,20 @@ export const IngredientSetPreferredVendorInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -94527,6 +94681,20 @@ export const IngredientSetPreferredVendorsInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -94865,6 +95033,20 @@ export const IngredientSetPrimaryImageInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -95208,6 +95390,20 @@ export const IngredientSetStorageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -95546,6 +95742,20 @@ export const IngredientUpdateCostingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -95877,6 +96087,20 @@ export const IngredientUpdateDetailsInvalidation = [
     "entity": "StockTransfer",
     "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
     "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -171513,6 +171737,20 @@ export const VendorOnboardInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorContact",
     "queryKeyHint": "queryKeys.vendorContact.lists()",
     "readId": "VendorContact.list",
@@ -171776,6 +172014,20 @@ export const VendorReinstateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorContact",
     "queryKeyHint": "queryKeys.vendorContact.lists()",
     "readId": "VendorContact.list",
@@ -172002,6 +172254,20 @@ export const VendorSuspendInvalidation = [
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.detail(id)",
     "readId": "RentalOrderLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -172238,6 +172504,20 @@ export const VendorTerminateInvalidation = [
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.detail(id)",
     "readId": "RentalOrderLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -172495,6 +172775,20 @@ export const VendorUpdateDetailsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorContact",
     "queryKeyHint": "queryKeys.vendorContact.lists()",
     "readId": "VendorContact.list",
@@ -172620,6 +172914,469 @@ export const VendorUpdateDetailsAction = {
       "name": "notes",
       "label": "Notes",
       "required": false
+    }
+  ]
+} as const;
+
+// --- VendorBillMatch.record ---
+export interface VendorBillMatchRecordClientInput {
+  vendorOrderLineId: string;
+  vendorOrderId: string;
+  vendorId: string;
+  ingredientId: string;
+  billNumber: string;
+  billedQuantity: number;
+  billedUnitPrice: number;
+  receivedQuantity: number;
+  receiptUnitPrice: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  /** Allowed: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" */
+  matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ";
+  matchSequence: number;
+  reason: string;
+}
+
+export const VendorBillMatchRecordCapability = {
+  capabilityId: "VendorBillMatch.record",
+  entity: "VendorBillMatch",
+  command: "record",
+  route: "/api/manifest/VendorBillMatch/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","billNumber","billedQuantity","billedUnitPrice","receivedQuantity","receiptUnitPrice","unit","matchState","matchSequence","reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor bill matches"},{"kind":"policy_denial","message":"Procurement and managers may update vendor bill matches"},{"kind":"policy_denial","message":"Procurement and managers may change vendor bill matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorBillMatch not found"}],
+  emits: ["VendorBillMatchRecorded"],
+} as const;
+
+export type VendorBillMatchRecordResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorBillMatch.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorBillMatchRecordInput(client: VendorBillMatchRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorBillMatch.record. */
+export const VendorBillMatchRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorBillMatch.record. Not a rendered control. */
+export const VendorBillMatchRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "vendorOrderLineId",
+      "label": "Vendor order line id",
+      "required": true
+    },
+    {
+      "name": "vendorOrderId",
+      "label": "Vendor order id",
+      "required": true
+    },
+    {
+      "name": "vendorId",
+      "label": "Vendor id",
+      "required": true
+    },
+    {
+      "name": "ingredientId",
+      "label": "Ingredient id",
+      "required": true
+    },
+    {
+      "name": "billNumber",
+      "label": "Bill number",
+      "required": true
+    },
+    {
+      "name": "billedQuantity",
+      "label": "Billed quantity",
+      "required": true
+    },
+    {
+      "name": "billedUnitPrice",
+      "label": "Billed unit price",
+      "required": true
+    },
+    {
+      "name": "receivedQuantity",
+      "label": "Received quantity",
+      "required": true
+    },
+    {
+      "name": "receiptUnitPrice",
+      "label": "Receipt unit price",
+      "required": true
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": true,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
+    },
+    {
+      "name": "matchState",
+      "label": "Match state",
+      "required": true,
+      "choices": [
+        {
+          "value": "matched",
+          "label": "matched"
+        },
+        {
+          "value": "quantity_differs",
+          "label": "quantity_differs"
+        },
+        {
+          "value": "price_differs",
+          "label": "price_differs"
+        },
+        {
+          "value": "quantity_and_price_differ",
+          "label": "quantity_and_price_differ"
+        }
+      ]
+    },
+    {
+      "name": "matchSequence",
+      "label": "Match sequence",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- VendorBillMatch.review ---
+export interface VendorBillMatchReviewClientInput {
+  /** Allowed: "open" | "accepted" | "disputed" */
+  decision: "open" | "accepted" | "disputed";
+  note: string;
+}
+
+export const VendorBillMatchReviewCapability = {
+  capabilityId: "VendorBillMatch.review",
+  entity: "VendorBillMatch",
+  command: "review",
+  route: "/api/manifest/VendorBillMatch/commands/review",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["decision","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor bill matches"},{"kind":"policy_denial","message":"Procurement and managers may update vendor bill matches"},{"kind":"policy_denial","message":"Procurement and managers may change vendor bill matches"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorBillMatch not found"}],
+  emits: ["VendorBillMatchReviewed"],
+} as const;
+
+export type VendorBillMatchReviewResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorBillMatch.review.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorBillMatchReviewInput(client: VendorBillMatchReviewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorBillMatch.review. */
+export const VendorBillMatchReviewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorBillMatch.review. Not a rendered control. */
+export const VendorBillMatchReviewAction = {
+  "exposure": "human",
+  "label": "Review",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "decision",
+      "label": "Decision",
+      "required": true,
+      "choices": [
+        {
+          "value": "open",
+          "label": "open"
+        },
+        {
+          "value": "accepted",
+          "label": "accepted"
+        },
+        {
+          "value": "disputed",
+          "label": "disputed"
+        }
+      ]
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": true
     }
   ]
 } as const;
@@ -174021,6 +174778,20 @@ export const VendorOrderApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -174226,6 +174997,20 @@ export const VendorOrderCancelInvalidation = [
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.detail(id)",
     "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -174464,6 +175249,20 @@ export const VendorOrderConfirmInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -174673,6 +175472,20 @@ export const VendorOrderEnsureWeeklyDraftInvalidation = [
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.detail(id)",
     "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -175013,6 +175826,20 @@ export const VendorOrderMarkPartiallyReceivedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -175216,6 +176043,20 @@ export const VendorOrderMarkReceivedInvalidation = [
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.detail(id)",
     "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -175429,6 +176270,20 @@ export const VendorOrderNoteReceiptCorrectionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -175622,6 +176477,20 @@ export const VendorOrderOpenInvalidation = [
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.detail(id)",
     "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -175843,6 +176712,20 @@ export const VendorOrderRequestChangesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -176045,6 +176928,20 @@ export const VendorOrderRetireEmptyDraftInvalidation = [
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.detail(id)",
     "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -176277,6 +177174,20 @@ export const VendorOrderSubmitInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -176484,6 +177395,20 @@ export const VendorOrderSubmitForApprovalInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -176687,6 +177612,20 @@ export const VendorOrderSyncLineTotalsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrderLine",
     "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
     "readId": "VendorOrderLine.list",
@@ -176878,6 +177817,20 @@ export const VendorOrderUpdateTotalsInvalidation = [
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.detail(id)",
     "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -177102,6 +178055,20 @@ export const VendorOrderLineAddLineInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -177313,14 +178280,14 @@ export const VendorOrderLineCancelLineCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"constraint_block","message":"Say why you're cancelling this line."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineCancelled"],
 } as const;
 
-export type VendorOrderLineCancelLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineCancelLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.cancelLine.
@@ -177446,6 +178413,20 @@ export const VendorOrderLineCancelLineInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -177535,14 +178516,14 @@ export const VendorOrderLineCommitSupplyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["purchasingWeekStart"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineSupplyCommitted"],
 } as const;
 
-export type VendorOrderLineCommitSupplyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineCommitSupplyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.commitSupply.
@@ -177668,6 +178649,20 @@ export const VendorOrderLineCommitSupplyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -177710,6 +178705,232 @@ export const VendorOrderLineCommitSupplyAction = {
   ]
 } as const;
 
+// --- VendorOrderLine.correctBillMatch ---
+export interface VendorOrderLineCorrectBillMatchClientInput {
+  billNumber: string;
+  /** Bounds: 0..∞ */
+  billedQuantity: number;
+  /** Bounds: 0..∞ */
+  billedUnitPrice: number;
+  reason: string;
+}
+
+export const VendorOrderLineCorrectBillMatchCapability = {
+  capabilityId: "VendorOrderLine.correctBillMatch",
+  entity: "VendorOrderLine",
+  command: "correctBillMatch",
+  route: "/api/manifest/VendorOrderLine/commands/correctBillMatch",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["billNumber","billedQuantity","billedUnitPrice","reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter the bill number from the vendor's bill."},{"kind":"constraint_block","message":"The billed amount can't be negative. Use zero or more."},{"kind":"constraint_block","message":"The billed price can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Say why the bill match changed."},{"kind":"constraint_block","message":"Change the bill number, billed amount or billed price, or keep the match as it is."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
+  emits: ["VendorOrderLineBillMatched"],
+} as const;
+
+export type VendorOrderLineCorrectBillMatchResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorOrderLine.correctBillMatch.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineCorrectBillMatchInput(client: VendorOrderLineCorrectBillMatchClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLine.correctBillMatch. */
+export const VendorOrderLineCorrectBillMatchInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "readId": "IngredientDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "readId": "IngredientDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
+    "readId": "IngredientPriceObservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.detail(id)",
+    "readId": "IngredientPriceObservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "readId": "VendorOrderLineDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "readId": "VendorOrderLineDemand.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorOrderLine.correctBillMatch. Not a rendered control. */
+export const VendorOrderLineCorrectBillMatchAction = {
+  "exposure": "human",
+  "label": "Correct bill match",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "billNumber",
+      "label": "Bill number",
+      "required": true
+    },
+    {
+      "name": "billedQuantity",
+      "label": "Billed quantity",
+      "required": true
+    },
+    {
+      "name": "billedUnitPrice",
+      "label": "Billed unit price",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- VendorOrderLine.correctReceipt ---
 export interface VendorOrderLineCorrectReceiptClientInput {
   /** Bounds: 0..∞ */
@@ -177730,14 +178951,14 @@ export const VendorOrderLineCorrectReceiptCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["correctedQuantity","reason","supplierLotNumber"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"constraint_block","message":"The corrected count can't be negative. Use zero or more."},{"kind":"constraint_block","message":"The corrected count can't be higher than what was ordered."},{"kind":"constraint_block","message":"Enter a count that's different from the current received count."},{"kind":"constraint_block","message":"Say why this count changed."},{"kind":"constraint_block","message":"Supplier lot number is required so this delivery can be traced."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineReceiptCorrected"],
 } as const;
 
-export type VendorOrderLineCorrectReceiptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineCorrectReceiptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.correctReceipt.
@@ -177863,6 +179084,20 @@ export const VendorOrderLineCorrectReceiptInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -177945,14 +179180,14 @@ export const VendorOrderLineEnsureWeeklyLineCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["vendorOrderId","ingredientId","weekNeed","onHand","contributionQuantity","unit","purchaseNeedId","ingredientDemandId","pendingSupply","orderedNeed","fulfilledNeed","stockClaimed"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This weekly order line's amount can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineWeeklyEnsured"],
 } as const;
 
-export type VendorOrderLineEnsureWeeklyLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineEnsureWeeklyLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.ensureWeeklyLine.
@@ -178074,6 +179309,20 @@ export const VendorOrderLineEnsureWeeklyLineInvalidation = [
     "entity": "StorageLocation",
     "queryKeyHint": "queryKeys.storageLocation.detail(id)",
     "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -178281,6 +179530,226 @@ export const VendorOrderLineEnsureWeeklyLineAction = {
   ]
 } as const;
 
+// --- VendorOrderLine.matchBill ---
+export interface VendorOrderLineMatchBillClientInput {
+  billNumber: string;
+  /** Bounds: 0..∞ */
+  billedQuantity: number;
+  /** Bounds: 0..∞ */
+  billedUnitPrice: number;
+}
+
+export const VendorOrderLineMatchBillCapability = {
+  capabilityId: "VendorOrderLine.matchBill",
+  entity: "VendorOrderLine",
+  command: "matchBill",
+  route: "/api/manifest/VendorOrderLine/commands/matchBill",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["billNumber","billedQuantity","billedUnitPrice"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"constraint_block","message":"Enter the bill number from the vendor's bill."},{"kind":"constraint_block","message":"The billed amount can't be negative. Use zero or more."},{"kind":"constraint_block","message":"The billed price can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This line is already matched to a vendor bill. Use Fix the bill match to change it."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
+  emits: ["VendorOrderLineBillMatched"],
+} as const;
+
+export type VendorOrderLineMatchBillResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorOrderLine.matchBill.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineMatchBillInput(client: VendorOrderLineMatchBillClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLine.matchBill. */
+export const VendorOrderLineMatchBillInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "readId": "IngredientDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "readId": "IngredientDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
+    "readId": "IngredientPriceObservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.detail(id)",
+    "readId": "IngredientPriceObservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "readId": "VendorOrderLineDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "readId": "VendorOrderLineDemand.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorOrderLine.matchBill. Not a rendered control. */
+export const VendorOrderLineMatchBillAction = {
+  "exposure": "human",
+  "label": "Match bill",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "billNumber",
+      "label": "Bill number",
+      "required": true
+    },
+    {
+      "name": "billedQuantity",
+      "label": "Billed quantity",
+      "required": true
+    },
+    {
+      "name": "billedUnitPrice",
+      "label": "Billed unit price",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- VendorOrderLine.reconcileDraftRequirement ---
 export interface VendorOrderLineReconcileDraftRequirementClientInput {
   /** Bounds: 0..∞ */
@@ -178302,14 +179771,14 @@ export const VendorOrderLineReconcileDraftRequirementCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["plannedQuantity","quantityIsManual","quantityReviewReason","ingredientDemandId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Planned quantity can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This automatically calculated line needs a quantity."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineRequirementReconciled"],
 } as const;
 
-export type VendorOrderLineReconcileDraftRequirementResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineReconcileDraftRequirementResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.reconcileDraftRequirement.
@@ -178435,6 +179904,20 @@ export const VendorOrderLineReconcileDraftRequirementInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -178518,14 +180001,14 @@ export const VendorOrderLineRecordReceiptCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["quantity","locationId","unitPrice","supplierLotNumber","discrepancyQuantity","discrepancyNotes","deliveryReference"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"This delivery slip is already counted on this line. To change the count, fix the received count instead."},{"kind":"constraint_block","message":"This receipt is for a different location. Pick the location already set on this line."},{"kind":"constraint_block","message":"This order line's received amount has to be more than zero. Enter how much arrived."},{"kind":"constraint_block","message":"This order line can't receive more than was ordered. Enter a smaller amount."},{"kind":"constraint_block","message":"This order line's price per unit can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Enter the supplier's lot number so this delivery can be traced."},{"kind":"constraint_block","message":"The discrepancy amount can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineReceived"],
 } as const;
 
-export type VendorOrderLineRecordReceiptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineRecordReceiptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.recordReceipt.
@@ -178651,6 +180134,20 @@ export const VendorOrderLineRecordReceiptInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -178738,14 +180235,14 @@ export const VendorOrderLineReleaseSupplyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineSupplyReleased"],
 } as const;
 
-export type VendorOrderLineReleaseSupplyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineReleaseSupplyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.releaseSupply.
@@ -178871,6 +180368,20 @@ export const VendorOrderLineReleaseSupplyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -178922,14 +180433,14 @@ export const VendorOrderLineRetireEmptyDraftCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineDraftRetired"],
 } as const;
 
-export type VendorOrderLineRetireEmptyDraftResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineRetireEmptyDraftResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.retireEmptyDraft.
@@ -179055,6 +180566,20 @@ export const VendorOrderLineRetireEmptyDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "VendorOrder",
     "queryKeyHint": "queryKeys.vendorOrder.lists()",
     "readId": "VendorOrder.list",
@@ -179121,6 +180646,233 @@ export const VendorOrderLineRetireEmptyDraftLifecycle = [
   }
 ] as const;
 
+// --- VendorOrderLine.reviewBillDifference ---
+export interface VendorOrderLineReviewBillDifferenceClientInput {
+  /** Allowed: "open" | "accepted" | "disputed" */
+  decision: "open" | "accepted" | "disputed";
+  note: string;
+}
+
+export const VendorOrderLineReviewBillDifferenceCapability = {
+  capabilityId: "VendorOrderLine.reviewBillDifference",
+  entity: "VendorOrderLine",
+  command: "reviewBillDifference",
+  route: "/api/manifest/VendorOrderLine/commands/reviewBillDifference",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["decision","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Choose Accept or Dispute."},{"kind":"constraint_block","message":"Say why you accept or dispute this bill."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
+  emits: ["VendorOrderLineBillReviewed"],
+} as const;
+
+export type VendorOrderLineReviewBillDifferenceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorOrderLine.reviewBillDifference.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineReviewBillDifferenceInput(client: VendorOrderLineReviewBillDifferenceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLine.reviewBillDifference. */
+export const VendorOrderLineReviewBillDifferenceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "readId": "IngredientDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "readId": "IngredientDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
+    "readId": "IngredientPriceObservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.detail(id)",
+    "readId": "IngredientPriceObservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "readId": "VendorOrderLineDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "readId": "VendorOrderLineDemand.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorOrderLine.reviewBillDifference. Not a rendered control. */
+export const VendorOrderLineReviewBillDifferenceAction = {
+  "exposure": "human",
+  "label": "Review bill difference",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "decision",
+      "label": "Decision",
+      "required": true,
+      "choices": [
+        {
+          "value": "open",
+          "label": "open"
+        },
+        {
+          "value": "accepted",
+          "label": "accepted"
+        },
+        {
+          "value": "disputed",
+          "label": "disputed"
+        }
+      ]
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- VendorOrderLine.reviseQuantity ---
 export interface VendorOrderLineReviseQuantityClientInput {
   /** Bounds: 1..∞ */
@@ -179141,14 +180893,14 @@ export const VendorOrderLineReviseQuantityCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["orderedQuantity","unitCost"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This order line's ordered amount has to be more than zero. Enter how much to order."},{"kind":"constraint_block","message":"This order line's cost per unit can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
   emits: ["VendorOrderLineQuantityRevised"],
 } as const;
 
-export type VendorOrderLineReviseQuantityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+export type VendorOrderLineReviseQuantityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for VendorOrderLine.reviseQuantity.
@@ -179270,6 +181022,20 @@ export const VendorOrderLineReviseQuantityInvalidation = [
     "entity": "StorageLocation",
     "queryKeyHint": "queryKeys.storageLocation.detail(id)",
     "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.lists()",
+    "readId": "VendorBillMatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorBillMatch",
+    "queryKeyHint": "queryKeys.vendorBillMatch.detail(id)",
+    "readId": "VendorBillMatch.get",
     "label": "related entity detail"
   },
   {
@@ -185601,6 +187367,8 @@ export const ALL_CAPABILITY_IDS = [
   "Vendor.suspend",
   "Vendor.terminate",
   "Vendor.updateDetails",
+  "VendorBillMatch.record",
+  "VendorBillMatch.review",
   "VendorContact.add",
   "VendorContact.remove",
   "VendorContact.update",
@@ -185629,12 +187397,15 @@ export const ALL_CAPABILITY_IDS = [
   "VendorOrderLine.addLine",
   "VendorOrderLine.cancelLine",
   "VendorOrderLine.commitSupply",
+  "VendorOrderLine.correctBillMatch",
   "VendorOrderLine.correctReceipt",
   "VendorOrderLine.ensureWeeklyLine",
+  "VendorOrderLine.matchBill",
   "VendorOrderLine.reconcileDraftRequirement",
   "VendorOrderLine.recordReceipt",
   "VendorOrderLine.releaseSupply",
   "VendorOrderLine.retireEmptyDraft",
+  "VendorOrderLine.reviewBillDifference",
   "VendorOrderLine.reviseQuantity",
   "VendorOrderLineDemand.link",
   "VendorOrderLineDemand.retire",
@@ -186561,6 +188332,14 @@ export const ALL_READ_IDS = [
   "Vendor.byTenantId",
   "Vendor.get",
   "Vendor.list",
+  "VendorBillMatch.byBillNumber",
+  "VendorBillMatch.byIngredientId",
+  "VendorBillMatch.byTenantId",
+  "VendorBillMatch.byVendorId",
+  "VendorBillMatch.byVendorOrderId",
+  "VendorBillMatch.byVendorOrderLineId",
+  "VendorBillMatch.get",
+  "VendorBillMatch.list",
   "VendorContact.byTenantId",
   "VendorContact.byVendorId",
   "VendorContact.get",
@@ -189293,6 +191072,30 @@ export type getVendorResult = { _id: string; _creationTime: number; tenantId: st
 export const listVendorRead = {"entity":"Vendor","readId":"Vendor.list","exportName":"listVendor","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; email: string | null; phone: string | null; addressLine1: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; paymentTermsDays: number; notes: string | null; status: \"active\" | \"suspended\" | \"terminated\"; onboardedAt: number | null; suspendedAt: number | null; suspensionReason: string | null; terminatedAt: number | null; terminationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVendorResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; email: string | null; phone: string | null; addressLine1: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; paymentTermsDays: number; notes: string | null; status: "active" | "suspended" | "terminated"; onboardedAt: number | null; suspendedAt: number | null; suspensionReason: string | null; terminatedAt: number | null; terminationReason: string | null; createdAt: number; updatedAt: number }>;
 
+export const listVendorBillMatchByBillNumberRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.byBillNumber","exportName":"listVendorBillMatchByBillNumber","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"billNumber","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchByBillNumberResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVendorBillMatchByIngredientIdRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.byIngredientId","exportName":"listVendorBillMatchByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVendorBillMatchByTenantIdRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.byTenantId","exportName":"listVendorBillMatchByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVendorBillMatchByVendorIdRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.byVendorId","exportName":"listVendorBillMatchByVendorId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchByVendorIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVendorBillMatchByVendorOrderIdRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.byVendorOrderId","exportName":"listVendorBillMatchByVendorOrderId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorOrderId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchByVendorOrderIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVendorBillMatchByVendorOrderLineIdRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.byVendorOrderLineId","exportName":"listVendorBillMatchByVendorOrderLineId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorOrderLineId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchByVendorOrderLineIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getVendorBillMatchRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.get","exportName":"getVendorBillMatch","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getVendorBillMatchResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listVendorBillMatchRead = {"entity":"VendorBillMatch","readId":"VendorBillMatch.list","exportName":"listVendorBillMatch","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; matchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\"; matchSequence: number; reason: string | null; reviewState: \"open\" | \"accepted\" | \"disputed\" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorBillMatchResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; billNumber: string; billedQuantity: number; billedUnitPrice: number; receivedQuantity: number; receiptUnitPrice: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; matchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ"; matchSequence: number; reason: string | null; reviewState: "open" | "accepted" | "disputed" | null; reviewNote: string | null; matchedAt: number | null; reviewedAt: number | null; createdAt: number; updatedAt: number }>;
+
 export const listVendorContactByTenantIdRead = {"entity":"VendorContact","readId":"VendorContact.byTenantId","exportName":"listVendorContactByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorId: string; name: string; role: \"account_rep\" | \"dispatch\" | \"billing\" | \"general\"; email: string | null; phone: string | null; notes: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVendorContactByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorId: string; name: string; role: "account_rep" | "dispatch" | "billing" | "general"; email: string | null; phone: string | null; notes: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
 
@@ -189347,26 +191150,26 @@ export type getVendorOrderResult = { _id: string; _creationTime: number; tenantI
 export const listVendorOrderRead = {"entity":"VendorOrder","readId":"VendorOrder.list","exportName":"listVendorOrder","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorId: string; eventId: string | null; sourceRangeStart: number | null; sourceRangeEnd: number | null; orderNumber: string | null; subtotal: number; taxAmount: number; shippingAmount: number; totalAmount: number; notes: string | null; status: \"draft\" | \"pending_approval\" | \"submitted\" | \"confirmed\" | \"partially_received\" | \"received\" | \"cancelled\"; openedAt: number | null; submittedAt: number | null; confirmedAt: number | null; receivedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; approvalRequestedAt: number | null; approvedAt: number | null; approvalNotes: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVendorOrderResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorId: string; eventId: string | null; sourceRangeStart: number | null; sourceRangeEnd: number | null; orderNumber: string | null; subtotal: number; taxAmount: number; shippingAmount: number; totalAmount: number; notes: string | null; status: "draft" | "pending_approval" | "submitted" | "confirmed" | "partially_received" | "received" | "cancelled"; openedAt: number | null; submittedAt: number | null; confirmedAt: number | null; receivedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; approvalRequestedAt: number | null; approvedAt: number | null; approvalNotes: string | null; createdAt: number; updatedAt: number }>;
 
-export const listVendorOrderLineByIngredientDemandIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byIngredientDemandId","exportName":"listVendorOrderLineByIngredientDemandId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientDemandId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVendorOrderLineByIngredientDemandIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVendorOrderLineByIngredientDemandIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byIngredientDemandId","exportName":"listVendorOrderLineByIngredientDemandId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientDemandId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorOrderLineByIngredientDemandIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listVendorOrderLineByIngredientIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byIngredientId","exportName":"listVendorOrderLineByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVendorOrderLineByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVendorOrderLineByIngredientIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byIngredientId","exportName":"listVendorOrderLineByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorOrderLineByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listVendorOrderLineByLocationIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byLocationId","exportName":"listVendorOrderLineByLocationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"locationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVendorOrderLineByLocationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVendorOrderLineByLocationIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byLocationId","exportName":"listVendorOrderLineByLocationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"locationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorOrderLineByLocationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listVendorOrderLineByTenantIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byTenantId","exportName":"listVendorOrderLineByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVendorOrderLineByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVendorOrderLineByTenantIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byTenantId","exportName":"listVendorOrderLineByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorOrderLineByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listVendorOrderLineByVendorOrderIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byVendorOrderId","exportName":"listVendorOrderLineByVendorOrderId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorOrderId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVendorOrderLineByVendorOrderIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVendorOrderLineByVendorOrderIdRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.byVendorOrderId","exportName":"listVendorOrderLineByVendorOrderId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorOrderId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorOrderLineByVendorOrderIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getVendorOrderLineRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.get","exportName":"getVendorOrderLine","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getVendorOrderLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number } | null;
+export const getVendorOrderLineRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.get","exportName":"getVendorOrderLine","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getVendorOrderLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listVendorOrderLineRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.list","exportName":"listVendorOrderLine","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVendorOrderLineResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVendorOrderLineRead = {"entity":"VendorOrderLine","readId":"VendorOrderLine.list","exportName":"listVendorOrderLine","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: \"matched\" | \"quantity_differs\" | \"price_differs\" | \"quantity_and_price_differ\" | null; billReviewState: \"open\" | \"accepted\" | \"disputed\" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVendorOrderLineResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; receiptCorrectionCount: number | null; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; billNumber: string | null; billedQuantity: number | null; billedUnitPrice: number | null; billMatchState: "matched" | "quantity_differs" | "price_differs" | "quantity_and_price_differ" | null; billReviewState: "open" | "accepted" | "disputed" | null; billReviewNote: string | null; billMatchCount: number | null; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listVendorOrderLineDemandByIngredientDemandIdRead = {"entity":"VendorOrderLineDemand","readId":"VendorOrderLineDemand.byIngredientDemandId","exportName":"listVendorOrderLineDemandByIngredientDemandId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientDemandId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; ingredientDemandId: string; vendorOrderId: string; contributionQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; linkedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVendorOrderLineDemandByIngredientDemandIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; ingredientDemandId: string; vendorOrderId: string; contributionQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; linkedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>;

@@ -4425,6 +4425,34 @@ export const VendorSchema = z.object({
 
 export type Vendor = z.infer<typeof VendorSchema>;
 
+// Entity: VendorBillMatch
+export const VendorBillMatchSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorOrderLineId: z.string().uuid(),
+  vendorOrderId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  billNumber: z.string().default(""),
+  billedQuantity: z.number().default(0),
+  billedUnitPrice: z.number().default(0),
+  receivedQuantity: z.number().default(0),
+  receiptUnitPrice: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  matchState: z.enum(["matched", "quantity_differs", "price_differs", "quantity_and_price_differ"]).default("matched"),
+  matchSequence: z.number().int().default(0),
+  reason: z.string().nullable().optional(),
+  reviewState: z.enum(["open", "accepted", "disputed"]).nullable().optional(),
+  reviewNote: z.string().nullable().optional(),
+  matchedAt: z.coerce.date().nullable().optional(),
+  reviewedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorBillMatch = z.infer<typeof VendorBillMatchSchema>;
+
 // Entity: VendorContact
 export const VendorContactSchema = z.object({
   id: z.string().uuid(),
@@ -4553,6 +4581,13 @@ export const VendorOrderLineSchema = z.object({
   discrepancyQuantity: z.number().nullable().optional(),
   discrepancyNotes: z.string().nullable().optional(),
   status: z.enum(["pending", "added", "receiving", "complete", "cancelled"]).default("pending"),
+  billNumber: z.string().nullable().optional(),
+  billedQuantity: z.number().nullable().optional(),
+  billedUnitPrice: z.number().nullable().optional(),
+  billMatchState: z.enum(["matched", "quantity_differs", "price_differs", "quantity_and_price_differ"]).nullable().optional(),
+  billReviewState: z.enum(["open", "accepted", "disputed"]).nullable().optional(),
+  billReviewNote: z.string().nullable().optional(),
+  billMatchCount: z.number().int().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   completedAt: z.coerce.date().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
@@ -11828,6 +11863,33 @@ export const VendorUpdateDetailsParamsSchema = z.object({
 
 export type VendorUpdateDetailsParams = z.infer<typeof VendorUpdateDetailsParamsSchema>;
 
+// Command: record on VendorBillMatch
+export const VendorBillMatchRecordParamsSchema = z.object({
+  vendorOrderLineId: z.string().min(1),
+  vendorOrderId: z.string().min(1),
+  vendorId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  billNumber: z.string(),
+  billedQuantity: z.number(),
+  billedUnitPrice: z.number(),
+  receivedQuantity: z.number(),
+  receiptUnitPrice: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  matchState: z.enum(["matched", "quantity_differs", "price_differs", "quantity_and_price_differ"]),
+  matchSequence: z.number().int(),
+  reason: z.string(),
+});
+
+export type VendorBillMatchRecordParams = z.infer<typeof VendorBillMatchRecordParamsSchema>;
+
+// Command: review on VendorBillMatch
+export const VendorBillMatchReviewParamsSchema = z.object({
+  decision: z.enum(["open", "accepted", "disputed"]),
+  note: z.string(),
+});
+
+export type VendorBillMatchReviewParams = z.infer<typeof VendorBillMatchReviewParamsSchema>;
+
 // Command: add on VendorContact
 export const VendorContactAddParamsSchema = z.object({
   vendorId: z.string().min(1),
@@ -12055,6 +12117,16 @@ export const VendorOrderLineCommitSupplyParamsSchema = z.object({
 
 export type VendorOrderLineCommitSupplyParams = z.infer<typeof VendorOrderLineCommitSupplyParamsSchema>;
 
+// Command: correctBillMatch on VendorOrderLine
+export const VendorOrderLineCorrectBillMatchParamsSchema = z.object({
+  billNumber: z.string(),
+  billedQuantity: z.number(),
+  billedUnitPrice: z.number(),
+  reason: z.string(),
+});
+
+export type VendorOrderLineCorrectBillMatchParams = z.infer<typeof VendorOrderLineCorrectBillMatchParamsSchema>;
+
 // Command: correctReceipt on VendorOrderLine
 export const VendorOrderLineCorrectReceiptParamsSchema = z.object({
   correctedQuantity: z.number(),
@@ -12081,6 +12153,15 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
 });
 
 export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLineEnsureWeeklyLineParamsSchema>;
+
+// Command: matchBill on VendorOrderLine
+export const VendorOrderLineMatchBillParamsSchema = z.object({
+  billNumber: z.string(),
+  billedQuantity: z.number(),
+  billedUnitPrice: z.number(),
+});
+
+export type VendorOrderLineMatchBillParams = z.infer<typeof VendorOrderLineMatchBillParamsSchema>;
 
 // Command: reconcileDraftRequirement on VendorOrderLine
 export const VendorOrderLineReconcileDraftRequirementParamsSchema = z.object({
@@ -12114,6 +12195,14 @@ export type VendorOrderLineReleaseSupplyParams = z.infer<typeof VendorOrderLineR
 export const VendorOrderLineRetireEmptyDraftParamsSchema = z.object({});
 
 export type VendorOrderLineRetireEmptyDraftParams = z.infer<typeof VendorOrderLineRetireEmptyDraftParamsSchema>;
+
+// Command: reviewBillDifference on VendorOrderLine
+export const VendorOrderLineReviewBillDifferenceParamsSchema = z.object({
+  decision: z.enum(["open", "accepted", "disputed"]),
+  note: z.string(),
+});
+
+export type VendorOrderLineReviewBillDifferenceParams = z.infer<typeof VendorOrderLineReviewBillDifferenceParamsSchema>;
 
 // Command: reviseQuantity on VendorOrderLine
 export const VendorOrderLineReviseQuantityParamsSchema = z.object({

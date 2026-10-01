@@ -807,6 +807,8 @@ import {
   VehicleUpdateInsuranceParamsSchema,
   VehicleUpdateOperationalStatusParamsSchema,
   VehicleUpdateRegistrationParamsSchema,
+  VendorBillMatchRecordParamsSchema,
+  VendorBillMatchReviewParamsSchema,
   VendorContactAddParamsSchema,
   VendorContactRemoveParamsSchema,
   VendorContactUpdateParamsSchema,
@@ -826,15 +828,18 @@ import {
   VendorOrderLineAddLineParamsSchema,
   VendorOrderLineCancelLineParamsSchema,
   VendorOrderLineCommitSupplyParamsSchema,
+  VendorOrderLineCorrectBillMatchParamsSchema,
   VendorOrderLineCorrectReceiptParamsSchema,
   VendorOrderLineDemandLinkParamsSchema,
   VendorOrderLineDemandRetireParamsSchema,
   VendorOrderLineDemandReviseParamsSchema,
   VendorOrderLineEnsureWeeklyLineParamsSchema,
+  VendorOrderLineMatchBillParamsSchema,
   VendorOrderLineReconcileDraftRequirementParamsSchema,
   VendorOrderLineRecordReceiptParamsSchema,
   VendorOrderLineReleaseSupplyParamsSchema,
   VendorOrderLineRetireEmptyDraftParamsSchema,
+  VendorOrderLineReviewBillDifferenceParamsSchema,
   VendorOrderLineReviseQuantityParamsSchema,
   VendorOrderMarkPartiallyReceivedParamsSchema,
   VendorOrderMarkReceivedParamsSchema,
@@ -12247,6 +12252,36 @@ export function useCreateVendor() {
   };
 }
 
+/** Reactive list for VendorBillMatch. */
+export function useListVendorBillMatch() {
+  return useQuery(api.queries.listVendorBillMatch);
+}
+
+/** Reactive get-by-id for VendorBillMatch. Pass "skip" to suspend. */
+export function useGetVendorBillMatch(id: string | "skip") {
+  return useQuery(api.queries.getVendorBillMatch, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for VendorBillMatch.record. */
+export function useVendorBillMatchRecord() {
+  const mutate = useMutation(api.mutations.VendorBillMatch_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorBillMatchRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorBillMatch.review. */
+export function useVendorBillMatchReview() {
+  const mutate = useMutation(api.mutations.VendorBillMatch_review);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorBillMatchReviewParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Reactive list for VendorContact. */
 export function useListVendorContact() {
   return useQuery(api.queries.listVendorContact);
@@ -12621,6 +12656,16 @@ export function useVendorOrderLineCommitSupply() {
   };
 }
 
+/** Mutation hook for VendorOrderLine.correctBillMatch. */
+export function useVendorOrderLineCorrectBillMatch() {
+  const mutate = useMutation(api.mutations.VendorOrderLine_correctBillMatch);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineCorrectBillMatchParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for VendorOrderLine.correctReceipt. */
 export function useVendorOrderLineCorrectReceipt() {
   const mutate = useMutation(api.mutations.VendorOrderLine_correctReceipt);
@@ -12637,6 +12682,16 @@ export function useVendorOrderLineEnsureWeeklyLine() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = VendorOrderLineEnsureWeeklyLineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorOrderLine.matchBill. */
+export function useVendorOrderLineMatchBill() {
+  const mutate = useMutation(api.mutations.VendorOrderLine_matchBill);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineMatchBillParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -12677,6 +12732,16 @@ export function useVendorOrderLineRetireEmptyDraft() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = VendorOrderLineRetireEmptyDraftParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorOrderLine.reviewBillDifference. */
+export function useVendorOrderLineReviewBillDifference() {
+  const mutate = useMutation(api.mutations.VendorOrderLine_reviewBillDifference);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineReviewBillDifferenceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13272,4 +13337,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1404 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1411 as const;
