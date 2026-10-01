@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { formatDate } from "../../../lib/format";
 import { formatStatusLabel } from "../../../lib/statusLabels";
+import { EventAllergenBriefingBody } from "../EventAllergenBriefingBody";
 import { EventBudgetCard } from "../EventBudgetCard";
 import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
@@ -28,6 +29,7 @@ export const SHEET_LABEL: Record<DashSheetId, string> = {
   service: "Service & allergies",
   workbook: "Event workbook",
   ops: "Operations",
+  allergens: "Allergen briefing",
   notes: "Planning notes",
   stage: "Pipeline stage",
   edit: "Edit event basics",
@@ -196,12 +198,13 @@ export function EventDashSheetBody({
                 : "No accessibility notes."}
             </div>
             <div className="evd-center">
-              <Link
-                to={`/events/${eventId}/allergen-briefing`}
+              <button
+                type="button"
                 className="evd-btn"
+                onClick={() => onOpen("allergens")}
               >
                 Allergen briefing
-              </Link>
+              </button>
               <button
                 type="button"
                 className="evd-btn"
@@ -214,6 +217,30 @@ export function EventDashSheetBody({
         </>
       );
     }
+    case "allergens":
+      return (
+        <>
+          <EventDashSheetHead
+            kicker="Allergen briefing"
+            title={title}
+            lede="Every dish with its allergens, and each guest's restrictions. Read it at the pre-event huddle."
+          />
+          <div className="evd-sheet-body">
+            <EventAllergenBriefingBody
+              eventId={eventId}
+              expectedHeadcount={expectedHeadcount}
+            />
+            <div className="evd-center">
+              <Link
+                to={`/events/${eventId}/allergen-briefing`}
+                className="evd-btn pri"
+              >
+                Print briefing
+              </Link>
+            </div>
+          </div>
+        </>
+      );
     case "workbook":
       return (
         <>

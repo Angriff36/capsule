@@ -61,6 +61,7 @@ export type DashSheetId =
   | "service"
   | "workbook"
   | "ops"
+  | "allergens"
   | "notes"
   | "stage"
   | "edit";

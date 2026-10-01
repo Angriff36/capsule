@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ALLERGEN_BRIEFING_HASH } from "../AllergenBriefingButton";
 import type { EventDetailTab } from "../eventRoutes";
 import { useEventReviewFlags } from "../review-flags/useEventReviewFlags";
 import { EventDashHero } from "./EventDashHero";
@@ -47,9 +48,22 @@ export function EventDashboard(props: Props) {
   // Old "Edit" links land on #event-setup-basics: open the edit sheet.
   // Tracker "Question" links land on #event-questions: open the stage sheet,
   // which lists the event's open questions.
+  // Allergen briefing links land on #allergen-briefing: open it as a panel.
+  // The hash is cleared once used, so the same link opens it again later.
+  const navigate = useNavigate();
   useEffect(() => {
-    if (location.hash === "#event-setup-basics") setSheet("edit");
-    if (location.hash === "#event-questions") setSheet("stage");
+    const opens: Record<string, DashSheetId> = {
+      "#event-setup-basics": "edit",
+      "#event-questions": "stage",
+      [ALLERGEN_BRIEFING_HASH]: "allergens",
+    };
+    const target = opens[location.hash];
+    if (!target) return;
+    setSheet(target);
+    navigate(
+      { pathname: location.pathname, search: location.search },
+      { replace: true },
+    );
   }, [location.hash]);
 
   const onTab = (tab: EventDetailTab) => {

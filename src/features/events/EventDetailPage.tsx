@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { normalizeCurrencyCode } from "../../lib/format";
@@ -386,13 +387,7 @@ function EventDetailContent({
       >
         Save as template
       </Link>
-      <Link
-        key="allergen-briefing"
-        className="btn btn-ghost"
-        to={`/events/${event._id}/allergen-briefing`}
-      >
-        Allergen briefing
-      </Link>
+      <AllergenBriefingButton key="allergen-briefing" />
       {dangerActions.length > 0 ? <ActionMenuRule /> : null}
       {dangerActions.map((action) => (
         <button
