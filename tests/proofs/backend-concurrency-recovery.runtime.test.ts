@@ -18,6 +18,8 @@
  *   answer comes back and the change is not applied twice. A sign-in that
  *   ran out saves nothing and the screen asks for a refresh; after signing
  *   back in the same retry key saves once.
+ * - A venue saved twice with one retry key is one venue; its company reads
+ *   it back and another company does not see it (AC-358, venues slice).
  *
  * Saves book follow-ups (timing plan, stage check) that run moments later and
  * may move the version, so the stale and lost-answer cases let them finish
@@ -497,5 +499,41 @@ describe("concurrency and recovery (backend §20.4)", () => {
       retried,
     );
     expect(await read()).toEqual(final);
+  });
+
+  it("a venue saved twice with one retry key is one venue, read back by its company and hidden from another (AC-358)", async () => {
+    const t = convexTest(schema, modules);
+    const owner = (tenantId: string) =>
+      t.withIdentity({
+        subject: `race-venue-${tenantId}`,
+        tokenIdentifier: `race|venue-${tenantId}`,
+        role: "org:owner",
+        tenantId,
+      });
+    const mine = owner("tenant-race-venue-a");
+    const theirs = owner("tenant-race-venue-b");
+    const register = () =>
+      mine.mutation(M.Venue_createViaRegister, {
+        name: "Riverside Hall",
+        venueType: "other",
+        capacity: 120,
+        addressLine1: "1 River Road",
+        idempotencyKey: "venue-save-1",
+      } as never) as Promise<{ docId: string }>;
+
+    const [first, resent] = await Promise.all([register(), register()]);
+    expect(resent.docId).toBe(first.docId);
+    const listed = (await mine.query(api.queries.listVenue, {})) as Array<{
+      _id: string;
+      name: string;
+      capacity: number;
+    }>;
+    expect(listed.map((v) => [v._id, v.name, v.capacity])).toEqual([
+      [first.docId, "Riverside Hall", 120],
+    ]);
+    const foreign = (await theirs.query(api.queries.listVenue, {})) as Array<{
+      _id: string;
+    }>;
+    expect(foreign.map((v) => v._id)).not.toContain(first.docId);
   });
 });
