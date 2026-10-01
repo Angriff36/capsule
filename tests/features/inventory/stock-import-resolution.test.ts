@@ -151,6 +151,37 @@ describe("stock import resolution (AC-076)", () => {
     expect(settled.size).toBe(0);
   });
 
+  it("one SKU counted in two locations is two rows, not one", () => {
+    const walkIn = readOpeningStockRow({
+      Name: "Butter",
+      SKU: "B-1",
+      Qty: "4",
+      Location: "Walk-in",
+    });
+    const dry = readOpeningStockRow({
+      Name: "Butter",
+      SKU: "B-1",
+      Qty: "2",
+      Location: "Dry storage",
+    });
+    expect(walkIn!.sourceRow).not.toBe(dry!.sourceRow);
+    // A recount with a different amount is its own row (it clashes visibly).
+    const recount = readOpeningStockRow({
+      Name: "Butter",
+      SKU: "B-1",
+      Qty: "5",
+      Location: "Walk-in",
+    });
+    expect(recount!.sourceRow).not.toBe(walkIn!.sourceRow);
+    const same = readOpeningStockRow({
+      Name: "Butter",
+      SKU: "B-1",
+      Qty: "4",
+      Location: "Walk-in",
+    });
+    expect(same!.sourceRow).toBe(walkIn!.sourceRow);
+  });
+
   it("reads plain unit words the way count sheets write them", () => {
     expect(unitFromText("lbs")).toBe("pound");
     expect(unitFromText("Oz - Fld")).toBe("fluid_ounce");

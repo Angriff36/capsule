@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "00af3bb2af00c85d1c9942c4e788643b05f5f4b6c95488b61ffcd81c565bc0ac:0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2c468f48d7a3ce63653f4405dceb1be68d9eca69e901b1f5f3a2604ffee230d0:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:4077c14a8869f46cc909e55d268b2cbb68cefc914237fb1a87ffaf9f1325ccb8:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:58289c45ed74812206f85688dbec40d6b1d3ccca36a420a263c88fbfd8d9bb5b:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:75e90dc93cb70aaacdfcdf93e86d279a5f6d9223a3e37d6f643e592ddbb3a663:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:8615c9439a3c2de2b2ac53a2796d9bd5b72d81e4953b8e2498112a2650748a6d:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:c9dbe2a4ed7401ba0daa133d95b1ffa0417947733046e96f28b6db7a2f0978fc:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cb17aebd1693e196fafc3596ad97832043eec454bda05e20f29d3baec5d76070:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecb19ddbe662c687b90bec15dc4623d74b353dc60e7f8dbc966617480b3d9a66:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0701fd8da6f0ff57fe6288375989c750ac7448e2ac307460454c1161ada69dc1:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:4077c14a8869f46cc909e55d268b2cbb68cefc914237fb1a87ffaf9f1325ccb8:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:75e90dc93cb70aaacdfcdf93e86d279a5f6d9223a3e37d6f643e592ddbb3a663:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:84636a99993745fa6a645e8e7b395aee173204cd1b3ce0a9fcbf4f9ab485213d:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8e3f1f8f08eb0cc8cc3f2e9afe4018cc68d423bc2a4c18ca98809770cf7c7946:8ec578f7077e46d69b4d0ba1914d95b1dfa689c99423192a216e5c84d68a7c63:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:ab2f86d75388e25c6f02f1fae63a30ef4e6b350a8673f7551eb0f88629f892ea:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cb17aebd1693e196fafc3596ad97832043eec454bda05e20f29d3baec5d76070:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecb19ddbe662c687b90bec15dc4623d74b353dc60e7f8dbc966617480b3d9a66:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -16394,6 +16394,118 @@ export const DeliveryStartTransitLifecycle = [
   }
 ] as const;
 
+// --- DepartureOverride.record ---
+export interface DepartureOverrideRecordClientInput {
+  eventId: string;
+  reason: string;
+  openItems?: string;
+  packListId?: string;
+}
+
+export const DepartureOverrideRecordCapability = {
+  capabilityId: "DepartureOverride.record",
+  entity: "DepartureOverride",
+  command: "record",
+  route: "/api/manifest/DepartureOverride/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventId","reason","openItems","packListId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see why a truck left with open items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may send a truck out with open items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may send a truck out with open items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"This reason is for a different event. Pick the event already on it."},{"kind":"constraint_block","message":"Say why it is fine to leave."}],
+  emits: ["DepartureOverrideRecorded"],
+} as const;
+
+export type DepartureOverrideRecordResult = { docId: string };
+
+/**
+ * Build command input for DepartureOverride.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDepartureOverrideRecordInput(client: DepartureOverrideRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DepartureOverride.record. */
+export const DepartureOverrideRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DepartureOverride.record. Not a rendered control. */
+export const DepartureOverrideRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    },
+    {
+      "name": "openItems",
+      "label": "Open items",
+      "required": false
+    },
+    {
+      "name": "packListId",
+      "label": "Pack list id",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Dish.classifyAllergens ---
 export interface DishClassifyAllergensClientInput {
   allergenSummary: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
@@ -23898,14 +24010,14 @@ export const EquipmentClearPrimaryImageCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentImageChanged"],
 } as const;
 
-export type EquipmentClearPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentClearPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.clearPrimaryImage.
@@ -24003,6 +24115,20 @@ export const EquipmentClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -24054,14 +24180,14 @@ export const EquipmentReactivateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentReactivated"],
 } as const;
 
-export type EquipmentReactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentReactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.reactivate.
@@ -24159,6 +24285,20 @@ export const EquipmentReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -24229,14 +24369,14 @@ export const EquipmentRecountCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["actualQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This equipment's counted amount can't be negative. Use zero or more."},{"kind":"constraint_block","message":"A piece tracked by serial number is one piece. Count it as 1, or 0 if it is lost."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentRecounted"],
 } as const;
 
-export type EquipmentRecountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentRecountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.recount.
@@ -24330,6 +24470,20 @@ export const EquipmentRecountInvalidation = [
     "entity": "EquipmentServiceEntry",
     "queryKeyHint": "queryKeys.equipmentServiceEntry.detail(id)",
     "readId": "EquipmentServiceEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
     "label": "related entity detail"
   },
   {
@@ -24519,6 +24673,20 @@ export const EquipmentRegisterInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -24690,14 +24858,14 @@ export const EquipmentRetireCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Say why you're retiring this equipment."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentRetired"],
 } as const;
 
-export type EquipmentRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.retire.
@@ -24795,6 +24963,20 @@ export const EquipmentRetireInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -24887,14 +25069,14 @@ export const EquipmentReviseDetailsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["name","category","ownership","purchaseValue","homeLocation","currentLocation","trackingMode","serialNumber","description","countUnit","replacementCost","customerPrice","vendorId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this equipment a name."},{"kind":"constraint_block","message":"Pick what kind of equipment this is."},{"kind":"constraint_block","message":"This equipment's purchase value can't be negative. Use zero or more."},{"kind":"constraint_block","message":"A piece tracked by serial number is one piece. Recount this line to 1 first, or keep it counted."},{"kind":"constraint_block","message":"Replacement cost and client price can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentDetailsRevised"],
 } as const;
 
-export type EquipmentReviseDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentReviseDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.reviseDetails.
@@ -24988,6 +25170,20 @@ export const EquipmentReviseDetailsInvalidation = [
     "entity": "EquipmentServiceEntry",
     "queryKeyHint": "queryKeys.equipmentServiceEntry.detail(id)",
     "readId": "EquipmentServiceEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
     "label": "related entity detail"
   },
   {
@@ -25114,6 +25310,190 @@ export const EquipmentReviseDetailsAction = {
   ]
 } as const;
 
+// --- Equipment.setOperatingFacts ---
+export interface EquipmentSetOperatingFactsClientInput {
+  providesJson?: string;
+  needsJson?: string;
+}
+
+export const EquipmentSetOperatingFactsCapability = {
+  capabilityId: "Equipment.setOperatingFacts",
+  entity: "Equipment",
+  command: "setOperatingFacts",
+  route: "/api/manifest/Equipment/commands/setOperatingFacts",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["providesJson","needsJson"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
+  emits: ["EquipmentOperatingFactsSet"],
+} as const;
+
+export type EquipmentSetOperatingFactsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Equipment.setOperatingFacts.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEquipmentSetOperatingFactsInput(client: EquipmentSetOperatingFactsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Equipment.setOperatingFacts. */
+export const EquipmentSetOperatingFactsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.lists()",
+    "readId": "EquipmentIssue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentIssue",
+    "queryKeyHint": "queryKeys.equipmentIssue.detail(id)",
+    "readId": "EquipmentIssue.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentMaintenanceTask",
+    "queryKeyHint": "queryKeys.equipmentMaintenanceTask.lists()",
+    "readId": "EquipmentMaintenanceTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentMaintenanceTask",
+    "queryKeyHint": "queryKeys.equipmentMaintenanceTask.detail(id)",
+    "readId": "EquipmentMaintenanceTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentPart",
+    "queryKeyHint": "queryKeys.equipmentPart.lists()",
+    "readId": "EquipmentPart.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentPart",
+    "queryKeyHint": "queryKeys.equipmentPart.detail(id)",
+    "readId": "EquipmentPart.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.lists()",
+    "readId": "EquipmentReservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentReservation",
+    "queryKeyHint": "queryKeys.equipmentReservation.detail(id)",
+    "readId": "EquipmentReservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EquipmentServiceEntry",
+    "queryKeyHint": "queryKeys.equipmentServiceEntry.lists()",
+    "readId": "EquipmentServiceEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EquipmentServiceEntry",
+    "queryKeyHint": "queryKeys.equipmentServiceEntry.detail(id)",
+    "readId": "EquipmentServiceEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "RentalOrderLine",
+    "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
+    "readId": "RentalOrderLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RentalOrderLine",
+    "queryKeyHint": "queryKeys.rentalOrderLine.detail(id)",
+    "readId": "RentalOrderLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Equipment.setOperatingFacts. Not a rendered control. */
+export const EquipmentSetOperatingFactsAction = {
+  "exposure": "human",
+  "label": "Set operating facts",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "providesJson",
+      "label": "Provides json",
+      "required": false
+    },
+    {
+      "name": "needsJson",
+      "label": "Needs json",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Equipment.setPrimaryImage ---
 export interface EquipmentSetPrimaryImageClientInput {
   storageId: string;
@@ -25132,14 +25512,14 @@ export const EquipmentSetPrimaryImageCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["storageId","fileName"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Add a photo before you set it as the main picture."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentImageChanged"],
 } as const;
 
-export type EquipmentSetPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentSetPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.setPrimaryImage.
@@ -25237,6 +25617,20 @@ export const EquipmentSetPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -25302,14 +25696,14 @@ export const EquipmentTransferCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["toLocation","note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say where the equipment is going."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentTransferred"],
 } as const;
 
-export type EquipmentTransferResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentTransferResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.transfer.
@@ -25407,6 +25801,20 @@ export const EquipmentTransferInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -25473,14 +25881,14 @@ export const EquipmentUpdateConditionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["condition","note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: ["EquipmentConditionUpdated"],
 } as const;
 
-export type EquipmentUpdateConditionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentUpdateConditionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.updateCondition.
@@ -25578,6 +25986,20 @@ export const EquipmentUpdateConditionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "RentalOrderLine",
     "queryKeyHint": "queryKeys.rentalOrderLine.lists()",
     "readId": "RentalOrderLine.list",
@@ -25665,14 +26087,14 @@ export const EquipmentWriteOffMissingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["missingQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Inventory or logistics staff may see equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may update equipment"},{"kind":"policy_denial","message":"Inventory or logistics staff may change equipment"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"The missing amount can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Equipment not found"}],
   emits: [],
 } as const;
 
-export type EquipmentWriteOffMissingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+export type EquipmentWriteOffMissingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Equipment.writeOffMissing.
@@ -25766,6 +26188,20 @@ export const EquipmentWriteOffMissingInvalidation = [
     "entity": "EquipmentServiceEntry",
     "queryKeyHint": "queryKeys.equipmentServiceEntry.detail(id)",
     "readId": "EquipmentServiceEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
     "label": "related entity detail"
   },
   {
@@ -27624,6 +28060,20 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -27834,6 +28284,20 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -27844,6 +28308,20 @@ export const EventApplyRouteTravelInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -28072,6 +28550,34 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -28278,6 +28784,20 @@ export const EventApplyRouteTravelInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -28531,6 +29051,20 @@ export const EventApplyTimingPolicyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -28741,6 +29275,20 @@ export const EventApplyTimingPolicyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -28751,6 +29299,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -28979,6 +29541,34 @@ export const EventApplyTimingPolicyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -29185,6 +29775,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -29446,6 +30050,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -29656,6 +30274,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -29666,6 +30298,20 @@ export const EventApproveInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -29894,6 +30540,34 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -30100,6 +30774,20 @@ export const EventApproveInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -30348,6 +31036,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -30558,6 +31260,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -30568,6 +31284,20 @@ export const EventArchiveInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -30796,6 +31526,34 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -31002,6 +31760,20 @@ export const EventArchiveInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -31241,6 +32013,20 @@ export const EventAssignOwnerInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -31451,6 +32237,20 @@ export const EventAssignOwnerInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -31461,6 +32261,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -31689,6 +32503,34 @@ export const EventAssignOwnerInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -31895,6 +32737,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -32136,6 +32992,20 @@ export const EventBeginExecutionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -32346,6 +33216,20 @@ export const EventBeginExecutionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -32356,6 +33240,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -32584,6 +33482,34 @@ export const EventBeginExecutionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -32790,6 +33716,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -33038,6 +33978,20 @@ export const EventCancelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -33248,6 +34202,20 @@ export const EventCancelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -33258,6 +34226,20 @@ export const EventCancelInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -33486,6 +34468,34 @@ export const EventCancelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -33692,6 +34702,20 @@ export const EventCancelInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -34014,6 +35038,20 @@ export const EventCaptureDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -34224,6 +35262,20 @@ export const EventCaptureDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -34234,6 +35286,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -34462,6 +35528,34 @@ export const EventCaptureDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -34668,6 +35762,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -35022,6 +36130,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -35232,6 +36354,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -35242,6 +36378,20 @@ export const EventChangeHeadcountInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -35470,6 +36620,34 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -35676,6 +36854,20 @@ export const EventChangeHeadcountInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -35917,6 +37109,20 @@ export const EventChangePricingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -36127,6 +37333,20 @@ export const EventChangePricingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -36137,6 +37357,20 @@ export const EventChangePricingInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -36365,6 +37599,34 @@ export const EventChangePricingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -36571,6 +37833,20 @@ export const EventChangePricingInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -36816,6 +38092,20 @@ export const EventChangePrimaryContactInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -37026,6 +38316,20 @@ export const EventChangePrimaryContactInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -37036,6 +38340,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -37264,6 +38582,34 @@ export const EventChangePrimaryContactInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -37470,6 +38816,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -37720,6 +39080,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -37930,6 +39304,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -37940,6 +39328,20 @@ export const EventChangeRequirementsInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -38168,6 +39570,34 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -38374,6 +39804,20 @@ export const EventChangeRequirementsInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -38623,6 +40067,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -38833,6 +40291,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -38843,6 +40315,20 @@ export const EventChangeServiceStyleInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -39071,6 +40557,34 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -39277,6 +40791,20 @@ export const EventChangeServiceStyleInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -39524,6 +41052,20 @@ export const EventChangeVenueInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -39734,6 +41276,20 @@ export const EventChangeVenueInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -39744,6 +41300,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -39972,6 +41542,34 @@ export const EventChangeVenueInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -40178,6 +41776,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -40431,6 +42043,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -40641,6 +42267,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -40651,6 +42291,20 @@ export const EventChooseOperatingLocationInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -40879,6 +42533,34 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -41085,6 +42767,20 @@ export const EventChooseOperatingLocationInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -41321,6 +43017,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -41531,6 +43241,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -41541,6 +43265,20 @@ export const EventClearBinderBuiltInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -41769,6 +43507,34 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -41975,6 +43741,20 @@ export const EventClearBinderBuiltInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -42205,6 +43985,20 @@ export const EventCloseOutInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -42415,6 +44209,20 @@ export const EventCloseOutInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -42425,6 +44233,20 @@ export const EventCloseOutInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -42653,6 +44475,34 @@ export const EventCloseOutInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -42859,6 +44709,20 @@ export const EventCloseOutInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -43105,6 +44969,20 @@ export const EventCompleteInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -43315,6 +45193,20 @@ export const EventCompleteInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -43325,6 +45217,20 @@ export const EventCompleteInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -43553,6 +45459,34 @@ export const EventCompleteInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -43759,6 +45693,20 @@ export const EventCompleteInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -44016,6 +45964,20 @@ export const EventConfigureRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -44226,6 +46188,20 @@ export const EventConfigureRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -44236,6 +46212,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -44464,6 +46454,34 @@ export const EventConfigureRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -44670,6 +46688,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -44971,6 +47003,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -45181,6 +47227,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -45191,6 +47251,20 @@ export const EventConfigureTimingInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -45419,6 +47493,34 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -45625,6 +47727,20 @@ export const EventConfigureTimingInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -45901,6 +48017,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -46111,6 +48241,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -46121,6 +48265,20 @@ export const EventConfirmSalesLockInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -46349,6 +48507,34 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -46555,6 +48741,20 @@ export const EventConfirmSalesLockInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -46807,6 +49007,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -47017,6 +49231,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -47027,6 +49255,20 @@ export const EventCorrectCommercialInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -47255,6 +49497,34 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -47461,6 +49731,20 @@ export const EventCorrectCommercialInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -47707,6 +49991,20 @@ export const EventFinalizeEventInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -47917,6 +50215,20 @@ export const EventFinalizeEventInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -47927,6 +50239,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -48155,6 +50481,34 @@ export const EventFinalizeEventInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -48361,6 +50715,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -48611,6 +50979,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -48821,6 +51203,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -48831,6 +51227,20 @@ export const EventLinkExternalChannelInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -49059,6 +51469,34 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -49265,6 +51703,20 @@ export const EventLinkExternalChannelInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -49511,6 +51963,20 @@ export const EventLockForSalesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -49721,6 +52187,20 @@ export const EventLockForSalesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -49731,6 +52211,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -49959,6 +52453,34 @@ export const EventLockForSalesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -50165,6 +52687,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -50411,6 +52947,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -50621,6 +53171,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -50631,6 +53195,20 @@ export const EventMarkBinderBuiltInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -50859,6 +53437,34 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -51065,6 +53671,20 @@ export const EventMarkBinderBuiltInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -51295,6 +53915,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -51505,6 +54139,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -51515,6 +54163,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -51743,6 +54405,34 @@ export const EventNormalizePurchasingWeekInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -51949,6 +54639,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -52212,6 +54916,20 @@ export const EventPlanEngagementInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -52422,6 +55140,20 @@ export const EventPlanEngagementInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -52432,6 +55164,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -52660,6 +55406,34 @@ export const EventPlanEngagementInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -52866,6 +55640,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -53250,6 +56038,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -53460,6 +56262,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -53470,6 +56286,20 @@ export const EventReactivateInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -53698,6 +56528,34 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -53904,6 +56762,20 @@ export const EventReactivateInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -54134,6 +57006,20 @@ export const EventReassignClientInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -54344,6 +57230,20 @@ export const EventReassignClientInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -54354,6 +57254,20 @@ export const EventReassignClientInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -54582,6 +57496,34 @@ export const EventReassignClientInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -54788,6 +57730,20 @@ export const EventReassignClientInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -55023,6 +57979,20 @@ export const EventRescheduleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -55233,6 +58203,20 @@ export const EventRescheduleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -55243,6 +58227,20 @@ export const EventRescheduleInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -55471,6 +58469,34 @@ export const EventRescheduleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -55677,6 +58703,20 @@ export const EventRescheduleInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -55920,6 +58960,20 @@ export const EventReturnToPlanningInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -56130,6 +59184,20 @@ export const EventReturnToPlanningInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -56140,6 +59208,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -56368,6 +59450,34 @@ export const EventReturnToPlanningInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -56574,6 +59684,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -56835,6 +59959,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -57045,6 +60183,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -57055,6 +60207,20 @@ export const EventSetEventNumberInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -57283,6 +60449,34 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -57489,6 +60683,20 @@ export const EventSetEventNumberInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -57728,6 +60936,20 @@ export const EventStageClientMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -57938,6 +61160,20 @@ export const EventStageClientMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -57948,6 +61184,20 @@ export const EventStageClientMergeInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -58176,6 +61426,34 @@ export const EventStageClientMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -58382,6 +61660,20 @@ export const EventStageClientMergeInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -58623,6 +61915,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -58833,6 +62139,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -58843,6 +62163,20 @@ export const EventStopRecurrenceInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -59071,6 +62405,34 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -59277,6 +62639,20 @@ export const EventStopRecurrenceInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -59507,6 +62883,20 @@ export const EventSubmitForApprovalInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -59717,6 +63107,20 @@ export const EventSubmitForApprovalInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -59727,6 +63131,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -59955,6 +63373,34 @@ export const EventSubmitForApprovalInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -60161,6 +63607,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -60407,6 +63867,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -60617,6 +64091,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -60627,6 +64115,20 @@ export const EventUnlinkExternalChannelInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -60855,6 +64357,34 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -61061,6 +64591,20 @@ export const EventUnlinkExternalChannelInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -61308,6 +64852,20 @@ export const EventUpdateDaySheetInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -61518,6 +65076,20 @@ export const EventUpdateDaySheetInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -61528,6 +65100,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -61756,6 +65342,34 @@ export const EventUpdateDaySheetInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -61962,6 +65576,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -62301,6 +65929,20 @@ export const EventUpdateImportDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -62511,6 +66153,20 @@ export const EventUpdateImportDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -62521,6 +66177,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -62749,6 +66419,34 @@ export const EventUpdateImportDraftInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -62955,6 +66653,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -63316,6 +67028,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -63526,6 +67252,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -63536,6 +67276,20 @@ export const EventUpdateSetupNotesInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -63764,6 +67518,34 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -63970,6 +67752,20 @@ export const EventUpdateSetupNotesInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -64256,6 +68052,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -64466,6 +68276,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -64476,6 +68300,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -64704,6 +68542,34 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -64910,6 +68776,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -65189,6 +69069,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EquipmentIssue",
     "queryKeyHint": "queryKeys.equipmentIssue.lists()",
     "readId": "EquipmentIssue.list",
@@ -65399,6 +69293,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
     "readId": "EventStaffNeed.list",
@@ -65409,6 +69317,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "EventStaffNeed",
     "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
     "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
     "label": "related entity detail"
   },
   {
@@ -65637,6 +69559,34 @@ export const EventUseCompanyTimingRuleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PrepTask",
     "queryKeyHint": "queryKeys.prepTask.lists()",
     "readId": "PrepTask.list",
@@ -65843,6 +69793,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.detail(id)",
     "readId": "TimeRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   },
   {
@@ -66209,6 +70173,20 @@ export const EventAssignmentApplyApprovedShiftSwapInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -66335,6 +70313,20 @@ export const EventAssignmentAssignInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -66457,6 +70449,20 @@ export const EventAssignmentCheckInInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -66566,6 +70572,20 @@ export const EventAssignmentCheckOutInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -66671,6 +70691,20 @@ export const EventAssignmentChooseTravelLegInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -66764,6 +70798,20 @@ export const EventAssignmentConfirmInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -66868,6 +70916,20 @@ export const EventAssignmentDeclineInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -66987,6 +71049,20 @@ export const EventAssignmentMarkNoShowInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -67101,6 +71177,20 @@ export const EventAssignmentPlanTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -67208,6 +71298,20 @@ export const EventAssignmentUnassignInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -67252,6 +71356,366 @@ export const EventAssignmentUnassignLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- EventChecklist.define ---
+export interface EventChecklistDefineClientInput {
+  name: string;
+  itemsJson: string;
+  category?: string;
+}
+
+export const EventChecklistDefineCapability = {
+  capabilityId: "EventChecklist.define",
+  entity: "EventChecklist",
+  command: "define",
+  route: "/api/manifest/EventChecklist/commands/define",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["name","itemsJson","category"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change event checklists"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this checklist a name."}],
+  emits: ["EventChecklistDefined"],
+} as const;
+
+export type EventChecklistDefineResult = { docId: string };
+
+/**
+ * Build command input for EventChecklist.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventChecklistDefineInput(client: EventChecklistDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventChecklist.define. */
+export const EventChecklistDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventChecklist.define. Not a rendered control. */
+export const EventChecklistDefineAction = {
+  "exposure": "human",
+  "label": "Define",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "itemsJson",
+      "label": "Items json",
+      "required": true
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EventChecklist.reinstate ---
+export type EventChecklistReinstateClientInput = Record<string, never>;
+
+export const EventChecklistReinstateCapability = {
+  capabilityId: "EventChecklist.reinstate",
+  entity: "EventChecklist",
+  command: "reinstate",
+  route: "/api/manifest/EventChecklist/commands/reinstate",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change event checklists"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventChecklist not found"}],
+  emits: ["EventChecklistReinstated"],
+} as const;
+
+export type EventChecklistReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventChecklist.reinstate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventChecklistReinstateInput(client: EventChecklistReinstateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventChecklist.reinstate. */
+export const EventChecklistReinstateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventChecklist.reinstate. Not a rendered control. */
+export const EventChecklistReinstateAction = {
+  "exposure": "human",
+  "label": "Reinstate",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "retired"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EventChecklist.reinstate. */
+export const EventChecklistReinstateLifecycle = [
+  {
+    "property": "status",
+    "from": "retired",
+    "to": "active",
+    "proven": true
+  }
+] as const;
+
+// --- EventChecklist.retire ---
+export type EventChecklistRetireClientInput = Record<string, never>;
+
+export const EventChecklistRetireCapability = {
+  capabilityId: "EventChecklist.retire",
+  entity: "EventChecklist",
+  command: "retire",
+  route: "/api/manifest/EventChecklist/commands/retire",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change event checklists"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventChecklist not found"}],
+  emits: ["EventChecklistRetired"],
+} as const;
+
+export type EventChecklistRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventChecklist.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventChecklistRetireInput(client: EventChecklistRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventChecklist.retire. */
+export const EventChecklistRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventChecklist.retire. Not a rendered control. */
+export const EventChecklistRetireAction = {
+  "exposure": "human",
+  "label": "Retire",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "active"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EventChecklist.retire. */
+export const EventChecklistRetireLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
+  }
+] as const;
+
+// --- EventChecklist.revise ---
+export interface EventChecklistReviseClientInput {
+  name: string;
+  itemsJson: string;
+  category?: string;
+}
+
+export const EventChecklistReviseCapability = {
+  capabilityId: "EventChecklist.revise",
+  entity: "EventChecklist",
+  command: "revise",
+  route: "/api/manifest/EventChecklist/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["name","itemsJson","category"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update event checklists"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change event checklists"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this checklist a name."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventChecklist not found"}],
+  emits: ["EventChecklistRevised"],
+} as const;
+
+export type EventChecklistReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventChecklist.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventChecklistReviseInput(client: EventChecklistReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventChecklist.revise. */
+export const EventChecklistReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventChecklist.revise. Not a rendered control. */
+export const EventChecklistReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "itemsJson",
+      "label": "Items json",
+      "required": true
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": false
+    }
+  ]
+} as const;
 
 // --- EventCloseout.capture ---
 export interface EventCloseoutCaptureClientInput {
@@ -73250,6 +77714,186 @@ export const EventLayoutSectionUpdateAction = {
   ]
 } as const;
 
+// --- EventPlanNeeds.note ---
+export interface EventPlanNeedsNoteClientInput {
+  eventId: string;
+  /** Bounds: 0..∞ */
+  trucksNeeded?: number;
+  siteProvidesJson?: string;
+}
+
+export const EventPlanNeedsNoteCapability = {
+  capabilityId: "EventPlanNeeds.note",
+  entity: "EventPlanNeeds",
+  command: "note",
+  route: "/api/manifest/EventPlanNeeds/commands/note",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventId","trucksNeeded","siteProvidesJson"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see what an event needs"},{"kind":"policy_denial","message":"Event, sales and logistics staff and managers may say what an event needs"},{"kind":"policy_denial","message":"Event, sales and logistics staff and managers may say what an event needs"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"These needs are for a different event. Pick the event already on them."},{"kind":"constraint_block","message":"Trucks needed can't be negative. Use zero or more."}],
+  emits: ["EventPlanNeedsNoted"],
+} as const;
+
+export type EventPlanNeedsNoteResult = { docId: string };
+
+/**
+ * Build command input for EventPlanNeeds.note.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventPlanNeedsNoteInput(client: EventPlanNeedsNoteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventPlanNeeds.note. */
+export const EventPlanNeedsNoteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventPlanNeeds.note. Not a rendered control. */
+export const EventPlanNeedsNoteAction = {
+  "exposure": "human",
+  "label": "Note",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "trucksNeeded",
+      "label": "Trucks needed",
+      "required": false
+    },
+    {
+      "name": "siteProvidesJson",
+      "label": "Site provides json",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EventPlanNeeds.revise ---
+export interface EventPlanNeedsReviseClientInput {
+  /** Bounds: 0..∞ */
+  trucksNeeded?: number;
+  siteProvidesJson?: string;
+}
+
+export const EventPlanNeedsReviseCapability = {
+  capabilityId: "EventPlanNeeds.revise",
+  entity: "EventPlanNeeds",
+  command: "revise",
+  route: "/api/manifest/EventPlanNeeds/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["trucksNeeded","siteProvidesJson"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see what an event needs"},{"kind":"policy_denial","message":"Event, sales and logistics staff and managers may say what an event needs"},{"kind":"policy_denial","message":"Event, sales and logistics staff and managers may say what an event needs"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Trucks needed can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventPlanNeeds not found"}],
+  emits: ["EventPlanNeedsNoted"],
+} as const;
+
+export type EventPlanNeedsReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventPlanNeeds.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventPlanNeedsReviseInput(client: EventPlanNeedsReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventPlanNeeds.revise. */
+export const EventPlanNeedsReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.lists()",
+    "readId": "EventPlanNeeds.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventPlanNeeds",
+    "queryKeyHint": "queryKeys.eventPlanNeeds.detail(id)",
+    "readId": "EventPlanNeeds.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventPlanNeeds.revise. Not a rendered control. */
+export const EventPlanNeedsReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "trucksNeeded",
+      "label": "Trucks needed",
+      "required": false
+    },
+    {
+      "name": "siteProvidesJson",
+      "label": "Site provides json",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- EventStaffNeed.applyApprovedShiftSwap ---
 export interface EventStaffNeedApplyApprovedShiftSwapClientInput {
   personId: string;
@@ -73315,6 +77959,20 @@ export const EventStaffNeedApplyApprovedShiftSwapInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -73433,6 +78091,20 @@ export const EventStaffNeedCancelInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -73573,6 +78245,20 @@ export const EventStaffNeedChangeCoverageInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -73726,6 +78412,20 @@ export const EventStaffNeedChooseTravelLegInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -73835,6 +78535,20 @@ export const EventStaffNeedClaimInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -73967,6 +78681,20 @@ export const EventStaffNeedDescribeDemandInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -74119,6 +78847,20 @@ export const EventStaffNeedFillInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -74249,6 +78991,20 @@ export const EventStaffNeedPlanTimingInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -74392,6 +79148,20 @@ export const EventStaffNeedPostOpenInvalidation = [
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.detail(id)",
     "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
     "label": "related entity detail"
   },
   {
@@ -74620,6 +79390,20 @@ export const EventStaffNeedPrepareCoverageContinuationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -74726,6 +79510,20 @@ export const EventStaffNeedReleaseClaimInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Person",
     "queryKeyHint": "queryKeys.person.lists()",
     "readId": "Person.list",
@@ -74774,6 +79572,1078 @@ export const EventStaffNeedReleaseClaimLifecycle = [
     "property": "status",
     "from": "claimed",
     "to": "open",
+    "proven": true
+  }
+] as const;
+
+// --- EventTask.add ---
+export interface EventTaskAddClientInput {
+  eventId: string;
+  title: string;
+  details?: string;
+  category?: string;
+  ownerPersonId?: string;
+  dueAt?: string;
+  /** Allowed: "critical" | "high" | "medium" | "low" */
+  priority?: "critical" | "high" | "medium" | "low";
+  waitsForTaskId?: string;
+  proofRequired?: boolean;
+  checklistTemplateId?: string;
+  templateLineKey?: string;
+  suggestionKey?: string;
+}
+
+export const EventTaskAddCapability = {
+  capabilityId: "EventTask.add",
+  entity: "EventTask",
+  command: "add",
+  route: "/api/manifest/EventTask/commands/add",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["dueAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventId","title","details","category","ownerPersonId","dueAt","priority","waitsForTaskId","proofRequired","checklistTemplateId","templateLineKey","suggestionKey"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"constraint_block","message":"This to-do is for a different event. Pick the event already on it."},{"kind":"constraint_block","message":"Give this to-do a title."}],
+  emits: ["EventTaskAdded"],
+} as const;
+
+export type EventTaskAddResult = { docId: string };
+
+/**
+ * Build command input for EventTask.add.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskAddInput(client: EventTaskAddClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.add. */
+export const EventTaskAddInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.add. Not a rendered control. */
+export const EventTaskAddAction = {
+  "exposure": "human",
+  "label": "Add",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "title",
+      "label": "Title",
+      "required": true
+    },
+    {
+      "name": "details",
+      "label": "Details",
+      "required": false
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": false
+    },
+    {
+      "name": "ownerPersonId",
+      "label": "Owner person id",
+      "required": false
+    },
+    {
+      "name": "dueAt",
+      "label": "Due at",
+      "required": false
+    },
+    {
+      "name": "priority",
+      "label": "Priority",
+      "required": false,
+      "choices": [
+        {
+          "value": "critical",
+          "label": "critical"
+        },
+        {
+          "value": "high",
+          "label": "high"
+        },
+        {
+          "value": "medium",
+          "label": "medium"
+        },
+        {
+          "value": "low",
+          "label": "low"
+        }
+      ]
+    },
+    {
+      "name": "waitsForTaskId",
+      "label": "Waits for task id",
+      "required": false
+    },
+    {
+      "name": "proofRequired",
+      "label": "Proof required",
+      "required": false
+    },
+    {
+      "name": "checklistTemplateId",
+      "label": "Checklist template id",
+      "required": false
+    },
+    {
+      "name": "templateLineKey",
+      "label": "Template line key",
+      "required": false
+    },
+    {
+      "name": "suggestionKey",
+      "label": "Suggestion key",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EventTask.complete ---
+export interface EventTaskCompleteClientInput {
+  note?: string;
+}
+
+export const EventTaskCompleteCapability = {
+  capabilityId: "EventTask.complete",
+  entity: "EventTask",
+  command: "complete",
+  route: "/api/manifest/EventTask/commands/complete",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskCompleted"],
+} as const;
+
+export type EventTaskCompleteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.complete.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskCompleteInput(client: EventTaskCompleteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.complete. */
+export const EventTaskCompleteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.complete. Not a rendered control. */
+export const EventTaskCompleteAction = {
+  "exposure": "human",
+  "label": "Complete",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "in_progress",
+      "open"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EventTask.complete. */
+export const EventTaskCompleteLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "done",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "in_progress",
+    "to": "done",
+    "proven": true
+  }
+] as const;
+
+// --- EventTask.giveTo ---
+export interface EventTaskGiveToClientInput {
+  ownerPersonId?: string;
+}
+
+export const EventTaskGiveToCapability = {
+  capabilityId: "EventTask.giveTo",
+  entity: "EventTask",
+  command: "giveTo",
+  route: "/api/manifest/EventTask/commands/giveTo",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["ownerPersonId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskOwnerChanged"],
+} as const;
+
+export type EventTaskGiveToResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.giveTo.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskGiveToInput(client: EventTaskGiveToClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.giveTo. */
+export const EventTaskGiveToInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.giveTo. Not a rendered control. */
+export const EventTaskGiveToAction = {
+  "exposure": "human",
+  "label": "Give to",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "ownerPersonId",
+      "label": "Owner person id",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EventTask.remove ---
+export type EventTaskRemoveClientInput = Record<string, never>;
+
+export const EventTaskRemoveCapability = {
+  capabilityId: "EventTask.remove",
+  entity: "EventTask",
+  command: "remove",
+  route: "/api/manifest/EventTask/commands/remove",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskRemoved"],
+} as const;
+
+export type EventTaskRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskRemoveInput(client: EventTaskRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.remove. */
+export const EventTaskRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.remove. Not a rendered control. */
+export const EventTaskRemoveAction = {
+  "exposure": "human",
+  "label": "Remove",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- EventTask.reopen ---
+export type EventTaskReopenClientInput = Record<string, never>;
+
+export const EventTaskReopenCapability = {
+  capabilityId: "EventTask.reopen",
+  entity: "EventTask",
+  command: "reopen",
+  route: "/api/manifest/EventTask/commands/reopen",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskReopened"],
+} as const;
+
+export type EventTaskReopenResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.reopen.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskReopenInput(client: EventTaskReopenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.reopen. */
+export const EventTaskReopenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.reopen. Not a rendered control. */
+export const EventTaskReopenAction = {
+  "exposure": "human",
+  "label": "Reopen",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "done",
+      "in_progress",
+      "skipped"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EventTask.reopen. */
+export const EventTaskReopenLifecycle = [
+  {
+    "property": "status",
+    "from": "in_progress",
+    "to": "open",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "done",
+    "to": "open",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "skipped",
+    "to": "open",
+    "proven": true
+  }
+] as const;
+
+// --- EventTask.revise ---
+export interface EventTaskReviseClientInput {
+  title: string;
+  details?: string;
+  category?: string;
+  dueAt?: string;
+  /** Allowed: "critical" | "high" | "medium" | "low" */
+  priority?: "critical" | "high" | "medium" | "low";
+  waitsForTaskId?: string;
+  proofRequired?: boolean;
+}
+
+export const EventTaskReviseCapability = {
+  capabilityId: "EventTask.revise",
+  entity: "EventTask",
+  command: "revise",
+  route: "/api/manifest/EventTask/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["dueAt"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["title","details","category","dueAt","priority","waitsForTaskId","proofRequired"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this to-do a title."},{"kind":"constraint_block","message":"A to-do can't wait for itself."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskRevised"],
+} as const;
+
+export type EventTaskReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskReviseInput(client: EventTaskReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.revise. */
+export const EventTaskReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.revise. Not a rendered control. */
+export const EventTaskReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "title",
+      "label": "Title",
+      "required": true
+    },
+    {
+      "name": "details",
+      "label": "Details",
+      "required": false
+    },
+    {
+      "name": "category",
+      "label": "Category",
+      "required": false
+    },
+    {
+      "name": "dueAt",
+      "label": "Due at",
+      "required": false
+    },
+    {
+      "name": "priority",
+      "label": "Priority",
+      "required": false,
+      "choices": [
+        {
+          "value": "critical",
+          "label": "critical"
+        },
+        {
+          "value": "high",
+          "label": "high"
+        },
+        {
+          "value": "medium",
+          "label": "medium"
+        },
+        {
+          "value": "low",
+          "label": "low"
+        }
+      ]
+    },
+    {
+      "name": "waitsForTaskId",
+      "label": "Waits for task id",
+      "required": false
+    },
+    {
+      "name": "proofRequired",
+      "label": "Proof required",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- EventTask.skip ---
+export interface EventTaskSkipClientInput {
+  reason: string;
+}
+
+export const EventTaskSkipCapability = {
+  capabilityId: "EventTask.skip",
+  entity: "EventTask",
+  command: "skip",
+  route: "/api/manifest/EventTask/commands/skip",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why this to-do is not needed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskSkipped"],
+} as const;
+
+export type EventTaskSkipResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.skip.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskSkipInput(client: EventTaskSkipClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.skip. */
+export const EventTaskSkipInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.skip. Not a rendered control. */
+export const EventTaskSkipAction = {
+  "exposure": "human",
+  "label": "Skip",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "in_progress",
+      "open"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EventTask.skip. */
+export const EventTaskSkipLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "skipped",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "in_progress",
+    "to": "skipped",
+    "proven": true
+  }
+] as const;
+
+// --- EventTask.start ---
+export type EventTaskStartClientInput = Record<string, never>;
+
+export const EventTaskStartCapability = {
+  capabilityId: "EventTask.start",
+  entity: "EventTask",
+  command: "start",
+  route: "/api/manifest/EventTask/commands/start",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see event to-dos"},{"kind":"policy_denial","message":"Staff may update event to-dos"},{"kind":"policy_denial","message":"Staff may work event to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"EventTask not found"}],
+  emits: ["EventTaskStarted"],
+} as const;
+
+export type EventTaskStartResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for EventTask.start.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTaskStartInput(client: EventTaskStartClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTask.start. */
+export const EventTaskStartInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.lists()",
+    "readId": "EventChecklist.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventChecklist",
+    "queryKeyHint": "queryKeys.eventChecklist.detail(id)",
+    "readId": "EventChecklist.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer EventTask.start. Not a rendered control. */
+export const EventTaskStartAction = {
+  "exposure": "human",
+  "label": "Start",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "open"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for EventTask.start. */
+export const EventTaskStartLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "in_progress",
     "proven": true
   }
 ] as const;
@@ -76162,6 +82032,34 @@ export const EventVehicleAssignmentAssignInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.lists()",
     "readId": "PackListItem.list",
@@ -76214,6 +82112,20 @@ export const EventVehicleAssignmentAssignInvalidation = [
     "entity": "Vehicle",
     "queryKeyHint": "queryKeys.vehicle.detail(id)",
     "readId": "Vehicle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -76346,6 +82258,34 @@ export const EventVehicleAssignmentClearPreloadedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.lists()",
     "readId": "PackListItem.list",
@@ -76398,6 +82338,20 @@ export const EventVehicleAssignmentClearPreloadedInvalidation = [
     "entity": "Vehicle",
     "queryKeyHint": "queryKeys.vehicle.detail(id)",
     "readId": "Vehicle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -76474,6 +82428,34 @@ export const EventVehicleAssignmentMarkPreloadedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.lists()",
     "readId": "PackListItem.list",
@@ -76526,6 +82508,20 @@ export const EventVehicleAssignmentMarkPreloadedInvalidation = [
     "entity": "Vehicle",
     "queryKeyHint": "queryKeys.vehicle.detail(id)",
     "readId": "Vehicle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -76609,6 +82605,34 @@ export const EventVehicleAssignmentPlanLegInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.lists()",
     "readId": "PackListItem.list",
@@ -76661,6 +82685,20 @@ export const EventVehicleAssignmentPlanLegInvalidation = [
     "entity": "Vehicle",
     "queryKeyHint": "queryKeys.vehicle.detail(id)",
     "readId": "Vehicle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -76753,6 +82791,34 @@ export const EventVehicleAssignmentReleaseInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.lists()",
     "readId": "PackListItem.list",
@@ -76805,6 +82871,20 @@ export const EventVehicleAssignmentReleaseInvalidation = [
     "entity": "Vehicle",
     "queryKeyHint": "queryKeys.vehicle.detail(id)",
     "readId": "Vehicle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -76883,6 +82963,34 @@ export const EventVehicleAssignmentSetLoadingZoneInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.lists()",
+    "readId": "EventAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventAssignment",
+    "queryKeyHint": "queryKeys.eventAssignment.detail(id)",
+    "readId": "EventAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "readId": "EventStaffNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "readId": "EventStaffNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.lists()",
     "readId": "PackListItem.list",
@@ -76935,6 +83043,20 @@ export const EventVehicleAssignmentSetLoadingZoneInvalidation = [
     "entity": "Vehicle",
     "queryKeyHint": "queryKeys.vehicle.detail(id)",
     "readId": "Vehicle.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -96033,52 +102155,8 @@ export const InvoiceRecordRefundAction = {
       "label": "Payment id",
       "required": true
     }
-  ],
-  "availableFrom": {
-    "property": "status",
-    "values": [
-      "overdue",
-      "paid",
-      "partial",
-      "sent",
-      "viewed"
-    ]
-  }
+  ]
 } as const;
-
-/** Proven lifecycle transitions for Invoice.recordRefund. */
-export const InvoiceRecordRefundLifecycle = [
-  {
-    "property": "status",
-    "from": "sent",
-    "to": "partial",
-    "proven": true
-  },
-  {
-    "property": "status",
-    "from": "viewed",
-    "to": "partial",
-    "proven": true
-  },
-  {
-    "property": "status",
-    "from": "overdue",
-    "to": "partial",
-    "proven": true
-  },
-  {
-    "property": "status",
-    "from": "partial",
-    "to": "partial",
-    "proven": true
-  },
-  {
-    "property": "status",
-    "from": "paid",
-    "to": "partial",
-    "proven": true
-  }
-] as const;
 
 // --- Invoice.send ---
 export type InvoiceSendClientInput = Record<string, never>;
@@ -102939,14 +109017,14 @@ export const OrganizationConfigureBrandingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["displayName","address","primaryColor","accentColor"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationBrandingConfigured"],
 } as const;
 
-export type OrganizationConfigureBrandingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationConfigureBrandingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.configureBranding.
@@ -103003,6 +109081,72 @@ export const OrganizationConfigureBrandingAction = {
   ]
 } as const;
 
+// --- Organization.configurePlanningChecks ---
+export interface OrganizationConfigurePlanningChecksClientInput {
+  checksJson?: string;
+}
+
+export const OrganizationConfigurePlanningChecksCapability = {
+  capabilityId: "Organization.configurePlanningChecks",
+  entity: "Organization",
+  command: "configurePlanningChecks",
+  route: "/api/manifest/Organization/commands/configurePlanningChecks",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["checksJson"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
+  emits: ["OrganizationPlanningChecksConfigured"],
+} as const;
+
+export type OrganizationConfigurePlanningChecksResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Organization.configurePlanningChecks.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOrganizationConfigurePlanningChecksInput(client: OrganizationConfigurePlanningChecksClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Organization.configurePlanningChecks. */
+export const OrganizationConfigurePlanningChecksInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Organization",
+    "queryKeyHint": "queryKeys.organization.lists()",
+    "readId": "Organization.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Organization",
+    "queryKeyHint": "queryKeys.organization.detail(id)",
+    "readId": "Organization.get",
+    "label": "entity detail"
+  }
+] as const;
+
+/** How a screen should offer Organization.configurePlanningChecks. Not a rendered control. */
+export const OrganizationConfigurePlanningChecksAction = {
+  "exposure": "human",
+  "label": "Configure planning checks",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "checksJson",
+      "label": "Checks json",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Organization.configureRoutePolicy ---
 export interface OrganizationConfigureRoutePolicyClientInput {
   /** Bounds: 0..240 */
@@ -103025,14 +109169,14 @@ export const OrganizationConfigureRoutePolicyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["safetyBufferMinutes","trafficPolicy","refreshHours"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Use a safety buffer from 0 to 240 minutes."},{"kind":"constraint_block","message":"Refresh drive times every 1 to 720 hours."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationRoutePolicyConfigured"],
 } as const;
 
-export type OrganizationConfigureRoutePolicyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationConfigureRoutePolicyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.configureRoutePolicy.
@@ -103119,14 +109263,14 @@ export const OrganizationConfigureTimingPolicyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["fullServiceSetupMinutes","limitedServiceSetupMinutes","briefingMinutes","loadBaselineMinutes","loadRulesJson"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Use a full service setup time from 0 to 720 minutes."},{"kind":"constraint_block","message":"Use a limited service setup time from 0 to 720 minutes."},{"kind":"constraint_block","message":"Use a briefing time from 0 to 240 minutes."},{"kind":"constraint_block","message":"Use a standard load time from 0 to 480 minutes."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationTimingPolicyConfigured"],
 } as const;
 
-export type OrganizationConfigureTimingPolicyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationConfigureTimingPolicyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.configureTimingPolicy.
@@ -103203,14 +109347,14 @@ export const OrganizationDeactivateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationDeactivated"],
 } as const;
 
-export type OrganizationDeactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationDeactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.deactivate.
@@ -103284,14 +109428,14 @@ export const OrganizationReactivateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationReactivated"],
 } as const;
 
-export type OrganizationReactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationReactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.reactivate.
@@ -103450,14 +109594,14 @@ export const OrganizationRenameCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["name"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give your company a name."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationRenamed"],
 } as const;
 
-export type OrganizationRenameResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationRenameResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.rename.
@@ -103516,14 +109660,14 @@ export const OrganizationSetBrandLogoCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["storageId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationBrandLogoSet"],
 } as const;
 
-export type OrganizationSetBrandLogoResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationSetBrandLogoResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.setBrandLogo.
@@ -103582,14 +109726,14 @@ export const OrganizationSetDefaultCurrencyCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["currencyCode"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Enter a three-letter currency code, like USD."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationDefaultCurrencySet"],
 } as const;
 
-export type OrganizationSetDefaultCurrencyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationSetDefaultCurrencyResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.setDefaultCurrency.
@@ -103648,14 +109792,14 @@ export const OrganizationSuspendCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see the company profile"},{"kind":"policy_denial","message":"Managers may update the company profile"},{"kind":"policy_denial","message":"Managers may change the company profile"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Organization not found"}],
   emits: ["OrganizationSuspended"],
 } as const;
 
-export type OrganizationSuspendResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number };
+export type OrganizationSuspendResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Organization.suspend.
@@ -103960,6 +110104,20 @@ export const PackListAcknowledgePackingRequirementInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -103984,6 +110142,20 @@ export const PackListAcknowledgePackingRequirementInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -104068,6 +110240,20 @@ export const PackListApplyServiceStyleKitInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104092,6 +110278,20 @@ export const PackListApplyServiceStyleKitInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -104190,6 +110390,20 @@ export const PackListCancelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104214,6 +110428,20 @@ export const PackListCancelInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -104333,6 +110561,20 @@ export const PackListDispatchInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104357,6 +110599,20 @@ export const PackListDispatchInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -104449,6 +110705,20 @@ export const PackListMarkLoadedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104473,6 +110743,20 @@ export const PackListMarkLoadedInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -104565,6 +110849,20 @@ export const PackListMarkPackedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104589,6 +110887,20 @@ export const PackListMarkPackedInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -104686,6 +110998,20 @@ export const PackListOpenInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104724,6 +111050,20 @@ export const PackListOpenInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -104837,6 +111177,20 @@ export const PackListRequestAssistanceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -104861,6 +111215,20 @@ export const PackListRequestAssistanceInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -104947,6 +111315,20 @@ export const PackListRequestDishContainersInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "DishContainer",
     "queryKeyHint": "queryKeys.dishContainer.lists()",
     "readId": "DishContainer.list",
@@ -104985,6 +111367,20 @@ export const PackListRequestDishContainersInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -105077,6 +111473,20 @@ export const PackListResolveAssistanceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -105101,6 +111511,20 @@ export const PackListResolveAssistanceInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -105177,6 +111601,20 @@ export const PackListStandDownWithEventInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -105201,6 +111639,20 @@ export const PackListStandDownWithEventInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -105314,6 +111766,20 @@ export const PackListStartPackingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.lists()",
+    "readId": "DepartureOverride.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DepartureOverride",
+    "queryKeyHint": "queryKeys.departureOverride.detail(id)",
+    "readId": "DepartureOverride.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -105338,6 +111804,20 @@ export const PackListStartPackingInvalidation = [
     "entity": "PackListItem",
     "queryKeyHint": "queryKeys.packListItem.detail(id)",
     "readId": "PackListItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -105709,14 +112189,14 @@ export const PackListItemAdjustQuantityCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["requiredQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a required amount more than zero."},{"kind":"constraint_block","message":"You can't set the required amount below what's already packed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemQuantityAdjusted"],
 } as const;
 
-export type PackListItemAdjustQuantityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemAdjustQuantityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.adjustQuantity.
@@ -105866,14 +112346,14 @@ export const PackListItemAdoptContainerLinkCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["eventDishId","followsDishServings","containerServings","expectedItemVersion","expectedPackListVersion","expectedEventDishVersion","expectedContainerVersion"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"guard_failure","message":"Guard 8 failed"},{"kind":"constraint_block","message":"This packing line is for a different menu line. Pick the menu line already on this packing line."},{"kind":"constraint_block","message":"Servings can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This container has to be for the same dish as this packing line."},{"kind":"constraint_block","message":"Automatic packing needs the unit from the container template. Turn off automatic packing to use a different unit."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: [],
 } as const;
 
-export type PackListItemAdoptContainerLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemAdoptContainerLinkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.adoptContainerLink.
@@ -106046,14 +112526,14 @@ export const PackListItemAnnotateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemAnnotated"],
 } as const;
 
-export type PackListItemAnnotateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemAnnotateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.annotate.
@@ -106207,14 +112687,14 @@ export const PackListItemApplyGeneratedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packListId","generationKey","category","ownership","returnRequired","returnNote","requiredCapability","generatedQuantity","sourcesJson"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This packing line is for a different item. Refresh and try again."},{"kind":"constraint_block","message":"A pack amount can't be negative."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemApplyGeneratedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemApplyGeneratedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.applyGenerated.
@@ -106501,14 +112981,14 @@ export const PackListItemAssignLoadCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["loadAssignmentId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemLoadAssigned"],
 } as const;
 
-export type PackListItemAssignLoadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemAssignLoadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.assignLoad.
@@ -106652,14 +113132,14 @@ export const PackListItemCorrectImportedFluidOuncesCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["sourceReference","expectedVersion"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"constraint_block","message":"Say where this fluid-ounce fix came from."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: [],
 } as const;
 
-export type PackListItemCorrectImportedFluidOuncesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemCorrectImportedFluidOuncesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.correctImportedFluidOunces.
@@ -106814,14 +113294,14 @@ export const PackListItemEnsureContainerCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packListId","dishContainerId","eventDishId","dishId","description","quantityServings","unit"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This container's details don't match this line anymore. Refresh and try again."},{"kind":"constraint_block","message":"This container and menu line have to be for the same event and dish."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemEnsureContainerResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemEnsureContainerResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.ensureContainer.
@@ -107106,14 +113586,14 @@ export const PackListItemEnsureKitItemCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packListId","serviceStyleKitItemId","description","requiredQuantity","unit","note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This kit line doesn't match this packing line anymore."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemKitEnsured","PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemEnsureKitItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemEnsureKitItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.ensureKitItem.
@@ -107392,14 +113872,14 @@ export const PackListItemEnsureTemplateLineCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packListId","packListTemplateId","templateLineKey","templateVersion","requiredQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This packing line came from a different template line. Refresh and try again."},{"kind":"constraint_block","message":"A template line needs an amount more than zero."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemEnsureTemplateLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemEnsureTemplateLineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.ensureTemplateLine.
@@ -107565,14 +114045,14 @@ export const PackListItemExcludeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason","replacementDescription","coveredBy"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why this item is not going."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemExcluded"],
 } as const;
 
-export type PackListItemExcludeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemExcludeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.exclude.
@@ -107737,14 +114217,14 @@ export const PackListItemMarkMissingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemMissing"],
 } as const;
 
-export type PackListItemMarkMissingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemMarkMissingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.markMissing.
@@ -107898,14 +114378,14 @@ export const PackListItemMarkPackedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packedQuantity"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a packed amount more than zero."},{"kind":"constraint_block","message":"You can't pack more than what's required. Enter a smaller amount."},{"kind":"constraint_block","message":"Save a short count on this line until you have the full amount"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a packed amount more than zero."},{"kind":"constraint_block","message":"You can't pack more than what's required. Enter a smaller amount."},{"kind":"constraint_block","message":"Save a short count on this line until you have the full amount"},{"kind":"constraint_block","message":"That is less than the return already counted on this line. Correct the return count first."},{"kind":"constraint_block","message":"That is less than what is already checked or on the truck. Correct those counts first."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemPacked"],
 } as const;
 
-export type PackListItemMarkPackedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemMarkPackedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.markPacked.
@@ -108047,6 +114527,308 @@ export const PackListItemMarkPackedLifecycle = [
   }
 ] as const;
 
+// --- PackListItem.recordChecked ---
+export interface PackListItemRecordCheckedClientInput {
+  /** Bounds: 0..∞ */
+  checkedQuantity: number;
+}
+
+export const PackListItemRecordCheckedCapability = {
+  capabilityId: "PackListItem.recordChecked",
+  entity: "PackListItem",
+  command: "recordChecked",
+  route: "/api/manifest/PackListItem/commands/recordChecked",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["checkedQuantity"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"The checked amount can't be negative. Use zero or more."},{"kind":"constraint_block","message":"You can't check more than what is packed. Save the packed amount first."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemChecked"],
+} as const;
+
+export type PackListItemRecordCheckedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.recordChecked.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemRecordCheckedInput(client: PackListItemRecordCheckedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.recordChecked. */
+export const PackListItemRecordCheckedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.recordChecked. Not a rendered control. */
+export const PackListItemRecordCheckedAction = {
+  "exposure": "human",
+  "label": "Record checked",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "checkedQuantity",
+      "label": "Checked quantity",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- PackListItem.recordLoaded ---
+export interface PackListItemRecordLoadedClientInput {
+  /** Bounds: 0..∞ */
+  loadedQuantity: number;
+}
+
+export const PackListItemRecordLoadedCapability = {
+  capabilityId: "PackListItem.recordLoaded",
+  entity: "PackListItem",
+  command: "recordLoaded",
+  route: "/api/manifest/PackListItem/commands/recordLoaded",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["loadedQuantity"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"The loaded amount can't be negative. Use zero or more."},{"kind":"constraint_block","message":"You can't load more than what is packed. Save the packed amount first."},{"kind":"constraint_block","message":"That is less than the return already counted on this line. Correct the return count first."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemLoaded"],
+} as const;
+
+export type PackListItemRecordLoadedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.recordLoaded.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemRecordLoadedInput(client: PackListItemRecordLoadedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.recordLoaded. */
+export const PackListItemRecordLoadedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.recordLoaded. Not a rendered control. */
+export const PackListItemRecordLoadedAction = {
+  "exposure": "human",
+  "label": "Record loaded",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "loadedQuantity",
+      "label": "Loaded quantity",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- PackListItem.recordPackedCount ---
 export interface PackListItemRecordPackedCountClientInput {
   /** Bounds: 1..∞ */
@@ -108065,14 +114847,14 @@ export const PackListItemRecordPackedCountCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["packedQuantity"],
   serverParameterNames: [],
-  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a packed amount more than zero."},{"kind":"constraint_block","message":"This is the full amount. Mark the line packed."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Enter a packed amount more than zero."},{"kind":"constraint_block","message":"This is the full amount. Mark the line packed."},{"kind":"constraint_block","message":"That is less than the return already counted on this line. Correct the return count first."},{"kind":"constraint_block","message":"That is less than what is already checked or on the truck. Correct those counts first."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemCountRecorded"],
 } as const;
 
-export type PackListItemRecordPackedCountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemRecordPackedCountResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.recordPackedCount.
@@ -108198,6 +114980,184 @@ export const PackListItemRecordPackedCountAction = {
   ]
 } as const;
 
+// --- PackListItem.recordReturn ---
+export interface PackListItemRecordReturnClientInput {
+  /** Bounds: 0..∞ */
+  returnedQuantity: number;
+  /** Bounds: 0..∞ */
+  usedQuantity: number;
+  /** Bounds: 0..∞ */
+  lostQuantity: number;
+  /** Bounds: 0..∞ */
+  damagedQuantity: number;
+  finding?: string;
+}
+
+export const PackListItemRecordReturnCapability = {
+  capabilityId: "PackListItem.recordReturn",
+  entity: "PackListItem",
+  command: "recordReturn",
+  route: "/api/manifest/PackListItem/commands/recordReturn",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["returnedQuantity","usedQuantity","lostQuantity","damagedQuantity","finding"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This line does not come back, so there is no return to count."},{"kind":"constraint_block","message":"A return amount can't be negative. Use zero or more."},{"kind":"constraint_block","message":"That is more than what went out. Check the amounts."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
+  emits: ["PackListItemReturnCounted"],
+} as const;
+
+export type PackListItemRecordReturnResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackListItem.recordReturn.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemRecordReturnInput(client: PackListItemRecordReturnClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.recordReturn. */
+export const PackListItemRecordReturnInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "readId": "PackListItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "readId": "PackListItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.lists()",
+    "readId": "DishContainer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishContainer",
+    "queryKeyHint": "queryKeys.dishContainer.detail(id)",
+    "readId": "DishContainer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "readId": "EventDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "readId": "EventDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackListItem.recordReturn. Not a rendered control. */
+export const PackListItemRecordReturnAction = {
+  "exposure": "human",
+  "label": "Record return",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "returnedQuantity",
+      "label": "Returned quantity",
+      "required": true
+    },
+    {
+      "name": "usedQuantity",
+      "label": "Used quantity",
+      "required": true
+    },
+    {
+      "name": "lostQuantity",
+      "label": "Lost quantity",
+      "required": true
+    },
+    {
+      "name": "damagedQuantity",
+      "label": "Damaged quantity",
+      "required": true
+    },
+    {
+      "name": "finding",
+      "label": "Finding",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- PackListItem.recordSentInstead ---
 export interface PackListItemRecordSentInsteadClientInput {
   sentInstead?: string;
@@ -108215,14 +115175,14 @@ export const PackListItemRecordSentInsteadCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["sentInstead"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemSentInsteadRecorded"],
 } as const;
 
-export type PackListItemRecordSentInsteadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemRecordSentInsteadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.recordSentInstead.
@@ -108363,14 +115323,14 @@ export const PackListItemRemoveCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRemoved"],
 } as const;
 
-export type PackListItemRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.remove.
@@ -108505,14 +115465,14 @@ export const PackListItemRestoreExcludedCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemRestoreExcludedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemRestoreExcludedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.restoreExcluded.
@@ -108656,14 +115616,14 @@ export const PackListItemRestoreImportedAssociationCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["dishId","eventDishId","expectedDescription","expectedVersion","expectedPackListVersion","expectedEventVersion","expectedEventDishVersion","sourceReference"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"guard_failure","message":"Guard 8 failed"},{"kind":"constraint_block","message":"Say where this packing link came from."},{"kind":"constraint_block","message":"This line's description changed since it was reviewed. Check it before continuing."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: [],
 } as const;
 
-export type PackListItemRestoreImportedAssociationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemRestoreImportedAssociationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.restoreImportedAssociation.
@@ -108844,14 +115804,14 @@ export const PackListItemSetResponsibilityCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["ownership","returnRequired","returnNote"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"This line comes from a pack rule. Change who supplies it on the rule."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemResponsibilitySet"],
 } as const;
 
-export type PackListItemSetResponsibilityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemSetResponsibilityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.setResponsibility.
@@ -109019,14 +115979,14 @@ export const PackListItemSetUnitWeightCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["unitWeightKg"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Weight cannot be negative."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemWeightSet"],
 } as const;
 
-export type PackListItemSetUnitWeightResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemSetUnitWeightResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.setUnitWeight.
@@ -109169,14 +116129,14 @@ export const PackListItemSyncContainerServingsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["quantityServings"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemSyncContainerServingsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemSyncContainerServingsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.syncContainerServings.
@@ -109319,14 +116279,14 @@ export const PackListItemSyncKitGuestsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["requiredQuantity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may update pack list items"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may change pack list items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackListItem not found"}],
   emits: ["PackListItemRequirementSynced"],
 } as const;
 
-export type PackListItemSyncKitGuestsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type PackListItemSyncKitGuestsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for PackListItem.syncKitGuests.
@@ -110877,6 +117837,192 @@ export const PackRuleReviseAction = {
       "name": "note",
       "label": "Note",
       "required": false
+    }
+  ]
+} as const;
+
+// --- PackSectionClaim.release ---
+export type PackSectionClaimReleaseClientInput = Record<string, never>;
+
+export const PackSectionClaimReleaseCapability = {
+  capabilityId: "PackSectionClaim.release",
+  entity: "PackSectionClaim",
+  command: "release",
+  route: "/api/manifest/PackSectionClaim/commands/release",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see who is packing each section"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may take a pack list section"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may take a pack list section"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PackSectionClaim not found"}],
+  emits: ["PackSectionReleased"],
+} as const;
+
+export type PackSectionClaimReleaseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PackSectionClaim.release.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackSectionClaimReleaseInput(client: PackSectionClaimReleaseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackSectionClaim.release. */
+export const PackSectionClaimReleaseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackSectionClaim.release. Not a rendered control. */
+export const PackSectionClaimReleaseAction = {
+  "exposure": "human",
+  "label": "Release",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- PackSectionClaim.take ---
+export interface PackSectionClaimTakeClientInput {
+  packListId: string;
+  sectionKey: string;
+}
+
+export const PackSectionClaimTakeCapability = {
+  capabilityId: "PackSectionClaim.take",
+  entity: "PackSectionClaim",
+  command: "take",
+  route: "/api/manifest/PackSectionClaim/commands/take",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["packListId","sectionKey"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see who is packing each section"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may take a pack list section"},{"kind":"policy_denial","message":"Kitchen, logistics, event and sales staff and managers may take a pack list section"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This section is on a different pack list. Pick the pack list already on it."},{"kind":"constraint_block","message":"Pick the section to take."}],
+  emits: ["PackSectionTaken"],
+} as const;
+
+export type PackSectionClaimTakeResult = { docId: string };
+
+/**
+ * Build command input for PackSectionClaim.take.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackSectionClaimTakeInput(client: PackSectionClaimTakeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackSectionClaim.take. */
+export const PackSectionClaimTakeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.lists()",
+    "readId": "PackList.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackList",
+    "queryKeyHint": "queryKeys.packList.detail(id)",
+    "readId": "PackList.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PackSectionClaim.take. Not a rendered control. */
+export const PackSectionClaimTakeAction = {
+  "exposure": "human",
+  "label": "Take",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "packListId",
+      "label": "Pack list id",
+      "required": true
+    },
+    {
+      "name": "sectionKey",
+      "label": "Section key",
+      "required": true
     }
   ]
 } as const;
@@ -114947,6 +122093,20 @@ export const PersonAssignRoleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -115027,6 +122187,20 @@ export const PersonAssignRoleInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -115611,6 +122785,20 @@ export const PersonChangeAddressInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -115691,6 +122879,20 @@ export const PersonChangeAddressInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -116201,6 +123403,20 @@ export const PersonCorrectEmailInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -116281,6 +123497,20 @@ export const PersonCorrectEmailInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -116773,6 +124003,20 @@ export const PersonCorrectIdentityInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -116853,6 +124097,20 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -117351,6 +124609,20 @@ export const PersonDeactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -117431,6 +124703,20 @@ export const PersonDeactivateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -117941,6 +125227,20 @@ export const PersonHireInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -118021,6 +125321,20 @@ export const PersonHireInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -118659,6 +125973,20 @@ export const PersonLinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -118739,6 +126067,20 @@ export const PersonLinkAccountInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -119227,6 +126569,20 @@ export const PersonReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -119307,6 +126663,20 @@ export const PersonReactivateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -119807,6 +127177,20 @@ export const PersonSetEmployeeNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -119887,6 +127271,20 @@ export const PersonSetEmployeeNumberInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -120378,6 +127776,20 @@ export const PersonSetPayRateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -120458,6 +127870,20 @@ export const PersonSetPayRateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -120948,6 +128374,20 @@ export const PersonSetSchedulingHoldInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -121028,6 +128468,20 @@ export const PersonSetSchedulingHoldInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -121518,6 +128972,20 @@ export const PersonSetSmsAlertsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -121598,6 +129066,20 @@ export const PersonSetSmsAlertsInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -122088,6 +129570,20 @@ export const PersonSetStaffingVendorInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -122168,6 +129664,20 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -122659,6 +130169,20 @@ export const PersonSetWorkPreferencesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -122739,6 +130263,20 @@ export const PersonSetWorkPreferencesInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -123234,6 +130772,20 @@ export const PersonTerminateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -123314,6 +130866,20 @@ export const PersonTerminateInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -123825,6 +131391,20 @@ export const PersonUnlinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.lists()",
+    "readId": "EventTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTask",
+    "queryKeyHint": "queryKeys.eventTask.detail(id)",
+    "readId": "EventTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "EventTimelineComment",
     "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
     "readId": "EventTimelineComment.list",
@@ -123905,6 +131485,20 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "OneOnOneAction",
     "queryKeyHint": "queryKeys.oneOnOneAction.detail(id)",
     "readId": "OneOnOneAction.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.lists()",
+    "readId": "PackSectionClaim.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackSectionClaim",
+    "queryKeyHint": "queryKeys.packSectionClaim.detail(id)",
+    "readId": "PackSectionClaim.get",
     "label": "related entity detail"
   },
   {
@@ -124223,6 +131817,683 @@ export const PersonUnlinkAccountAction = {
   "label": "Unlink account",
   "confirm": false,
   "fields": []
+} as const;
+
+// --- PlanningOverride.record ---
+export interface PlanningOverrideRecordClientInput {
+  eventId: string;
+  action: string;
+  reason: string;
+  openItems?: string;
+}
+
+export const PlanningOverrideRecordCapability = {
+  capabilityId: "PlanningOverride.record",
+  entity: "PlanningOverride",
+  command: "record",
+  route: "/api/manifest/PlanningOverride/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventId","action","reason","openItems"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see why a plan change was made"},{"kind":"policy_denial","message":"Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"},{"kind":"policy_denial","message":"Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This reason is for a different event. Pick the event already on it."},{"kind":"constraint_block","message":"Say why this change is fine."}],
+  emits: ["PlanningOverrideRecorded"],
+} as const;
+
+export type PlanningOverrideRecordResult = { docId: string };
+
+/**
+ * Build command input for PlanningOverride.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningOverrideRecordInput(client: PlanningOverrideRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningOverride.record. */
+export const PlanningOverrideRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.lists()",
+    "readId": "PlanningOverride.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningOverride",
+    "queryKeyHint": "queryKeys.planningOverride.detail(id)",
+    "readId": "PlanningOverride.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningOverride.record. Not a rendered control. */
+export const PlanningOverrideRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "action",
+      "label": "Action",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    },
+    {
+      "name": "openItems",
+      "label": "Open items",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PlanningReceipt.answerAgain ---
+export interface PlanningReceiptAnswerAgainClientInput {
+  /** Bounds: 0..∞ */
+  quantity: number;
+  declined: boolean;
+  basis?: string;
+}
+
+export const PlanningReceiptAnswerAgainCapability = {
+  capabilityId: "PlanningReceipt.answerAgain",
+  entity: "PlanningReceipt",
+  command: "answerAgain",
+  route: "/api/manifest/PlanningReceipt/commands/answerAgain",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["quantity","declined","basis"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see answered suggestions"},{"kind":"policy_denial","message":"Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"},{"kind":"policy_denial","message":"Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"The amount can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PlanningReceipt not found"}],
+  emits: ["PlanningSuggestionAnswered"],
+} as const;
+
+export type PlanningReceiptAnswerAgainResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PlanningReceipt.answerAgain.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningReceiptAnswerAgainInput(client: PlanningReceiptAnswerAgainClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningReceipt.answerAgain. */
+export const PlanningReceiptAnswerAgainInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningReceipt.answerAgain. Not a rendered control. */
+export const PlanningReceiptAnswerAgainAction = {
+  "exposure": "human",
+  "label": "Answer again",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": true
+    },
+    {
+      "name": "declined",
+      "label": "Declined",
+      "required": true
+    },
+    {
+      "name": "basis",
+      "label": "Basis",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PlanningReceipt.record ---
+export interface PlanningReceiptRecordClientInput {
+  eventId: string;
+  suggestionKey: string;
+  /** Bounds: 0..∞ */
+  quantity: number;
+  declined: boolean;
+  basis?: string;
+}
+
+export const PlanningReceiptRecordCapability = {
+  capabilityId: "PlanningReceipt.record",
+  entity: "PlanningReceipt",
+  command: "record",
+  route: "/api/manifest/PlanningReceipt/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventId","suggestionKey","quantity","declined","basis"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see answered suggestions"},{"kind":"policy_denial","message":"Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"},{"kind":"policy_denial","message":"Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This answer is for a different event. Pick the event already on it."},{"kind":"constraint_block","message":"This answer has no suggestion to go with."},{"kind":"constraint_block","message":"The amount can't be negative. Use zero or more."}],
+  emits: ["PlanningSuggestionAnswered"],
+} as const;
+
+export type PlanningReceiptRecordResult = { docId: string };
+
+/**
+ * Build command input for PlanningReceipt.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningReceiptRecordInput(client: PlanningReceiptRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningReceipt.record. */
+export const PlanningReceiptRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.lists()",
+    "readId": "PlanningReceipt.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningReceipt",
+    "queryKeyHint": "queryKeys.planningReceipt.detail(id)",
+    "readId": "PlanningReceipt.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningReceipt.record. Not a rendered control. */
+export const PlanningReceiptRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    },
+    {
+      "name": "suggestionKey",
+      "label": "Suggestion key",
+      "required": true
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": true
+    },
+    {
+      "name": "declined",
+      "label": "Declined",
+      "required": true
+    },
+    {
+      "name": "basis",
+      "label": "Basis",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PlanningRule.define ---
+export interface PlanningRuleDefineClientInput {
+  name: string;
+  /** Allowed: "every_event" | "equipment" | "equipment_kind" */
+  trigger: "every_event" | "equipment" | "equipment_kind";
+  actionsJson: string;
+  triggerEquipmentId?: string;
+  triggerEquipmentKind?: string;
+}
+
+export const PlanningRuleDefineCapability = {
+  capabilityId: "PlanningRule.define",
+  entity: "PlanningRule",
+  command: "define",
+  route: "/api/manifest/PlanningRule/commands/define",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["name","trigger","actionsJson","triggerEquipmentId","triggerEquipmentKind"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change planning rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give this rule a name."},{"kind":"constraint_block","message":"Pick the equipment or the kind of equipment that sets this rule off."}],
+  emits: ["PlanningRuleDefined"],
+} as const;
+
+export type PlanningRuleDefineResult = { docId: string };
+
+/**
+ * Build command input for PlanningRule.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningRuleDefineInput(client: PlanningRuleDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningRule.define. */
+export const PlanningRuleDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningRule.define. Not a rendered control. */
+export const PlanningRuleDefineAction = {
+  "exposure": "human",
+  "label": "Define",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "trigger",
+      "label": "Trigger",
+      "required": true,
+      "choices": [
+        {
+          "value": "every_event",
+          "label": "every_event"
+        },
+        {
+          "value": "equipment",
+          "label": "equipment"
+        },
+        {
+          "value": "equipment_kind",
+          "label": "equipment_kind"
+        }
+      ]
+    },
+    {
+      "name": "actionsJson",
+      "label": "Actions json",
+      "required": true
+    },
+    {
+      "name": "triggerEquipmentId",
+      "label": "Trigger equipment id",
+      "required": false
+    },
+    {
+      "name": "triggerEquipmentKind",
+      "label": "Trigger equipment kind",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- PlanningRule.reinstate ---
+export type PlanningRuleReinstateClientInput = Record<string, never>;
+
+export const PlanningRuleReinstateCapability = {
+  capabilityId: "PlanningRule.reinstate",
+  entity: "PlanningRule",
+  command: "reinstate",
+  route: "/api/manifest/PlanningRule/commands/reinstate",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change planning rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PlanningRule not found"}],
+  emits: ["PlanningRuleReinstated"],
+} as const;
+
+export type PlanningRuleReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PlanningRule.reinstate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningRuleReinstateInput(client: PlanningRuleReinstateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningRule.reinstate. */
+export const PlanningRuleReinstateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningRule.reinstate. Not a rendered control. */
+export const PlanningRuleReinstateAction = {
+  "exposure": "human",
+  "label": "Reinstate",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "retired"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for PlanningRule.reinstate. */
+export const PlanningRuleReinstateLifecycle = [
+  {
+    "property": "status",
+    "from": "retired",
+    "to": "active",
+    "proven": true
+  }
+] as const;
+
+// --- PlanningRule.retire ---
+export type PlanningRuleRetireClientInput = Record<string, never>;
+
+export const PlanningRuleRetireCapability = {
+  capabilityId: "PlanningRule.retire",
+  entity: "PlanningRule",
+  command: "retire",
+  route: "/api/manifest/PlanningRule/commands/retire",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change planning rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PlanningRule not found"}],
+  emits: ["PlanningRuleRetired"],
+} as const;
+
+export type PlanningRuleRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PlanningRule.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningRuleRetireInput(client: PlanningRuleRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningRule.retire. */
+export const PlanningRuleRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningRule.retire. Not a rendered control. */
+export const PlanningRuleRetireAction = {
+  "exposure": "human",
+  "label": "Retire",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "active"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for PlanningRule.retire. */
+export const PlanningRuleRetireLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
+  }
+] as const;
+
+// --- PlanningRule.revise ---
+export interface PlanningRuleReviseClientInput {
+  name: string;
+  actionsJson: string;
+}
+
+export const PlanningRuleReviseCapability = {
+  capabilityId: "PlanningRule.revise",
+  entity: "PlanningRule",
+  command: "revise",
+  route: "/api/manifest/PlanningRule/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["name","actionsJson"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may update planning rules"},{"kind":"policy_denial","message":"Event managers, logistics staff and managers may change planning rules"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this rule a name."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PlanningRule not found"}],
+  emits: ["PlanningRuleRevised"],
+} as const;
+
+export type PlanningRuleReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PlanningRule.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPlanningRuleReviseInput(client: PlanningRuleReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PlanningRule.revise. */
+export const PlanningRuleReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.lists()",
+    "readId": "PlanningRule.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PlanningRule",
+    "queryKeyHint": "queryKeys.planningRule.detail(id)",
+    "readId": "PlanningRule.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.lists()",
+    "readId": "Equipment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Equipment",
+    "queryKeyHint": "queryKeys.equipment.detail(id)",
+    "readId": "Equipment.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PlanningRule.revise. Not a rendered control. */
+export const PlanningRuleReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "actionsJson",
+      "label": "Actions json",
+      "required": true
+    }
+  ]
 } as const;
 
 // --- PrepTask.assign ---
@@ -157812,14 +166083,14 @@ export const VehicleReviseDetailsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["make","model","registration","ownership","payloadCapacityKg"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may update vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may change vehicles"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this vehicle a make."},{"kind":"constraint_block","message":"Give this vehicle a model."},{"kind":"constraint_block","message":"Give this vehicle a registration."},{"kind":"constraint_block","message":"This vehicle's payload capacity has to be more than zero."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Vehicle not found"}],
   emits: ["VehicleDetailsRevised"],
 } as const;
 
-export type VehicleReviseDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
+export type VehicleReviseDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Vehicle.reviseDetails.
@@ -157961,6 +166232,149 @@ export const VehicleReviseDetailsAction = {
   ]
 } as const;
 
+// --- Vehicle.setCrewFacts ---
+export interface VehicleSetCrewFactsClientInput {
+  /** Bounds: 1..∞ */
+  seatCount?: number;
+  driverQualificationName?: string;
+}
+
+export const VehicleSetCrewFactsCapability = {
+  capabilityId: "Vehicle.setCrewFacts",
+  entity: "Vehicle",
+  command: "setCrewFacts",
+  route: "/api/manifest/Vehicle/commands/setCrewFacts",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["seatCount","driverQualificationName"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may update vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may change vehicles"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"A truck has at least one seat. Enter 1 or more, or leave it empty."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Vehicle not found"}],
+  emits: ["VehicleCrewFactsSet"],
+} as const;
+
+export type VehicleSetCrewFactsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Vehicle.setCrewFacts.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVehicleSetCrewFactsInput(client: VehicleSetCrewFactsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Vehicle.setCrewFacts. */
+export const VehicleSetCrewFactsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.lists()",
+    "readId": "Vehicle.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vehicle",
+    "queryKeyHint": "queryKeys.vehicle.detail(id)",
+    "readId": "Vehicle.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.lists()",
+    "readId": "Delivery.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Delivery",
+    "queryKeyHint": "queryKeys.delivery.detail(id)",
+    "readId": "Delivery.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleFuelLog",
+    "queryKeyHint": "queryKeys.vehicleFuelLog.lists()",
+    "readId": "VehicleFuelLog.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleFuelLog",
+    "queryKeyHint": "queryKeys.vehicleFuelLog.detail(id)",
+    "readId": "VehicleFuelLog.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleMaintenanceSchedule",
+    "queryKeyHint": "queryKeys.vehicleMaintenanceSchedule.lists()",
+    "readId": "VehicleMaintenanceSchedule.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleMaintenanceSchedule",
+    "queryKeyHint": "queryKeys.vehicleMaintenanceSchedule.detail(id)",
+    "readId": "VehicleMaintenanceSchedule.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VehicleServiceEntry",
+    "queryKeyHint": "queryKeys.vehicleServiceEntry.lists()",
+    "readId": "VehicleServiceEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleServiceEntry",
+    "queryKeyHint": "queryKeys.vehicleServiceEntry.detail(id)",
+    "readId": "VehicleServiceEntry.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Vehicle.setCrewFacts. Not a rendered control. */
+export const VehicleSetCrewFactsAction = {
+  "exposure": "human",
+  "label": "Set crew facts",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "seatCount",
+      "label": "Seat count",
+      "required": false
+    },
+    {
+      "name": "driverQualificationName",
+      "label": "Driver qualification name",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Vehicle.setTowCapacity ---
 export interface VehicleSetTowCapacityClientInput {
   /** Bounds: 0..∞ */
@@ -157979,14 +166393,14 @@ export const VehicleSetTowCapacityCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["towCapacityKg"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may update vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may change vehicles"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Towing limit cannot be negative."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Vehicle not found"}],
   emits: ["VehicleTowCapacitySet"],
 } as const;
 
-export type VehicleSetTowCapacityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
+export type VehicleSetTowCapacityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Vehicle.setTowCapacity.
@@ -158118,14 +166532,14 @@ export const VehicleUpdateInsuranceCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["insuranceProvider","insurancePolicyNumber","insuranceExpiresAt"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may update vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may change vehicles"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this vehicle an insurance provider."},{"kind":"constraint_block","message":"Give this vehicle an insurance policy number."},{"kind":"constraint_block","message":"This vehicle's insurance expiry has to be a future date."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Vehicle not found"}],
   emits: ["VehicleInsuranceUpdated"],
 } as const;
 
-export type VehicleUpdateInsuranceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
+export type VehicleUpdateInsuranceResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Vehicle.updateInsurance.
@@ -158266,14 +166680,14 @@ export const VehicleUpdateOperationalStatusCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["operationalStatus","statusNote"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may update vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may change vehicles"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Vehicle not found"}],
   emits: ["VehicleOperationalStatusUpdated"],
 } as const;
 
-export type VehicleUpdateOperationalStatusResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
+export type VehicleUpdateOperationalStatusResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Vehicle.updateOperationalStatus.
@@ -158431,14 +166845,14 @@ export const VehicleUpdateRegistrationCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["registrationNumber","registrationExpiresAt"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may update vehicles"},{"kind":"policy_denial","message":"Logistics staff and managers may change vehicles"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this vehicle a registration number."},{"kind":"constraint_block","message":"This vehicle's registration expiry has to be a future date."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Vehicle not found"}],
   emits: ["VehicleRegistrationUpdated"],
 } as const;
 
-export type VehicleUpdateRegistrationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
+export type VehicleUpdateRegistrationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Vehicle.updateRegistration.
@@ -159059,6 +167473,340 @@ export const VehicleServiceEntryRecordAction = {
     {
       "name": "nextDueMileage",
       "label": "Next due mileage",
+      "required": false
+    },
+    {
+      "name": "notes",
+      "label": "Notes",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- VehicleTripCheck.record ---
+export interface VehicleTripCheckRecordClientInput {
+  eventVehicleAssignmentId: string;
+  /** Allowed: "before_leaving" | "after_return" */
+  kind: "before_leaving" | "after_return";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  tires: "good" | "fair" | "poor" | "fail";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  brakes: "good" | "fair" | "poor" | "fail";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  lights: "good" | "fair" | "poor" | "fail";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  fluids: "good" | "fair" | "poor" | "fail";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  bodywork: "good" | "fair" | "poor" | "fail";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  interior: "good" | "fair" | "poor" | "fail";
+  /** Allowed: "good" | "fair" | "poor" | "fail" */
+  refrigeration?: "good" | "fair" | "poor" | "fail";
+  /** Bounds: 0..∞ */
+  odometer?: number;
+  /** Allowed: "empty" | "quarter" | "half" | "three_quarters" | "full" */
+  fuelLevel?: "empty" | "quarter" | "half" | "three_quarters" | "full";
+  damageNote?: string;
+  notes?: string;
+}
+
+export const VehicleTripCheckRecordCapability = {
+  capabilityId: "VehicleTripCheck.record",
+  entity: "VehicleTripCheck",
+  command: "record",
+  route: "/api/manifest/VehicleTripCheck/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["eventVehicleAssignmentId","kind","tires","brakes","lights","fluids","bodywork","interior","refrigeration","odometer","fuelLevel","damageNote","notes"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see trip checks"},{"kind":"policy_denial","message":"Staff may add trip checks"},{"kind":"policy_denial","message":"Staff may add trip checks"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This check is for a different truck run. Pick the run already on this check."},{"kind":"constraint_block","message":"The odometer reading can't be negative. Use zero or more."}],
+  emits: ["VehicleTripChecked"],
+} as const;
+
+export type VehicleTripCheckRecordResult = { docId: string };
+
+/**
+ * Build command input for VehicleTripCheck.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVehicleTripCheckRecordInput(client: VehicleTripCheckRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VehicleTripCheck.record. */
+export const VehicleTripCheckRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.lists()",
+    "readId": "VehicleTripCheck.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VehicleTripCheck",
+    "queryKeyHint": "queryKeys.vehicleTripCheck.detail(id)",
+    "readId": "VehicleTripCheck.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.lists()",
+    "readId": "EventVehicleAssignment.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventVehicleAssignment",
+    "queryKeyHint": "queryKeys.eventVehicleAssignment.detail(id)",
+    "readId": "EventVehicleAssignment.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VehicleTripCheck.record. Not a rendered control. */
+export const VehicleTripCheckRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventVehicleAssignmentId",
+      "label": "Event vehicle assignment id",
+      "required": true
+    },
+    {
+      "name": "kind",
+      "label": "Kind",
+      "required": true,
+      "choices": [
+        {
+          "value": "before_leaving",
+          "label": "before_leaving"
+        },
+        {
+          "value": "after_return",
+          "label": "after_return"
+        }
+      ]
+    },
+    {
+      "name": "tires",
+      "label": "Tires",
+      "required": true,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "brakes",
+      "label": "Brakes",
+      "required": true,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "lights",
+      "label": "Lights",
+      "required": true,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "fluids",
+      "label": "Fluids",
+      "required": true,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "bodywork",
+      "label": "Bodywork",
+      "required": true,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "interior",
+      "label": "Interior",
+      "required": true,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "refrigeration",
+      "label": "Refrigeration",
+      "required": false,
+      "choices": [
+        {
+          "value": "good",
+          "label": "good"
+        },
+        {
+          "value": "fair",
+          "label": "fair"
+        },
+        {
+          "value": "poor",
+          "label": "poor"
+        },
+        {
+          "value": "fail",
+          "label": "fail"
+        }
+      ]
+    },
+    {
+      "name": "odometer",
+      "label": "Odometer",
+      "required": false
+    },
+    {
+      "name": "fuelLevel",
+      "label": "Fuel level",
+      "required": false,
+      "choices": [
+        {
+          "value": "empty",
+          "label": "empty"
+        },
+        {
+          "value": "quarter",
+          "label": "quarter"
+        },
+        {
+          "value": "half",
+          "label": "half"
+        },
+        {
+          "value": "three_quarters",
+          "label": "three_quarters"
+        },
+        {
+          "value": "full",
+          "label": "full"
+        }
+      ]
+    },
+    {
+      "name": "damageNote",
+      "label": "Damage note",
       "required": false
     },
     {
@@ -172599,6 +181347,7 @@ export const ALL_CAPABILITY_IDS = [
   "Delivery.schedule",
   "Delivery.standDownWithEvent",
   "Delivery.startTransit",
+  "DepartureOverride.record",
   "Dish.classifyAllergens",
   "Dish.classifyKind",
   "Dish.clearPrimaryImage",
@@ -172639,6 +181388,7 @@ export const ALL_CAPABILITY_IDS = [
   "Equipment.register",
   "Equipment.retire",
   "Equipment.reviseDetails",
+  "Equipment.setOperatingFacts",
   "Equipment.setPrimaryImage",
   "Equipment.transfer",
   "Equipment.updateCondition",
@@ -172708,6 +181458,10 @@ export const ALL_CAPABILITY_IDS = [
   "EventAssignment.markNoShow",
   "EventAssignment.planTiming",
   "EventAssignment.unassign",
+  "EventChecklist.define",
+  "EventChecklist.reinstate",
+  "EventChecklist.retire",
+  "EventChecklist.revise",
   "EventCloseout.capture",
   "EventCloseout.correct",
   "EventCloseout.finalize",
@@ -172745,6 +181499,8 @@ export const ALL_CAPABILITY_IDS = [
   "EventLayoutSection.add",
   "EventLayoutSection.remove",
   "EventLayoutSection.update",
+  "EventPlanNeeds.note",
+  "EventPlanNeeds.revise",
   "EventStaffNeed.applyApprovedShiftSwap",
   "EventStaffNeed.cancel",
   "EventStaffNeed.changeCoverage",
@@ -172756,6 +181512,14 @@ export const ALL_CAPABILITY_IDS = [
   "EventStaffNeed.postOpen",
   "EventStaffNeed.prepareCoverageContinuation",
   "EventStaffNeed.releaseClaim",
+  "EventTask.add",
+  "EventTask.complete",
+  "EventTask.giveTo",
+  "EventTask.remove",
+  "EventTask.reopen",
+  "EventTask.revise",
+  "EventTask.skip",
+  "EventTask.start",
   "EventTemplate.archive",
   "EventTemplate.define",
   "EventTemplate.reactivate",
@@ -172932,6 +181696,7 @@ export const ALL_CAPABILITY_IDS = [
   "OperatingLocation.deactivate",
   "OperatingLocation.revise",
   "Organization.configureBranding",
+  "Organization.configurePlanningChecks",
   "Organization.configureRoutePolicy",
   "Organization.configureTimingPolicy",
   "Organization.deactivate",
@@ -172968,7 +181733,10 @@ export const ALL_CAPABILITY_IDS = [
   "PackListItem.exclude",
   "PackListItem.markMissing",
   "PackListItem.markPacked",
+  "PackListItem.recordChecked",
+  "PackListItem.recordLoaded",
   "PackListItem.recordPackedCount",
+  "PackListItem.recordReturn",
   "PackListItem.recordSentInstead",
   "PackListItem.remove",
   "PackListItem.restoreExcluded",
@@ -172985,6 +181753,8 @@ export const ALL_CAPABILITY_IDS = [
   "PackRule.reinstate",
   "PackRule.retire",
   "PackRule.revise",
+  "PackSectionClaim.release",
+  "PackSectionClaim.take",
   "Payment.beginProcessing",
   "Payment.disputeReconciliation",
   "Payment.fail",
@@ -173029,6 +181799,13 @@ export const ALL_CAPABILITY_IDS = [
   "Person.setWorkPreferences",
   "Person.terminate",
   "Person.unlinkAccount",
+  "PlanningOverride.record",
+  "PlanningReceipt.answerAgain",
+  "PlanningReceipt.record",
+  "PlanningRule.define",
+  "PlanningRule.reinstate",
+  "PlanningRule.retire",
+  "PlanningRule.revise",
   "PrepTask.assign",
   "PrepTask.cancel",
   "PrepTask.claim",
@@ -173242,6 +182019,7 @@ export const ALL_CAPABILITY_IDS = [
   "TrainingModule.retire",
   "Vehicle.register",
   "Vehicle.reviseDetails",
+  "Vehicle.setCrewFacts",
   "Vehicle.setTowCapacity",
   "Vehicle.updateInsurance",
   "Vehicle.updateOperationalStatus",
@@ -173250,6 +182028,7 @@ export const ALL_CAPABILITY_IDS = [
   "VehicleMaintenanceSchedule.applyService",
   "VehicleMaintenanceSchedule.schedule",
   "VehicleServiceEntry.record",
+  "VehicleTripCheck.record",
   "Vendor.onboard",
   "Vendor.reinstate",
   "Vendor.suspend",
@@ -173461,6 +182240,11 @@ export const ALL_READ_IDS = [
   "Delivery.byVehicleId",
   "Delivery.get",
   "Delivery.list",
+  "DepartureOverride.byEventId",
+  "DepartureOverride.byPackListId",
+  "DepartureOverride.byTenantId",
+  "DepartureOverride.get",
+  "DepartureOverride.list",
   "Dish.byCanonicalDishId",
   "Dish.byMergedIntoDishId",
   "Dish.byTenantId",
@@ -173553,9 +182337,13 @@ export const ALL_READ_IDS = [
   "EventAllergenCheck.list",
   "EventAssignment.byEventId",
   "EventAssignment.byPersonId",
+  "EventAssignment.byRideVehicleAssignmentId",
   "EventAssignment.byTenantId",
   "EventAssignment.get",
   "EventAssignment.list",
+  "EventChecklist.byTenantId",
+  "EventChecklist.get",
+  "EventChecklist.list",
   "EventCloseout.byEventId",
   "EventCloseout.byTenantId",
   "EventCloseout.get",
@@ -173621,14 +182409,26 @@ export const ALL_READ_IDS = [
   "EventPacketRevision.byTenantId",
   "EventPacketRevision.get",
   "EventPacketRevision.list",
+  "EventPlanNeeds.byEventId",
+  "EventPlanNeeds.byTenantId",
+  "EventPlanNeeds.get",
+  "EventPlanNeeds.list",
   "EventStaffNeed.byClaimedByPersonId",
   "EventStaffNeed.byCoverageReplacementPersonId",
   "EventStaffNeed.byEventId",
   "EventStaffNeed.byFilledByPersonId",
   "EventStaffNeed.byPreviousStaffNeedId",
+  "EventStaffNeed.byRideVehicleAssignmentId",
   "EventStaffNeed.byTenantId",
   "EventStaffNeed.get",
   "EventStaffNeed.list",
+  "EventTask.byChecklistTemplateId",
+  "EventTask.byEventId",
+  "EventTask.byOwnerPersonId",
+  "EventTask.byTenantId",
+  "EventTask.byWaitsForTaskId",
+  "EventTask.get",
+  "EventTask.list",
   "EventTemplate.byTenantId",
   "EventTemplate.get",
   "EventTemplate.list",
@@ -173831,6 +182631,11 @@ export const ALL_READ_IDS = [
   "PackRule.byTenantId",
   "PackRule.get",
   "PackRule.list",
+  "PackSectionClaim.byPackListId",
+  "PackSectionClaim.byPersonId",
+  "PackSectionClaim.byTenantId",
+  "PackSectionClaim.get",
+  "PackSectionClaim.list",
   "Payment.byClientId",
   "Payment.byClientMergeAuthorizationId",
   "Payment.byEventId",
@@ -173866,6 +182671,18 @@ export const ALL_READ_IDS = [
   "Person.byTenantId",
   "Person.get",
   "Person.list",
+  "PlanningOverride.byEventId",
+  "PlanningOverride.byTenantId",
+  "PlanningOverride.get",
+  "PlanningOverride.list",
+  "PlanningReceipt.byEventId",
+  "PlanningReceipt.byTenantId",
+  "PlanningReceipt.get",
+  "PlanningReceipt.list",
+  "PlanningRule.byTenantId",
+  "PlanningRule.byTriggerEquipmentId",
+  "PlanningRule.get",
+  "PlanningRule.list",
   "PrepTask.byAssignedToId",
   "PrepTask.byComponentId",
   "PrepTask.byDishId",
@@ -174153,6 +182970,11 @@ export const ALL_READ_IDS = [
   "VehicleServiceEntry.byVehicleId",
   "VehicleServiceEntry.get",
   "VehicleServiceEntry.list",
+  "VehicleTripCheck.byEventId",
+  "VehicleTripCheck.byEventVehicleAssignmentId",
+  "VehicleTripCheck.byTenantId",
+  "VehicleTripCheck.get",
+  "VehicleTripCheck.list",
   "Vendor.byTenantId",
   "Vendor.get",
   "Vendor.list",
@@ -174626,6 +183448,21 @@ export type getDeliveryResult = { _id: string; _creationTime: number; tenantId: 
 export const listDeliveryRead = {"entity":"Delivery","readId":"Delivery.list","exportName":"listDelivery","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: \"scheduled\" | \"in_transit\" | \"delivered\" | \"failed\" | \"cancelled\"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; departedByPersonId: string | null; deliveredByPersonId: string | null; receivedByName: string | null; deliveryNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listDeliveryResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: "scheduled" | "in_transit" | "delivered" | "failed" | "cancelled"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; departedByPersonId: string | null; deliveredByPersonId: string | null; receivedByName: string | null; deliveryNote: string | null; createdAt: number; updatedAt: number }>;
 
+export const listDepartureOverrideByEventIdRead = {"entity":"DepartureOverride","readId":"DepartureOverride.byEventId","exportName":"listDepartureOverrideByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDepartureOverrideByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listDepartureOverrideByPackListIdRead = {"entity":"DepartureOverride","readId":"DepartureOverride.byPackListId","exportName":"listDepartureOverrideByPackListId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"packListId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDepartureOverrideByPackListIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listDepartureOverrideByTenantIdRead = {"entity":"DepartureOverride","readId":"DepartureOverride.byTenantId","exportName":"listDepartureOverrideByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDepartureOverrideByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getDepartureOverrideRead = {"entity":"DepartureOverride","readId":"DepartureOverride.get","exportName":"getDepartureOverride","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getDepartureOverrideResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listDepartureOverrideRead = {"entity":"DepartureOverride","readId":"DepartureOverride.list","exportName":"listDepartureOverride","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDepartureOverrideResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; packListId: string | null; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
 export const listDishByCanonicalDishIdRead = {"entity":"Dish","readId":"Dish.byCanonicalDishId","exportName":"listDishByCanonicalDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"canonicalDishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; recipeInstructions: string | null; recipeSourceText: string | null; recipeSourceYield: string | null; recipeSourceFingerprint: string | null; serviceInstructions: string | null; serviceInstructionsSource: string | null; category: string | null; course: string | null; serviceStyle: string | null; portionSize: number; portionUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; dietaryTags: string[]; allergenSummary: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; status: \"active\" | \"retired\"; introducedAt: number | null; retiredAt: number | null; retirementReason: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; canonicalDishId: string | null; editionNumber: number | null; mergedIntoDishId: string | null; kind: \"food\" | \"supply\" | \"service\" | \"package\" | null; createdAt: number; updatedAt: number }>"} as const;
 export type listDishByCanonicalDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; recipeInstructions: string | null; recipeSourceText: string | null; recipeSourceYield: string | null; recipeSourceFingerprint: string | null; serviceInstructions: string | null; serviceInstructionsSource: string | null; category: string | null; course: string | null; serviceStyle: string | null; portionSize: number; portionUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; dietaryTags: string[]; allergenSummary: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; status: "active" | "retired"; introducedAt: number | null; retiredAt: number | null; retirementReason: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; canonicalDishId: string | null; editionNumber: number | null; mergedIntoDishId: string | null; kind: "food" | "supply" | "service" | "package" | null; createdAt: number; updatedAt: number }>;
 
@@ -174743,20 +183580,20 @@ export type getEmailNotificationSubscriptionResult = { _id: string; _creationTim
 export const listEmailNotificationSubscriptionRead = {"entity":"EmailNotificationSubscription","readId":"EmailNotificationSubscription.list","exportName":"listEmailNotificationSubscription","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; ownerId: string | null; eventUpdates: boolean; invoiceReminders: boolean; lowStockAlerts: boolean; shiftChanges: boolean; configuredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEmailNotificationSubscriptionResult = Array<{ _id: string; _creationTime: number; tenantId: string; ownerId: string | null; eventUpdates: boolean; invoiceReminders: boolean; lowStockAlerts: boolean; shiftChanges: boolean; configuredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEquipmentByPrimaryImageStorageIdRead = {"entity":"Equipment","readId":"Equipment.byPrimaryImageStorageId","exportName":"listEquipmentByPrimaryImageStorageId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"primaryImageStorageId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentByPrimaryImageStorageIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentByPrimaryImageStorageIdRead = {"entity":"Equipment","readId":"Equipment.byPrimaryImageStorageId","exportName":"listEquipmentByPrimaryImageStorageId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"primaryImageStorageId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentByPrimaryImageStorageIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEquipmentByTenantIdRead = {"entity":"Equipment","readId":"Equipment.byTenantId","exportName":"listEquipmentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentByTenantIdRead = {"entity":"Equipment","readId":"Equipment.byTenantId","exportName":"listEquipmentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listEquipmentByVendorIdRead = {"entity":"Equipment","readId":"Equipment.byVendorId","exportName":"listEquipmentByVendorId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentByVendorIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentByVendorIdRead = {"entity":"Equipment","readId":"Equipment.byVendorId","exportName":"listEquipmentByVendorId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentByVendorIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getEquipmentRead = {"entity":"Equipment","readId":"Equipment.get","exportName":"getEquipment","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getEquipmentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number } | null;
+export const getEquipmentRead = {"entity":"Equipment","readId":"Equipment.get","exportName":"getEquipment","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEquipmentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listEquipmentRead = {"entity":"Equipment","readId":"Equipment.list","exportName":"listEquipment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listEquipmentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
+export const listEquipmentRead = {"entity":"Equipment","readId":"Equipment.list","exportName":"listEquipment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: \"owned\" | \"rented\"; quantity: number; purchaseValue: number; condition: \"excellent\" | \"good\" | \"fair\" | \"poor\" | \"out_of_service\"; status: \"active\" | \"retired\"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: \"serialized\" | \"bulk\" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEquipmentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; assetTag: string; category: string; ownership: "owned" | "rented"; quantity: number; purchaseValue: number; condition: "excellent" | "good" | "fair" | "poor" | "out_of_service"; status: "active" | "retired"; conditionNote: string | null; homeLocation: string | null; currentLocation: string | null; registeredAt: number | null; retiredAt: number | null; retirementReason: string | null; trackingMode: "serialized" | "bulk" | null; serialNumber: string | null; description: string | null; countUnit: string | null; replacementCost: number | null; customerPrice: number | null; vendorId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; providesJson: string | null; needsJson: string | null; operatingFactsCheckedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listEquipmentIssueByEquipmentIdRead = {"entity":"EquipmentIssue","readId":"EquipmentIssue.byEquipmentId","exportName":"listEquipmentIssueByEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"equipmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: \"damaged\" | \"missing\" | \"cleaning\" | \"repair\" | \"late_return\" | \"vendor_return\"; severity: \"low\" | \"medium\" | \"high\"; quantity: number; holdsUnits: boolean; description: string; status: \"open\" | \"resolved\"; raisedAt: number | null; issueRaisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: \"undecided\" | \"company\" | \"client\" | \"vendor\"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; issueSettledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEquipmentIssueByEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; equipmentId: string | null; eventId: string | null; equipmentReservationId: string | null; rentalOrderLineId: string | null; kind: "damaged" | "missing" | "cleaning" | "repair" | "late_return" | "vendor_return"; severity: "low" | "medium" | "high"; quantity: number; holdsUnits: boolean; description: string; status: "open" | "resolved"; raisedAt: number | null; issueRaisedById: string | null; dueAt: number | null; ownerName: string | null; vendorId: string | null; cost: number | null; payer: "undecided" | "company" | "client" | "vendor"; chargeAmount: number | null; notes: string | null; resolvedAt: number | null; issueSettledById: string | null; resolution: string | null; createdAt: number; updatedAt: number }>;
@@ -174902,6 +183739,9 @@ export type listEventAssignmentByEventIdResult = Array<{ _id: string; _creationT
 export const listEventAssignmentByPersonIdRead = {"entity":"EventAssignment","readId":"EventAssignment.byPersonId","exportName":"listEventAssignmentByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: \"assigned\" | \"confirmed\" | \"checked_in\" | \"checked_out\" | \"no_show\" | \"unassigned\"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventAssignmentByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: "assigned" | "confirmed" | "checked_in" | "checked_out" | "no_show" | "unassigned"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>;
 
+export const listEventAssignmentByRideVehicleAssignmentIdRead = {"entity":"EventAssignment","readId":"EventAssignment.byRideVehicleAssignmentId","exportName":"listEventAssignmentByRideVehicleAssignmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"rideVehicleAssignmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: \"assigned\" | \"confirmed\" | \"checked_in\" | \"checked_out\" | \"no_show\" | \"unassigned\"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventAssignmentByRideVehicleAssignmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: "assigned" | "confirmed" | "checked_in" | "checked_out" | "no_show" | "unassigned"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>;
+
 export const listEventAssignmentByTenantIdRead = {"entity":"EventAssignment","readId":"EventAssignment.byTenantId","exportName":"listEventAssignmentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: \"assigned\" | \"confirmed\" | \"checked_in\" | \"checked_out\" | \"no_show\" | \"unassigned\"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventAssignmentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: "assigned" | "confirmed" | "checked_in" | "checked_out" | "no_show" | "unassigned"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>;
 
@@ -174910,6 +183750,15 @@ export type getEventAssignmentResult = { _id: string; _creationTime: number; ten
 
 export const listEventAssignmentRead = {"entity":"EventAssignment","readId":"EventAssignment.list","exportName":"listEventAssignment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: \"assigned\" | \"confirmed\" | \"checked_in\" | \"checked_out\" | \"no_show\" | \"unassigned\"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventAssignmentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; personId: string; role: string; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; notes: string | null; status: "assigned" | "confirmed" | "checked_in" | "checked_out" | "no_show" | "unassigned"; assignedAt: number | null; confirmedAt: number | null; checkedInAt: number | null; checkedOutAt: number | null; noShowAt: number | null; unassignedAt: number | null; overrideReason: string | null; declinedAt: number | null; declineReason: string | null; createdAt: number; updatedAt: number }>;
+
+export const listEventChecklistByTenantIdRead = {"entity":"EventChecklist","readId":"EventChecklist.byTenantId","exportName":"listEventChecklistByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventChecklistByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getEventChecklistRead = {"entity":"EventChecklist","readId":"EventChecklist.get","exportName":"getEventChecklist","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEventChecklistResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listEventChecklistRead = {"entity":"EventChecklist","readId":"EventChecklist.list","exportName":"listEventChecklist","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventChecklistResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; itemsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listEventCloseoutByEventIdRead = {"entity":"EventCloseout","readId":"EventCloseout.byEventId","exportName":"listEventCloseoutByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; actualRevenue: number; budgetedRevenue: number; revenueVariance: number; actualIngredientCost: number; actualWasteCost: number; actualLaborCost: number; actualVendorCost: number; budgetedCost: number; totalActualCost: number; costVariance: number; grossProfit: number; expectedHeadcount: number; actualHeadcount: number; unresolvedIssues: string | null; performanceNotes: string | null; notes: string | null; status: \"draft\" | \"finalized\"; capturedAt: number | null; finalizedAt: number | null; sourceSnapshot: string | null; revision: number | null; correctionReason: string | null; correctedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventCloseoutByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; actualRevenue: number; budgetedRevenue: number; revenueVariance: number; actualIngredientCost: number; actualWasteCost: number; actualLaborCost: number; actualVendorCost: number; budgetedCost: number; totalActualCost: number; costVariance: number; grossProfit: number; expectedHeadcount: number; actualHeadcount: number; unresolvedIssues: string | null; performanceNotes: string | null; notes: string | null; status: "draft" | "finalized"; capturedAt: number | null; finalizedAt: number | null; sourceSnapshot: string | null; revision: number | null; correctionReason: string | null; correctedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -175106,6 +183955,18 @@ export type getEventPacketRevisionResult = { _id: string; _creationTime: number;
 export const listEventPacketRevisionRead = {"entity":"EventPacketRevision","readId":"EventPacketRevision.list","exportName":"listEventPacketRevision","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; eventId: string; snapshotFingerprint: string; pdfStorageId: string; snapshotStorageId: string; stage: string; createdBy: string; supersededBy: string | null; answersJson: string | null; sectionsJson: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventPacketRevisionResult = Array<{ _id: string; _creationTime: number; tenantId: string; eventId: string; snapshotFingerprint: string; pdfStorageId: string; snapshotStorageId: string; stage: string; createdBy: string; supersededBy: string | null; answersJson: string | null; sectionsJson: string | null; createdAt: number; updatedAt: number }>;
 
+export const listEventPlanNeedsByEventIdRead = {"entity":"EventPlanNeeds","readId":"EventPlanNeeds.byEventId","exportName":"listEventPlanNeedsByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventPlanNeedsByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listEventPlanNeedsByTenantIdRead = {"entity":"EventPlanNeeds","readId":"EventPlanNeeds.byTenantId","exportName":"listEventPlanNeedsByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventPlanNeedsByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getEventPlanNeedsRead = {"entity":"EventPlanNeeds","readId":"EventPlanNeeds.get","exportName":"getEventPlanNeeds","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEventPlanNeedsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listEventPlanNeedsRead = {"entity":"EventPlanNeeds","readId":"EventPlanNeeds.list","exportName":"listEventPlanNeeds","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventPlanNeedsResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; trucksNeeded: number | null; siteProvidesJson: string | null; notedAt: number | null; createdAt: number; updatedAt: number }>;
+
 export const listEventStaffNeedByClaimedByPersonIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byClaimedByPersonId","exportName":"listEventStaffNeedByClaimedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"claimedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventStaffNeedByClaimedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
@@ -175121,6 +183982,9 @@ export type listEventStaffNeedByFilledByPersonIdResult = Array<{ _id: string; _c
 export const listEventStaffNeedByPreviousStaffNeedIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byPreviousStaffNeedId","exportName":"listEventStaffNeedByPreviousStaffNeedId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"previousStaffNeedId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventStaffNeedByPreviousStaffNeedIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
+export const listEventStaffNeedByRideVehicleAssignmentIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byRideVehicleAssignmentId","exportName":"listEventStaffNeedByRideVehicleAssignmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"rideVehicleAssignmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventStaffNeedByRideVehicleAssignmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
+
 export const listEventStaffNeedByTenantIdRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.byTenantId","exportName":"listEventStaffNeedByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventStaffNeedByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
 
@@ -175129,6 +183993,27 @@ export type getEventStaffNeedResult = { _id: string; _creationTime: number; tena
 
 export const listEventStaffNeedRead = {"entity":"EventStaffNeed","readId":"EventStaffNeed.list","exportName":"listEventStaffNeed","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: \"open\" | \"claimed\" | \"filled\" | \"cancelled\"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: \"hourly\" | \"flat_rate\" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventStaffNeedResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; role: string; description: string | null; startsAt: number | null; endsAt: number | null; followsEventTiming: boolean | null; rideVehicleAssignmentId: string | null; meetsAtVenue: boolean | null; status: "open" | "claimed" | "filled" | "cancelled"; claimedByPersonId: string | null; filledByPersonId: string | null; notes: string | null; postedAt: number | null; claimedAt: number | null; filledAt: number | null; cancelledAt: number | null; cancellationReason: string | null; previousStaffNeedId: string | null; continuationSlot: number | null; coverageContinuedAt: number | null; coverageReplacementPersonId: string | null; coverageStartsAt: number | null; coverageEndsAt: number | null; coverageWindowsJson: string | null; skills: string | null; qualificationName: string | null; certificationType: string | null; uniform: string | null; workLocation: string | null; payBasis: "hourly" | "flat_rate" | null; budgetHourlyRate: number | null; staffingTemplateId: string | null; templateLineKey: string | null; templateSlot: number | null; createdAt: number; updatedAt: number }>;
+
+export const listEventTaskByChecklistTemplateIdRead = {"entity":"EventTask","readId":"EventTask.byChecklistTemplateId","exportName":"listEventTaskByChecklistTemplateId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"checklistTemplateId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventTaskByChecklistTemplateIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listEventTaskByEventIdRead = {"entity":"EventTask","readId":"EventTask.byEventId","exportName":"listEventTaskByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventTaskByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listEventTaskByOwnerPersonIdRead = {"entity":"EventTask","readId":"EventTask.byOwnerPersonId","exportName":"listEventTaskByOwnerPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ownerPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventTaskByOwnerPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listEventTaskByTenantIdRead = {"entity":"EventTask","readId":"EventTask.byTenantId","exportName":"listEventTaskByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventTaskByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listEventTaskByWaitsForTaskIdRead = {"entity":"EventTask","readId":"EventTask.byWaitsForTaskId","exportName":"listEventTaskByWaitsForTaskId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"waitsForTaskId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventTaskByWaitsForTaskIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getEventTaskRead = {"entity":"EventTask","readId":"EventTask.get","exportName":"getEventTask","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getEventTaskResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listEventTaskRead = {"entity":"EventTask","readId":"EventTask.list","exportName":"listEventTask","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: \"critical\" | \"high\" | \"medium\" | \"low\"; status: \"open\" | \"in_progress\" | \"done\" | \"skipped\"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listEventTaskResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; title: string; details: string | null; category: string | null; ownerPersonId: string | null; dueAt: number | null; priority: "critical" | "high" | "medium" | "low"; status: "open" | "in_progress" | "done" | "skipped"; waitsForTaskId: string | null; proofRequired: boolean | null; doneNote: string | null; doneAt: number | null; doneByPersonId: string | null; skipReason: string | null; checklistTemplateId: string | null; templateLineKey: string | null; suggestionKey: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listEventTemplateByTenantIdRead = {"entity":"EventTemplate","readId":"EventTemplate.byTenantId","exportName":"listEventTemplateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; clientType: \"company\" | \"person\"; eventType: string; defaultHeadcount: number; menuId: string | null; defaultStaffRoles: string[]; typicalEquipment: string[]; notes: string | null; sourceEventId: string | null; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listEventTemplateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; clientType: "company" | "person"; eventType: string; defaultHeadcount: number; menuId: string | null; defaultStaffRoles: string[]; typicalEquipment: string[]; notes: string | null; sourceEventId: string | null; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; createdAt: number; updatedAt: number }>;
@@ -175652,14 +184537,14 @@ export type getOperatingLocationResult = { _id: string; _creationTime: number; t
 export const listOperatingLocationRead = {"entity":"OperatingLocation","readId":"OperatingLocation.list","exportName":"listOperatingLocation","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; timeZone: string | null; status: \"active\" | \"inactive\"; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOperatingLocationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; timeZone: string | null; status: "active" | "inactive"; addedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listOrganizationByTenantIdRead = {"entity":"Organization","readId":"Organization.byTenantId","exportName":"listOrganizationByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listOrganizationByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }>;
+export const listOrganizationByTenantIdRead = {"entity":"Organization","readId":"Organization.byTenantId","exportName":"listOrganizationByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOrganizationByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }>;
 
-export const getOrganizationRead = {"entity":"Organization","readId":"Organization.get","exportName":"getOrganization","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getOrganizationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number } | null;
+export const getOrganizationRead = {"entity":"Organization","readId":"Organization.get","exportName":"getOrganization","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getOrganizationResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listOrganizationRead = {"entity":"Organization","readId":"Organization.list","exportName":"listOrganization","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listOrganizationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; createdAt: number; updatedAt: number }>;
+export const listOrganizationRead = {"entity":"Organization","readId":"Organization.list","exportName":"listOrganization","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOrganizationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; createdAt: number; updatedAt: number }>;
 
 export const listOrganizationCapabilitySettingByTenantIdRead = {"entity":"OrganizationCapabilitySetting","readId":"OrganizationCapabilitySetting.byTenantId","exportName":"listOrganizationCapabilitySettingByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; capability: \"kitchen\" | \"inventory\" | \"procurement\" | \"events\" | \"sales\" | \"logistics\" | \"workforce\" | \"finance\" | \"reports\" | \"administration\"; enabled: boolean; updatedBy: string | null; registeredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOrganizationCapabilitySettingByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; capability: "kitchen" | "inventory" | "procurement" | "events" | "sales" | "logistics" | "workforce" | "finance" | "reports" | "administration"; enabled: boolean; updatedBy: string | null; registeredAt: number | null; createdAt: number; updatedAt: number }>;
@@ -175682,35 +184567,35 @@ export type getPackListResult = { _id: string; _creationTime: number; tenantId: 
 export const listPackListRead = {"entity":"PackList","readId":"PackList.list","exportName":"listPackList","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; activeEventId: string | null; name: string; purpose: string | null; notes: string | null; status: \"draft\" | \"packing\" | \"packed\" | \"loaded\" | \"dispatched\" | \"cancelled\"; openedAt: number | null; packingStartedAt: number | null; packedAt: number | null; loadedAt: number | null; dispatchedAt: number | null; loadedByPersonId: string | null; dispatchedByPersonId: string | null; dispatchDestination: string | null; cancelledAt: number | null; cancellationReason: string | null; assistanceRequestedAt: number | null; assistanceNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackListResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; activeEventId: string | null; name: string; purpose: string | null; notes: string | null; status: "draft" | "packing" | "packed" | "loaded" | "dispatched" | "cancelled"; openedAt: number | null; packingStartedAt: number | null; packedAt: number | null; loadedAt: number | null; dispatchedAt: number | null; loadedByPersonId: string | null; dispatchedByPersonId: string | null; dispatchDestination: string | null; cancelledAt: number | null; cancellationReason: string | null; assistanceRequestedAt: number | null; assistanceNote: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByDishContainerIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishContainerId","exportName":"listPackListItemByDishContainerId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishContainerId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByDishContainerIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByDishContainerIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishContainerId","exportName":"listPackListItemByDishContainerId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishContainerId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByDishContainerIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishId","exportName":"listPackListItemByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byDishId","exportName":"listPackListItemByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByEventDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byEventDishId","exportName":"listPackListItemByEventDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventDishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByEventDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByEventDishIdRead = {"entity":"PackListItem","readId":"PackListItem.byEventDishId","exportName":"listPackListItemByEventDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventDishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByEventDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByLoadAssignmentIdRead = {"entity":"PackListItem","readId":"PackListItem.byLoadAssignmentId","exportName":"listPackListItemByLoadAssignmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"loadAssignmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByLoadAssignmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByLoadAssignmentIdRead = {"entity":"PackListItem","readId":"PackListItem.byLoadAssignmentId","exportName":"listPackListItemByLoadAssignmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"loadAssignmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByLoadAssignmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByPackListIdRead = {"entity":"PackListItem","readId":"PackListItem.byPackListId","exportName":"listPackListItemByPackListId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"packListId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByPackListIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByPackListIdRead = {"entity":"PackListItem","readId":"PackListItem.byPackListId","exportName":"listPackListItemByPackListId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"packListId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByPackListIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByProductionBatchIdRead = {"entity":"PackListItem","readId":"PackListItem.byProductionBatchId","exportName":"listPackListItemByProductionBatchId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"productionBatchId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByProductionBatchIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByProductionBatchIdRead = {"entity":"PackListItem","readId":"PackListItem.byProductionBatchId","exportName":"listPackListItemByProductionBatchId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"productionBatchId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByProductionBatchIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByServiceStyleKitItemIdRead = {"entity":"PackListItem","readId":"PackListItem.byServiceStyleKitItemId","exportName":"listPackListItemByServiceStyleKitItemId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleKitItemId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByServiceStyleKitItemIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByServiceStyleKitItemIdRead = {"entity":"PackListItem","readId":"PackListItem.byServiceStyleKitItemId","exportName":"listPackListItemByServiceStyleKitItemId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleKitItemId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByServiceStyleKitItemIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listPackListItemByTenantIdRead = {"entity":"PackListItem","readId":"PackListItem.byTenantId","exportName":"listPackListItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemByTenantIdRead = {"entity":"PackListItem","readId":"PackListItem.byTenantId","exportName":"listPackListItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.get","exportName":"getPackListItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getPackListItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+export const getPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.get","exportName":"getPackListItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPackListItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.list","exportName":"listPackListItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listPackListItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listPackListItemRead = {"entity":"PackListItem","readId":"PackListItem.list","exportName":"listPackListItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\" | null; ownership: \"owned\" | \"rented\" | \"client\" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: \"equivalent\" | \"client\" | \"vendor\" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; status: \"pending\" | \"listed\" | \"packed\" | \"missing\"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackListItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; description: string; dishId: string | null; dishContainerId: string | null; eventDishId: string | null; followsDishServings: boolean | null; containerServings: number | null; productionBatchId: string | null; note: string | null; sentInstead: string | null; serviceStyleKitItemId: string | null; unitCorrectionSource: string | null; associationSource: string | null; generationKey: string | null; sourcesJson: string | null; generatedQuantity: number | null; retiredAt: number | null; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other" | null; ownership: "owned" | "rented" | "client" | null; returnRequired: boolean | null; returnNote: string | null; requiredCapability: boolean | null; packListTemplateId: string | null; templateLineKey: string | null; templateVersion: number | null; excludedAt: number | null; exclusionReason: string | null; replacementDescription: string | null; coveredBy: "equivalent" | "client" | "vendor" | null; loadAssignmentId: string | null; unitWeightKg: number | null; requiredQuantity: number; packedQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; status: "pending" | "listed" | "packed" | "missing"; listedAt: number | null; packedAt: number | null; packedByPersonId: string | null; missingAt: number | null; missingByPersonId: string | null; sentInsteadByPersonId: string | null; excludedByPersonId: string | null; checkedQuantity: number | null; checkedAt: number | null; checkedByPersonId: string | null; loadedQuantity: number | null; lineLoadedAt: number | null; lineLoadedByPersonId: string | null; returnedQuantity: number | null; usedQuantity: number | null; lostQuantity: number | null; damagedQuantity: number | null; returnFinding: string | null; returnCountedAt: number | null; returnCountedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listPackListTemplateByTenantIdRead = {"entity":"PackListTemplate","readId":"PackListTemplate.byTenantId","exportName":"listPackListTemplateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; items: string; status: \"active\" | \"archived\"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; serviceStyleId: string | null; occasionId: string | null; guestCountMin: number | null; guestCountMax: number | null; venueRequirement: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackListTemplateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; description: string | null; items: string; status: "active" | "archived"; definedAt: number | null; archivedAt: number | null; archiveReason: string | null; serviceStyleId: string | null; occasionId: string | null; guestCountMin: number | null; guestCountMax: number | null; venueRequirement: string | null; createdAt: number; updatedAt: number }>;
@@ -175735,6 +184620,21 @@ export type getPackRuleResult = { _id: string; _creationTime: number; tenantId: 
 
 export const listPackRuleRead = {"entity":"PackRule","readId":"PackRule.list","exportName":"listPackRule","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: \"dish\" | \"production_note\" | \"service_style\" | \"guest_count\" | \"event_fact\"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: \"serving_vessel\" | \"utensil\" | \"holding\" | \"transport\" | \"garnish\" | \"portioning\" | \"disposable\" | \"place_setting\" | \"linen\" | \"table_setup\" | \"power\" | \"water\" | \"handwashing\" | \"tent\" | \"flooring\" | \"weather\" | \"bar\" | \"glassware\" | \"ice\" | \"decor\" | \"rental\" | \"other\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; baseQuantity: number; scaleBy: \"fixed\" | \"servings\" | \"guests\"; perUnits: number | null; sparePercent: number; ownership: \"owned\" | \"rented\" | \"client\"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPackRuleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; trigger: "dish" | "production_note" | "service_style" | "guest_count" | "event_fact"; dishId: string | null; serviceStyleId: string | null; matchFact: string | null; matchText: string | null; description: string; category: "serving_vessel" | "utensil" | "holding" | "transport" | "garnish" | "portioning" | "disposable" | "place_setting" | "linen" | "table_setup" | "power" | "water" | "handwashing" | "tent" | "flooring" | "weather" | "bar" | "glassware" | "ice" | "decor" | "rental" | "other"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; baseQuantity: number; scaleBy: "fixed" | "servings" | "guests"; perUnits: number | null; sparePercent: number; ownership: "owned" | "rented" | "client"; returnRequired: boolean; returnNote: string | null; requiredCapability: boolean; note: string | null; ruleVersion: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listPackSectionClaimByPackListIdRead = {"entity":"PackSectionClaim","readId":"PackSectionClaim.byPackListId","exportName":"listPackSectionClaimByPackListId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"packListId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackSectionClaimByPackListIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listPackSectionClaimByPersonIdRead = {"entity":"PackSectionClaim","readId":"PackSectionClaim.byPersonId","exportName":"listPackSectionClaimByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackSectionClaimByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listPackSectionClaimByTenantIdRead = {"entity":"PackSectionClaim","readId":"PackSectionClaim.byTenantId","exportName":"listPackSectionClaimByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackSectionClaimByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getPackSectionClaimRead = {"entity":"PackSectionClaim","readId":"PackSectionClaim.get","exportName":"getPackSectionClaim","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPackSectionClaimResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listPackSectionClaimRead = {"entity":"PackSectionClaim","readId":"PackSectionClaim.list","exportName":"listPackSectionClaim","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPackSectionClaimResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; sectionKey: string; personId: string | null; personName: string; claimedAt: number | null; releasedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listPaymentByClientIdRead = {"entity":"Payment","readId":"Payment.byClientId","exportName":"listPaymentByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; amount: number; method: \"card\" | \"check\" | \"cash\" | \"ach\" | \"other\"; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"refunded\" | \"charged_back\" | \"returned\"; paymentMethodId: string | null; notes: string | null; recordedAt: number | null; settledAt: number | null; failedAt: number | null; refundedAt: number | null; failureReason: string | null; refundReason: string | null; feeAmount: number | null; gratuityAmount: number | null; appliedAmount: number | null; unappliedAmount: number | null; refundedAmount: number | null; chargedBackAmount: number | null; returnedAmount: number | null; occurredAt: number | null; effectiveAt: number | null; providerAccount: string | null; matchedSource: \"tpp_legacy\" | \"quickbooks_online\" | \"nowsta\" | \"stripe\" | \"manual\" | \"other\" | null; matchedExternalId: string | null; reconciliationStatus: \"unreconciled\" | \"matched\" | \"disputed\" | \"verified\"; externalSource: \"tpp_legacy\" | \"quickbooks_online\" | \"nowsta\" | \"stripe\" | \"manual\" | \"other\" | null; externalPaymentId: string | null; providerTransactionIds: string | null; reconciliationDetails: string | null; reconciledAt: number | null; reconciledByUserId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPaymentByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; invoiceId: string; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; eventId: string | null; amount: number; method: "card" | "check" | "cash" | "ach" | "other"; status: "pending" | "processing" | "completed" | "failed" | "refunded" | "charged_back" | "returned"; paymentMethodId: string | null; notes: string | null; recordedAt: number | null; settledAt: number | null; failedAt: number | null; refundedAt: number | null; failureReason: string | null; refundReason: string | null; feeAmount: number | null; gratuityAmount: number | null; appliedAmount: number | null; unappliedAmount: number | null; refundedAmount: number | null; chargedBackAmount: number | null; returnedAmount: number | null; occurredAt: number | null; effectiveAt: number | null; providerAccount: string | null; matchedSource: "tpp_legacy" | "quickbooks_online" | "nowsta" | "stripe" | "manual" | "other" | null; matchedExternalId: string | null; reconciliationStatus: "unreconciled" | "matched" | "disputed" | "verified"; externalSource: "tpp_legacy" | "quickbooks_online" | "nowsta" | "stripe" | "manual" | "other" | null; externalPaymentId: string | null; providerTransactionIds: string | null; reconciliationDetails: string | null; reconciledAt: number | null; reconciledByUserId: string | null; createdAt: number; updatedAt: number }>;
@@ -175840,6 +184740,42 @@ export type getPersonResult = { _id: string; _creationTime: number; tenantId: st
 
 export const listPersonRead = {"entity":"Person","readId":"Person.list","exportName":"listPerson","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; givenName: string; familyName: string; email: string; phone: string | null; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; role: \"staff\" | \"kitchen_staff\" | \"kitchen_lead\" | \"sales_staff\" | \"event_staff\" | \"inventory_staff\" | \"procurement_staff\" | \"logistics_staff\" | \"driver\" | \"workforce_staff\" | \"finance_staff\" | \"manager\" | \"kitchen_manager\" | \"sales_manager\" | \"event_manager\" | \"inventory_manager\" | \"logistics_manager\" | \"workforce_manager\" | \"finance_manager\" | \"admin\" | \"owner\" | \"system\"; authSubjectId: string | null; employeeNumber: string | null; employmentType: \"full_time\" | \"part_time\" | \"contractor\" | \"temporary\"; status: \"active\" | \"inactive\" | \"terminated\"; hireDate: number | null; terminationDate: number | null; smsAlertsOptIn: boolean | null; preferredRoles: string[]; approvedWorkLocations: string[]; schedulingHoldReason: string | null; staffingVendor: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPersonResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; givenName: string; familyName: string; email: string; phone: string | null; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; role: "staff" | "kitchen_staff" | "kitchen_lead" | "sales_staff" | "event_staff" | "inventory_staff" | "procurement_staff" | "logistics_staff" | "driver" | "workforce_staff" | "finance_staff" | "manager" | "kitchen_manager" | "sales_manager" | "event_manager" | "inventory_manager" | "logistics_manager" | "workforce_manager" | "finance_manager" | "admin" | "owner" | "system"; authSubjectId: string | null; employeeNumber: string | null; employmentType: "full_time" | "part_time" | "contractor" | "temporary"; status: "active" | "inactive" | "terminated"; hireDate: number | null; terminationDate: number | null; smsAlertsOptIn: boolean | null; preferredRoles: string[]; approvedWorkLocations: string[]; schedulingHoldReason: string | null; staffingVendor: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPlanningOverrideByEventIdRead = {"entity":"PlanningOverride","readId":"PlanningOverride.byEventId","exportName":"listPlanningOverrideByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningOverrideByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPlanningOverrideByTenantIdRead = {"entity":"PlanningOverride","readId":"PlanningOverride.byTenantId","exportName":"listPlanningOverrideByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningOverrideByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getPlanningOverrideRead = {"entity":"PlanningOverride","readId":"PlanningOverride.get","exportName":"getPlanningOverride","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPlanningOverrideResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listPlanningOverrideRead = {"entity":"PlanningOverride","readId":"PlanningOverride.list","exportName":"listPlanningOverride","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningOverrideResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; action: string; reason: string; openItems: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPlanningReceiptByEventIdRead = {"entity":"PlanningReceipt","readId":"PlanningReceipt.byEventId","exportName":"listPlanningReceiptByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningReceiptByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPlanningReceiptByTenantIdRead = {"entity":"PlanningReceipt","readId":"PlanningReceipt.byTenantId","exportName":"listPlanningReceiptByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningReceiptByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getPlanningReceiptRead = {"entity":"PlanningReceipt","readId":"PlanningReceipt.get","exportName":"getPlanningReceipt","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPlanningReceiptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listPlanningReceiptRead = {"entity":"PlanningReceipt","readId":"PlanningReceipt.list","exportName":"listPlanningReceipt","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningReceiptResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; suggestionKey: string; quantity: number; declined: boolean; basis: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPlanningRuleByTenantIdRead = {"entity":"PlanningRule","readId":"PlanningRule.byTenantId","exportName":"listPlanningRuleByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningRuleByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listPlanningRuleByTriggerEquipmentIdRead = {"entity":"PlanningRule","readId":"PlanningRule.byTriggerEquipmentId","exportName":"listPlanningRuleByTriggerEquipmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"triggerEquipmentId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningRuleByTriggerEquipmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getPlanningRuleRead = {"entity":"PlanningRule","readId":"PlanningRule.get","exportName":"getPlanningRule","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPlanningRuleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listPlanningRuleRead = {"entity":"PlanningRule","readId":"PlanningRule.list","exportName":"listPlanningRule","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: \"every_event\" | \"equipment\" | \"equipment_kind\"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: \"active\" | \"retired\"; definedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPlanningRuleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; trigger: "every_event" | "equipment" | "equipment_kind"; triggerEquipmentId: string | null; triggerEquipmentKind: string | null; actionsJson: string; status: "active" | "retired"; definedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listPrepTaskByAssignedToIdRead = {"entity":"PrepTask","readId":"PrepTask.byAssignedToId","exportName":"listPrepTaskByAssignedToId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"assignedToId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventDishId: string; eventId: string; name: string; dishTaskId: string | null; ingredientId: string | null; ingredientDemandId: string | null; dishId: string | null; componentId: string | null; category: string; taskType: string; specialInstructions: string | null; isGenerated: boolean; recipeTemplateVersion: number | null; recipeTemplateName: string | null; recipeTemplateInstructions: string | null; recipeTemplateStation: string | null; quantity: number; completedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; station: string | null; dueAt: number | null; assignedToId: string | null; notes: string | null; status: \"pending\" | \"claimed\" | \"in_progress\" | \"blocked\" | \"completed\" | \"cancelled\"; claimedAt: number | null; startedAt: number | null; completedAt: number | null; cancelledAt: number | null; templateRetiredAt: number | null; cancellationReason: string | null; blockedAt: number | null; blockReason: string | null; overrideOfDishTaskId: string | null; overrideReason: string | null; resolution: \"resolved\" | \"choice_pending\" | \"content_missing\" | null; choiceOptions: string[] | null; chosenOption: string | null; stationId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPrepTaskByAssignedToIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventDishId: string; eventId: string; name: string; dishTaskId: string | null; ingredientId: string | null; ingredientDemandId: string | null; dishId: string | null; componentId: string | null; category: string; taskType: string; specialInstructions: string | null; isGenerated: boolean; recipeTemplateVersion: number | null; recipeTemplateName: string | null; recipeTemplateInstructions: string | null; recipeTemplateStation: string | null; quantity: number; completedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; station: string | null; dueAt: number | null; assignedToId: string | null; notes: string | null; status: "pending" | "claimed" | "in_progress" | "blocked" | "completed" | "cancelled"; claimedAt: number | null; startedAt: number | null; completedAt: number | null; cancelledAt: number | null; templateRetiredAt: number | null; cancellationReason: string | null; blockedAt: number | null; blockReason: string | null; overrideOfDishTaskId: string | null; overrideReason: string | null; resolution: "resolved" | "choice_pending" | "content_missing" | null; choiceOptions: string[] | null; chosenOption: string | null; stationId: string | null; createdAt: number; updatedAt: number }>;
@@ -176654,14 +185590,14 @@ export type getTrainingModuleResult = { _id: string; _creationTime: number; tena
 export const listTrainingModuleRead = {"entity":"TrainingModule","readId":"TrainingModule.list","exportName":"listTrainingModule","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: \"food_safety\" | \"equipment_operation\" | \"service_standards\" | \"other\"; description: string | null; passingScore: number; status: \"active\" | \"retired\"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listTrainingModuleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: "food_safety" | "equipment_operation" | "service_standards" | "other"; description: string | null; passingScore: number; status: "active" | "retired"; definedAt: number | null; retiredAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listVehicleByTenantIdRead = {"entity":"Vehicle","readId":"Vehicle.byTenantId","exportName":"listVehicleByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVehicleByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVehicleByTenantIdRead = {"entity":"Vehicle","readId":"Vehicle.byTenantId","exportName":"listVehicleByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVehicleByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const getVehicleRead = {"entity":"Vehicle","readId":"Vehicle.get","exportName":"getVehicle","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getVehicleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number } | null;
+export const getVehicleRead = {"entity":"Vehicle","readId":"Vehicle.get","exportName":"getVehicle","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getVehicleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listVehicleRead = {"entity":"Vehicle","readId":"Vehicle.list","exportName":"listVehicle","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVehicleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>;
+export const listVehicleRead = {"entity":"Vehicle","readId":"Vehicle.list","exportName":"listVehicle","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: \"owned\" | \"leased\"; payloadCapacityKg: number; operationalStatus: \"available\" | \"in_use\" | \"maintenance\" | \"out_of_service\" | \"retired\"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVehicleResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; make: string; model: string; registration: string; ownership: "owned" | "leased"; payloadCapacityKg: number; operationalStatus: "available" | "in_use" | "maintenance" | "out_of_service" | "retired"; statusNote: string | null; registeredAt: number | null; statusChangedAt: number | null; towCapacityKg: number | null; seatCount: number | null; driverQualificationName: string | null; registrationNumber: string | null; registrationExpiresAt: number | null; insuranceProvider: string | null; insurancePolicyNumber: string | null; insuranceExpiresAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listVehicleFuelLogByTenantIdRead = {"entity":"VehicleFuelLog","readId":"VehicleFuelLog.byTenantId","exportName":"listVehicleFuelLogByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vehicleId: string; odometer: number; fuelCost: number; filledAt: number | null; notes: string | null; loggedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVehicleFuelLogByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vehicleId: string; odometer: number; fuelCost: number; filledAt: number | null; notes: string | null; loggedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -176701,6 +185637,21 @@ export type getVehicleServiceEntryResult = { _id: string; _creationTime: number;
 
 export const listVehicleServiceEntryRead = {"entity":"VehicleServiceEntry","readId":"VehicleServiceEntry.list","exportName":"listVehicleServiceEntry","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; maintenanceScheduleId: string; vehicleId: string; vendor: string; cost: number; odometer: number; notes: string | null; completedAt: number | null; nextDueAt: number | null; nextDueMileage: number | null; loggedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVehicleServiceEntryResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; maintenanceScheduleId: string; vehicleId: string; vendor: string; cost: number; odometer: number; notes: string | null; completedAt: number | null; nextDueAt: number | null; nextDueMileage: number | null; loggedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVehicleTripCheckByEventIdRead = {"entity":"VehicleTripCheck","readId":"VehicleTripCheck.byEventId","exportName":"listVehicleTripCheckByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: \"before_leaving\" | \"after_return\"; tires: \"good\" | \"fair\" | \"poor\" | \"fail\"; brakes: \"good\" | \"fair\" | \"poor\" | \"fail\"; lights: \"good\" | \"fair\" | \"poor\" | \"fail\"; fluids: \"good\" | \"fair\" | \"poor\" | \"fail\"; bodywork: \"good\" | \"fair\" | \"poor\" | \"fail\"; interior: \"good\" | \"fair\" | \"poor\" | \"fail\"; refrigeration: \"good\" | \"fair\" | \"poor\" | \"fail\" | null; odometer: number | null; fuelLevel: \"empty\" | \"quarter\" | \"half\" | \"three_quarters\" | \"full\" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVehicleTripCheckByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: "before_leaving" | "after_return"; tires: "good" | "fair" | "poor" | "fail"; brakes: "good" | "fair" | "poor" | "fail"; lights: "good" | "fair" | "poor" | "fail"; fluids: "good" | "fair" | "poor" | "fail"; bodywork: "good" | "fair" | "poor" | "fail"; interior: "good" | "fair" | "poor" | "fail"; refrigeration: "good" | "fair" | "poor" | "fail" | null; odometer: number | null; fuelLevel: "empty" | "quarter" | "half" | "three_quarters" | "full" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listVehicleTripCheckByEventVehicleAssignmentIdRead = {"entity":"VehicleTripCheck","readId":"VehicleTripCheck.byEventVehicleAssignmentId","exportName":"listVehicleTripCheckByEventVehicleAssignmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventVehicleAssignmentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: \"before_leaving\" | \"after_return\"; tires: \"good\" | \"fair\" | \"poor\" | \"fail\"; brakes: \"good\" | \"fair\" | \"poor\" | \"fail\"; lights: \"good\" | \"fair\" | \"poor\" | \"fail\"; fluids: \"good\" | \"fair\" | \"poor\" | \"fail\"; bodywork: \"good\" | \"fair\" | \"poor\" | \"fail\"; interior: \"good\" | \"fair\" | \"poor\" | \"fail\"; refrigeration: \"good\" | \"fair\" | \"poor\" | \"fail\" | null; odometer: number | null; fuelLevel: \"empty\" | \"quarter\" | \"half\" | \"three_quarters\" | \"full\" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVehicleTripCheckByEventVehicleAssignmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: "before_leaving" | "after_return"; tires: "good" | "fair" | "poor" | "fail"; brakes: "good" | "fair" | "poor" | "fail"; lights: "good" | "fair" | "poor" | "fail"; fluids: "good" | "fair" | "poor" | "fail"; bodywork: "good" | "fair" | "poor" | "fail"; interior: "good" | "fair" | "poor" | "fail"; refrigeration: "good" | "fair" | "poor" | "fail" | null; odometer: number | null; fuelLevel: "empty" | "quarter" | "half" | "three_quarters" | "full" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listVehicleTripCheckByTenantIdRead = {"entity":"VehicleTripCheck","readId":"VehicleTripCheck.byTenantId","exportName":"listVehicleTripCheckByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: \"before_leaving\" | \"after_return\"; tires: \"good\" | \"fair\" | \"poor\" | \"fail\"; brakes: \"good\" | \"fair\" | \"poor\" | \"fail\"; lights: \"good\" | \"fair\" | \"poor\" | \"fail\"; fluids: \"good\" | \"fair\" | \"poor\" | \"fail\"; bodywork: \"good\" | \"fair\" | \"poor\" | \"fail\"; interior: \"good\" | \"fair\" | \"poor\" | \"fail\"; refrigeration: \"good\" | \"fair\" | \"poor\" | \"fail\" | null; odometer: number | null; fuelLevel: \"empty\" | \"quarter\" | \"half\" | \"three_quarters\" | \"full\" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVehicleTripCheckByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: "before_leaving" | "after_return"; tires: "good" | "fair" | "poor" | "fail"; brakes: "good" | "fair" | "poor" | "fail"; lights: "good" | "fair" | "poor" | "fail"; fluids: "good" | "fair" | "poor" | "fail"; bodywork: "good" | "fair" | "poor" | "fail"; interior: "good" | "fair" | "poor" | "fail"; refrigeration: "good" | "fair" | "poor" | "fail" | null; odometer: number | null; fuelLevel: "empty" | "quarter" | "half" | "three_quarters" | "full" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getVehicleTripCheckRead = {"entity":"VehicleTripCheck","readId":"VehicleTripCheck.get","exportName":"getVehicleTripCheck","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: \"before_leaving\" | \"after_return\"; tires: \"good\" | \"fair\" | \"poor\" | \"fail\"; brakes: \"good\" | \"fair\" | \"poor\" | \"fail\"; lights: \"good\" | \"fair\" | \"poor\" | \"fail\"; fluids: \"good\" | \"fair\" | \"poor\" | \"fail\"; bodywork: \"good\" | \"fair\" | \"poor\" | \"fail\"; interior: \"good\" | \"fair\" | \"poor\" | \"fail\"; refrigeration: \"good\" | \"fair\" | \"poor\" | \"fail\" | null; odometer: number | null; fuelLevel: \"empty\" | \"quarter\" | \"half\" | \"three_quarters\" | \"full\" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getVehicleTripCheckResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: "before_leaving" | "after_return"; tires: "good" | "fair" | "poor" | "fail"; brakes: "good" | "fair" | "poor" | "fail"; lights: "good" | "fair" | "poor" | "fail"; fluids: "good" | "fair" | "poor" | "fail"; bodywork: "good" | "fair" | "poor" | "fail"; interior: "good" | "fair" | "poor" | "fail"; refrigeration: "good" | "fair" | "poor" | "fail" | null; odometer: number | null; fuelLevel: "empty" | "quarter" | "half" | "three_quarters" | "full" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listVehicleTripCheckRead = {"entity":"VehicleTripCheck","readId":"VehicleTripCheck.list","exportName":"listVehicleTripCheck","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: \"before_leaving\" | \"after_return\"; tires: \"good\" | \"fair\" | \"poor\" | \"fail\"; brakes: \"good\" | \"fair\" | \"poor\" | \"fail\"; lights: \"good\" | \"fair\" | \"poor\" | \"fail\"; fluids: \"good\" | \"fair\" | \"poor\" | \"fail\"; bodywork: \"good\" | \"fair\" | \"poor\" | \"fail\"; interior: \"good\" | \"fair\" | \"poor\" | \"fail\"; refrigeration: \"good\" | \"fair\" | \"poor\" | \"fail\" | null; odometer: number | null; fuelLevel: \"empty\" | \"quarter\" | \"half\" | \"three_quarters\" | \"full\" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVehicleTripCheckResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventVehicleAssignmentId: string; eventId: string | null; kind: "before_leaving" | "after_return"; tires: "good" | "fair" | "poor" | "fail"; brakes: "good" | "fair" | "poor" | "fail"; lights: "good" | "fair" | "poor" | "fail"; fluids: "good" | "fair" | "poor" | "fail"; bodywork: "good" | "fair" | "poor" | "fail"; interior: "good" | "fair" | "poor" | "fail"; refrigeration: "good" | "fair" | "poor" | "fail" | null; odometer: number | null; fuelLevel: "empty" | "quarter" | "half" | "three_quarters" | "full" | null; damageNote: string | null; notes: string | null; checkedAt: number | null; checkedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listVendorByTenantIdRead = {"entity":"Vendor","readId":"Vendor.byTenantId","exportName":"listVendorByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; email: string | null; phone: string | null; addressLine1: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; paymentTermsDays: number; notes: string | null; status: \"active\" | \"suspended\" | \"terminated\"; onboardedAt: number | null; suspendedAt: number | null; suspensionReason: string | null; terminatedAt: number | null; terminationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVendorByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; email: string | null; phone: string | null; addressLine1: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; paymentTermsDays: number; notes: string | null; status: "active" | "suspended" | "terminated"; onboardedAt: number | null; suspendedAt: number | null; suspensionReason: string | null; terminatedAt: number | null; terminationReason: string | null; createdAt: number; updatedAt: number }>;

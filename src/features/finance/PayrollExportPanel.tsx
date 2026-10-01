@@ -1,12 +1,6 @@
 import { formatCountNoun } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { PersonEmployeeNumberField } from "../admin/PersonEmployeeNumberField";
-import type { PayrollRevisionPlan } from "./payrollReconcile";
-import {
-  PayrollPlanNote,
-  PayrollReceiptsList,
-  usePayrollReceipts,
-} from "./PayrollReceipts";
 import {
   PAYROLL_PROCESSORS,
   payrollCsvDownloadAllowed,
@@ -64,9 +58,10 @@ export function PayrollExportPanel({
   const missingNumberNames = (document?.rows ?? [])
     .filter((row) => row.missingEmployeeNumber)
     .map((row) => row.employeeName);
-  const receipts = usePayrollReceipts(document);
-  const downloadDisabled =
-    loading || receipts.loading || !payrollCsvDownloadAllowed(document);
+  // Payroll receipts (who was sent what, revision by revision) are held back
+  // until they record the exact time entries each file carried in one saved
+  // step (release review 2026-09-29). The download itself is unchanged.
+  const downloadDisabled = loading || !payrollCsvDownloadAllowed(document);
 
   const downloadExport = () => {
     if (!payrollCsvDownloadAllowed(document) || !document) return;
@@ -81,15 +76,9 @@ export function PayrollExportPanel({
     const label =
       PAYROLL_PROCESSORS.find((item) => item.value === processor)?.label ??
       processor;
-    // Keep a receipt per person whose hours changed since the last send.
-    receipts
-      .recordSend()
-      .then((written) =>
-        onNotice(
-          `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}. ${written === 0 ? "Nothing changed since the last send." : `${written} receipt${written === 1 ? "" : "s"} saved.`}`,
-        ),
-      )
-      .catch(onFailure);
+    onNotice(
+      `${document.rows.length} payroll row${document.rows.length === 1 ? "" : "s"} exported for ${label}.`,
+    );
   };
 
   return (
@@ -171,18 +160,6 @@ export function PayrollExportPanel({
           estimatedGross={estimatedGross}
           onNotice={onNotice}
           onFailure={onFailure}
-          plans={receipts.plans}
-        />
-      ) : null}
-      {document ? (
-        <PayrollReceiptsList
-          document={document}
-          receipts={receipts.receipts}
-          personName={(personId) =>
-            document.rows.find((row) => row.personId === personId)
-              ?.employeeName ?? "Someone with no approved hours now"
-          }
-          onFailure={onFailure}
         />
       ) : null}
     </section>
@@ -196,7 +173,6 @@ function PayrollExportPreview({
   estimatedGross,
   onNotice,
   onFailure,
-  plans,
 }: {
   document: PayrollExportDocument;
   missingNumberNames: readonly string[];
@@ -204,7 +180,6 @@ function PayrollExportPreview({
   estimatedGross: (personId: string, totalHours: number) => number | null;
   onNotice: (message: string) => void;
   onFailure: (error: unknown) => void;
-  plans: readonly PayrollRevisionPlan[];
 }) {
   return (
     <>
@@ -218,6 +193,11 @@ function PayrollExportPreview({
       {missingNumberNames.length > 0 ? (
         <p className="mb-3 text-sm text-warn" role="status">
           {`CSV download is off until every employee has a payroll employee number — missing for ${missingNumberNames.join(", ")}. Type the number next to their name below. Raw Capsule IDs are never sent to a payroll processor.`}
+        </p>
+      ) : null}
+      {document.payPrepNames.length > 0 ? (
+        <p className="mb-3 text-sm text-warn" role="status">
+          {`Check overtime: ${document.payPrepNames.join(", ")} worked over 40 hours in a week. This file lists their clocked hours as regular until you prepare their pay with the overtime split your payroll rules use.`}
         </p>
       ) : null}
       {document.waitingOnlyNames.length > 0 ? (
@@ -281,11 +261,6 @@ function PayrollExportPreview({
                       ) : (
                         <small>{row.employeeId}</small>
                       )}
-                      <PayrollPlanNote
-                        plan={plans.find(
-                          (plan) => plan.personId === row.personId,
-                        )}
-                      />
                     </td>
                     <td>{row.regularHours.toFixed(2)} h</td>
                     <td>{row.overtimeHours.toFixed(2)} h</td>

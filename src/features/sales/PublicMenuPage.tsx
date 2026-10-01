@@ -7,6 +7,7 @@ import {
   menuPriceText,
   seasonText,
 } from "./publicMenuText";
+import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 
 /**
  * Public menu (spec CF-4-2). Anyone can open it; it lists the published
@@ -15,7 +16,10 @@ import {
  * price from, so a quote never shows a different price.
  */
 export function PublicMenuPage() {
-  const menus = useQuery(api.publicMenu.getPublicMenu, {});
+  const clock = useMinuteClock();
+  const menus = useLatestDefined(
+    useQuery(api.publicMenu.getPublicMenu, { clock }),
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">

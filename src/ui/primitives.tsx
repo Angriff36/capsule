@@ -29,8 +29,12 @@ export function StatusChip({
   children?: ReactNode;
 }) {
   const known = (STAGE_LABEL as Record<string, string>)[status];
+  // Only a tone class may override (DESIGN.md status chips carry a state icon
+  // per tone); an old background/text class override falls back to the tone
+  // for the status, so no chip shows state by colour alone.
+  const tone = color?.startsWith("chip-tone-") ? color : undefined;
   const cls =
-    color ??
+    tone ??
     (STAGE_CHIP as Record<string, string>)[status] ??
     statusChipClass(status) ??
     "chip-tone-mute";

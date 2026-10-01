@@ -2,6 +2,7 @@ import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import { formatMoneyExact } from "../../lib/format";
 import type { QuotePicksValue } from "./QuoteMenuChoice";
+import { useMinuteClock } from "../../lib/useMinuteClock";
 
 /**
  * The estimate for the visitor's picks (spec CF-4-3). It comes from the same
@@ -21,6 +22,7 @@ export function QuoteEstimatePanel({
     eventDate != null &&
     guestCount != null &&
     (value.menuId != null || value.extras.length > 0);
+  const clock = useMinuteClock();
   const result = useQuery(
     api.lib.quoteSelections.estimateQuote,
     ready
@@ -30,6 +32,7 @@ export function QuoteEstimatePanel({
           menuId: value.menuId,
           picks: value.picks,
           extras: value.extras,
+          clock,
         }
       : "skip",
   );

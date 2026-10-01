@@ -594,6 +594,23 @@ export const DeliverySchema = z.object({
 
 export type Delivery = z.infer<typeof DeliverySchema>;
 
+// Entity: DepartureOverride
+export const DepartureOverrideSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  packListId: z.string().uuid().nullable().optional(),
+  reason: z.string().default(""),
+  openItems: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  recordedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DepartureOverride = z.infer<typeof DepartureOverrideSchema>;
+
 // Entity: Dish
 export const DishSchema = z.object({
   id: z.string().uuid(),
@@ -809,6 +826,9 @@ export const EquipmentSchema = z.object({
   vendorId: z.string().uuid().nullable().optional(),
   primaryImageStorageId: z.string().nullable().optional(),
   primaryImageFileName: z.string().nullable().optional(),
+  providesJson: z.string().nullable().optional(),
+  needsJson: z.string().nullable().optional(),
+  operatingFactsCheckedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1149,6 +1169,22 @@ export const EventAssignmentSchema = z.object({
 
 export type EventAssignment = z.infer<typeof EventAssignmentSchema>;
 
+// Entity: EventChecklist
+export const EventChecklistSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  category: z.string().nullable().optional(),
+  itemsJson: z.string().default("[]"),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventChecklist = z.infer<typeof EventChecklistSchema>;
+
 // Entity: EventCloseout
 export const EventCloseoutSchema = z.object({
   id: z.string().uuid(),
@@ -1445,6 +1481,21 @@ export const EventPacketRevisionSchema = z.object({
 
 export type EventPacketRevision = z.infer<typeof EventPacketRevisionSchema>;
 
+// Entity: EventPlanNeeds
+export const EventPlanNeedsSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  trucksNeeded: z.number().int().nullable().optional(),
+  siteProvidesJson: z.string().nullable().optional(),
+  notedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventPlanNeeds = z.infer<typeof EventPlanNeedsSchema>;
+
 // Entity: EventStaffNeed
 export const EventStaffNeedSchema = z.object({
   id: z.string().uuid(),
@@ -1489,6 +1540,35 @@ export const EventStaffNeedSchema = z.object({
 });
 
 export type EventStaffNeed = z.infer<typeof EventStaffNeedSchema>;
+
+// Entity: EventTask
+export const EventTaskSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  title: z.string().default(""),
+  details: z.string().nullable().optional(),
+  category: z.string().nullable().optional(),
+  ownerPersonId: z.string().uuid().nullable().optional(),
+  dueAt: z.coerce.date().nullable().optional(),
+  priority: z.enum(["critical", "high", "medium", "low"]).default("medium"),
+  status: z.enum(["open", "in_progress", "done", "skipped"]).default("open"),
+  waitsForTaskId: z.string().uuid().nullable().optional(),
+  proofRequired: z.boolean().nullable().optional(),
+  doneNote: z.string().nullable().optional(),
+  doneAt: z.coerce.date().nullable().optional(),
+  doneByPersonId: z.string().uuid().nullable().optional(),
+  skipReason: z.string().nullable().optional(),
+  checklistTemplateId: z.string().uuid().nullable().optional(),
+  templateLineKey: z.string().nullable().optional(),
+  suggestionKey: z.string().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventTask = z.infer<typeof EventTaskSchema>;
 
 // Entity: EventTemplate
 export const EventTemplateSchema = z.object({
@@ -2442,6 +2522,7 @@ export const OrganizationSchema = z.object({
   timingBriefingMinutes: z.number().int().nullable().optional(),
   timingLoadBaselineMinutes: z.number().int().nullable().optional(),
   timingLoadRulesJson: z.string().nullable().optional(),
+  planningChecksJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2546,6 +2627,19 @@ export const PackListItemSchema = z.object({
   missingByPersonId: z.string().uuid().nullable().optional(),
   sentInsteadByPersonId: z.string().uuid().nullable().optional(),
   excludedByPersonId: z.string().uuid().nullable().optional(),
+  checkedQuantity: z.number().nullable().optional(),
+  checkedAt: z.coerce.date().nullable().optional(),
+  checkedByPersonId: z.string().uuid().nullable().optional(),
+  loadedQuantity: z.number().nullable().optional(),
+  lineLoadedAt: z.coerce.date().nullable().optional(),
+  lineLoadedByPersonId: z.string().uuid().nullable().optional(),
+  returnedQuantity: z.number().nullable().optional(),
+  usedQuantity: z.number().nullable().optional(),
+  lostQuantity: z.number().nullable().optional(),
+  damagedQuantity: z.number().nullable().optional(),
+  returnFinding: z.string().nullable().optional(),
+  returnCountedAt: z.coerce.date().nullable().optional(),
+  returnCountedByPersonId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2618,6 +2712,29 @@ export const PackRuleSchema = z.object({
 });
 
 export type PackRule = z.infer<typeof PackRuleSchema>;
+
+// Entity: PackSectionClaim
+export const PackSectionClaimSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  packListId: z.string().uuid(),
+  sectionKey: z.string().default(""),
+  personId: z.string().uuid().nullable().optional(),
+  personName: z.string().optional().default(""),
+  claimedAt: z.coerce.date().nullable().optional(),
+  releasedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: PackSectionClaim
+export const PackSectionClaimComputedSchema = PackSectionClaimSchema.extend({
+  isLive: z.boolean(),
+});
+
+export type PackSectionClaim = z.infer<typeof PackSectionClaimSchema>;
+export type PackSectionClaimWithComputed = z.infer<typeof PackSectionClaimComputedSchema>;
 
 // Entity: Payment
 export const PaymentSchema = z.object({
@@ -2806,6 +2923,59 @@ export const PersonComputedSchema = PersonSchema.extend({
 
 export type Person = z.infer<typeof PersonSchema>;
 export type PersonWithComputed = z.infer<typeof PersonComputedSchema>;
+
+// Entity: PlanningOverride
+export const PlanningOverrideSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  action: z.string().default(""),
+  reason: z.string().default(""),
+  openItems: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  recordedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PlanningOverride = z.infer<typeof PlanningOverrideSchema>;
+
+// Entity: PlanningReceipt
+export const PlanningReceiptSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  suggestionKey: z.string().default(""),
+  quantity: z.number().default(0),
+  declined: z.boolean().default(false),
+  basis: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  recordedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PlanningReceipt = z.infer<typeof PlanningReceiptSchema>;
+
+// Entity: PlanningRule
+export const PlanningRuleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  trigger: z.enum(["every_event", "equipment", "equipment_kind"]).default("every_event"),
+  triggerEquipmentId: z.string().uuid().nullable().optional(),
+  triggerEquipmentKind: z.string().nullable().optional(),
+  actionsJson: z.string().default("[]"),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PlanningRule = z.infer<typeof PlanningRuleSchema>;
 
 // Entity: PrepTask
 export const PrepTaskSchema = z.object({
@@ -4056,6 +4226,8 @@ export const VehicleSchema = z.object({
   registeredAt: z.coerce.date().nullable().optional(),
   statusChangedAt: z.coerce.date().nullable().optional(),
   towCapacityKg: z.number().int().nullable().optional(),
+  seatCount: z.number().int().nullable().optional(),
+  driverQualificationName: z.string().nullable().optional(),
   registrationNumber: z.string().nullable().optional(),
   registrationExpiresAt: z.coerce.date().nullable().optional(),
   insuranceProvider: z.string().nullable().optional(),
@@ -4134,6 +4306,39 @@ export const VehicleServiceEntrySchema = z.object({
 });
 
 export type VehicleServiceEntry = z.infer<typeof VehicleServiceEntrySchema>;
+
+// Entity: VehicleTripCheck
+export const VehicleTripCheckSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventVehicleAssignmentId: z.string().uuid(),
+  eventId: z.string().uuid().nullable().optional(),
+  kind: z.enum(["before_leaving", "after_return"]).default("before_leaving"),
+  tires: z.enum(["good", "fair", "poor", "fail"]).default("good"),
+  brakes: z.enum(["good", "fair", "poor", "fail"]).default("good"),
+  lights: z.enum(["good", "fair", "poor", "fail"]).default("good"),
+  fluids: z.enum(["good", "fair", "poor", "fail"]).default("good"),
+  bodywork: z.enum(["good", "fair", "poor", "fail"]).default("good"),
+  interior: z.enum(["good", "fair", "poor", "fail"]).default("good"),
+  refrigeration: z.enum(["good", "fair", "poor", "fail"]).nullable().optional(),
+  odometer: z.number().int().nullable().optional(),
+  fuelLevel: z.enum(["empty", "quarter", "half", "three_quarters", "full"]).nullable().optional(),
+  damageNote: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  checkedAt: z.coerce.date().nullable().optional(),
+  checkedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: VehicleTripCheck
+export const VehicleTripCheckComputedSchema = VehicleTripCheckSchema.extend({
+  passed: z.boolean(),
+});
+
+export type VehicleTripCheck = z.infer<typeof VehicleTripCheckSchema>;
+export type VehicleTripCheckWithComputed = z.infer<typeof VehicleTripCheckComputedSchema>;
 
 // Entity: Vendor
 export const VendorSchema = z.object({
@@ -5446,6 +5651,16 @@ export const DeliveryStartTransitParamsSchema = z.object({});
 
 export type DeliveryStartTransitParams = z.infer<typeof DeliveryStartTransitParamsSchema>;
 
+// Command: record on DepartureOverride
+export const DepartureOverrideRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  reason: z.string(),
+  openItems: z.string().optional(),
+  packListId: z.string().min(1).optional(),
+});
+
+export type DepartureOverrideRecordParams = z.infer<typeof DepartureOverrideRecordParamsSchema>;
+
 // Command: classifyAllergens on Dish
 export const DishClassifyAllergensParamsSchema = z.object({
   allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
@@ -5823,6 +6038,14 @@ export const EquipmentReviseDetailsParamsSchema = z.object({
 });
 
 export type EquipmentReviseDetailsParams = z.infer<typeof EquipmentReviseDetailsParamsSchema>;
+
+// Command: setOperatingFacts on Equipment
+export const EquipmentSetOperatingFactsParamsSchema = z.object({
+  providesJson: z.string().optional(),
+  needsJson: z.string().optional(),
+});
+
+export type EquipmentSetOperatingFactsParams = z.infer<typeof EquipmentSetOperatingFactsParamsSchema>;
 
 // Command: setPrimaryImage on Equipment
 export const EquipmentSetPrimaryImageParamsSchema = z.object({
@@ -6431,7 +6654,7 @@ export type EventAssignmentCheckOutParams = z.infer<typeof EventAssignmentCheckO
 
 // Command: chooseTravelLeg on EventAssignment
 export const EventAssignmentChooseTravelLegParamsSchema = z.object({
-  rideVehicleAssignmentId: z.string().uuid().optional(),
+  rideVehicleAssignmentId: z.string().min(1).optional(),
   meetsAtVenue: z.boolean().optional(),
 });
 
@@ -6468,6 +6691,34 @@ export type EventAssignmentPlanTimingParams = z.infer<typeof EventAssignmentPlan
 export const EventAssignmentUnassignParamsSchema = z.object({});
 
 export type EventAssignmentUnassignParams = z.infer<typeof EventAssignmentUnassignParamsSchema>;
+
+// Command: define on EventChecklist
+export const EventChecklistDefineParamsSchema = z.object({
+  name: z.string(),
+  itemsJson: z.string(),
+  category: z.string().optional(),
+});
+
+export type EventChecklistDefineParams = z.infer<typeof EventChecklistDefineParamsSchema>;
+
+// Command: reinstate on EventChecklist
+export const EventChecklistReinstateParamsSchema = z.object({});
+
+export type EventChecklistReinstateParams = z.infer<typeof EventChecklistReinstateParamsSchema>;
+
+// Command: retire on EventChecklist
+export const EventChecklistRetireParamsSchema = z.object({});
+
+export type EventChecklistRetireParams = z.infer<typeof EventChecklistRetireParamsSchema>;
+
+// Command: revise on EventChecklist
+export const EventChecklistReviseParamsSchema = z.object({
+  name: z.string(),
+  itemsJson: z.string(),
+  category: z.string().optional(),
+});
+
+export type EventChecklistReviseParams = z.infer<typeof EventChecklistReviseParamsSchema>;
 
 // Command: capture on EventCloseout
 export const EventCloseoutCaptureParamsSchema = z.object({
@@ -6808,6 +7059,23 @@ export const EventLayoutSectionUpdateParamsSchema = z.object({
 
 export type EventLayoutSectionUpdateParams = z.infer<typeof EventLayoutSectionUpdateParamsSchema>;
 
+// Command: note on EventPlanNeeds
+export const EventPlanNeedsNoteParamsSchema = z.object({
+  eventId: z.string().min(1),
+  trucksNeeded: z.number().int().optional(),
+  siteProvidesJson: z.string().optional(),
+});
+
+export type EventPlanNeedsNoteParams = z.infer<typeof EventPlanNeedsNoteParamsSchema>;
+
+// Command: revise on EventPlanNeeds
+export const EventPlanNeedsReviseParamsSchema = z.object({
+  trucksNeeded: z.number().int().optional(),
+  siteProvidesJson: z.string().optional(),
+});
+
+export type EventPlanNeedsReviseParams = z.infer<typeof EventPlanNeedsReviseParamsSchema>;
+
 // Command: applyApprovedShiftSwap on EventStaffNeed
 export const EventStaffNeedApplyApprovedShiftSwapParamsSchema = z.object({
   personId: z.string().min(1),
@@ -6835,7 +7103,7 @@ export type EventStaffNeedChangeCoverageParams = z.infer<typeof EventStaffNeedCh
 
 // Command: chooseTravelLeg on EventStaffNeed
 export const EventStaffNeedChooseTravelLegParamsSchema = z.object({
-  rideVehicleAssignmentId: z.string().uuid().optional(),
+  rideVehicleAssignmentId: z.string().min(1).optional(),
   meetsAtVenue: z.boolean().optional(),
 });
 
@@ -6914,6 +7182,73 @@ export type EventStaffNeedPrepareCoverageContinuationParams = z.infer<typeof Eve
 export const EventStaffNeedReleaseClaimParamsSchema = z.object({});
 
 export type EventStaffNeedReleaseClaimParams = z.infer<typeof EventStaffNeedReleaseClaimParamsSchema>;
+
+// Command: add on EventTask
+export const EventTaskAddParamsSchema = z.object({
+  eventId: z.string().min(1),
+  title: z.string(),
+  details: z.string().optional(),
+  category: z.string().optional(),
+  ownerPersonId: z.string().min(1).optional(),
+  dueAt: z.coerce.date().optional(),
+  priority: z.enum(["critical", "high", "medium", "low"]).optional(),
+  waitsForTaskId: z.string().min(1).optional(),
+  proofRequired: z.boolean().optional(),
+  checklistTemplateId: z.string().min(1).optional(),
+  templateLineKey: z.string().optional(),
+  suggestionKey: z.string().optional(),
+});
+
+export type EventTaskAddParams = z.infer<typeof EventTaskAddParamsSchema>;
+
+// Command: complete on EventTask
+export const EventTaskCompleteParamsSchema = z.object({
+  note: z.string().optional(),
+});
+
+export type EventTaskCompleteParams = z.infer<typeof EventTaskCompleteParamsSchema>;
+
+// Command: giveTo on EventTask
+export const EventTaskGiveToParamsSchema = z.object({
+  ownerPersonId: z.string().min(1).optional(),
+});
+
+export type EventTaskGiveToParams = z.infer<typeof EventTaskGiveToParamsSchema>;
+
+// Command: remove on EventTask
+export const EventTaskRemoveParamsSchema = z.object({});
+
+export type EventTaskRemoveParams = z.infer<typeof EventTaskRemoveParamsSchema>;
+
+// Command: reopen on EventTask
+export const EventTaskReopenParamsSchema = z.object({});
+
+export type EventTaskReopenParams = z.infer<typeof EventTaskReopenParamsSchema>;
+
+// Command: revise on EventTask
+export const EventTaskReviseParamsSchema = z.object({
+  title: z.string(),
+  details: z.string().optional(),
+  category: z.string().optional(),
+  dueAt: z.coerce.date().optional(),
+  priority: z.enum(["critical", "high", "medium", "low"]).optional(),
+  waitsForTaskId: z.string().min(1).optional(),
+  proofRequired: z.boolean().optional(),
+});
+
+export type EventTaskReviseParams = z.infer<typeof EventTaskReviseParamsSchema>;
+
+// Command: skip on EventTask
+export const EventTaskSkipParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventTaskSkipParams = z.infer<typeof EventTaskSkipParamsSchema>;
+
+// Command: start on EventTask
+export const EventTaskStartParamsSchema = z.object({});
+
+export type EventTaskStartParams = z.infer<typeof EventTaskStartParamsSchema>;
 
 // Command: archive on EventTemplate
 export const EventTemplateArchiveParamsSchema = z.object({
@@ -8447,6 +8782,13 @@ export const OrganizationConfigureBrandingParamsSchema = z.object({
 
 export type OrganizationConfigureBrandingParams = z.infer<typeof OrganizationConfigureBrandingParamsSchema>;
 
+// Command: configurePlanningChecks on Organization
+export const OrganizationConfigurePlanningChecksParamsSchema = z.object({
+  checksJson: z.string().optional(),
+});
+
+export type OrganizationConfigurePlanningChecksParams = z.infer<typeof OrganizationConfigurePlanningChecksParamsSchema>;
+
 // Command: configureRoutePolicy on Organization
 export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
   safetyBufferMinutes: z.number().int(),
@@ -8734,12 +9076,37 @@ export const PackListItemMarkPackedParamsSchema = z.object({
 
 export type PackListItemMarkPackedParams = z.infer<typeof PackListItemMarkPackedParamsSchema>;
 
+// Command: recordChecked on PackListItem
+export const PackListItemRecordCheckedParamsSchema = z.object({
+  checkedQuantity: z.number(),
+});
+
+export type PackListItemRecordCheckedParams = z.infer<typeof PackListItemRecordCheckedParamsSchema>;
+
+// Command: recordLoaded on PackListItem
+export const PackListItemRecordLoadedParamsSchema = z.object({
+  loadedQuantity: z.number(),
+});
+
+export type PackListItemRecordLoadedParams = z.infer<typeof PackListItemRecordLoadedParamsSchema>;
+
 // Command: recordPackedCount on PackListItem
 export const PackListItemRecordPackedCountParamsSchema = z.object({
   packedQuantity: z.number(),
 });
 
 export type PackListItemRecordPackedCountParams = z.infer<typeof PackListItemRecordPackedCountParamsSchema>;
+
+// Command: recordReturn on PackListItem
+export const PackListItemRecordReturnParamsSchema = z.object({
+  returnedQuantity: z.number(),
+  usedQuantity: z.number(),
+  lostQuantity: z.number(),
+  damagedQuantity: z.number(),
+  finding: z.string().optional(),
+});
+
+export type PackListItemRecordReturnParams = z.infer<typeof PackListItemRecordReturnParamsSchema>;
 
 // Command: recordSentInstead on PackListItem
 export const PackListItemRecordSentInsteadParamsSchema = z.object({
@@ -8896,6 +9263,19 @@ export const PackRuleReviseParamsSchema = z.object({
 });
 
 export type PackRuleReviseParams = z.infer<typeof PackRuleReviseParamsSchema>;
+
+// Command: release on PackSectionClaim
+export const PackSectionClaimReleaseParamsSchema = z.object({});
+
+export type PackSectionClaimReleaseParams = z.infer<typeof PackSectionClaimReleaseParamsSchema>;
+
+// Command: take on PackSectionClaim
+export const PackSectionClaimTakeParamsSchema = z.object({
+  packListId: z.string().min(1),
+  sectionKey: z.string(),
+});
+
+export type PackSectionClaimTakeParams = z.infer<typeof PackSectionClaimTakeParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});
@@ -9250,6 +9630,65 @@ export type PersonTerminateParams = z.infer<typeof PersonTerminateParamsSchema>;
 export const PersonUnlinkAccountParamsSchema = z.object({});
 
 export type PersonUnlinkAccountParams = z.infer<typeof PersonUnlinkAccountParamsSchema>;
+
+// Command: record on PlanningOverride
+export const PlanningOverrideRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  action: z.string(),
+  reason: z.string(),
+  openItems: z.string().optional(),
+});
+
+export type PlanningOverrideRecordParams = z.infer<typeof PlanningOverrideRecordParamsSchema>;
+
+// Command: answerAgain on PlanningReceipt
+export const PlanningReceiptAnswerAgainParamsSchema = z.object({
+  quantity: z.number(),
+  declined: z.boolean(),
+  basis: z.string().optional(),
+});
+
+export type PlanningReceiptAnswerAgainParams = z.infer<typeof PlanningReceiptAnswerAgainParamsSchema>;
+
+// Command: record on PlanningReceipt
+export const PlanningReceiptRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  suggestionKey: z.string(),
+  quantity: z.number(),
+  declined: z.boolean(),
+  basis: z.string().optional(),
+});
+
+export type PlanningReceiptRecordParams = z.infer<typeof PlanningReceiptRecordParamsSchema>;
+
+// Command: define on PlanningRule
+export const PlanningRuleDefineParamsSchema = z.object({
+  name: z.string(),
+  trigger: z.enum(["every_event", "equipment", "equipment_kind"]),
+  actionsJson: z.string(),
+  triggerEquipmentId: z.string().min(1).optional(),
+  triggerEquipmentKind: z.string().optional(),
+});
+
+export type PlanningRuleDefineParams = z.infer<typeof PlanningRuleDefineParamsSchema>;
+
+// Command: reinstate on PlanningRule
+export const PlanningRuleReinstateParamsSchema = z.object({});
+
+export type PlanningRuleReinstateParams = z.infer<typeof PlanningRuleReinstateParamsSchema>;
+
+// Command: retire on PlanningRule
+export const PlanningRuleRetireParamsSchema = z.object({});
+
+export type PlanningRuleRetireParams = z.infer<typeof PlanningRuleRetireParamsSchema>;
+
+// Command: revise on PlanningRule
+export const PlanningRuleReviseParamsSchema = z.object({
+  name: z.string(),
+  actionsJson: z.string(),
+});
+
+export type PlanningRuleReviseParams = z.infer<typeof PlanningRuleReviseParamsSchema>;
 
 // Command: assign on PrepTask
 export const PrepTaskAssignParamsSchema = z.object({
@@ -11046,6 +11485,14 @@ export const VehicleReviseDetailsParamsSchema = z.object({
 
 export type VehicleReviseDetailsParams = z.infer<typeof VehicleReviseDetailsParamsSchema>;
 
+// Command: setCrewFacts on Vehicle
+export const VehicleSetCrewFactsParamsSchema = z.object({
+  seatCount: z.number().int().optional(),
+  driverQualificationName: z.string().optional(),
+});
+
+export type VehicleSetCrewFactsParams = z.infer<typeof VehicleSetCrewFactsParamsSchema>;
+
 // Command: setTowCapacity on Vehicle
 export const VehicleSetTowCapacityParamsSchema = z.object({
   towCapacityKg: z.number().int().optional(),
@@ -11127,6 +11574,25 @@ export const VehicleServiceEntryRecordParamsSchema = z.object({
 });
 
 export type VehicleServiceEntryRecordParams = z.infer<typeof VehicleServiceEntryRecordParamsSchema>;
+
+// Command: record on VehicleTripCheck
+export const VehicleTripCheckRecordParamsSchema = z.object({
+  eventVehicleAssignmentId: z.string().min(1),
+  kind: z.enum(["before_leaving", "after_return"]),
+  tires: z.enum(["good", "fair", "poor", "fail"]),
+  brakes: z.enum(["good", "fair", "poor", "fail"]),
+  lights: z.enum(["good", "fair", "poor", "fail"]),
+  fluids: z.enum(["good", "fair", "poor", "fail"]),
+  bodywork: z.enum(["good", "fair", "poor", "fail"]),
+  interior: z.enum(["good", "fair", "poor", "fail"]),
+  refrigeration: z.enum(["good", "fair", "poor", "fail"]).optional(),
+  odometer: z.number().int().optional(),
+  fuelLevel: z.enum(["empty", "quarter", "half", "three_quarters", "full"]).optional(),
+  damageNote: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type VehicleTripCheckRecordParams = z.infer<typeof VehicleTripCheckRecordParamsSchema>;
 
 // Command: onboard on Vendor
 export const VendorOnboardParamsSchema = z.object({

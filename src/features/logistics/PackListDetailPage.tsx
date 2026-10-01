@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
@@ -25,7 +25,12 @@ import {
   useListServiceStyleKitItem,
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
+  usePackListItemRecordChecked,
+  useListPackSectionClaim,
+  usePackSectionClaimRelease,
+  usePackListItemRecordLoaded,
   usePackListItemRecordPackedCount,
+  usePackListItemRecordReturn,
   usePackListItemRecordSentInstead,
   usePackListMarkLoaded,
   usePackListMarkPacked,
@@ -38,6 +43,8 @@ import {
   useBulkSelection,
 } from "../../ui/bulk-select";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { usePackSectionTake } from "../../lib/usePackSectionTake";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
@@ -47,10 +54,12 @@ import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PackListItemForm } from "./PackListItemForm";
 import { PackListViews } from "./PackListViews";
-import type { PackViewKind } from "./packViews";
+import { PACK_VIEWS, type PackViewKind } from "./packViews";
 import { usePackRigs } from "./usePackRigs";
 import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
+import { PackScanPanel } from "./PackScanPanel";
+import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
 import {
@@ -114,6 +123,13 @@ export function PackListDetailPage() {
   const markItemPacked = usePackListItemMarkPacked();
   const recordPackedCount = usePackListItemRecordPackedCount();
   const recordSentInstead = usePackListItemRecordSentInstead();
+  const recordChecked = usePackListItemRecordChecked();
+  const sectionClaims = useListPackSectionClaim();
+  const authStatus = useAuthStatus();
+  const takeSection = usePackSectionTake();
+  const giveBackSection = usePackSectionClaimRelease();
+  const recordLoaded = usePackListItemRecordLoaded();
+  const recordReturn = usePackListItemRecordReturn();
   const markItemMissing = usePackListItemMarkMissing();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -122,10 +138,17 @@ export function PackListDetailPage() {
   const cancel = usePackListCancel();
   const [showAdd, setShowAdd] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showScan, setShowScan] = useState(false);
   const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(
     null,
   );
-  const [view, setView] = useState<PackViewKind>("all");
+  // The dispatch board and the returns page open a list on one view.
+  const [searchParams] = useSearchParams();
+  const [view, setView] = useState<PackViewKind>(
+    () =>
+      PACK_VIEWS.find((option) => option.kind === searchParams.get("view"))
+        ?.kind ?? "all",
+  );
   const rigs = usePackRigs(packList ? packList.eventId : null);
   const transport = useEventTransport(packList ? packList.eventId : null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -228,6 +251,67 @@ export function PackListDetailPage() {
     } finally {
       setBusy(null);
     }
+  };
+
+  // Who is packing which section of the warehouse walk. Taking a section
+  // stops nobody: anyone may still count a line in it.
+  const sectionAside = (group: { key: string; label: string }) => {
+    const claim = sectionClaims?.find(
+      (row) =>
+        row.deletedAt == null &&
+        row.packListId === packList._id &&
+        row.sectionKey === group.key &&
+        row.claimedAt != null &&
+        row.releasedAt == null,
+    );
+    const mine =
+      claim?.personId != null && claim.personId === authStatus?.personId;
+    // One save: whoever had the section gives it back and you take it.
+    const take = () =>
+      run(`section:${group.key}`, async () => {
+        await takeSection({
+          packListId: packList._id as never,
+          sectionKey: group.key,
+        });
+      });
+    return (
+      <div className="flex flex-wrap items-center gap-2 text-base text-ink-2">
+        {claim && (
+          <span>
+            {mine
+              ? "You are packing this"
+              : `${claim.personName?.trim() || packedByName(claim.personId) || "Someone"} is packing this`}
+          </span>
+        )}
+        {claim && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy != null}
+            onClick={() =>
+              void run(`section:${group.key}`, async () => {
+                await giveBackSection({
+                  docId: claim._id,
+                  version: claim.version,
+                });
+              })
+            }
+          >
+            Give back
+          </button>
+        )}
+        {!mine && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy != null}
+            onClick={() => void take()}
+          >
+            {claim ? "Take over" : "I will pack this"}
+          </button>
+        )}
+      </div>
+    );
   };
 
   const submitItem = (event: FormEvent<HTMLFormElement>) => {
@@ -423,9 +507,123 @@ export function PackListDetailPage() {
       status: unknown;
       note?: string | null;
       sentInstead?: string | null;
+      checkedQuantity?: number | null;
+      loadedQuantity?: number | null;
+      returnedQuantity?: number | null;
+      usedQuantity?: number | null;
+      lostQuantity?: number | null;
+      damagedQuantity?: number | null;
+      returnFinding?: string | null;
     },
     key: string,
   ) => {
+    if (key === "secondCheck" || key === "onTruck") {
+      const check = key === "secondCheck";
+      const packed = Number(item.packedQuantity ?? 0);
+      const saved = check ? item.checkedQuantity : item.loadedQuantity;
+      const values = await prompt.askFields({
+        title: check ? "Second check" : "On the truck",
+        description: check
+          ? `${packed} packed. Count it again and enter what you found. Enter 0 to clear the check.`
+          : `${packed} packed. Enter how much of it is on the truck. Enter 0 to take it back off.`,
+        confirmLabel: check ? "Save check" : "Save",
+        fields: [
+          {
+            name: "amount",
+            label: check ? "Amount counted" : "Amount on the truck",
+            inputType: "number",
+            required: true,
+            defaultValue: String(saved ?? packed),
+          },
+        ],
+      });
+      if (!values) return;
+      const amount = Number(values.amount);
+      void run(`${item._id}:${key}`, async () => {
+        if (check)
+          await recordChecked({
+            docId: item._id,
+            version: item.version,
+            checkedQuantity: amount,
+          });
+        else
+          await recordLoaded({
+            docId: item._id,
+            version: item.version,
+            loadedQuantity: amount,
+          });
+        setNotice(
+          check
+            ? amount > 0
+              ? `Checked ${amount} of ${packed} packed.`
+              : "Check cleared."
+            : amount > 0
+              ? `${amount} of ${packed} on the truck.`
+              : "Taken off the truck.",
+        );
+      });
+      return;
+    }
+    if (key === "countReturn") {
+      const packed = packWentOut(item);
+      const values = await prompt.askFields({
+        title: "Count the return",
+        description: `${packed} went out. Enter what came back, what was used up, what was lost and what came back broken. You can save this again later.`,
+        confirmLabel: "Save return count",
+        fields: [
+          {
+            name: "returned",
+            label: "Came back",
+            inputType: "number",
+            required: true,
+            defaultValue: String(item.returnedQuantity ?? packed),
+          },
+          {
+            name: "used",
+            label: "Used up",
+            inputType: "number",
+            required: false,
+            defaultValue: String(item.usedQuantity ?? 0),
+          },
+          {
+            name: "lost",
+            label: "Lost",
+            inputType: "number",
+            required: false,
+            defaultValue: String(item.lostQuantity ?? 0),
+          },
+          {
+            name: "damaged",
+            label: "Came back broken",
+            inputType: "number",
+            required: false,
+            defaultValue: String(item.damagedQuantity ?? 0),
+          },
+          {
+            name: "finding",
+            label: "What you found (optional)",
+            inputType: "text",
+            required: false,
+            defaultValue: item.returnFinding ?? "",
+          },
+        ],
+      });
+      if (!values) return;
+      const amount = (raw: string | undefined) => Number(raw?.trim() || 0);
+      void run(`${item._id}:countReturn`, async () => {
+        await recordReturn({
+          docId: item._id,
+          version: item.version,
+          returnedQuantity: amount(values.returned),
+          usedQuantity: amount(values.used),
+          lostQuantity: amount(values.lost),
+          damagedQuantity: amount(values.damaged),
+          finding: values.finding?.trim() || undefined,
+        });
+        setNotice("Return count saved.");
+      });
+      return;
+    }
     if (key === "sentInstead") {
       const values = await prompt.askFields({
         title: "Sent instead",
@@ -770,6 +968,16 @@ export function PackListDetailPage() {
               </button>
             </>
           ) : null}
+          {String(packList.status) !== "cancelled" ? (
+            <button
+              className="btn btn-ghost"
+              type="button"
+              aria-pressed={showScan}
+              onClick={() => setShowScan((value) => !value)}
+            >
+              {showScan ? "Close scan" : "Scan labels"}
+            </button>
+          ) : null}
           {listIsLive ? (
             <button
               className="btn btn-ghost"
@@ -852,6 +1060,26 @@ export function PackListDetailPage() {
               setNotice("Assistance resolved.");
             })
           }
+        />
+      ) : null}
+
+      {showScan && String(packList.status) !== "cancelled" ? (
+        <PackScanPanel
+          packList={{
+            _id: packList._id,
+            version: packList.version,
+            eventId: packList.eventId,
+            status: String(packList.status),
+          }}
+          eventNumber={event?.eventNumber}
+          lines={listItems.map((item) => ({
+            ...item,
+            status: String(item.status),
+            requiredQuantity: Number(item.requiredQuantity),
+            packedQuantity: Number(item.packedQuantity),
+            unit: String(item.unit),
+          }))}
+          rigs={rigs}
         />
       ) : null}
 
@@ -947,6 +1175,7 @@ export function PackListDetailPage() {
         <PackListViews
           view={view}
           onViewChange={setView}
+          sectionAside={sectionAside}
           rigs={rigs}
           transport={transport}
           loading={
@@ -955,6 +1184,8 @@ export function PackListDetailPage() {
           items={listItems}
           canAddItems={canAddItems}
           canEditLines={listIsLive}
+          canCount={String(packList.status) !== "cancelled"}
+          canCountReturn={String(packList.status) === "dispatched"}
           busy={busy}
           dishName={dishName}
           packedByName={packedByName}

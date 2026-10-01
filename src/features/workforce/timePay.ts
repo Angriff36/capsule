@@ -51,8 +51,21 @@ export function isFinishedTime(record: PayTimeRecord): boolean {
   );
 }
 
+/**
+ * Whether approval decides if finished time is paid. Off, by Ryan's decision
+ * (2026-09-29: "req approval or dont i dont fucking care no ones fucking using
+ * it"): payroll counts finished time as live Capsule does today, and approval
+ * still shows on the time sheet. Older entries have no approvedAt, so turning
+ * this on needs a release step that approves them first.
+ */
+export const PAYROLL_REQUIRES_APPROVAL = false;
+
+export function hasPayrollApproval(record: { approvedAt?: unknown }): boolean {
+  return !PAYROLL_REQUIRES_APPROVAL || record.approvedAt != null;
+}
+
 export function isApprovedTime(record: PayTimeRecord): boolean {
-  return isFinishedTime(record) && record.approvedAt != null;
+  return isFinishedTime(record) && hasPayrollApproval(record);
 }
 
 /** Real minutes between clock-in and clock-out (null while open). */
@@ -96,14 +109,34 @@ export function approvedPayroll(
     (record) =>
       String(record.personId) === personId &&
       isFinishedTime(record) &&
+      // A shift belongs to the period it started in, so an overnight shift
+      // across the period line is paid once, never dropped.
       num(record.clockInAt) >= startAt &&
-      num(record.clockOutAt) <= endExclusiveAt,
+      num(record.clockInAt) < endExclusiveAt,
   );
   const approved = inWindow
-    .filter((record) => record.approvedAt != null)
+    .filter((record) => hasPayrollApproval(record))
     .sort((a, b) => num(a.clockInAt) - num(b.clockInAt));
   const thresholdMinutes = thresholdHours * 60;
   const weekTotals = new Map<number, number>();
+  // A period that starts midweek: approved shifts that started before it, in
+  // that same week, count toward the weekly threshold (they are paid in the
+  // period before, which is where a shift crossing the line belongs).
+  const weekStart = startOfLocalWeek(startAt);
+  for (const record of records) {
+    if (
+      String(record.personId) !== personId ||
+      !isApprovedTime(record) ||
+      num(record.clockInAt) < weekStart ||
+      num(record.clockInAt) >= startAt
+    )
+      continue;
+    const week = startOfLocalWeek(num(record.clockInAt));
+    weekTotals.set(
+      week,
+      (weekTotals.get(week) ?? 0) + (paidMinutes(record) ?? 0),
+    );
+  }
   let regularMinutes = 0;
   let overtimeMinutes = 0;
   for (const record of approved) {

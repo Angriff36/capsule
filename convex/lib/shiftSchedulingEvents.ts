@@ -1,5 +1,7 @@
 import { ConvexError } from "convex/values";
 import { findApprovedTimeOffConflict } from "../../src/lib/timeOff";
+// Same payroll eligibility as the calculation (approval off, Ryan 2026-09-29).
+import { isApprovedTime } from "../../src/features/workforce/timePay";
 import {
   parseTemplateLines,
   pickStaffingTemplate,
@@ -178,9 +180,9 @@ export async function validatePayrollInputSources(
   for (const id of ids) {
     const record = await ctx.db.get(id as Id<"timeRecords">).catch(() => null);
     if (!record || record.tenantId !== input.tenantId || record.deletedAt != null ||
-      record.personId !== input.personId || record.approvedAt == null)
+      record.personId !== input.personId || !isApprovedTime(record))
       throw new ConvexError(
-        "One of these time entries is not an approved entry for this person. Refresh and try again.",
+        "One of these time entries is not a finished entry for this person. Refresh and try again.",
       );
   }
   const others = await ctx.db.query("payrollInputs")

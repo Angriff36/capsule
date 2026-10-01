@@ -23,6 +23,7 @@ type ReceiptRow = {
   totalMinutes: number;
   deltaMinutes: number;
   status: string;
+  processor?: string;
   providerReference?: string | null;
   rejectionReason?: string | null;
   deletedAt?: number | null;
@@ -50,6 +51,7 @@ export function usePayrollReceipts(document: PayrollExportDocument | null) {
         receipts,
         periodStart: document.periodStart,
         periodEnd: document.periodEnd,
+        processor: document.processor,
       })
     : [];
   /** Record one receipt per person whose total changed since the last send. */

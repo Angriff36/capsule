@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
+import { clockNow } from "./lib/clockNow";
 
 /**
  * AUTHOR SEAM — public, token-authorized proposal share links (spec §4.6).
@@ -108,6 +109,7 @@ function linkEndsAt(link: Doc<"shareLinks">): number {
 async function openShareLink(
   ctx: QueryCtx,
   token: string,
+  clock?: number,
 ): Promise<{
   link: Doc<"shareLinks">;
   revision: Doc<"proposalRevisions">;
@@ -118,7 +120,7 @@ async function openShareLink(
   const link: Doc<"shareLinks"> | null = await ctx.db.get(linkId);
   if (!link || link.deletedAt != null) return null;
   if (link.status !== "active") return null;
-  if (linkEndsAt(link) <= Date.now()) return null;
+  if (linkEndsAt(link) <= clockNow(clock)) return null;
 
   const [revision, proposal] = await Promise.all([
     ctx.db.get(link.proposalRevisionId),
@@ -178,9 +180,9 @@ async function replacementOf(
 
 /** Resolve a share token to the pinned revision's client-safe view, or null. */
 export const getSharedProposal = query({
-  args: { token: v.string() },
-  handler: async (ctx, { token }): Promise<SharedProposal | null> => {
-    const opened = await openShareLink(ctx, token);
+  args: { token: v.string(), clock: v.optional(v.number()) },
+  handler: async (ctx, { token, clock }): Promise<SharedProposal | null> => {
+    const opened = await openShareLink(ctx, token, clock);
     if (!opened) return null;
     const { link, revision, proposal: liveProposal } = opened;
 

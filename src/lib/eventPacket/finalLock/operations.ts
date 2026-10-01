@@ -98,40 +98,27 @@ export function operationsAnswers(
   const chatWords = chat.messageCount
     ? `The event chat has ${chat.messageCount} message${chat.messageCount === 1 ? "" : "s"} and ${chat.attachmentCount} file${chat.attachmentCount === 1 ? "" : "s"}.`
     : "The event chat is ready; no messages yet.";
-  // Every event has its own chat; an empty one is not a problem to fix. An
-  // outside channel is optional, but when there is one its name must match.
-  out["communication.channel"] =
-    outside && outside.name !== expected
-      ? unresolved(
-          [
-            expected
-              ? `The outside chat channel is named "${outside.name}"; it should be "${expected}".`
-              : `The event has an outside chat channel "${outside.name}" but no event number to name it by.`,
-          ],
-          expected
-            ? `Rename the outside channel to "${expected}" and record the new name on the event.`
-            : "Give the event its number, then rename the outside channel.",
-          "communication.channel.one-event-chat",
-          chatSources,
-        )
-      : answered(
-          {
-            type: "record",
-            fields: {
-              messages: chat.messageCount,
-              attachments: chat.attachmentCount,
-              outsideChannel: outside?.name ?? null,
-              outsideChannelName: expected,
-            },
-          },
-          outside
-            ? `${chatWords} Mirrored to the outside channel "${outside.name}".`
-            : expected
-              ? `${chatWords} An outside channel, if the team makes one, is named "${expected}".`
-              : chatWords,
-          "communication.channel.one-event-chat",
-          chatSources,
-        );
+  // Every event has its own chat; an empty one is not a problem to fix. No
+  // outside channel is required or checked (Ryan 2026-09-29: "i dont care
+  // about slack, capsule has its own fucking chat").
+  out["communication.channel"] = answered(
+    {
+      type: "record",
+      fields: {
+        messages: chat.messageCount,
+        attachments: chat.attachmentCount,
+        outsideChannel: outside?.name ?? null,
+        outsideChannelName: expected,
+      },
+    },
+    outside
+      ? `${chatWords} Mirrored to the outside channel "${outside.name}".`
+      : expected
+        ? `${chatWords} An outside channel, if the team makes one, is named "${expected}".`
+        : chatWords,
+    "communication.channel.one-event-chat",
+    chatSources,
+  );
   return out;
 }
 

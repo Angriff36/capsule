@@ -910,8 +910,8 @@ export const processQuoteSubmission = action({
 
     // Picks (AC-095/AC-241): the chosen menu and dishes become priced lines
     // and dish choices, extras become offered enhancements — all from the
-    // same catalog and price rule the visitor saw. Lines are added only
-    // while the proposal has none; dish choices and extras are keyed to this
+    // same catalog and price rule the visitor saw. A retry adds only the
+    // lines still missing; dish choices and extras are keyed to this
     // submission, so a retried conversion fills gaps without doubling.
     if (proposalId && (submission.menuId || submission.selectionsJson)) {
       try {
@@ -919,10 +919,10 @@ export const processQuoteSubmission = action({
           internal.lib.quoteSelections.quoteConversionPlan,
           { proposalId, submissionId },
         );
-        for (const [sortOrder, line] of plan.lines.entries()) {
+        for (const line of plan.lines) {
           await ctx.runMutation(
             api.lib.proposalPricing.addProposalLineAndRecompute,
-            { proposalId, sortOrder, ...line },
+            { proposalId, ...line },
           );
         }
         for (const pick of plan.dishSelections) {

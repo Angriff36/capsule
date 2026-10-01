@@ -22,6 +22,7 @@ import {
   ClientPortalPayments,
   type PortalPayableInvoice,
 } from "./ClientPortalPayments";
+import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 import "./clientPortal.css";
 
 const PORTAL_STAGES: EventStage[] = [
@@ -103,9 +104,9 @@ type PortalStyle = CSSProperties & {
 export function ClientPortalPage({ token: tokenProp }: { token?: string }) {
   const { token: routeToken } = useParams();
   const token = tokenProp ?? routeToken;
-  const portal = useQuery(
-    api.clientPortal.getEvent,
-    token ? { token } : "skip",
+  const clock = useMinuteClock();
+  const portal = useLatestDefined(
+    useQuery(api.clientPortal.getEvent, token ? { token, clock } : "skip"),
   ) as ClientPortalSnapshot | null | undefined;
 
   if (!token || portal === null) return <ClientPortalUnavailable />;

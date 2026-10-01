@@ -1770,6 +1770,120 @@
       "category": "event-payload-changed",
       "acknowledgedAt": "2026-09-29",
       "reason": "Batch 2026-09-29 PL-CLOSEOUT: the finalized event now also carries every closeout number and the record list, so each final result stays readable from the ledger. Fields were only added."
+    },
+    {
+      "path": "PackListItem.checkedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.checkedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.checkedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.damagedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.lineLoadedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.lineLoadedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.loadedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.lostQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.returnCountedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.returnCountedByPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.returnedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.returnFinding",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "PackListItem.usedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional pack line counts (second check, on the truck, and the return count after the event); saved pack lines need no backfill."
+    },
+    {
+      "path": "Equipment.needsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
+    },
+    {
+      "path": "Equipment.operatingFactsCheckedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
+    },
+    {
+      "path": "Equipment.providesJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
+    },
+    {
+      "path": "Organization.planningChecksJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
+    },
+    {
+      "path": "Vehicle.driverQualificationName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
+    },
+    {
+      "path": "Vehicle.seatCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
     }
   ]
 }

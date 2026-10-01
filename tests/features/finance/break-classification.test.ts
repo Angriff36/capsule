@@ -4,7 +4,10 @@
  * 40 in a week into overtime.
  */
 import { describe, expect, it } from "vitest";
-import { buildPayrollExport } from "../../../src/features/finance/payrollExport";
+import {
+  buildPayrollExport,
+  payrollCsvDownloadAllowed,
+} from "../../../src/features/finance/payrollExport";
 import {
   approvedPayroll,
   overtimeWarnings,
@@ -46,7 +49,7 @@ describe("break classification", () => {
     expect(document.rows[0]?.recordedHours).toBe(7.5);
   });
 
-  it("payroll counts only approved time and names what still waits", () => {
+  it("payroll counts finished time, approved or not, while approval is off (Ryan 2026-09-29)", () => {
     const day = {
       personId: "p1",
       clockInAt: at("2026-03-03T09:00:00"),
@@ -67,11 +70,11 @@ describe("break classification", () => {
       at("2026-03-09T00:00:00"),
     );
     expect(result).toEqual({
-      approvedMinutes: 240,
-      regularMinutes: 240,
+      approvedMinutes: 480,
+      regularMinutes: 480,
       overtimeMinutes: 0,
-      approvedCount: 1,
-      waitingApprovalCount: 1,
+      approvedCount: 2,
+      waitingApprovalCount: 0,
       approvedIds: [],
     });
     const document = buildPayrollExport({
@@ -85,7 +88,7 @@ describe("break classification", () => {
       ].map((row) => ({ ...row, clockOutAt: row.clockInAt + 4 * 3_600_000 })),
       payrollInputs: [],
     });
-    expect(document.rows[0]?.recordedHours).toBe(4);
+    expect(document.rows[0]?.recordedHours).toBe(8);
   });
 
   it("hours past 40 in one week are overtime and raise a warning", () => {
@@ -114,5 +117,79 @@ describe("break classification", () => {
         overtimeHours: 7.5,
       }),
     ]);
+  });
+  it("a period that starts midweek counts that week's earlier hours toward overtime, and an overtime week waits for prepared pay", () => {
+    // Mon 2026-03-02 to Fri 2026-03-06, ten approved hours a day = 50 hours.
+    const days = ["02", "03", "04", "05", "06"].map((day) => ({
+      personId: "p1",
+      clockInAt: at(`2026-03-${day}T08:00:00`),
+      clockOutAt: at(`2026-03-${day}T18:00:00`),
+      status: "closed",
+      approvedAt: at(`2026-03-${day}T19:00:00`),
+    }));
+    // Period Wed-Fri: 30 hours, but 20 were already worked Mon-Tue.
+    const midweek = approvedPayroll(
+      days,
+      "p1",
+      at("2026-03-04T00:00:00"),
+      at("2026-03-07T00:00:00"),
+    );
+    expect(midweek.regularMinutes).toBe(20 * 60);
+    expect(midweek.overtimeMinutes).toBe(10 * 60);
+
+    // An overnight shift crossing the period start (Tue 22:00 - Wed 06:00)
+    // belongs to Tuesday's period: it is not paid in this one.
+    const crossing = {
+      personId: "p1",
+      clockInAt: at("2026-03-03T22:00:00"),
+      clockOutAt: at("2026-03-04T06:00:00"),
+      status: "closed",
+      approvedAt: at("2026-03-04T07:00:00"),
+    };
+    const withCrossing = approvedPayroll(
+      [...days.slice(2), crossing],
+      "p1",
+      at("2026-03-04T00:00:00"),
+      at("2026-03-07T00:00:00"),
+    );
+    expect(withCrossing.regularMinutes).toBe(30 * 60);
+    expect(withCrossing.overtimeMinutes).toBe(0);
+
+    const document = buildPayrollExport({
+      processor: "gusto",
+      periodStart: "2026-03-02",
+      periodEnd: "2026-03-06",
+      people: [
+        { _id: "p1", givenName: "Pat", familyName: "Pay", employeeNumber: "7" },
+      ],
+      timeRecords: days,
+      payrollInputs: [],
+    });
+    // Capsule does not guess the overtime split: the person is named, and the
+    // file still downloads with the clocked hours.
+    expect(document.rows[0]).toMatchObject({
+      recordedHours: 50,
+      needsPayPrep: true,
+    });
+    expect(document.payPrepNames).toEqual(["Pat Pay"]);
+    expect(payrollCsvDownloadAllowed(document)).toBe(true);
+  });
+  it("an overnight shift is paid in the period it started in; an unapproved finished entry still counts while approval is off", () => {
+    const night = {
+      personId: "p1",
+      clockInAt: at("2026-03-03T22:00:00"),
+      clockOutAt: at("2026-03-04T06:00:00"),
+      status: "closed",
+      approvedAt: at("2026-03-04T07:00:00"),
+    };
+    const tue = [at("2026-03-03T00:00:00"), at("2026-03-04T00:00:00")] as const;
+    const wed = [at("2026-03-04T00:00:00"), at("2026-03-05T00:00:00")] as const;
+    expect(approvedPayroll([night], "p1", ...tue).approvedMinutes).toBe(480);
+    expect(approvedPayroll([night], "p1", ...wed).approvedMinutes).toBe(0);
+    // Approval is off: a finished entry with no approval still counts.
+    const unapproved = { ...night, approvedAt: undefined };
+    expect(approvedPayroll([unapproved], "p1", ...tue).approvedMinutes).toBe(
+      480,
+    );
   });
 });

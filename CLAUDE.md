@@ -209,3 +209,12 @@ Convex agent skills for common tasks can be installed by running
 `npx convex ai-files install`.
 
 <!-- convex-ai-end -->
+
+## Component reuse
+
+Storybook is Capsule's reusable component catalog. Before building or changing UI,
+read `docs/design/component-catalog.md`, inspect the matching story and implementation,
+and reuse the existing component/variant. Follow AGENTS.md's "Component catalog and
+reuse" rules. Action dropdowns use `src/ui/DropdownMenu.tsx`; examples live in
+`src/ui/DropdownMenu.stories.tsx`. Add colocated stories and update the catalog when
+adding a reusable component. `DESIGN.md` remains presentation authority.

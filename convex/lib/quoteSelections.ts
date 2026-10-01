@@ -22,6 +22,7 @@ import {
   type QuoteSelections,
 } from "../../src/lib/quoteSelections";
 import { resolveCatalogPrice } from "./proposalPricing";
+import { clockNow } from "./clockNow";
 
 export const quotePickValidator = v.object({
   menuDishId: v.id("menuDishes"),
@@ -74,6 +75,9 @@ export async function resolveQuoteSelections(
     extras?: QuotePick[];
     eventDate: number;
     guestCount: number;
+    /** The page's current minute (see clockNow): a scheduled price switches
+     *  on an open page too, not only on the next load. */
+    clock?: number;
   },
 ): Promise<QuoteSelections> {
   const picks = args.picks ?? [];
@@ -84,7 +88,7 @@ export async function resolveQuoteSelections(
   if (picks.length > 0 && !args.menuId) {
     throw new ConvexError("Pick a menu before picking its dishes.");
   }
-  const now = Date.now();
+  const now = clockNow(args.clock);
   const refuseIneligible = (menu: Doc<"menus">) => {
     const reasons = menuIneligibleReasons(menu, {
       eventDate: args.eventDate,
@@ -181,6 +185,7 @@ export const estimateQuote = query({
     menuId: v.optional(v.id("menus")),
     picks: v.optional(v.array(quotePickValidator)),
     extras: v.optional(v.array(quotePickValidator)),
+    clock: v.optional(v.number()),
   },
   handler: async (
     ctx,
@@ -317,21 +322,31 @@ export const quoteConversionPlan = internalQuery({
     const plan = quoteProposalPlan(current, guestCount);
     const live = <T extends { deletedAt?: number | null }>(rows: T[]) =>
       rows.filter((row) => row.deletedAt == null);
-    const hasLines =
-      live(
-        await ctx.db
-          .query("proposalLineItems")
-          .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
-          .collect(),
-      ).length > 0;
+    // A retried conversion adds only the lines still missing: a line is
+    // already there when a live line has the same place, text and dish.
+    const saved = live(
+      await ctx.db
+        .query("proposalLineItems")
+        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
+        .collect(),
+    );
+    const isSaved = (line: (typeof plan.lines)[number], sortOrder: number) =>
+      saved.some(
+        (row) =>
+          row.sortOrder === sortOrder &&
+          row.description === line.description &&
+          (row.menuDishId ?? null) === (line.menuDishId ?? null),
+      );
 
     return {
-      lines: hasLines
-        ? []
-        : plan.lines.map((line) => ({
-            ...line,
-            menuDishId: line.menuDishId as Id<"menuDishes"> | undefined,
-          })),
+      lines: plan.lines
+        .map((line, sortOrder) => ({ line, sortOrder }))
+        .filter(({ line, sortOrder }) => !isSaved(line, sortOrder))
+        .map(({ line, sortOrder }) => ({
+          ...line,
+          sortOrder,
+          menuDishId: line.menuDishId as Id<"menuDishes"> | undefined,
+        })),
       enhancements: plan.enhancements,
       dishSelections: current.lines
         .filter((line) => line.kind === "menu")

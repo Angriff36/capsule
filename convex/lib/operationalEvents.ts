@@ -56,6 +56,7 @@ import { assertProposalFollowTotals } from "./proposalFollowTotals";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
+import { enforceOneOnly } from "./oneOnlyRules";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
@@ -71,6 +72,7 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  await enforceOneOnly(ctx, event);
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
   // Pack lines follow every event fact that asks for equipment (spec §13.2).

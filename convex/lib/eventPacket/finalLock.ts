@@ -8,6 +8,7 @@ import {
   type QueryCtx,
 } from "../../_generated/server";
 import { getAuthContext, requireTenant } from "../authContext";
+import { storageNotOwnedElsewhere } from "../../fileStorage";
 import { authorize, hasManagementAccess } from "./commands";
 import {
   eventFieldForms,
@@ -216,9 +217,17 @@ async function fieldFormRows(
       observedAt: typeof f.observedAt === "number" ? f.observedAt : null,
       outcome: (f.outcome as "all_good" | "problem" | undefined) ?? null,
       note: (f.note as string | undefined) ?? null,
-      photoUrl: f.photoStorageId
-        ? await ctx.storage.getUrl(f.photoStorageId as Id<"_storage">)
-        : null,
+      // The form only stores the id it was given: show the photo only when
+      // no other company or private chat owns that file.
+      photoUrl:
+        f.photoStorageId &&
+        (await storageNotOwnedElsewhere(
+          ctx,
+          tenantId,
+          f.photoStorageId as string,
+        ))
+          ? await ctx.storage.getUrl(f.photoStorageId as Id<"_storage">)
+          : null,
       checkedBy: name(f.formCheckedById),
       secondObservedAt:
         typeof f.secondObservedAt === "number" ? f.secondObservedAt : null,

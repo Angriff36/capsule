@@ -294,7 +294,13 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
     const tenantId = "tenant-acct-refund";
     const finance = financeOf(proof, tenantId);
     const invoice = await sentInvoice(proof, finance, tenantId, 400, "A-3");
+    await finance.run(async (ctx) =>
+      ctx.db.patch(invoice.invoiceId as never, { depositAmount: 100 } as never),
+    );
     const paymentId = await pay(proof, finance, invoice, 400);
+    expect(
+      (await read(finance, invoice.invoiceId)).depositPaidAt,
+    ).not.toBeNull();
 
     await proof.executeCommand(finance, api.mutations.Payment_refund, {
       docId: paymentId,
@@ -308,6 +314,8 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
     expect(await read(finance, invoice.invoiceId)).toMatchObject({
       amountPaid: 0,
       amountDue: 400,
+      // Less than the deposit is paid now: the deposit is open again.
+      depositPaidAt: null,
     });
   });
 
@@ -470,6 +478,25 @@ describe("payment accounting truth (PL-ACCOUNTING)", () => {
     expect(await read(finance, invoice.invoiceId)).toMatchObject({
       status: "paid",
       amountDue: 0,
+    });
+
+    // A second paid checkout on the now-closed invoice still lands in the
+    // ledger as money received, all of it left over, so it can be refunded.
+    const second = (await finance.mutation(
+      internal.lib.invoiceStripeReconcile.recordPaidSession,
+      { ...args, sessionId: "cs_replay_2" },
+    )) as Row;
+    expect(second).toMatchObject({ recorded: true, applied: 0, overpaid: 300 });
+    const extra = (await finance.run(async (ctx) =>
+      (await ctx.db.query("payments").collect()).find(
+        (row) => row.externalPaymentId === "cs_replay_2",
+      ),
+    )) as Row;
+    expect(extra).toMatchObject({
+      amount: 300,
+      appliedAmount: 0,
+      unappliedAmount: 300,
+      status: "completed",
     });
   });
 });

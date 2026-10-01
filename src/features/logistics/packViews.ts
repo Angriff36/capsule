@@ -137,7 +137,15 @@ function loadGroup(line: PackViewLine, ctx: Context) {
 }
 
 /** Lines that come back: marked so, or not marked and not throwaway. */
-export function comesBack(line: PackViewLine): boolean {
+export function comesBack(
+  line:
+    | PackViewLine
+    | {
+        excludedAt?: number | null;
+        returnRequired?: boolean | null;
+        category?: string | null;
+      },
+): boolean {
   if (line.excludedAt != null) return false;
   if (line.returnRequired != null) return line.returnRequired;
   return line.category !== "disposable";

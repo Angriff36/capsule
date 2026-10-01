@@ -12,7 +12,7 @@ import { TimeSheetPage } from "../../../src/features/workforce/TimeSheetPage";
 const IN = new Date("2026-03-03T09:00:00").getTime();
 const OUT = new Date("2026-03-03T14:00:00").getTime();
 
-it("each timesheet row shows punch evidence, break minutes, approval state and payroll inclusion", async () => {
+it("each timesheet row shows punch evidence, break minutes, and approval state", async () => {
   backend.values.set("useListPerson", [
     { _id: "p-ada", givenName: "Ada", familyName: "Cook", status: "active" },
   ]);
@@ -62,10 +62,7 @@ it("each timesheet row shows punch evidence, break minutes, approval state and p
   expect(sent?.textContent).toContain("30 min");
   expect(sent?.textContent).toContain("15 min paid breaks");
   expect(sent?.textContent).toContain("Approved for payroll");
-  expect(sent?.textContent).toContain("Sent to payroll (revision 2, accepted)");
-  const later = rows.find(
-    (row) =>
-      row !== sent && row.textContent?.includes("Not sent to payroll yet"),
-  );
-  expect(later).toBeDefined();
+  // "Sent to payroll" waits until each receipt records the exact entries its
+  // file carried (release review 2026-09-29): the time sheet does not guess.
+  expect(container.textContent).not.toContain("Sent to payroll");
 });

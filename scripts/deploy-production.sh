@@ -35,6 +35,7 @@ VERCEL_WAIT_SECONDS=900
 
 reviewer=""
 no_review=0
+candidate=""
 fail() {
   echo ""
   echo "RESULT: FAIL - $1"
@@ -46,6 +47,9 @@ while [ $# -gt 0 ]; do
     # Ryan, 2026-09-24: "dont need to do another code review for such a small change".
     --no-review) no_review=1; shift ;;
     --ssh-host) PROD_SSH="${2:-}"; shift 2 ;;
+    # The frozen release candidate. Without it, the commit checked out now is
+    # frozen: review, gate, merge and deploy all use that one commit.
+    --candidate) candidate="${2:-}"; [ -n "$candidate" ] || fail "--candidate needs a commit"; shift 2 ;;
     *) fail "unknown argument $1" ;;
   esac
 done
@@ -54,6 +58,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.." || fail "cannot go to the repository root
 mkdir -p .artifacts
 branch="$(git symbolic-ref --short -q HEAD || true)"
 [ -n "$branch" ] || fail "detached HEAD. Check out the branch to release"
+if [ "$branch" != "main" ]; then
+  head_sha="$(git rev-parse HEAD)"
+  if [ -n "$candidate" ]; then
+    candidate="$(git rev-parse --verify -q "$candidate^{commit}" || true)"
+    [ "$candidate" = "$head_sha" ] || fail "$branch is at $head_sha, not at the release candidate. Check out the candidate to release it"
+  else
+    candidate="$head_sha"
+  fi
+  echo "deploy-production: release candidate $candidate (frozen; later commits wait for the next release)"
+fi
 
 # The mandated review text (AGENTS.md, merge gate). The reviewer is a model
 # that did not write the diff, so Codex never reviews Codex commits.
@@ -81,13 +95,28 @@ run_review() {
       echo "This diff touches authored UI. Read DESIGN.md in the repository root and apply the 'If the diff touches authored UI' review text in AGENTS.md (section 'Merge gate') in full: DESIGN.md is the presentation authority; an unamended DESIGN.md plus a changed visual language is a REJECT."
     fi
     echo ""
+    echo "How to review: inspect the diff and the tests it adds or changes. Do NOT run the full test suite, coverage, the build, Storybook, \`bun run check\` or any other full gate: this release runs the complete production gate once, right after your APPROVE. You MAY run a focused test (one file or one test name) to confirm or rule out a specific suspected blocker. If you cannot approve without broader execution, say exactly what must be run and why, instead of running it."
+    echo ""
     echo "A rejection must identify a concrete problem in the changed code and a plausible user or production failure. End with exactly one line: \`VERDICT: APPROVE\` or \`VERDICT: REJECT\`."
   } > "$prompt"
   echo "deploy-production: independent review by Codex gpt-5.6-sol (log: $log)"
   # "high", not the config default "xhigh": the owner (2026-09-22) does not
   # want the release review at the highest reasoning level. It took 20-40
   # minutes a pass; the verdicts do not need it.
-  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 || fail "the review command failed. Read $log"
+  # The review can take 20+ minutes (it may run the test suite itself): print
+  # a progress line every minute with the last command the reviewer ran, so a
+  # long review is visibly working, never a silent wait.
+  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 &
+  local review_pid=$! started=$SECONDS last=$SECONDS every="${DEPLOY_REVIEW_PROGRESS_SECONDS:-60}"
+  while kill -0 "$review_pid" 2>/dev/null; do
+    sleep 1
+    if [ $((SECONDS - last)) -ge "$every" ]; then
+      last=$SECONDS
+      echo "deploy-production: review still running ($(( (SECONDS - started) / 60 )) min); last step: $(grep -A1 '^exec$' "$log" 2>/dev/null | tail -1 | cut -c1-120)"
+    fi
+  done
+  wait "$review_pid" || fail "the review command failed. Read $log"
+  echo "deploy-production: review finished after $(( (SECONDS - started) / 60 )) min"
   # The log echoes the prompt; the verdict is in the reviewer's last message.
   local answer
   answer="$(awk '/^codex$/ { buffer = "" ; next } { buffer = buffer "\n" $0 } END { print buffer }' "$log")"
@@ -113,7 +142,7 @@ else
     [ -n "$reviewer" ] || run_review
     release_args=(--reviewer "$reviewer")
   fi
-  bash scripts/release.sh "${release_args[@]}" || fail "scripts/release.sh failed (above). Nothing after it ran"
+  bash scripts/release.sh "${release_args[@]}" --candidate "$candidate" || fail "scripts/release.sh failed (above). Nothing after it ran"
   git fetch origin --quiet || fail "git fetch failed after the release"
 fi
 sha="$(git rev-parse origin/main)"
@@ -122,6 +151,13 @@ case "$(git log -1 --format=%s "$sha")" in
   "[release] "*) ;;
   *) fail "origin/main ($sha) is not a [release] commit" ;;
 esac
+if [ -n "$candidate" ]; then
+  # The release commit must carry the frozen candidate, not newer branch work.
+  git log -1 --format=%B "$sha" | grep -qx "Release-Candidate: $candidate" || fail "the release commit $sha does not record the candidate $candidate"
+  # The shared branch may have taken newer work after the merge; the rest of
+  # this run uses the release commit itself.
+  git checkout -q -B main "$sha" || fail "cannot check out the release commit $sha"
+fi
 [ "$(git rev-parse HEAD)" = "$sha" ] || fail "the working tree is not at the release commit $sha"
 echo "deploy-production: release commit $sha"
 

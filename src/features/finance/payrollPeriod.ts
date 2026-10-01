@@ -1,3 +1,5 @@
+import { hasPayrollApproval } from "../workforce/timePay";
+
 /**
  * Payroll period + clocked-time semantics shared by the export preview
  * (payrollExport.ts), the prepare-form prefill, and the worksheet.
@@ -91,7 +93,7 @@ export function payrollReadyClockedMinutes(
 ): { personId: string; minutes: number } | null {
   if (
     record.deletedAt != null ||
-    record.approvedAt == null ||
+    !hasPayrollApproval(record) ||
     !PAYROLL_READY_TIME_STATUSES.has(String(record.status))
   ) {
     return null;
@@ -105,7 +107,7 @@ export function payrollReadyClockedMinutes(
     !Number.isFinite(clockOutAt) ||
     clockOutAt < clockInAt ||
     clockInAt < startAt ||
-    clockOutAt > endExclusiveAt
+    clockInAt >= endExclusiveAt
   ) {
     return null;
   }

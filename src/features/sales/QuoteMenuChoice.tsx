@@ -3,6 +3,7 @@ import { useQuery } from "convex/react";
 import { api, type Id } from "../../lib/api";
 import { dishPriceText, menuPriceText } from "./publicMenuText";
 import { QuoteEstimatePanel } from "./QuoteEstimatePanel";
+import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 
 export type QuotePickInput = {
   menuDishId: Id<"menuDishes">;
@@ -47,10 +48,14 @@ export function QuoteMenuChoice({
   disabled: boolean;
   onChange: (value: QuotePicksValue) => void;
 }>) {
-  const menus = useQuery(api.publicMenu.getPublicMenu, {
-    eventDate,
-    guestCount,
-  });
+  const clock = useMinuteClock();
+  const menus = useLatestDefined(
+    useQuery(api.publicMenu.getPublicMenu, {
+      eventDate,
+      guestCount,
+      clock,
+    }),
+  );
   const [menuId, setMenuId] = useState<string>("");
   // Dishes of the chosen menu start ticked; unticking one leaves it out.
   const [unticked, setUnticked] = useState<Chosen>({});

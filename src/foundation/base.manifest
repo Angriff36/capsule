@@ -197,6 +197,9 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property timingBriefingMinutes: int?
   property timingLoadBaselineMinutes: int?
   property timingLoadRulesJson: string?
+  // Planning board: how loud each check is (JSON map of check to
+  // fix | look | off, read by src/lib/planningChecks.ts). Unset = defaults.
+  property planningChecksJson: string?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
@@ -348,6 +351,16 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // How the planning board treats each check. Empty goes back to the defaults.
+  command configurePlanningChecks(optional checksJson: string) {
+    guard self.deletedAt == null
+    mutate planningChecksJson = checksJson
+    emit OrganizationPlanningChecksConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -439,6 +452,11 @@ event OrganizationRoutePolicyConfigured: "organization.route_policy_configured" 
 }
 
 event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationPlanningChecksConfigured: "organization.planning_checks_configured" {
   organizationId: string
   tenantId: string
 }

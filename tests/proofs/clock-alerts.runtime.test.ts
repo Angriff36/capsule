@@ -262,12 +262,12 @@ describe("approved time to payroll (AC-383)", () => {
       periodEnd: S.endsAt + 24 * 60 * MIN,
     };
 
-    // Not approved yet: payroll waits for it.
+    // Not approved yet: counted anyway while approval is off (Ryan 2026-09-29).
     const waiting = await s.payFor(kit.personId, period);
     expect(waiting).toMatchObject({
-      approvedMinutes: 0,
-      approvedCount: 0,
-      waitingApprovalCount: 1,
+      approvedMinutes: 270,
+      approvedCount: 1,
+      waitingApprovalCount: 0,
     });
 
     const corrected = await s.read<Doc<"timeRecords">>(recordId);

@@ -326,7 +326,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   }
 
   command recordRefund(refundAmount: money(12, 2), paymentId: string) {
-    guard self.status == "paid" or self.status == "partial"
+    // An overdue invoice with money on it can still have that money taken back.
+    guard self.status == "paid" or self.status == "partial" or self.status == "overdue"
     guard self.deletedAt == null
     constraint refundPositive: refundAmount > 0 "This refund amount has to be more than zero. Enter how much to refund."
     constraint refundWithinPaid: refundAmount <= self.amountPaid "Refund amount cannot exceed amount paid"
@@ -335,8 +336,11 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     compute nextDue = self.amountDue + refundAmount
     mutate amountPaid = nextPaid
     mutate amountDue = nextDue
-    mutate status = "partial"
+    mutate status = self.status == "overdue" ? "overdue" : "partial"
     mutate paidAt = null
+    // A refund, chargeback or bank return that leaves less paid than the
+    // deposit reopens the deposit, so the client can pay it again.
+    mutate depositPaidAt = self.depositAmount != null and self.depositAmount > 0 and nextPaid < self.depositAmount ? null : self.depositPaidAt
     emit InvoiceRefundRecorded {
       invoiceId: self.id
       tenantId: self.tenantId

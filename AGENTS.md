@@ -160,6 +160,30 @@ and `src/styles/**`.
   an entry records an owner decision that is still open, and adding one for
   fresh work is the silent override this rule forbids.
 
+## Component catalog and reuse (agents)
+
+Storybook is Capsule's component catalog, not just a preview playground.
+Before adding or changing UI, read [the component catalog](docs/design/component-catalog.md),
+then inspect the matching `src/**/*.stories.tsx` and its component implementation.
+Reuse the existing component and documented variant before creating another.
+Run `bun run storybook` to inspect it at http://localhost:6007 when visual context
+is needed. `DESIGN.md` remains the presentation authority.
+
+- Use `src/ui/DropdownMenu.tsx` for action dropdowns, grouped menus, and menu
+  checkbox/radio choices (Origin UI adapted to Capsule). See
+  `src/ui/DropdownMenu.stories.tsx`. Use `asChild` for router links and existing
+  trigger buttons; use `onSelect` for actions. Do not invent another dropdown.
+- Native selects and searchable record pickers have different semantics;
+  do not replace form selection controls with action menus.
+- When a reusable component or variant is missing, add it under `src/ui/` (or
+  its owning feature), add colocated stories showing its real states and usage,
+  and update the catalog in the same change. Stories must render the actual
+  shared component, not a separate mock implementation.
+- Keep speculative `src/ui/next/` examples separate from shipped components:
+  check their production imports before treating them as established defaults.
+- No new tests are authorized by this catalog rule; the existing tests rule
+  still applies. Run the existing checks, including the Storybook build.
+
 ## Domain gating (agents)
 
 Before adding or tightening policies/guards/constraints in `src/**/*.manifest`,

@@ -7,6 +7,7 @@ import {
   menuPriceLabel,
   type MenuPriceLabel,
 } from "../src/lib/catalogEligibility";
+import { clockNow } from "./lib/clockNow";
 
 // Anonymous public menu (spec CF-4-2). It reads the SAME catalog the proposal
 // builder prices from — published menus and their active dishes — through the
@@ -48,15 +49,19 @@ export const getPublicMenu = query({
   args: {
     eventDate: v.optional(v.number()),
     guestCount: v.optional(v.number()),
+    clock: v.optional(v.number()),
   },
-  handler: async (ctx, { eventDate, guestCount }): Promise<PublicMenu[]> => {
+  handler: async (
+    ctx,
+    { eventDate, guestCount, clock },
+  ): Promise<PublicMenu[]> => {
     const org = await ctx.db
       .query("organizations")
       .filter((q) => q.eq(q.field("status"), "active"))
       .first();
     if (!org) return [];
     const tenantId = org.tenantId;
-    const now = Date.now();
+    const now = clockNow(clock);
 
     const menus = (
       await ctx.db

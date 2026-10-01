@@ -3,20 +3,26 @@ import { EventTrackerPage } from "../EventTrackerPage";
 import { eventsIndexPath } from "../eventRoutes";
 import "../../home/HomeCalendar.css";
 import "../EventTracker.css";
+import { PlanningBoardPage } from "../planning/PlanningBoardPage";
 import { EventTrackerSheet } from "./EventTrackerSheet";
 
 const VIEWS = [
   { key: "sheet", label: "Month sheet" },
   { key: "board", label: "Two-week board" },
+  { key: "plan", label: "Planning board" },
 ] as const;
 
 /**
- * The tracker has two views of the same events: the month sheet (the warehouse
- * spreadsheet) and the two-week board with drag and drop.
+ * The tracker has three views of the same events: the month sheet (the
+ * warehouse spreadsheet), the two-week board that moves an event to another
+ * day, and the planning board that puts people, trucks and equipment on
+ * events.
  */
 export function EventTrackerHome() {
   const [params, setParams] = useSearchParams();
-  const view = params.get("view") === "board" ? "board" : "sheet";
+  const viewParam = params.get("view");
+  const view =
+    viewParam === "board" ? "board" : viewParam === "plan" ? "plan" : "sheet";
 
   const switcher = (
     <div
@@ -49,6 +55,14 @@ export function EventTrackerHome() {
       <>
         {switcher}
         <EventTrackerPage />
+      </>
+    );
+  }
+  if (view === "plan") {
+    return (
+      <>
+        {switcher}
+        <PlanningBoardPage />
       </>
     );
   }

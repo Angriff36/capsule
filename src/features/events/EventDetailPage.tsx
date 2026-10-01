@@ -77,6 +77,8 @@ import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
 import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
+import { EventTodosTab } from "./EventTodosTab";
+import { EventHistoryTab } from "./EventHistoryTab";
 import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
 import { RecurringEventPanel } from "./RecurringEventPanel";
@@ -610,6 +612,16 @@ function EventDetailContent({
       {activeTab === "timeline" ? (
         <EventTabErrorBoundary tabLabel="Timeline" key="timeline">
           <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "todos" ? (
+        <EventTabErrorBoundary tabLabel="To-dos" key="todos">
+          <EventTodosTab eventId={event._id} startsAt={event.startsAt} />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "history" ? (
+        <EventTabErrorBoundary tabLabel="History" key="history">
+          <EventHistoryTab eventId={event._id} />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "layouts" ? (

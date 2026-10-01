@@ -6,6 +6,7 @@
  * silent rewrite. A provider rejection never touches the approved time.
  */
 import {
+  hasPayrollApproval,
   isApprovedTime,
   isFinishedTime,
   type PayTimeRecord,
@@ -60,7 +61,7 @@ export function payrollRowWarnings({
       `${overlaps} approved time ${overlaps === 1 ? "entry overlaps" : "entries overlap"} another — check before sending, or the hours count twice.`,
     );
   const waiting = mine.filter(
-    (record) => isFinishedTime(record) && record.approvedAt == null,
+    (record) => isFinishedTime(record) && !hasPayrollApproval(record),
   ).length;
   if (waiting > 0)
     warnings.push(
@@ -84,6 +85,7 @@ export type PayrollExportReceipt = {
   revision: number;
   totalMinutes: number;
   status: string;
+  processor?: string;
 };
 
 const localDate = (at: number) => {
@@ -141,11 +143,14 @@ export function planPayrollRevisions({
   receipts,
   periodStart,
   periodEnd,
+  processor,
 }: {
   rows: readonly { personId: string; totalMinutes: number }[];
   receipts: readonly PayrollExportReceipt[];
   periodStart: string;
   periodEnd: string;
+  /** A file for a different payroll provider is a new send with its own receipt. */
+  processor?: string;
 }): PayrollRevisionPlan[] {
   const totals = new Map(
     rows.map((row) => [row.personId, Math.round(row.totalMinutes)]),
@@ -170,7 +175,10 @@ export function planPayrollRevisions({
     const changed =
       history.at(-1)?.status === "rejected" ||
       previousTotalMinutes == null ||
-      previousTotalMinutes !== totalMinutes;
+      previousTotalMinutes !== totalMinutes ||
+      (processor != null &&
+        baseline?.processor != null &&
+        baseline.processor !== processor);
     return {
       personId,
       periodKey,

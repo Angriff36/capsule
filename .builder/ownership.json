@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "65d6b50ef98e5234645400d06cc30988713d678c9203ddd87eed8074d31ebef8"
+      "sha256": "e0a7d79401d08676aef970491bba9e67b6306f8b9ba3442b272782a9c9d064d4"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "1c6668a09dfa3fc32b51e24816efd37bd211ce8c35f8b642b37c367c007ace2d"
+      "sha256": "21a56231965c426aef291507339786b4256fe63b579c6f6ea57fcfb4f93f9f09"
     },
     "convex/lib/authContext.ts": {
       "sha256": "d18a22d82b44ddb5dbd519947c031b9d9ac0a50268b6c4603478b152a477be77",
@@ -18,46 +18,46 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "87f2347a8fbc6351f056a8c0a27cd655cd7952b459c8f20ec5adc395aea22353"
+      "sha256": "96d415a475d51c4591c9da23721de805cb492e49cdfa541b09f3726ae41390c7"
     },
     "convex/queries.ts": {
-      "sha256": "4f3449d39c9cef84b7154c67bf0bfc69f8af2894ec37cd2a1c7d6099c4d58ea6"
+      "sha256": "fec463f7de4dc9e1cb6f8c6e5156248a0d8584bd621ed9e7ad2d8f6a0b662ef5"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "7e1679d7c7eeb69b6d917349a3cfd068d2c9c7020df438e68d2294ef4ee38039"
+      "sha256": "2e09e55b0731c6ad309c8920787631c7654343e1ea522a1b33cb6d0ce57da476"
     },
     "manifest-context-summary.json": {
-      "sha256": "1e4de04384e62a3df84cfac500a5ea103fe57d51206317fb2c3fcbf3996160b0"
+      "sha256": "eb695ab1de55e7e3cde8bb5e9227caf574c64748b406ce3d2c2e07ab35d7fd01"
     },
     "package.json": {
-      "sha256": "b10cc1bcbbf3b99bd5947da28b89aeb9b52bb5d0ab9e7a21ee232d826b870fb6"
+      "sha256": "e99d824daaf32db8940c951f027ecac621cbd964996413f95674dac5f692f4cb"
     },
     "PRESET.md": {
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "203f50bf8cbc2a0880f139f9a040e2885e2b1b65df5cc89e42f7751306d0d104"
+      "sha256": "bac30902e04ce95683246f2008060fb6d946d66b0fed7252c14f6a65cf1390a3"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "1272653412f37c29226d878160526d61dedb551fdc44c5775a1a48f91cdd6f91"
+      "sha256": "286b993d68459a71a5207514231da3890048f1509d5e379a82caa8ecf4c1e041"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "a3483ca1e273a03b5ae3bb21f7f8bb64f2a049aaa389cdcc3914bb1f497ea0ab"
+      "sha256": "77ed384871997dc90e94641b330852b65c15489cf179e7b463b7c6cc5dd7e644"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "599fedb207ef511a758012ef7025ba094c829f0b6ea6767ade49241c9e66d1f7"
+      "sha256": "c17f2a1a0f4e25ed60daedcb50f7a040330c8e9943f2bce9b450365c6f550b20"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "af8ed033e68836fb13ed65d8930839c9dde890571a3d3157f8728e05be3322e7"
+      "sha256": "ca09254e14bed3aa7954b97d0a9775f949efa8f96faf2946c7d87cc551bf65ab"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "352d92d2ed5c99316b688c727190b86bd800614b6e0c562c8fed806931a434f4"
+      "sha256": "cbed73d1564b0dc4b6b7f472bcd40067d4c6f5c3a01c7ca10c5aa421d10d8d23"
     }
   },
   "package": {
@@ -121,16 +121,21 @@
       "src/inventory/stock.manifest",
       "src/inventory/transfer.manifest",
       "src/logistics/delivery.manifest",
+      "src/logistics/departure-override.manifest",
       "src/logistics/event-vehicle.manifest",
       "src/logistics/pack-list-template.manifest",
       "src/logistics/pack-list.manifest",
       "src/logistics/pack-rule.manifest",
+      "src/logistics/pack-section-claim.manifest",
       "src/logistics/packing.manifest",
       "src/logistics/rental-order.manifest",
+      "src/logistics/vehicle-trip-check.manifest",
       "src/logistics/vehicle.manifest",
       "src/operations/client-portal-link.manifest",
       "src/operations/event-number-sequence.manifest",
       "src/operations/event-packet.manifest",
+      "src/operations/event-planning.manifest",
+      "src/operations/event-task.manifest",
       "src/operations/event-template.manifest",
       "src/operations/event.manifest",
       "src/operations/field-confirmation.manifest",

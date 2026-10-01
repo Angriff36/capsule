@@ -379,7 +379,12 @@ describe("client pays from the portal link", () => {
     ).toMatchObject({ outcome: "succeeded", amountPaid: 1000, amountDue: 0 });
 
     const after = await state(env);
-    expect(after.payments).toEqual([{ status: "completed", amount: 1000 }]);
+    // Both charges are in the ledger as money received; the second pays
+    // nothing on the closed invoice and stays as money left over to refund.
+    expect(after.payments).toEqual([
+      { status: "completed", amount: 1000 },
+      { status: "completed", amount: 1000 },
+    ]);
     expect(after.invoice).toMatchObject({
       status: "paid",
       amountPaid: 1000,
