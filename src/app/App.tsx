@@ -6,6 +6,7 @@ import { SharedProposalPage } from "../features/clients/SharedProposalPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
 import { PublicMenuPage } from "../features/sales/PublicMenuPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
+import { EventRouteMapPage } from "../features/events/EventRouteMapPage";
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
@@ -746,6 +747,7 @@ export function App() {
               path="/events/:id/allergen-briefing"
               element={<EventAllergenBriefingPage />}
             />
+            <Route path="/events/:id/map" element={<EventRouteMapPage />} />
             <Route
               path="/events/:id/menu"
               element={<RedirectEventMenuAlias />}

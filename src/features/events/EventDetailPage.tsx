@@ -388,6 +388,20 @@ function EventDetailContent({
         Save as template
       </Link>
       <AllergenBriefingButton key="allergen-briefing" />
+      <Link
+        key="print-map"
+        className="btn btn-ghost"
+        to={`/events/${event._id}/map?print=1`}
+      >
+        Print map
+      </Link>
+      <Link
+        key="map-to-chat"
+        className="btn btn-ghost"
+        to={`/events/${event._id}/map`}
+      >
+        Send map and layouts to team chat
+      </Link>
       {dangerActions.length > 0 ? <ActionMenuRule /> : null}
       {dangerActions.map((action) => (
         <button
