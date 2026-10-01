@@ -344,4 +344,3 @@ event RevenueAttributionApplied: "revenue_attribution.applied" {
   eventRevenue: money(12, 2)
   allocatedAmount: money(12, 2)
 }
-

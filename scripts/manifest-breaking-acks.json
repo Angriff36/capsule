@@ -2244,6 +2244,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-CUTOVER AC-292: optional; stamped at go only. No backfill."
+    },
+    {
+      "path": "recordApprovals.parameters.businessEvidence",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional parameter; the sign-off says what was checked. Old callers still work; the switch page sends it."
+    },
+    {
+      "path": "hold.parameters.scorecardId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-327: optional parameter; a one-on-one links the scorecard in force. Old callers still work."
     }
   ]
 }
