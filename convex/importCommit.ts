@@ -1037,7 +1037,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -1354,7 +1354,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -1519,7 +1519,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -1857,7 +1857,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -2062,7 +2062,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -2310,7 +2310,7 @@ export const commitImportRun = action({
       }
     }
 
-    if (committed === 0 && pending > 0) {
+    if (committed === 0 && skipped === 0 && pending > 0) {
       throw new ConvexError(
         `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
       );
