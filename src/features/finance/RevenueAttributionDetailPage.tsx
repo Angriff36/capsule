@@ -1,8 +1,14 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  Link,
+} from "react-router-dom";
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import {
   useGetRevenueAttribution,
   useGetEvent,
+  useListEvent,
   useListVenue,
   useListPerson,
   useListReferralSource,
@@ -66,6 +72,12 @@ export function RevenueAttributionDetailPage() {
   const event = useGetEvent(
     isNew || !attribution?.eventId ? "skip" : attribution.eventId,
   );
+  const events = useListEvent();
+  const [searchParams] = useSearchParams();
+  const [eventId, setEventId] = useState(searchParams.get("eventId") ?? "");
+  const eventChoices = (events ?? [])
+    .filter((e) => e.deletedAt == null && e.stage !== "cancelled")
+    .sort((a, b) => b.startsAt - a.startsAt);
 
   const create = useRevenueAttributionCreate();
   const apply = useRevenueAttributionApply();
@@ -152,12 +164,13 @@ export function RevenueAttributionDetailPage() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isNew) {
+      if (!eventId) {
+        setFailure(new Error("Pick the event this split is for."));
+        return;
+      }
       void run("create", async () => {
-        // Note: the routed paths always carry an :id, so this create branch is
-        // unreachable today — attributions are created from event detail pages.
-        // If a standalone create route is ever added it must supply an eventId.
         await create({
-          eventId: "",
+          eventId,
           attributionType,
           allocationMethod,
           percentBasis: allocationMethod === "percent" ? percentBasis : 0,
@@ -378,6 +391,25 @@ export function RevenueAttributionDetailPage() {
               <h2>{attributionTypeLabel(attributionType)}</h2>
             </div>
           </div>
+
+          {isNew ? (
+            <label className="field-label">
+              Event
+              <select
+                className="input"
+                value={eventId}
+                onChange={(e) => setEventId(e.target.value)}
+                required
+              >
+                <option value="">Pick the event this split is for</option>
+                {eventChoices.map((choice) => (
+                  <option key={choice._id} value={choice._id}>
+                    {choice.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
 
           <label className="field-label">
             Attribution type

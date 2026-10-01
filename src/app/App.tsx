@@ -1247,6 +1247,14 @@ export function App() {
               }
             />
             <Route
+              path="/finance/attribution/new"
+              element={
+                <SupplyRoute>
+                  <RevenueAttributionDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/finance/attribution/:id/:mode?"
               element={
                 <SupplyRoute>

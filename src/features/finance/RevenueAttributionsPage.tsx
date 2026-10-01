@@ -172,6 +172,9 @@ export function RevenueAttributionsPage() {
             Review and approve revenue splits to venues, salespeople, and
             partners. Attribution applies to event revenue after approval.
           </p>
+          <Link to="/finance/attribution/new" className="btn btn-primary mt-3">
+            Add revenue split
+          </Link>
         </div>
         <div className="tax-period-stamp" aria-label="Attribution status">
           <span>Pending approval</span>
@@ -198,8 +201,8 @@ export function RevenueAttributionsPage() {
         <div className="document-empty">
           <p>No revenue attributions yet.</p>
           <span>
-            Create attributions from event detail pages to track commissions and
-            splits.
+            Use Add revenue split to track a venue commission, a sales
+            commission or a partner split for an event.
           </span>
         </div>
       ) : (
