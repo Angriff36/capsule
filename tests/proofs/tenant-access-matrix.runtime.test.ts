@@ -275,6 +275,9 @@ const LINK_TABLE: Record<string, string> = {
   recipeSyncDishId: "dishes",
   recipeSyncIngredientId: "ingredients",
   recipientAuthSubjectId: "@sign-in",
+  // importResolution.chooseExistingRecord: the record an import item is
+  // pointed at; contact rows (the usual case) live in clients.
+  recordId: "clients",
   recipientContactId: "clientContacts",
   recipientPersonId: "people",
   reconciledById: "@sign-in",
