@@ -10,6 +10,7 @@ export const IMPORT_RECORD_HOMES: Record<
   { table: TableNames; entity: string }
 > = {
   contact: { table: "clients", entity: "Client" },
+  company: { table: "clients", entity: "Client" },
   venue: { table: "venues", entity: "Venue" },
   event: { table: "events", entity: "Event" },
   lead: { table: "leads", entity: "Lead" },

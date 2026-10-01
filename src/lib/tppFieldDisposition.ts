@@ -83,9 +83,7 @@ const CONTACT: DatasetDispositions = {
   Phone: rec("Client", "phone"),
   Mobile: rec("Client", "phone"),
   Title: rec("Client", "notes"),
-  CompanyID: link(
-    "The old company id stays on the import; the company list has no import yet.",
-  ),
+  CompanyID: rec("Client", "companyName"),
   IsPrimary: link(
     "Each imported contact is its own client; the primary flag stays on the import.",
   ),
@@ -94,20 +92,27 @@ const CONTACT: DatasetDispositions = {
   ),
   Notes: rec("Client", "notes"),
   CreatedDate: OLD_DATES,
+  Address: rec("Client", "addressLine1"),
+  City: rec("Client", "city"),
+  State: rec("Client", "region"),
+  ZipCode: rec("Client", "postalCode"),
+  Birthday: rec("Client", "birthday"),
 };
 
 const COMPANY: DatasetDispositions = {
-  CompanyID: link("The company list has no import yet."),
-  CompanyName: link("The company list has no import yet."),
-  ClientType: link("The company list has no import yet."),
-  BillingAddress: link("The company list has no import yet."),
-  City: link("The company list has no import yet."),
-  State: link("The company list has no import yet."),
-  ZipCode: link("The company list has no import yet."),
-  TaxId: link("The company list has no import yet."),
-  PaymentTerms: link("The company list has no import yet."),
-  Notes: link("The company list has no import yet."),
-  CreatedDate: link("The company list has no import yet."),
+  CompanyID: OLD_ID,
+  CompanyName: rec("Client", "companyName"),
+  ClientType: link(
+    "A company row is always a company client; the old client type stays on the import.",
+  ),
+  BillingAddress: rec("Client", "addressLine1"),
+  City: rec("Client", "city"),
+  State: rec("Client", "region"),
+  ZipCode: rec("Client", "postalCode"),
+  TaxId: rec("Client", "taxId"),
+  PaymentTerms: rec("Client", "paymentTermsDays"),
+  Notes: rec("Client", "notes"),
+  CreatedDate: OLD_DATES,
 };
 
 const LEAD: DatasetDispositions = {

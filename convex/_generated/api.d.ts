@@ -115,6 +115,7 @@ import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_headcountReconciliation from "../lib/headcountReconciliation.js";
 import type * as lib_headcountStaffingReconciliation from "../lib/headcountStaffingReconciliation.js";
 import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
+import type * as lib_importCompanies from "../lib/importCompanies.js";
 import type * as lib_importEventFiles from "../lib/importEventFiles.js";
 import type * as lib_importRecordHomes from "../lib/importRecordHomes.js";
 import type * as lib_importSourceFields from "../lib/importSourceFields.js";
@@ -363,6 +364,7 @@ declare const fullApi: ApiFromModules<{
   "lib/headcountReconciliation": typeof lib_headcountReconciliation;
   "lib/headcountStaffingReconciliation": typeof lib_headcountStaffingReconciliation;
   "lib/householdVolumeParse": typeof lib_householdVolumeParse;
+  "lib/importCompanies": typeof lib_importCompanies;
   "lib/importEventFiles": typeof lib_importEventFiles;
   "lib/importRecordHomes": typeof lib_importRecordHomes;
   "lib/importSourceFields": typeof lib_importSourceFields;

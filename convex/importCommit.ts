@@ -126,6 +126,11 @@ import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { commitStockRows } from "./openingStock";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
 import { attachImportedEventFiles } from "./lib/importEventFiles";
+import {
+  COMPANY_RECORD_TYPE,
+  commitImportedCompany,
+  importedCompanyName,
+} from "./lib/importCompanies";
 import { compensateStoppedRun } from "./importCancel";
 import { madeSnapshot } from "./lib/importRecordHomes";
 import {
@@ -834,6 +839,23 @@ export const commitImportRun = action({
           });
         }
         await stopIfStopped();
+        if (contact.company) {
+          // A company row (TPP_COMPANY_MAPPINGS) becomes a company client.
+          const outcome = await commitImportedCompany(ctx, {
+            tenantId,
+            sourceSystem,
+            importRunId: args.importRunId,
+            company: contact,
+            rawSourceData: withSourceRow(
+              contact,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+          });
+          if (outcome === "committed") committed += 1;
+          else if (outcome === "skipped") skipped += 1;
+          else if (outcome === "pending") pending += 1;
+          continue;
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -869,6 +891,14 @@ export const commitImportRun = action({
         const notes =
           [contact.title, contact.notes].filter(Boolean).join(" — ") ||
           undefined;
+        // AC-275: the person's company, when the company row was imported.
+        const companyName = contact.companyId
+          ? await importedCompanyName(ctx, {
+              tenantId,
+              sourceSystem,
+              companyId: contact.companyId,
+            })
+          : undefined;
         try {
           const created = await ctx.runMutation(
             api.mutations.Client_createViaRegister,
@@ -876,13 +906,26 @@ export const commitImportRun = action({
               clientType: "person",
               givenName: contact.givenName,
               familyName: contact.familyName,
+              companyName,
               email: contact.email,
               phone: contact.phone ?? contact.mobile,
+              addressLine1: contact.addressLine1,
+              city: contact.city,
+              region: contact.region,
+              postalCode: contact.postalCode,
               notes,
               idempotencyKey,
             },
           );
           const clientId: string = (created as { docId: string }).docId;
+          // AC-063: the birthday goes on the client (Birthday List report).
+          if (contact.birthday) {
+            await ctx.runMutation(api.mutations.Client_setBirthday, {
+              docId: clientId as Id<"clients">,
+              birthday: contact.birthday,
+              idempotencyKey: `${idempotencyKey}:birthday`,
+            });
+          }
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -1017,12 +1060,20 @@ export const commitImportRun = action({
         // TPP company id never imported as a contact) becomes a
         // pending_conflict link rather than fabricating a client — the
         // documented next slice (company→Client).
-        const clientLink = await ctx.runQuery(internal.importCommit.findLink, {
-          tenantId,
-          sourceSystem,
-          recordType: "contact",
-          externalId: event.clientId,
-        });
+        // A ClientID may name a person contact or a company row (AC-275).
+        const clientLink =
+          (await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "contact",
+            externalId: event.clientId,
+          })) ??
+          (await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: COMPANY_RECORD_TYPE,
+            externalId: event.clientId,
+          }));
         if (!clientLink || !clientLink.capsuleId) {
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
@@ -1072,10 +1123,12 @@ export const commitImportRun = action({
           const contact = JSON.parse(clientLink.rawSourceData || "{}") as {
             givenName?: string;
             familyName?: string;
+            company?: { name?: string };
           };
-          const name = [contact.givenName, contact.familyName]
-            .filter(Boolean)
-            .join(" ");
+          const name =
+            [contact.givenName, contact.familyName].filter(Boolean).join(" ") ||
+            contact.company?.name ||
+            "";
           if (name) primaryContactName = name;
         } catch {
           // keep placeholder

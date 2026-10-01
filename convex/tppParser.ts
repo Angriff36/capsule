@@ -87,6 +87,12 @@ export interface TppContactRecord {
   IsBilling?: boolean;
   Notes?: string;
   CreatedDate?: string;
+  // Address / Phone List and Birthday List report columns (PR02-07).
+  Address?: string;
+  City?: string;
+  State?: string;
+  ZipCode?: string;
+  Birthday?: string;
 }
 
 export interface TppCompanyRecord {
@@ -225,6 +231,22 @@ export interface ParsedCapsuleContact {
   isBillingContact?: boolean;
   notes?: string;
   createdAt?: number;
+  addressLine1?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  /** YYYY-MM-DD; a birthday the parser cannot read stays on the link only. */
+  birthday?: string;
+  /**
+   * A company row of the contacts dataset (TPP_COMPANY_MAPPINGS): becomes a
+   * company client. externalId is its CompanyID.
+   */
+  company?: {
+    name: string;
+    clientType?: string;
+    taxId?: string;
+    paymentTermsDays?: number;
+  };
 }
 
 export interface ParsedCapsuleVenue {
@@ -634,6 +656,64 @@ export function parseTppContact(
     isBillingContact: parseTppBoolean(record.IsBilling),
     notes: record.Notes,
     createdAt: parseTppDateTime(record.CreatedDate),
+    addressLine1: record.Address,
+    city: record.City,
+    region: record.State,
+    postalCode: record.ZipCode,
+    birthday: parseTppBirthday(record.Birthday),
+  };
+}
+
+/** "YYYY-MM-DD" or "M/D/YYYY" → "YYYY-MM-DD"; anything else → undefined. */
+export function parseTppBirthday(value?: string): string | undefined {
+  const text = value?.trim();
+  if (!text) return undefined;
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text);
+  const us = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(text);
+  const [year, month, day] = iso
+    ? [iso[1], iso[2], iso[3]]
+    : us
+      ? [us[3], us[1], us[2]]
+      : [];
+  if (!year || !month || !day) return undefined;
+  const m = Number(month);
+  const d = Number(day);
+  if (m < 1 || m > 12 || d < 1 || d > 31) return undefined;
+  return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+/** A row of the contacts dataset that describes a company, not a person. */
+export function isTppCompanyRow(record: Record<string, unknown>): boolean {
+  return (
+    typeof record.CompanyName === "string" &&
+    record.CompanyName.trim().length > 0 &&
+    !record.ContactID &&
+    !record.FirstName
+  );
+}
+
+/** TPP company row (TPP_COMPANY_MAPPINGS) → a company client. */
+export function parseTppCompany(
+  record: TppCompanyRecord,
+): ParsedCapsuleContact {
+  const terms = /(\d{1,3})/.exec(record.PaymentTerms ?? "");
+  const days = terms ? Number(terms[1]) : undefined;
+  return {
+    externalId: record.CompanyID,
+    givenName: "",
+    familyName: "",
+    notes: record.Notes,
+    createdAt: parseTppDateTime(record.CreatedDate),
+    addressLine1: record.BillingAddress,
+    city: record.City,
+    region: record.State,
+    postalCode: record.ZipCode,
+    company: {
+      name: record.CompanyName.trim(),
+      clientType: record.ClientType,
+      taxId: record.TaxId,
+      paymentTermsDays: days !== undefined && days <= 365 ? days : undefined,
+    },
   };
 }
 
@@ -1029,8 +1109,27 @@ export function parseTppContacts(
     message: string;
   }> = [];
 
+  // Company rows commit first, so a person row's CompanyID finds its company
+  // in the same run.
+  const companies: ParsedCapsuleContact[] = [];
+  const companyIndexes: number[] = [];
+
   records.forEach((record, index) => {
     try {
+      if (isTppCompanyRow(record as unknown as Record<string, unknown>)) {
+        const company = parseTppCompany(record as unknown as TppCompanyRecord);
+        if (!company.externalId) {
+          errors.push({
+            recordIndex: index,
+            field: "CompanyID",
+            message: "CompanyID is required",
+          });
+          return;
+        }
+        companies.push(company);
+        companyIndexes.push(index);
+        return;
+      }
       const parsed = parseTppContact(record);
 
       // Validate required fields
@@ -1073,12 +1172,12 @@ export function parseTppContacts(
 
   return {
     success: errors.length === 0,
-    sourceIndexes,
-    records: result,
+    sourceIndexes: [...companyIndexes, ...sourceIndexes],
+    records: [...companies, ...result],
     errors,
     warnings,
     totalCount: records.length,
-    successCount: result.length,
+    successCount: companies.length + result.length,
     failureCount: errors.length,
   };
 }

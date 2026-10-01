@@ -335,7 +335,14 @@ const TPP_CONTACT_MAPPINGS: DatasetConfig = {
     { sourceField: "IsPrimary", targetField: "isPrimary", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
     { sourceField: "IsBilling", targetField: "isBillingContact", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
     { sourceField: "Notes", targetField: "notes", mappingType: "directCopy", required: false, validationRules: [] },
-    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    // Address / Phone List and Birthday List report columns
+    // (specs/ralph/production-02-source-identity.md PR02-07).
+    { sourceField: "Address", targetField: "addressLine1", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "City", targetField: "city", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "State", targetField: "region", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ZipCode", targetField: "postalCode", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Birthday", targetField: "birthday", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseCalendarDate" }
   ]
 }
 
