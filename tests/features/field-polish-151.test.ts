@@ -44,7 +44,11 @@ describe("#151 layout", () => {
         createElement(
           MemoryRouter,
           null,
-          createElement(MyDayFrame, { wide, signedInName: "Ada Cook" }, null),
+          createElement(MyDayFrame, {
+            wide,
+            signedInName: "Ada Cook",
+            children: null,
+          }),
         ),
       );
     expect(html(true)).toContain("md:max-w-5xl");

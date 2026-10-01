@@ -120,6 +120,8 @@ describe("proposal regeneration preservation (AC-417)", () => {
       proposalId: built.proposalId,
       created: false,
       changed: false,
+      outcome: "reused",
+      version: expect.any(Number),
     });
     expect(
       (await liveLines(w, built.proposalId)).map((l) => l.description),
