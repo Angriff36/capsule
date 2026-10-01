@@ -116,6 +116,7 @@ import type * as lib_headcountReconciliation from "../lib/headcountReconciliatio
 import type * as lib_headcountStaffingReconciliation from "../lib/headcountStaffingReconciliation.js";
 import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_importEventFiles from "../lib/importEventFiles.js";
+import type * as lib_importRecordHomes from "../lib/importRecordHomes.js";
 import type * as lib_importSourceFields from "../lib/importSourceFields.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalogImageImport.js";
@@ -363,6 +364,7 @@ declare const fullApi: ApiFromModules<{
   "lib/headcountStaffingReconciliation": typeof lib_headcountStaffingReconciliation;
   "lib/householdVolumeParse": typeof lib_householdVolumeParse;
   "lib/importEventFiles": typeof lib_importEventFiles;
+  "lib/importRecordHomes": typeof lib_importRecordHomes;
   "lib/importSourceFields": typeof lib_importSourceFields;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/ingredientCatalogImageImport": typeof lib_ingredientCatalogImageImport;

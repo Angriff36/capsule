@@ -122,6 +122,7 @@ import { commitStockRows } from "./openingStock";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
 import { attachImportedEventFiles } from "./lib/importEventFiles";
 import { compensateStoppedRun } from "./importCancel";
+import { madeSnapshot } from "./lib/importRecordHomes";
 import {
   SOURCE_FIELD_MAPS,
   sourceVersionOf,
@@ -338,6 +339,13 @@ export const upsertLink = internalMutation({
             lastSeenImportRunId: String(args.sourceImportRunId),
           }
         : {};
+    // AC-631: the record as this run finished it, so a stopped run can tell
+    // an untouched record from one a person changed.
+    const made =
+      args.conflictStatus === "resolved"
+        ? await madeSnapshot(ctx.db, args.recordType, args.capsuleId)
+        : undefined;
+    const madeMetadata = made !== undefined ? { metadata: made } : {};
     const existing = await ctx.db
       .query("externalRecordLinks")
       .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
@@ -360,6 +368,7 @@ export const upsertLink = internalMutation({
         conflictStatus: args.conflictStatus,
         resolutionNote: args.resolutionNote ?? existing.resolutionNote,
         ...baseline,
+        ...madeMetadata,
         updatedAt: now,
         version: existing.version + 1,
       });
@@ -382,6 +391,7 @@ export const upsertLink = internalMutation({
       conflictStatus: args.conflictStatus,
       resolutionNote: args.resolutionNote,
       ...baseline,
+      ...madeMetadata,
       // SoftDeletable shape: generated creates stamp deletedAt: null, and
       // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
       // the key leaves it undefined and every cross-dataset findLink

@@ -80,7 +80,11 @@ const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
     { next: "committing", label: "Approve & Commit" },
     { next: "failed", label: "Fail" },
   ],
-  committing: [{ next: "completed", label: "Complete Commit" }],
+  committing: [
+    { next: "completed", label: "Complete Commit" },
+    // AC-631: stops part-way and takes back what nobody changed yet.
+    { next: "stopped", label: "Stop this import" },
+  ],
   completed: [{ next: "reverted", label: "Revert" }],
   failed: [],
   reverted: [],
@@ -102,6 +106,7 @@ export function ImportRunDetailPage() {
   // see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
+  const cancelImportRun = useAction(api.importCancel.cancelImportRun);
 
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
@@ -327,6 +332,41 @@ export function ImportRunDetailPage() {
     });
   };
 
+  const handleStop = async () => {
+    const reason = await prompt.askReason({
+      title: "Stop this import",
+      description:
+        "Nothing more is brought in. Items this import already added are removed again, unless someone has changed them since — those stay.",
+      label: "Why are you stopping it?",
+      placeholder: "For example: wrong file",
+      confirmLabel: "Stop import",
+      tone: "danger",
+    });
+    if (!reason?.trim()) return;
+    setError(null);
+    setNotice(null);
+    setBusy("stopped");
+    void (async () => {
+      try {
+        const result = await cancelImportRun({
+          importRunId: importRun._id,
+          reason: reason.trim(),
+        });
+        setNotice(
+          `Stopped. ${result.removed} item(s) removed again` +
+            (result.kept.length > 0
+              ? `; kept because someone changed them: ${result.kept.join(", ")}`
+              : "") +
+            ".",
+        );
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Stop failed");
+      } finally {
+        setBusy(null);
+      }
+    })();
+  };
+
   const handleRevert = async () => {
     const confirmed = await prompt.askConfirm({
       title: "Revert Import",
@@ -475,6 +515,9 @@ export function ImportRunDetailPage() {
                 case "reverted":
                   void handleRevert();
                   break;
+                case "stopped":
+                  void handleStop();
+                  break;
               }
             };
             return (
@@ -484,7 +527,9 @@ export function ImportRunDetailPage() {
                 onClick={handleClick}
                 disabled={isBusy}
                 className={`btn ${
-                  transition.next === "failed" || transition.next === "reverted"
+                  transition.next === "failed" ||
+                  transition.next === "reverted" ||
+                  transition.next === "stopped"
                     ? "btn-ghost"
                     : "btn-primary"
                 }`}

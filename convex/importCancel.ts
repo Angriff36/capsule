@@ -27,6 +27,7 @@ import {
 } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import type { Id, TableNames } from "./_generated/dataModel";
+import { IMPORT_RECORD_HOMES, readMadeSnapshot } from "./lib/importRecordHomes";
 
 /** Mirrors importCommit.canImport (managers + system). */
 function canImport(role: string): boolean {
@@ -39,15 +40,7 @@ function canImport(role: string): boolean {
   );
 }
 
-/** The record types an import makes, and where each one lives. */
-const RECORD_HOMES: Record<string, { table: TableNames; entity: string }> = {
-  contact: { table: "clients", entity: "Client" },
-  venue: { table: "venues", entity: "Venue" },
-  event: { table: "events", entity: "Event" },
-  lead: { table: "leads", entity: "Lead" },
-  menu: { table: "dishes", entity: "Dish" },
-  pack_list: { table: "packLists", entity: "PackList" },
-};
+const RECORD_HOMES = IMPORT_RECORD_HOMES;
 
 /** A name for the kept list, from the source row (never encrypted fields). */
 function sourceLabel(raw: string | null | undefined): string {
@@ -162,18 +155,25 @@ export const takeBackLink = internalMutation({
       return { kind: "removed" };
     }
 
-    // The moment the run finished this record: the link is written after the
-    // record and everything the run made under it.
-    const madeAt = Math.max(
-      typeof link.createdAt === "number" ? link.createdAt : 0,
-      typeof link.appliedAt === "number" ? link.appliedAt : 0,
-    );
+    // The record as the run finished it (version + last change, kept on the
+    // link), and when: the link is written after the record and everything
+    // the run made under it. Links from before the snapshot fall back to time.
+    const made = readMadeSnapshot(link.metadata);
+    const madeAt =
+      made.madeAt ??
+      Math.max(
+        typeof link.createdAt === "number" ? link.createdAt : 0,
+        typeof link.appliedAt === "number" ? link.appliedAt : 0,
+      );
     const changedAfter = (value: unknown) =>
       typeof value === "number" && value > madeAt;
     const label = sourceLabel(link.rawSourceData) || link.externalId;
 
     let changed =
-      changedAfter(record.updatedAt) ||
+      (made.madeVersion !== undefined
+        ? record.version !== made.madeVersion ||
+          record.updatedAt !== made.madeUpdatedAt
+        : changedAfter(record.updatedAt)) ||
       (await ctx.db
         .query("manifestEvents")
         .withIndex("by_entityId", (q) => q.eq("entityId", link.capsuleId))
