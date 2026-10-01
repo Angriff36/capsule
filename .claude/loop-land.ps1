@@ -59,6 +59,20 @@ function Release($h, $reviewer) {
   else { Set-Content $pending $reviewer; Record $h 'RELEASE-FAIL' "production release did not pass: $(if ($result) { $result } else { ($rel -split "`n" | Select-Object -Last 3) -join ' | ' }) - see loop-land.log" }
 }
 
+function ReviewVerdict($text) {
+  # Only the reviewer's final VERDICT line counts, so error text quoted in its findings changes nothing.
+  # A reviewer whose shell would not start says NONE, or (older habit) REJECT with a final reason that
+  # opens "could not inspect / the diff could not be inspected" and names the shell or sandbox.
+  # That is no verdict on the change. Every other REJECT stays a REJECT.
+  $v = [regex]::Matches("$text", '(?m)^VERDICT: (APPROVE|REJECT|NONE)(.*)$') | Select-Object -Last 1
+  if (-not $v) { return $null }
+  $verdict = $v.Groups[1].Value; $reason = $v.Groups[2].Value.Trim(" -`r")
+  if ($verdict -eq 'REJECT' -and $reason -match '(?i)^(the )?((repository |repo )?(diff|change|changes|repository|repo) (could not|cannot|can''t|was not|were not) (be )?(inspected|read|reviewed)|(could not|cannot|can''t|unable to) (inspect|read|review|run git))' -and $reason -match '(?i)\b(shell|sandbox)\b') {
+    $verdict = 'NONE'
+  }
+  return @{ verdict = $verdict; reason = $reason }
+}
+
 function Review($wt, $target, $base = 'origin/main', $extra = '') {
   $prompt = @"
 You are the independent reviewer for an automated fix. In this directory run ``git diff $base HEAD --stat`` and then ``git diff $base HEAD`` (everything this change adds) (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
@@ -70,32 +84,29 @@ End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT -
 If your shell or sandbox fails so you cannot run git diff and read the change, do not judge it: end instead with exactly one line: VERDICT: NONE - <the error>
 "@
   $out = Join-Path $wt '.loop-verdict.txt'
-  # The Codex Windows sandbox can fail to start any shell (its "setup refresh" error). The reviewer then
-  # cannot read the change and has still written "VERDICT: REJECT". That is no verdict on the change:
-  # try Codex once more, then grok; if no reviewer can read it, it is NOREVIEW (kept, no strike).
-  # The phrases are split so this file's own diff, quoted in a review, never matches them.
-  $toolFault = '(?i)setup refresh had ' + 'errors|helper_unknown' + '_error|shell failed before ' + 'process creation'
+  # The Codex Windows sandbox can fail to start any shell (its "setup refresh" error). A review that could
+  # not read the change (ReviewVerdict says NONE): try Codex once more, then grok, judged the same way;
+  # if no reviewer can read it, it is NOREVIEW (kept, no strike).
   $reviewer = 'gpt-5.6-sol'
+  $r = $null
   foreach ($try in 1..2) {
     Remove-Item $out -Force -ErrorAction SilentlyContinue
     # Ryan 2026-09-22: "I don't think it needs highest reasoning" - xhigh made each round take 20-40 minutes.
     codex exec -s read-only -m gpt-5.6-sol -c model_reasoning_effort="high" -C $wt -o $out $prompt *> $null
     $text = if (Test-Path $out) { Get-Content $out -Raw } else { '' }
-    $v = [regex]::Matches("$text", '(?m)^VERDICT: (APPROVE|REJECT|NONE)') | Select-Object -Last 1
-    $couldNotRead = $v -and ($v.Groups[1].Value -eq 'NONE' -or ($v.Groups[1].Value -eq 'REJECT' -and $text -match $toolFault))
-    if (-not $couldNotRead) { break }
-    Say "gpt-5.6-sol could not read the change (try $try): $($v.Value)"
+    $r = ReviewVerdict $text
+    if (-not $r -or $r.verdict -ne 'NONE') { break }
+    Say "gpt-5.6-sol could not read the change (try $try): $($r.reason)"
   }
-  if (-not $v -or $couldNotRead) {
+  if (-not $r -or $r.verdict -eq 'NONE') {
     # Codex gave no verdict (quota / outage / broken shell) - grok via Cursor CLI is also a different provider than the maker.
     $reviewer = 'cursor-grok-4.5-high-fast'
     $text = (& "$env:LOCALAPPDATA\cursor-agent\agent.ps1" -p --trust --model cursor-grok-4.5-high-fast --workspace $wt $prompt 2>$null) -join "`n"
+    $r = ReviewVerdict $text
   }
   Remove-Item $out -Force -ErrorAction SilentlyContinue
-  $m = [regex]::Matches("$text", '(?m)^VERDICT: (APPROVE|REJECT|NONE)(.*)$')
-  if ($m.Count -eq 0 -or $m[$m.Count - 1].Groups[1].Value -eq 'NONE') { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
-  $last = $m[$m.Count - 1]
-  return @{ reviewer = $reviewer; verdict = $last.Groups[1].Value; reason = $last.Groups[2].Value.Trim(' -'); full = $text }
+  if (-not $r -or $r.verdict -eq 'NONE') { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
+  return @{ reviewer = $reviewer; verdict = $r.verdict; reason = $r.reason; full = $text }
 }
 
 if (-not (Test-Path $handoffDir)) { exit 0 }
