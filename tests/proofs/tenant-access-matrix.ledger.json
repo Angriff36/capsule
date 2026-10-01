@@ -14,7 +14,7 @@
     "culinaryDemand:eventFoodCostReport": "reaches workspace A records",
     "culinaryDemand:kitchenUnresolvedReport": "reaches workspace A records",
     "culinaryDemandSweep:recipeEditionImpact": "reaches workspace A records",
-    "cutover:countUnresolvedLinks": "reaches workspace A records",
+    "cutover:countUnresolvedLinks": "no owner reach: same answer with or without workspace A records",
     "cutover:getCutoverStatus": "reaches workspace A records",
     "cutover:getLatestImportRun": "reaches workspace A records",
     "cutover:validateCutoverReadiness": "reaches workspace A records",
