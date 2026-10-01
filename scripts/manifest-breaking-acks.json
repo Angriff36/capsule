@@ -1784,6 +1784,54 @@
       "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; an imported lead's event date. Stored leads need no backfill."
     },
     {
+      "path": "reassignClient.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Command name shared by several entities (PL-SOURCE-MERGE adds it to Lead, ClientOutreachTask, QuoteSubmission); the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "stageClientMerge.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Command name shared by several entities (PL-SOURCE-MERGE adds it to Lead, ClientOutreachTask, QuoteSubmission); the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "Lead.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; set only while a client merge moves the lead. Stored leads need no backfill."
+    },
+    {
+      "path": "Lead.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; the client a merge moves the lead to. Stored leads need no backfill."
+    },
+    {
+      "path": "ClientOutreachTask.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; set only while a client merge moves the reminder. No backfill."
+    },
+    {
+      "path": "ClientOutreachTask.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; the client a merge moves the reminder to. No backfill."
+    },
+    {
+      "path": "QuoteSubmission.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; set only while a client merge moves the quote request. No backfill."
+    },
+    {
+      "path": "QuoteSubmission.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; the client a merge moves the quote request to. No backfill."
+    },
+    {
       "path": "Lead.closedAt",
       "category": "property-added",
       "acknowledgedAt": "2026-10-01",

@@ -246,6 +246,8 @@ export const ClientOutreachTaskSchema = z.object({
   openedAt: z.coerce.date().nullable().optional(),
   resolvedAt: z.coerce.date().nullable().optional(),
   resolutionNote: z.string().nullable().optional(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2248,6 +2250,8 @@ export const LeadSchema = z.object({
   sourceStage: z.string().nullable().optional(),
   eventDate: z.coerce.date().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3455,6 +3459,8 @@ export const QuoteSubmissionSchema = z.object({
   completedAt: z.coerce.date().nullable().optional(),
   errorMessage: z.string().nullable().optional(),
   processingErrors: z.string().nullable().optional(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5074,6 +5080,19 @@ export const ClientOutreachTaskOpenParamsSchema = z.object({
 });
 
 export type ClientOutreachTaskOpenParams = z.infer<typeof ClientOutreachTaskOpenParamsSchema>;
+
+// Command: reassignClient on ClientOutreachTask
+export const ClientOutreachTaskReassignClientParamsSchema = z.object({});
+
+export type ClientOutreachTaskReassignClientParams = z.infer<typeof ClientOutreachTaskReassignClientParamsSchema>;
+
+// Command: stageClientMerge on ClientOutreachTask
+export const ClientOutreachTaskStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type ClientOutreachTaskStageClientMergeParams = z.infer<typeof ClientOutreachTaskStageClientMergeParamsSchema>;
 
 // Command: create on ClientPortalLink
 export const ClientPortalLinkCreateParamsSchema = z.object({
@@ -8428,6 +8447,11 @@ export const LeadConfirmProposalSentParamsSchema = z.object({});
 
 export type LeadConfirmProposalSentParams = z.infer<typeof LeadConfirmProposalSentParamsSchema>;
 
+// Command: reassignClient on Lead
+export const LeadReassignClientParamsSchema = z.object({});
+
+export type LeadReassignClientParams = z.infer<typeof LeadReassignClientParamsSchema>;
+
 // Command: recordSourceHistory on Lead
 export const LeadRecordSourceHistoryParamsSchema = z.object({
   stage: z.enum(["new", "qualified", "proposalSent", "negotiating"]),
@@ -8452,6 +8476,14 @@ export const LeadReviseDetailsParamsSchema = z.object({
 });
 
 export type LeadReviseDetailsParams = z.infer<typeof LeadReviseDetailsParamsSchema>;
+
+// Command: stageClientMerge on Lead
+export const LeadStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type LeadStageClientMergeParams = z.infer<typeof LeadStageClientMergeParamsSchema>;
 
 // Command: stageConversion on Lead
 export const LeadStageConversionParamsSchema = z.object({
@@ -10512,10 +10544,23 @@ export const QuoteSubmissionFailParamsSchema = z.object({
 
 export type QuoteSubmissionFailParams = z.infer<typeof QuoteSubmissionFailParamsSchema>;
 
+// Command: reassignClient on QuoteSubmission
+export const QuoteSubmissionReassignClientParamsSchema = z.object({});
+
+export type QuoteSubmissionReassignClientParams = z.infer<typeof QuoteSubmissionReassignClientParamsSchema>;
+
 // Command: retry on QuoteSubmission
 export const QuoteSubmissionRetryParamsSchema = z.object({});
 
 export type QuoteSubmissionRetryParams = z.infer<typeof QuoteSubmissionRetryParamsSchema>;
+
+// Command: stageClientMerge on QuoteSubmission
+export const QuoteSubmissionStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type QuoteSubmissionStageClientMergeParams = z.infer<typeof QuoteSubmissionStageClientMergeParamsSchema>;
 
 // Command: startProcessing on QuoteSubmission
 export const QuoteSubmissionStartProcessingParamsSchema = z.object({});

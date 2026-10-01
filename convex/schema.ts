@@ -229,12 +229,16 @@ export default defineSchema({
     openedAt: v.optional(v.union(v.number(), v.null())),
     resolvedAt: v.optional(v.union(v.number(), v.null())),
     resolutionNote: v.optional(v.union(v.string(), v.null())),
+    clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
+    mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_clientId", ["clientId"]),
+    .index("by_clientId", ["clientId"])
+    .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
+    .index("by_mergeTargetClientId", ["mergeTargetClientId"]),
   clientPortalLinks: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2069,12 +2073,16 @@ export default defineSchema({
     sourceStage: v.optional(v.union(v.string(), v.null())),
     eventDate: v.optional(v.union(v.number(), v.null())),
     closedAt: v.optional(v.union(v.number(), v.null())),
+    clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
+    mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_clientId", ["clientId"])
+    .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
+    .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_clientContactId", ["clientContactId"])
     .index("by_proposalId", ["proposalId"])
     .index("by_referralSourceId", ["referralSourceId"])
@@ -3193,12 +3201,16 @@ export default defineSchema({
     completedAt: v.optional(v.union(v.number(), v.null())),
     errorMessage: v.optional(v.union(v.string(), v.null())),
     processingErrors: v.optional(v.union(v.string(), v.null())),
+    clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
+    mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_clientId", ["clientId"])
+    .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
+    .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_leadId", ["leadId"])
     .index("by_eventId", ["eventId"])
     .index("by_proposalId", ["proposalId"])

@@ -32,6 +32,8 @@ import {
   ClientOutreachTaskCompleteParamsSchema,
   ClientOutreachTaskDismissParamsSchema,
   ClientOutreachTaskOpenParamsSchema,
+  ClientOutreachTaskReassignClientParamsSchema,
+  ClientOutreachTaskStageClientMergeParamsSchema,
   ClientPortalLinkCreateParamsSchema,
   ClientPortalLinkRevokeParamsSchema,
   ClientReactivateParamsSchema,
@@ -419,8 +421,10 @@ import {
   LeadCaptureParamsSchema,
   LeadConfirmConversionParamsSchema,
   LeadConfirmProposalSentParamsSchema,
+  LeadReassignClientParamsSchema,
   LeadRecordSourceHistoryParamsSchema,
   LeadReviseDetailsParamsSchema,
+  LeadStageClientMergeParamsSchema,
   LeadStageConversionParamsSchema,
   LeadStageProposalParamsSchema,
   LeadUpdatePipelineParamsSchema,
@@ -662,7 +666,9 @@ import {
   QuoteSubmissionCreateParamsSchema,
   QuoteSubmissionDismissParamsSchema,
   QuoteSubmissionFailParamsSchema,
+  QuoteSubmissionReassignClientParamsSchema,
   QuoteSubmissionRetryParamsSchema,
+  QuoteSubmissionStageClientMergeParamsSchema,
   QuoteSubmissionStartProcessingParamsSchema,
   ReceiptCorrectionRecordParamsSchema,
   RecurringAvailabilityDeclareParamsSchema,
@@ -1456,6 +1462,26 @@ export function useClientOutreachTaskOpen() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ClientOutreachTaskOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ClientOutreachTask.reassignClient. */
+export function useClientOutreachTaskReassignClient() {
+  const mutate = useMutation(api.mutations.ClientOutreachTask_reassignClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientOutreachTaskReassignClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ClientOutreachTask.stageClientMerge. */
+export function useClientOutreachTaskStageClientMerge() {
+  const mutate = useMutation(api.mutations.ClientOutreachTask_stageClientMerge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientOutreachTaskStageClientMergeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6659,6 +6685,16 @@ export function useLeadConfirmProposalSent() {
   };
 }
 
+/** Mutation hook for Lead.reassignClient. */
+export function useLeadReassignClient() {
+  const mutate = useMutation(api.mutations.Lead_reassignClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadReassignClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Lead.recordSourceHistory. */
 export function useLeadRecordSourceHistory() {
   const mutate = useMutation(api.mutations.Lead_recordSourceHistory);
@@ -6675,6 +6711,16 @@ export function useLeadReviseDetails() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = LeadReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Lead.stageClientMerge. */
+export function useLeadStageClientMerge() {
+  const mutate = useMutation(api.mutations.Lead_stageClientMerge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadStageClientMergeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9959,12 +10005,32 @@ export function useQuoteSubmissionFail() {
   };
 }
 
+/** Mutation hook for QuoteSubmission.reassignClient. */
+export function useQuoteSubmissionReassignClient() {
+  const mutate = useMutation(api.mutations.QuoteSubmission_reassignClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = QuoteSubmissionReassignClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for QuoteSubmission.retry. */
 export function useQuoteSubmissionRetry() {
   const mutate = useMutation(api.mutations.QuoteSubmission_retry);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = QuoteSubmissionRetryParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for QuoteSubmission.stageClientMerge. */
+export function useQuoteSubmissionStageClientMerge() {
+  const mutate = useMutation(api.mutations.QuoteSubmission_stageClientMerge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = QuoteSubmissionStageClientMergeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13119,4 +13185,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1389 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1395 as const;

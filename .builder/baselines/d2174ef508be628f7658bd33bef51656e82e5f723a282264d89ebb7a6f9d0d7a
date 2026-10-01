@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:37c70b2489896123777c48f5a0c7da7d7a87389668b12a3cefc107bc0423dbc8:398de6fac81b57a12cac5b21d6b92092e59241f6324c945716c91508f9ad4c70:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:4077c14a8869f46cc909e55d268b2cbb68cefc914237fb1a87ffaf9f1325ccb8:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:476ced946ebccd9a2bf7c447942640aa6821d2cd5bab7b36c5c94245d3a7cd98:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4baf0b1cfe2e6ff546a021da30266fde4408359b1fca0b01c4dd32eaa264f4c0:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:84636a99993745fa6a645e8e7b395aee173204cd1b3ce0a9fcbf4f9ab485213d:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8e3f1f8f08eb0cc8cc3f2e9afe4018cc68d423bc2a4c18ca98809770cf7c7946:8ec578f7077e46d69b4d0ba1914d95b1dfa689c99423192a216e5c84d68a7c63:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cb17aebd1693e196fafc3596ad97832043eec454bda05e20f29d3baec5d76070:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecb19ddbe662c687b90bec15dc4623d74b353dc60e7f8dbc966617480b3d9a66:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:09b4472debd89e9951f81f7627401c2ac9ca158fe3ac04911998a6d9a748f5de:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2fac34977c6eb571488bdebd1af5f8443a1995bf4f3bb25465c29da3752e6468:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:398de6fac81b57a12cac5b21d6b92092e59241f6324c945716c91508f9ad4c70:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:476ced946ebccd9a2bf7c447942640aa6821d2cd5bab7b36c5c94245d3a7cd98:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4baf0b1cfe2e6ff546a021da30266fde4408359b1fca0b01c4dd32eaa264f4c0:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:84636a99993745fa6a645e8e7b395aee173204cd1b3ce0a9fcbf4f9ab485213d:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:862e4ee7c96e36e1c1aa314ef077a67b3d5c91e47fe4245cd5422d9b63682599:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8e3f1f8f08eb0cc8cc3f2e9afe4018cc68d423bc2a4c18ca98809770cf7c7946:8ec578f7077e46d69b4d0ba1914d95b1dfa689c99423192a216e5c84d68a7c63:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cb17aebd1693e196fafc3596ad97832043eec454bda05e20f29d3baec5d76070:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecb19ddbe662c687b90bec15dc4623d74b353dc60e7f8dbc966617480b3d9a66:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -5250,6 +5250,20 @@ export const ClientMergeMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.lists()",
+    "readId": "ClientOutreachTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.detail(id)",
+    "readId": "ClientOutreachTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Contract",
     "queryKeyHint": "queryKeys.contract.lists()",
     "readId": "Contract.list",
@@ -5306,6 +5320,20 @@ export const ClientMergeMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Payment",
     "queryKeyHint": "queryKeys.payment.lists()",
     "readId": "Payment.list",
@@ -5344,6 +5372,20 @@ export const ClientMergeMergeInvalidation = [
     "entity": "Proposal",
     "queryKeyHint": "queryKeys.proposal.detail(id)",
     "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -5384,14 +5426,14 @@ export const ClientOutreachTaskCompleteCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may update client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may change client follow-up reminders"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ClientOutreachTask not found"}],
   emits: ["ClientOutreachTaskCompleted"],
 } as const;
 
-export type ClientOutreachTaskCompleteResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+export type ClientOutreachTaskCompleteResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ClientOutreachTask.complete.
@@ -5429,6 +5471,20 @@ export const ClientOutreachTaskCompleteInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -5480,14 +5536,14 @@ export const ClientOutreachTaskDismissCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["note"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may update client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may change client follow-up reminders"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ClientOutreachTask not found"}],
   emits: ["ClientOutreachTaskDismissed"],
 } as const;
 
-export type ClientOutreachTaskDismissResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number };
+export type ClientOutreachTaskDismissResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for ClientOutreachTask.dismiss.
@@ -5525,6 +5581,20 @@ export const ClientOutreachTaskDismissInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -5623,6 +5693,20 @@ export const ClientOutreachTaskOpenInvalidation = [
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -5640,6 +5724,192 @@ export const ClientOutreachTaskOpenAction = {
     {
       "name": "reason",
       "label": "Reason",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- ClientOutreachTask.reassignClient ---
+export type ClientOutreachTaskReassignClientClientInput = Record<string, never>;
+
+export const ClientOutreachTaskReassignClientCapability = {
+  capabilityId: "ClientOutreachTask.reassignClient",
+  entity: "ClientOutreachTask",
+  command: "reassignClient",
+  route: "/api/manifest/ClientOutreachTask/commands/reassignClient",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may update client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may change client follow-up reminders"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"constraint_block","message":"Merge authorization does not match the reminder client"},{"kind":"constraint_block","message":"Merge authorization does not match the primary client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ClientOutreachTask not found"}],
+  emits: ["ClientOutreachTaskClientReassigned"],
+} as const;
+
+export type ClientOutreachTaskReassignClientResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ClientOutreachTask.reassignClient.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindClientOutreachTaskReassignClientInput(client: ClientOutreachTaskReassignClientClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ClientOutreachTask.reassignClient. */
+export const ClientOutreachTaskReassignClientInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.lists()",
+    "readId": "ClientOutreachTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.detail(id)",
+    "readId": "ClientOutreachTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ClientOutreachTask.reassignClient. Not a rendered control. */
+export const ClientOutreachTaskReassignClientAction = {
+  "exposure": "human",
+  "label": "Reassign client",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- ClientOutreachTask.stageClientMerge ---
+export interface ClientOutreachTaskStageClientMergeClientInput {
+  clientMergeId: string;
+  clientId: string;
+}
+
+export const ClientOutreachTaskStageClientMergeCapability = {
+  capabilityId: "ClientOutreachTask.stageClientMerge",
+  entity: "ClientOutreachTask",
+  command: "stageClientMerge",
+  route: "/api/manifest/ClientOutreachTask/commands/stageClientMerge",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["clientMergeId","clientId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may update client follow-up reminders"},{"kind":"policy_denial","message":"Sales staff may change client follow-up reminders"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Reminder already belongs to this client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"ClientOutreachTask not found"}],
+  emits: ["ClientOutreachTaskClientMergeStaged"],
+} as const;
+
+export type ClientOutreachTaskStageClientMergeResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for ClientOutreachTask.stageClientMerge.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindClientOutreachTaskStageClientMergeInput(client: ClientOutreachTaskStageClientMergeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ClientOutreachTask.stageClientMerge. */
+export const ClientOutreachTaskStageClientMergeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.lists()",
+    "readId": "ClientOutreachTask.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.detail(id)",
+    "readId": "ClientOutreachTask.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ClientOutreachTask.stageClientMerge. Not a rendered control. */
+export const ClientOutreachTaskStageClientMergeAction = {
+  "exposure": "human",
+  "label": "Stage client merge",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "clientMergeId",
+      "label": "Client merge id",
+      "required": true
+    },
+    {
+      "name": "clientId",
+      "label": "Client id",
       "required": true
     }
   ]
@@ -103651,6 +103921,20 @@ export const LeadCaptureInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "MessageThread",
     "queryKeyHint": "queryKeys.messageThread.lists()",
     "readId": "MessageThread.list",
@@ -103796,14 +104080,14 @@ export const LeadConfirmConversionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Lead contact must belong to the converted client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: ["LeadConverted"],
 } as const;
 
-export type LeadConfirmConversionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadConfirmConversionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.confirmConversion.
@@ -103855,6 +104139,20 @@ export const LeadConfirmConversionInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -103938,14 +104236,14 @@ export const LeadConfirmProposalSentCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Lead proposal must belong to the converted client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: ["LeadProposalLinked"],
 } as const;
 
-export type LeadConfirmProposalSentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadConfirmProposalSentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.confirmProposalSent.
@@ -103997,6 +104295,20 @@ export const LeadConfirmProposalSentInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -104065,6 +104377,162 @@ export const LeadConfirmProposalSentAction = {
   "fields": []
 } as const;
 
+// --- Lead.reassignClient ---
+export type LeadReassignClientClientInput = Record<string, never>;
+
+export const LeadReassignClientCapability = {
+  capabilityId: "Lead.reassignClient",
+  entity: "Lead",
+  command: "reassignClient",
+  route: "/api/manifest/Lead/commands/reassignClient",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"constraint_block","message":"Merge authorization does not match the lead client"},{"kind":"constraint_block","message":"Merge authorization does not match the primary client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
+  emits: ["LeadClientReassigned"],
+} as const;
+
+export type LeadReassignClientResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Lead.reassignClient.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindLeadReassignClientInput(client: LeadReassignClientClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Lead.reassignClient. */
+export const LeadReassignClientInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.lists()",
+    "readId": "ClientContact.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.detail(id)",
+    "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.lists()",
+    "readId": "ReferralSource.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.detail(id)",
+    "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Lead.reassignClient. Not a rendered control. */
+export const LeadReassignClientAction = {
+  "exposure": "human",
+  "label": "Reassign client",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- Lead.recordSourceHistory ---
 export interface LeadRecordSourceHistoryClientInput {
   /** Allowed: "new" | "qualified" | "proposalSent" | "negotiating" */
@@ -104086,14 +104554,14 @@ export const LeadRecordSourceHistoryCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["stage","sourceStage","eventDate","closedAt"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: ["LeadSourceHistoryRecorded"],
 } as const;
 
-export type LeadRecordSourceHistoryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadRecordSourceHistoryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.recordSourceHistory.
@@ -104145,6 +104613,20 @@ export const LeadRecordSourceHistoryInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -104278,14 +104760,14 @@ export const LeadReviseDetailsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["leadType","source","referralSourceId","companyName","givenName","familyName","email","phone","notes"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give a company name for a company lead, or a given name for a person lead"},{"kind":"constraint_block","message":"Say where this lead came from"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: ["LeadDetailsRevised"],
 } as const;
 
-export type LeadReviseDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadReviseDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.reviseDetails.
@@ -104337,6 +104819,20 @@ export const LeadReviseDetailsInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -104461,6 +104957,176 @@ export const LeadReviseDetailsAction = {
   ]
 } as const;
 
+// --- Lead.stageClientMerge ---
+export interface LeadStageClientMergeClientInput {
+  clientMergeId: string;
+  clientId: string;
+}
+
+export const LeadStageClientMergeCapability = {
+  capabilityId: "Lead.stageClientMerge",
+  entity: "Lead",
+  command: "stageClientMerge",
+  route: "/api/manifest/Lead/commands/stageClientMerge",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["clientMergeId","clientId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Lead already belongs to this client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
+  emits: ["LeadClientMergeStaged"],
+} as const;
+
+export type LeadStageClientMergeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Lead.stageClientMerge.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindLeadStageClientMergeInput(client: LeadStageClientMergeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Lead.stageClientMerge. */
+export const LeadStageClientMergeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.lists()",
+    "readId": "ClientContact.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.detail(id)",
+    "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.lists()",
+    "readId": "ReferralSource.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.detail(id)",
+    "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Lead.stageClientMerge. Not a rendered control. */
+export const LeadStageClientMergeAction = {
+  "exposure": "human",
+  "label": "Stage client merge",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "clientMergeId",
+      "label": "Client merge id",
+      "required": true
+    },
+    {
+      "name": "clientId",
+      "label": "Client id",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- Lead.stageConversion ---
 export interface LeadStageConversionClientInput {
   clientId: string;
@@ -104479,14 +105145,14 @@ export const LeadStageConversionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["clientId","clientContactId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: [],
 } as const;
 
-export type LeadStageConversionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadStageConversionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.stageConversion.
@@ -104538,6 +105204,20 @@ export const LeadStageConversionInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -104634,14 +105314,14 @@ export const LeadStageProposalCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["proposalId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: [],
 } as const;
 
-export type LeadStageProposalResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadStageProposalResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.stageProposal.
@@ -104693,6 +105373,20 @@ export const LeadStageProposalInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -104789,14 +105483,14 @@ export const LeadUpdatePipelineCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["stage","estimatedValue","probability"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Sales staff may see leads"},{"kind":"policy_denial","message":"Sales staff may update leads"},{"kind":"policy_denial","message":"Sales staff may change leads"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This lead's estimated value can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Lead probability must be between 0 and 100"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Lead not found"}],
   emits: ["LeadPipelineUpdated"],
 } as const;
 
-export type LeadUpdatePipelineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number };
+export type LeadUpdatePipelineResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Lead.updatePipeline.
@@ -104848,6 +105542,20 @@ export const LeadUpdatePipelineInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -149259,14 +149967,14 @@ export const QuoteSubmissionCompleteCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["clientId","leadId","eventId","proposalId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
   emits: ["QuoteProcessingCompleted"],
 } as const;
 
-export type QuoteSubmissionCompleteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number };
+export type QuoteSubmissionCompleteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for QuoteSubmission.complete.
@@ -149304,6 +150012,20 @@ export const QuoteSubmissionCompleteInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -149468,14 +150190,14 @@ export const QuoteSubmissionCreateCapability = {
   versionField: null,
   acceptsIdempotencyKey: true,
   resultKind: "created",
-  returnTsType: "{ _id: string; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["dedupKey","clientName","email","phone","eventDate","eventEndTime","guestCount","marketingConsent","serviceStyleId","occasionId","serviceStyleText","occasionText","venueName","venueAddress","menuPreferences","dietaryRestrictions","notes","menuId","selectionsJson","estimateJson","submissionKey","referralSourceId","howHeardText","utmSource","utmMedium","utmCampaign","referrer","landingPage","consentNotice"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This quote request is missing the ID used to catch duplicates"},{"kind":"constraint_block","message":"Give the client's name"},{"kind":"constraint_block","message":"Give an email address"},{"kind":"constraint_block","message":"The guest count has to be more than zero"}],
   emits: ["QuoteSubmitted"],
 } as const;
 
-export type QuoteSubmissionCreateResult = { _id: string; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number };
+export type QuoteSubmissionCreateResult = { _id: string; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for QuoteSubmission.create.
@@ -149513,6 +150235,20 @@ export const QuoteSubmissionCreateInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -149772,14 +150508,14 @@ export const QuoteSubmissionDismissCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Give a reason for dismissing this"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
   emits: [],
 } as const;
 
-export type QuoteSubmissionDismissResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number };
+export type QuoteSubmissionDismissResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for QuoteSubmission.dismiss.
@@ -149817,6 +150553,20 @@ export const QuoteSubmissionDismissInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -149937,14 +150687,14 @@ export const QuoteSubmissionFailCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["errorMessage","processingErrors"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
   emits: ["QuoteProcessingFailed"],
 } as const;
 
-export type QuoteSubmissionFailResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number };
+export type QuoteSubmissionFailResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for QuoteSubmission.fail.
@@ -149982,6 +150732,20 @@ export const QuoteSubmissionFailInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -150089,6 +150853,176 @@ export const QuoteSubmissionFailAction = {
   ]
 } as const;
 
+// --- QuoteSubmission.reassignClient ---
+export type QuoteSubmissionReassignClientClientInput = Record<string, never>;
+
+export const QuoteSubmissionReassignClientCapability = {
+  capabilityId: "QuoteSubmission.reassignClient",
+  entity: "QuoteSubmission",
+  command: "reassignClient",
+  route: "/api/manifest/QuoteSubmission/commands/reassignClient",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"guard_failure","message":"Guard 6 failed"},{"kind":"guard_failure","message":"Guard 7 failed"},{"kind":"constraint_block","message":"Merge authorization does not match the quote request client"},{"kind":"constraint_block","message":"Merge authorization does not match the primary client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
+  emits: ["QuoteSubmissionClientReassigned"],
+} as const;
+
+export type QuoteSubmissionReassignClientResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for QuoteSubmission.reassignClient.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindQuoteSubmissionReassignClientInput(client: QuoteSubmissionReassignClientClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful QuoteSubmission.reassignClient. */
+export const QuoteSubmissionReassignClientInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Occasion",
+    "queryKeyHint": "queryKeys.occasion.lists()",
+    "readId": "Occasion.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Occasion",
+    "queryKeyHint": "queryKeys.occasion.detail(id)",
+    "readId": "Occasion.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.lists()",
+    "readId": "ReferralSource.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.detail(id)",
+    "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer QuoteSubmission.reassignClient. Not a rendered control. */
+export const QuoteSubmissionReassignClientAction = {
+  "exposure": "human",
+  "label": "Reassign client",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- QuoteSubmission.retry ---
 export type QuoteSubmissionRetryClientInput = Record<string, never>;
 
@@ -150104,14 +151038,14 @@ export const QuoteSubmissionRetryCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
   emits: [],
 } as const;
 
-export type QuoteSubmissionRetryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number };
+export type QuoteSubmissionRetryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for QuoteSubmission.retry.
@@ -150149,6 +151083,20 @@ export const QuoteSubmissionRetryInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -150245,6 +151193,190 @@ export const QuoteSubmissionRetryAction = {
   "fields": []
 } as const;
 
+// --- QuoteSubmission.stageClientMerge ---
+export interface QuoteSubmissionStageClientMergeClientInput {
+  clientMergeId: string;
+  clientId: string;
+}
+
+export const QuoteSubmissionStageClientMergeCapability = {
+  capabilityId: "QuoteSubmission.stageClientMerge",
+  entity: "QuoteSubmission",
+  command: "stageClientMerge",
+  route: "/api/manifest/QuoteSubmission/commands/stageClientMerge",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["clientMergeId","clientId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Quote request already belongs to this client"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
+  emits: ["QuoteSubmissionClientMergeStaged"],
+} as const;
+
+export type QuoteSubmissionStageClientMergeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for QuoteSubmission.stageClientMerge.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindQuoteSubmissionStageClientMergeInput(client: QuoteSubmissionStageClientMergeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful QuoteSubmission.stageClientMerge. */
+export const QuoteSubmissionStageClientMergeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.lists()",
+    "readId": "QuoteSubmission.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "QuoteSubmission",
+    "queryKeyHint": "queryKeys.quoteSubmission.detail(id)",
+    "readId": "QuoteSubmission.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Occasion",
+    "queryKeyHint": "queryKeys.occasion.lists()",
+    "readId": "Occasion.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Occasion",
+    "queryKeyHint": "queryKeys.occasion.detail(id)",
+    "readId": "Occasion.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.lists()",
+    "readId": "ReferralSource.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.detail(id)",
+    "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.lists()",
+    "readId": "ServiceStyle.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ServiceStyle",
+    "queryKeyHint": "queryKeys.serviceStyle.detail(id)",
+    "readId": "ServiceStyle.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer QuoteSubmission.stageClientMerge. Not a rendered control. */
+export const QuoteSubmissionStageClientMergeAction = {
+  "exposure": "human",
+  "label": "Stage client merge",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "clientMergeId",
+      "label": "Client merge id",
+      "required": true
+    },
+    {
+      "name": "clientId",
+      "label": "Client id",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- QuoteSubmission.startProcessing ---
 export type QuoteSubmissionStartProcessingClientInput = Record<string, never>;
 
@@ -150260,14 +151392,14 @@ export const QuoteSubmissionStartProcessingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Anyone may check a quote request"},{"kind":"policy_denial","message":"Only sales staff may update quote submissions"},{"kind":"policy_denial","message":"Anyone may send a quote request"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"QuoteSubmission not found"}],
   emits: [],
 } as const;
 
-export type QuoteSubmissionStartProcessingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number };
+export type QuoteSubmissionStartProcessingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for QuoteSubmission.startProcessing.
@@ -150305,6 +151437,20 @@ export const QuoteSubmissionStartProcessingInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.lists()",
+    "readId": "ClientMerge.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientMerge",
+    "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "readId": "ClientMerge.get",
     "label": "related entity detail"
   },
   {
@@ -181742,6 +182888,8 @@ export const ALL_CAPABILITY_IDS = [
   "ClientOutreachTask.complete",
   "ClientOutreachTask.dismiss",
   "ClientOutreachTask.open",
+  "ClientOutreachTask.reassignClient",
+  "ClientOutreachTask.stageClientMerge",
   "ClientPortalLink.create",
   "ClientPortalLink.revoke",
   "Component.draft",
@@ -182125,8 +183273,10 @@ export const ALL_CAPABILITY_IDS = [
   "Lead.capture",
   "Lead.confirmConversion",
   "Lead.confirmProposalSent",
+  "Lead.reassignClient",
   "Lead.recordSourceHistory",
   "Lead.reviseDetails",
+  "Lead.stageClientMerge",
   "Lead.stageConversion",
   "Lead.stageProposal",
   "Lead.updatePipeline",
@@ -182368,7 +183518,9 @@ export const ALL_CAPABILITY_IDS = [
   "QuoteSubmission.create",
   "QuoteSubmission.dismiss",
   "QuoteSubmission.fail",
+  "QuoteSubmission.reassignClient",
   "QuoteSubmission.retry",
+  "QuoteSubmission.stageClientMerge",
   "QuoteSubmission.startProcessing",
   "ReceiptCorrection.record",
   "RecurringAvailability.declare",
@@ -182636,6 +183788,8 @@ export const ALL_READ_IDS = [
   "ClientMerge.get",
   "ClientMerge.list",
   "ClientOutreachTask.byClientId",
+  "ClientOutreachTask.byClientMergeAuthorizationId",
+  "ClientOutreachTask.byMergeTargetClientId",
   "ClientOutreachTask.byTenantId",
   "ClientOutreachTask.get",
   "ClientOutreachTask.list",
@@ -183023,6 +184177,8 @@ export const ALL_READ_IDS = [
   "ItemUnitMapping.list",
   "Lead.byClientContactId",
   "Lead.byClientId",
+  "Lead.byClientMergeAuthorizationId",
+  "Lead.byMergeTargetClientId",
   "Lead.byProposalId",
   "Lead.byReferralSourceId",
   "Lead.byTenantId",
@@ -183253,8 +184409,10 @@ export const ALL_READ_IDS = [
   "QualityCheck.get",
   "QualityCheck.list",
   "QuoteSubmission.byClientId",
+  "QuoteSubmission.byClientMergeAuthorizationId",
   "QuoteSubmission.byEventId",
   "QuoteSubmission.byLeadId",
+  "QuoteSubmission.byMergeTargetClientId",
   "QuoteSubmission.byOccasionId",
   "QuoteSubmission.byProposalId",
   "QuoteSubmission.byReferralSourceId",
@@ -183692,17 +184850,23 @@ export type getClientMergeResult = { _id: string; _creationTime: number; tenantI
 export const listClientMergeRead = {"entity":"ClientMerge","readId":"ClientMerge.list","exportName":"listClientMerge","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; primaryClientId: string; duplicateClientId: string; mergedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listClientMergeResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; primaryClientId: string; duplicateClientId: string; mergedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listClientOutreachTaskByClientIdRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.byClientId","exportName":"listClientOutreachTaskByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listClientOutreachTaskByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>;
+export const listClientOutreachTaskByClientIdRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.byClientId","exportName":"listClientOutreachTaskByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listClientOutreachTaskByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listClientOutreachTaskByTenantIdRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.byTenantId","exportName":"listClientOutreachTaskByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listClientOutreachTaskByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>;
+export const listClientOutreachTaskByClientMergeAuthorizationIdRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.byClientMergeAuthorizationId","exportName":"listClientOutreachTaskByClientMergeAuthorizationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientMergeAuthorizationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listClientOutreachTaskByClientMergeAuthorizationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getClientOutreachTaskRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.get","exportName":"getClientOutreachTask","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getClientOutreachTaskResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number } | null;
+export const listClientOutreachTaskByMergeTargetClientIdRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.byMergeTargetClientId","exportName":"listClientOutreachTaskByMergeTargetClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergeTargetClientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listClientOutreachTaskByMergeTargetClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listClientOutreachTaskRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.list","exportName":"listClientOutreachTask","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listClientOutreachTaskResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; createdAt: number; updatedAt: number }>;
+export const listClientOutreachTaskByTenantIdRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.byTenantId","exportName":"listClientOutreachTaskByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listClientOutreachTaskByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getClientOutreachTaskRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.get","exportName":"getClientOutreachTask","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getClientOutreachTaskResult = { _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listClientOutreachTaskRead = {"entity":"ClientOutreachTask","readId":"ClientOutreachTask.list","exportName":"listClientOutreachTask","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: \"open\" | \"completed\" | \"dismissed\"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listClientOutreachTaskResult = Array<{ _id: string; _creationTime: number; tenantId: string; clientId: string; reason: string; status: "open" | "completed" | "dismissed"; openedById: string | null; openedAt: number | null; resolvedAt: number | null; resolutionNote: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listClientPortalLinkByEventIdRead = {"entity":"ClientPortalLink","readId":"ClientPortalLink.byEventId","exportName":"listClientPortalLinkByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; status: \"active\" | \"revoked\"; expiresAt: number; revokedAt: number | null; issuedBySubject: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listClientPortalLinkByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; status: "active" | "revoked"; expiresAt: number; revokedAt: number | null; issuedBySubject: string | null; createdAt: number; updatedAt: number }>;
@@ -184850,26 +186014,32 @@ export type getItemUnitMappingResult = { _id: string; _creationTime: number; ten
 export const listItemUnitMappingRead = {"entity":"ItemUnitMapping","readId":"ItemUnitMapping.list","exportName":"listItemUnitMapping","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string | null; componentId: string | null; kind: \"pack\" | \"density\" | \"portion\" | \"yield\"; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; equalsQuantity: number; equalsUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; fromBasis: \"as_purchased\" | \"as_produced\" | \"raw\" | \"cooked\" | \"unknown\" | null; toBasis: \"as_purchased\" | \"as_produced\" | \"raw\" | \"cooked\" | \"unknown\" | null; source: string | null; confirmedByUserId: string | null; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listItemUnitMappingResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string | null; componentId: string | null; kind: "pack" | "density" | "portion" | "yield"; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; equalsQuantity: number; equalsUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; fromBasis: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" | null; toBasis: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" | null; source: string | null; confirmedByUserId: string | null; recordedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadByClientContactIdRead = {"entity":"Lead","readId":"Lead.byClientContactId","exportName":"listLeadByClientContactId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientContactId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadByClientContactIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listLeadByClientContactIdRead = {"entity":"Lead","readId":"Lead.byClientContactId","exportName":"listLeadByClientContactId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientContactId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByClientContactIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadByClientIdRead = {"entity":"Lead","readId":"Lead.byClientId","exportName":"listLeadByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listLeadByClientIdRead = {"entity":"Lead","readId":"Lead.byClientId","exportName":"listLeadByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadByProposalIdRead = {"entity":"Lead","readId":"Lead.byProposalId","exportName":"listLeadByProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"proposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadByProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listLeadByClientMergeAuthorizationIdRead = {"entity":"Lead","readId":"Lead.byClientMergeAuthorizationId","exportName":"listLeadByClientMergeAuthorizationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientMergeAuthorizationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByClientMergeAuthorizationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadByReferralSourceIdRead = {"entity":"Lead","readId":"Lead.byReferralSourceId","exportName":"listLeadByReferralSourceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"referralSourceId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadByReferralSourceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listLeadByMergeTargetClientIdRead = {"entity":"Lead","readId":"Lead.byMergeTargetClientId","exportName":"listLeadByMergeTargetClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergeTargetClientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByMergeTargetClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadByTenantIdRead = {"entity":"Lead","readId":"Lead.byTenantId","exportName":"listLeadByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listLeadByProposalIdRead = {"entity":"Lead","readId":"Lead.byProposalId","exportName":"listLeadByProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"proposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getLeadRead = {"entity":"Lead","readId":"Lead.get","exportName":"getLead","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getLeadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number } | null;
+export const listLeadByReferralSourceIdRead = {"entity":"Lead","readId":"Lead.byReferralSourceId","exportName":"listLeadByReferralSourceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"referralSourceId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByReferralSourceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadRead = {"entity":"Lead","readId":"Lead.list","exportName":"listLead","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
+export const listLeadByTenantIdRead = {"entity":"Lead","readId":"Lead.byTenantId","exportName":"listLeadByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getLeadRead = {"entity":"Lead","readId":"Lead.get","exportName":"getLead","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getLeadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listLeadRead = {"entity":"Lead","readId":"Lead.list","exportName":"listLead","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; closedAt: number | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listMaterializationReceiptByReceiptKeyRead = {"entity":"MaterializationReceipt","readId":"MaterializationReceipt.byReceiptKey","exportName":"listMaterializationReceiptByReceiptKey","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"receiptKey","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; receiptKey: string | null; family: string | null; operationKey: string | null; output: unknown | null; createdAt: number; updatedAt: number }>"} as const;
 export type listMaterializationReceiptByReceiptKeyResult = Array<{ _id: string; _creationTime: number; tenantId: string; receiptKey: string | null; family: string | null; operationKey: string | null; output: unknown | null; createdAt: number; updatedAt: number }>;
@@ -185543,35 +186713,41 @@ export type getQualityCheckResult = { _id: string; _creationTime: number; tenant
 export const listQualityCheckRead = {"entity":"QualityCheck","readId":"QualityCheck.list","exportName":"listQualityCheck","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; prepTaskId: string | null; productionBatchId: string | null; notes: string | null; result: \"pass\" | \"fail\" | null; checkedById: string | null; status: \"pending\" | \"passed\" | \"failed\"; openedAt: number | null; completedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listQualityCheckResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; prepTaskId: string | null; productionBatchId: string | null; notes: string | null; result: "pass" | "fail" | null; checkedById: string | null; status: "pending" | "passed" | "failed"; openedAt: number | null; completedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByClientIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byClientId","exportName":"listQuoteSubmissionByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByClientIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byClientId","exportName":"listQuoteSubmissionByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByEventIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byEventId","exportName":"listQuoteSubmissionByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByClientMergeAuthorizationIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byClientMergeAuthorizationId","exportName":"listQuoteSubmissionByClientMergeAuthorizationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientMergeAuthorizationId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByClientMergeAuthorizationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByLeadIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byLeadId","exportName":"listQuoteSubmissionByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByEventIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byEventId","exportName":"listQuoteSubmissionByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByOccasionIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byOccasionId","exportName":"listQuoteSubmissionByOccasionId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"occasionId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByOccasionIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByLeadIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byLeadId","exportName":"listQuoteSubmissionByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByProposalIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byProposalId","exportName":"listQuoteSubmissionByProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"proposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByMergeTargetClientIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byMergeTargetClientId","exportName":"listQuoteSubmissionByMergeTargetClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergeTargetClientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByMergeTargetClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByReferralSourceIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byReferralSourceId","exportName":"listQuoteSubmissionByReferralSourceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"referralSourceId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByReferralSourceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByOccasionIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byOccasionId","exportName":"listQuoteSubmissionByOccasionId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"occasionId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByOccasionIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByServiceStyleIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byServiceStyleId","exportName":"listQuoteSubmissionByServiceStyleId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByServiceStyleIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByProposalIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byProposalId","exportName":"listQuoteSubmissionByProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"proposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionByTenantIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byTenantId","exportName":"listQuoteSubmissionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByReferralSourceIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byReferralSourceId","exportName":"listQuoteSubmissionByReferralSourceId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"referralSourceId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByReferralSourceIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getQuoteSubmissionRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.get","exportName":"getQuoteSubmission","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getQuoteSubmissionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number } | null;
+export const listQuoteSubmissionByServiceStyleIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byServiceStyleId","exportName":"listQuoteSubmissionByServiceStyleId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"serviceStyleId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByServiceStyleIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listQuoteSubmissionRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.list","exportName":"listQuoteSubmission","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listQuoteSubmissionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+export const listQuoteSubmissionByTenantIdRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.byTenantId","exportName":"listQuoteSubmissionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getQuoteSubmissionRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.get","exportName":"getQuoteSubmission","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getQuoteSubmissionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listQuoteSubmissionRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.list","exportName":"listQuoteSubmission","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listQuoteSubmissionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; menuId: string | null; selectionsJson: string | null; estimateJson: string | null; submissionKey: string | null; referralSourceId: string | null; howHeardText: string | null; utmSource: string | null; utmMedium: string | null; utmCampaign: string | null; referrer: string | null; landingPage: string | null; notes: string | null; consentGrantedAt: number; consentNotice: string | null; marketingConsent: boolean; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listReceiptCorrectionByIngredientIdRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.byIngredientId","exportName":"listReceiptCorrectionByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; correctionSequence: number; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listReceiptCorrectionByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; correctionSequence: number; recordedAt: number | null; createdAt: number; updatedAt: number }>;

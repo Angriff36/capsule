@@ -37,8 +37,13 @@ entity Lead mixin TenantScoped, SoftDeletable {
   property sourceStage: string?
   property eventDate: datetime?
   property closedAt: datetime?
+  // A client merge moves the lead to the client kept (PL-SOURCE-MERGE).
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
 
   ref client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
   ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
   ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
@@ -217,7 +222,52 @@ entity Lead mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Lead already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit LeadClientMergeStaged {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the lead client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit LeadClientReassigned {
+      leadId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store Lead in durable
+}
+
+event LeadClientMergeStaged: "lead.client_merge_staged" {
+  leadId: string
+  tenantId: string
+}
+
+event LeadClientReassigned: "lead.client_reassigned" {
+  leadId: string
+  tenantId: string
+  previousClientId: string?
+  clientId: string?
 }
 
 event LeadCaptured: "lead.captured" {
