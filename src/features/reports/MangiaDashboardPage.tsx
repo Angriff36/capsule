@@ -162,7 +162,15 @@ export function MangiaDashboardPage() {
       (e) => e.stage === "completed",
     ).length;
 
+    // Soonest event from today on, so an empty week still says what is next.
+    const nextEvent = (events || [])
+      .filter((e) => e.startsAt && new Date(e.startsAt) >= today)
+      .sort((a, b) => Number(a.startsAt) - Number(b.startsAt))[0];
+
     return {
+      weekStart,
+      weekEnd,
+      nextEvent,
       totalEvents: weekEvents.length,
       completedEvents: weekCompleted,
       totalRevenue: weekRevenue,
@@ -198,9 +206,22 @@ export function MangiaDashboardPage() {
     }
 
     if (weekToDateMetrics.totalEvents === 0) {
+      const day = (date: Date) =>
+        date.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        });
+      const lastDay = new Date(weekToDateMetrics.weekEnd);
+      lastDay.setDate(lastDay.getDate() - 1);
+      const next = weekToDateMetrics.nextEvent;
       alerts.push({
         severity: "low",
-        message: "No events scheduled this week",
+        message: `No events this week (${day(weekToDateMetrics.weekStart)} – ${day(lastDay)}). ${
+          next?.startsAt
+            ? `Next event: ${next.title || "Untitled event"} on ${day(new Date(next.startsAt))}.`
+            : "No upcoming events on the calendar."
+        }`,
       });
     }
 
