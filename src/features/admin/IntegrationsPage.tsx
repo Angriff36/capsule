@@ -5,6 +5,7 @@ import { api } from "../../lib/api";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { OutsideMessagesSection } from "./OutsideMessagesSection";
 import { StripeConnectSection } from "./StripeConnectSection";
 import { WebhooksSection } from "./WebhooksSection";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
@@ -554,6 +555,8 @@ export function IntegrationsPage() {
       <StripeConnectSection />
 
       <WebhooksSection canManage={connection.canManage} />
+
+      <OutsideMessagesSection />
     </div>
   );
 }

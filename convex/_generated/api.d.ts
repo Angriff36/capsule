@@ -31,6 +31,7 @@ import type * as crons from "../crons.js";
 import type * as culinaryDemand from "../culinaryDemand.js";
 import type * as culinaryDemandSweep from "../culinaryDemandSweep.js";
 import type * as cutover from "../cutover.js";
+import type * as deliveryHealth from "../deliveryHealth.js";
 import type * as deploymentProbe from "../deploymentProbe.js";
 import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailNotifications from "../emailNotifications.js";
@@ -289,6 +290,7 @@ declare const fullApi: ApiFromModules<{
   culinaryDemand: typeof culinaryDemand;
   culinaryDemandSweep: typeof culinaryDemandSweep;
   cutover: typeof cutover;
+  deliveryHealth: typeof deliveryHealth;
   deploymentProbe: typeof deploymentProbe;
   driverAssignment: typeof driverAssignment;
   emailNotifications: typeof emailNotifications;
