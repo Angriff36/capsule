@@ -65,8 +65,13 @@ async function snapshot(actor: Actor) {
     for (const name of SIDE_EFFECT_TABLES) {
       counts[name] = (await query(name).collect()).length;
     }
+    const system = (
+      ctx.db as unknown as {
+        system: { query(t: string): { collect(): Promise<unknown[]> } };
+      }
+    ).system;
     counts.scheduled = (
-      await ctx.db.system.query("_scheduled_functions").collect()
+      await system.query("_scheduled_functions").collect()
     ).length;
     return counts;
   })) as Record<string, number>;
