@@ -2228,7 +2228,7 @@
       "reason": "PL-CUTOVER AC-632: optional; unset = no backup written down. No backfill."
     },
     {
-      "path": "CutoverDecision.finalImportRunIds",
+      "path": "CutoverDecision.finalImportRuns",
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-CUTOVER AC-287: optional; stamped at go only. No backfill."

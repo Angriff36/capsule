@@ -427,7 +427,7 @@ export const executeCutoverDecision = mutation({
       }
       // The import runs this decision rests on, and the record that
       // scheduled TPP imports are off from here on (AC-292).
-      patch.finalImportRunIds = JSON.stringify(gate.finalImportRunIds);
+      patch.finalImportRuns = JSON.stringify(gate.finalImportRunIds);
       patch.scheduledImportsDisabledAt = now;
       patch.scheduledImportsNote =
         SCHEDULED_TPP_IMPORTS.length === 0

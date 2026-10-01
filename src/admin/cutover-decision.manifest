@@ -44,7 +44,8 @@ entity CutoverDecision mixin TenantScoped {
   property backupEvidence: string?
   // Stamped at go: the import runs the decision rests on, and the record
   // that scheduled TPP imports are off.
-  property finalImportRunIds: string?
+  // A short JSON text of dataset -> import run, not a single record link.
+  property finalImportRuns: string?
   property scheduledImportsDisabledAt: int?
   property scheduledImportsNote: string?
   default policy cutoverDecisionRead read: user.id != null "Signed-in staff may see cutover decisions"

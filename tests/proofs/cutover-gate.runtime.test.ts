@@ -286,12 +286,11 @@ describe("runtime proof: the switch from TPP (PL-CUTOVER)", () => {
     expect(decided.status).toBe("go");
     let row: Record<string, unknown> | null = null;
     await owner.run(async (ctx) => {
-      row = (await ctx.db
-        .query("cutoverDecisions")
-        .first()) as unknown as Record<string, unknown>;
+      const rows = await ctx.db.query("cutoverDecisions").collect();
+      row = rows.find((r) => r.tenantId === tenantId) ?? null;
     });
     const saved = row as unknown as Record<string, unknown>;
-    expect(JSON.parse(String(saved.finalImportRunIds))).toEqual({
+    expect(JSON.parse(String(saved.finalImportRuns))).toEqual({
       events: eventsRun,
       menus: menusRun,
     });

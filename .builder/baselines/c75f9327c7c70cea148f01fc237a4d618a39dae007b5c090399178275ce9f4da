@@ -571,7 +571,7 @@ export default defineSchema({
     openingStockConfirmedById: v.optional(v.union(v.string(), v.null())),
     financialMode: v.optional(v.union(v.literal("reference_history"), v.literal("ledger_reconstruction"), v.null())),
     backupEvidence: v.optional(v.union(v.string(), v.null())),
-    finalImportRunIds: v.optional(v.union(v.string(), v.null())),
+    finalImportRuns: v.optional(v.union(v.string(), v.null())),
     scheduledImportsDisabledAt: v.optional(v.union(v.number(), v.null())),
     scheduledImportsNote: v.optional(v.union(v.string(), v.null())),
   })

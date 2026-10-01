@@ -610,7 +610,7 @@ export const CutoverDecisionSchema = z.object({
   openingStockConfirmedById: z.string().nullable().optional(),
   financialMode: z.enum(["reference_history", "ledger_reconstruction"]).nullable().optional(),
   backupEvidence: z.string().nullable().optional(),
-  finalImportRunIds: z.string().nullable().optional(),
+  finalImportRuns: z.string().nullable().optional(),
   scheduledImportsDisabledAt: z.number().int().nullable().optional(),
   scheduledImportsNote: z.string().nullable().optional(),
 });

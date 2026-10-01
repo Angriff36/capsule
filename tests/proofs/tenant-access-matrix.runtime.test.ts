@@ -247,8 +247,6 @@ const LINK_TABLE: Record<string, string> = {
   // office; who signed, checked or chased is the signed-in person.
   responsiblePersonId: "people",
   secondPersonId: "people",
-  // A text list of the import runs a switch decision rests on.
-  finalImportRunIds: "importRuns",
   formCompletedById: "people",
   formCheckedById: "people",
   formEscalatedById: "people",
