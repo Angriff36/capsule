@@ -50,7 +50,7 @@ describe("runtime proof: backend source identity (AC-630)", () => {
       },
     ];
     const first = await importRows(actor, "contacts", rows);
-    expect(first).toMatchObject({ committed: 2, pending: 1 });
+    expect(first).toMatchObject({ committed: 3, pending: 0 });
 
     // (1) + (2): replay finds every record by its id or its built identity.
     const again = await importRows(actor, "contacts", rows);

@@ -36,7 +36,7 @@ describe("runtime proof: id-less source rows (AC-179)", () => {
 
     const first = await importRows(actor, "contacts", CONTACTS);
     // Two different people with one name: both made, the second waits.
-    expect(first).toMatchObject({ committed: 1, pending: 1 });
+    expect(first).toMatchObject({ committed: 2, pending: 0 });
     await importRows(actor, "venues", VENUES);
 
     const before = await links(actor, tenantId);

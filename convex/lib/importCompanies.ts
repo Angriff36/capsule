@@ -82,7 +82,8 @@ export async function commitImportedCompany(
           }
         : { conflictStatus: "resolved" as const }),
     });
-    return lookAlikeNote ? "pending" : "committed";
+    // A look-alike is a made record; only its link waits on the match list.
+    return "committed";
   } catch (cause) {
     await ctx.runMutation(internal.importCommit.upsertLink, {
       ...link,

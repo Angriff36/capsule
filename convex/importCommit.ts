@@ -996,8 +996,9 @@ export const commitImportRun = action({
               : { conflictStatus: "resolved" as const }),
             ...sourceBaseline("contacts", contact),
           });
-          if (lookAlikeNote) pending += 1;
-          else committed += 1;
+          // A look-alike is a made record: it counts as added, and its link
+          // waits on the match list.
+          committed += 1;
         } catch (cause) {
           // Per-record failure (e.g. salesAccess denied) → review queue.
           const note =
@@ -2211,8 +2212,8 @@ export const commitImportRun = action({
             : { conflictStatus: "resolved" as const }),
           ...sourceBaseline("venues", venue),
         });
-        if (lookAlikeNote) pending += 1;
-        else committed += 1;
+        // A look-alike is a made record: it counts as added (see contacts).
+        committed += 1;
       } catch (cause) {
         // Per-record failure (e.g. eventManageAccess denied) → review queue.
         const note =

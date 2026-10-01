@@ -53,8 +53,9 @@ describe("runtime proof: no silent merge of look-alike source records (AC-058)",
         Email: "cal@d.example",
       },
     ]);
-    // C-1, C-3 and C-5 are plain; C-2 (same name) and C-4 (same email) wait.
-    expect(first).toMatchObject({ committed: 3, pending: 2 });
+    // All five are added; C-2 (same name) and C-4 (same email) wait for a
+    // person on the match list (checked below).
+    expect(first).toMatchObject({ committed: 5, pending: 0 });
 
     const all = await links(actor, tenantId);
     const byId = (id: string) => all.find((l) => l.externalId === id)!;
@@ -139,7 +140,7 @@ describe("runtime proof: no silent merge of look-alike source records (AC-058)",
         ZipCode: "60603",
       },
     ]);
-    expect(result).toMatchObject({ committed: 2, pending: 2 });
+    expect(result).toMatchObject({ committed: 4, pending: 0 });
 
     const all = await links(actor, tenantId);
     const byId = (id: string) => all.find((l) => l.externalId === id)!;
