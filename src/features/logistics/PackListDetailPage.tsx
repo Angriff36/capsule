@@ -59,6 +59,7 @@ import { usePackRigs } from "./usePackRigs";
 import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PackScanPanel } from "./PackScanPanel";
+import { PackListSourcePanel } from "./PackListSourcePanel";
 import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
@@ -1208,6 +1209,8 @@ export function PackListDetailPage() {
           selectableCount={selectableItems.length}
         />
       </section>
+
+      <PackListSourcePanel packListId={packList._id} />
 
       <BulkActionBar
         count={selection.count}
