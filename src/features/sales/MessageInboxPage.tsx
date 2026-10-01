@@ -21,6 +21,7 @@ import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
 import { useActionNotice } from "../../ui/action-result";
 import { deliveryStatusLabel, replyDisposition } from "./deliveryHonesty";
+import { messageTime } from "./messageOrder";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -105,7 +106,7 @@ export function MessageInboxPage() {
       selected
         ? (messages ?? [])
             .filter((m) => m.threadId === selected._id && m.deletedAt == null)
-            .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
+            .sort((a, b) => messageTime(a) - messageTime(b))
         : [],
     [messages, selected],
   );
@@ -422,7 +423,7 @@ export function MessageInboxPage() {
             {visibleThreads.map((t) => {
               const lastAt = (messages ?? [])
                 .filter((m) => m.threadId === t._id)
-                .reduce((max, m) => Math.max(max, m.createdAt ?? 0), 0);
+                .reduce((max, m) => Math.max(max, messageTime(m)), 0);
               return (
                 <li key={t._id}>
                   <button
@@ -601,7 +602,7 @@ export function MessageInboxPage() {
                             {m.bodyText}
                           </p>
                           <p className="mt-1 text-2xs text-ink-3">
-                            {m.createdAt ? formatTime(m.createdAt) : ""}
+                            {messageTime(m) ? formatTime(messageTime(m)) : ""}
                             {m.senderIdentity ? ` · ${m.senderIdentity}` : ""}
                             {mine && deliveryStatusLabel(String(m.status))
                               ? ` · ${deliveryStatusLabel(String(m.status))}`

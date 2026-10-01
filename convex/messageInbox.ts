@@ -271,6 +271,24 @@ function pickEnvelopeField(
   return undefined;
 }
 
+// The provider's own send time (epoch ms, epoch seconds, or a date string),
+// so a late or repeated delivery still sorts where it was sent.
+function pickEnvelopeTime(
+  parsed: Record<string, unknown>,
+  keys: string[],
+): number | undefined {
+  for (const k of keys) {
+    const val = parsed[k];
+    if (typeof val === "number" && Number.isFinite(val) && val > 0)
+      return val < 1e11 ? val * 1000 : val;
+    if (typeof val === "string" && val.trim()) {
+      const ms = Date.parse(val.trim());
+      if (Number.isFinite(ms)) return ms;
+    }
+  }
+  return undefined;
+}
+
 // Provider raw-envelope ingress — the §4.4 "failed parsing appears in a
 // retryable sync-error queue" parse boundary. Accepts a raw provider envelope
 // (a signed-webhook body, a polling-API response, or an operator-pasted export)
@@ -381,6 +399,12 @@ export const ingestProviderEnvelope = action({
             "subject",
             "subject_line",
             "title",
+          ]),
+          sentAt: pickEnvelopeTime(parsed, [
+            "sentAt",
+            "sent_at",
+            "timestamp",
+            "date",
           ]),
           rawPayload:
             args.rawJson.length <= MAX_RAW_PAYLOAD ? args.rawJson : undefined,
