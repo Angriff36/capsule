@@ -60,6 +60,7 @@ export const listForParent = query({
       v.literal("ingredient"),
       v.literal("equipment"),
       v.literal("component"),
+      v.literal("venue"),
       // No "staffMessage": chat files are private to the message's readers
       // and are hydrated only by convex/teamChat.ts.
     ),

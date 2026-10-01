@@ -1,3 +1,8 @@
+import {
+  guestCapacityFor,
+  type VenueOperatingFacts,
+} from "../facilities/venueOperatingFacts";
+
 const DAY_MS = 86_400_000;
 
 export interface CapacityPlannerEvent {
@@ -11,6 +16,7 @@ export interface CapacityPlannerEvent {
   venueName?: string | null;
   venueCapacity?: number | null;
   expectedHeadcount?: number | null;
+  serviceStyleName?: string | null;
 }
 
 export interface CapacityPlannerGuest {
@@ -19,9 +25,8 @@ export interface CapacityPlannerGuest {
   deletedAt?: number | null;
 }
 
-export interface CapacityPlannerVenue {
+export interface CapacityPlannerVenue extends VenueOperatingFacts {
   _id: string;
-  capacity?: number | null;
 }
 
 export type CapacityHeat = "unknown" | "quiet" | "steady" | "busy" | "full";
@@ -171,9 +176,7 @@ export function buildCapacityPlan({
     );
   }
 
-  const venueCapacity = new Map(
-    venues.map((venue) => [venue._id, venue.capacity ?? null]),
-  );
+  const venueById = new Map(venues.map((venue) => [venue._id, venue]));
   const conflictsByEvent = new Map<string, Set<string>>();
   const conflicts: CapacityConflict[] = [];
 
@@ -197,8 +200,11 @@ export function buildCapacityPlan({
 
   const cards = visibleEvents.map((event): CapacityEventCard => {
     const confirmedHeadcount = confirmedByEvent.get(event._id) ?? 0;
-    const fallbackCapacity = event.venueId
-      ? venueCapacity.get(event.venueId)
+    // No event-level snapshot: the venue's seated or standing number for
+    // this style, else its overall capacity.
+    const venue = event.venueId ? venueById.get(event.venueId) : undefined;
+    const fallbackCapacity = venue
+      ? guestCapacityFor(venue, event.serviceStyleName)
       : null;
     const rawCapacity = event.venueCapacity ?? fallbackCapacity ?? null;
     const capacity =

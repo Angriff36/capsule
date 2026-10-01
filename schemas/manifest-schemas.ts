@@ -64,7 +64,7 @@ export const AttachmentSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "component", "staffMessage"]).default("eventRecord"),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "component", "staffMessage", "venue"]).default("eventRecord"),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -4719,6 +4719,12 @@ export const VenueSchema = z.object({
   powerAvailable: z.boolean().nullable().optional(),
   waterAccess: z.boolean().nullable().optional(),
   hasStairs: z.boolean().nullable().optional(),
+  seatedCapacity: z.number().int().nullable().optional(),
+  standingCapacity: z.number().int().nullable().optional(),
+  hasOven: z.boolean().nullable().optional(),
+  hasRefrigeration: z.boolean().nullable().optional(),
+  loadInFrom: z.string().nullable().optional(),
+  loadOutBy: z.string().nullable().optional(),
   wasteRules: z.string().nullable().optional(),
   permitsInsuranceNotes: z.string().nullable().optional(),
   restrictions: z.string().nullable().optional(),
@@ -4959,7 +4965,7 @@ export type AssistantLlmConfigConfigureParams = z.infer<typeof AssistantLlmConfi
 
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "component", "staffMessage"]),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "component", "staffMessage", "venue"]),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -12381,6 +12387,18 @@ export const VenueRegisterParamsSchema = z.object({
 });
 
 export type VenueRegisterParams = z.infer<typeof VenueRegisterParamsSchema>;
+
+// Command: setSiteFacts on Venue
+export const VenueSetSiteFactsParamsSchema = z.object({
+  seatedCapacity: z.number().optional(),
+  standingCapacity: z.number().optional(),
+  hasOven: z.boolean().optional(),
+  hasRefrigeration: z.boolean().optional(),
+  loadInFrom: z.string().optional(),
+  loadOutBy: z.string().optional(),
+});
+
+export type VenueSetSiteFactsParams = z.infer<typeof VenueSetSiteFactsParamsSchema>;
 
 // Command: setTimeZone on Venue
 export const VenueSetTimeZoneParamsSchema = z.object({

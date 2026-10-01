@@ -19,7 +19,8 @@ export type AttachmentParentType =
   | "dish"
   | "ingredient"
   | "equipment"
-  | "component";
+  | "component"
+  | "venue";
 
 function formatSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;

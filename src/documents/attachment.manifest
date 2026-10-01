@@ -1,4 +1,4 @@
-// Capsule documents — file attachments on Event, Client, Contract, Vendor,
+// Capsule documents — file attachments on Event, Client, Contract, Vendor, Venue,
 // Delivery, Closeout, Dish, Ingredient, Equipment, and StaffMessage (team
 // chat) records.
 // Binary content lives in Convex file storage (authored seam
@@ -28,6 +28,8 @@ enum AttachmentParentType {
   component
   // Team chat photo or file; parentId is the StaffMessage id.
   staffMessage
+  // Venue photos, floor plans and insurance papers (spec §8.1).
+  venue
 }
 
 enum AttachmentEvidenceType {

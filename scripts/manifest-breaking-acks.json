@@ -2256,6 +2256,42 @@
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-HR AC-327: optional parameter; a one-on-one links the scorecard in force. Old callers still work."
+    },
+    {
+      "path": "Venue.seatedCapacity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional; unset reads as 'Not known' and the overall capacity is used. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.standingCapacity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional; unset reads as 'Not known' and the overall capacity is used. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.hasOven",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional yes/no; unset reads as 'Not known'. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.hasRefrigeration",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional yes/no; unset reads as 'Not known'. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.loadInFrom",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional time; unset means no load-in window on file. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.loadOutBy",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional time; unset means no load-out time on file. Stored venues need no backfill."
     }
   ]
 }

@@ -374,6 +374,16 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property powerAvailable: boolean?
   property waterAccess: boolean?
   property hasStairs: boolean?
+  // Structured operating facts (PL-VENUE-PROFILE, spec §8.1): they drive the
+  // venue filter, pack rules, the proposal snapshot and the event-day sheet.
+  // Set by setSiteFacts only, so the details form never clears them.
+  property seatedCapacity: int?
+  property standingCapacity: int?
+  property hasOven: boolean?
+  property hasRefrigeration: boolean?
+  // Earliest load-in and latest load-out, "HH:MM" in the venue's own time.
+  property loadInFrom: string?
+  property loadOutBy: string?
   property wasteRules: string?
   property permitsInsuranceNotes: string?
   property restrictions: string?
@@ -388,6 +398,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
 
   constraint venueIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered venues require a name"
   constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity can't be negative. Use zero or more."
+  constraint venueSeatedNonnegative: self.seatedCapacity == null or self.seatedCapacity >= 0 "Seated capacity can't be negative. Use zero or more."
+  constraint venueStandingNonnegative: self.standingCapacity == null or self.standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
   constraint venueLatitudeRange: self.latitude == null or (self.latitude >= -90 and self.latitude <= 90) "Latitude must be between -90 and 90"
   constraint venueLongitudeRange: self.longitude == null or (self.longitude >= -180 and self.longitude <= 180) "Longitude must be between -180 and 180"
 
@@ -559,6 +571,31 @@ entity Venue mixin TenantScoped, SoftDeletable {
   command setTimeZone(optional timeZone: string) {
     guard self.deletedAt == null
     mutate timeZone = timeZone != null and length(trim(timeZone)) > 0 ? trim(timeZone) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Seated / standing capacity, oven, fridge and the load-in window. Each
+  // call states all six; a blank clears that fact.
+  command setSiteFacts(
+    optional seatedCapacity: number,
+    optional standingCapacity: number,
+    optional hasOven: boolean,
+    optional hasRefrigeration: boolean,
+    optional loadInFrom: string,
+    optional loadOutBy: string
+  ) {
+    guard self.deletedAt == null
+    constraint setVenueSeatedCapacity: seatedCapacity == null or seatedCapacity >= 0 "Seated capacity can't be negative. Use zero or more."
+    constraint setVenueStandingCapacity: standingCapacity == null or standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
+    mutate seatedCapacity = seatedCapacity
+    mutate standingCapacity = standingCapacity
+    mutate hasOven = hasOven
+    mutate hasRefrigeration = hasRefrigeration
+    mutate loadInFrom = loadInFrom != null and length(trim(loadInFrom)) > 0 ? trim(loadInFrom) : null
+    mutate loadOutBy = loadOutBy != null and length(trim(loadOutBy)) > 0 ? trim(loadOutBy) : null
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

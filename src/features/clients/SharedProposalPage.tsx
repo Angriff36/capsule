@@ -5,6 +5,7 @@ import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
+import { loadWindowLabel } from "../facilities/venueOperatingFacts";
 
 /**
  * Client-facing shared proposal view (spec §4.6).
@@ -116,6 +117,12 @@ export function SharedProposalPage({ token }: { token: string }) {
       ]);
     if (vl.capacity !== null)
       venueLogisticsRows.push(["Capacity", `${vl.capacity}`]);
+    if (vl.seatedCapacity != null)
+      venueLogisticsRows.push(["Seated guests", `${vl.seatedCapacity}`]);
+    if (vl.standingCapacity != null)
+      venueLogisticsRows.push(["Standing guests", `${vl.standingCapacity}`]);
+    const loadWindow = loadWindowLabel(vl);
+    if (loadWindow) venueLogisticsRows.push(["Load-in window", loadWindow]);
     if (vl.loadInInstructions)
       venueLogisticsRows.push(["Load-in", vl.loadInInstructions]);
     if (vl.powerAvailable !== null)

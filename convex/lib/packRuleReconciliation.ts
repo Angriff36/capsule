@@ -74,6 +74,12 @@ function eventFacts(event: EventRow, venue: Doc<"venues"> | null) {
     venuePowerAvailable: venue?.powerAvailable ?? null,
     venueWaterAccess: venue?.waterAccess ?? null,
     venueLoadIn: venue?.loadInInstructions ?? null,
+    venueOnPremise: venue?.onPremise ?? null,
+    venueParking: venue?.parkingAvailable ?? null,
+    venueFreightElevator: venue?.hasFreightElevator ?? null,
+    venueStorage: venue?.storageAvailable ?? null,
+    venueHasOven: venue?.hasOven ?? null,
+    venueHasRefrigeration: venue?.hasRefrigeration ?? null,
   };
 }
 

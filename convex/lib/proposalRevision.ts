@@ -127,6 +127,13 @@ export interface ProposalRevisionSnapshot {
     restrictions: string | null;
     accessNotes: string | null;
     cateringNotes: string | null;
+    // PL-VENUE-PROFILE operating facts; absent on revisions saved earlier.
+    seatedCapacity?: number | null;
+    standingCapacity?: number | null;
+    hasOven?: boolean | null;
+    hasRefrigeration?: boolean | null;
+    loadInFrom?: string | null;
+    loadOutBy?: string | null;
   } | null;
   dishSelections: Array<{
     id: string;
@@ -222,6 +229,12 @@ async function resolveVenueLogistics(
     restrictions: venue.restrictions ?? null,
     accessNotes: venue.accessNotes ?? null,
     cateringNotes: venue.cateringNotes ?? null,
+    seatedCapacity: venue.seatedCapacity ?? null,
+    standingCapacity: venue.standingCapacity ?? null,
+    hasOven: venue.hasOven ?? null,
+    hasRefrigeration: venue.hasRefrigeration ?? null,
+    loadInFrom: venue.loadInFrom ?? null,
+    loadOutBy: venue.loadOutBy ?? null,
   };
 }
 
