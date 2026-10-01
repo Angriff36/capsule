@@ -4,7 +4,12 @@
 // (threeWayReconcile); this file only names the fields and how to read them.
 import type { FieldValue } from "./culinaryModel/importMapping";
 
-export type SourceDeltaDataset = "contacts" | "venues" | "events";
+export type SourceDeltaDataset =
+  | "contacts"
+  | "venues"
+  | "events"
+  | "leads"
+  | "menus";
 
 type Values = Record<string, FieldValue>;
 type Row = Record<string, unknown>;
@@ -149,10 +154,93 @@ const EVENT_FIELDS: SourceFieldMap = {
   }),
 };
 
+// Leads: the sales estimate and chance are shown for review, never written.
+const LEAD_FIELDS: SourceFieldMap = {
+  fields: ["companyName", "source", "estimatedValue", "probability"],
+  writable: ["companyName", "source"],
+  labels: {
+    companyName: "Lead name",
+    source: "Where the lead came from",
+    estimatedValue: "Estimated value",
+    probability: "Chance of booking",
+  },
+  fromSource: (row) => ({
+    companyName: text(row.opportunityName),
+    source: text(row.source),
+    estimatedValue: num(row.estimatedValue),
+    probability: num(row.probability),
+  }),
+  fromCapsule: (doc) => ({
+    companyName: text(doc.companyName),
+    source: text(doc.source),
+    estimatedValue: num(doc.estimatedValue),
+    probability: num(doc.probability),
+  }),
+};
+
+const list = (value: unknown): FieldValue =>
+  Array.isArray(value)
+    ? value
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .sort()
+    : [];
+
+// Dishes: allergens are food safety, so a change always waits for a person.
+const DISH_FIELDS: SourceFieldMap = {
+  fields: [
+    "name",
+    "description",
+    "category",
+    "serviceStyle",
+    "dietaryTags",
+    "portionSize",
+    "allergenSummary",
+  ],
+  writable: [
+    "name",
+    "description",
+    "category",
+    "serviceStyle",
+    "dietaryTags",
+    "portionSize",
+  ],
+  labels: {
+    name: "Dish name",
+    description: "Description",
+    category: "Category",
+    serviceStyle: "Service style",
+    dietaryTags: "Diet tags",
+    portionSize: "Portion size",
+    allergenSummary: "Allergens",
+  },
+  fromSource: (row) => ({
+    name: text(row.name),
+    description: text(row.description),
+    category: text(row.category),
+    serviceStyle: text(row.serviceStyle),
+    dietaryTags: list(row.dietaryTags),
+    portionSize: num(row.portionSize),
+    allergenSummary: list(row.allergenSummary),
+  }),
+  fromCapsule: (doc) => ({
+    name: text(doc.name),
+    description: text(doc.description),
+    category: text(doc.category),
+    serviceStyle: text(doc.serviceStyle),
+    dietaryTags: list(doc.dietaryTags),
+    portionSize: num(doc.portionSize),
+    allergenSummary: list(doc.allergenSummary),
+  }),
+};
+
 export const SOURCE_FIELD_MAPS: Record<SourceDeltaDataset, SourceFieldMap> = {
   contacts: CONTACT_FIELDS,
   venues: VENUE_FIELDS,
   events: EVENT_FIELDS,
+  leads: LEAD_FIELDS,
+  menus: DISH_FIELDS,
 };
 
 /** Recordtype on the link → dataset, for screens that start from a link. */
@@ -160,6 +248,8 @@ export const DATASET_BY_RECORD_TYPE: Record<string, SourceDeltaDataset> = {
   contact: "contacts",
   venue: "venues",
   event: "events",
+  lead: "leads",
+  menu: "menus",
 };
 
 /** Plain words for a stored value on the review list. */
@@ -167,6 +257,9 @@ export function describeValue(field: string, value: FieldValue): string {
   if (value == null || value === "") return "(blank)";
   if ((field === "startsAt" || field === "endsAt") && typeof value === "number") {
     return new Date(value).toLocaleString();
+  }
+  if (Array.isArray(value)) {
+    return value.length === 0 ? "(none)" : value.join(", ");
   }
   return String(value);
 }

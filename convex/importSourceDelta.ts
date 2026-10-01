@@ -66,6 +66,16 @@ async function readCapsule(
         id: capsuleId as Id<"clients">,
       })) as CapsuleDoc | null;
     }
+    if (dataset === "leads") {
+      return (await ctx.runQuery(api.queries.getLead, {
+        id: capsuleId as Id<"leads">,
+      })) as CapsuleDoc | null;
+    }
+    if (dataset === "menus") {
+      return (await ctx.runQuery(api.queries.getDish, {
+        id: capsuleId as Id<"dishes">,
+      })) as CapsuleDoc | null;
+    }
     if (dataset === "events") {
       return (await ctx.runQuery(api.queries.getEvent, {
         id: capsuleId as Id<"events">,
@@ -118,6 +128,26 @@ async function writeCapsule(
   }
   if (dataset === "events") {
     await writeEvent(ctx, capsuleId as Id<"events">, doc, writes);
+    return;
+  }
+  if (dataset === "leads") {
+    await ctx.runMutation(api.mutations.Lead_reviseDetails, {
+      docId: capsuleId as Id<"leads">,
+      leadType: doc.leadType,
+      source: put(writes, doc, "source") ?? keep(doc.source) ?? "other",
+      referralSourceId: keep(doc.referralSourceId),
+      companyName: put(writes, doc, "companyName"),
+      givenName: keep(doc.givenName),
+      familyName: keep(doc.familyName),
+      email: keep(doc.email),
+      phone: keep(doc.phone),
+      notes: keep(doc.notes),
+      version: doc.version,
+    });
+    return;
+  }
+  if (dataset === "menus") {
+    await writeDish(ctx, capsuleId as Id<"dishes">, doc, writes);
     return;
   }
   const venueId = capsuleId as Id<"venues">;
@@ -233,6 +263,42 @@ async function writeEvent(
         version,
       }),
     );
+  }
+}
+
+/** Dishes: details in one command, portion size in another. */
+async function writeDish(
+  ctx: ActionCtx,
+  docId: Id<"dishes">,
+  doc: CapsuleDoc,
+  writes: Values,
+): Promise<void> {
+  const { portionSize, ...details } = writes;
+  let version = doc.version;
+  if (Object.keys(details).length > 0) {
+    const tags =
+      "dietaryTags" in details ? details.dietaryTags : doc.dietaryTags;
+    const updated = (await ctx.runMutation(api.mutations.Dish_reviseDetails, {
+      docId,
+      name: put(details, doc, "name") ?? keep(doc.name) ?? "",
+      description: put(details, doc, "description"),
+      category: put(details, doc, "category"),
+      course: keep(doc.course),
+      serviceStyle: put(details, doc, "serviceStyle"),
+      dietaryTags: Array.isArray(tags)
+        ? tags.filter((tag): tag is string => typeof tag === "string")
+        : undefined,
+      version,
+    })) as { version?: number } | null;
+    version = updated?.version ?? undefined;
+  }
+  if ("portionSize" in writes && typeof portionSize === "number") {
+    await ctx.runMutation(api.mutations.Dish_updatePortioning, {
+      docId,
+      portionSize,
+      portionUnit: doc.portionUnit ?? "portion",
+      version,
+    });
   }
 }
 

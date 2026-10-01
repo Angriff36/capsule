@@ -344,4 +344,78 @@ describe("runtime proof: import field ownership conflict (AC-272, AC-273)", () =
     expect(kept[0]!.status).toBe("keep_capsule");
     expect((await readEvent(link1.capsuleId)).expectedHeadcount).toBe(55);
   });
+
+  it("dishes and leads take untouched changes; allergens and a chef's edit wait for a person", async () => {
+    const tenantId = "tenant-import-field-ownership-dishes";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-ownership-dishes-owner",
+      role: "owner",
+      tenantId,
+    });
+    const dish = {
+      MenuItemID: "M-801",
+      Name: "Herb Chicken",
+      Description: "Roasted thigh",
+      Category: "Entree",
+      PortionSizeDescription: "1 piece",
+      Allergens: "",
+    };
+    expect((await importRows(owner, "menus", [dish])).committed).toBe(1);
+    const dishLink = await linkFor(owner, tenantId, "M-801");
+    const readDish = async () =>
+      (await owner.query(api.queries.getDish, {
+        id: dishLink.capsuleId as never,
+      })) as Row;
+    const before = await readDish();
+
+    // The chef rewrites the description in Capsule.
+    await owner.mutation(api.mutations.Dish_reviseDetails, {
+      docId: dishLink.capsuleId as never,
+      name: String(before.name),
+      description: "Roasted thigh, lemon jus",
+      category: before.category as string,
+    });
+
+    // The old system changes the description, the category and adds an allergen.
+    const second = await importRows(owner, "menus", [
+      {
+        ...dish,
+        Description: "Grilled thigh",
+        Category: "Main",
+        Allergens: "Milk",
+      },
+    ]);
+    expect(second.committed).toBe(0);
+    expect(second.conflicted).toBe(1);
+    const after = await readDish();
+    expect(after.description).toBe("Roasted thigh, lemon jus");
+    expect(after.category).toBe("Main");
+    expect(after.allergenSummary ?? []).toEqual(before.allergenSummary ?? []);
+    const fields = (await tableRows(owner, "importConflicts", tenantId))
+      .map((c) => c.field)
+      .sort();
+    expect(fields).toEqual(["allergenSummary", "description"]);
+    expect(await tableRows(owner, "dishes", tenantId)).toHaveLength(1);
+
+    // A lead renamed in the old system, untouched in Capsule, takes the name.
+    const lead = {
+      LeadID: "L-801",
+      OpportunityName: "Spring Gala",
+      ClientID: "C-801",
+      Stage: "New",
+      EstimatedValue: 5000,
+    };
+    expect((await importRows(owner, "leads", [lead])).committed).toBe(1);
+    const leadResult = await importRows(owner, "leads", [
+      { ...lead, OpportunityName: "Spring Gala 2027" },
+    ]);
+    expect(leadResult.updated).toBe(1);
+    const leadLink = await linkFor(owner, tenantId, "L-801");
+    const leadDoc = (await owner.query(api.queries.getLead, {
+      id: leadLink.capsuleId as never,
+    })) as Row;
+    expect(leadDoc.companyName).toBe("Spring Gala 2027");
+    expect(await tableRows(owner, "leads", tenantId)).toHaveLength(1);
+  });
 });
