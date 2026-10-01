@@ -1,6 +1,26 @@
 export type CommandFailureCategory =
   "denied" | "validation" | "guard_blocked" | "conflict" | "unexpected";
 
+/**
+ * Stable failure code (backend end-state spec BE-18.3). Read from the same
+ * generated/authored error text the banner uses; it is not a second error
+ * envelope. A refused other-company record and a missing one share
+ * NOT_FOUND_OR_FORBIDDEN so the code never tells a caller which it was.
+ */
+export type CommandFailureCode =
+  | "NOT_FOUND_OR_FORBIDDEN"
+  | "STALE_VERSION"
+  | "INVALID_STATE"
+  | "VALIDATION_FAILED"
+  | "MISSING_REQUIRED_FACT"
+  | "UNIT_CONVERSION_UNRESOLVED"
+  | "INSUFFICIENT_STOCK"
+  | "SCHEDULE_CONFLICT"
+  | "PROVIDER_RETRYING"
+  | "PROVIDER_ACTION_REQUIRED"
+  | "RECONCILIATION_REQUIRED"
+  | "UNEXPECTED";
+
 /** A corrective step the user can take directly from the failure banner. */
 export interface CommandFailureAction {
   label: string;
@@ -10,6 +30,7 @@ export interface CommandFailureAction {
 
 export interface CommandFailure {
   category: CommandFailureCategory;
+  code: CommandFailureCode;
   title: string;
   detail: string;
   action?: CommandFailureAction;
@@ -31,7 +52,9 @@ function humanizeState(token: string): string {
  * allowed. Allowed from 'A': ['B', 'C']  (placeholder tokens - the real
  * stage names come from the generated guard message at runtime)
  */
-function stateTransitionFailure(detail: string): CommandFailure | null {
+function stateTransitionFailure(
+  detail: string,
+): Omit<CommandFailure, "code"> | null {
   const match = detail.match(
     /Invalid state transition for '[^']+':\s*'([^']+)'\s*->\s*'([^']+)'[^.]*\.\s*Allowed from '[^']+':\s*\[([^\]]*)\]/i,
   );
@@ -117,7 +140,89 @@ function isZodError(
   );
 }
 
+const DENIED_TEXT =
+  /staff may|permission|not allowed|policy|\bonly an? [^.]{0,60}\bmay\b|\bmay (see|update|change|create|add|remove|record|run|correct|reconcile|view|use|approve|manage)\b|sign in/i;
+
+/** The spec code for a failure, read from its category and server text. */
+function failureCode(
+  category: CommandFailureCategory,
+  detail: string,
+): CommandFailureCode {
+  if (/ConcurrencyConflict|VERSION_MISMATCH/i.test(detail))
+    return "STALE_VERSION";
+  if (
+    category === "denied" ||
+    /\bnot found\b|No tenant|authentication context|not authenticated/i.test(
+      detail,
+    ) ||
+    DENIED_TEXT.test(detail)
+  )
+    return "NOT_FOUND_OR_FORBIDDEN";
+  if (
+    /not enough (free )?stock|short (by|of) \d|only \d+ (left|free)/i.test(
+      detail,
+    )
+  )
+    return "INSUFFICIENT_STOCK";
+  if (
+    /already out for|is already (out|on|working|booked|assigned)\b|in the shop|out of service|on leave|same time|overlap/i.test(
+      detail,
+    )
+  )
+    return "SCHEDULE_CONFLICT";
+  if (
+    /doesn't convert|does not convert|no conversion|unit (differs|mapping)|unit from the container/i.test(
+      detail,
+    )
+  )
+    return "UNIT_CONVERSION_UNRESOLVED";
+  if (/rate limit|retry after|will try again|trying again/i.test(detail))
+    return "PROVIDER_RETRYING";
+  if (
+    /reconnect|is missing on this deployment|provider (turned|did not|rejected|declined)|signing secret/i.test(
+      detail,
+    )
+  )
+    return "PROVIDER_ACTION_REQUIRED";
+  if (
+    /^reconcile\b|\breconcile [^.]{0,60}\bbefore\b|until reviewed|review (it|this|them) first/i.test(
+      detail,
+    )
+  )
+    return "RECONCILIATION_REQUIRED";
+  if (category === "guard_blocked") return "INVALID_STATE";
+  if (
+    /\bis missing\b|\bmissing\b|\bfirst\.?$|\bneeds? (a|an|the|its) /i.test(
+      detail,
+    )
+  )
+    return "MISSING_REQUIRED_FACT";
+  if (
+    category === "validation" ||
+    /Validator error|ArgumentValidationError/i.test(detail)
+  )
+    return "VALIDATION_FAILED";
+  return "UNEXPECTED";
+}
+
+function rootCause(error: unknown): unknown {
+  return typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    error.name === "BulkRunFailure" &&
+    "cause" in error
+    ? rootCause(error.cause)
+    : error;
+}
+
 export function classifyCommandFailure(error: unknown): CommandFailure {
+  const failure = classifyWithoutCode(error);
+  const cause = rootCause(error);
+  const detail = isZodError(cause) ? "" : normalizeCommandError(cause).detail;
+  return { ...failure, code: failureCode(failure.category, detail) };
+}
+
+function classifyWithoutCode(error: unknown): Omit<CommandFailure, "code"> {
   const bulk =
     typeof error === "object" &&
     error !== null &&
