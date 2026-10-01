@@ -466,6 +466,7 @@ export function PlanningBoardPage() {
           await hitchTrailer({
             rigId: draft.pulledBy.slice(4) as never,
             trailerId: draft.trailerId as never,
+            ...kept,
           });
         } else if (draft.kind === "truck" || draft.kind === "trailer") {
           const rig =

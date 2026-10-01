@@ -9,6 +9,7 @@
  *   same truck on two runs at once;
  * - the crew riding the old rig and the pack lines loaded on it move to the
  *   new one, so nobody is left riding a released truck;
+ * - a reason for a "fix first" item is kept in the same save;
  * - when any step is refused, nothing is kept.
  * Releasing and making the rig, and moving pack lines, are the generated
  * commands (their rules and permissions apply). Moving a rider is part of
@@ -25,6 +26,10 @@ export const hitchTrailer = mutation({
   args: {
     rigId: v.id("eventVehicleAssignments"),
     trailerId: v.id("trailers"),
+    /** Set when the board asked why a "fix first" item is fine: kept too. */
+    action: v.optional(v.string()),
+    reason: v.optional(v.string()),
+    openItems: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<{ rigId: string }> => {
     const tenantId = requireTenant(await getAuthContext(ctx));
@@ -98,6 +103,14 @@ export const hitchTrailer = mutation({
         loadAssignmentId: newRigId,
       });
     }
+
+    if (args.reason?.trim())
+      await ctx.runMutation(api.mutations.PlanningOverride_createViaRecord, {
+        eventId: rig.eventId,
+        action: args.action?.trim() || "Hitch a trailer",
+        reason: args.reason,
+        openItems: args.openItems,
+      });
 
     return { rigId: newRigId };
   },

@@ -10,16 +10,10 @@ import {
   useListEquipmentReservation,
   useListEventVehicleAssignment,
   useListVehicle,
-  usePackListItemMarkPacked,
-  usePackListItemRecordChecked,
-  usePackListItemRecordLoaded,
-  usePackListItemRecordPackedCount,
-  usePackListItemRecordReturn,
-  usePackListStartPacking,
   useCreatePackScan,
-  useListPackScan,
 } from "../../lib/manifest-convex-react";
 import { BarcodeLabel } from "../../ui/BarcodeLabel";
+import { usePackScanCount, usePackScansForList } from "../../lib/usePackScans";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import {
   applyScan,
@@ -71,14 +65,9 @@ export function PackScanPanel({
   const reservations = useListEquipmentReservation();
   const assignments = useListEventVehicleAssignment();
   const vehicles = useListVehicle();
-  const startPacking = usePackListStartPacking();
-  const markPacked = usePackListItemMarkPacked();
-  const recordPackedCount = usePackListItemRecordPackedCount();
-  const recordChecked = usePackListItemRecordChecked();
-  const recordLoaded = usePackListItemRecordLoaded();
-  const recordReturn = usePackListItemRecordReturn();
   const recordScan = useCreatePackScan();
-  const keptScans = useListPackScan();
+  const countScan = usePackScanCount();
+  const keptScans = usePackScansForList(packList._id);
   // What the scanner read for the scan being handled; empty for a line picked
   // by hand.
   const labelRef = useRef("");
@@ -98,26 +87,32 @@ export function PackScanPanel({
   const say = (ok: boolean, text: string) =>
     setRecent((rows) => [{ at: Date.now(), ok, text }, ...rows].slice(0, 8));
 
+  const scanLabel = () => labelRef.current.trim() || "Picked by hand";
+
   // Every scan is kept, the ones that counted and the ones that did not, so
-  // the crew lead can see afterwards what happened. Keeping it never holds up
-  // the count.
+  // the crew lead can see afterwards what happened. A scan that counts is
+  // kept in the same save as the count (see save below); this keeps the
+  // ones that counted nothing, and says so when one could not be kept.
   const keep = (
     ok: boolean,
     text: string,
     outcome: string,
     line?: { _id: string } | null,
-    counted?: number,
   ) => {
     say(ok, text);
     void recordScan({
       packListId: packList._id,
       step,
-      label: labelRef.current.trim() || "Picked by hand",
+      label: scanLabel(),
       outcome,
       message: text,
       packListItemId: line?._id,
-      quantity: counted,
-    }).catch(() => undefined);
+    }).catch((error: unknown) =>
+      say(
+        false,
+        `That scan was not kept: ${classifyCommandFailure(error).title}`,
+      ),
+    );
   };
 
   const stopCamera = useCallback(() => {
@@ -164,72 +159,41 @@ export function PackScanPanel({
       return;
     }
     const change = result.change;
-    const args = { docId: line._id, version: line.version };
+    const truck = rigs.find((rig) => rig.id === truckId)?.label;
+    const next =
+      change.step === "pack"
+        ? change.packedQuantity
+        : change.step === "check"
+          ? change.checkedQuantity
+          : change.step === "load"
+            ? change.loadedQuantity
+            : change.returnedQuantity;
+    const message =
+      change.step === "pack"
+        ? `${name}: packed ${change.packedQuantity} of ${line.requiredQuantity} ${line.unit}`
+        : change.step === "check"
+          ? `${name}: checked ${change.checkedQuantity} of ${line.packedQuantity}`
+          : change.step === "load"
+            ? `${name}: ${change.loadedQuantity} of ${line.packedQuantity} on ${truck ?? "the truck"}`
+            : `${name}: ${change.returnedQuantity} of ${line.packedQuantity} back`;
     setBusy(true);
     try {
-      if (change.step === "pack") {
-        if (packList.status === "draft")
-          await startPacking({
-            docId: packList._id,
-            version: packList.version,
-          });
-        await (change.full ? markPacked : recordPackedCount)({
-          ...args,
-          packedQuantity: change.packedQuantity,
-        });
-        keep(
-          true,
-          `${name}: packed ${change.packedQuantity} of ${line.requiredQuantity} ${line.unit}`,
-          "ok",
-          line,
-          amount,
-        );
-      } else if (change.step === "check") {
-        await recordChecked({
-          ...args,
-          checkedQuantity: change.checkedQuantity,
-        });
-        keep(
-          true,
-          `${name}: checked ${change.checkedQuantity} of ${line.packedQuantity}`,
-          "ok",
-          line,
-          amount,
-        );
-      } else if (change.step === "load") {
-        // The picked truck is saved with the count, so a line on no truck
-        // yet is put on the one being loaded.
-        await recordLoaded({
-          ...args,
-          loadedQuantity: change.loadedQuantity,
-          loadAssignmentId: truckId || undefined,
-        });
-        const truck = rigs.find((rig) => rig.id === truckId)?.label;
-        keep(
-          true,
-          `${name}: ${change.loadedQuantity} of ${line.packedQuantity} on ${truck ?? "the truck"}`,
-          "ok",
-          line,
-          amount,
-        );
-      } else {
-        await recordReturn({
-          ...args,
-          returnedQuantity: change.returnedQuantity,
-          usedQuantity: Number(line.usedQuantity ?? 0),
-          lostQuantity: Number(line.lostQuantity ?? 0),
-          damagedQuantity: Number(line.damagedQuantity ?? 0),
-          // Left out, the saved note would be cleared.
-          finding: line.returnFinding?.trim() || undefined,
-        });
-        keep(
-          true,
-          `${name}: ${change.returnedQuantity} of ${line.packedQuantity} back`,
-          "ok",
-          line,
-          amount,
-        );
-      }
+      // The count and its kept scan are one save: both or neither. The
+      // picked truck is saved with an on-truck count, so a line on no truck
+      // yet is put on the one being loaded.
+      await countScan({
+        packListItemId: line._id as never,
+        version: line.version,
+        step: change.step,
+        nextQuantity: next,
+        added: amount,
+        full: change.step === "pack" ? change.full : undefined,
+        loadAssignmentId:
+          change.step === "load" ? truckId || undefined : undefined,
+        label: scanLabel(),
+        message,
+      });
+      say(true, message);
     } catch (error) {
       keep(
         false,
@@ -552,16 +516,12 @@ export function PackScanPanel({
       </details>
 
       {(() => {
-        const scans = (keptScans ?? [])
-          .filter(
-            (row) => row.deletedAt == null && row.packListId === packList._id,
-          )
-          .sort((a, b) => Number(b.scannedAt ?? 0) - Number(a.scannedAt ?? 0));
+        const scans = keptScans ?? [];
         if (scans.length === 0) return null;
         return (
           <details className="mt-3">
             <summary className="cursor-pointer text-base text-ink-2">
-              Every scan on this list ({scans.length})
+              Latest scans on this list ({scans.length})
             </summary>
             <ul className="mt-2 divide-y divide-line">
               {scans.slice(0, 50).map((row) => (
