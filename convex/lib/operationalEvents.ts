@@ -56,6 +56,7 @@ import { assertProposalFollowTotals } from "./proposalFollowTotals";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
+import { enforceOneOnly } from "./oneOnlyRules";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
@@ -71,12 +72,14 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  await enforceOneOnly(ctx, event);
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
   // Pack lines follow every event fact that asks for equipment (spec §13.2).
   const packEventId = packFactEventId(event);
   if (packEventId) await reconcileEventPackRules(ctx, packEventId);
-  if (event.entity === "PackListItem" && event.type === "PackListItemLoadAssigned") {
+  if (event.entity === "PackListItem" && (event.type === "PackListItemLoadAssigned" ||
+    (event.type === "PackListItemLoaded" && event.payload.loadAssignmentId != null))) {
     await validatePackLoadAssignment(ctx, event.entityId as Id<"packListItems">);
     await validateRigLoadForLine(ctx, event.entityId as Id<"packListItems">);
     return;

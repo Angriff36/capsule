@@ -34,6 +34,7 @@ const STUBS: Record<string, string> = {
 case "$*" in
   *verify-vercel-release.ts*) echo "bun $*" >> "$STUB_LOG"; exit "\${STUB_VERCEL_EXIT:-0}" ;;
   *release-backend-scope.ts*) echo "bun $*" >> "$STUB_LOG"; printf '%b' "\${STUB_SCOPE:-backend=unchanged\\nverify=\\n}"; exit 0 ;;
+  "run check") echo "bun run check" >> "$STUB_LOG.gate"; exit 0 ;;
   *) exit 0 ;;
 esac
 `,
@@ -52,6 +53,7 @@ esac
 echo "codex $*" >> "$STUB_LOG"
 # Work landing on the branch while the review runs (frozen-candidate test).
 if [ -n "\${STUB_DURING_REVIEW:-}" ]; then bash -c "$STUB_DURING_REVIEW" >/dev/null 2>&1; fi
+if [ -n "\${STUB_REVIEW_SLEEP:-}" ]; then printf 'exec\nbun run test\n'; sleep "$STUB_REVIEW_SLEEP"; fi
 cat
 echo "codex"
 printf '%b\\n' "\${STUB_REVIEW:-No blocking findings.\\nVERDICT: APPROVE}"
@@ -394,6 +396,62 @@ describe("scripts/deploy-production.sh", () => {
       expect(
         await git(checkout.work, "log", "-1", "--format=%B", next),
       ).toContain(`Release-Candidate: ${candidateB}`);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "a long review prints progress with the reviewer's last step instead of waiting silently",
+    async () => {
+      const checkout = await makeCheckout();
+      const result = await checkout.run([], {
+        STUB_REVIEW_SLEEP: "4",
+        DEPLOY_REVIEW_PROGRESS_SECONDS: "1",
+      });
+      expect(result.output).toMatch(
+        /deploy-production: review still running \(0 min\); last step: bun run test/,
+      );
+      expect(result.output).toContain(
+        "deploy-production: review finished after 0 min",
+      );
+      expect(result.status).toBe(0);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "the reviewer inspects the diff and never runs the full gate; the full gate runs once after APPROVE",
+    async () => {
+      const checkout = await makeCheckout();
+      const candidate = await git(checkout.work, "rev-parse", "HEAD");
+      const result = await checkout.run([]);
+      expect(result.status).toBe(0);
+      const prompt = readFileSync(
+        join(checkout.work, ".artifacts", "deploy-production-review-prompt.md"),
+        "utf8",
+      );
+      expect(prompt).toContain(
+        "Do NOT run the full test suite, coverage, the build, Storybook, `bun run check` or any other full gate",
+      );
+      expect(prompt).toContain("You MAY run a focused test");
+      expect(prompt).toContain(
+        "If you cannot approve without broader execution, say exactly what must be run and why",
+      );
+      // The frozen candidate is what the reviewer sees.
+      expect(prompt).toContain(`git diff origin/main...${candidate}`);
+      // The complete production gate still ran, exactly once, after APPROVE.
+      expect(
+        readFileSync(`${checkout.log}.gate`, "utf8").trim().split("\n"),
+      ).toEqual(["bun run check"]);
+      expect(
+        await git(
+          checkout.work,
+          "log",
+          "-1",
+          "--format=%B",
+          await checkout.mainSha(),
+        ),
+      ).toContain(`Release-Candidate: ${candidate}`);
     },
     TIMEOUT,
   );

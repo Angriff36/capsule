@@ -34,6 +34,11 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   // How much a hitched trailer and its load may weigh (PL-DELIVERY). Empty =
   // not recorded, no check. 0 = this truck cannot pull a trailer.
   property towCapacityKg: int?
+  // Planning board facts. Seats counts the driver. Empty = not recorded, no
+  // check. The certificate is the name of a staff qualification a driver of
+  // this truck has to hold ("CDL class B"); empty = any driver.
+  property seatCount: int?
+  property driverQualificationName: string?
 
   // Compliance: registration certificate and insurance policy. Optional at
   // register time so existing workflows keep working; expiry dates drive the
@@ -143,6 +148,20 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Saves both answers; an empty one clears it.
+  command setCrewFacts(optional seatCount: int, optional driverQualificationName: string) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint setSeatsPositive: seatCount == null or seatCount > 0 "A truck has at least one seat. Enter 1 or more, or leave it empty."
+    mutate seatCount = seatCount
+    mutate driverQualificationName = driverQualificationName != null and length(trim(driverQualificationName)) > 0 ? trim(driverQualificationName) : null
+    emit VehicleCrewFactsSet {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      seatCount: seatCount
+    }
+  }
+
   command updateOperationalStatus(
     operationalStatus: VehicleOperationalStatus,
     optional statusNote: string
@@ -231,6 +250,12 @@ event VehicleTowCapacitySet: "vehicle.tow_capacity_set" {
   vehicleId: string
   tenantId: string
   towCapacityKg: int?
+}
+
+event VehicleCrewFactsSet: "vehicle.crew_facts_set" {
+  vehicleId: string
+  tenantId: string
+  seatCount: int?
 }
 
 event VehicleOperationalStatusUpdated: "vehicle.operational_status_updated" {

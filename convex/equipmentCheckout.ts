@@ -88,9 +88,12 @@ export const reserve = mutation({
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
-    if (!EQUIPMENT_ROLES.has(auth.role)) {
+    // An event manager plans the event and sees what is free (availability
+    // below), so they may also hold it. Booking a unit that is out of use
+    // stays with the inventory and logistics managers.
+    if (!EQUIPMENT_ROLES.has(auth.role) && auth.role !== "event_manager") {
       throw new ConvexError(
-        "Inventory or logistics access is required to reserve equipment.",
+        "Inventory, logistics or event manager access is required to reserve equipment.",
       );
     }
     const overrideReason = args.overrideReason?.trim() || null;

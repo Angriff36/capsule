@@ -3,16 +3,16 @@
   "meta": {
     "compilerVersion": "3.6.58",
     "schemaVersion": "1.0",
-    "contentHash": "00af3bb2af00c85d1c9942c4e788643b05f5f4b6c95488b61ffcd81c565bc0ac:0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2c468f48d7a3ce63653f4405dceb1be68d9eca69e901b1f5f3a2604ffee230d0:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:4077c14a8869f46cc909e55d268b2cbb68cefc914237fb1a87ffaf9f1325ccb8:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:571c1fbbd06e6f847dc0789bb6699eef2dad5b3438eb906c97bd99975eee1572:58289c45ed74812206f85688dbec40d6b1d3ccca36a420a263c88fbfd8d9bb5b:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:75e90dc93cb70aaacdfcdf93e86d279a5f6d9223a3e37d6f643e592ddbb3a663:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:8615c9439a3c2de2b2ac53a2796d9bd5b72d81e4953b8e2498112a2650748a6d:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b8371dec149afe525f389169aedf38e3953a48946523b416345e61b2ba2a9543:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cb17aebd1693e196fafc3596ad97832043eec454bda05e20f29d3baec5d76070:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecb19ddbe662c687b90bec15dc4623d74b353dc60e7f8dbc966617480b3d9a66:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1",
+    "contentHash": "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:0469c4ed0c814a019380a73675adacc62173c22b928bf9a8d16c336b313b24e0:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0bb16567f6a859490c1104494d9c83f7f4652733f9c97c36a2292844266487c4:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17b60c747936cdfd25a3ec8b99c088a0ba3ead13b38322d8b859d3a861cb0892:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1d8872a0d663a5981c4057cf107ce06dbe68c8a1f580521a0bb2ba17ec8605e7:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:30ced9bf2c2b4b2190066de5346c43fa2196d9a5ff1c4e99b9f078b3e07eb815:32c5fa3081f3c94ce79a9facf5fd92a016f32d4a0765a4df7d18874bb33cca51:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:398de6fac81b57a12cac5b21d6b92092e59241f6324c945716c91508f9ad4c70:3a9adca299d75a682ab44b692011aed734499c6d76f8fca86bc48796165bcc7f:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:403deb933fd89c8ddd7e2eea454c768c96c4993e49e1fc07dfb733cf3ca21be4:4077c14a8869f46cc909e55d268b2cbb68cefc914237fb1a87ffaf9f1325ccb8:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:41f4c3f363442a2fcb6904eba5a56637c13780c5893c673b0ad17626aa728444:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:49da6e643d0e944845ffba5a4196eb5be41d4c764393cacaac1c7bf77937cafa:4a4c3333ff364559ebe86ccb3acfdcaa69c548a1bc774d4e0c7b8d0d878e4e4a:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5b1a6e044cc0addd7bf6bc5f82a1f15994e33d01cccd75bb4dec4971b38b039b:5eede5832d56f1a6f53fff1c333df6f4f34990f8b3a29f4c007b8e1b88f8c60b:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6d96d7055ac2e876e744578a7bc662ad0ce44e2b3d7e6133a0ef7ccaf8cc47a8:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:75e90dc93cb70aaacdfcdf93e86d279a5f6d9223a3e37d6f643e592ddbb3a663:771f4d513162ad4669f03607a789fff791ef393e15feec8ee66432b7b8c8ed08:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7ff317c9e6d350b9dd58b1404fffb6c6fdad728265f192388029421e13e286b3:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:84636a99993745fa6a645e8e7b395aee173204cd1b3ce0a9fcbf4f9ab485213d:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86308625154e714a670a80baf85f5a64d28aae64b678f61e1bf989a170d55c20:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bd58b2529235c8f434d7645a4f71b975a270f896e0cdb9b888833ed1ad666d2:8e3f1f8f08eb0cc8cc3f2e9afe4018cc68d423bc2a4c18ca98809770cf7c7946:8ec578f7077e46d69b4d0ba1914d95b1dfa689c99423192a216e5c84d68a7c63:8fdbc78ae86f1d64917a31fbf7921afd2962a5a2d0f108af786eb7d6fc3a62c9:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bdd1b012f7d07994cf68f2b2a7d503e54200daa4b80053709945fc32f95c6374:bffff73e9b8e9cb7042e00f28d069c488d63b2fa981cc1fef344970a38494857:c02afa6a0ba3d9bb03030a70d8b59e57fb3b6d30a112e443215bf92883fd447b:c13917727f7d5888d94877fcb14f5f05e17046192aa505590ce29e2711720871:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cb17aebd1693e196fafc3596ad97832043eec454bda05e20f29d3baec5d76070:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccd72e1626e8659c7b43fe7ac7a3f5210245e7d32107e356d0cb3df0decf6453:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dd8aa810d5a85cd4b5ee211fddef27140711f3349e39118175813e4b836e39b2:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e525f86638654821e0fa3123bad1b8075162ae70d0ca58589d9c8680ce48c976:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:ecb19ddbe662c687b90bec15dc4623d74b353dc60e7f8dbc966617480b3d9a66:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fd1e32b3a26685665a19f765f03ad0151dc896877166bd3f09b9c6e2ad543236:febea776b7a0cfa3b1492db972fd87b4e42ca7305a1f593596daae74bb6328a1",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 174,
-    "commandCount": 833,
-    "policyCount": 513,
-    "constraintCount": 281,
-    "enumCount": 187,
-    "eventCount": 712,
+    "entityCount": 183,
+    "commandCount": 865,
+    "policyCount": 540,
+    "constraintCount": 288,
+    "enumCount": 195,
+    "eventCount": 741,
     "modules": [],
     "multiTenant": true
   },
@@ -4912,6 +4912,143 @@
       ]
     },
     {
+      "name": "DepartureOverride",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "packListId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "openItems",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "packList",
+          "kind": "belongsTo",
+          "target": "PackList",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "packListId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "departureOverrideReasonPresent",
+          "code": "departureOverrideReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Say why it is fine to leave.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "record"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
       "name": "Dish",
       "properties": [
         {
@@ -6645,6 +6782,24 @@
           "modifiers": []
         },
         {
+          "name": "providesJson",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "needsJson",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "operatingFactsCheckedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -6748,6 +6903,7 @@
         "register",
         "retire",
         "reviseDetails",
+        "setOperatingFacts",
         "setPrimaryImage",
         "transfer",
         "updateCondition",
@@ -9544,6 +9700,21 @@
               "id"
             ]
           }
+        },
+        {
+          "name": "rideVehicle",
+          "kind": "ref",
+          "target": "EventVehicleAssignment",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "rideVehicleAssignmentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
         }
       ],
       "constraints": [
@@ -9614,6 +9785,129 @@
           "property": "status",
           "from": "unassigned",
           "to": []
+        }
+      ]
+    },
+    {
+      "name": "EventChecklist",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "category",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "itemsJson",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "[]"
+        },
+        {
+          "name": "status",
+          "type": "EventChecklistStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "active"
+        },
+        {
+          "name": "definedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [],
+      "constraints": [
+        {
+          "name": "eventChecklistNamed",
+          "code": "eventChecklistNamed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this checklist a name.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "define",
+        "reinstate",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "active",
+          "to": [
+            "retired"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "retired",
+          "to": [
+            "active"
+          ]
         }
       ]
     },
@@ -11849,6 +12143,114 @@
       ]
     },
     {
+      "name": "EventPlanNeeds",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "trucksNeeded",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "siteProvidesJson",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "notedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "planNeedsTrucksNotNegative",
+          "code": "planNeedsTrucksNotNegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Trucks needed can't be negative. Use zero or more.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "note",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
       "name": "EventStaffNeed",
       "properties": [
         {
@@ -12166,6 +12568,21 @@
           }
         },
         {
+          "name": "rideVehicle",
+          "kind": "ref",
+          "target": "EventVehicleAssignment",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "rideVehicleAssignmentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
           "name": "coverageReplacementPerson",
           "kind": "ref",
           "target": "Person",
@@ -12247,6 +12664,293 @@
           "property": "status",
           "from": "cancelled",
           "to": []
+        }
+      ]
+    },
+    {
+      "name": "EventTask",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "details",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "category",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ownerPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dueAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "priority",
+          "type": "EventTaskPriority",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "medium"
+        },
+        {
+          "name": "status",
+          "type": "EventTaskStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "open"
+        },
+        {
+          "name": "waitsForTaskId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "proofRequired",
+          "type": "boolean | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "doneNote",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "doneAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "doneByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "skipReason",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "checklistTemplateId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "templateLineKey",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "suggestionKey",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "addedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "kind": "belongsTo",
+          "target": "Person",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ownerPersonId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "waitsFor",
+          "kind": "ref",
+          "target": "EventTask",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "waitsForTaskId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "checklist",
+          "kind": "belongsTo",
+          "target": "EventChecklist",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "checklistTemplateId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "eventTaskTitled",
+          "code": "eventTaskTitled",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this to-do a title.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "add",
+        "complete",
+        "giveTo",
+        "remove",
+        "reopen",
+        "revise",
+        "skip",
+        "start"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "open",
+          "to": [
+            "in_progress",
+            "done",
+            "skipped"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "in_progress",
+          "to": [
+            "open",
+            "done",
+            "skipped"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "done",
+          "to": [
+            "open"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "skipped",
+          "to": [
+            "open"
+          ]
         }
       ]
     },
@@ -19864,6 +20568,12 @@
           "modifiers": []
         },
         {
+          "name": "planningChecksJson",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -19914,6 +20624,7 @@
       ],
       "commands": [
         "configureBranding",
+        "configurePlanningChecks",
         "configureRoutePolicy",
         "configureTimingPolicy",
         "deactivate",
@@ -20597,6 +21308,84 @@
           "modifiers": []
         },
         {
+          "name": "checkedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "checkedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "checkedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "loadedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lineLoadedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lineLoadedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "returnedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "usedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lostQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "damagedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "returnFinding",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "returnCountedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "returnCountedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -20749,7 +21538,10 @@
         "exclude",
         "markMissing",
         "markPacked",
+        "recordChecked",
+        "recordLoaded",
         "recordPackedCount",
+        "recordReturn",
         "recordSentInstead",
         "remove",
         "restoreExcluded",
@@ -21323,6 +22115,174 @@
             "active"
           ]
         }
+      ]
+    },
+    {
+      "name": "PackSectionClaim",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "packListId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "sectionKey",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "personId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "personName",
+          "type": "string",
+          "required": false,
+          "modifiers": [],
+          "defaultValue": ""
+        },
+        {
+          "name": "claimedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "releasedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "takenOverByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "takenOverByName",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [
+        {
+          "name": "isLive",
+          "type": "boolean",
+          "expression": "[omitted]",
+          "dependencies": [
+            "claimedAt",
+            "releasedAt"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "packList",
+          "kind": "belongsTo",
+          "target": "PackList",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "packListId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "person",
+          "kind": "belongsTo",
+          "target": "Person",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "personId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "takenOverBy",
+          "kind": "belongsTo",
+          "target": "Person",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "takenOverByPersonId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "release",
+        "take",
+        "takeOver"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -23011,6 +23971,411 @@
           "property": "status",
           "from": "terminated",
           "to": []
+        }
+      ]
+    },
+    {
+      "name": "PlanningOverride",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "openItems",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "planningOverrideReasonPresent",
+          "code": "planningOverrideReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Say why this change is fine.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "record"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "PlanningReceipt",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "suggestionKey",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "declined",
+          "type": "boolean",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": false
+        },
+        {
+          "name": "basis",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "answerAgain",
+        "record"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "PlanningRule",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "trigger",
+          "type": "PlanningRuleTrigger",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "every_event"
+        },
+        {
+          "name": "triggerEquipmentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "triggerEquipmentKind",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "actionsJson",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "[]"
+        },
+        {
+          "name": "status",
+          "type": "PlanningRuleStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "active"
+        },
+        {
+          "name": "definedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "triggerEquipment",
+          "kind": "belongsTo",
+          "target": "Equipment",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "triggerEquipmentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "planningRuleNamed",
+          "code": "planningRuleNamed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this rule a name.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "define",
+        "reinstate",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "active",
+          "to": [
+            "retired"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "retired",
+          "to": [
+            "active"
+          ]
         }
       ]
     },
@@ -33750,6 +35115,18 @@
           "modifiers": []
         },
         {
+          "name": "seatCount",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "driverQualificationName",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "registrationNumber",
           "type": "string | null",
           "required": false,
@@ -33854,6 +35231,7 @@
       "commands": [
         "register",
         "reviseDetails",
+        "setCrewFacts",
         "setTowCapacity",
         "updateInsurance",
         "updateOperationalStatus",
@@ -34363,6 +35741,238 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "Give this service a vendor, a cost, an odometer reading, and when it was done. Cost can't be negative.",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "record"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "VehicleTripCheck",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventVehicleAssignmentId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "eventId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": [
+            "indexed"
+          ]
+        },
+        {
+          "name": "kind",
+          "type": "TripCheckKind",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "before_leaving"
+        },
+        {
+          "name": "tires",
+          "type": "TripCheckRating",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "good"
+        },
+        {
+          "name": "brakes",
+          "type": "TripCheckRating",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "good"
+        },
+        {
+          "name": "lights",
+          "type": "TripCheckRating",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "good"
+        },
+        {
+          "name": "fluids",
+          "type": "TripCheckRating",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "good"
+        },
+        {
+          "name": "bodywork",
+          "type": "TripCheckRating",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "good"
+        },
+        {
+          "name": "interior",
+          "type": "TripCheckRating",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "good"
+        },
+        {
+          "name": "refrigeration",
+          "type": "TripCheckRating | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "odometer",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "fuelLevel",
+          "type": "TripFuelLevel | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "damageNote",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "notes",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "checkedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "checkedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [
+        {
+          "name": "passed",
+          "type": "boolean",
+          "expression": "[omitted]",
+          "dependencies": [
+            "tires",
+            "brakes",
+            "lights",
+            "fluids",
+            "bodywork",
+            "interior",
+            "refrigeration"
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "run",
+          "kind": "belongsTo",
+          "target": "EventVehicleAssignment",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventVehicleAssignmentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "tripCheckOdometerNonnegative",
+          "code": "tripCheckOdometerNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The odometer reading can't be negative. Use zero or more.",
           "overrideable": false
         }
       ],
@@ -44748,6 +46358,89 @@
       ]
     },
     {
+      "name": "record",
+      "entity": "DepartureOverride",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "openItems",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "packListId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordDepartureEventMatch",
+          "code": "recordDepartureEventMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This reason is for a different event. Pick the event already on it."
+        },
+        {
+          "name": "recordDepartureReason",
+          "code": "recordDepartureReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Say why it is fine to leave."
+        }
+      ],
+      "policies": [
+        "departureOverrideRead",
+        "departureOverrideWrite",
+        "departureOverrideExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "packListId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openItems",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DepartureOverrideRecorded"
+      ]
+    },
+    {
       "name": "classifyAllergens",
       "entity": "Dish",
       "parameters": [
@@ -47673,6 +49366,52 @@
       ],
       "emits": [
         "EquipmentDetailsRevised"
+      ]
+    },
+    {
+      "name": "setOperatingFacts",
+      "entity": "Equipment",
+      "parameters": [
+        {
+          "name": "providesJson",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "needsJson",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "equipmentRead",
+        "equipmentWrite",
+        "equipmentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "providesJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "needsJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "operatingFactsCheckedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EquipmentOperatingFactsSet"
       ]
     },
     {
@@ -52984,6 +54723,179 @@
       ]
     },
     {
+      "name": "define",
+      "entity": "EventChecklist",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "itemsJson",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "defineChecklistName",
+          "code": "defineChecklistName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this checklist a name."
+        }
+      ],
+      "policies": [
+        "eventChecklistRead",
+        "eventChecklistWrite",
+        "eventChecklistExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "itemsJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "definedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventChecklistDefined"
+      ]
+    },
+    {
+      "name": "reinstate",
+      "entity": "EventChecklist",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventChecklistRead",
+        "eventChecklistWrite",
+        "eventChecklistExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventChecklistReinstated"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "EventChecklist",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventChecklistRead",
+        "eventChecklistWrite",
+        "eventChecklistExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventChecklistRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "EventChecklist",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "itemsJson",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseChecklistName",
+          "code": "reviseChecklistName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this checklist a name."
+        }
+      ],
+      "policies": [
+        "eventChecklistRead",
+        "eventChecklistWrite",
+        "eventChecklistExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "itemsJson",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventChecklistRevised"
+      ]
+    },
+    {
       "name": "capture",
       "entity": "EventCloseout",
       "parameters": [
@@ -55686,6 +57598,122 @@
       ]
     },
     {
+      "name": "note",
+      "entity": "EventPlanNeeds",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "trucksNeeded",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "siteProvidesJson",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "notePlanNeedsEventMatch",
+          "code": "notePlanNeedsEventMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "These needs are for a different event. Pick the event already on them."
+        },
+        {
+          "name": "notePlanNeedsTrucks",
+          "code": "notePlanNeedsTrucks",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Trucks needed can't be negative. Use zero or more."
+        }
+      ],
+      "policies": [
+        "eventPlanNeedsRead",
+        "eventPlanNeedsWrite",
+        "eventPlanNeedsExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "trucksNeeded",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "siteProvidesJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "notedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPlanNeedsNoted"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "EventPlanNeeds",
+      "parameters": [
+        {
+          "name": "trucksNeeded",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "siteProvidesJson",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "revisePlanNeedsTrucks",
+          "code": "revisePlanNeedsTrucks",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Trucks needed can't be negative. Use zero or more."
+        }
+      ],
+      "policies": [
+        "eventPlanNeedsRead",
+        "eventPlanNeedsWrite",
+        "eventPlanNeedsExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "trucksNeeded",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "siteProvidesJson",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventPlanNeedsNoted"
+      ]
+    },
+    {
       "name": "applyApprovedShiftSwap",
       "entity": "EventStaffNeed",
       "parameters": [
@@ -56505,6 +58533,500 @@
       ],
       "emits": [
         "EventStaffNeedReleased"
+      ]
+    },
+    {
+      "name": "add",
+      "entity": "EventTask",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ownerPersonId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dueAt",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "name": "priority",
+          "type": "EventTaskPriority",
+          "required": false
+        },
+        {
+          "name": "waitsForTaskId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "proofRequired",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "name": "checklistTemplateId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "templateLineKey",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "suggestionKey",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "addTaskEventMatch",
+          "code": "addTaskEventMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This to-do is for a different event. Pick the event already on it."
+        },
+        {
+          "name": "addTaskTitle",
+          "code": "addTaskTitle",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this to-do a title."
+        }
+      ],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "title",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "details",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ownerPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dueAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "priority",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "waitsForTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "proofRequired",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "checklistTemplateId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "templateLineKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "suggestionKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "addedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskAdded"
+      ]
+    },
+    {
+      "name": "complete",
+      "entity": "EventTask",
+      "parameters": [
+        {
+          "name": "note",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "doneNote",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "doneAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "doneByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskCompleted"
+      ]
+    },
+    {
+      "name": "giveTo",
+      "entity": "EventTask",
+      "parameters": [
+        {
+          "name": "ownerPersonId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "ownerPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskOwnerChanged"
+      ]
+    },
+    {
+      "name": "remove",
+      "entity": "EventTask",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskRemoved"
+      ]
+    },
+    {
+      "name": "reopen",
+      "entity": "EventTask",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "doneAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "doneByPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "doneNote",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "skipReason",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskReopened"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "EventTask",
+      "parameters": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "details",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "dueAt",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "name": "priority",
+          "type": "EventTaskPriority",
+          "required": false
+        },
+        {
+          "name": "waitsForTaskId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "proofRequired",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseTaskTitle",
+          "code": "reviseTaskTitle",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this to-do a title."
+        },
+        {
+          "name": "reviseTaskNotItself",
+          "code": "reviseTaskNotItself",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A to-do can't wait for itself."
+        }
+      ],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "title",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "details",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dueAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "priority",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "waitsForTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "proofRequired",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskRevised"
+      ]
+    },
+    {
+      "name": "skip",
+      "entity": "EventTask",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "skipTaskReason",
+          "code": "skipTaskReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Say why this to-do is not needed."
+        }
+      ],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "skipReason",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskSkipped"
+      ]
+    },
+    {
+      "name": "start",
+      "entity": "EventTask",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventTaskRead",
+        "eventTaskWrite",
+        "eventTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTaskStarted"
       ]
     },
     {
@@ -69055,6 +71577,36 @@
       ]
     },
     {
+      "name": "configurePlanningChecks",
+      "entity": "Organization",
+      "parameters": [
+        {
+          "name": "checksJson",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "organizationRead",
+        "organizationWrite",
+        "organizationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "planningChecksJson",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "OrganizationPlanningChecksConfigured"
+      ]
+    },
+    {
       "name": "configureRoutePolicy",
       "entity": "Organization",
       "parameters": [
@@ -70659,6 +73211,16 @@
         },
         {
           "kind": "mutate",
+          "target": "checkedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "loadedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "unit",
           "expression": "[omitted]"
         },
@@ -71120,6 +73682,20 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "Save a short count on this line until you have the full amount"
+        },
+        {
+          "name": "packedCoversReturn",
+          "code": "packedCoversReturn",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "That is less than the return already counted on this line. Correct the return count first."
+        },
+        {
+          "name": "packedCoversCounts",
+          "code": "packedCoversCounts",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "That is less than what is already checked or on the truck. Correct those counts first."
         }
       ],
       "policies": [
@@ -71164,6 +73740,135 @@
       ]
     },
     {
+      "name": "recordChecked",
+      "entity": "PackListItem",
+      "parameters": [
+        {
+          "name": "checkedQuantity",
+          "type": "decimal",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "checkedNotNegative",
+          "code": "checkedNotNegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The checked amount can't be negative. Use zero or more."
+        },
+        {
+          "name": "checkedNotOverPacked",
+          "code": "checkedNotOverPacked",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "You can't check more than what is packed. Save the packed amount first."
+        }
+      ],
+      "policies": [
+        "packListItemRead",
+        "packListItemWrite",
+        "packListItemExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "checkedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "checkedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "checkedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PackListItemChecked"
+      ]
+    },
+    {
+      "name": "recordLoaded",
+      "entity": "PackListItem",
+      "parameters": [
+        {
+          "name": "loadedQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "loadAssignmentId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "loadedNotNegative",
+          "code": "loadedNotNegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The loaded amount can't be negative. Use zero or more."
+        },
+        {
+          "name": "loadedNotOverPacked",
+          "code": "loadedNotOverPacked",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "You can't load more than what is packed. Save the packed amount first."
+        },
+        {
+          "name": "loadedCoversReturn",
+          "code": "loadedCoversReturn",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "That is less than the return already counted on this line. Correct the return count first."
+        }
+      ],
+      "policies": [
+        "packListItemRead",
+        "packListItemWrite",
+        "packListItemExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "loadedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "loadAssignmentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lineLoadedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lineLoadedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PackListItemLoaded"
+      ]
+    },
+    {
       "name": "recordPackedCount",
       "entity": "PackListItem",
       "parameters": [
@@ -71193,6 +73898,20 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "This is the full amount. Mark the line packed."
+        },
+        {
+          "name": "packedCoversReturn",
+          "code": "packedCoversReturn",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "That is less than the return already counted on this line. Correct the return count first."
+        },
+        {
+          "name": "packedCoversCounts",
+          "code": "packedCoversCounts",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "That is less than what is already checked or on the truck. Correct those counts first."
         }
       ],
       "policies": [
@@ -71219,6 +73938,109 @@
       ],
       "emits": [
         "PackListItemCountRecorded"
+      ]
+    },
+    {
+      "name": "recordReturn",
+      "entity": "PackListItem",
+      "parameters": [
+        {
+          "name": "returnedQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "usedQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "lostQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "damagedQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "finding",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "returnLineComesBack",
+          "code": "returnLineComesBack",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This line does not come back, so there is no return to count."
+        },
+        {
+          "name": "returnAmountsNotNegative",
+          "code": "returnAmountsNotNegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A return amount can't be negative. Use zero or more."
+        },
+        {
+          "name": "returnNotOverWentOut",
+          "code": "returnNotOverWentOut",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "That is more than what went out. Check the amounts."
+        }
+      ],
+      "policies": [
+        "packListItemRead",
+        "packListItemWrite",
+        "packListItemExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "returnedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "usedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lostQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "damagedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "returnFinding",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "returnCountedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "returnCountedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PackListItemReturnCounted"
       ]
     },
     {
@@ -72394,6 +75216,141 @@
       ],
       "emits": [
         "PackRuleRevised"
+      ]
+    },
+    {
+      "name": "release",
+      "entity": "PackSectionClaim",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "releaseOwnSection",
+          "code": "releaseOwnSection",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Only the person packing this section can give it back. Use \"Take over\" to take it yourself."
+        }
+      ],
+      "policies": [
+        "packSectionClaimRead",
+        "packSectionClaimWrite",
+        "packSectionClaimExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "releasedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PackSectionReleased"
+      ]
+    },
+    {
+      "name": "take",
+      "entity": "PackSectionClaim",
+      "parameters": [
+        {
+          "name": "packListId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "sectionKey",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "takeSectionListMatch",
+          "code": "takeSectionListMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This section is on a different pack list. Pick the pack list already on it."
+        },
+        {
+          "name": "takeSectionKey",
+          "code": "takeSectionKey",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Pick the section to take."
+        }
+      ],
+      "policies": [
+        "packSectionClaimRead",
+        "packSectionClaimWrite",
+        "packSectionClaimExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "sectionKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "personId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "personName",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "claimedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PackSectionTaken"
+      ]
+    },
+    {
+      "name": "takeOver",
+      "entity": "PackSectionClaim",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "packSectionClaimRead",
+        "packSectionClaimWrite",
+        "packSectionClaimExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "releasedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "takenOverByPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "takenOverByName",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PackSectionReleased"
       ]
     },
     {
@@ -75079,6 +78036,447 @@
       ],
       "emits": [
         "PersonAccountUnlinked"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "PlanningOverride",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "openItems",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordPlanOverrideEventMatch",
+          "code": "recordPlanOverrideEventMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This reason is for a different event. Pick the event already on it."
+        },
+        {
+          "name": "recordPlanOverrideReason",
+          "code": "recordPlanOverrideReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Say why this change is fine."
+        }
+      ],
+      "policies": [
+        "planningOverrideRead",
+        "planningOverrideWrite",
+        "planningOverrideExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "action",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openItems",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningOverrideRecorded"
+      ]
+    },
+    {
+      "name": "answerAgain",
+      "entity": "PlanningReceipt",
+      "parameters": [
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "declined",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "basis",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "answerAgainAmount",
+          "code": "answerAgainAmount",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The amount can't be negative. Use zero or more."
+        }
+      ],
+      "policies": [
+        "planningReceiptRead",
+        "planningReceiptWrite",
+        "planningReceiptExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "declined",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "basis",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningSuggestionAnswered"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "PlanningReceipt",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "suggestionKey",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "declined",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "basis",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordReceiptEventMatch",
+          "code": "recordReceiptEventMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This answer is for a different event. Pick the event already on it."
+        },
+        {
+          "name": "recordReceiptKey",
+          "code": "recordReceiptKey",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This answer has no suggestion to go with."
+        },
+        {
+          "name": "recordReceiptAmount",
+          "code": "recordReceiptAmount",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The amount can't be negative. Use zero or more."
+        }
+      ],
+      "policies": [
+        "planningReceiptRead",
+        "planningReceiptWrite",
+        "planningReceiptExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "suggestionKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "declined",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "basis",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningSuggestionAnswered"
+      ]
+    },
+    {
+      "name": "define",
+      "entity": "PlanningRule",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "trigger",
+          "type": "PlanningRuleTrigger",
+          "required": true
+        },
+        {
+          "name": "actionsJson",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "triggerEquipmentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "triggerEquipmentKind",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "definePlanningRuleName",
+          "code": "definePlanningRuleName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this rule a name."
+        },
+        {
+          "name": "definePlanningRuleTrigger",
+          "code": "definePlanningRuleTrigger",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Pick the equipment or the kind of equipment that sets this rule off."
+        }
+      ],
+      "policies": [
+        "planningRuleRead",
+        "planningRuleWrite",
+        "planningRuleExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "trigger",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "triggerEquipmentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "triggerEquipmentKind",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "actionsJson",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "definedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningRuleDefined"
+      ]
+    },
+    {
+      "name": "reinstate",
+      "entity": "PlanningRule",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "planningRuleRead",
+        "planningRuleWrite",
+        "planningRuleExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningRuleReinstated"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "PlanningRule",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "planningRuleRead",
+        "planningRuleWrite",
+        "planningRuleExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningRuleRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "PlanningRule",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "actionsJson",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "revisePlanningRuleName",
+          "code": "revisePlanningRuleName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Give this rule a name."
+        }
+      ],
+      "policies": [
+        "planningRuleRead",
+        "planningRuleWrite",
+        "planningRuleExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "actionsJson",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PlanningRuleRevised"
       ]
     },
     {
@@ -90445,6 +93843,55 @@
       ]
     },
     {
+      "name": "setCrewFacts",
+      "entity": "Vehicle",
+      "parameters": [
+        {
+          "name": "seatCount",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "driverQualificationName",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "setSeatsPositive",
+          "code": "setSeatsPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A truck has at least one seat. Enter 1 or more, or leave it empty."
+        }
+      ],
+      "policies": [
+        "vehicleRead",
+        "vehicleWrite",
+        "vehicleExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "seatCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "driverQualificationName",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VehicleCrewFactsSet"
+      ]
+    },
+    {
       "name": "setTowCapacity",
       "entity": "Vehicle",
       "parameters": [
@@ -91103,6 +94550,183 @@
       ],
       "emits": [
         "VehicleServiceRecorded"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "VehicleTripCheck",
+      "parameters": [
+        {
+          "name": "eventVehicleAssignmentId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "TripCheckKind",
+          "required": true
+        },
+        {
+          "name": "tires",
+          "type": "TripCheckRating",
+          "required": true
+        },
+        {
+          "name": "brakes",
+          "type": "TripCheckRating",
+          "required": true
+        },
+        {
+          "name": "lights",
+          "type": "TripCheckRating",
+          "required": true
+        },
+        {
+          "name": "fluids",
+          "type": "TripCheckRating",
+          "required": true
+        },
+        {
+          "name": "bodywork",
+          "type": "TripCheckRating",
+          "required": true
+        },
+        {
+          "name": "interior",
+          "type": "TripCheckRating",
+          "required": true
+        },
+        {
+          "name": "refrigeration",
+          "type": "TripCheckRating",
+          "required": false
+        },
+        {
+          "name": "odometer",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "fuelLevel",
+          "type": "TripFuelLevel",
+          "required": false
+        },
+        {
+          "name": "damageNote",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordTripCheckRunMatch",
+          "code": "recordTripCheckRunMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "This check is for a different truck run. Pick the run already on this check."
+        },
+        {
+          "name": "recordTripCheckOdometer",
+          "code": "recordTripCheckOdometer",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "The odometer reading can't be negative. Use zero or more."
+        }
+      ],
+      "policies": [
+        "vehicleTripCheckRead",
+        "vehicleTripCheckWrite",
+        "vehicleTripCheckExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "kind",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "tires",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "brakes",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lights",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "fluids",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "bodywork",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "interior",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "refrigeration",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "odometer",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "fuelLevel",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "damageNote",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "notes",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "checkedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "checkedByPersonId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VehicleTripChecked"
       ]
     },
     {
@@ -97585,6 +101209,27 @@
       "message": "Logistics staff and managers may update deliveries"
     },
     {
+      "name": "departureOverrideExecute",
+      "entity": "DepartureOverride",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, logistics, event and sales staff and managers may send a truck out with open items"
+    },
+    {
+      "name": "departureOverrideRead",
+      "entity": "DepartureOverride",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see why a truck left with open items"
+    },
+    {
+      "name": "departureOverrideWrite",
+      "entity": "DepartureOverride",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, logistics, event and sales staff and managers may send a truck out with open items"
+    },
+    {
       "name": "dishComponentExecute",
       "entity": "DishComponent",
       "action": "execute",
@@ -97858,6 +101503,27 @@
       "message": "Crew may update shared event staffing"
     },
     {
+      "name": "eventChecklistExecute",
+      "entity": "EventChecklist",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"eventManageAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event managers, logistics staff and managers may change event checklists"
+    },
+    {
+      "name": "eventChecklistRead",
+      "entity": "EventChecklist",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see event checklists"
+    },
+    {
+      "name": "eventChecklistWrite",
+      "entity": "EventChecklist",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"eventManageAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event managers, logistics staff and managers may update event checklists"
+    },
+    {
       "name": "eventCloseoutExecute",
       "entity": "EventCloseout",
       "action": "execute",
@@ -98040,6 +101706,27 @@
       "message": "Only Capsule can update event number counters"
     },
     {
+      "name": "eventPlanNeedsExecute",
+      "entity": "EventPlanNeeds",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event, sales and logistics staff and managers may say what an event needs"
+    },
+    {
+      "name": "eventPlanNeedsRead",
+      "entity": "EventPlanNeeds",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see what an event needs"
+    },
+    {
+      "name": "eventPlanNeedsWrite",
+      "entity": "EventPlanNeeds",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event, sales and logistics staff and managers may say what an event needs"
+    },
+    {
       "name": "eventRead",
       "entity": "Event",
       "action": "read",
@@ -98066,6 +101753,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"workforceAccess\") or roleAllows(user.role, \"workforceSelfAccess\")",
       "message": "Crew may update shared event staffing"
+    },
+    {
+      "name": "eventTaskExecute",
+      "entity": "EventTask",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may work event to-dos"
+    },
+    {
+      "name": "eventTaskRead",
+      "entity": "EventTask",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see event to-dos"
+    },
+    {
+      "name": "eventTaskWrite",
+      "entity": "EventTask",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may update event to-dos"
     },
     {
       "name": "eventTemplateExecute",
@@ -98992,6 +102700,27 @@
       "message": "Event managers, logistics staff and managers may update pack rules"
     },
     {
+      "name": "packSectionClaimExecute",
+      "entity": "PackSectionClaim",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, logistics, event and sales staff and managers may take a pack list section"
+    },
+    {
+      "name": "packSectionClaimRead",
+      "entity": "PackSectionClaim",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see who is packing each section"
+    },
+    {
+      "name": "packSectionClaimWrite",
+      "entity": "PackSectionClaim",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, logistics, event and sales staff and managers may take a pack list section"
+    },
+    {
       "name": "paymentExecute",
       "entity": "Payment",
       "action": "execute",
@@ -99116,6 +102845,69 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"workforceManageAccess\")",
       "message": "Workforce managers may update people"
+    },
+    {
+      "name": "planningOverrideExecute",
+      "entity": "PlanningOverride",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"workforceAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"
+    },
+    {
+      "name": "planningOverrideRead",
+      "entity": "PlanningOverride",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see why a plan change was made"
+    },
+    {
+      "name": "planningOverrideWrite",
+      "entity": "PlanningOverride",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"workforceAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"
+    },
+    {
+      "name": "planningReceiptExecute",
+      "entity": "PlanningReceipt",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"workforceAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"
+    },
+    {
+      "name": "planningReceiptRead",
+      "entity": "PlanningReceipt",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see answered suggestions"
+    },
+    {
+      "name": "planningReceiptWrite",
+      "entity": "PlanningReceipt",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"eventAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"workforceAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"
+    },
+    {
+      "name": "planningRuleExecute",
+      "entity": "PlanningRule",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"eventManageAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event managers, logistics staff and managers may change planning rules"
+    },
+    {
+      "name": "planningRuleRead",
+      "entity": "PlanningRule",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see planning rules"
+    },
+    {
+      "name": "planningRuleWrite",
+      "entity": "PlanningRule",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"eventManageAccess\") or roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Event managers, logistics staff and managers may update planning rules"
     },
     {
       "name": "prepTaskCommentExecute",
@@ -100203,6 +103995,27 @@
       "message": "Logistics staff and managers may add vehicle service"
     },
     {
+      "name": "vehicleTripCheckExecute",
+      "entity": "VehicleTripCheck",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may add trip checks"
+    },
+    {
+      "name": "vehicleTripCheckRead",
+      "entity": "VehicleTripCheck",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may see trip checks"
+    },
+    {
+      "name": "vehicleTripCheckWrite",
+      "entity": "VehicleTripCheck",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Staff may add trip checks"
+    },
+    {
       "name": "vehicleWrite",
       "entity": "Vehicle",
       "action": "write",
@@ -100881,6 +104694,15 @@
       "overrideable": false
     },
     {
+      "entity": "DepartureOverride",
+      "name": "departureOverrideReasonPresent",
+      "code": "departureOverrideReasonPresent",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Say why it is fine to leave.",
+      "overrideable": false
+    },
+    {
       "entity": "Dish",
       "name": "dishIdentityComplete",
       "code": "dishIdentityComplete",
@@ -101160,6 +104982,15 @@
       "overrideable": false
     },
     {
+      "entity": "EventChecklist",
+      "name": "eventChecklistNamed",
+      "code": "eventChecklistNamed",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Give this checklist a name.",
+      "overrideable": false
+    },
+    {
       "entity": "EventCloseout",
       "name": "closeoutCapturedMoneyNonnegative",
       "code": "closeoutCapturedMoneyNonnegative",
@@ -101313,6 +105144,15 @@
       "overrideable": false
     },
     {
+      "entity": "EventPlanNeeds",
+      "name": "planNeedsTrucksNotNegative",
+      "code": "planNeedsTrucksNotNegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Trucks needed can't be negative. Use zero or more.",
+      "overrideable": false
+    },
+    {
       "entity": "EventStaffNeed",
       "name": "staffNeedRole",
       "code": "staffNeedRole",
@@ -101328,6 +105168,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "This staffing need's end has to be after its start.",
+      "overrideable": false
+    },
+    {
+      "entity": "EventTask",
+      "name": "eventTaskTitled",
+      "code": "eventTaskTitled",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Give this to-do a title.",
       "overrideable": false
     },
     {
@@ -102030,6 +105879,24 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "A hired person needs a first name, a last name, and an email.",
+      "overrideable": false
+    },
+    {
+      "entity": "PlanningOverride",
+      "name": "planningOverrideReasonPresent",
+      "code": "planningOverrideReasonPresent",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Say why this change is fine.",
+      "overrideable": false
+    },
+    {
+      "entity": "PlanningRule",
+      "name": "planningRuleNamed",
+      "code": "planningRuleNamed",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Give this rule a name.",
       "overrideable": false
     },
     {
@@ -102768,6 +106635,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Give this service a vendor, a cost, an odometer reading, and when it was done. Cost can't be negative.",
+      "overrideable": false
+    },
+    {
+      "entity": "VehicleTripCheck",
+      "name": "tripCheckOdometerNonnegative",
+      "code": "tripCheckOdometerNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "The odometer reading can't be negative. Use zero or more.",
       "overrideable": false
     },
     {
@@ -103803,6 +107679,38 @@
       }
     },
     {
+      "source": "DepartureOverride",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DepartureOverride",
+      "target": "PackList",
+      "kind": "belongsTo",
+      "name": "packList",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "packListId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "Dish",
       "target": "DishIngredient",
       "kind": "hasMany",
@@ -104589,6 +108497,22 @@
       }
     },
     {
+      "source": "EventAssignment",
+      "target": "EventVehicleAssignment",
+      "kind": "ref",
+      "name": "rideVehicle",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "rideVehicleAssignmentId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "EventCloseout",
       "target": "Event",
       "kind": "belongsTo",
@@ -104867,6 +108791,22 @@
       }
     },
     {
+      "source": "EventPlanNeeds",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "EventStaffNeed",
       "target": "Event",
       "kind": "belongsTo",
@@ -104932,6 +108872,22 @@
     },
     {
       "source": "EventStaffNeed",
+      "target": "EventVehicleAssignment",
+      "kind": "ref",
+      "name": "rideVehicle",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "rideVehicleAssignmentId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventStaffNeed",
       "target": "Person",
       "kind": "ref",
       "name": "coverageReplacementPerson",
@@ -104939,6 +108895,70 @@
         "fields": [
           "tenantId",
           "coverageReplacementPersonId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventTask",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventTask",
+      "target": "Person",
+      "kind": "belongsTo",
+      "name": "owner",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ownerPersonId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventTask",
+      "target": "EventTask",
+      "kind": "ref",
+      "name": "waitsFor",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "waitsForTaskId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventTask",
+      "target": "EventChecklist",
+      "kind": "belongsTo",
+      "name": "checklist",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "checklistTemplateId"
         ],
         "references": [
           "tenantId",
@@ -106097,6 +110117,54 @@
       }
     },
     {
+      "source": "PackSectionClaim",
+      "target": "PackList",
+      "kind": "belongsTo",
+      "name": "packList",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "packListId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PackSectionClaim",
+      "target": "Person",
+      "kind": "belongsTo",
+      "name": "person",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "personId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PackSectionClaim",
+      "target": "Person",
+      "kind": "belongsTo",
+      "name": "takenOverBy",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "takenOverByPersonId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "Payment",
       "target": "Invoice",
       "kind": "belongsTo",
@@ -106345,6 +110413,54 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PlanningOverride",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PlanningReceipt",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PlanningRule",
+      "target": "Equipment",
+      "kind": "belongsTo",
+      "name": "triggerEquipment",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "triggerEquipmentId"
         ],
         "references": [
           "tenantId",
@@ -108299,6 +112415,38 @@
       }
     },
     {
+      "source": "VehicleTripCheck",
+      "target": "EventVehicleAssignment",
+      "kind": "belongsTo",
+      "name": "run",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventVehicleAssignmentId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "VehicleTripCheck",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "VendorContact",
       "target": "Vendor",
       "kind": "belongsTo",
@@ -109811,6 +113959,17 @@
       ]
     },
     {
+      "name": "EventChecklistStatus",
+      "values": [
+        {
+          "name": "active"
+        },
+        {
+          "name": "retired"
+        }
+      ]
+    },
+    {
       "name": "EventCloseoutStatus",
       "values": [
         {
@@ -109912,6 +114071,40 @@
         },
         {
           "name": "closed_out"
+        }
+      ]
+    },
+    {
+      "name": "EventTaskPriority",
+      "values": [
+        {
+          "name": "critical"
+        },
+        {
+          "name": "high"
+        },
+        {
+          "name": "medium"
+        },
+        {
+          "name": "low"
+        }
+      ]
+    },
+    {
+      "name": "EventTaskStatus",
+      "values": [
+        {
+          "name": "open"
+        },
+        {
+          "name": "in_progress"
+        },
+        {
+          "name": "done"
+        },
+        {
+          "name": "skipped"
         }
       ]
     },
@@ -111044,6 +115237,31 @@
       ]
     },
     {
+      "name": "PlanningRuleStatus",
+      "values": [
+        {
+          "name": "active"
+        },
+        {
+          "name": "retired"
+        }
+      ]
+    },
+    {
+      "name": "PlanningRuleTrigger",
+      "values": [
+        {
+          "name": "every_event"
+        },
+        {
+          "name": "equipment"
+        },
+        {
+          "name": "equipment_kind"
+        }
+      ]
+    },
+    {
       "name": "PrepTaskCommentCategory",
       "values": [
         {
@@ -111782,6 +116000,54 @@
         },
         {
           "name": "retired"
+        }
+      ]
+    },
+    {
+      "name": "TripCheckKind",
+      "values": [
+        {
+          "name": "before_leaving"
+        },
+        {
+          "name": "after_return"
+        }
+      ]
+    },
+    {
+      "name": "TripCheckRating",
+      "values": [
+        {
+          "name": "good"
+        },
+        {
+          "name": "fair"
+        },
+        {
+          "name": "poor"
+        },
+        {
+          "name": "fail"
+        }
+      ]
+    },
+    {
+      "name": "TripFuelLevel",
+      "values": [
+        {
+          "name": "empty"
+        },
+        {
+          "name": "quarter"
+        },
+        {
+          "name": "half"
+        },
+        {
+          "name": "three_quarters"
+        },
+        {
+          "name": "full"
         }
       ]
     },
@@ -112747,6 +117013,11 @@
       "payload": "{deliveryId: string, tenantId: string, vehicleId: string, eventId: string}"
     },
     {
+      "name": "DepartureOverrideRecorded",
+      "channel": "departure_override.recorded",
+      "payload": "{departureOverrideId: string, tenantId: string, eventId: string, packListId: string | null, reason: string}"
+    },
+    {
       "name": "DishAllergensClassified",
       "channel": "dish.allergens_classified",
       "payload": "{dishId: string, tenantId: string, allergenSummary: list<AllergenCode>}"
@@ -112932,6 +117203,11 @@
       "payload": "{maintenanceTaskId: string, equipmentId: string, tenantId: string, taskName: string, intervalDays: int, nextDueAt: datetime}"
     },
     {
+      "name": "EquipmentOperatingFactsSet",
+      "channel": "equipment.operating_facts_set",
+      "payload": "{equipmentId: string, tenantId: string}"
+    },
+    {
       "name": "EquipmentPartAttached",
       "channel": "equipment.part_attached",
       "payload": "{equipmentPartId: string, tenantId: string, equipmentId: string, partEquipmentId: string, role: EquipmentPartRole}"
@@ -113065,6 +117341,26 @@
       "name": "EventCancelled",
       "channel": "event.cancelled",
       "payload": "{eventId: string, tenantId: string, clientId: string, reason: string}"
+    },
+    {
+      "name": "EventChecklistDefined",
+      "channel": "event_checklist.defined",
+      "payload": "{eventChecklistId: string, tenantId: string, name: string}"
+    },
+    {
+      "name": "EventChecklistReinstated",
+      "channel": "event_checklist.reinstated",
+      "payload": "{eventChecklistId: string, tenantId: string}"
+    },
+    {
+      "name": "EventChecklistRetired",
+      "channel": "event_checklist.retired",
+      "payload": "{eventChecklistId: string, tenantId: string}"
+    },
+    {
+      "name": "EventChecklistRevised",
+      "channel": "event_checklist.revised",
+      "payload": "{eventChecklistId: string, tenantId: string, name: string}"
     },
     {
       "name": "EventClientMergeStaged",
@@ -113277,6 +117573,11 @@
       "payload": "{eventId: string, tenantId: string, clientId: string, serviceStyleId: string | null, venueId: string | null, venueCapacity: number | null, startsAt: datetime, endsAt: datetime, expectedHeadcount: number}"
     },
     {
+      "name": "EventPlanNeedsNoted",
+      "channel": "event_plan_needs.noted",
+      "payload": "{eventPlanNeedsId: string, tenantId: string, eventId: string}"
+    },
+    {
       "name": "EventPricingChanged",
       "channel": "event.pricing_changed",
       "payload": "{eventId: string, tenantId: string, budgetAmount: money, quotedPrice: money}"
@@ -113392,9 +117693,49 @@
       "payload": "{eventId: string, tenantId: string}"
     },
     {
+      "name": "EventTaskAdded",
+      "channel": "event_task.added",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string, title: string}"
+    },
+    {
       "name": "EventTaskBreakdownUpdated",
       "channel": "event_task_breakdown.updated",
       "payload": "{eventId: string, tenantId: string}"
+    },
+    {
+      "name": "EventTaskCompleted",
+      "channel": "event_task.completed",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string, title: string}"
+    },
+    {
+      "name": "EventTaskOwnerChanged",
+      "channel": "event_task.owner_changed",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string}"
+    },
+    {
+      "name": "EventTaskRemoved",
+      "channel": "event_task.removed",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string}"
+    },
+    {
+      "name": "EventTaskReopened",
+      "channel": "event_task.reopened",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string}"
+    },
+    {
+      "name": "EventTaskRevised",
+      "channel": "event_task.revised",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string}"
+    },
+    {
+      "name": "EventTaskSkipped",
+      "channel": "event_task.skipped",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string, reason: string}"
+    },
+    {
+      "name": "EventTaskStarted",
+      "channel": "event_task.started",
+      "payload": "{eventTaskId: string, tenantId: string, eventId: string}"
     },
     {
       "name": "EventTemplateArchived",
@@ -114162,6 +118503,11 @@
       "payload": "{organizationId: string, tenantId: string, currencyCode: string}"
     },
     {
+      "name": "OrganizationPlanningChecksConfigured",
+      "channel": "organization.planning_checks_configured",
+      "payload": "{organizationId: string, tenantId: string}"
+    },
+    {
       "name": "OrganizationReactivated",
       "channel": "organization.reactivated",
       "payload": "{organizationId: string, tenantId: string}"
@@ -114222,6 +118568,11 @@
       "payload": "{packListItemId: string, tenantId: string, packListId: string}"
     },
     {
+      "name": "PackListItemChecked",
+      "channel": "pack_list_item.checked",
+      "payload": "{packListItemId: string, tenantId: string, packListId: string, checkedQuantity: decimal}"
+    },
+    {
       "name": "PackListItemCountRecorded",
       "channel": "pack_list_item.count_recorded",
       "payload": "{packListItemId: string, tenantId: string, packListId: string, eventId: string, description: string, previousPackedQuantity: decimal, packedQuantity: decimal, requiredQuantity: decimal, unit: UnitOfMeasure, status: PackListItemStatus}"
@@ -114240,6 +118591,11 @@
       "name": "PackListItemLoadAssigned",
       "channel": "pack_list_item.load_assigned",
       "payload": "{packListItemId: string, tenantId: string, packListId: string, loadAssignmentId: string | null}"
+    },
+    {
+      "name": "PackListItemLoaded",
+      "channel": "pack_list_item.loaded",
+      "payload": "{packListItemId: string, tenantId: string, packListId: string, loadedQuantity: decimal, loadAssignmentId: string | null}"
     },
     {
       "name": "PackListItemMissing",
@@ -114270,6 +118626,11 @@
       "name": "PackListItemResponsibilitySet",
       "channel": "pack_list_item.responsibility_set",
       "payload": "{packListItemId: string, tenantId: string, packListId: string, ownership: PackOwnership, returnRequired: boolean}"
+    },
+    {
+      "name": "PackListItemReturnCounted",
+      "channel": "pack_list_item.return_counted",
+      "payload": "{packListItemId: string, tenantId: string, packListId: string, returnedQuantity: decimal, usedQuantity: decimal, lostQuantity: decimal, damagedQuantity: decimal}"
     },
     {
       "name": "PackListItemSentInsteadRecorded",
@@ -114345,6 +118706,16 @@
       "name": "PackRuleRevised",
       "channel": "pack_rule.revised",
       "payload": "{packRuleId: string, tenantId: string, ruleVersion: int}"
+    },
+    {
+      "name": "PackSectionReleased",
+      "channel": "pack_section.released",
+      "payload": "{packSectionClaimId: string, tenantId: string, packListId: string, sectionKey: string}"
+    },
+    {
+      "name": "PackSectionTaken",
+      "channel": "pack_section.taken",
+      "payload": "{packSectionClaimId: string, tenantId: string, packListId: string, sectionKey: string, personName: string}"
     },
     {
       "name": "PaymentClientMergeStaged",
@@ -114555,6 +118926,36 @@
       "name": "PersonWorkPreferencesSet",
       "channel": "person.work_preferences_set",
       "payload": "{personId: string, tenantId: string}"
+    },
+    {
+      "name": "PlanningOverrideRecorded",
+      "channel": "planning_override.recorded",
+      "payload": "{planningOverrideId: string, tenantId: string, eventId: string, action: string, reason: string}"
+    },
+    {
+      "name": "PlanningRuleDefined",
+      "channel": "planning_rule.defined",
+      "payload": "{planningRuleId: string, tenantId: string, name: string}"
+    },
+    {
+      "name": "PlanningRuleReinstated",
+      "channel": "planning_rule.reinstated",
+      "payload": "{planningRuleId: string, tenantId: string}"
+    },
+    {
+      "name": "PlanningRuleRetired",
+      "channel": "planning_rule.retired",
+      "payload": "{planningRuleId: string, tenantId: string}"
+    },
+    {
+      "name": "PlanningRuleRevised",
+      "channel": "planning_rule.revised",
+      "payload": "{planningRuleId: string, tenantId: string, name: string}"
+    },
+    {
+      "name": "PlanningSuggestionAnswered",
+      "channel": "planning_receipt.answered",
+      "payload": "{planningReceiptId: string, tenantId: string, eventId: string, suggestionKey: string, declined: boolean}"
     },
     {
       "name": "PrepTaskAssigned",
@@ -115477,6 +119878,11 @@
       "payload": "{trainingModuleId: string, tenantId: string, name: string}"
     },
     {
+      "name": "VehicleCrewFactsSet",
+      "channel": "vehicle.crew_facts_set",
+      "payload": "{vehicleId: string, tenantId: string, seatCount: int | null}"
+    },
+    {
       "name": "VehicleDetailsRevised",
       "channel": "vehicle.details_revised",
       "payload": "{vehicleId: string, tenantId: string, make: string, model: string, registration: string, ownership: VehicleOwnership, payloadCapacityKg: int}"
@@ -115525,6 +119931,11 @@
       "name": "VehicleTowCapacitySet",
       "channel": "vehicle.tow_capacity_set",
       "payload": "{vehicleId: string, tenantId: string, towCapacityKg: int | null}"
+    },
+    {
+      "name": "VehicleTripChecked",
+      "channel": "vehicle.trip_checked",
+      "payload": "{vehicleTripCheckId: string, tenantId: string, eventVehicleAssignmentId: string, eventId: string, kind: TripCheckKind, odometer: int | null}"
     },
     {
       "name": "VendorContactAdded",
@@ -115932,6 +120343,10 @@
       "target": "durable"
     },
     {
+      "entity": "DepartureOverride",
+      "target": "durable"
+    },
+    {
       "entity": "Dish",
       "target": "durable"
     },
@@ -115996,6 +120411,10 @@
       "target": "durable"
     },
     {
+      "entity": "EventChecklist",
+      "target": "durable"
+    },
+    {
       "entity": "EventCloseout",
       "target": "durable"
     },
@@ -116048,7 +120467,15 @@
       "target": "durable"
     },
     {
+      "entity": "EventPlanNeeds",
+      "target": "durable"
+    },
+    {
       "entity": "EventStaffNeed",
+      "target": "durable"
+    },
+    {
+      "entity": "EventTask",
       "target": "durable"
     },
     {
@@ -116212,6 +120639,10 @@
       "target": "durable"
     },
     {
+      "entity": "PackSectionClaim",
+      "target": "durable"
+    },
+    {
       "entity": "Payment",
       "target": "durable"
     },
@@ -116233,6 +120664,18 @@
     },
     {
       "entity": "Person",
+      "target": "durable"
+    },
+    {
+      "entity": "PlanningOverride",
+      "target": "durable"
+    },
+    {
+      "entity": "PlanningReceipt",
+      "target": "durable"
+    },
+    {
+      "entity": "PlanningRule",
       "target": "durable"
     },
     {
@@ -116445,6 +120888,10 @@
     },
     {
       "entity": "VehicleServiceEntry",
+      "target": "durable"
+    },
+    {
+      "entity": "VehicleTripCheck",
       "target": "durable"
     },
     {

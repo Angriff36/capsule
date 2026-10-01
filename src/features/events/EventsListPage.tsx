@@ -2,14 +2,15 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCount } from "../../lib/format";
 import { useListClient, useListEvent } from "../../lib/manifest-convex-react";
-import { PlusIcon } from "../../ui/icons";
-import { formatStatusLabel } from "../../lib/statusLabels";
+import { ChevronDownIcon, PlusIcon } from "../../ui/icons";
 import {
-  ActionMenu,
-  EmptyState,
-  StatusChip,
-  TableSkeleton,
-} from "../../ui/primitives";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../ui/DropdownMenu";
+import { formatStatusLabel } from "../../lib/statusLabels";
+import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { SavedViewsBar } from "../views/SavedViewsBar";
 import { EventArchiveVisibility } from "./eventArchiveVisibility";
 import { clientDisplayName } from "./clientName";
@@ -293,12 +294,27 @@ export function EventsListPage() {
           <Link to="/events/new" className="btn btn-primary">
             <PlusIcon /> New event
           </Link>
-          <ActionMenu>
-            <Link to={eventImportPath()}>Import from BEO / worksheet</Link>
-            <Link to="/events/tracker">Event tracker</Link>
-            <Link to="/events/capacity">Capacity calendar</Link>
-            <Link to="/events/templates">Templates</Link>
-          </ActionMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className="btn btn-ghost">
+                More <ChevronDownIcon width={12} height={12} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link to={eventImportPath()}>Import from BEO / worksheet</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/events/tracker">Event tracker</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/events/capacity">Capacity calendar</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/events/templates">Templates</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

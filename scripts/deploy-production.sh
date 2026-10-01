@@ -95,13 +95,28 @@ run_review() {
       echo "This diff touches authored UI. Read DESIGN.md in the repository root and apply the 'If the diff touches authored UI' review text in AGENTS.md (section 'Merge gate') in full: DESIGN.md is the presentation authority; an unamended DESIGN.md plus a changed visual language is a REJECT."
     fi
     echo ""
+    echo "How to review: inspect the diff and the tests it adds or changes. Do NOT run the full test suite, coverage, the build, Storybook, \`bun run check\` or any other full gate: this release runs the complete production gate once, right after your APPROVE. You MAY run a focused test (one file or one test name) to confirm or rule out a specific suspected blocker. If you cannot approve without broader execution, say exactly what must be run and why, instead of running it."
+    echo ""
     echo "A rejection must identify a concrete problem in the changed code and a plausible user or production failure. End with exactly one line: \`VERDICT: APPROVE\` or \`VERDICT: REJECT\`."
   } > "$prompt"
   echo "deploy-production: independent review by Codex gpt-5.6-sol (log: $log)"
   # "high", not the config default "xhigh": the owner (2026-09-22) does not
   # want the release review at the highest reasoning level. It took 20-40
   # minutes a pass; the verdicts do not need it.
-  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 || fail "the review command failed. Read $log"
+  # The review can take 20+ minutes (it may run the test suite itself): print
+  # a progress line every minute with the last command the reviewer ran, so a
+  # long review is visibly working, never a silent wait.
+  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 &
+  local review_pid=$! started=$SECONDS last=$SECONDS every="${DEPLOY_REVIEW_PROGRESS_SECONDS:-60}"
+  while kill -0 "$review_pid" 2>/dev/null; do
+    sleep 1
+    if [ $((SECONDS - last)) -ge "$every" ]; then
+      last=$SECONDS
+      echo "deploy-production: review still running ($(( (SECONDS - started) / 60 )) min); last step: $(grep -A1 '^exec$' "$log" 2>/dev/null | tail -1 | cut -c1-120)"
+    fi
+  done
+  wait "$review_pid" || fail "the review command failed. Read $log"
+  echo "deploy-production: review finished after $(( (SECONDS - started) / 60 )) min"
   # The log echoes the prompt; the verdict is in the reviewer's last message.
   local answer
   answer="$(awk '/^codex$/ { buffer = "" ; next } { buffer = buffer "\n" $0 } END { print buffer }' "$log")"

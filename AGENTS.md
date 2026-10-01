@@ -65,7 +65,8 @@ RYAN_APPROVED 7-23-2026 Created by Ryan
 
 ```bash
 bun install --frozen-lockfile
-bun run dev              # Vite → http://localhost:7811
+bun run dev              # local Convex backend + Vite → http://localhost:7811
+bun run dev:frontend     # Vite only
 bun run dev:convex       # Convex sync
 bun run toolchain        # Bun/Node pin check
 bun run typecheck
@@ -76,7 +77,7 @@ bun run test             # or bunx vitest run <files>; bare bun test cannot run 
 bun run test:coverage    # vitest + coverage ratchet
 bun run build
 bun run baseline:decay   # monthly hygiene checks
-bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + manifest-breaking (vs last [release], acks in scripts/manifest-breaking-acks.json) + manifest-fmt (--check) + manifest-scan (--strict) + manifest-completeness (validate-ai domain/reaction; tracked list in scripts/manifest-completeness-tracked.json) + manifest-integration (all domain guards, generated/proof/guard.*.json) + design-vocab + typecheck + format:check + secrets + test:coverage + build + baseline:decay
+bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + manifest-breaking (vs last [release], acks in scripts/manifest-breaking-acks.json) + manifest-fmt (--check) + manifest-scan (--strict) + manifest-completeness (validate-ai domain/reaction; tracked list in scripts/manifest-completeness-tracked.json) + wiring-drift + manifest-integration (all domain guards, generated/proof/guard.*.json) + design-vocab + typecheck + format:check + secrets + test:coverage + build + storybook (check:storybook builds into .artifacts/storybook-static) + baseline:decay
 bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL
@@ -158,6 +159,30 @@ and `src/styles/**`.
   Do **not** add an entry to make a new change pass —
   an entry records an owner decision that is still open, and adding one for
   fresh work is the silent override this rule forbids.
+
+## Component catalog and reuse (agents)
+
+Storybook is Capsule's component catalog, not just a preview playground.
+Before adding or changing UI, read [the component catalog](docs/design/component-catalog.md),
+then inspect the matching `src/**/*.stories.tsx` and its component implementation.
+Reuse the existing component and documented variant before creating another.
+Run `bun run storybook` to inspect it at http://localhost:6007 when visual context
+is needed. `DESIGN.md` remains the presentation authority.
+
+- Use `src/ui/DropdownMenu.tsx` for action dropdowns, grouped menus, and menu
+  checkbox/radio choices (Origin UI adapted to Capsule). See
+  `src/ui/DropdownMenu.stories.tsx`. Use `asChild` for router links and existing
+  trigger buttons; use `onSelect` for actions. Do not invent another dropdown.
+- Native selects and searchable record pickers have different semantics;
+  do not replace form selection controls with action menus.
+- When a reusable component or variant is missing, add it under `src/ui/` (or
+  its owning feature), add colocated stories showing its real states and usage,
+  and update the catalog in the same change. Stories must render the actual
+  shared component, not a separate mock implementation.
+- Keep speculative `src/ui/next/` examples separate from shipped components:
+  check their production imports before treating them as established defaults.
+- No new tests are authorized by this catalog rule; the existing tests rule
+  still applies. Run the existing checks, including the Storybook build.
 
 ## Domain gating (agents)
 

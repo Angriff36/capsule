@@ -14,11 +14,13 @@ export type EventDetailTab =
   | "guests"
   | "photos"
   | "timeline"
+  | "todos"
   | "layouts"
   | "recurring"
   | "staffing"
   | "inventory"
   | "incidents"
+  | "history"
   | "margin";
 
 export const EVENT_DETAIL_TABS: readonly {
@@ -34,11 +36,13 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "guests", label: "Guests" },
   { key: "photos", label: "Event Photo Gallery" },
   { key: "timeline", label: "Timeline" },
+  { key: "todos", label: "To-dos" },
   { key: "layouts", label: "Layouts" },
   { key: "recurring", label: "Recurring Schedule" },
   { key: "staffing", label: "Staffing" },
   { key: "inventory", label: "Inventory" },
   { key: "incidents", label: "Incidents" },
+  { key: "history", label: "History" },
   { key: "margin", label: "Margin" },
 ] as const;
 
@@ -61,12 +65,12 @@ export const EVENT_TAB_GROUPS: readonly {
   {
     key: "dayof",
     label: "Day-of",
-    tabs: ["timeline", "staffing", "equipment", "layouts"],
+    tabs: ["timeline", "todos", "staffing", "equipment", "layouts"],
   },
   {
     key: "records",
     label: "Photos & incidents",
-    tabs: ["photos", "incidents"],
+    tabs: ["photos", "incidents", "history"],
   },
   { key: "money", label: "Money", tabs: ["margin"] },
 ] as const;

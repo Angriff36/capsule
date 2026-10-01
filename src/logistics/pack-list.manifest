@@ -389,6 +389,25 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property missingByPersonId: uuid?
   property sentInsteadByPersonId: uuid?
   property excludedByPersonId: uuid?
+  // Second count of what is packed, by whoever looks it over before it
+  // loads. Empty = nobody has counted it a second time.
+  property checkedQuantity: decimal(12, 4)?
+  property checkedAt: datetime?
+  property checkedByPersonId: uuid?
+  // How much of this line is on the truck. Empty = not counted onto a truck;
+  // the list's own "loaded" step still covers the whole list.
+  property loadedQuantity: decimal(12, 4)?
+  property lineLoadedAt: datetime?
+  property lineLoadedByPersonId: uuid?
+  // After the event: what came back, what was used up, what was lost and
+  // what came back broken. Empty = nobody has counted the return yet.
+  property returnedQuantity: decimal(12, 4)?
+  property usedQuantity: decimal(12, 4)?
+  property lostQuantity: decimal(12, 4)?
+  property damagedQuantity: decimal(12, 4)?
+  property returnFinding: string?
+  property returnCountedAt: datetime?
+  property returnCountedByPersonId: uuid?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
@@ -531,6 +550,11 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "Say where this fluid-ounce fix came from."
     mutate requiredQuantity = self.requiredQuantity / 8
     mutate packedQuantity = self.packedQuantity / 8
+    // The second check and the on-truck count are in the same unit as the
+    // packed amount, so they change with it. No return is counted yet: the
+    // list has not left.
+    mutate checkedQuantity = self.checkedQuantity != null ? self.checkedQuantity / 8 : null
+    mutate loadedQuantity = self.loadedQuantity != null ? self.loadedQuantity / 8 : null
     mutate unit = "cup"
     mutate unitCorrectionSource = sourceReference
   }
@@ -565,6 +589,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint recordPackedCountPositive: packedQuantity > 0 "Enter a packed amount more than zero."
     constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
     compute previousPacked = self.packedQuantity
+    // A saved return count stays true: what went out can't drop below it.
+    constraint packedCoversReturn: self.returnCountedAt == null or self.loadedQuantity != null or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    // A packed amount can't drop below what was already checked or put on the truck.
+    constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
     mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemCountRecorded {
@@ -593,6 +621,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint markPackedComplete: packedQuantity == self.requiredQuantity "Save a short count on this line until you have the full amount"
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
+    // A saved return count stays true: what went out can't drop below it.
+    constraint packedCoversReturn: self.returnCountedAt == null or self.loadedQuantity != null or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    // A packed amount can't drop below what was already checked or put on the truck.
+    constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
     mutate status = "packed"
     mutate packedAt = now()
@@ -872,6 +904,86 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Second count before loading. The packer may check their own line: a small
+  // crew has nobody else, and the name of who checked is kept. Zero clears it.
+  command recordChecked(checkedQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint checkedNotNegative: checkedQuantity >= 0 "The checked amount can't be negative. Use zero or more."
+    constraint checkedNotOverPacked: checkedQuantity <= self.packedQuantity "You can't check more than what is packed. Save the packed amount first."
+    mutate checkedQuantity = checkedQuantity > 0 ? checkedQuantity : null
+    mutate checkedAt = checkedQuantity > 0 ? now() : null
+    mutate checkedByPersonId = checkedQuantity > 0 ? user.personId : null
+    emit PackListItemChecked {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      checkedQuantity: checkedQuantity
+    }
+  }
+
+  // How much of this line is on the truck. Zero is kept: it says nothing of
+  // this line went out, which is not the same as "not counted". A truck given
+  // here puts the line on that truck in the same step (the scan's "Truck being
+  // loaded"); left out, the line keeps the truck it has. The seam
+  // (convex/lib/operationalEvents.ts) checks the truck is on the event.
+  command recordLoaded(loadedQuantity: decimal(12, 4), optional loadAssignmentId: uuid) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint loadedNotNegative: loadedQuantity >= 0 "The loaded amount can't be negative. Use zero or more."
+    constraint loadedNotOverPacked: loadedQuantity <= self.packedQuantity "You can't load more than what is packed. Save the packed amount first."
+    // A saved return count stays true: what went out can't drop below it.
+    constraint loadedCoversReturn: self.returnCountedAt == null or loadedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    mutate loadedQuantity = loadedQuantity
+    mutate loadAssignmentId = loadAssignmentId != null ? loadAssignmentId : self.loadAssignmentId
+    mutate lineLoadedAt = now()
+    mutate lineLoadedByPersonId = user.personId
+    emit PackListItemLoaded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      loadedQuantity: loadedQuantity
+      loadAssignmentId: loadAssignmentId
+    }
+  }
+
+  // The return count after the event. It can be saved again: a crate turns up
+  // the next morning. The four amounts together can't be more than what
+  // went out. Only a list that has left can have a return: a count saved before
+  // that would make the returns page show the list as already counted.
+  command recordReturn(
+    returnedQuantity: decimal(12, 4),
+    usedQuantity: decimal(12, 4),
+    lostQuantity: decimal(12, 4),
+    damagedQuantity: decimal(12, 4),
+    optional finding: string
+  ) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status == "dispatched"
+    // Same rule as the "Coming back" view: marked to come back, or not
+    // marked and not a throwaway.
+    constraint returnLineComesBack: self.excludedAt == null and (self.returnRequired != null ? self.returnRequired == true : self.category != "disposable") "This line does not come back, so there is no return to count."
+    constraint returnAmountsNotNegative: returnedQuantity >= 0 and usedQuantity >= 0 and lostQuantity >= 0 and damagedQuantity >= 0 "A return amount can't be negative. Use zero or more."
+    // What went out is the on-truck count when one was taken (zero included), else what was packed.
+    constraint returnNotOverWentOut: returnedQuantity + usedQuantity + lostQuantity + damagedQuantity <= (self.loadedQuantity != null ? self.loadedQuantity : self.packedQuantity) "That is more than what went out. Check the amounts."
+    mutate returnedQuantity = returnedQuantity
+    mutate usedQuantity = usedQuantity
+    mutate lostQuantity = lostQuantity
+    mutate damagedQuantity = damagedQuantity
+    mutate returnFinding = finding != null and length(trim(finding)) > 0 ? trim(finding) : null
+    mutate returnCountedAt = now()
+    mutate returnCountedByPersonId = user.personId
+    emit PackListItemReturnCounted {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      returnedQuantity: returnedQuantity
+      usedQuantity: usedQuantity
+      lostQuantity: lostQuantity
+      damagedQuantity: damagedQuantity
+    }
+  }
+
   command restoreExcluded() {
     guard self.deletedAt == null and self.excludedAt != null
     guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
@@ -1082,6 +1194,31 @@ event PackListItemSentInsteadRecorded: "pack_list_item.sent_instead_recorded" {
   tenantId: string
   packListId: string
   sentInstead: string?
+}
+
+event PackListItemChecked: "pack_list_item.checked" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  checkedQuantity: decimal(12, 4)
+}
+
+event PackListItemLoaded: "pack_list_item.loaded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  loadedQuantity: decimal(12, 4)
+  loadAssignmentId: string?
+}
+
+event PackListItemReturnCounted: "pack_list_item.return_counted" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  returnedQuantity: decimal(12, 4)
+  usedQuantity: decimal(12, 4)
+  lostQuantity: decimal(12, 4)
+  damagedQuantity: decimal(12, 4)
 }
 
 event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
