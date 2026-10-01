@@ -45,10 +45,10 @@ describe("service style everywhere (AC-218, AC-221, AC-222)", () => {
     for (const name of TPP_STYLES) {
       const row = SERVICE_STYLE_CATALOG.find((style) => style.name === name)!;
       expect(row, name).toBeDefined();
-      const { docId } = await owner.mutation(
+      const { docId } = (await owner.mutation(
         api.eventCreateCatalog.ensureBuiltInServiceStyle,
-        { name: row.name, code: row.code, sortOrder: row.sortOrder },
-      );
+        { name: row.name, code: row.code, sortOrder: styleIds.size },
+      )) as { docId: string };
       styleIds.set(name, docId);
       await proof.executeCommand(
         owner,

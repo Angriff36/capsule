@@ -319,7 +319,7 @@ describe("ProposalCreateForm from an event (PL-CATALOGS AC-221, AC-222)", () => 
       defaultServiceChargePercent: null,
       visibleSections: [],
       serviceStyleId: "style-full",
-    } as (typeof templates)[number]);
+    } as unknown as (typeof templates)[number]);
     await act(async () => root.unmount());
     root = createRoot(container);
     await act(async () =>
