@@ -3448,6 +3448,12 @@ export default defineSchema({
     reason: v.optional(v.union(v.string(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
     appliedAt: v.optional(v.union(v.number(), v.null())),
+    venueCommissionTermId: v.optional(v.union(v.id("venueCommissionTerms"), v.null())),
+    overrideReason: v.optional(v.union(v.string(), v.null())),
+    overriddenById: v.optional(v.union(v.id("people"), v.null())),
+    overriddenAt: v.optional(v.union(v.number(), v.null())),
+    overRevenueReason: v.optional(v.union(v.string(), v.null())),
+    overRevenueAllowedById: v.optional(v.union(v.id("people"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
@@ -3460,7 +3466,10 @@ export default defineSchema({
     .index("by_partnerPersonId", ["partnerPersonId"])
     .index("by_partnerClientId", ["partnerClientId"])
     .index("by_requestedById", ["requestedById"])
-    .index("by_approvedById", ["approvedById"]),
+    .index("by_approvedById", ["approvedById"])
+    .index("by_venueCommissionTermId", ["venueCommissionTermId"])
+    .index("by_overriddenById", ["overriddenById"])
+    .index("by_overRevenueAllowedById", ["overRevenueAllowedById"]),
   reviewFlags: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

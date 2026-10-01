@@ -16,6 +16,7 @@ import {
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { RevenueSplitSummary } from "./RevenueSplitSummary";
 // This page renders tax-workspace surfaces (tax-period-stamp). Routes are lazy
 // chunks, so landing directly on this page without this import gets no styles
 // and the header stat runs together ("Pending approval00 total").
@@ -196,6 +197,14 @@ export function RevenueAttributionsPage() {
         </p>
       ) : null}
       {host}
+
+      <RevenueSplitSummary
+        events={events.map((event) => ({ ...event, _id: String(event._id) }))}
+        splits={configuredAttributions.map((attr) => ({
+          ...attr,
+          eventId: String(attr.eventId),
+        }))}
+      />
 
       {configuredAttributions.length === 0 ? (
         <div className="document-empty">

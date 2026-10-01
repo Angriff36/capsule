@@ -2310,6 +2310,42 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-VENUE-LAYOUT AC-314: optional; goes with sourceTemplateId. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.venueCommissionTermId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set on the split captured at booking. Earlier splits name no term. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set only by changeSplit. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overriddenById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set only by changeSplit. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overriddenAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set only by changeSplit. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overRevenueReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-301: optional; set only by allowOverRevenue. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overRevenueAllowedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-301: optional; set only by allowOverRevenue. No backfill."
     }
   ]
 }

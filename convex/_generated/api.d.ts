@@ -71,6 +71,7 @@ import type * as lib_authContext from "../lib/authContext.js";
 import type * as lib_autoStageFollowUp from "../lib/autoStageFollowUp.js";
 import type * as lib_backendRelease from "../lib/backendRelease.js";
 import type * as lib_blobs from "../lib/blobs.js";
+import type * as lib_bookingAttribution from "../lib/bookingAttribution.js";
 import type * as lib_cancellationReconciliation from "../lib/cancellationReconciliation.js";
 import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
 import type * as lib_cateringPackageOperations from "../lib/cateringPackageOperations.js";
@@ -342,6 +343,7 @@ declare const fullApi: ApiFromModules<{
   "lib/autoStageFollowUp": typeof lib_autoStageFollowUp;
   "lib/backendRelease": typeof lib_backendRelease;
   "lib/blobs": typeof lib_blobs;
+  "lib/bookingAttribution": typeof lib_bookingAttribution;
   "lib/cancellationReconciliation": typeof lib_cancellationReconciliation;
   "lib/catalogUnitGrams": typeof lib_catalogUnitGrams;
   "lib/cateringPackageOperations": typeof lib_cateringPackageOperations;

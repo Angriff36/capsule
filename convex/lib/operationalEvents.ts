@@ -25,6 +25,7 @@ import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
 import { freezeFinalVenueFacts } from "./venueFactsSnapshot";
 import { assertVendorAllowedAtEvent } from "../venueVendorPolicy";
+import { assertSplitsWithinRevenue, captureVenueTermAtBooking } from "./bookingAttribution";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
@@ -150,6 +151,15 @@ export async function handleManifestEvent(
     // One unsent draft invoice when the quoted price is above zero (AC-618).
     await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
+    // PL-ATTRIBUTION (AC-321): the venue term in force at booking.
+    await captureVenueTermAtBooking(ctx, event.entityId as Id<"events">);
+  }
+  if (event.entity === "RevenueAttribution" && event.type === "RevenueAttributionApplied") {
+    await assertSplitsWithinRevenue(
+      ctx,
+      event.entityId as Id<"revenueAttributions">,
+      Number(event.payload.eventRevenue ?? 0),
+    );
   }
   // PL-VENUE-LAYOUT (AC-315): the finished event keeps the venue as it was.
   if (event.entity === "Event" && event.type === "EventFinalized") {

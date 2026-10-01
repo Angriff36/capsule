@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/lib/api";
 import { classifyCommandFailure } from "../../events/CommandFailure";
+import { BoundedDateTimeLocalInput } from "@/ui/BoundedDateInputs";
 
 type FinancialMode = "reference_history" | "ledger_reconstruction";
 
@@ -81,8 +82,7 @@ export function CutoverFactsCard({
       <h3 className="font-medium">Switch facts</h3>
       <label className="block space-y-1 text-xs">
         <span className="font-medium">TPP stopped taking new entries at</span>
-        <input
-          type="datetime-local"
+        <BoundedDateTimeLocalInput
           className="w-full border rounded-sm p-2"
           value={frozenValue}
           onChange={(e) => setFrozenAt(e.target.value)}
@@ -94,8 +94,7 @@ export function CutoverFactsCard({
       </label>
       <label className="block space-y-1 text-xs">
         <span className="font-medium">Opening stock counted as of</span>
-        <input
-          type="datetime-local"
+        <BoundedDateTimeLocalInput
           className="w-full border rounded-sm p-2"
           value={stockValue}
           onChange={(e) => setStockAsOf(e.target.value)}

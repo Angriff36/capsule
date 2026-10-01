@@ -3778,7 +3778,7 @@ Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 
 ## 10. Billing and closeout
 
-Screens (62): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventInvoiceCard.tsx`, `events/EventMarginBreakdown.tsx`, `events/EventMarginSummaryAside.tsx`, `events/EventMarginTab.tsx`, `events/LiveEventProfitabilityWidget.tsx`, `finance/CloseoutBillingTruth.tsx`, `finance/CloseoutCaptureForm.tsx`, `finance/CloseoutCorrectionPanel.tsx`, `finance/CloseoutLifecyclePolicy.ts`, `finance/CloseoutPage.tsx`, `finance/CloseoutSourcesPanel.tsx`, `finance/CommercialLifecyclePolicy.ts`, `finance/eventCostSummary.ts`, `finance/EventCostSummaryReport.tsx`, `finance/EventFoodCostPanel.tsx`, `finance/FinanceFailureBanner.tsx`, `finance/FinanceOverviewPage.tsx`, `finance/FinanceReconciliationPage.tsx`, `finance/financeRoutes.ts`, `finance/FinanceWorkspaceNav.tsx`, `finance/foodCostPercentage.ts`, `finance/FoodCostPercentagePage.tsx`, `finance/invoiceBilling.ts`, `finance/InvoiceDetailPage.tsx`, `finance/InvoiceEquipmentCharges.tsx`, `finance/InvoiceIssueForm.tsx`, `finance/invoiceNumberDisplay.ts`, `finance/InvoiceNumberEditor.tsx`, `finance/invoicePdf.ts`, `finance/InvoicesPage.tsx`, `finance/invoiceTax.ts`, `finance/laborCost.ts`, `finance/paymentBreakdown.ts`, `finance/PaymentMethodLifecyclePolicy.ts`, `finance/PaymentMethodsPage.tsx`, `finance/PaymentsLedgerPresenter.ts`, `finance/PaymentsPage.tsx`, `finance/payrollExport.ts`, `finance/PayrollExportPanel.tsx`, `finance/PayrollLifecyclePolicy.ts`, `finance/PayrollPage.tsx`, `finance/payrollPeriod.ts`, `finance/PayrollPrepareForm.tsx`, `finance/PayrollPreparePayloadBuilder.ts`, `finance/PayrollReceipts.tsx`, `finance/payrollReconcile.ts`, `finance/PayrollWorksheet.tsx`, `finance/profitMarginReport.ts`, `finance/ProfitMarginReportsPage.tsx`, `finance/ReconciliationTables.tsx`, `finance/RevenueAttributionDetailPage.tsx`, `finance/RevenueAttributionsPage.tsx`, `finance/revenueAttributionValues.ts`, `finance/revenueTrend.ts`, `finance/RevenueTrendsPage.tsx`, `finance/TaxRatesPage.tsx`, `finance/tipDistribution.ts`, `finance/TipDistributionPage.tsx`, `finance/useFinanceReportFilters.ts`, `finance/VenueCommissionTermsPage.tsx`
+Screens (65): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventInvoiceCard.tsx`, `events/EventMarginBreakdown.tsx`, `events/EventMarginSummaryAside.tsx`, `events/EventMarginTab.tsx`, `events/LiveEventProfitabilityWidget.tsx`, `finance/CloseoutBillingTruth.tsx`, `finance/CloseoutCaptureForm.tsx`, `finance/CloseoutCorrectionPanel.tsx`, `finance/CloseoutLifecyclePolicy.ts`, `finance/CloseoutPage.tsx`, `finance/CloseoutSourcesPanel.tsx`, `finance/CommercialLifecyclePolicy.ts`, `finance/eventCostSummary.ts`, `finance/EventCostSummaryReport.tsx`, `finance/EventFoodCostPanel.tsx`, `finance/FinanceFailureBanner.tsx`, `finance/FinanceOverviewPage.tsx`, `finance/FinanceReconciliationPage.tsx`, `finance/financeRoutes.ts`, `finance/FinanceWorkspaceNav.tsx`, `finance/foodCostPercentage.ts`, `finance/FoodCostPercentagePage.tsx`, `finance/invoiceBilling.ts`, `finance/InvoiceDetailPage.tsx`, `finance/InvoiceEquipmentCharges.tsx`, `finance/InvoiceIssueForm.tsx`, `finance/invoiceNumberDisplay.ts`, `finance/InvoiceNumberEditor.tsx`, `finance/invoicePdf.ts`, `finance/InvoicesPage.tsx`, `finance/invoiceTax.ts`, `finance/laborCost.ts`, `finance/paymentBreakdown.ts`, `finance/PaymentMethodLifecyclePolicy.ts`, `finance/PaymentMethodsPage.tsx`, `finance/PaymentsLedgerPresenter.ts`, `finance/PaymentsPage.tsx`, `finance/payrollExport.ts`, `finance/PayrollExportPanel.tsx`, `finance/PayrollLifecyclePolicy.ts`, `finance/PayrollPage.tsx`, `finance/payrollPeriod.ts`, `finance/PayrollPrepareForm.tsx`, `finance/PayrollPreparePayloadBuilder.ts`, `finance/PayrollReceipts.tsx`, `finance/payrollReconcile.ts`, `finance/PayrollWorksheet.tsx`, `finance/profitMarginReport.ts`, `finance/ProfitMarginReportsPage.tsx`, `finance/ReconciliationTables.tsx`, `finance/RevenueAttributionDetailPage.tsx`, `finance/RevenueAttributionsPage.tsx`, `finance/revenueAttributionValues.ts`, `finance/RevenueSplitChanges.tsx`, `finance/revenueSplitMeasures.ts`, `finance/RevenueSplitSummary.tsx`, `finance/revenueTrend.ts`, `finance/RevenueTrendsPage.tsx`, `finance/TaxRatesPage.tsx`, `finance/tipDistribution.ts`, `finance/TipDistributionPage.tsx`, `finance/useFinanceReportFilters.ts`, `finance/VenueCommissionTermsPage.tsx`
 
 ### Generated reads
 
@@ -4045,48 +4045,62 @@ Screens (62): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
   - refusals (role, stage and rules): "Finance managers may see payroll inputs"; "Finance managers may update payroll inputs"; "Finance managers may change payroll inputs"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're voiding this payroll input."; and 2 more
   - effects: PayrollInputVoided
   - refresh: live reads update by themselves; reads affected: PayrollInput.list, PayrollInput.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.RevenueAttribution_allowOverRevenue` (RevenueAttribution.allowOverRevenue)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "This split is already applied."; "Say why this event's splits may add up to more than its revenue."; and 3 more
+  - effects: RevenueAttributionUpdated
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.RevenueAttribution_apply` (RevenueAttribution.apply)
   - inputs from the screen: eventRevenue; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "This event's revenue can't be negative. Use zero or more."; and 2 more
   - effects: RevenueAttributionApplied
-  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 4 more
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.RevenueAttribution_approve` (RevenueAttribution.approve)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: RevenueAttributionApproved
-  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 4 more
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_changeSplit` (RevenueAttribution.changeSplit)
+  - inputs from the screen: reason, percentBasis, fixedAmount; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "This split is already approved. Reject it first, or add a new one."; "Say why you are changing this split."; and 5 more
+  - effects: RevenueAttributionUpdated
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.RevenueAttribution_create` (RevenueAttribution.create)
-  - inputs from the screen: eventId, attributionType, allocationMethod, percentBasis, fixedAmount, venueId, salespersonId, referralSourceId, partnerPersonId, partnerClientId, effectiveStartDate, effectiveEndDate, reason; filled by the server: none
+  - inputs from the screen: eventId, attributionType, allocationMethod, percentBasis, fixedAmount, venueId, salespersonId, referralSourceId, partnerPersonId, partnerClientId, effectiveStartDate, effectiveEndDate, reason, venueCommissionTermId; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: created `{ _id: string; tenantId: string; deletedAt: number | null; eventId: string; a...`
   - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Link your account to a staff profile before you add a revenue attribution."
   - effects: RevenueAttributionCreated
-  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 4 more
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.RevenueAttribution_reject` (RevenueAttribution.reject)
   - inputs from the screen: rejectionReason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: RevenueAttributionRejected
-  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 4 more
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.RevenueAttribution_requestApproval` (RevenueAttribution.requestApproval)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: RevenueAttributionApprovalRequested
-  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 4 more
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.RevenueAttribution_update` (RevenueAttribution.update)
   - inputs from the screen: percentBasis, fixedAmount, effectiveStartDate, effectiveEndDate, reason, notes; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "This attribution's percent basis has to be between 0 and 100."; and 3 more
   - effects: RevenueAttributionUpdated
-  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 4 more
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
 - `mutations.SavedReportDefinition_createViaCreateDefinition` (SavedReportDefinition.createDefinition)
   - inputs from the screen: name, subjectArea, chartType, definition, sharingScope; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -4119,23 +4133,23 @@ Screens (62): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
   - inputs from the screen: venueId, commissionPercent, effectiveStartDate, effectiveEndDate, notes; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"
+  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "This venue's commission percent has to be between 0 and 100."; and 1 more
   - effects: VenueCommissionTermDefined
-  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, Venue.list, Venue.get
+  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, RevenueAttribution.list, RevenueAttribution.get, Venue.list, Venue.get
 - `mutations.VenueCommissionTerm_retire` (VenueCommissionTerm.retire)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "This venue commission term is already retired."; and 2 more
   - effects: VenueCommissionTermRetired
-  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, Venue.list, Venue.get
+  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, RevenueAttribution.list, RevenueAttribution.get, Venue.list, Venue.get
 - `mutations.VenueCommissionTerm_revise` (VenueCommissionTerm.revise)
   - inputs from the screen: commissionPercent, effectiveEndDate, notes; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "This venue commission term is already retired. You can't revise it."; and 4 more
   - effects: VenueCommissionTermRevised
-  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, Venue.list, Venue.get
+  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, RevenueAttribution.list, RevenueAttribution.get, Venue.list, Venue.get
 
 ### Authored reads and steps
 

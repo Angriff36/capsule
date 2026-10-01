@@ -694,8 +694,10 @@ import {
   RentalOrderLineMarkDeliveredParamsSchema,
   RentalOrderLineMarkReturnedParamsSchema,
   RentalOrderLineReviseParamsSchema,
+  RevenueAttributionAllowOverRevenueParamsSchema,
   RevenueAttributionApplyParamsSchema,
   RevenueAttributionApproveParamsSchema,
+  RevenueAttributionChangeSplitParamsSchema,
   RevenueAttributionCreateParamsSchema,
   RevenueAttributionRejectParamsSchema,
   RevenueAttributionRequestApprovalParamsSchema,
@@ -10426,6 +10428,16 @@ export function useGetRevenueAttribution(id: string | "skip") {
   return useQuery(api.queries.getRevenueAttribution, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for RevenueAttribution.allowOverRevenue. */
+export function useRevenueAttributionAllowOverRevenue() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_allowOverRevenue);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionAllowOverRevenueParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for RevenueAttribution.apply. */
 export function useRevenueAttributionApply() {
   const mutate = useMutation(api.mutations.RevenueAttribution_apply);
@@ -10442,6 +10454,16 @@ export function useRevenueAttributionApprove() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = RevenueAttributionApproveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.changeSplit. */
+export function useRevenueAttributionChangeSplit() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_changeSplit);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionChangeSplitParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13412,4 +13434,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1420 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1422 as const;

@@ -24,6 +24,7 @@ import {
   formatMoneyExact,
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
+import { RevenueSplitChanges } from "./RevenueSplitChanges";
 import { useActionNotice } from "../../ui/action-result";
 import {
   eventRevenueEstimate,
@@ -379,6 +380,9 @@ export function RevenueAttributionDetailPage() {
                 </div>
               )}
             </dl>
+            <RevenueSplitChanges
+              split={{ ...attribution, _id: String(attribution._id) }}
+            />
           </div>
         </div>
       ) : (

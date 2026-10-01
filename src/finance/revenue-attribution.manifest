@@ -45,6 +45,8 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.definedAt == null
+    constraint defineTermPercent: commissionPercent >= 0 and commissionPercent <= 100 "This venue's commission percent has to be between 0 and 100."
+    constraint defineTermDates: effectiveEndDate == null or effectiveEndDate >= effectiveStartDate "The term's end date can't be before its start date."
 
     mutate venueId = venueId
     mutate commissionPercent = commissionPercent
@@ -62,8 +64,9 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.definedAt != null
-    guard self.retiredAt == null "This venue commission term is already retired. You can't revise it."
-    guard commissionPercent == null or (commissionPercent >= 0 and commissionPercent <= 100) "This venue's commission percent has to be between 0 and 100."
+    constraint reviseNotRetired: self.retiredAt == null "This venue commission term is already retired. You can't revise it."
+    constraint revisePercentRange: commissionPercent == null or (commissionPercent >= 0 and commissionPercent <= 100) "This venue's commission percent has to be between 0 and 100."
+    constraint reviseTermDates: effectiveEndDate == null or effectiveEndDate >= self.effectiveStartDate "The term's end date can't be before its start date."
 
     mutate commissionPercent = commissionPercent != null ? commissionPercent : self.commissionPercent
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : self.effectiveEndDate
@@ -74,7 +77,7 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
   command retire() {
     guard self.deletedAt == null
     guard self.definedAt != null
-    guard self.retiredAt == null "This venue commission term is already retired."
+    constraint retireNotRetired: self.retiredAt == null "This venue commission term is already retired."
 
     mutate retiredAt = now()
     mutate effectiveEndDate = now()
@@ -141,6 +144,18 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   property notes: string?
   property appliedAt: datetime?
 
+  // PL-ATTRIBUTION: the venue term in force when the event was booked
+  // (booking follow-up). Later term changes never reach this row.
+  property venueCommissionTermId: uuid?
+  // A person changed the captured percent or amount, and why (changeSplit).
+  property overrideReason: string?
+  property overriddenById: uuid?
+  property overriddenAt: datetime?
+  // A person allowed the event's splits to add up to more than its revenue,
+  // and why (allowOverRevenue). Checked when the split is applied.
+  property overRevenueReason: string?
+  property overRevenueAllowedById: uuid?
+
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
   ref salesperson: Person fields [tenantId, salespersonId] references [tenantId, id]
@@ -149,6 +164,9 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   ref partnerClient: Client fields [tenantId, partnerClientId] references [tenantId, id]
   ref requestedBy: Person fields [tenantId, requestedById] references [tenantId, id]
   ref approvedBy: Person fields [tenantId, approvedById] references [tenantId, id]
+  ref venueCommissionTerm: VenueCommissionTerm fields [tenantId, venueCommissionTermId] references [tenantId, id]
+  ref overriddenBy: Person fields [tenantId, overriddenById] references [tenantId, id]
+  ref overRevenueAllowedBy: Person fields [tenantId, overRevenueAllowedById] references [tenantId, id]
 
   constraint percentBasisValid: self.allocationMethod != "percent" or (self.percentBasis > 0 and self.percentBasis <= 100) "This attribution's percent basis has to be between 0 and 100."
 
@@ -179,11 +197,15 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     optional partnerClientId: uuid,
     optional effectiveStartDate: datetime,
     optional effectiveEndDate: datetime,
-    optional reason: string
+    optional reason: string,
+    optional venueCommissionTermId: uuid
   ) {
     guard self.deletedAt == null
     guard user.id != null
-    constraint createNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you add a revenue attribution."
+    // The booking follow-up (convex/lib/bookingAttribution.ts) runs as the
+    // company's system role: it captures the venue term in force when the
+    // event is approved, as a draft finance approves like any other.
+    constraint createNeedsStaffProfile: user.personId != null or user.role == "system" "Link your account to a staff profile before you add a revenue attribution."
 
     mutate eventId = eventId
     mutate attributionType = attributionType
@@ -207,7 +229,46 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     mutate approvedAt = null
     mutate rejectionReason = null
     mutate appliedAt = null
+    // The term link is what the caller named; a change of split or an
+    // over-revenue allowance belongs to changeSplit / allowOverRevenue.
+    mutate venueCommissionTermId = venueCommissionTermId
+    mutate overrideReason = null
+    mutate overriddenById = null
+    mutate overriddenAt = null
+    mutate overRevenueReason = null
+    mutate overRevenueAllowedById = null
     emit RevenueAttributionCreated
+  }
+
+  // Change the percent or amount of a split not yet approved, saying why.
+  command changeSplit(
+    reason: string,
+    optional percentBasis: decimal(5, 2),
+    optional fixedAmount: money(12, 2)
+  ) {
+    guard self.deletedAt == null
+    constraint changeSplitNotApproved: self.status == "draft" or self.status == "pending_approval" or self.status == "rejected" "This split is already approved. Reject it first, or add a new one."
+    constraint overrideReasonGiven: length(trim(reason)) > 0 "Say why you are changing this split."
+    constraint overrideNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you change a revenue split."
+    constraint overridePercent: percentBasis == null or (percentBasis > 0 and percentBasis <= 100) "This attribution's percent basis has to be between 0 and 100."
+    constraint overrideAmount: fixedAmount == null or fixedAmount >= 0 "This attribution's fixed amount can't be negative. Use zero or more."
+    mutate percentBasis = percentBasis != null ? percentBasis : self.percentBasis
+    mutate fixedAmount = fixedAmount != null ? fixedAmount : self.fixedAmount
+    mutate overrideReason = reason
+    mutate overriddenById = user.personId
+    mutate overriddenAt = now()
+    emit RevenueAttributionUpdated
+  }
+
+  // Let this split take the event's splits past its revenue, saying why.
+  command allowOverRevenue(reason: string) {
+    guard self.deletedAt == null
+    constraint allowOverNotApplied: self.status != "applied" "This split is already applied."
+    constraint overRevenueReasonGiven: length(trim(reason)) > 0 "Say why this event's splits may add up to more than its revenue."
+    constraint overRevenueNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you allow this."
+    mutate overRevenueReason = reason
+    mutate overRevenueAllowedById = user.personId
+    emit RevenueAttributionUpdated
   }
 
   command requestApproval() {
@@ -235,7 +296,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.status == "pending_approval"
     guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
-    guard length(trim(rejectionReason)) > 0 "Say why you're rejecting this attribution."
+    constraint rejectReasonGiven: length(trim(rejectionReason)) > 0 "Say why you're rejecting this attribution."
 
     mutate status = "rejected"
     mutate rejectionReason = rejectionReason
@@ -245,14 +306,22 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   command apply(eventRevenue: money(12, 2)) {
     guard self.deletedAt == null
     guard self.status == "approved"
-    guard eventRevenue >= 0 "This event's revenue can't be negative. Use zero or more."
+    constraint applyRevenueNonnegative: eventRevenue >= 0 "This event's revenue can't be negative. Use zero or more."
 
-    compute allocation = self.allocationMethod == "percent" ? round((eventRevenue * self.percentBasis) / 100, 2) : self.fixedAmount
+    // To the cent: revenue x percent is in hundredths of a cent-percent, so
+    // round that and divide by 100 (round(x, 2) rounded to whole dollars).
+    compute allocation = self.allocationMethod == "percent" ? round(eventRevenue * self.percentBasis) / 100 : self.fixedAmount
 
     mutate allocatedAmount = allocation
     mutate appliedAt = now()
     mutate status = "applied"
-    emit RevenueAttributionApplied
+    emit RevenueAttributionApplied {
+      revenueAttributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventRevenue: eventRevenue
+      allocatedAmount: allocation
+    }
   }
 
   command update(
@@ -265,8 +334,8 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.status == "draft" or self.status == "rejected"
-    guard percentBasis == null or (percentBasis > 0 and percentBasis <= 100) "This attribution's percent basis has to be between 0 and 100."
-    guard fixedAmount == null or fixedAmount >= 0 "This attribution's fixed amount can't be negative. Use zero or more."
+    constraint updatePercentRange: percentBasis == null or (percentBasis > 0 and percentBasis <= 100) "This attribution's percent basis has to be between 0 and 100."
+    constraint updateAmountNonnegative: fixedAmount == null or fixedAmount >= 0 "This attribution's fixed amount can't be negative. Use zero or more."
 
     mutate percentBasis = percentBasis != null ? percentBasis : self.percentBasis
     mutate fixedAmount = fixedAmount != null ? fixedAmount : self.fixedAmount

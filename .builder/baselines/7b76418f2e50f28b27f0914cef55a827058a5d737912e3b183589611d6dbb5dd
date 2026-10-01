@@ -3710,6 +3710,12 @@ export const RevenueAttributionSchema = z.object({
   reason: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   appliedAt: z.coerce.date().nullable().optional(),
+  venueCommissionTermId: z.string().uuid().nullable().optional(),
+  overrideReason: z.string().nullable().optional(),
+  overriddenById: z.string().uuid().nullable().optional(),
+  overriddenAt: z.coerce.date().nullable().optional(),
+  overRevenueReason: z.string().nullable().optional(),
+  overRevenueAllowedById: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -10934,6 +10940,13 @@ export const RentalOrderLineReviseParamsSchema = z.object({
 
 export type RentalOrderLineReviseParams = z.infer<typeof RentalOrderLineReviseParamsSchema>;
 
+// Command: allowOverRevenue on RevenueAttribution
+export const RevenueAttributionAllowOverRevenueParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type RevenueAttributionAllowOverRevenueParams = z.infer<typeof RevenueAttributionAllowOverRevenueParamsSchema>;
+
 // Command: apply on RevenueAttribution
 export const RevenueAttributionApplyParamsSchema = z.object({
   eventRevenue: z.number(),
@@ -10945,6 +10958,15 @@ export type RevenueAttributionApplyParams = z.infer<typeof RevenueAttributionApp
 export const RevenueAttributionApproveParamsSchema = z.object({});
 
 export type RevenueAttributionApproveParams = z.infer<typeof RevenueAttributionApproveParamsSchema>;
+
+// Command: changeSplit on RevenueAttribution
+export const RevenueAttributionChangeSplitParamsSchema = z.object({
+  reason: z.string(),
+  percentBasis: z.number().optional(),
+  fixedAmount: z.number().optional(),
+});
+
+export type RevenueAttributionChangeSplitParams = z.infer<typeof RevenueAttributionChangeSplitParamsSchema>;
 
 // Command: create on RevenueAttribution
 export const RevenueAttributionCreateParamsSchema = z.object({
@@ -10961,6 +10983,7 @@ export const RevenueAttributionCreateParamsSchema = z.object({
   effectiveStartDate: z.coerce.date().optional(),
   effectiveEndDate: z.coerce.date().optional(),
   reason: z.string().optional(),
+  venueCommissionTermId: z.string().min(1).optional(),
 });
 
 export type RevenueAttributionCreateParams = z.infer<typeof RevenueAttributionCreateParamsSchema>;
