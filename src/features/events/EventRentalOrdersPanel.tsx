@@ -14,7 +14,11 @@ import {
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice } from "../../ui/action-result";
 import { Link } from "react-router-dom";
-import { useRentalVendorChoices } from "../facilities/equipmentCheckout";
+import {
+  useRentalVendorChoices,
+  useVenueVendorRules,
+  VENUE_VENDOR_NOTE,
+} from "../facilities/equipmentCheckout";
 import { ADD_NEW_CHOICE, findByName } from "../inventory/inlineCatalogChoice";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { rentalAvailability } from "../logistics/eventRequirements";
@@ -60,6 +64,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
   const lines = useListRentalOrderLine() as RentalRow[] | undefined;
   const equipment = useListEquipment();
   const vendorChoices = useRentalVendorChoices();
+  const venueRuleRows = useVenueVendorRules(eventId);
   const vendors = vendorChoices ?? [];
   const createVendor = useCreateVendor();
   // No vendors yet, or "New vendor…" picked: name one here and the rental
@@ -79,6 +84,10 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
   const { prompt, host } = useActionPrompt(busy != null);
 
   const vendorName = new Map(vendors.map((v) => [String(v.vendorId), v.name]));
+  const venueRules = new Map(
+    (venueRuleRows ?? []).map((rule) => [rule.vendorId, rule.status]),
+  );
+  const [pickedVendor, setPickedVendor] = useState("");
   const rentedItems = (equipment ?? []).filter(
     (row) =>
       row.deletedAt == null &&
@@ -398,16 +407,31 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                   onChange={(event) => {
                     if (event.target.value === ADD_NEW_CHOICE)
                       setAddingVendor(true);
+                    setPickedVendor(event.target.value);
                   }}
                 >
                   <option value="">The list item's vendor</option>
-                  {vendors.map((vendor) => (
-                    <option key={vendor.vendorId} value={vendor.vendorId}>
-                      {vendor.name}
-                    </option>
-                  ))}
+                  {vendors.map((vendor) => {
+                    const rule = venueRules.get(String(vendor.vendorId));
+                    return (
+                      <option
+                        key={vendor.vendorId}
+                        value={vendor.vendorId}
+                        disabled={rule === "banned"}
+                      >
+                        {vendor.name}
+                        {rule ? VENUE_VENDOR_NOTE[rule] : ""}
+                      </option>
+                    );
+                  })}
                   <option value={ADD_NEW_CHOICE}>New vendor…</option>
                 </select>
+                {venueRules.get(pickedVendor) === "restricted" ? (
+                  <span className="text-xs text-warn" role="status">
+                    This venue restricts this vendor. Check with the venue
+                    before you book.
+                  </span>
+                ) : null}
               </label>
             )}
             <label className="field-label">

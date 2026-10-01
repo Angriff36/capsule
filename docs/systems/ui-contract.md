@@ -1166,6 +1166,7 @@ Screens (62): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `reasonedChanges.sendOutWithReason` - mutation; authored step; live reads update by themselves
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
+- `venueVendorPolicy.forEvent` - query; live read, updates by itself
 
 ## 4. Menu and kitchen
 
@@ -3678,6 +3679,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `venueVendorPolicy.forEvent` - query; live read, updates by itself
 
 ## 9. Final Lock and event packet
 
@@ -4169,3 +4171,4 @@ Screens (62): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `laborSummary.listPayRates` - query; live read, updates by itself
 - `laborSummary.payrollTimeRecords` - query; live read, updates by itself
 - `laborSummary.personPeriodLaborSummary` - query; live read, updates by itself
+- `venueVendorPolicy.forEvent` - query; live read, updates by itself

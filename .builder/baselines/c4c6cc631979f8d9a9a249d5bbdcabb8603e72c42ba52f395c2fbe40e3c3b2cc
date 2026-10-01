@@ -69641,6 +69641,8 @@ async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, 
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
     if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
+    if (!((((effectiveFrom == null) || (effectiveUntil == null)) || (effectiveFrom <= effectiveUntil)))) throw new Error("Effective from must be before effective until");
+    if (!(((discountPercent == null) || ((discountPercent >= 0) && (discountPercent <= 100))))) throw new Error("Discount percent must be between 0 and 100");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -69774,6 +69776,8 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!(((venueId != null) && (((venueId).trim()).length > 0)))) throw new Error("Pick a venue.");
     if (!(((vendorId != null) && (((vendorId).trim()).length > 0)))) throw new Error("Pick a vendor.");
+    if (!((((effectiveFrom == null) || (effectiveUntil == null)) || (effectiveFrom <= effectiveUntil)))) throw new Error("Effective from must be before effective until");
+    if (!(((discountPercent == null) || ((discountPercent >= 0) && (discountPercent <= 100))))) throw new Error("Discount percent must be between 0 and 100");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -69870,7 +69874,7 @@ async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { doc
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change venue suppliers");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
-    if (!((((effectiveFrom == null) || (effectiveUntil == null)) || (effectiveFrom <= effectiveUntil)))) throw new Error("Effective from must be before effective until");
+    if (!((((((effectiveFrom != null) ? effectiveFrom : doc.effectiveFrom) == null) || (((effectiveUntil != null) ? effectiveUntil : doc.effectiveUntil) == null)) || (((effectiveFrom != null) ? effectiveFrom : doc.effectiveFrom) <= ((effectiveUntil != null) ? effectiveUntil : doc.effectiveUntil))))) throw new Error("Effective from must be before effective until");
     if (!(((discountPercent == null) || ((discountPercent >= 0) && (discountPercent <= 100))))) throw new Error("Discount percent must be between 0 and 100");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);

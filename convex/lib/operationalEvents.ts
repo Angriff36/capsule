@@ -24,6 +24,7 @@ import { eventPacketReconciliation } from "./packetReconciliation";
 import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
 import { freezeFinalVenueFacts } from "./venueFactsSnapshot";
+import { assertVendorAllowedAtEvent } from "../venueVendorPolicy";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
@@ -112,6 +113,15 @@ export async function handleManifestEvent(
   if (event.entity === "EquipmentReservation" && event.type === "EquipmentReturned") {
     await raiseReturnIssues(ctx, event.entityId as Id<"equipmentReservations">);
     return;
+  }
+  // PL-VENDOR-POLICY (AC-319): the venue's banned vendors stay out.
+  if ((event.entity === "RentalOrderLine" && event.type === "RentalOrderLineRequested") ||
+    (event.entity === "VendorOrder" && event.type === "VendorOrderOpened")) {
+    await assertVendorAllowedAtEvent(
+      ctx,
+      event.payload.eventId as string | null | undefined,
+      event.payload.vendorId as string | null | undefined,
+    );
   }
   if (event.entity === "RentalOrderLine" && event.type === "RentalOrderLineReturned") {
     await raiseVendorReturnIssue(ctx, event.entityId as Id<"rentalOrderLines">);
