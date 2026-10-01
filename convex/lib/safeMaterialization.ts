@@ -3,6 +3,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
 import { ConvexError, v } from "convex/values";
 import { parseTemplateLines } from "../../src/lib/packTemplateLines";
+import { parseLayoutTemplateSections } from "../../src/lib/layoutTemplateSections";
 import { PACK_LIST_UNITS } from "../../src/features/logistics/packListUnits";
 import { getAuthContext, requireTenant } from "./authContext";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
@@ -58,6 +59,26 @@ async function ownedLive<Table extends "packLists" | "events" | "vendors" | "ven
   return row;
 }
 
+/** A live, active venue layout template of this company, as copied now. */
+async function templateSource(
+  ctx: MutationCtx,
+  templateId: Id<"venueLayoutTemplates">,
+  tenantId: string,
+) {
+  const template = await ctx.db.get(templateId);
+  if (!template || template.deletedAt != null || template.tenantId !== tenantId ||
+    template.definedAt == null) {
+    throw new ConvexError("That layout template is gone. Pick another one.");
+  }
+  if (template.status !== "active") {
+    throw new ConvexError("That layout template is archived. Bring it back first, or pick another one.");
+  }
+  return {
+    templateId: template._id,
+    version: Number(template.version),
+    sections: parseLayoutTemplateSections(template.sections),
+  };
+}
 
 export const applyPackTemplate = mutation({
   args: {
@@ -166,6 +187,10 @@ export const applyLayoutTemplate = mutation({
       type: v.string(),
       instructions: v.optional(v.string()),
     })),
+    // PL-VENUE-LAYOUT: copy the saved template itself (its sections as stored
+    // now), and stamp each row with the template and version it came from.
+    // `sections` is then ignored.
+    templateId: v.optional(v.id("venueLayoutTemplates")),
   },
   handler: async (ctx, args): Promise<{ sectionCount: number; recovered: boolean }> => {
     const auth = await getAuthContext(ctx);
@@ -174,16 +199,23 @@ export const applyLayoutTemplate = mutation({
     await ownedLive(ctx, args.eventId, tenantId, "Event");
     const prior = await readMaterializationReceipt<{ sectionCount: number }>(ctx, tenantId, "layout", args.operationKey, args);
     if (prior) return { ...prior, recovered: true };
-    for (let index = 0; index < args.sections.length; index++) {
-      const section = args.sections[index];
+    const source = args.templateId
+      ? await templateSource(ctx, args.templateId, tenantId)
+      : null;
+    const sections = source ? source.sections : args.sections;
+    if (source && sections.length === 0) throw new ConvexError("That template has no sections to copy.");
+    for (let index = 0; index < sections.length; index++) {
+      const section = sections[index];
       await ctx.runMutation(api.mutations.EventLayoutSection_createViaAdd, {
         eventId: args.eventId,
         type: section.type,
         instructions: section.instructions,
         sortOrder: args.baseSortOrder + index,
+        sourceTemplateId: source?.templateId,
+        sourceTemplateVersion: source?.version,
       });
     }
-    const output = { sectionCount: args.sections.length };
+    const output = { sectionCount: sections.length };
     await writeMaterializationReceipt(ctx, tenantId, "layout", args.operationKey, args, output);
     return { ...output, recovered: false };
   },

@@ -278,9 +278,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // EventLayoutSection has multiple initialization commands (add, remove); using the selected initialization command: add.
   // EventLayoutSection → api.mutations.EventLayoutSection_createViaAdd
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-1", "type": "demo-type-1", "instructions": "demo-instructions-1", "sortOrder": 1 } as any);
+  await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-1", "type": "demo-type-1", "instructions": "demo-instructions-1", "sortOrder": 1, "sourceTemplateId": "sourceTemplateId-event-layout-section-1", "sourceTemplateVersion": 1 } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-2", "type": "demo-type-2", "instructions": "demo-instructions-2", "sortOrder": 2 } as any);
+  await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-2", "type": "demo-type-2", "instructions": "demo-instructions-2", "sortOrder": 2, "sourceTemplateId": "sourceTemplateId-event-layout-section-2", "sourceTemplateVersion": 2 } as any);
   // skip EventNumberAssignment: no creation command in IR (2 rows unused)
   // skip EventNumberSequence: no creation command in IR (2 rows unused)
   // skip EventPacketArtifact: no creation command in IR (2 rows unused)

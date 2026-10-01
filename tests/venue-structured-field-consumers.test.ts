@@ -32,7 +32,8 @@ const CLOCK_FIELDS = new Set(["loadInFrom", "loadOutBy", "timeZone"]);
 const CONSUMERS: Record<string, string> = {
   filter: "src/features/facilities/venueOperatingFacts.ts",
   capacityPlanner: "src/features/events/eventCapacityPlanner.ts",
-  proposal: "convex/lib/proposalRevision.ts",
+  // The venue copy frozen into proposals and finished events.
+  proposal: "convex/lib/venueFactsSnapshot.ts",
   packing: "convex/lib/packRuleReconciliation.ts",
   daySheet: "convex/eventDayBriefing.ts",
   routes: "src/lib/routeFacts.ts",

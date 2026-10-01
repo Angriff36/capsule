@@ -1062,6 +1062,7 @@ export const EventSchema = z.object({
   venueName: z.string().nullable().optional(),
   venueAddress: z.string().nullable().optional(),
   venueCapacity: z.number().int().nullable().optional(),
+  finalVenueFacts: z.string().nullable().optional(),
   expectedHeadcount: z.number().int().nullable().optional(),
   primaryContactName: z.string().nullable().optional(),
   primaryContactEmail: z.string().nullable().optional(),
@@ -1433,6 +1434,8 @@ export const EventLayoutSectionSchema = z.object({
   instructions: z.string().nullable().optional(),
   sortOrder: z.number().int().min(0).default(0),
   addedAt: z.coerce.date().nullable().optional(),
+  sourceTemplateId: z.string().uuid().nullable().optional(),
+  sourceTemplateVersion: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6688,6 +6691,13 @@ export const EventReassignClientParamsSchema = z.object({});
 
 export type EventReassignClientParams = z.infer<typeof EventReassignClientParamsSchema>;
 
+// Command: recordFinalVenueFacts on Event
+export const EventRecordFinalVenueFactsParamsSchema = z.object({
+  facts: z.string(),
+});
+
+export type EventRecordFinalVenueFactsParams = z.infer<typeof EventRecordFinalVenueFactsParamsSchema>;
+
 // Command: reschedule on Event
 export const EventRescheduleParamsSchema = z.object({
   startsAt: z.coerce.date(),
@@ -7256,6 +7266,8 @@ export const EventLayoutSectionAddParamsSchema = z.object({
   type: z.string(),
   instructions: z.string().optional(),
   sortOrder: z.number().optional(),
+  sourceTemplateId: z.string().uuid().optional(),
+  sourceTemplateVersion: z.number().optional(),
 });
 
 export type EventLayoutSectionAddParams = z.infer<typeof EventLayoutSectionAddParamsSchema>;

@@ -23,6 +23,7 @@ import { eventProposalReconciliation } from "./proposalReconciliation";
 import { eventPacketReconciliation } from "./packetReconciliation";
 import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
+import { freezeFinalVenueFacts } from "./venueFactsSnapshot";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
@@ -139,6 +140,10 @@ export async function handleManifestEvent(
     // One unsent draft invoice when the quoted price is above zero (AC-618).
     await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
+  }
+  // PL-VENUE-LAYOUT (AC-315): the finished event keeps the venue as it was.
+  if (event.entity === "Event" && event.type === "EventFinalized") {
+    await freezeFinalVenueFacts(ctx, event.entityId as Id<"events">);
   }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedDemandDescribed") {
     await validateDescribedDemand(ctx, event.entityId as Id<"eventStaffNeeds">);

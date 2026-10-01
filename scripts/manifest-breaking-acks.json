@@ -2292,6 +2292,24 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-VENUE-PROFILE AC-312: optional time; unset means no load-out time on file. Stored venues need no backfill."
+    },
+    {
+      "path": "Event.finalVenueFacts",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-LAYOUT AC-315: optional; written once when an event is finalized. Events finished earlier keep none (their printed venue name/address/capacity snapshot stays). No backfill."
+    },
+    {
+      "path": "EventLayoutSection.sourceTemplateId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-LAYOUT AC-314: optional; unset = a section typed on the event. Earlier copies carry none. No backfill."
+    },
+    {
+      "path": "EventLayoutSection.sourceTemplateVersion",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-LAYOUT AC-314: optional; goes with sourceTemplateId. No backfill."
     }
   ]
 }

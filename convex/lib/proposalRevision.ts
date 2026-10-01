@@ -5,6 +5,11 @@ import { api, internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext } from "./authContext";
+import {
+  liveVenue,
+  venueFactsSnapshot,
+  type VenueFactsSnapshot,
+} from "./venueFactsSnapshot";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
@@ -108,33 +113,8 @@ export interface ProposalRevisionSnapshot {
   // venue edits (§5.5 L284). Null when the proposal isn't linked through an
   // event to a venue (Proposal.eventId → Event.venueId → Venue); the free-text
   // proposal.venueName/venueAddress remain the always-present fallback then.
-  venue: {
-    name: string;
-    venueType: string;
-    capacity: number;
-    onPremise: boolean | null;
-    kitchenAccess: string | null;
-    parkingAvailable: boolean | null;
-    hasFreightElevator: boolean | null;
-    storageAvailable: boolean | null;
-    logisticsNotes: string | null;
-    loadInInstructions: string | null;
-    powerAvailable: boolean | null;
-    waterAccess: boolean | null;
-    hasStairs: boolean | null;
-    wasteRules: string | null;
-    permitsInsuranceNotes: string | null;
-    restrictions: string | null;
-    accessNotes: string | null;
-    cateringNotes: string | null;
-    // PL-VENUE-PROFILE operating facts; absent on revisions saved earlier.
-    seatedCapacity?: number | null;
-    standingCapacity?: number | null;
-    hasOven?: boolean | null;
-    hasRefrigeration?: boolean | null;
-    loadInFrom?: string | null;
-    loadOutBy?: string | null;
-  } | null;
+  // PL-VENUE-PROFILE operating facts are optional: absent on older revisions.
+  venue: VenueFactsSnapshot | null;
   dishSelections: Array<{
     id: string;
     menuId: string;
@@ -206,36 +186,8 @@ async function resolveVenueLogistics(
   const event: any = await ctx.db.get(proposal.eventId);
   if (!event || event.tenantId !== proposal.tenantId) return null;
   if (!event.venueId) return null;
-  const venue: any = await ctx.db.get(event.venueId);
-  if (!venue || venue.deletedAt != null || venue.tenantId !== proposal.tenantId) {
-    return null;
-  }
-  return {
-    name: venue.name,
-    venueType: venue.venueType,
-    capacity: venue.capacity,
-    onPremise: venue.onPremise ?? null,
-    kitchenAccess: venue.kitchenAccess ?? null,
-    parkingAvailable: venue.parkingAvailable ?? null,
-    hasFreightElevator: venue.hasFreightElevator ?? null,
-    storageAvailable: venue.storageAvailable ?? null,
-    logisticsNotes: venue.logisticsNotes ?? null,
-    loadInInstructions: venue.loadInInstructions ?? null,
-    powerAvailable: venue.powerAvailable ?? null,
-    waterAccess: venue.waterAccess ?? null,
-    hasStairs: venue.hasStairs ?? null,
-    wasteRules: venue.wasteRules ?? null,
-    permitsInsuranceNotes: venue.permitsInsuranceNotes ?? null,
-    restrictions: venue.restrictions ?? null,
-    accessNotes: venue.accessNotes ?? null,
-    cateringNotes: venue.cateringNotes ?? null,
-    seatedCapacity: venue.seatedCapacity ?? null,
-    standingCapacity: venue.standingCapacity ?? null,
-    hasOven: venue.hasOven ?? null,
-    hasRefrigeration: venue.hasRefrigeration ?? null,
-    loadInFrom: venue.loadInFrom ?? null,
-    loadOutBy: venue.loadOutBy ?? null,
-  };
+  const venue = await liveVenue(ctx, proposal.tenantId, event.venueId);
+  return venue ? venueFactsSnapshot(venue) : null;
 }
 
 // The tenant's customer-facing name from its live organization record (the

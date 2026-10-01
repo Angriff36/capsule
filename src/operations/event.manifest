@@ -719,6 +719,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Snapshot the selected venue limit so historical event planning does not
   // silently change when the reusable Venue record is revised later.
   property venueCapacity: int?
+  // Venue facts frozen when the event is finalized (spec §8.2, AC-315): a
+  // JSON copy written once by convex/lib/venueFactsSnapshot.ts, so later venue
+  // edits never change what the finished event says the venue was.
+  property finalVenueFacts: string?
   property expectedHeadcount: int?
   property encrypted primaryContactName: string?
   // Client contact PII: every staff role reads events, but only event/sales
@@ -1903,6 +1907,21 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Run by the finalize follow-up (convex/lib/venueFactsSnapshot.ts) with the
+  // venue facts as JSON. Written once: a second call is refused.
+  command recordFinalVenueFacts(facts: string) {
+    guard self.deletedAt == null
+    guard self.finalizedAt != null
+    guard self.finalVenueFacts == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint finalVenueFactsPresent: length(trim(facts)) > 0 "No venue facts to keep."
+    mutate finalVenueFacts = facts
+    emit EventFinalVenueFactsRecorded {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   store Event in durable
 }
 
@@ -2339,6 +2358,11 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   property instructions: string?
   property required sortOrder: int = 0
   property addedAt: datetime?
+  // The venue layout template (and its version) this row was copied from
+  // (PL-VENUE-LAYOUT, spec §8.2). Unset = typed on the event. Editing the row
+  // never touches the template.
+  property sourceTemplateId: uuid?
+  property sourceTemplateVersion: int?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
@@ -2353,7 +2377,9 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     type: string,
     optional instructions: string,
-    optional sortOrder: number
+    optional sortOrder: number,
+    optional sourceTemplateId: uuid,
+    optional sourceTemplateVersion: number
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -2363,6 +2389,8 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     mutate type = type
     mutate instructions = instructions
     mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate sourceTemplateId = sourceTemplateId
+    mutate sourceTemplateVersion = sourceTemplateVersion
     mutate addedAt = now()
     emit EventLayoutSectionAdded {
       sectionId: self.id

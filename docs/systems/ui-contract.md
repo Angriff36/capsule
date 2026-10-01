@@ -3440,7 +3440,7 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 
 ## 8. Rentals and decor
 
-Screens (19): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentAvailabilityNote.tsx`, `events/EventEquipmentPanel.tsx`, `events/EventEquipmentProblems.tsx`, `events/EventEquipmentReserveForm.tsx`, `events/EventEquipmentSheet.tsx`, `events/EventEquipmentSidebar.tsx`, `events/EventLayoutSectionCard.tsx`, `events/EventLayoutsSidebar.tsx`, `events/EventLayoutsTab.tsx`, `events/EventRentalOrdersPanel.tsx`, `facilities/EquipmentBulkAddPanel.tsx`, `facilities/EquipmentCatalogPage.tsx`, `facilities/EquipmentCatalogTable.tsx`, `facilities/EquipmentDetailPanel.tsx`, `facilities/EquipmentForm.tsx`, `facilities/EquipmentMaintenanceBoard.tsx`, `facilities/EquipmentRepairsPanel.tsx`, `logistics/ReturnsPage.tsx`
+Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentAvailabilityNote.tsx`, `events/EventEquipmentPanel.tsx`, `events/EventEquipmentProblems.tsx`, `events/EventEquipmentReserveForm.tsx`, `events/EventEquipmentSheet.tsx`, `events/EventEquipmentSidebar.tsx`, `events/EventLayoutSectionCard.tsx`, `events/EventLayoutsSidebar.tsx`, `events/EventLayoutsTab.tsx`, `events/EventLayoutTemplateLinks.tsx`, `events/EventRentalOrdersPanel.tsx`, `facilities/EquipmentBulkAddPanel.tsx`, `facilities/EquipmentCatalogPage.tsx`, `facilities/EquipmentCatalogTable.tsx`, `facilities/EquipmentDetailPanel.tsx`, `facilities/EquipmentForm.tsx`, `facilities/EquipmentMaintenanceBoard.tsx`, `facilities/EquipmentRepairsPanel.tsx`, `logistics/ReturnsPage.tsx`
 
 ### Generated reads
 
@@ -3603,7 +3603,7 @@ Screens (19): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
   - effects: EquipmentConditionUpdated
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.EventLayoutSection_createViaAdd` (EventLayoutSection.add)
-  - inputs from the screen: eventId, type, instructions, sortOrder; filled by the server: none
+  - inputs from the screen: eventId, type, instructions, sortOrder, sourceTemplateId, sourceTemplateVersion; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Event staff may see event layout sections"; "Event staff may update the floor plan"; "Event staff may change the floor plan"; "Guard 0 failed"; "Guard 1 failed"; "Pick a layout section type."; and 1 more

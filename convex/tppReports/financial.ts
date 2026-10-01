@@ -821,7 +821,21 @@ export const run = query({
       );
     }
 
-    const revenueRows: TppRow[] = rangedInvoices.map((invoice) => {
+    // Venue Sales for one venue (PL-VENUE-PROFILE, AC-323): the event's own
+    // venue link, so a renamed venue still finds its events.
+    const venueFilter =
+      typeof parameters.venueId === "string" && parameters.venueId
+        ? parameters.venueId
+        : null;
+    const venueInvoices = venueFilter
+      ? rangedInvoices.filter(
+          (invoice) =>
+            invoice.eventId != null &&
+            String(eventById.get(String(invoice.eventId))?.venueId ?? "") ===
+              venueFilter,
+        )
+      : rangedInvoices;
+    const revenueRows: TppRow[] = venueInvoices.map((invoice) => {
       const event = shownEvent(invoice.eventId);
       return {
         id: invoice._id,
