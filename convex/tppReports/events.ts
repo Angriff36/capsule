@@ -11,6 +11,12 @@ import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFi
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
+import { loadWindowLabel } from "../../src/features/facilities/venueOperatingFacts";
+import {
+  eventDocumentSections,
+  serviceRows,
+  type EventDocumentTemplate,
+} from "../../src/lib/tppReports/eventDocumentTemplates";
 import type {
   TppColumn,
   TppDocumentSection,
@@ -59,6 +65,8 @@ const RESERVATION_READ = [
   "eventManageAccess",
 ];
 const EQUIPMENT_READ = ["inventoryAccess", "logisticsAccess"];
+// Mirrors RentalOrderLine's read policy.
+const RENTAL_READ = ["logisticsAccess", "inventoryAccess", "eventManageAccess"];
 const PACK_LIST_READ = ["staffAccess"];
 const DEMAND_READ = ["inventoryAccess", "manageAccess"];
 // Dish ingredient lines, dish recipes, component ingredient lines.
@@ -1041,12 +1049,15 @@ export const run = query({
     const header = [
       { label: "Event", value: event.title },
       { label: "Date", value: dateText(event.startsAt) },
-      { label: "Contact", value: event.primaryContactName ?? "" },
+      {
+        label: "Contact",
+        value: event.primaryContactName?.trim() || "Not recorded",
+      },
       {
         label: "Venue",
-        value: [event.venueName, event.venueAddress]
-          .filter(Boolean)
-          .join(" · "),
+        value:
+          [event.venueName, event.venueAddress].filter(Boolean).join(" · ") ||
+          "No venue picked yet",
       },
       {
         label: "Guests",
@@ -1114,123 +1125,173 @@ export const run = query({
       ].includes(args.reportId)
     ) {
       // Each section follows the read policy of its own records.
-      const [timeline, staffing, reservations, equipment] = await Promise.all([
-        canRead(auth, TIMELINE_READ)
-          ? ctx.db
-              .query("eventTimelineActivities")
-              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-              .take(REPORT_ROW_LIMIT)
-          : [],
-        canRead(auth, STAFFING_READ)
-          ? eventStaffing(ctx, tenantId, event._id, canRead(auth, PERSON_READ))
-          : [],
-        canRead(auth, RESERVATION_READ)
-          ? ctx.db
-              .query("equipmentReservations")
-              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-              .take(REPORT_ROW_LIMIT)
-          : [],
-        canRead(auth, EQUIPMENT_READ)
-          ? ctx.db
-              .query("equipments")
-              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
-          : [],
-      ]);
+      const seeRentals = canRead(auth, RENTAL_READ);
+      const [timeline, staffing, reservations, equipment, rentals, venue] =
+        await Promise.all([
+          canRead(auth, TIMELINE_READ)
+            ? ctx.db
+                .query("eventTimelineActivities")
+                .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+                .take(REPORT_ROW_LIMIT)
+            : [],
+          canRead(auth, STAFFING_READ)
+            ? eventStaffing(
+                ctx,
+                tenantId,
+                event._id,
+                canRead(auth, PERSON_READ),
+              )
+            : [],
+          canRead(auth, RESERVATION_READ)
+            ? ctx.db
+                .query("equipmentReservations")
+                .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+                .take(REPORT_ROW_LIMIT)
+            : [],
+          canRead(auth, EQUIPMENT_READ)
+            ? ctx.db
+                .query("equipments")
+                .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+                .take(REPORT_ROW_LIMIT)
+            : [],
+          seeRentals
+            ? ctx.db
+                .query("rentalOrderLines")
+                .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+                .take(REPORT_ROW_LIMIT)
+            : [],
+          seeVenues && event.venueId ? ctx.db.get(event.venueId) : null,
+        ]);
       // Removed equipment never shows.
       const equipmentById = new Map(
         equipment
           .filter((item) => isLiveTenantRow(item, tenantId))
           .map((item) => [String(item._id), item.name]),
       );
+      const seesMenu =
+        canRead(auth, EVENT_DISH_READ) && canRead(auth, DISH_READ);
+      const menuRows = menu.map(({ item, dish }) => {
+        const menuNotes = displayEventMenuNotes(item.specialInstructions);
+        return {
+          label: item.course ?? dish.course ?? "",
+          value: `${dish.name} · ${item.quantityServings} servings${menuNotes ? ` — ${menuNotes}` : ""}`,
+        };
+      });
+      const heatingRows = menu.map(({ item, dish }) => {
+        const menuNotes = displayEventMenuNotes(item.specialInstructions);
+        return {
+          label: `${dish.name} · ${item.quantityServings} servings`,
+          value: [
+            serviceMethodText(
+              dish.serviceInstructions,
+              dish.serviceInstructionsSource,
+              dish.recipeInstructions,
+            ),
+            serviceSourceText(dish.serviceInstructionsSource),
+            menuNotes ? `Event notes: ${menuNotes}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+          recipe: { kind: "dish" as const, id: String(dish._id) },
+        };
+      });
+      const liveVenue =
+        venue && isLiveTenantRow(venue, tenantId)
+          ? (venue as Doc<"venues">)
+          : null;
       return {
         kind: "document",
         title: reportTitle(args.reportId),
         template: args.reportId,
-        sections: [
+        sections: eventDocumentSections(
+          args.reportId as EventDocumentTemplate,
           {
-            id: "event",
-            heading:
-              args.reportId === "event-beo" ? "Banquet Event Order" : "Event",
-            rows: header,
+            header,
+            rows: {
+              service: serviceRows([
+                ["Service style", event.serviceStyleName],
+                ["Bar service", event.barService],
+                ["Drinks on the menu", event.beveragesOnMenu],
+                ["Place settings", event.placeSettings],
+                ["Table linen", event.linenColorTables],
+                ["Guest tables", event.guestTableSetup],
+                ["Buffet tables", event.buffetTableSetup],
+                ["Rentals", event.eventRentals],
+                ["Decor", event.decorKit],
+                ["Rain plan", event.rainPlan],
+              ]),
+              venue: !seeVenues
+                ? null
+                : liveVenue
+                  ? serviceRows([
+                      ["Load-in window", loadWindowLabel(liveVenue)],
+                      ["Load-in", liveVenue.loadInInstructions],
+                      ["Access", liveVenue.accessNotes],
+                      ["Stairs", liveVenue.hasStairs],
+                      ["Freight elevator", liveVenue.hasFreightElevator],
+                      ["Parking", liveVenue.parkingAvailable],
+                      ["Oven on site", liveVenue.hasOven],
+                      ["Fridge on site", liveVenue.hasRefrigeration],
+                      ["Restrictions", liveVenue.restrictions],
+                    ])
+                  : [],
+              menu: seesMenu ? menuRows : null,
+              heating: seesMenu ? heatingRows : null,
+              timeline: canRead(auth, TIMELINE_READ)
+                ? timeline
+                    .filter((row) => isLiveTenantRow(row, tenantId))
+                    .sort(
+                      (a, b) =>
+                        (a.startsAt ?? a.sortOrder ?? 0) -
+                        (b.startsAt ?? b.sortOrder ?? 0),
+                    )
+                    .map((row) => ({
+                      label: dateText(row.startsAt),
+                      value: `${row.name}${row.notes ? ` — ${row.notes}` : ""}`,
+                    }))
+                : null,
+              staff: canRead(auth, STAFFING_READ)
+                ? staffing.map((entry) => ({
+                    label: `${entry.label} — ${entry.role || "Role not set"}`,
+                    value: staffDetails(entry),
+                  }))
+                : null,
+              equipment: canRead(auth, RESERVATION_READ)
+                ? reservations
+                    .filter(
+                      (row) =>
+                        isLiveTenantRow(row, tenantId) &&
+                        row.status !== "cancelled",
+                    )
+                    .map((row) => ({
+                      label:
+                        equipmentById.get(String(row.equipmentId)) ??
+                        "Equipment",
+                      value: `${row.quantity}`,
+                    }))
+                : null,
+              rentals: seeRentals
+                ? rentals
+                    .filter(
+                      (row) =>
+                        isLiveTenantRow(row, tenantId) &&
+                        row.status !== "cancelled",
+                    )
+                    .map((row) => ({
+                      label: row.description,
+                      value: `${row.quantity} ${row.countUnit} · ${row.status}`,
+                    }))
+                : null,
+              notes: [
+                { label: "Service", value: event.serviceRequirements ?? "" },
+                {
+                  label: "Operations",
+                  value: event.operationalRequirements ?? "",
+                },
+              ],
+            },
           },
-          {
-            id: "menu",
-            heading:
-              args.reportId === "heating-serving-event-menu"
-                ? "Heating and serving"
-                : "Menu",
-            rows: menu.map(({ item, dish }) => {
-              const menuNotes = displayEventMenuNotes(item.specialInstructions);
-              if (args.reportId === "heating-serving-event-menu") {
-                return {
-                  label: `${dish.name} · ${item.quantityServings} servings`,
-                  value: [
-                    serviceMethodText(
-                      dish.serviceInstructions,
-                      dish.serviceInstructionsSource,
-                      dish.recipeInstructions,
-                    ),
-                    serviceSourceText(dish.serviceInstructionsSource),
-                    menuNotes ? `Event notes: ${menuNotes}` : "",
-                  ]
-                    .filter(Boolean)
-                    .join("\n"),
-                  recipe: { kind: "dish" as const, id: String(dish._id) },
-                };
-              }
-              return {
-                label: item.course ?? dish.course ?? "",
-                value: `${dish.name}${menuNotes ? ` — ${menuNotes}` : ""}`,
-              };
-            }),
-          },
-          {
-            id: "timeline",
-            heading: "Timeline",
-            rows: timeline
-              .filter((row) => isLiveTenantRow(row, tenantId))
-              .sort(
-                (a, b) =>
-                  (a.startsAt ?? a.sortOrder ?? 0) -
-                  (b.startsAt ?? b.sortOrder ?? 0),
-              )
-              .map((row) => ({
-                label: dateText(row.startsAt),
-                value: `${row.name}${row.notes ? ` — ${row.notes}` : ""}`,
-              })),
-          },
-          {
-            id: "staff",
-            heading: "Staffing",
-            rows: staffing.map((entry) => ({
-              label: `${entry.label} — ${entry.role || "Role not set"}`,
-              value: staffDetails(entry),
-            })),
-          },
-          {
-            id: "equipment",
-            heading: "Equipment",
-            rows: reservations
-              .filter(
-                (row) =>
-                  isLiveTenantRow(row, tenantId) && row.status !== "cancelled",
-              )
-              .map((row) => ({
-                label:
-                  equipmentById.get(String(row.equipmentId)) ?? "Equipment",
-                value: `${row.quantity}`,
-              })),
-          },
-          {
-            id: "notes",
-            heading: "Notes",
-            rows: [
-              { value: event.serviceRequirements ?? "" },
-              { value: event.operationalRequirements ?? "" },
-            ],
-          },
-        ],
+        ),
       };
     }
 
