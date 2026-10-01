@@ -8,6 +8,7 @@ import {
 import {
   DATASET_BY_RECORD_TYPE,
   SOURCE_FIELD_MAPS,
+  describeValue,
   parseValues,
   readStoredValue,
 } from "../../../../convex/lib/importSourceFields";
@@ -19,15 +20,11 @@ type Link = {
   rawSourceData?: string | null;
 };
 
-const shown = (raw: string | null | undefined): string => {
-  const value = readStoredValue(raw);
-  return value == null || value === "" ? "(blank)" : String(value);
-};
-
 function recordName(link: Link | undefined): string {
   if (!link) return "Unknown record";
   const kept = parseValues(link.rawSourceData) ?? {};
   if (typeof kept.name === "string") return kept.name;
+  if (typeof kept.title === "string") return kept.title;
   const person = [kept.givenName, kept.familyName]
     .filter((part) => typeof part === "string" && part)
     .join(" ");
@@ -106,13 +103,16 @@ export function SourceChangeReview({
               </span>
               <span>
                 <span className="text-ink-3">In Capsule now: </span>
-                {shown(row.capsuleValue)}
+                {describeValue(row.field, readStoredValue(row.capsuleValue))}
               </span>
               <span>
                 <span className="text-ink-3">New from old system: </span>
-                {shown(row.sourceValue)}
+                {describeValue(row.field, readStoredValue(row.sourceValue))}
               </span>
-              <span className="text-ink-3">Was {shown(row.appliedValue)}</span>
+              <span className="text-ink-3">
+                Was{" "}
+                {describeValue(row.field, readStoredValue(row.appliedValue))}
+              </span>
               <span className="ml-auto flex gap-2">
                 <button
                   type="button"

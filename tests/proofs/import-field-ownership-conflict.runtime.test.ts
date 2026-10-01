@@ -269,4 +269,79 @@ describe("runtime proof: import field ownership conflict (AC-272, AC-273)", () =
       }),
     ).rejects.toThrow(/First name on the record/);
   });
+
+  it("an event changed in the old system moves its time and guest count unless a person changed them", async () => {
+    const tenantId = "tenant-import-field-ownership-events";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-ownership-events-owner",
+      role: "owner",
+      tenantId,
+    });
+    await importRows(owner, "contacts", [
+      { ContactID: "C-601", FirstName: "Ana", LastName: "Ruiz" },
+    ]);
+    const eventRow = (id: string, over: Record<string, unknown> = {}) => ({
+      EventID: id,
+      EventName: `Gala ${id}`,
+      ClientID: "C-601",
+      EventDate: "2026-11-14",
+      StartTime: "18:00",
+      ExpectedCount: 40,
+      EventStatus: "Proposal",
+      ...over,
+    });
+    const first = await importRows(owner, "events", [
+      eventRow("E-601"),
+      eventRow("E-602"),
+    ]);
+    expect(first.committed).toBe(2);
+    const link1 = await linkFor(owner, tenantId, "E-601");
+    const link2 = await linkFor(owner, tenantId, "E-602");
+    const readEvent = async (id: unknown) =>
+      (await owner.query(api.queries.getEvent, { id: id as never })) as Row;
+    const before1 = await readEvent(link1.capsuleId);
+
+    // The client tells the planner 55 guests; the planner saves it.
+    await owner.mutation(api.mutations.Event_changeHeadcount, {
+      docId: link1.capsuleId as never,
+      newHeadcount: 55,
+    });
+
+    // The old system says 60 guests and an hour later for E-601, 30 for E-602.
+    const revised = [
+      eventRow("E-601", { ExpectedCount: 60, StartTime: "19:00" }),
+      eventRow("E-602", { ExpectedCount: 30 }),
+    ];
+    const second = await importRows(owner, "events", revised);
+    expect(second.committed).toBe(0);
+    expect(second.updated).toBe(1);
+    expect(second.conflicted).toBe(1);
+    expect(await tableRows(owner, "events", tenantId)).toHaveLength(2);
+
+    const after1 = await readEvent(link1.capsuleId);
+    expect(after1.expectedHeadcount).toBe(55);
+    expect(after1.startsAt).toBe(Number(before1.startsAt) + 3_600_000);
+    expect((await readEvent(link2.capsuleId)).expectedHeadcount).toBe(30);
+
+    const conflicts = await tableRows(owner, "importConflicts", tenantId);
+    expect(conflicts).toHaveLength(1);
+    expect(conflicts[0]!.field).toBe("expectedHeadcount");
+    expect(JSON.parse(String(conflicts[0]!.appliedValue))).toBe(40);
+    expect(JSON.parse(String(conflicts[0]!.capsuleValue))).toBe(55);
+    expect(JSON.parse(String(conflicts[0]!.sourceValue))).toBe(60);
+
+    // Keep the planner's number; the same revision later raises nothing.
+    await owner.mutation(api.mutations.ImportConflict_settle, {
+      docId: conflicts[0]!._id as never,
+      resolution: "keep_capsule",
+    });
+    const third = await importRows(owner, "events", revised);
+    expect(third.skipped).toBe(2);
+    expect(third.conflicted).toBe(0);
+    const kept = await tableRows(owner, "importConflicts", tenantId);
+    expect(kept).toHaveLength(1);
+    expect(kept[0]!.status).toBe("keep_capsule");
+    expect((await readEvent(link1.capsuleId)).expectedHeadcount).toBe(55);
+  });
 });

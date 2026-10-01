@@ -28,6 +28,7 @@ import { getAuthContext } from "./lib/authContext";
 import {
   mergeConflicts,
   threeWayReconcile,
+  valuesEqual,
   type FieldConflict,
   type FieldValue,
 } from "./lib/culinaryModel/importMapping";
@@ -63,6 +64,11 @@ async function readCapsule(
     if (dataset === "contacts") {
       return (await ctx.runQuery(api.queries.getClient, {
         id: capsuleId as Id<"clients">,
+      })) as CapsuleDoc | null;
+    }
+    if (dataset === "events") {
+      return (await ctx.runQuery(api.queries.getEvent, {
+        id: capsuleId as Id<"events">,
       })) as CapsuleDoc | null;
     }
     return (await ctx.runQuery(api.queries.getVenue, {
@@ -108,6 +114,10 @@ async function writeCapsule(
       countryCode: keep(doc.countryCode),
       version: doc.version,
     });
+    return;
+  }
+  if (dataset === "events") {
+    await writeEvent(ctx, capsuleId as Id<"events">, doc, writes);
     return;
   }
   const venueId = capsuleId as Id<"venues">;
@@ -156,6 +166,73 @@ async function writeCapsule(
       capacity: typeof capacity === "number" ? capacity : 0,
       version,
     });
+  }
+}
+
+/**
+ * Events change through one command per concern (reschedule, guest count,
+ * venue, requirements); each call restates the fields it would otherwise
+ * clear, and the next call carries the version the last one returned.
+ */
+async function writeEvent(
+  ctx: ActionCtx,
+  docId: Id<"events">,
+  doc: CapsuleDoc,
+  writes: Values,
+): Promise<void> {
+  let version = doc.version;
+  const after = (result: unknown) => {
+    version = (result as { version?: number } | null)?.version ?? undefined;
+  };
+  const has = (field: string) => field in writes;
+  if (has("startsAt") || has("endsAt")) {
+    const startsAt = has("startsAt") ? writes.startsAt : doc.startsAt;
+    const endsAt = has("endsAt") ? writes.endsAt : doc.endsAt;
+    if (typeof startsAt !== "number" || typeof endsAt !== "number") {
+      throw new Error("An event needs a start and an end time.");
+    }
+    after(
+      await ctx.runMutation(api.mutations.Event_reschedule, {
+        docId,
+        startsAt,
+        endsAt,
+        version,
+      }),
+    );
+  }
+  if (has("expectedHeadcount")) {
+    after(
+      await ctx.runMutation(api.mutations.Event_changeHeadcount, {
+        docId,
+        newHeadcount: writes.expectedHeadcount,
+        version,
+      }),
+    );
+  }
+  if (has("venueName") || has("venueAddress")) {
+    after(
+      await ctx.runMutation(api.mutations.Event_changeVenue, {
+        docId,
+        venueId: keep(doc.venueId),
+        venueName: put(writes, doc, "venueName"),
+        venueAddress: put(writes, doc, "venueAddress"),
+        venueCapacity: doc.venueCapacity ?? undefined,
+        version,
+      }),
+    );
+  }
+  if (has("operationalRequirements")) {
+    after(
+      await ctx.runMutation(api.mutations.Event_changeRequirements, {
+        docId,
+        accessibilityNeeds: Array.isArray(doc.accessibilityNeeds)
+          ? (doc.accessibilityNeeds as string[])
+          : undefined,
+        serviceRequirements: keep(doc.serviceRequirements),
+        operationalRequirements: put(writes, doc, "operationalRequirements"),
+        version,
+      }),
+    );
   }
 }
 
@@ -240,10 +317,17 @@ export async function reconcileExistingLink(
       await writeCapsule(ctx, dataset, link.capsuleId, doc, writes);
       wrote = true;
     } catch {
-      // Someone saved the record meanwhile, or the save was refused: never
-      // force it. Each field becomes a review item instead.
-      const now = map.fromCapsule(doc);
+      // Someone saved the record meanwhile, or a save was refused: never
+      // force it. Fields that did save count as taken; the rest become
+      // review items with the value Capsule holds now.
+      const fresh = await readCapsule(ctx, dataset, link.capsuleId);
+      const now = map.fromCapsule(fresh ?? doc);
       for (const field of Object.keys(writes)) {
+        if (valuesEqual(now[field], writes[field])) {
+          newApplied[field] = writes[field] ?? null;
+          wrote = true;
+          continue;
+        }
         conflicts.push({
           field,
           appliedValue: baseline?.[field] ?? null,

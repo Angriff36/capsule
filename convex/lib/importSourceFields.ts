@@ -4,7 +4,7 @@
 // (threeWayReconcile); this file only names the fields and how to read them.
 import type { FieldValue } from "./culinaryModel/importMapping";
 
-export type SourceDeltaDataset = "contacts" | "venues";
+export type SourceDeltaDataset = "contacts" | "venues" | "events";
 
 type Values = Record<string, FieldValue>;
 type Row = Record<string, unknown>;
@@ -88,16 +88,88 @@ const VENUE_FIELDS: SourceFieldMap = {
   }),
 };
 
+// Events: the same shaping importCommit applies at create (a missing or
+// backwards end is one hour after the start; at least one guest; notes stand
+// in for requirements). Money fields are not compared here.
+const HOUR = 3_600_000;
+const EVENT_FIELDS: SourceFieldMap = {
+  fields: [
+    "title",
+    "startsAt",
+    "endsAt",
+    "expectedHeadcount",
+    "venueName",
+    "venueAddress",
+    "operationalRequirements",
+  ],
+  writable: [
+    "startsAt",
+    "endsAt",
+    "expectedHeadcount",
+    "venueName",
+    "venueAddress",
+    "operationalRequirements",
+  ],
+  labels: {
+    title: "Event name",
+    startsAt: "Start time",
+    endsAt: "End time",
+    expectedHeadcount: "Guest count",
+    venueName: "Venue name",
+    venueAddress: "Venue address",
+    operationalRequirements: "Event notes",
+  },
+  fromSource: (row) => {
+    const startsAt = num(row.startsAt);
+    const endsAt = num(row.endsAt);
+    const guests = num(row.expectedHeadcount);
+    return {
+      title: text(row.title),
+      startsAt,
+      endsAt:
+        typeof startsAt === "number" &&
+        (typeof endsAt !== "number" || endsAt <= startsAt)
+          ? startsAt + HOUR
+          : endsAt,
+      expectedHeadcount: Math.max(1, typeof guests === "number" ? guests : 1),
+      venueName: text(row.venueName),
+      venueAddress: text(row.venueAddress),
+      operationalRequirements:
+        text(row.operationalRequirements) ?? text(row.notes),
+    };
+  },
+  fromCapsule: (doc) => ({
+    title: text(doc.title),
+    startsAt: num(doc.startsAt),
+    endsAt: num(doc.endsAt),
+    expectedHeadcount: num(doc.expectedHeadcount),
+    venueName: text(doc.venueName),
+    venueAddress: text(doc.venueAddress),
+    operationalRequirements: text(doc.operationalRequirements),
+  }),
+};
+
 export const SOURCE_FIELD_MAPS: Record<SourceDeltaDataset, SourceFieldMap> = {
   contacts: CONTACT_FIELDS,
   venues: VENUE_FIELDS,
+  events: EVENT_FIELDS,
 };
 
 /** Recordtype on the link → dataset, for screens that start from a link. */
 export const DATASET_BY_RECORD_TYPE: Record<string, SourceDeltaDataset> = {
   contact: "contacts",
   venue: "venues",
+  event: "events",
 };
+
+/** Plain words for a stored value on the review list. */
+export function describeValue(field: string, value: FieldValue): string {
+  if (value == null || value === "") return "(blank)";
+  if ((field === "startsAt" || field === "endsAt") && typeof value === "number") {
+    return new Date(value).toLocaleString();
+  }
+  return String(value);
+}
 
 /**
  * Short, stable fingerprint of the compared source values. Two runs of the
