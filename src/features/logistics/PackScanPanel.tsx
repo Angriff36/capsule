@@ -16,6 +16,8 @@ import {
   usePackListItemRecordPackedCount,
   usePackListItemRecordReturn,
   usePackListStartPacking,
+  useCreatePackScan,
+  useListPackScan,
 } from "../../lib/manifest-convex-react";
 import { BarcodeLabel } from "../../ui/BarcodeLabel";
 import { classifyCommandFailure } from "../events/CommandFailure";
@@ -75,6 +77,11 @@ export function PackScanPanel({
   const recordChecked = usePackListItemRecordChecked();
   const recordLoaded = usePackListItemRecordLoaded();
   const recordReturn = usePackListItemRecordReturn();
+  const recordScan = useCreatePackScan();
+  const keptScans = useListPackScan();
+  // What the scanner read for the scan being handled; empty for a line picked
+  // by hand.
+  const labelRef = useRef("");
 
   const [step, setStep] = useState<ScanStep>("pack");
   const [code, setCode] = useState("");
@@ -90,6 +97,28 @@ export function PackScanPanel({
 
   const say = (ok: boolean, text: string) =>
     setRecent((rows) => [{ at: Date.now(), ok, text }, ...rows].slice(0, 8));
+
+  // Every scan is kept, the ones that counted and the ones that did not, so
+  // the crew lead can see afterwards what happened. Keeping it never holds up
+  // the count.
+  const keep = (
+    ok: boolean,
+    text: string,
+    outcome: string,
+    line?: { _id: string } | null,
+    counted?: number,
+  ) => {
+    say(ok, text);
+    void recordScan({
+      packListId: packList._id,
+      step,
+      label: labelRef.current.trim() || "Picked by hand",
+      outcome,
+      message: text,
+      packListItemId: line?._id,
+      quantity: counted,
+    }).catch(() => undefined);
+  };
 
   const stopCamera = useCallback(() => {
     if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
@@ -115,13 +144,23 @@ export function PackScanPanel({
 
   const save = async (line: Line, amount: number): Promise<void> => {
     if (step === "back" && String(packList.status) !== "dispatched") {
-      say(false, `${line.description}: ${SCAN_OUTCOME_TEXT.not_out_yet}`);
+      keep(
+        false,
+        `${line.description}: ${SCAN_OUTCOME_TEXT.not_out_yet}`,
+        "not_out_yet",
+        line,
+      );
       return;
     }
     const result = applyScan(step, line, amount, truckId || null);
     const name = line.description;
     if (result.outcome !== "ok" || !result.change) {
-      say(false, `${name}: ${SCAN_OUTCOME_TEXT[result.outcome]}`);
+      keep(
+        false,
+        `${name}: ${SCAN_OUTCOME_TEXT[result.outcome]}`,
+        result.outcome,
+        line,
+      );
       return;
     }
     const change = result.change;
@@ -138,24 +177,33 @@ export function PackScanPanel({
           ...args,
           packedQuantity: change.packedQuantity,
         });
-        say(
+        keep(
           true,
           `${name}: packed ${change.packedQuantity} of ${line.requiredQuantity} ${line.unit}`,
+          "ok",
+          line,
+          amount,
         );
       } else if (change.step === "check") {
         await recordChecked({
           ...args,
           checkedQuantity: change.checkedQuantity,
         });
-        say(
+        keep(
           true,
           `${name}: checked ${change.checkedQuantity} of ${line.packedQuantity}`,
+          "ok",
+          line,
+          amount,
         );
       } else if (change.step === "load") {
         await recordLoaded({ ...args, loadedQuantity: change.loadedQuantity });
-        say(
+        keep(
           true,
           `${name}: ${change.loadedQuantity} of ${line.packedQuantity} on the truck`,
+          "ok",
+          line,
+          amount,
         );
       } else {
         await recordReturn({
@@ -167,13 +215,21 @@ export function PackScanPanel({
           // Left out, the saved note would be cleared.
           finding: line.returnFinding?.trim() || undefined,
         });
-        say(
+        keep(
           true,
           `${name}: ${change.returnedQuantity} of ${line.packedQuantity} back`,
+          "ok",
+          line,
+          amount,
         );
       }
     } catch (error) {
-      say(false, `${name}: ${classifyCommandFailure(error).title}`);
+      keep(
+        false,
+        `${name}: ${classifyCommandFailure(error).title}`,
+        "refused",
+        line,
+      );
     } finally {
       setBusy(false);
     }
@@ -187,6 +243,7 @@ export function PackScanPanel({
   const handleLabel = async (raw: string): Promise<void> => {
     const target = parseScanLabel(raw);
     if (!target) return;
+    labelRef.current = raw;
     const found = findScanTarget(target, {
       eventId: packList.eventId,
       eventNumber,
@@ -199,23 +256,28 @@ export function PackScanPanel({
       rigs: scanRigs,
     });
     if (found.found === "event") {
-      say(true, "Right event: this label is for this list's event.");
+      keep(true, "Right event: this label is for this list's event.", "event");
       return;
     }
     if (found.found === "truck") {
       setTruckId(found.rigId);
       const label =
         rigs.find((rig) => rig.id === found.rigId)?.label ?? "Truck";
-      say(
+      keep(
         true,
         step === "load"
           ? `Loading onto ${label}.`
           : `${label} is on this event. Pick "On truck" to load it.`,
+        "truck",
       );
       return;
     }
     if (found.found === "none") {
-      say(false, `${raw.trim()}: ${SCAN_OUTCOME_TEXT[found.outcome]}`);
+      keep(
+        false,
+        `${raw.trim()}: ${SCAN_OUTCOME_TEXT[found.outcome]}`,
+        found.outcome,
+      );
       return;
     }
     const line = lines.find((row) => row._id === found.line._id);
@@ -413,6 +475,7 @@ export function PackScanPanel({
         onSubmit={(event) => {
           event.preventDefault();
           const line = lines.find((row) => row._id === pickedLineId);
+          labelRef.current = "";
           if (line) void save(line, amount());
         }}
       >
@@ -446,23 +509,32 @@ export function PackScanPanel({
           Print labels for this event and its trucks
         </summary>
         <div className="mt-3 flex flex-wrap gap-5">
-          {eventNumber?.trim() ? (
-            <BarcodeLabel
-              code={scanLabelFor.event(eventNumber)}
-              title={`Event #${eventNumber.trim()}`}
-            />
-          ) : (
-            <p className="text-base text-ink-2">
-              This event has no number yet, so it has no label. Number it on the
-              event tracker.
-            </p>
-          )}
+          <BarcodeLabel
+            code={
+              eventNumber?.trim() ? scanLabelFor.event(eventNumber) : undefined
+            }
+            qr={`capsule://event/${packList.eventId}`}
+            title={
+              eventNumber?.trim()
+                ? `Event #${eventNumber.trim()}`
+                : "This event"
+            }
+          />
           {scanRigs
-            .filter((rig) => rig.plate?.trim())
+            .filter((rig) => rig.plate?.trim() || rig.vehicleId)
             .map((rig) => (
               <BarcodeLabel
                 key={rig.id}
-                code={scanLabelFor.vehicle(rig.plate ?? "")}
+                code={
+                  rig.plate?.trim()
+                    ? scanLabelFor.vehicle(rig.plate)
+                    : undefined
+                }
+                qr={
+                  rig.vehicleId
+                    ? `capsule://vehicle/${rig.vehicleId}`
+                    : undefined
+                }
                 title={rigs.find((row) => row.id === rig.id)?.label ?? "Truck"}
               />
             ))}
@@ -471,6 +543,44 @@ export function PackScanPanel({
           Equipment labels print from each item on the equipment page.
         </p>
       </details>
+
+      {(() => {
+        const scans = (keptScans ?? [])
+          .filter(
+            (row) => row.deletedAt == null && row.packListId === packList._id,
+          )
+          .sort((a, b) => Number(b.scannedAt ?? 0) - Number(a.scannedAt ?? 0));
+        if (scans.length === 0) return null;
+        return (
+          <details className="mt-3">
+            <summary className="cursor-pointer text-base text-ink-2">
+              Every scan on this list ({scans.length})
+            </summary>
+            <ul className="mt-2 divide-y divide-line">
+              {scans.slice(0, 50).map((row) => (
+                <li
+                  key={row._id}
+                  className={`py-1.5 text-base ${row.outcome === "ok" || row.outcome === "event" || row.outcome === "truck" ? "text-ink" : "text-danger"}`}
+                >
+                  {row.message}
+                  <small className="block text-sm text-ink-3">
+                    {row.scannedAt != null
+                      ? new Date(row.scannedAt).toLocaleString([], {
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })
+                      : ""}
+                    {row.personName?.trim() ? ` · ${row.personName}` : ""} ·
+                    read “{row.label}”
+                  </small>
+                </li>
+              ))}
+            </ul>
+          </details>
+        );
+      })()}
 
       {recent.length > 0 ? (
         <ul className="mt-3 divide-y divide-line" aria-live="polite">

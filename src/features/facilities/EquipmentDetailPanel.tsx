@@ -7,9 +7,17 @@ import {
   useCreateEquipmentPart,
   useEquipmentClearPrimaryImage,
   useEquipmentPartDetach,
+  useEquipmentSetCustomFields,
   useEquipmentSetPrimaryImage,
   useListEquipmentPart,
+  useListOrganization,
 } from "../../lib/manifest-convex-react";
+import {
+  fieldsForCategory,
+  fieldValuesJson,
+  parseEquipmentFieldSets,
+  parseFieldValues,
+} from "../../lib/equipmentFields";
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { BarcodeLabel } from "../../ui/BarcodeLabel";
@@ -31,6 +39,8 @@ type CatalogItem = {
   vendorId?: string | null;
   homeLocation?: string | null;
   primaryImageStorageId?: string | null;
+  category?: string | null;
+  customFieldsJson?: string | null;
 };
 
 type PartRow = {
@@ -65,6 +75,10 @@ export function EquipmentDetailPanel({
   const createAttachment = useCreateAttachment();
   const setPrimaryImage = useEquipmentSetPrimaryImage();
   const clearPrimaryImage = useEquipmentClearPrimaryImage();
+  const setCustomFields = useEquipmentSetCustomFields();
+  const organization = useListOrganization()?.find(
+    (row) => row.deletedAt == null,
+  );
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -127,6 +141,34 @@ export function EquipmentDetailPanel({
     ],
     ["Storage place", item.homeLocation?.trim() || "Not set"],
   ];
+  // The company's own fields for this item's category, and its answers.
+  // An answer to a field the category no longer asks for still shows.
+  const fieldNames = fieldsForCategory(
+    parseEquipmentFieldSets(organization?.equipmentFieldsJson),
+    item.category,
+  );
+  const fieldValues = parseFieldValues(item.customFieldsJson);
+  const olderFields = Object.keys(fieldValues).filter(
+    (name) => !fieldNames.includes(name),
+  );
+  const saveFields = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const answers = Object.fromEntries(
+      fieldNames.map((name, index) => [
+        name,
+        String(data.get(`field-${index}`) ?? ""),
+      ]),
+    );
+    void run(() =>
+      setCustomFields({
+        docId: item._id,
+        version: item.version,
+        customFieldsJson: fieldValuesJson(fieldValues, answers),
+      }),
+    );
+  };
+
   if (item.ownership === "rented") {
     facts.push([
       "Rented from",
@@ -201,13 +243,16 @@ export function EquipmentDetailPanel({
               </button>
             ) : null}
           </div>
-          {item.assetTag?.trim() ? (
-            <BarcodeLabel
-              code={scanLabelFor.equipment(item.assetTag)}
-              title={item.name}
-              subtitle={item.homeLocation?.trim() || undefined}
-            />
-          ) : null}
+          <BarcodeLabel
+            code={
+              item.assetTag?.trim()
+                ? scanLabelFor.equipment(item.assetTag)
+                : undefined
+            }
+            qr={`capsule://equipment/${item._id}`}
+            title={item.name}
+            subtitle={item.homeLocation?.trim() || undefined}
+          />
         </div>
         <div className="space-y-4">
           <dl className="grid gap-2 sm:grid-cols-2">
@@ -218,6 +263,46 @@ export function EquipmentDetailPanel({
               </div>
             ))}
           </dl>
+          {fieldNames.length > 0 || olderFields.length > 0 ? (
+            <form
+              key={`${item._id}:${item.version}`}
+              className="space-y-2"
+              onSubmit={saveFields}
+            >
+              <h3 className="text-sm font-semibold text-ink">
+                {item.category?.trim() || "Item"} details
+              </h3>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {fieldNames.map((name, index) => (
+                  <label key={name} className="field-label">
+                    <span>{name}</span>
+                    <input
+                      name={`field-${index}`}
+                      className="input min-h-10 w-full"
+                      defaultValue={fieldValues[name] ?? ""}
+                    />
+                  </label>
+                ))}
+              </div>
+              {olderFields.length > 0 ? (
+                <p className="text-sm text-ink-3">
+                  Also saved:{" "}
+                  {olderFields
+                    .map((name) => `${name}: ${fieldValues[name]}`)
+                    .join(" · ")}
+                </p>
+              ) : null}
+              {fieldNames.length > 0 ? (
+                <button
+                  type="submit"
+                  className="btn btn-ghost btn-sm"
+                  disabled={busy}
+                >
+                  Save details
+                </button>
+              ) : null}
+            </form>
+          ) : null}
           <div>
             <h3 className="text-sm font-semibold text-ink">Goes with it</h3>
             {itemParts.length === 0 ? (

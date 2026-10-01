@@ -495,6 +495,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-1", "dishId": "dishId-pack-rule-1", "serviceStyleId": "serviceStyleId-pack-rule-1", "matchFact": "demo-matchFact-1", "matchText": "demo-matchText-1", "description": "demo-description-1", "category": "demo-category-1", "unit": "demo-unit-1", "baseQuantity": 1, "scaleBy": "demo-scaleBy-1", "perUnits": 1, "sparePercent": 1, "ownership": "demo-ownership-1", "returnRequired": false, "returnNote": "demo-returnNote-1", "requiredCapability": false, "note": "demo-note-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-2", "dishId": "dishId-pack-rule-2", "serviceStyleId": "serviceStyleId-pack-rule-2", "matchFact": "demo-matchFact-2", "matchText": "demo-matchText-2", "description": "demo-description-2", "category": "demo-category-2", "unit": "demo-unit-2", "baseQuantity": 2, "scaleBy": "demo-scaleBy-2", "perUnits": 2, "sparePercent": 2, "ownership": "demo-ownership-2", "returnRequired": false, "returnNote": "demo-returnNote-2", "requiredCapability": false, "note": "demo-note-2" } as any);
+  // PackScan → api.mutations.PackScan_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PackScan_createViaRecord, { "packListId": "packListId-pack-scan-1", "packListItemId": "packListItemId-pack-scan-1", "step": "demo-step-1", "label": "demo-label-1", "outcome": "demo-outcome-1", "message": "demo-message-1", "quantity": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PackScan_createViaRecord, { "packListId": "packListId-pack-scan-2", "packListItemId": "packListItemId-pack-scan-2", "step": "demo-step-2", "label": "demo-label-2", "outcome": "demo-outcome-2", "message": "demo-message-2", "quantity": 2 } as any);
   // PackSectionClaim → api.mutations.PackSectionClaim_createViaTake
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-1", "sectionKey": "demo-sectionKey-1" } as any);
@@ -1424,6 +1429,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PackRule",
       "createMutation": "PackRule_createViaDefine",
+      "rowCount": 2
+    },
+    {
+      "entity": "PackScan",
+      "createMutation": "PackScan_createViaRecord",
       "rowCount": 2
     },
     {

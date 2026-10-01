@@ -1884,6 +1884,54 @@
       "category": "property-added",
       "acknowledgedAt": "2026-09-30",
       "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
+    },
+    {
+      "path": "Vehicle.cargoVolumeM3",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Vehicle.hitchType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Trailer.cargoVolumeM3",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Trailer.hitchType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Trailer.emptyWeightKg",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "PackListItem.unitVolumeM3",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Equipment.customFieldsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Organization.equipmentFieldsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
     }
   ]
 }

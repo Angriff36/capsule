@@ -200,6 +200,8 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // Planning board: how loud each check is (JSON map of check to
   // fix | look | off, read by src/lib/planningChecks.ts). Unset = defaults.
   property planningChecksJson: string?
+  // The fields each equipment category asks for: {"Ovens": ["Fuel", "Burners"]}.
+  property equipmentFieldsJson: string?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
@@ -361,6 +363,15 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command configureEquipmentFields(optional fieldsJson: string) {
+    guard self.deletedAt == null
+    mutate equipmentFieldsJson = fieldsJson
+    emit OrganizationEquipmentFieldsConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -452,6 +463,11 @@ event OrganizationRoutePolicyConfigured: "organization.route_policy_configured" 
 }
 
 event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationEquipmentFieldsConfigured: "organization.equipment_fields_configured" {
   organizationId: string
   tenantId: string
 }

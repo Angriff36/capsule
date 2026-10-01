@@ -39,6 +39,10 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   // this truck has to hold ("CDL class B"); empty = any driver.
   property seatCount: int?
   property driverQualificationName: string?
+  // Cargo space in cubic metres and the hitch on the back ("50 mm ball",
+  // "pintle"). Both optional: the planning board checks them when known.
+  property cargoVolumeM3: float?
+  property hitchType: string?
 
   // Compliance: registration certificate and insurance policy. Optional at
   // register time so existing workflows keep working; expiry dates drive the
@@ -159,6 +163,18 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
       vehicleId: self.id
       tenantId: self.tenantId
       seatCount: seatCount
+    }
+  }
+
+  command setCargoFacts(optional cargoVolumeM3: float, optional hitchType: string) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint setCargoVolumeNotNegative: cargoVolumeM3 == null or cargoVolumeM3 >= 0 "Cargo space can't be negative. Use zero or more, or leave it empty."
+    mutate cargoVolumeM3 = cargoVolumeM3
+    mutate hitchType = hitchType != null and length(trim(hitchType)) > 0 ? trim(hitchType) : null
+    emit VehicleCargoFactsSet {
+      vehicleId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -315,6 +331,12 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   property insurancePolicyNumber: string?
   property insuranceExpiresAt: datetime?
 
+  // Cargo space, the coupler that has to fit the truck's hitch, and the
+  // trailer's own weight empty (it counts against the truck's towing limit).
+  property cargoVolumeM3: float?
+  property hitchType: string?
+  property emptyWeightKg: int?
+
   computed isOperational: boolean = self.operationalStatus == "available" or self.operationalStatus == "in_use"
   computed registrationCurrent: boolean = self.registrationExpiresAt != null and self.registrationExpiresAt > now()
   computed insuranceCurrent: boolean = self.insuranceExpiresAt != null and self.insuranceExpiresAt > now()
@@ -447,6 +469,20 @@ entity Trailer mixin TenantScoped, SoftDeletable {
       insuranceProvider: insuranceProvider
       insurancePolicyNumber: insurancePolicyNumber
       insuranceExpiresAt: insuranceExpiresAt
+    }
+  }
+
+  command setCargoFacts(optional cargoVolumeM3: float, optional hitchType: string, optional emptyWeightKg: int) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint setTrailerVolumeNotNegative: cargoVolumeM3 == null or cargoVolumeM3 >= 0 "Cargo space can't be negative. Use zero or more, or leave it empty."
+    constraint setTrailerWeightNotNegative: emptyWeightKg == null or emptyWeightKg >= 0 "The trailer's own weight can't be negative. Use zero or more, or leave it empty."
+    mutate cargoVolumeM3 = cargoVolumeM3
+    mutate hitchType = hitchType != null and length(trim(hitchType)) > 0 ? trim(hitchType) : null
+    mutate emptyWeightKg = emptyWeightKg
+    emit TrailerCargoFactsSet {
+      trailerId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -770,3 +806,13 @@ on VehicleServiceRecorded run VehicleMaintenanceSchedule.applyService
     nextDueAt: payload.nextDueAt
     nextDueMileage: payload.nextDueMileage
   }
+
+event VehicleCargoFactsSet: "vehicle.cargo_facts_set" {
+  vehicleId: string
+  tenantId: string
+}
+
+event TrailerCargoFactsSet: "trailer.cargo_facts_set" {
+  trailerId: string
+  tenantId: string
+}
