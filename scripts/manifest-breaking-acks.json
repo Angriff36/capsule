@@ -1760,6 +1760,18 @@
       "reason": "Batch 2026-09-29 PL-CLOSEOUT: optional closeout fields (records behind the numbers, version number, correction reason and time); saved closeouts need no backfill."
     },
     {
+      "path": "ImportRun.sourceRowsStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-IMPORT-CANCEL: optional; the rows a run was given, kept so anyone can continue it. Stored runs need no backfill."
+    },
+    {
+      "path": "ImportRun.stopReport",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-IMPORT-CANCEL: optional; what Stop this import did. Stored runs need no backfill."
+    },
+    {
       "path": "EventCloseout.sourceSnapshot",
       "category": "property-added",
       "acknowledgedAt": "2026-09-29",

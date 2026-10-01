@@ -1855,6 +1855,8 @@ export const ImportRunSchema = z.object({
   unaccountedRecordCount: z.number().int().nullable().optional(),
   commitCheckpoint: z.string().nullable().optional(),
   indexNameMismatch: z.boolean().nullable().optional(),
+  sourceRowsStorageId: z.string().nullable().optional(),
+  stopReport: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -7690,6 +7692,13 @@ export const ImportRunExplainArchiveDiscrepancyParamsSchema = z.object({
 
 export type ImportRunExplainArchiveDiscrepancyParams = z.infer<typeof ImportRunExplainArchiveDiscrepancyParamsSchema>;
 
+// Command: keepSourceRows on ImportRun
+export const ImportRunKeepSourceRowsParamsSchema = z.object({
+  sourceRowsStorageId: z.string(),
+});
+
+export type ImportRunKeepSourceRowsParams = z.infer<typeof ImportRunKeepSourceRowsParamsSchema>;
+
 // Command: markFailed on ImportRun
 export const ImportRunMarkFailedParamsSchema = z.object({
   failureDetails: z.string(),
@@ -7729,6 +7738,13 @@ export const ImportRunRecordParseParamsSchema = z.object({
 });
 
 export type ImportRunRecordParseParams = z.infer<typeof ImportRunRecordParseParamsSchema>;
+
+// Command: recordStopReport on ImportRun
+export const ImportRunRecordStopReportParamsSchema = z.object({
+  stopReport: z.string(),
+});
+
+export type ImportRunRecordStopReportParams = z.infer<typeof ImportRunRecordStopReportParamsSchema>;
 
 // Command: revert on ImportRun
 export const ImportRunRevertParamsSchema = z.object({});

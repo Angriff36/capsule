@@ -211,13 +211,24 @@ describe("runtime proof: durable import (AC-631, AC-269)", () => {
     expect(String(retry)).toContain("committing");
     expect(await tableRows(owner, "venues", tenantId)).toHaveLength(2);
 
-    // Stopping again only finishes the take-back; nothing changes.
+    // Stopping again only finishes the take-back; nothing more changes and
+    // the run's report still says what the stop did.
     const again = (await asActions(owner).action(
       api.importCancel.cancelImportRun,
       { importRunId: runId, reason: "Wrong file" },
     )) as { removed: number; kept: string[] };
-    expect(again.removed).toBe(0);
+    expect(again.removed).toBe(1);
     expect(again.kept).toEqual(["S Venue 1"]);
+    const report = (await owner.run(async (ctx) =>
+      ctx.db.get(runId as never),
+    )) as { stopReport?: string } | null;
+    expect(JSON.parse(report!.stopReport!)).toEqual({
+      removed: 1,
+      retired: 0,
+      kept: ["S Venue 1"],
+      done: true,
+    });
+    expect(await tableRows(owner, "venues", tenantId)).toHaveLength(2);
   });
 
   it("stopping an event import takes back the event with the files the run attached", async () => {

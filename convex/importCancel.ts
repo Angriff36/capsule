@@ -110,8 +110,11 @@ export const takeBackLink = internalMutation({
   handler: async (ctx, args): Promise<TakeBackOutcome> => {
     const run = await ctx.db.get(args.importRunId);
     const link = await ctx.db.get(args.linkId);
+    // Only a stopped run gives anything back: a run that finished (for
+    // example by a second worker) keeps every record.
     if (
       !run ||
+      run.status !== "failed" ||
       !link ||
       link.tenantId !== run.tenantId ||
       link.sourceImportRunId !== args.importRunId ||
@@ -253,12 +256,52 @@ export type StopResult = {
   kept: string[];
 };
 
-/** Take back everything the stopped run made that nobody changed. */
+/** The run's state for a take-back: stopped or not, and its last report. */
+export const stopState = internalQuery({
+  args: { importRunId: v.id("importRuns") },
+  handler: async (ctx, args) => {
+    const run = await ctx.db.get(args.importRunId);
+    return {
+      stopped: run !== null && run.status === "failed",
+      stopReport: run?.stopReport ?? null,
+    };
+  },
+});
+
+function readStopReport(raw: string | null): StopResult {
+  try {
+    const parsed = JSON.parse(raw ?? "{}") as Partial<StopResult>;
+    return {
+      removed: typeof parsed.removed === "number" ? parsed.removed : 0,
+      retired: typeof parsed.retired === "number" ? parsed.retired : 0,
+      kept: [],
+    };
+  } catch {
+    return { removed: 0, retired: 0, kept: [] };
+  }
+}
+
+/**
+ * Take back everything the stopped run made that nobody changed. The run
+ * keeps a report as it goes (done: false until the last page): counts add up
+ * across tries; the kept list is the current one.
+ */
 export async function compensateStoppedRun(
   ctx: ActionCtx,
   importRunId: Id<"importRuns">,
 ): Promise<StopResult> {
-  const result: StopResult = { removed: 0, retired: 0, kept: [] };
+  const state: { stopped: boolean; stopReport: string | null } =
+    await ctx.runQuery(internal.importCancel.stopState, { importRunId });
+  if (!state.stopped) {
+    return { removed: 0, retired: 0, kept: [] };
+  }
+  const result = readStopReport(state.stopReport);
+  const report = async (done: boolean) => {
+    await ctx.runMutation(api.mutations.ImportRun_recordStopReport, {
+      docId: importRunId,
+      stopReport: JSON.stringify({ ...result, done }),
+    });
+  };
   let cursor: string | null = null;
   for (;;) {
     const page: {
@@ -279,8 +322,10 @@ export async function compensateStoppedRun(
       else if (outcome.kind === "kept") result.kept.push(outcome.label);
     }
     if (page.isDone) break;
+    await report(false);
     cursor = page.continueCursor;
   }
+  await report(true);
   return result;
 }
 

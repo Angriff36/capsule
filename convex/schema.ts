@@ -1712,6 +1712,8 @@ export default defineSchema({
     unaccountedRecordCount: v.optional(v.union(v.number(), v.null())),
     commitCheckpoint: v.optional(v.union(v.string(), v.null())),
     indexNameMismatch: v.optional(v.union(v.boolean(), v.null())),
+    sourceRowsStorageId: v.optional(v.union(v.string(), v.null())),
+    stopReport: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

@@ -330,11 +330,13 @@ import {
   ImportRunBeginReviewParamsSchema,
   ImportRunCommitParamsSchema,
   ImportRunExplainArchiveDiscrepancyParamsSchema,
+  ImportRunKeepSourceRowsParamsSchema,
   ImportRunMarkFailedParamsSchema,
   ImportRunRecordArchiveInventoryParamsSchema,
   ImportRunRecordCommitCheckpointParamsSchema,
   ImportRunRecordDispositionSummaryParamsSchema,
   ImportRunRecordParseParamsSchema,
+  ImportRunRecordStopReportParamsSchema,
   ImportRunRevertParamsSchema,
   ImportRunStartParamsSchema,
   ImportRunValidateParamsSchema,
@@ -5494,6 +5496,16 @@ export function useImportRunExplainArchiveDiscrepancy() {
   };
 }
 
+/** Mutation hook for ImportRun.keepSourceRows. */
+export function useImportRunKeepSourceRows() {
+  const mutate = useMutation(api.mutations.ImportRun_keepSourceRows);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportRunKeepSourceRowsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for ImportRun.markFailed. */
 export function useImportRunMarkFailed() {
   const mutate = useMutation(api.mutations.ImportRun_markFailed);
@@ -5540,6 +5552,16 @@ export function useImportRunRecordParse() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ImportRunRecordParseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ImportRun.recordStopReport. */
+export function useImportRunRecordStopReport() {
+  const mutate = useMutation(api.mutations.ImportRun_recordStopReport);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportRunRecordStopReportParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13086,4 +13108,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1386 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1388 as const;

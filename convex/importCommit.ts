@@ -90,7 +90,12 @@
  * JSON-paste migration path.
  */
 import { ConvexError, v } from "convex/values";
-import { action, internalMutation, internalQuery } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  type ActionCtx,
+} from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
 import {
@@ -464,6 +469,21 @@ export const supersedeLink = internalMutation({
   },
 });
 
+/** The rows a run kept when it started committing (AC-056). */
+async function readKeptRows(
+  ctx: ActionCtx,
+  storageId: string,
+): Promise<unknown[]> {
+  const blob = await ctx.storage.get(storageId as Id<"_storage">);
+  if (!blob) {
+    throw new ConvexError(
+      "This import's saved rows are gone. Paste the rows again to continue.",
+    );
+  }
+  const rows: unknown = JSON.parse(await blob.text());
+  return Array.isArray(rows) ? rows : [];
+}
+
 export type CommitResult = {
   committed: number;
   skipped: number;
@@ -638,6 +658,22 @@ export const commitImportRun = action({
       throw new ConvexError("maxRecords must be at least 1 when provided.");
     }
 
+    // PL-IMPORT-CANCEL (AC-056): the first commit keeps its rows in file
+    // storage; a later Continue with no rows reads them back, so a run whose
+    // worker stopped finishes without the browser that started it.
+    let rawRows: unknown[] = args.rawRows;
+    if (rawRows.length === 0 && importRun.sourceRowsStorageId) {
+      rawRows = await readKeptRows(ctx, importRun.sourceRowsStorageId);
+    } else if (rawRows.length > 0 && !importRun.sourceRowsStorageId) {
+      const storageId = await ctx.storage.store(
+        new Blob([JSON.stringify(rawRows)], { type: "application/json" }),
+      );
+      await ctx.runMutation(api.mutations.ImportRun_keepSourceRows, {
+        docId: args.importRunId,
+        sourceRowsStorageId: storageId,
+      });
+    }
+
     // R2-6 resume state, shared by every dataset branch below. Counting
     // rule: a link THIS run wrote was counted by the invocation that handled
     // it (the loop skip is silent for own-run links); foreign-run links,
@@ -728,6 +764,13 @@ export const commitImportRun = action({
         importRunId: args.importRunId,
       });
       if (still) return;
+      const state = await ctx.runQuery(internal.importCancel.stopState, {
+        importRunId: args.importRunId,
+      });
+      if (!state.stopped) {
+        // Another worker finished it; this one adds nothing more.
+        throw new ConvexError("This import already finished.");
+      }
       await compensateStoppedRun(ctx, args.importRunId);
       throw new ConvexError(
         "This import was stopped. Nothing more was brought in.",
@@ -738,7 +781,7 @@ export const commitImportRun = action({
     // accounting alone. ImportRun_commit still refuses until every file is
     // accounted for and any report-list gap is explained; finishing creates
     // no records, and the run keeps each file's outcome visible.
-    if (args.rawRows.length === 0 && importRun.archiveStorageId) {
+    if (rawRows.length === 0 && importRun.archiveStorageId) {
       const none = { committed: 0, skipped: 0, pending: 0 };
       await completeRun(none);
       return {
@@ -759,10 +802,10 @@ export const commitImportRun = action({
     // "client"). The company/title are folded into notes (the full raw row is
     // also preserved on the link), so nothing is lost.
     if (importRun.datasetType === "contacts") {
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppContacts(args.rawRows as TppContactRecord[]);
+      const parsed = parseTppContacts(rawRows as TppContactRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid contact records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -811,7 +854,7 @@ export const commitImportRun = action({
             record: contact,
             rawSourceData: withSourceRow(
               contact,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             importRunId: args.importRunId,
           });
@@ -849,7 +892,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               contact,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
             ...sourceBaseline("contacts", contact),
@@ -871,7 +914,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               contact,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
@@ -904,10 +947,10 @@ export const commitImportRun = action({
     }
 
     if (importRun.datasetType === "events") {
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppEvents(args.rawRows as TppEventRecord[]);
+      const parsed = parseTppEvents(rawRows as TppEventRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid event records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -956,7 +999,7 @@ export const commitImportRun = action({
             record: event,
             rawSourceData: withSourceRow(
               event,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             importRunId: args.importRunId,
           });
@@ -990,7 +1033,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               event,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Client not imported (external ${event.clientId}); import contacts first.`,
@@ -1048,7 +1091,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               event,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: "Event is missing a start date (EventDate).",
@@ -1122,7 +1165,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               event,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
             ...(fileErrors.length > 0
@@ -1150,7 +1193,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               event,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
@@ -1201,10 +1244,10 @@ export const commitImportRun = action({
     }
 
     if (importRun.datasetType === "leads") {
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppLeads(args.rawRows as TppLeadRecord[]);
+      const parsed = parseTppLeads(rawRows as TppLeadRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid lead records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1253,7 +1296,7 @@ export const commitImportRun = action({
             record: lead,
             rawSourceData: withSourceRow(
               lead,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             importRunId: args.importRunId,
           });
@@ -1303,7 +1346,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               lead,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
             ...sourceBaseline("leads", lead),
@@ -1325,7 +1368,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               lead,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
@@ -1368,10 +1411,10 @@ export const commitImportRun = action({
       // in the queue. conflictStatus "pending_conflict" is the CORRECT
       // "awaiting match" state here — not a creation failure — so a staged link
       // counts as `committed` (the link IS the artifact this dataset produces).
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppPayments(args.rawRows as TppPaymentRecord[]);
+      const parsed = parseTppPayments(rawRows as TppPaymentRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid payment records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1502,7 +1545,7 @@ export const commitImportRun = action({
           sourceImportRunId: args.importRunId,
           rawSourceData: withSourceRow(
             payment,
-            args.rawRows[parsed.sourceIndexes[index]!],
+            rawRows[parsed.sourceIndexes[index]!],
           ),
           conflictStatus: waitsForMatch ? "pending_conflict" : "resolved",
           resolutionNote: note,
@@ -1547,10 +1590,10 @@ export const commitImportRun = action({
       // the other branches), so a role with importAccess but not kitchenAccess
       // sees every dish land as pending_conflict (managers/admins/owners hold
       // both); portionSize is parsed from free text and defaults to 1.
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppMenus(args.rawRows as TppMenuRecord[]);
+      const parsed = parseTppMenus(rawRows as TppMenuRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid menu records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1599,7 +1642,7 @@ export const commitImportRun = action({
             record: menu,
             rawSourceData: withSourceRow(
               menu,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             importRunId: args.importRunId,
           });
@@ -1636,7 +1679,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               menu,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
             ...sourceBaseline("menus", menu),
@@ -1658,7 +1701,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               menu,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
@@ -1703,10 +1746,10 @@ export const commitImportRun = action({
       // per-event (externalId = sourceEventId): a re-run skips an already-linked
       // event. PackList_createViaOpen is logisticsAccess-guarded, so a role with
       // importAccess but not logisticsAccess sees the row land as pending_conflict.
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppPackLists(args.rawRows as TppPackListRecord[]);
+      const parsed = parseTppPackLists(rawRows as TppPackListRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid pack-list records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1773,7 +1816,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               packList,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Source event not imported (external ${packList.sourceEventId}); import events first.`,
@@ -1859,7 +1902,7 @@ export const commitImportRun = action({
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
               packList,
-              args.rawRows[parsed.sourceIndexes[index]!],
+              rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
@@ -1894,14 +1937,14 @@ export const commitImportRun = action({
     if (importRun.datasetType === "stock") {
       // Opening stock count sheets (PL-OPENING-STOCK): each row is staged as
       // an OpeningStockRecord for review; on-hand stock is never written here.
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
       const result = await commitStockRows(ctx, {
         importRunId: args.importRunId,
         tenantId,
         sourceSystem: importRun.sourceSystem,
-        rawRows: args.rawRows,
+        rawRows: rawRows,
         maxRecords: args.maxRecords,
       });
       const invocation = {
@@ -1925,11 +1968,11 @@ export const commitImportRun = action({
     // importRun.datasetType to "venues" here — this fall-through is exhaustive.
     // A future member added without a branch would fall through to venue parsing
     // and fail loudly ("No valid venue records parsed") rather than misroute.
-    if (args.rawRows.length === 0) {
+    if (rawRows.length === 0) {
       throw new ConvexError("No source rows provided — nothing to commit.");
     }
 
-    const parsed = parseTppVenues(args.rawRows as TppVenueRecord[]);
+    const parsed = parseTppVenues(rawRows as TppVenueRecord[]);
     if (parsed.records.length === 0) {
       // Non-empty input that yields zero valid records (all rows failed to
       // parse) must NOT silently flip the run to completed.
@@ -1978,7 +2021,7 @@ export const commitImportRun = action({
           record: venue,
           rawSourceData: withSourceRow(
             venue,
-            args.rawRows[parsed.sourceIndexes[index]!],
+            rawRows[parsed.sourceIndexes[index]!],
           ),
           importRunId: args.importRunId,
         });
@@ -2019,7 +2062,7 @@ export const commitImportRun = action({
           sourceImportRunId: args.importRunId,
           rawSourceData: withSourceRow(
             venue,
-            args.rawRows[parsed.sourceIndexes[index]!],
+            rawRows[parsed.sourceIndexes[index]!],
           ),
           conflictStatus: "resolved",
           ...sourceBaseline("venues", venue),
@@ -2041,7 +2084,7 @@ export const commitImportRun = action({
           sourceImportRunId: args.importRunId,
           rawSourceData: withSourceRow(
             venue,
-            args.rawRows[parsed.sourceIndexes[index]!],
+            rawRows[parsed.sourceIndexes[index]!],
           ),
           conflictStatus: "pending_conflict",
           resolutionNote: note,

@@ -90,6 +90,13 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // computed name deltas; commit requires an explanation when it is true.
   property indexNameMismatch: boolean?
 
+  // PL-IMPORT-CANCEL (AC-056, additive, optional so stored runs stay valid):
+  // the rows this run was given, kept in file storage, so anyone in the
+  // company can continue a run whose worker stopped without the browser that
+  // started it; and what a stop did (removed / kept because changed / retired).
+  property sourceRowsStorageId: string?
+  property stopReport: string?
+
   constraint recordCountsPresent: self.recordCounts != null "This import needs its item counts filled in."
 
   transition status from "started" to ["parsing", "failed"]
@@ -364,7 +371,55 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // keepSourceRows - the commit seam keeps the rows once, when it starts
+  // bringing records in (AC-056).
+  command keepSourceRows(
+    sourceRowsStorageId: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "committing"
+    guard self.sourceRowsStorageId == null
+    constraint keepSourceRowsIdPresent: length(trim(sourceRowsStorageId)) > 0 "This import's saved rows need a storage ID."
+    mutate sourceRowsStorageId = sourceRowsStorageId
+    emit ImportRunSourceRowsKept {
+      importRunId: self.id
+      tenantId: self.tenantId
+      sourceRowsStorageId: sourceRowsStorageId
+    }
+  }
+
+  // recordStopReport - what Stop this import did, updated as the take-back
+  // goes (AC-056 "report compensation progress").
+  command recordStopReport(
+    stopReport: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "failed"
+    constraint stopReportPresent: length(trim(stopReport)) > 0 "Say what stopping this import did."
+    mutate stopReport = stopReport
+    mutate actorId = user.id
+    emit ImportRunStopReported {
+      importRunId: self.id
+      tenantId: self.tenantId
+      stopReport: stopReport
+      actorId: user.id
+    }
+  }
+
   store ImportRun in durable
+}
+
+event ImportRunSourceRowsKept: "import_run.source_rows_kept" {
+  importRunId: string
+  tenantId: string
+  sourceRowsStorageId: string
+}
+
+event ImportRunStopReported: "import_run.stop_reported" {
+  importRunId: string
+  tenantId: string
+  stopReport: string
+  actorId: string
 }
 
 event ImportRunStarted: "import_run.started" {

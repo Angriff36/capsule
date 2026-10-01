@@ -90,6 +90,29 @@ const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
   reverted: [],
 };
 
+/** What Stop this import did, saved on the run (AC-056). */
+function readStopReport(
+  raw: string | null | undefined,
+): { removed: number; kept: string[]; done: boolean } | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as {
+      removed?: unknown;
+      kept?: unknown;
+      done?: unknown;
+    };
+    return {
+      removed: typeof parsed.removed === "number" ? parsed.removed : 0,
+      kept: Array.isArray(parsed.kept)
+        ? parsed.kept.filter((name): name is string => typeof name === "string")
+        : [],
+      done: parsed.done === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function ImportRunDetailPage() {
   const { id } = useParams<{ id: string }>();
   const importRun = useRouteRecord(useGetImportRun, id);
@@ -332,6 +355,27 @@ export function ImportRunDetailPage() {
     });
   };
 
+  // AC-056: a run keeps its rows on the server, so anyone can finish it after
+  // the browser that started it closed.
+  const handleContinue = async () => {
+    setError(null);
+    setNotice(null);
+    setBusy("continue");
+    try {
+      const result = await commitImportRun({
+        importRunId: importRun._id,
+        rawRows: [],
+      });
+      setNotice(
+        `Import finished: ${result.committed} more ${commitNoun}(s) brought in.`,
+      );
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Continue failed");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const handleStop = async () => {
     const reason = await prompt.askReason({
       title: "Stop this import",
@@ -403,6 +447,7 @@ export function ImportRunDetailPage() {
   };
 
   const counts = parseRecordCounts(importRun.recordCounts);
+  const stopReport = readStopReport(importRun.stopReport);
   const dispositionSummary = parseRecordCounts(
     importRun.dispositionCounts ?? "{}",
   );
@@ -538,12 +583,32 @@ export function ImportRunDetailPage() {
               </button>
             );
           })}
+          {importRun.status === "committing" &&
+          importRun.sourceRowsStorageId ? (
+            <button
+              type="button"
+              onClick={() => void handleContinue()}
+              disabled={busy === "continue"}
+              className="btn btn-primary"
+            >
+              {busy === "continue" ? "Processing..." : "Continue import"}
+            </button>
+          ) : null}
           {availableTransitions.length === 0 ? (
             <span className="text-ink-2 text-xs">
               No actions available for this status
             </span>
           ) : null}
         </div>
+        {stopReport ? (
+          <p className="border-t border-line px-4 py-3 text-xs text-ink-2">
+            {stopReport.done ? "Stopped. " : "Stopping… "}
+            {stopReport.removed} item(s) removed again.
+            {stopReport.kept.length > 0
+              ? ` Kept because someone changed them: ${stopReport.kept.join(", ")}.`
+              : ""}
+          </p>
+        ) : null}
       </div>
 
       {/* Report archive intake: upload, list, sort, explain (PL-ARCHIVE) */}
