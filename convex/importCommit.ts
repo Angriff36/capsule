@@ -120,6 +120,8 @@ import { buildLinkKey } from "./lib/culinaryModel/importMapping";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { commitStockRows } from "./openingStock";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
+import { attachImportedEventFiles } from "./lib/importEventFiles";
+import { compensateStoppedRun } from "./importCancel";
 import {
   SOURCE_FIELD_MAPS,
   sourceVersionOf,
@@ -707,6 +709,21 @@ export const commitImportRun = action({
       });
     };
 
+    // PL-IMPORT-RESUME (AC-631): a person stopped this import (the run is no
+    // longer committing). Start no further record; take back what this run
+    // made that nobody has changed since — this worker may have linked one
+    // more record after the stop, so it runs the same take-back the stop did.
+    const stopIfStopped = async (): Promise<void> => {
+      const still = await ctx.runQuery(internal.importCancel.runIsCommitting, {
+        importRunId: args.importRunId,
+      });
+      if (still) return;
+      await compensateStoppedRun(ctx, args.importRunId);
+      throw new ConvexError(
+        "This import was stopped. Nothing more was brought in.",
+      );
+    };
+
     // PL-ARCHIVE: a report-archive run with no rows to bring in finishes on
     // accounting alone. ImportRun_commit still refuses until every file is
     // accounted for and any report-list gap is explained; finishing creates
@@ -762,6 +779,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -908,6 +926,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -1071,6 +1090,18 @@ export const commitImportRun = action({
             },
           );
           const eventId: string = (created as { docId: string }).docId;
+          // AC-024: the event's files, attached BEFORE the link (the pack-list
+          // item shape). A worker that dies between files leaves no link, so
+          // the resume re-opens the same event and each per-file key returns
+          // the file already attached with zero writes — a file a person
+          // removed in the meantime stays removed.
+          const fileErrors = await attachImportedEventFiles(ctx, {
+            tenantId,
+            importRunId: args.importRunId,
+            externalId: event.externalId,
+            eventId,
+            files: event.files ?? [],
+          });
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -1084,6 +1115,11 @@ export const commitImportRun = action({
               args.rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
+            ...(fileErrors.length > 0
+              ? {
+                  resolutionNote: `Some files were not added: ${fileErrors.join("; ")}`,
+                }
+              : {}),
             ...sourceBaseline("events", event),
           });
           committed += 1;
@@ -1187,6 +1223,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -1352,6 +1389,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         // Idempotent skip: an existing ACTIVE link means this payment reference
         // is already staged (or already matched). The link IS the artifact, so
         // ANY active link — matched or not — is a no-op skip (re-runs don't
@@ -1531,6 +1569,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -1685,6 +1724,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -1908,6 +1948,7 @@ export const commitImportRun = action({
           pending,
         });
       }
+      await stopIfStopped();
       const existing = await ctx.runQuery(internal.importCommit.findLink, {
         tenantId,
         sourceSystem,

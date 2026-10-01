@@ -13,6 +13,17 @@ import { Link } from "react-router-dom";
 
 const CHUNK_SIZE = 500;
 
+/** SHA-256 of the file as read, so each run records its source version. */
+async function fileChecksum(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(text),
+  );
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 interface ChunkResult {
   importRunId: string;
   committed: number;
@@ -39,8 +50,10 @@ export function QuickFileImport() {
     setSkippedRows(0);
     setBusy(true);
     try {
-      const { rows, skipped } = tppMenuCsvToRows(await file.text());
+      const text = await file.text();
+      const { rows, skipped } = tppMenuCsvToRows(text);
       setSkippedRows(skipped);
+      const checksum = await fileChecksum(text);
       const chunks: ChunkResult[] = [];
       for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const part = rows.slice(i, i + CHUNK_SIZE);
@@ -51,6 +64,7 @@ export function QuickFileImport() {
           datasetType: "menus",
           sourceSystem: "tpp_legacy",
           rows: part,
+          checksum,
         });
         chunks.push(result);
         setResults([...chunks]);

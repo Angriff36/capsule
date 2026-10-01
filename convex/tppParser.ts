@@ -53,6 +53,25 @@ export interface TppEventRecord {
   AccessibilityNeeds?: string;
   CreatedDate?: string;
   ModifiedDate?: string;
+  /**
+   * PL-IMPORT-RESUME (AC-024): files that belong to the event (contract, BEO,
+   * floor plan). The bytes are uploaded first; the row carries the stored id.
+   */
+  Files?: TppEventFile[];
+}
+
+export interface TppEventFile {
+  FileName: string;
+  ContentType?: string;
+  FileSize?: number;
+  StorageId: string;
+}
+
+export interface ParsedEventFile {
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  storageId: string;
 }
 
 export interface TppContactRecord {
@@ -190,6 +209,7 @@ export interface ParsedCapsuleEvent {
   accessibilityNeeds?: string[];
   createdAt?: number;
   updatedAt?: number;
+  files?: ParsedEventFile[];
 }
 
 export interface ParsedCapsuleContact {
@@ -559,7 +579,31 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
       record.AccessibilityNeeds?.split(",").map((s) => s.trim()) || [],
     createdAt: parseTppDateTime(record.CreatedDate),
     updatedAt: parseTppDateTime(record.ModifiedDate),
+    ...(record.Files && record.Files.length > 0
+      ? { files: parseTppEventFiles(record.Files) }
+      : {}),
   };
+}
+
+/** Event files (contracts, BEOs) whose bytes were uploaded before the import. */
+function parseTppEventFiles(files: TppEventFile[]): ParsedEventFile[] {
+  return files
+    .filter(
+      (file) =>
+        typeof file?.StorageId === "string" &&
+        file.StorageId.trim().length > 0 &&
+        typeof file.FileName === "string" &&
+        file.FileName.trim().length > 0,
+    )
+    .map((file) => ({
+      fileName: file.FileName.trim(),
+      contentType: file.ContentType?.trim() || "application/octet-stream",
+      fileSize:
+        typeof file.FileSize === "number" && file.FileSize >= 0
+          ? Math.round(file.FileSize)
+          : 0,
+      storageId: file.StorageId.trim(),
+    }));
 }
 
 /**
