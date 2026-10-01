@@ -78,7 +78,8 @@ export async function handleManifestEvent(
   // Pack lines follow every event fact that asks for equipment (spec §13.2).
   const packEventId = packFactEventId(event);
   if (packEventId) await reconcileEventPackRules(ctx, packEventId);
-  if (event.entity === "PackListItem" && event.type === "PackListItemLoadAssigned") {
+  if (event.entity === "PackListItem" && (event.type === "PackListItemLoadAssigned" ||
+    (event.type === "PackListItemLoaded" && event.payload.loadAssignmentId != null))) {
     await validatePackLoadAssignment(ctx, event.entityId as Id<"packListItems">);
     await validateRigLoadForLine(ctx, event.entityId as Id<"packListItems">);
     return;

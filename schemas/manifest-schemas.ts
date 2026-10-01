@@ -9131,6 +9131,7 @@ export type PackListItemRecordCheckedParams = z.infer<typeof PackListItemRecordC
 // Command: recordLoaded on PackListItem
 export const PackListItemRecordLoadedParamsSchema = z.object({
   loadedQuantity: z.number(),
+  loadAssignmentId: z.string().min(1).optional(),
 });
 
 export type PackListItemRecordLoadedParams = z.infer<typeof PackListItemRecordLoadedParamsSchema>;
