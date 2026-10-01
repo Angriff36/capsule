@@ -67,6 +67,7 @@ import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
 import { MyDayFieldForms } from "./MyDayFieldForms";
 import { MyPastShiftsCard } from "./MyPastShiftsCard";
+import { OpenShiftsCard } from "./OpenShiftsCard";
 import { readClockEvidence } from "./clockLocation";
 import { breakMinutesInput } from "../workforce/timeRecordEntry";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
@@ -907,6 +908,14 @@ export function MyDayPage() {
           </div>
           <div className="my-day-secondary-grid">
             <div className="my-day-section-stack">
+              <OpenShiftsCard
+                personId={me._id}
+                needs={staffNeeds}
+                events={events}
+                now={now}
+                busy={busy}
+                run={run}
+              />
               <MyPastShiftsCard
                 records={myRecords}
                 eventTitle={eventTitle}
