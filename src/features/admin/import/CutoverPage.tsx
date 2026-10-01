@@ -21,7 +21,7 @@ import { useActionPrompt } from "../../../ui/action-prompt";
 import { formatCountNoun, formatDate } from "@/lib/format";
 import { useAuthStatus } from "@/lib/useAuthStatus";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
-import { useActionFailure } from "../../../ui/action-result";
+import { useActionFailure, useActionNotice } from "../../../ui/action-result";
 
 interface ValidationCheck {
   passed: boolean;
@@ -55,6 +55,7 @@ export function CutoverPage() {
   const [localApproval, setLocalApproval] = useState(false);
   const [localRollbackPlan, setLocalRollbackPlan] = useState("");
   const { error, setError } = useActionFailure();
+  const { setNotice } = useActionNotice();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Execute go/no-go decision
@@ -92,7 +93,7 @@ export function CutoverPage() {
             ? `Switch approved - every check passed. Switch-back plan: ${rollbackPlan}`
             : `Switch stopped - ${rollbackPlan}`,
       });
-      window.location.reload();
+      setNotice(decision === "go" ? "Switch approved." : "Switch stopped.");
     } catch (err) {
       const failure = classifyCommandFailure(err);
       setError(`${failure.title}: ${failure.detail}`);
@@ -117,7 +118,7 @@ export function CutoverPage() {
       setError(null);
       try {
         await setTppReadOnly({ reason });
-        window.location.reload();
+        setNotice("TPP is now read-only.");
       } catch (err) {
         const failure = classifyCommandFailure(err);
         setError(`${failure.title}: ${failure.detail}`);
@@ -143,7 +144,7 @@ export function CutoverPage() {
       setError(null);
       try {
         await rollbackCutoverMutation({ reason });
-        window.location.reload();
+        setNotice("The switch was undone. TPP writes are back on.");
       } catch (err) {
         const failure = classifyCommandFailure(err);
         setError(`${failure.title}: ${failure.detail}`);
