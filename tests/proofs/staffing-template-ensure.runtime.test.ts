@@ -106,11 +106,23 @@ async function setup(proof: Proof, tenantId: string, guests: number) {
     ).filter(
       (row) => row.eventId === event.docId && row.status !== "cancelled",
     );
+  // Event changes queue follow-up work (timing, stage check) that may touch
+  // the event; let it finish before reading the version for the next step.
+  const settle = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await (
+      roles.events as unknown as {
+        finishInProgressScheduledFunctions: () => Promise<void>;
+      }
+    ).finishInProgressScheduledFunctions();
+  };
   async function approve() {
+    await settle();
     await runEvents(M.Event_submitForApproval, {
       docId: event.docId,
       version: await version(),
     });
+    await settle();
     await runEvents(M.Event_approve, {
       docId: event.docId,
       version: await version(),
