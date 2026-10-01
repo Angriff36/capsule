@@ -138,6 +138,11 @@ const ProductionYieldDashboardPage = lazy(() =>
     (module) => ({ default: module.ProductionYieldDashboardPage }),
   ),
 );
+const ProductionPlanPage = lazy(() =>
+  import("../features/production/ProductionPlanPage").then((module) => ({
+    default: module.ProductionPlanPage,
+  })),
+);
 const RosterPage = lazy(() =>
   import("../features/workforce/RosterPage").then((module) => ({
     default: module.RosterPage,
@@ -814,6 +819,7 @@ export function App() {
               element={<KitchenCatalogCleanupPage />}
             />
             <Route path="/kitchen/stations" element={<KitchenStationsPage />} />
+            <Route path="/kitchen/plan" element={<ProductionPlanPage />} />
             <Route
               path="/kitchen/yield"
               element={

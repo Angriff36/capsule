@@ -44,6 +44,8 @@ export function DishPrepTaskWorkControls({
     stage?: string | null;
     resolution?: string | null;
     choiceOptions?: (string | null)[] | null;
+    leadTimeMinDays?: number | null;
+    leadTimeMaxDays?: number | null;
   };
   materials: PrepMaterialRow[];
   options: PrepMaterialOption[];
@@ -57,6 +59,12 @@ export function DishPrepTaskWorkControls({
   const [pick, setPick] = useState("");
   const [choiceText, setChoiceText] = useState(
     (task.choiceOptions ?? []).filter(Boolean).join(", "),
+  );
+  const [aheadFrom, setAheadFrom] = useState(
+    task.leadTimeMinDays == null ? "" : String(task.leadTimeMinDays),
+  );
+  const [aheadTo, setAheadTo] = useState(
+    task.leadTimeMaxDays == null ? "" : String(task.leadTimeMaxDays),
   );
 
   const labelFor = (row: PrepMaterialRow) => {
@@ -138,6 +146,35 @@ export function DishPrepTaskWorkControls({
           choiceOptions: needsChoice ? choiceOptions : [],
         }),
       "Could not set the choice.",
+    );
+  };
+
+  // Days before the event this step may be made (the production plan's
+  // make-ahead window). One box filled means exactly that many days.
+  const saveMakeAhead = () => {
+    const from = aheadFrom.trim() === "" ? null : Number(aheadFrom);
+    const to = aheadTo.trim() === "" ? from : Number(aheadTo);
+    const first = from ?? to;
+    if (
+      first == null ||
+      to == null ||
+      !Number.isInteger(first) ||
+      !Number.isInteger(to) ||
+      first < 0 ||
+      to < 0
+    ) {
+      setError("Enter whole days before the event, zero or more.");
+      return;
+    }
+    void run(
+      () =>
+        specifyWork({
+          docId: task._id,
+          version: task.version,
+          leadTimeMinDays: Math.min(first, to),
+          leadTimeMaxDays: Math.max(first, to),
+        }),
+      "Could not save the make-ahead days.",
     );
   };
 
@@ -235,6 +272,38 @@ export function DishPrepTaskWorkControls({
           />{" "}
           Needs a choice
         </label>
+      </div>
+      <div className="flex flex-wrap items-end gap-2">
+        <label className="block text-sm">
+          <span className="meta-term">Make ahead: from (days before)</span>
+          <input
+            className="input mt-1"
+            type="number"
+            min={0}
+            step={1}
+            value={aheadFrom}
+            onChange={(event) => setAheadFrom(event.target.value)}
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="meta-term">to (days before)</span>
+          <input
+            className="input mt-1"
+            type="number"
+            min={0}
+            step={1}
+            value={aheadTo}
+            onChange={(event) => setAheadTo(event.target.value)}
+          />
+        </label>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={busy || (aheadFrom.trim() === "" && aheadTo.trim() === "")}
+          onClick={saveMakeAhead}
+        >
+          Save make-ahead days
+        </button>
       </div>
     </div>
   );
