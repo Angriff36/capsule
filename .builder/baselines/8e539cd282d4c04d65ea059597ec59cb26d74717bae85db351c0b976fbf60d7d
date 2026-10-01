@@ -2804,6 +2804,50 @@ export const PackSectionClaimComputedSchema = PackSectionClaimSchema.extend({
 export type PackSectionClaim = z.infer<typeof PackSectionClaimSchema>;
 export type PackSectionClaimWithComputed = z.infer<typeof PackSectionClaimComputedSchema>;
 
+// Entity: ParallelRunComparison
+export const ParallelRunComparisonSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  comparedAt: z.coerce.date(),
+  comparedCount: z.number().int().default(0),
+  openCount: z.number().int().default(0),
+  newCount: z.number().int().default(0),
+  clearedCount: z.number().int().default(0),
+  summary: z.string().nullable().optional(),
+  nextRunAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ParallelRunComparison = z.infer<typeof ParallelRunComparisonSchema>;
+
+// Entity: ParallelRunDifference
+export const ParallelRunDifferenceSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  externalRecordLinkId: z.string().uuid(),
+  externalId: z.string().default(""),
+  capsuleEntity: z.string().default("event_record"),
+  capsuleId: z.string().default(""),
+  field: z.string().default(""),
+  sourceValue: z.string().nullable().optional(),
+  capsuleValue: z.string().nullable().optional(),
+  status: z.enum(["open", "fixed", "accepted", "cleared"]).default("open"),
+  firstSeenAt: z.coerce.date().nullable().optional(),
+  lastSeenAt: z.coerce.date().nullable().optional(),
+  assignedToPersonId: z.string().uuid().nullable().optional(),
+  assignedById: z.string().nullable().optional(),
+  assignedAt: z.coerce.date().nullable().optional(),
+  resolvedByUserId: z.string().nullable().optional(),
+  resolvedAt: z.coerce.date().nullable().optional(),
+  resolutionNote: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ParallelRunDifference = z.infer<typeof ParallelRunDifferenceSchema>;
+
 // Entity: Payment
 export const PaymentSchema = z.object({
   id: z.string().uuid(),
@@ -9500,6 +9544,26 @@ export type PackSectionClaimTakeParams = z.infer<typeof PackSectionClaimTakePara
 export const PackSectionClaimTakeOverParamsSchema = z.object({});
 
 export type PackSectionClaimTakeOverParams = z.infer<typeof PackSectionClaimTakeOverParamsSchema>;
+
+// Command: assign on ParallelRunDifference
+export const ParallelRunDifferenceAssignParamsSchema = z.object({
+  assignedToPersonId: z.string().min(1).optional(),
+});
+
+export type ParallelRunDifferenceAssignParams = z.infer<typeof ParallelRunDifferenceAssignParamsSchema>;
+
+// Command: reopen on ParallelRunDifference
+export const ParallelRunDifferenceReopenParamsSchema = z.object({});
+
+export type ParallelRunDifferenceReopenParams = z.infer<typeof ParallelRunDifferenceReopenParamsSchema>;
+
+// Command: settle on ParallelRunDifference
+export const ParallelRunDifferenceSettleParamsSchema = z.object({
+  resolution: z.enum(["open", "fixed", "accepted", "cleared"]),
+  note: z.string().optional(),
+});
+
+export type ParallelRunDifferenceSettleParams = z.infer<typeof ParallelRunDifferenceSettleParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});

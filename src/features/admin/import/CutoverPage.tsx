@@ -23,6 +23,7 @@ import { useAuthStatus } from "@/lib/useAuthStatus";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionFailure, useActionNotice } from "../../../ui/action-result";
 import { CutoverFactsCard } from "./CutoverFactsCard";
+import { parallelRunDashboardPath } from "./importRoutes";
 
 interface ValidationCheck {
   passed: boolean;
@@ -390,11 +391,20 @@ export function CutoverPage() {
               {validation.openItems.map((item) => (
                 <li key={item.id} className="flex justify-between gap-2">
                   <span>
-                    {item.kind === "field_difference"
-                      ? `${item.recordType} ${item.externalId}: "${item.field}" differs between TPP and Capsule`
-                      : `${item.recordType} ${item.externalId} still needs matching`}
+                    {item.kind === "comparison_difference"
+                      ? `${item.recordType} ${item.externalId}: the daily comparison found a different ${item.field?.replace(/_/g, " ")}`
+                      : item.kind === "field_difference"
+                        ? `${item.recordType} ${item.externalId}: "${item.field}" differs between TPP and Capsule`
+                        : `${item.recordType} ${item.externalId} still needs matching`}
                   </span>
-                  <Link to="/admin/reconcile" className="text-info shrink-0">
+                  <Link
+                    to={
+                      item.kind === "comparison_difference"
+                        ? parallelRunDashboardPath()
+                        : "/admin/reconcile"
+                    }
+                    className="text-info shrink-0"
+                  >
                     Open
                   </Link>
                 </li>

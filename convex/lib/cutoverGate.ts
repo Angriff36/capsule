@@ -21,7 +21,7 @@ export interface CutoverCheck {
 
 /** One thing still in the way of the switch, with where to fix it. */
 export interface CutoverOpenItem {
-  kind: "unmatched_link" | "field_difference";
+  kind: "unmatched_link" | "field_difference" | "comparison_difference";
   id: string;
   recordType: string;
   externalId: string;
@@ -200,6 +200,14 @@ async function openItemsCheck(
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
       .collect()
   ).filter((row) => row.deletedAt == null && row.status === "pending");
+  // A difference the daily TPP comparison found is settled when a person
+  // says one system was fixed or the difference is fine (AC-286, AC-632).
+  const differences = (
+    await db
+      .query("parallelRunDifferences")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect()
+  ).filter((row) => row.deletedAt == null && row.status === "open");
   const linkById = new Map(links.map((link) => [String(link._id), link]));
 
   const items: CutoverOpenItem[] = [];
@@ -226,7 +234,20 @@ async function openItemsCheck(
     });
   }
 
-  const count = unmatched.length + conflicts.length;
+  for (const difference of differences.slice(0, OPEN_ITEM_SAMPLE)) {
+    const link = linkById.get(String(difference.externalRecordLinkId));
+    items.push({
+      kind: "comparison_difference",
+      id: String(difference._id),
+      recordType: link?.recordType ?? "event",
+      externalId: difference.externalId,
+      capsuleEntity: difference.capsuleEntity,
+      capsuleId: difference.capsuleId,
+      field: difference.field,
+    });
+  }
+
+  const count = unmatched.length + conflicts.length + differences.length;
   if (unmatched.length > 0) {
     blockers.push(`${unmatched.length} leftover TPP items still need matching`);
     warnings.push("Use the match-up page to finish leftover TPP items");
@@ -235,6 +256,12 @@ async function openItemsCheck(
     blockers.push(
       `${conflicts.length} imported field(s) differ from Capsule and need a person to pick which value stays`,
     );
+  }
+  if (differences.length > 0) {
+    blockers.push(
+      `${differences.length} difference(s) from the daily TPP comparison are not settled yet`,
+    );
+    warnings.push("Settle them on the Compare with TPP page");
   }
   return {
     check: {

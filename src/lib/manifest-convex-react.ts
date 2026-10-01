@@ -531,6 +531,9 @@ import {
   PackSectionClaimReleaseParamsSchema,
   PackSectionClaimTakeOverParamsSchema,
   PackSectionClaimTakeParamsSchema,
+  ParallelRunDifferenceAssignParamsSchema,
+  ParallelRunDifferenceReopenParamsSchema,
+  ParallelRunDifferenceSettleParamsSchema,
   PaymentBeginProcessingParamsSchema,
   PaymentDisputeReconciliationParamsSchema,
   PaymentFailParamsSchema,
@@ -8153,6 +8156,56 @@ export function useCreatePackSectionClaim() {
   };
 }
 
+/** Reactive list for ParallelRunComparison. */
+export function useListParallelRunComparison() {
+  return useQuery(api.queries.listParallelRunComparison);
+}
+
+/** Reactive get-by-id for ParallelRunComparison. Pass "skip" to suspend. */
+export function useGetParallelRunComparison(id: string | "skip") {
+  return useQuery(api.queries.getParallelRunComparison, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for ParallelRunDifference. */
+export function useListParallelRunDifference() {
+  return useQuery(api.queries.listParallelRunDifference);
+}
+
+/** Reactive get-by-id for ParallelRunDifference. Pass "skip" to suspend. */
+export function useGetParallelRunDifference(id: string | "skip") {
+  return useQuery(api.queries.getParallelRunDifference, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ParallelRunDifference.assign. */
+export function useParallelRunDifferenceAssign() {
+  const mutate = useMutation(api.mutations.ParallelRunDifference_assign);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ParallelRunDifferenceAssignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ParallelRunDifference.reopen. */
+export function useParallelRunDifferenceReopen() {
+  const mutate = useMutation(api.mutations.ParallelRunDifference_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ParallelRunDifferenceReopenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ParallelRunDifference.settle. */
+export function useParallelRunDifferenceSettle() {
+  const mutate = useMutation(api.mutations.ParallelRunDifference_settle);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ParallelRunDifferenceSettleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Reactive list for Payment. */
 export function useListPayment() {
   return useQuery(api.queries.listPayment);
@@ -13337,4 +13390,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1411 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1418 as const;

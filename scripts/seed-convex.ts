@@ -501,6 +501,8 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-1", "sectionKey": "demo-sectionKey-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-2", "sectionKey": "demo-sectionKey-2" } as any);
+  // skip ParallelRunComparison: no creation command in IR (2 rows unused)
+  // skip ParallelRunDifference: no creation command in IR (2 rows unused)
   // Payment → api.mutations.Payment_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.Payment_createViaRecord, { "invoiceId": "invoiceId-payment-1", "clientId": "clientId-payment-1", "eventId": "eventId-payment-1", "amount": 1, "method": "demo-method-1", "paymentMethodId": "paymentMethodId-payment-1", "notes": "demo-notes-1", "feeAmount": 1, "gratuityAmount": 1, "occurredAt": 1767268800000, "effectiveAt": 1767268800000, "providerAccount": "demo-providerAccount-1", "externalSource": "demo-externalSource-1", "externalPaymentId": "externalPaymentId-payment-1" } as any);
@@ -1436,6 +1438,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PackSectionClaim",
       "createMutation": "PackSectionClaim_createViaTake",
+      "rowCount": 2
+    },
+    {
+      "entity": "ParallelRunComparison",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ParallelRunDifference",
+      "createMutation": null,
       "rowCount": 2
     },
     {
