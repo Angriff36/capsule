@@ -66,6 +66,7 @@ import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
 import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
 import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
+import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
 import {
   beginPendingOperation,
@@ -726,6 +727,11 @@ export function ComponentDetailPage() {
           instructions={component.instructions}
         />
       </div>
+
+      <ComponentKitchenStandardsPanel
+        component={component}
+        onFailure={setFailure}
+      />
 
       <ComponentSubRecipesPanel componentId={component._id} />
 

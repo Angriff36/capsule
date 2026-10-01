@@ -64,7 +64,7 @@ export const AttachmentSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "staffMessage"]).default("eventRecord"),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "component", "staffMessage"]).default("eventRecord"),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -326,6 +326,15 @@ export const ComponentSchema = z.object({
   retirementReason: z.string().nullable().optional(),
   storageWindowDays: z.number().int().nullable().optional(),
   storageWindowSource: z.string().nullable().optional(),
+  equipmentNotes: z.string().nullable().optional(),
+  platingInstructions: z.string().nullable().optional(),
+  coolingInstructions: z.string().nullable().optional(),
+  holdingInstructions: z.string().nullable().optional(),
+  reheatInstructions: z.string().nullable().optional(),
+  substitutionNotes: z.string().nullable().optional(),
+  videoUrl: z.string().nullable().optional(),
+  primaryImageStorageId: z.string().nullable().optional(),
+  primaryImageFileName: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1947,6 +1956,8 @@ export const IngredientSchema = z.object({
   mergedIntoIngredientId: z.string().uuid().nullable().optional(),
   primaryImageStorageId: z.string().nullable().optional(),
   primaryImageFileName: z.string().nullable().optional(),
+  shelfLifeDays: z.number().int().nullable().optional(),
+  storageInstructions: z.string().nullable().optional(),
   caloriesPerUnit: z.number().nullable().optional(),
   proteinGramsPerUnit: z.number().nullable().optional(),
   carbsGramsPerUnit: z.number().nullable().optional(),
@@ -4850,7 +4861,7 @@ export type AssistantLlmConfigConfigureParams = z.infer<typeof AssistantLlmConfi
 
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "staffMessage"]),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish", "ingredient", "equipment", "component", "staffMessage"]),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -5153,6 +5164,11 @@ export const ClientPortalLinkRevokeParamsSchema = z.object({});
 
 export type ClientPortalLinkRevokeParams = z.infer<typeof ClientPortalLinkRevokeParamsSchema>;
 
+// Command: clearPrimaryImage on Component
+export const ComponentClearPrimaryImageParamsSchema = z.object({});
+
+export type ComponentClearPrimaryImageParams = z.infer<typeof ComponentClearPrimaryImageParamsSchema>;
+
 // Command: draft on Component
 export const ComponentDraftParamsSchema = z.object({
   name: z.string(),
@@ -5207,6 +5223,27 @@ export const ComponentReviseDraftParamsSchema = z.object({
 });
 
 export type ComponentReviseDraftParams = z.infer<typeof ComponentReviseDraftParamsSchema>;
+
+// Command: setKitchenStandards on Component
+export const ComponentSetKitchenStandardsParamsSchema = z.object({
+  equipmentNotes: z.string().optional(),
+  platingInstructions: z.string().optional(),
+  coolingInstructions: z.string().optional(),
+  holdingInstructions: z.string().optional(),
+  reheatInstructions: z.string().optional(),
+  substitutionNotes: z.string().optional(),
+  videoUrl: z.string().optional(),
+});
+
+export type ComponentSetKitchenStandardsParams = z.infer<typeof ComponentSetKitchenStandardsParamsSchema>;
+
+// Command: setPrimaryImage on Component
+export const ComponentSetPrimaryImageParamsSchema = z.object({
+  storageId: z.string(),
+  fileName: z.string().optional(),
+});
+
+export type ComponentSetPrimaryImageParams = z.infer<typeof ComponentSetPrimaryImageParamsSchema>;
 
 // Command: setServesPerYield on Component
 export const ComponentSetServesPerYieldParamsSchema = z.object({
@@ -7974,6 +8011,14 @@ export const IngredientSetPrimaryImageParamsSchema = z.object({
 });
 
 export type IngredientSetPrimaryImageParams = z.infer<typeof IngredientSetPrimaryImageParamsSchema>;
+
+// Command: setStorage on Ingredient
+export const IngredientSetStorageParamsSchema = z.object({
+  shelfLifeDays: z.number().int().optional(),
+  storageInstructions: z.string().optional(),
+});
+
+export type IngredientSetStorageParams = z.infer<typeof IngredientSetStorageParamsSchema>;
 
 // Command: updateCosting on Ingredient
 export const IngredientUpdateCostingParamsSchema = z.object({

@@ -24,6 +24,8 @@ enum AttachmentParentType {
   ingredient
   // Equipment catalog photo (Equipment.setPrimaryImage).
   equipment
+  // Recipe photo (Component.setPrimaryImage).
+  component
   // Team chat photo or file; parentId is the StaffMessage id.
   staffMessage
 }

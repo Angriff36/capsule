@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:104817e9436d077c12278247f0b59a33724d88996732b5707a58ceb1f9944102:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:2188c32cfbf67764c65fe58086243aaff760e8bb36686b221692e9919c8ae9c2:25693d35ebc40dd39ede1464d6be1ec679ae96a98e7660d3e4037ec21e9a4fda:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3309b4f20badbf95e9472b35c025b0de4cbce132d3186c7f52cabc345419691e:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:576b0f06b733b7f80d53e28d168698e1b262bb879a21c58913cee1712feeff40:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:690c2a1e500c5794fb8191eaab50d3545d902b2e63ffe52957a1e18ca83bb82e:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:78b3a3a832bea3a3dc8749a1c9e6ad1ffe8e0ac08d496c4f0aef7f7bf106cf78:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:85d5819d015e1ce751a2a97c393f1647e42ad5131e9edc9ca2b5586656bd12c9:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:880f4205365a0a0f170a2fe0a18a33a6ed08bd269d6f8d261bc9ac4443a327bc:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a134e201aae4a0a2a8d9ce9f3f28ee67cb100d1885392139c546ef1bbd292b78:a3b3072899bd6273b74a17dde35d7af6ae2f3e9e379b21b23b88ebc047fca499:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ac27fd41bb38267f1a6a5afd09a6d5f17098a6113587a316891dd2cba6f1979d:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b51ce6741292ad2fb52cee22257eadcc158fe6c25069c51eb8346febcbe98ba5:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b5ff8c556963d803836d6d34baba38f02806f60e6c35414c750b895ef4a90b46:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:cbf9591973e2054963904f1755eb64f37fe1e0d99159843ebc1023f9a76fa0a3:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:eae120bf14dd14f1d7417dbc056dcd64291f176fdb5485f839b9ba2ee5b13ef1:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:104817e9436d077c12278247f0b59a33724d88996732b5707a58ceb1f9944102:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:143e4c2a5a90e98fef6f835bb95290478f72f3e734ee36c1a5e2c19c6cf2ff57:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:25693d35ebc40dd39ede1464d6be1ec679ae96a98e7660d3e4037ec21e9a4fda:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2cdc691aa4c4355277763d183bfbac07260ee9f3e4bdbe1ddefb973475c7842f:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3309b4f20badbf95e9472b35c025b0de4cbce132d3186c7f52cabc345419691e:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:341cbd399566fbe8977768d10762e3833777c75f35f1252be5c134a537c680f7:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:576b0f06b733b7f80d53e28d168698e1b262bb879a21c58913cee1712feeff40:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:690c2a1e500c5794fb8191eaab50d3545d902b2e63ffe52957a1e18ca83bb82e:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:78b3a3a832bea3a3dc8749a1c9e6ad1ffe8e0ac08d496c4f0aef7f7bf106cf78:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:8208a9788b1017009e20c9f35e82e351e6070db4cabc9e38e3b124cf39fb4f60:847417282f46bf6ab20a73a2487314767eea8c665b8a07ab60fedd1ab30b59c8:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:880f4205365a0a0f170a2fe0a18a33a6ed08bd269d6f8d261bc9ac4443a327bc:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9a63614b32a44b12166ba833320d52932afc7196d6f5611a7965f7edc5791bb4:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a134e201aae4a0a2a8d9ce9f3f28ee67cb100d1885392139c546ef1bbd292b78:a3b3072899bd6273b74a17dde35d7af6ae2f3e9e379b21b23b88ebc047fca499:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ac27fd41bb38267f1a6a5afd09a6d5f17098a6113587a316891dd2cba6f1979d:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b51ce6741292ad2fb52cee22257eadcc158fe6c25069c51eb8346febcbe98ba5:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b5ff8c556963d803836d6d34baba38f02806f60e6c35414c750b895ef4a90b46:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:cbf9591973e2054963904f1755eb64f37fe1e0d99159843ebc1023f9a76fa0a3:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f767c6db5a8c715d27e34efd93b3eaff0d76f8b2605cdfacbc1a439e5088dd3b:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -385,8 +385,8 @@ export const AssistantLlmConfigConfigureAction = {
 
 // --- Attachment.attach ---
 export interface AttachmentAttachClientInput {
-  /** Allowed: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage" */
-  parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage";
+  /** Allowed: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage" */
+  parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage";
   parentId: string;
   fileName: string;
   contentType: string;
@@ -492,6 +492,10 @@ export const AttachmentAttachAction = {
           "label": "equipment"
         },
         {
+          "value": "component",
+          "label": "component"
+        },
+        {
           "value": "staffMessage",
           "label": "staffMessage"
         }
@@ -575,14 +579,14 @@ export const AttachmentRemoveCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see attached files; chat files show up with their message"},{"kind":"policy_denial","message":"Staff may update attachments"},{"kind":"policy_denial","message":"Staff may change attachments"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Attachment not found"}],
   emits: ["AttachmentRemoved"],
 } as const;
 
-export type AttachmentRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number };
+export type AttachmentRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Attachment.remove.
@@ -635,14 +639,14 @@ export const AttachmentSetSurveySelectionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["included"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see attached files; chat files show up with their message"},{"kind":"policy_denial","message":"Staff may update attachments"},{"kind":"policy_denial","message":"Staff may change attachments"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Attachment not found"}],
   emits: ["AttachmentSurveySelectionSet"],
 } as const;
 
-export type AttachmentSetSurveySelectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number };
+export type AttachmentSetSurveySelectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Attachment.setSurveySelection.
@@ -6534,6 +6538,232 @@ export const ClientPortalLinkRevokeAction = {
   "fields": []
 } as const;
 
+// --- Component.clearPrimaryImage ---
+export type ComponentClearPrimaryImageClientInput = Record<string, never>;
+
+export const ComponentClearPrimaryImageCapability = {
+  capabilityId: "Component.clearPrimaryImage",
+  entity: "Component",
+  command: "clearPrimaryImage",
+  route: "/api/manifest/Component/commands/clearPrimaryImage",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
+  emits: ["ComponentPrimaryImageCleared"],
+} as const;
+
+export type ComponentClearPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Component.clearPrimaryImage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentClearPrimaryImageInput(client: ComponentClearPrimaryImageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Component.clearPrimaryImage. */
+export const ComponentClearPrimaryImageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.lists()",
+    "readId": "Component.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.detail(id)",
+    "readId": "Component.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.lists()",
+    "readId": "ComponentComponent.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.detail(id)",
+    "readId": "ComponentComponent.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImport",
+    "queryKeyHint": "queryKeys.componentImport.lists()",
+    "readId": "ComponentImport.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImport",
+    "queryKeyHint": "queryKeys.componentImport.detail(id)",
+    "readId": "ComponentImport.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.lists()",
+    "readId": "ComponentImportLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.detail(id)",
+    "readId": "ComponentImportLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.lists()",
+    "readId": "ComponentIngredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.detail(id)",
+    "readId": "ComponentIngredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.lists()",
+    "readId": "ComponentPortionSpec.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.detail(id)",
+    "readId": "ComponentPortionSpec.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentSnapshot",
+    "queryKeyHint": "queryKeys.componentSnapshot.lists()",
+    "readId": "ComponentSnapshot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentSnapshot",
+    "queryKeyHint": "queryKeys.componentSnapshot.detail(id)",
+    "readId": "ComponentSnapshot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentStep",
+    "queryKeyHint": "queryKeys.componentStep.lists()",
+    "readId": "ComponentStep.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentStep",
+    "queryKeyHint": "queryKeys.componentStep.detail(id)",
+    "readId": "ComponentStep.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.lists()",
+    "readId": "DishComponent.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.detail(id)",
+    "readId": "DishComponent.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "readId": "DishTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "readId": "DishTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.lists()",
+    "readId": "EventDishComponentSeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.detail(id)",
+    "readId": "EventDishComponentSeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "readId": "PrepTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "readId": "PrepTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Component.clearPrimaryImage. Not a rendered control. */
+export const ComponentClearPrimaryImageAction = {
+  "exposure": "human",
+  "label": "Clear primary image",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- Component.draft ---
 export interface ComponentDraftClientInput {
   name: string;
@@ -6959,14 +7189,14 @@ export const ComponentPublishVersionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentVersionPublished"],
 } as const;
 
-export type ComponentPublishVersionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentPublishVersionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.publishVersion.
@@ -7201,14 +7431,14 @@ export const ComponentPurgeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentPurged"],
 } as const;
 
-export type ComponentPurgeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentPurgeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.purge.
@@ -7452,14 +7682,14 @@ export const ComponentRetireCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentRetired"],
 } as const;
 
-export type ComponentRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentRetireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.retire.
@@ -7707,14 +7937,14 @@ export const ComponentRetractCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentVersionRetracted"],
 } as const;
 
-export type ComponentRetractResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentRetractResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.retract.
@@ -7963,14 +8193,14 @@ export const ComponentReviseDraftCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["name","yieldQuantity","yieldUnit","batchMultiplier","servesPerYield","category","cuisine","description","instructions"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this recipe a name."},{"kind":"constraint_block","message":"This recipe's yield has to be more than zero. Enter how much it makes."},{"kind":"constraint_block","message":"How many guests this recipe serves has to be more than zero."},{"kind":"constraint_block","message":"This recipe's batch size has to be more than zero."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentDraftRevised"],
 } as const;
 
-export type ComponentReviseDraftResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentReviseDraftResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.reviseDraft.
@@ -8326,6 +8556,516 @@ export const ComponentReviseDraftAction = {
   ]
 } as const;
 
+// --- Component.setKitchenStandards ---
+export interface ComponentSetKitchenStandardsClientInput {
+  equipmentNotes?: string;
+  platingInstructions?: string;
+  coolingInstructions?: string;
+  holdingInstructions?: string;
+  reheatInstructions?: string;
+  substitutionNotes?: string;
+  videoUrl?: string;
+}
+
+export const ComponentSetKitchenStandardsCapability = {
+  capabilityId: "Component.setKitchenStandards",
+  entity: "Component",
+  command: "setKitchenStandards",
+  route: "/api/manifest/Component/commands/setKitchenStandards",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["equipmentNotes","platingInstructions","coolingInstructions","holdingInstructions","reheatInstructions","substitutionNotes","videoUrl"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
+  emits: ["ComponentKitchenStandardsSet"],
+} as const;
+
+export type ComponentSetKitchenStandardsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Component.setKitchenStandards.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentSetKitchenStandardsInput(client: ComponentSetKitchenStandardsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Component.setKitchenStandards. */
+export const ComponentSetKitchenStandardsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.lists()",
+    "readId": "Component.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.detail(id)",
+    "readId": "Component.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.lists()",
+    "readId": "ComponentComponent.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.detail(id)",
+    "readId": "ComponentComponent.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImport",
+    "queryKeyHint": "queryKeys.componentImport.lists()",
+    "readId": "ComponentImport.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImport",
+    "queryKeyHint": "queryKeys.componentImport.detail(id)",
+    "readId": "ComponentImport.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.lists()",
+    "readId": "ComponentImportLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.detail(id)",
+    "readId": "ComponentImportLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.lists()",
+    "readId": "ComponentIngredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.detail(id)",
+    "readId": "ComponentIngredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.lists()",
+    "readId": "ComponentPortionSpec.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.detail(id)",
+    "readId": "ComponentPortionSpec.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentSnapshot",
+    "queryKeyHint": "queryKeys.componentSnapshot.lists()",
+    "readId": "ComponentSnapshot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentSnapshot",
+    "queryKeyHint": "queryKeys.componentSnapshot.detail(id)",
+    "readId": "ComponentSnapshot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentStep",
+    "queryKeyHint": "queryKeys.componentStep.lists()",
+    "readId": "ComponentStep.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentStep",
+    "queryKeyHint": "queryKeys.componentStep.detail(id)",
+    "readId": "ComponentStep.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.lists()",
+    "readId": "DishComponent.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.detail(id)",
+    "readId": "DishComponent.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "readId": "DishTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "readId": "DishTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.lists()",
+    "readId": "EventDishComponentSeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.detail(id)",
+    "readId": "EventDishComponentSeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "readId": "PrepTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "readId": "PrepTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Component.setKitchenStandards. Not a rendered control. */
+export const ComponentSetKitchenStandardsAction = {
+  "exposure": "human",
+  "label": "Set kitchen standards",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "equipmentNotes",
+      "label": "Equipment notes",
+      "required": false
+    },
+    {
+      "name": "platingInstructions",
+      "label": "Plating instructions",
+      "required": false
+    },
+    {
+      "name": "coolingInstructions",
+      "label": "Cooling instructions",
+      "required": false
+    },
+    {
+      "name": "holdingInstructions",
+      "label": "Holding instructions",
+      "required": false
+    },
+    {
+      "name": "reheatInstructions",
+      "label": "Reheat instructions",
+      "required": false
+    },
+    {
+      "name": "substitutionNotes",
+      "label": "Substitution notes",
+      "required": false
+    },
+    {
+      "name": "videoUrl",
+      "label": "Video url",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- Component.setPrimaryImage ---
+export interface ComponentSetPrimaryImageClientInput {
+  storageId: string;
+  fileName?: string;
+}
+
+export const ComponentSetPrimaryImageCapability = {
+  capabilityId: "Component.setPrimaryImage",
+  entity: "Component",
+  command: "setPrimaryImage",
+  route: "/api/manifest/Component/commands/setPrimaryImage",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["storageId","fileName"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Add a photo before you set it as the main picture."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
+  emits: ["ComponentPrimaryImageSet"],
+} as const;
+
+export type ComponentSetPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Component.setPrimaryImage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentSetPrimaryImageInput(client: ComponentSetPrimaryImageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Component.setPrimaryImage. */
+export const ComponentSetPrimaryImageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.lists()",
+    "readId": "Component.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.detail(id)",
+    "readId": "Component.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.lists()",
+    "readId": "ComponentComponent.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.detail(id)",
+    "readId": "ComponentComponent.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImport",
+    "queryKeyHint": "queryKeys.componentImport.lists()",
+    "readId": "ComponentImport.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImport",
+    "queryKeyHint": "queryKeys.componentImport.detail(id)",
+    "readId": "ComponentImport.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.lists()",
+    "readId": "ComponentImportLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.detail(id)",
+    "readId": "ComponentImportLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.lists()",
+    "readId": "ComponentIngredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.detail(id)",
+    "readId": "ComponentIngredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.lists()",
+    "readId": "ComponentPortionSpec.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.detail(id)",
+    "readId": "ComponentPortionSpec.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentSnapshot",
+    "queryKeyHint": "queryKeys.componentSnapshot.lists()",
+    "readId": "ComponentSnapshot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentSnapshot",
+    "queryKeyHint": "queryKeys.componentSnapshot.detail(id)",
+    "readId": "ComponentSnapshot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentStep",
+    "queryKeyHint": "queryKeys.componentStep.lists()",
+    "readId": "ComponentStep.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentStep",
+    "queryKeyHint": "queryKeys.componentStep.detail(id)",
+    "readId": "ComponentStep.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.lists()",
+    "readId": "DishComponent.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.detail(id)",
+    "readId": "DishComponent.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "readId": "DishTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "readId": "DishTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.lists()",
+    "readId": "EventDishComponentSeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishComponentSeed",
+    "queryKeyHint": "queryKeys.eventDishComponentSeed.detail(id)",
+    "readId": "EventDishComponentSeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "readId": "PrepTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "readId": "PrepTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "readId": "ProductionBatch.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "readId": "ProductionBatch.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Component.setPrimaryImage. Not a rendered control. */
+export const ComponentSetPrimaryImageAction = {
+  "exposure": "human",
+  "label": "Set primary image",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "storageId",
+      "label": "Storage id",
+      "required": true
+    },
+    {
+      "name": "fileName",
+      "label": "File name",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Component.setServesPerYield ---
 export interface ComponentSetServesPerYieldClientInput {
   /** Bounds: 1..∞ */
@@ -8344,14 +9084,14 @@ export const ComponentSetServesPerYieldCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["servesPerYield"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"How many guests this recipe serves has to be more than zero."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentServesPerYieldSet"],
 } as const;
 
-export type ComponentSetServesPerYieldResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentSetServesPerYieldResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.setServesPerYield.
@@ -8580,14 +9320,14 @@ export const ComponentSetStorageWindowCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["storageWindowDays","source"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen staff may see recipes"},{"kind":"policy_denial","message":"Kitchen staff may update recipes"},{"kind":"policy_denial","message":"Kitchen staff may change recipes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"This recipe's storage window can't be negative. Use zero or more days."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Component not found"}],
   emits: ["ComponentStorageWindowSet"],
 } as const;
 
-export type ComponentSetStorageWindowResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number };
+export type ComponentSetStorageWindowResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Component.setStorageWindow.
@@ -89530,14 +90270,14 @@ export const IngredientClassifyAllergensCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["allergens","isGlutenFree"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientAllergensClassified"],
 } as const;
 
-export type IngredientClassifyAllergensResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientClassifyAllergensResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.classifyAllergens.
@@ -89903,14 +90643,14 @@ export const IngredientClearPrimaryImageCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientPrimaryImageCleared"],
 } as const;
 
-export type IngredientClearPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientClearPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.clearPrimaryImage.
@@ -90229,14 +90969,14 @@ export const IngredientConfigureSubstitutesCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["substituteIngredientIds"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientSubstitutesConfigured"],
 } as const;
 
-export type IngredientConfigureSubstitutesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientConfigureSubstitutesResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.configureSubstitutes.
@@ -90561,14 +91301,14 @@ export const IngredientDiscontinueCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientDiscontinued"],
 } as const;
 
-export type IngredientDiscontinueResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientDiscontinueResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.discontinue.
@@ -91425,14 +92165,14 @@ export const IngredientLinkAsEditionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["sourceIngredientId","editionNumber"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"An ingredient cannot be an edition of itself"},{"kind":"constraint_block","message":"This edition number has to be more than zero."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientEditionCreated"],
 } as const;
 
-export type IngredientLinkAsEditionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientLinkAsEditionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.linkAsEdition.
@@ -91763,14 +92503,14 @@ export const IngredientMergeIntoCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["targetIngredientId","reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Cannot merge an ingredient into itself"},{"kind":"constraint_block","message":"Say why you're merging this."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientMerged"],
 } as const;
 
-export type IngredientMergeIntoResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientMergeIntoResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.mergeInto.
@@ -92114,14 +92854,14 @@ export const IngredientPurgeCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientPurged"],
 } as const;
 
-export type IngredientPurgeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientPurgeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.purge.
@@ -92454,14 +93194,14 @@ export const IngredientReinstateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientReinstated"],
 } as const;
 
-export type IngredientReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientReinstateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.reinstate.
@@ -92813,14 +93553,14 @@ export const IngredientSetNutritionCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["caloriesPerUnit","proteinGramsPerUnit","carbsGramsPerUnit","fatGramsPerUnit","fiberGramsPerUnit","sugarGramsPerUnit","sodiumMgPerUnit","calciumMgPerUnit","ironMgPerUnit"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"This ingredient's calories can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's protein can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's carbs can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's fat can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's fiber can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's sugar can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's sodium can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's calcium can't be negative. Use zero or more."},{"kind":"constraint_block","message":"This ingredient's iron can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientNutritionSet"],
 } as const;
 
-export type IngredientSetNutritionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientSetNutritionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.setNutrition.
@@ -93185,14 +93925,14 @@ export const IngredientSetPreferredVendorCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["preferredVendorId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientPreferredVendorSet"],
 } as const;
 
-export type IngredientSetPreferredVendorResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientSetPreferredVendorResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.setPreferredVendor.
@@ -93518,14 +94258,14 @@ export const IngredientSetPreferredVendorsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["preferredVendorIds","preferredVendorId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientPreferredVendorsSet"],
 } as const;
 
-export type IngredientSetPreferredVendorsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientSetPreferredVendorsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.setPreferredVendors.
@@ -93856,14 +94596,14 @@ export const IngredientSetPrimaryImageCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["storageId","fileName"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Add a photo before you set it as the main picture."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientPrimaryImageSet"],
 } as const;
 
-export type IngredientSetPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientSetPrimaryImageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.setPrimaryImage.
@@ -94176,6 +94916,345 @@ export const IngredientSetPrimaryImageAction = {
   ]
 } as const;
 
+// --- Ingredient.setStorage ---
+export interface IngredientSetStorageClientInput {
+  /** Bounds: 0..∞ */
+  shelfLifeDays?: number;
+  storageInstructions?: string;
+}
+
+export const IngredientSetStorageCapability = {
+  capabilityId: "Ingredient.setStorage",
+  entity: "Ingredient",
+  command: "setStorage",
+  route: "/api/manifest/Ingredient/commands/setStorage",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["shelfLifeDays","storageInstructions"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Shelf life can't be negative. Use zero or more days."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
+  emits: ["IngredientStorageSet"],
+} as const;
+
+export type IngredientSetStorageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Ingredient.setStorage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIngredientSetStorageInput(client: IngredientSetStorageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Ingredient.setStorage. */
+export const IngredientSetStorageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.lists()",
+    "readId": "ComponentImportLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentImportLine",
+    "queryKeyHint": "queryKeys.componentImportLine.detail(id)",
+    "readId": "ComponentImportLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.lists()",
+    "readId": "ComponentIngredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentIngredient",
+    "queryKeyHint": "queryKeys.componentIngredient.detail(id)",
+    "readId": "ComponentIngredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishIngredient",
+    "queryKeyHint": "queryKeys.dishIngredient.lists()",
+    "readId": "DishIngredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishIngredient",
+    "queryKeyHint": "queryKeys.dishIngredient.detail(id)",
+    "readId": "DishIngredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "readId": "DishTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "readId": "DishTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+    "readId": "EventIngredientContribution.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+    "readId": "EventIngredientContribution.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "readId": "IngredientDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "readId": "IngredientDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
+    "readId": "IngredientPriceObservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.detail(id)",
+    "readId": "IngredientPriceObservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryItem",
+    "queryKeyHint": "queryKeys.inventoryItem.lists()",
+    "readId": "InventoryItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryItem",
+    "queryKeyHint": "queryKeys.inventoryItem.detail(id)",
+    "readId": "InventoryItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryReservation",
+    "queryKeyHint": "queryKeys.inventoryReservation.lists()",
+    "readId": "InventoryReservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryReservation",
+    "queryKeyHint": "queryKeys.inventoryReservation.detail(id)",
+    "readId": "InventoryReservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ItemUnitMapping",
+    "queryKeyHint": "queryKeys.itemUnitMapping.lists()",
+    "readId": "ItemUnitMapping.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ItemUnitMapping",
+    "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
+    "readId": "ItemUnitMapping.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.lists()",
+    "readId": "OpeningStockRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OpeningStockRecord",
+    "queryKeyHint": "queryKeys.openingStockRecord.detail(id)",
+    "readId": "OpeningStockRecord.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "readId": "PrepTask.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "readId": "PrepTask.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StockCountLine",
+    "queryKeyHint": "queryKeys.stockCountLine.lists()",
+    "readId": "StockCountLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StockCountLine",
+    "queryKeyHint": "queryKeys.stockCountLine.detail(id)",
+    "readId": "StockCountLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StockTransfer",
+    "queryKeyHint": "queryKeys.stockTransfer.lists()",
+    "readId": "StockTransfer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StockTransfer",
+    "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
+    "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "WasteRecord",
+    "queryKeyHint": "queryKeys.wasteRecord.lists()",
+    "readId": "WasteRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "WasteRecord",
+    "queryKeyHint": "queryKeys.wasteRecord.detail(id)",
+    "readId": "WasteRecord.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Ingredient.setStorage. Not a rendered control. */
+export const IngredientSetStorageAction = {
+  "exposure": "human",
+  "label": "Set storage",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "shelfLifeDays",
+      "label": "Shelf life days",
+      "required": false
+    },
+    {
+      "name": "storageInstructions",
+      "label": "Storage instructions",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Ingredient.updateCosting ---
 export interface IngredientUpdateCostingClientInput {
   /** Bounds: 0..∞ */
@@ -94194,14 +95273,14 @@ export const IngredientUpdateCostingCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["costPerUnit"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"This ingredient's cost can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientCostingUpdated"],
 } as const;
 
-export type IngredientUpdateCostingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientUpdateCostingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.updateCosting.
@@ -94529,14 +95608,14 @@ export const IngredientUpdateDetailsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["name","unit","category"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Kitchen, inventory and managers may see ingredients"},{"kind":"policy_denial","message":"Kitchen staff may update ingredients"},{"kind":"policy_denial","message":"Kitchen staff may change ingredients"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this ingredient a name."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Ingredient not found"}],
   emits: ["IngredientDetailsUpdated"],
 } as const;
 
-export type IngredientUpdateDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
+export type IngredientUpdateDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Ingredient.updateDetails.
@@ -183752,12 +184831,15 @@ export const ALL_CAPABILITY_IDS = [
   "ClientOutreachTask.stageClientMerge",
   "ClientPortalLink.create",
   "ClientPortalLink.revoke",
+  "Component.clearPrimaryImage",
   "Component.draft",
   "Component.publishVersion",
   "Component.purge",
   "Component.retire",
   "Component.retract",
   "Component.reviseDraft",
+  "Component.setKitchenStandards",
+  "Component.setPrimaryImage",
   "Component.setServesPerYield",
   "Component.setStorageWindow",
   "ComponentComponent.add",
@@ -184072,6 +185154,7 @@ export const ALL_CAPABILITY_IDS = [
   "Ingredient.setPreferredVendor",
   "Ingredient.setPreferredVendors",
   "Ingredient.setPrimaryImage",
+  "Ingredient.setStorage",
   "Ingredient.updateCosting",
   "Ingredient.updateDetails",
   "IngredientDemand.alignPurchasingWeek",
@@ -185603,20 +186686,20 @@ export type getAssistantUploadResult = { _id: string; _creationTime: number; ten
 export const listAssistantUploadRead = {"entity":"AssistantUpload","readId":"AssistantUpload.list","exportName":"listAssistantUpload","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; storageId: string; uploadedByAuthSubjectId: string; name: string; createdAt: number; updatedAt: number }>"} as const;
 export type listAssistantUploadResult = Array<{ _id: string; _creationTime: number; tenantId: string; storageId: string; uploadedByAuthSubjectId: string; name: string; createdAt: number; updatedAt: number }>;
 
-export const listAttachmentByParentIdRead = {"entity":"Attachment","readId":"Attachment.byParentId","exportName":"listAttachmentByParentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"parentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
-export type listAttachmentByParentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
+export const listAttachmentByParentIdRead = {"entity":"Attachment","readId":"Attachment.byParentId","exportName":"listAttachmentByParentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"parentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAttachmentByParentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
 
-export const listAttachmentByStorageIdRead = {"entity":"Attachment","readId":"Attachment.byStorageId","exportName":"listAttachmentByStorageId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"storageId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
-export type listAttachmentByStorageIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
+export const listAttachmentByStorageIdRead = {"entity":"Attachment","readId":"Attachment.byStorageId","exportName":"listAttachmentByStorageId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"storageId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAttachmentByStorageIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
 
-export const listAttachmentByTenantIdRead = {"entity":"Attachment","readId":"Attachment.byTenantId","exportName":"listAttachmentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
-export type listAttachmentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
+export const listAttachmentByTenantIdRead = {"entity":"Attachment","readId":"Attachment.byTenantId","exportName":"listAttachmentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAttachmentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
 
-export const getAttachmentRead = {"entity":"Attachment","readId":"Attachment.get","exportName":"getAttachment","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getAttachmentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number } | null;
+export const getAttachmentRead = {"entity":"Attachment","readId":"Attachment.get","exportName":"getAttachment","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getAttachmentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number } | null;
 
-export const listAttachmentRead = {"entity":"Attachment","readId":"Attachment.list","exportName":"listAttachment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
-export type listAttachmentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
+export const listAttachmentRead = {"entity":"Attachment","readId":"Attachment.list","exportName":"listAttachment","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: \"eventRecord\" | \"client\" | \"contract\" | \"vendor\" | \"delivery\" | \"closeout\" | \"dish\" | \"ingredient\" | \"equipment\" | \"component\" | \"staffMessage\"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: \"venueCondition\" | \"leftoverFood\" | \"equipmentReturn\" | \"setup\" | \"food\" | \"service\" | \"venue\" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAttachmentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" | "ingredient" | "equipment" | "component" | "staffMessage"; parentId: string; fileName: string; contentType: string; fileSize: number; storageId: string; evidenceType: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" | null; uploadedById: string | null; uploadedAt: number | null; inFeedbackSurvey: boolean | null; createdAt: number; updatedAt: number }>;
 
 export const listAvailabilityWindowByPersonIdRead = {"entity":"AvailabilityWindow","readId":"AvailabilityWindow.byPersonId","exportName":"listAvailabilityWindowByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; startsAt: number | null; endsAt: number | null; notes: string | null; kind: \"available\" | \"unavailable\" | null; status: \"active\" | \"withdrawn\"; declaredAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listAvailabilityWindowByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; startsAt: number | null; endsAt: number | null; notes: string | null; kind: "available" | "unavailable" | null; status: "active" | "withdrawn"; declaredAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;
@@ -185774,17 +186857,17 @@ export type getCommandAuditRecordResult = { _id: string; _creationTime: number; 
 export const listCommandAuditRecordRead = {"entity":"CommandAuditRecord","readId":"CommandAuditRecord.list","exportName":"listCommandAuditRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; occurredAt: number; lastOccurredAt: number | null; stepName: string | null; subjectEntity: string | null; subjectId: string | null; eventType: string | null; manifestEventId: string | null; eventCount: number | null; versionAfter: number | null; actorUserId: string | null; actorPersonId: string | null; actorRole: string | null; idempotencyKey: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listCommandAuditRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; occurredAt: number; lastOccurredAt: number | null; stepName: string | null; subjectEntity: string | null; subjectId: string | null; eventType: string | null; manifestEventId: string | null; eventCount: number | null; versionAfter: number | null; actorUserId: string | null; actorPersonId: string | null; actorRole: string | null; idempotencyKey: string | null; createdAt: number; updatedAt: number }>;
 
-export const listComponentByRecipeIdentityFingerprintRead = {"entity":"Component","readId":"Component.byRecipeIdentityFingerprint","exportName":"listComponentByRecipeIdentityFingerprint","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"recipeIdentityFingerprint","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listComponentByRecipeIdentityFingerprintResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }>;
+export const listComponentByRecipeIdentityFingerprintRead = {"entity":"Component","readId":"Component.byRecipeIdentityFingerprint","exportName":"listComponentByRecipeIdentityFingerprint","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"recipeIdentityFingerprint","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listComponentByRecipeIdentityFingerprintResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
 
-export const listComponentByTenantIdRead = {"entity":"Component","readId":"Component.byTenantId","exportName":"listComponentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listComponentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }>;
+export const listComponentByTenantIdRead = {"entity":"Component","readId":"Component.byTenantId","exportName":"listComponentByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listComponentByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
 
-export const getComponentRead = {"entity":"Component","readId":"Component.get","exportName":"getComponent","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getComponentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number } | null;
+export const getComponentRead = {"entity":"Component","readId":"Component.get","exportName":"getComponent","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getComponentResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listComponentRead = {"entity":"Component","readId":"Component.list","exportName":"listComponent","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listComponentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; createdAt: number; updatedAt: number }>;
+export const listComponentRead = {"entity":"Component","readId":"Component.list","exportName":"listComponent","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listComponentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
 
 export const listComponentComponentByChildComponentIdRead = {"entity":"ComponentComponent","readId":"ComponentComponent.byChildComponentId","exportName":"listComponentComponentByChildComponentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"childComponentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; componentId: string; childComponentId: string; quantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; sortOrder: number; wasteFactor: number | null; quantityBasis: \"as_purchased\" | \"as_produced\" | \"raw\" | \"cooked\" | \"unknown\" | null; prepNotes: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listComponentComponentByChildComponentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; componentId: string; childComponentId: string; quantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; sortOrder: number; wasteFactor: number | null; quantityBasis: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" | null; prepNotes: string | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -186704,20 +187787,20 @@ export type getIncidentResult = { _id: string; _creationTime: number; tenantId: 
 export const listIncidentRead = {"entity":"Incident","readId":"Incident.list","exportName":"listIncident","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; prepTaskId: string | null; deliveryId: string | null; shiftId: string | null; severity: \"low\" | \"medium\" | \"high\" | \"critical\"; category: \"food_safety\" | \"allergen\" | \"injury\" | \"equipment\" | \"service\" | \"other\"; description: string; resolution: string | null; dismissalReason: string | null; reportedById: string | null; reportedByPersonId: string | null; status: \"open\" | \"investigating\" | \"resolved\" | \"dismissed\"; correctiveActionRequired: boolean | null; reportedAt: number | null; investigatingAt: number | null; resolvedAt: number | null; dismissedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listIncidentResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; prepTaskId: string | null; deliveryId: string | null; shiftId: string | null; severity: "low" | "medium" | "high" | "critical"; category: "food_safety" | "allergen" | "injury" | "equipment" | "service" | "other"; description: string; resolution: string | null; dismissalReason: string | null; reportedById: string | null; reportedByPersonId: string | null; status: "open" | "investigating" | "resolved" | "dismissed"; correctiveActionRequired: boolean | null; reportedAt: number | null; investigatingAt: number | null; resolvedAt: number | null; dismissedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listIngredientByCanonicalIngredientIdRead = {"entity":"Ingredient","readId":"Ingredient.byCanonicalIngredientId","exportName":"listIngredientByCanonicalIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"canonicalIngredientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listIngredientByCanonicalIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
+export const listIngredientByCanonicalIngredientIdRead = {"entity":"Ingredient","readId":"Ingredient.byCanonicalIngredientId","exportName":"listIngredientByCanonicalIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"canonicalIngredientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIngredientByCanonicalIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
 
-export const listIngredientByMergedIntoIngredientIdRead = {"entity":"Ingredient","readId":"Ingredient.byMergedIntoIngredientId","exportName":"listIngredientByMergedIntoIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergedIntoIngredientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listIngredientByMergedIntoIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
+export const listIngredientByMergedIntoIngredientIdRead = {"entity":"Ingredient","readId":"Ingredient.byMergedIntoIngredientId","exportName":"listIngredientByMergedIntoIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"mergedIntoIngredientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIngredientByMergedIntoIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
 
-export const listIngredientByTenantIdRead = {"entity":"Ingredient","readId":"Ingredient.byTenantId","exportName":"listIngredientByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listIngredientByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
+export const listIngredientByTenantIdRead = {"entity":"Ingredient","readId":"Ingredient.byTenantId","exportName":"listIngredientByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIngredientByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
 
-export const getIngredientRead = {"entity":"Ingredient","readId":"Ingredient.get","exportName":"getIngredient","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getIngredientResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number } | null;
+export const getIngredientRead = {"entity":"Ingredient","readId":"Ingredient.get","exportName":"getIngredient","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getIngredientResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listIngredientRead = {"entity":"Ingredient","readId":"Ingredient.list","exportName":"listIngredient","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
-export type listIngredientResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
+export const listIngredientRead = {"entity":"Ingredient","readId":"Ingredient.list","exportName":"listIngredient","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; allergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: \"active\" | \"discontinued\"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listIngredientResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; allergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; isGlutenFree: boolean; costPerUnit: number; category: string | null; substituteIngredientIds: string[]; preferredVendorIds: string[]; preferredVendorId: string | null; status: "active" | "discontinued"; introducedAt: number | null; discontinuedAt: number | null; discontinuationReason: string | null; canonicalIngredientId: string | null; editionNumber: number | null; mergedIntoIngredientId: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; shelfLifeDays: number | null; storageInstructions: string | null; caloriesPerUnit: number | null; proteinGramsPerUnit: number | null; carbsGramsPerUnit: number | null; fatGramsPerUnit: number | null; fiberGramsPerUnit: number | null; sugarGramsPerUnit: number | null; sodiumMgPerUnit: number | null; calciumMgPerUnit: number | null; ironMgPerUnit: number | null; createdAt: number; updatedAt: number }>;
 
 export const listIngredientDemandByDishIdRead = {"entity":"IngredientDemand","readId":"IngredientDemand.byDishId","exportName":"listIngredientDemandByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; ingredientId: string; preferredVendorId: string | null; requiredQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servings: number | null; dishId: string | null; sourceComponentLineQuantity: number | null; sourceBatchMultiplier: number | null; sourceYieldQuantity: number | null; status: \"pending\" | \"calculated\" | \"confirmed\" | \"fulfilled\" | \"superseded\"; purchaseEligibleEventId: string | null; purchasingWeekStart: number | null; calculatedAt: number | null; confirmedAt: number | null; fulfilledAt: number | null; supersededAt: number | null; supersedeReason: string | null; lastRecalculationReason: string | null; unitReviewReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listIngredientDemandByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; ingredientId: string; preferredVendorId: string | null; requiredQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servings: number | null; dishId: string | null; sourceComponentLineQuantity: number | null; sourceBatchMultiplier: number | null; sourceYieldQuantity: number | null; status: "pending" | "calculated" | "confirmed" | "fulfilled" | "superseded"; purchaseEligibleEventId: string | null; purchasingWeekStart: number | null; calculatedAt: number | null; confirmedAt: number | null; fulfilledAt: number | null; supersededAt: number | null; supersedeReason: string | null; lastRecalculationReason: string | null; unitReviewReason: string | null; createdAt: number; updatedAt: number }>;

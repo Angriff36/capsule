@@ -42,6 +42,7 @@ import {
   ClientRegisterParamsSchema,
   ClientSetBirthdayParamsSchema,
   ClientStageClientMergeParamsSchema,
+  ComponentClearPrimaryImageParamsSchema,
   ComponentComponentAddParamsSchema,
   ComponentComponentAdjustQuantityParamsSchema,
   ComponentComponentRemoveParamsSchema,
@@ -82,6 +83,8 @@ import {
   ComponentRetireParamsSchema,
   ComponentRetractParamsSchema,
   ComponentReviseDraftParamsSchema,
+  ComponentSetKitchenStandardsParamsSchema,
+  ComponentSetPrimaryImageParamsSchema,
   ComponentSetServesPerYieldParamsSchema,
   ComponentSetStorageWindowParamsSchema,
   ComponentSnapshotCaptureParamsSchema,
@@ -372,6 +375,7 @@ import {
   IngredientSetPreferredVendorParamsSchema,
   IngredientSetPreferredVendorsParamsSchema,
   IngredientSetPrimaryImageParamsSchema,
+  IngredientSetStorageParamsSchema,
   IngredientUpdateCostingParamsSchema,
   IngredientUpdateDetailsParamsSchema,
   IntegrationConnectionAuthorizeParamsSchema,
@@ -1570,6 +1574,16 @@ export function useGetComponent(id: string | "skip") {
   return useQuery(api.queries.getComponent, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for Component.clearPrimaryImage. */
+export function useComponentClearPrimaryImage() {
+  const mutate = useMutation(api.mutations.Component_clearPrimaryImage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentClearPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Component.draft. */
 export function useComponentDraft() {
   const mutate = useMutation(api.mutations.Component_draft);
@@ -1626,6 +1640,26 @@ export function useComponentReviseDraft() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ComponentReviseDraftParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Component.setKitchenStandards. */
+export function useComponentSetKitchenStandards() {
+  const mutate = useMutation(api.mutations.Component_setKitchenStandards);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentSetKitchenStandardsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Component.setPrimaryImage. */
+export function useComponentSetPrimaryImage() {
+  const mutate = useMutation(api.mutations.Component_setPrimaryImage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentSetPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -5863,6 +5897,16 @@ export function useIngredientSetPrimaryImage() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = IngredientSetPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Ingredient.setStorage. */
+export function useIngredientSetStorage() {
+  const mutate = useMutation(api.mutations.Ingredient_setStorage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientSetStorageParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13228,4 +13272,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1400 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1404 as const;

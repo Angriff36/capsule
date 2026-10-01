@@ -33,6 +33,7 @@ import { IngredientCostingEditor } from "./IngredientCostingEditor";
 import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
 import { IngredientMergeControl } from "./IngredientMergeControl";
 import { IngredientNutritionEditor } from "./IngredientNutritionEditor";
+import { IngredientStorageEditor } from "./IngredientStorageEditor";
 import { IngredientSubstitutionEditor } from "./IngredientSubstitutionEditor";
 import { ItemUnitMappingsPanel } from "./ItemUnitMappingsPanel";
 import { kitchenCatalogPath } from "./kitchenRoutes";
@@ -576,6 +577,12 @@ export function IngredientDetailPage() {
         key={`costing:${ingredient._id}:${ingredient.version}:${lookupSuggestedCost ?? "none"}`}
         ingredient={ingredient}
         suggestedCostPerUnit={lookupSuggestedCost}
+        onFailure={setFailure}
+      />
+
+      <IngredientStorageEditor
+        key={`storage:${ingredient._id}:${ingredient.version}`}
+        ingredient={ingredient}
         onFailure={setFailure}
       />
 
