@@ -139,6 +139,7 @@ import {
 } from "./lib/importCompanies";
 import { compensateStoppedRun } from "./importCancel";
 import { madeSnapshot } from "./lib/importRecordHomes";
+import { skippedByPerson } from "./lib/importResolution";
 import {
   eventRequirementsText,
   SOURCE_FIELD_MAPS,
@@ -904,6 +905,11 @@ export const commitImportRun = action({
           recordType: "contact",
           externalId: contact.externalId,
         });
+        // PL-SOURCE-RESOLUTION (AC-065): a row a person skipped stays skipped.
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
           // Already materialized. A link THIS run wrote was counted by the
           // invocation that handled it, so a resume skips it silently (R2-6)
@@ -1087,6 +1093,10 @@ export const commitImportRun = action({
           recordType: "event",
           externalId: event.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
           // Already materialized (own-run links skip silently so resume
           // counts stay exact, R2-6).
@@ -1400,6 +1410,10 @@ export const commitImportRun = action({
           recordType: "lead",
           externalId: lead.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
           // Already materialized (own-run links skip silently so resume
           // counts stay exact, R2-6).
@@ -1750,6 +1764,10 @@ export const commitImportRun = action({
           recordType: "menu",
           externalId: menu.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
           // Already materialized (own-run links skip silently so resume
           // counts stay exact, R2-6).
@@ -1906,6 +1924,10 @@ export const commitImportRun = action({
           recordType: "pack_list",
           externalId: packList.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
           // Already materialized — idempotent skip (own-run links skip
           // silently so resume counts stay exact, R2-6).
@@ -2133,6 +2155,10 @@ export const commitImportRun = action({
         recordType: "venue",
         externalId: venue.externalId,
       });
+      if (existing && skippedByPerson(existing)) {
+        if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+        continue;
+      }
       if (existing && existing.capsuleId) {
         // Already materialized (own-run links skip silently so resume
         // counts stay exact, R2-6).

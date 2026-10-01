@@ -52,6 +52,7 @@ import type * as importCommit from "../importCommit.js";
 import type * as importCoordinator from "../importCoordinator.js";
 import type * as importPaymentMatch from "../importPaymentMatch.js";
 import type * as importPipeline from "../importPipeline.js";
+import type * as importResolution from "../importResolution.js";
 import type * as importServiceStyle from "../importServiceStyle.js";
 import type * as importSourceDelta from "../importSourceDelta.js";
 import type * as ingredientLookup from "../ingredientLookup.js";
@@ -117,7 +118,9 @@ import type * as lib_headcountStaffingReconciliation from "../lib/headcountStaff
 import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_importCompanies from "../lib/importCompanies.js";
 import type * as lib_importEventFiles from "../lib/importEventFiles.js";
+import type * as lib_importIdentity from "../lib/importIdentity.js";
 import type * as lib_importRecordHomes from "../lib/importRecordHomes.js";
+import type * as lib_importResolution from "../lib/importResolution.js";
 import type * as lib_importSourceFields from "../lib/importSourceFields.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalogImageImport.js";
@@ -301,6 +304,7 @@ declare const fullApi: ApiFromModules<{
   importCoordinator: typeof importCoordinator;
   importPaymentMatch: typeof importPaymentMatch;
   importPipeline: typeof importPipeline;
+  importResolution: typeof importResolution;
   importServiceStyle: typeof importServiceStyle;
   importSourceDelta: typeof importSourceDelta;
   ingredientLookup: typeof ingredientLookup;
@@ -366,7 +370,9 @@ declare const fullApi: ApiFromModules<{
   "lib/householdVolumeParse": typeof lib_householdVolumeParse;
   "lib/importCompanies": typeof lib_importCompanies;
   "lib/importEventFiles": typeof lib_importEventFiles;
+  "lib/importIdentity": typeof lib_importIdentity;
   "lib/importRecordHomes": typeof lib_importRecordHomes;
+  "lib/importResolution": typeof lib_importResolution;
   "lib/importSourceFields": typeof lib_importSourceFields;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/ingredientCatalogImageImport": typeof lib_ingredientCatalogImageImport;

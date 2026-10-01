@@ -142,8 +142,10 @@ export const takeBackLink = internalMutation({
         : null;
     // A look-alike record the run made (PL-SOURCE-IDENTITY) waits on the match
     // list but is still the run's own record, so it carries a made snapshot.
+    // A record a person picked or added on the match list (PL-SOURCE-RESOLUTION)
+    // is theirs, not the run's: its link is resolved by them with no snapshot.
     const runMadeRecord =
-      link.conflictStatus === "resolved" ||
+      (link.conflictStatus === "resolved" && link.resolvedByUserId == null) ||
       readMadeSnapshot(link.metadata).madeVersion !== undefined;
     if (!home || !recordId || !runMadeRecord) {
       await retireLink("Retired: the import was stopped.");

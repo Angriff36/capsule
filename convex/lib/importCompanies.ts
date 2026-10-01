@@ -7,6 +7,7 @@ import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { ParsedCapsuleContact } from "../tppParser";
 import type { LookAlikeClient } from "./importIdentity";
+import { skippedByPerson } from "./importResolution";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 
@@ -33,7 +34,7 @@ export async function commitImportedCompany(
     recordType: COMPANY_RECORD_TYPE,
     externalId: company.externalId,
   });
-  if (existing && existing.capsuleId) {
+  if (existing && (existing.capsuleId || skippedByPerson(existing))) {
     return existing.sourceImportRunId === args.importRunId
       ? "resumed"
       : "skipped";
