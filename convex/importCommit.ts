@@ -1770,7 +1770,8 @@ export const commitImportRun = action({
             sourceSystem,
             recordType: "menu",
             externalId: menu.externalId,
-            capsuleEntity: "menu",
+            // AC-180: the record is a Dish, so the link says so.
+            capsuleEntity: "dish",
             capsuleId: dishId,
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(
@@ -1792,7 +1793,7 @@ export const commitImportRun = action({
             sourceSystem,
             recordType: "menu",
             externalId: menu.externalId,
-            capsuleEntity: "menu",
+            capsuleEntity: "dish",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
             rawSourceData: withSourceRow(

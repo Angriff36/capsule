@@ -34,6 +34,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   contact: "Contact",
   lead: "Lead",
   menu: "Menu",
+  dish: "Dish",
   venue: "Venue",
   payment: "Payment",
   invoice: "Invoice",
