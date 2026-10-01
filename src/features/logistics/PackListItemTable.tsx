@@ -8,6 +8,7 @@ import {
 import { PackLineWhy } from "./PackLineWhy";
 import type { PackLineFacts } from "./packLineExplanation";
 import { packReturnSummary } from "./packReturn";
+import { packRowFacts } from "./packRowFacts";
 
 export interface PackListItemRow extends PackLineFacts {
   _id: string;
@@ -216,9 +217,19 @@ export function PackListItemTable({
                 {item.returnFinding ? (
                   <small className="block">Found: {item.returnFinding}</small>
                 ) : null}
+                {packRowFacts(item).notes.map((fact) => (
+                  <small key={fact} className="block">
+                    {fact}
+                  </small>
+                ))}
               </td>
               <td>
                 <StatusChip status={String(item.status)} />
+                {packRowFacts(item).blocking ? (
+                  <small className="block text-danger">
+                    Holds up Mark packed
+                  </small>
+                ) : null}
               </td>
               <td>
                 <div className="supply-row-actions">
