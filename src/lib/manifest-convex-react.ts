@@ -161,6 +161,7 @@ import {
   EquipmentRetireParamsSchema,
   EquipmentReviseDetailsParamsSchema,
   EquipmentServiceEntryRecordParamsSchema,
+  EquipmentSetCustomFieldsParamsSchema,
   EquipmentSetOperatingFactsParamsSchema,
   EquipmentSetPrimaryImageParamsSchema,
   EquipmentTransferParamsSchema,
@@ -295,6 +296,7 @@ import {
   EventUpdateTaskBreakdownParamsSchema,
   EventUseCompanyTimingRuleParamsSchema,
   EventVehicleAssignmentAssignParamsSchema,
+  EventVehicleAssignmentAttachTrailerParamsSchema,
   EventVehicleAssignmentClearPreloadedParamsSchema,
   EventVehicleAssignmentMarkPreloadedParamsSchema,
   EventVehicleAssignmentPlanLegParamsSchema,
@@ -459,6 +461,7 @@ import {
   OrganizationCapabilitySettingRegisterParamsSchema,
   OrganizationCapabilitySettingSetEnabledParamsSchema,
   OrganizationConfigureBrandingParamsSchema,
+  OrganizationConfigureEquipmentFieldsParamsSchema,
   OrganizationConfigurePlanningChecksParamsSchema,
   OrganizationConfigureRoutePolicyParamsSchema,
   OrganizationConfigureTimingPolicyParamsSchema,
@@ -495,6 +498,7 @@ import {
   PackListItemRestoreExcludedParamsSchema,
   PackListItemRestoreImportedAssociationParamsSchema,
   PackListItemSetResponsibilityParamsSchema,
+  PackListItemSetUnitVolumeParamsSchema,
   PackListItemSetUnitWeightParamsSchema,
   PackListItemSyncContainerServingsParamsSchema,
   PackListItemSyncKitGuestsParamsSchema,
@@ -514,6 +518,7 @@ import {
   PackRuleReinstateParamsSchema,
   PackRuleRetireParamsSchema,
   PackRuleReviseParamsSchema,
+  PackScanRecordParamsSchema,
   PackSectionClaimReleaseParamsSchema,
   PackSectionClaimTakeOverParamsSchema,
   PackSectionClaimTakeParamsSchema,
@@ -772,6 +777,7 @@ import {
   TimeRecordCorrectParamsSchema,
   TrailerRegisterParamsSchema,
   TrailerReviseDetailsParamsSchema,
+  TrailerSetCargoFactsParamsSchema,
   TrailerUpdateInsuranceParamsSchema,
   TrailerUpdateOperationalStatusParamsSchema,
   TrailerUpdateRegistrationParamsSchema,
@@ -785,6 +791,7 @@ import {
   VehicleRegisterParamsSchema,
   VehicleReviseDetailsParamsSchema,
   VehicleServiceEntryRecordParamsSchema,
+  VehicleSetCargoFactsParamsSchema,
   VehicleSetCrewFactsParamsSchema,
   VehicleSetTowCapacityParamsSchema,
   VehicleTripCheckRecordParamsSchema,
@@ -3048,6 +3055,16 @@ export function useEquipmentReviseDetails() {
   };
 }
 
+/** Mutation hook for Equipment.setCustomFields. */
+export function useEquipmentSetCustomFields() {
+  const mutate = useMutation(api.mutations.Equipment_setCustomFields);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EquipmentSetCustomFieldsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Equipment.setOperatingFacts. */
 export function useEquipmentSetOperatingFacts() {
   const mutate = useMutation(api.mutations.Equipment_setOperatingFacts);
@@ -5036,6 +5053,16 @@ export function useEventVehicleAssignmentAssign() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventVehicleAssignmentAssignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventVehicleAssignment.attachTrailer. */
+export function useEventVehicleAssignmentAttachTrailer() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_attachTrailer);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentAttachTrailerParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7245,6 +7272,16 @@ export function useOrganizationConfigureBranding() {
   };
 }
 
+/** Mutation hook for Organization.configureEquipmentFields. */
+export function useOrganizationConfigureEquipmentFields() {
+  const mutate = useMutation(api.mutations.Organization_configureEquipmentFields);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureEquipmentFieldsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.configurePlanningChecks. */
 export function useOrganizationConfigurePlanningChecks() {
   const mutate = useMutation(api.mutations.Organization_configurePlanningChecks);
@@ -7768,6 +7805,16 @@ export function usePackListItemSetResponsibility() {
   };
 }
 
+/** Mutation hook for PackListItem.setUnitVolume. */
+export function usePackListItemSetUnitVolume() {
+  const mutate = useMutation(api.mutations.PackListItem_setUnitVolume);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemSetUnitVolumeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PackListItem.setUnitWeight. */
 export function usePackListItemSetUnitWeight() {
   const mutate = useMutation(api.mutations.PackListItem_setUnitWeight);
@@ -7926,6 +7973,37 @@ export function useCreatePackRule() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = PackRuleDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for PackScan. */
+export function useListPackScan() {
+  return useQuery(api.queries.listPackScan);
+}
+
+/** Reactive get-by-id for PackScan. Pass "skip" to suspend. */
+export function useGetPackScan(id: string | "skip") {
+  return useQuery(api.queries.getPackScan, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PackScan.record. */
+export function usePackScanRecord() {
+  const mutate = useMutation(api.mutations.PackScan_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackScanRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PackScan.record. */
+export function useCreatePackScan() {
+  const mutate = useMutation(api.mutations.PackScan_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PackScanRecordParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -11642,6 +11720,16 @@ export function useTrailerReviseDetails() {
   };
 }
 
+/** Mutation hook for Trailer.setCargoFacts. */
+export function useTrailerSetCargoFacts() {
+  const mutate = useMutation(api.mutations.Trailer_setCargoFacts);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerSetCargoFactsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Trailer.updateInsurance. */
 export function useTrailerUpdateInsurance() {
   const mutate = useMutation(api.mutations.Trailer_updateInsurance);
@@ -11791,6 +11879,16 @@ export function useVehicleReviseDetails() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = VehicleReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Vehicle.setCargoFacts. */
+export function useVehicleSetCargoFacts() {
+  const mutate = useMutation(api.mutations.Vehicle_setCargoFacts);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VehicleSetCargoFactsParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13086,4 +13184,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1386 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1396 as const;

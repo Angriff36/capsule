@@ -150,6 +150,9 @@ export async function validateEventVehicleAssignment(
   const compatibility = rigCompatibilityProblem(vehicle && rigUnit(vehicle), trailer && rigUnit(trailer));
   if (compatibility) throw new ConvexError(compatibility);
 
+  // A run saved with a reason for being on two runs at once (planning board)
+  // skips only the same-time check below; status and fit still apply.
+  if (row.bookedTwiceReason?.trim()) return;
   const legs = await legsFor(ctx, event);
   const window = runWindow(legs.find((leg) => leg.id === String(row._id)), event);
   if (!window) return;

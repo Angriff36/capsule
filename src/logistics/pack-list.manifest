@@ -374,6 +374,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // About how heavy one unit is, so a truck is not loaded past what it can
   // carry (PL-DELIVERY). Empty = not known; not counted.
   property unitWeightKg: float?
+  // Space one unit takes in a truck, in cubic metres.
+  property unitVolumeM3: float?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -904,6 +906,19 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Space one unit takes. Empty clears it.
+  command setUnitVolume(optional unitVolumeM3: float) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint unitVolumeNotNegative: unitVolumeM3 == null or unitVolumeM3 >= 0 "Size cannot be negative."
+    mutate unitVolumeM3 = unitVolumeM3
+    emit PackListItemVolumeSet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+    }
+  }
+
   // Second count before loading. The packer may check their own line: a small
   // crew has nobody else, and the name of who checked is kept. Zero clears it.
   command recordChecked(checkedQuantity: decimal(12, 4)) {
@@ -1305,3 +1320,9 @@ event PackListItemRequirementSynced: "pack_list_item.requirement_synced" {
 on PackListItemRequirementSynced run PackList.acknowledgePackingRequirement
   resolve payload.packListId
   params { additionalRequired: payload.additionalRequired }
+
+event PackListItemVolumeSet: "pack_list_item.volume_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+}

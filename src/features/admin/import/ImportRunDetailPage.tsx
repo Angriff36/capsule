@@ -290,6 +290,12 @@ export function ImportRunDetailPage() {
       setNotice(
         `Imported ${result.committed} ${commitNoun}(s)` +
           (result.skipped ? `, ${result.skipped} already linked` : "") +
+          (result.updated
+            ? `, ${result.updated} updated from the old system`
+            : "") +
+          (result.conflicted
+            ? `, ${result.conflicted} also changed in Capsule (see Match leftover items)`
+            : "") +
           (result.pending ? `, ${result.pending} pending review` : "") +
           (result.parseErrors ? `, ${result.parseErrors} parse error(s)` : "") +
           ".",

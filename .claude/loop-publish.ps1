@@ -41,4 +41,10 @@ Say "on dev as $(git -C $wt rev-parse --short HEAD)"
 # and convex dev writes it again after the pull.
 git -C $root checkout -- convex/_generated *>> $log
 git -C $root pull --no-rebase --quiet origin dev *>> $log
-if ($LASTEXITCODE -ne 0) { Say 'main checkout pull refused - it keeps its local files; pull by hand' }
+if ($LASTEXITCODE -ne 0) {
+  # A pull that stops on a clash leaves a half-done merge (conflict marks in
+  # source files) under Ryan and every other session. Undo it, so the
+  # checkout is exactly as it was (2026-09-30: one such merge broke a test run).
+  if (Test-Path (Join-Path $root '.git\MERGE_HEAD')) { git -C $root merge --abort *>> $log }
+  Say 'main checkout pull refused - it keeps its local files; pull by hand'
+}

@@ -119,6 +119,12 @@ import { FINANCIAL_ROW_LABEL } from "../src/lib/financialRowClass";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { commitStockRows } from "./openingStock";
+import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
+import {
+  SOURCE_FIELD_MAPS,
+  sourceVersionOf,
+  type SourceDeltaDataset,
+} from "./lib/importSourceFields";
 
 /**
  * Canonical ExternalRecordLink key for an import-commit identity. Commit links
@@ -311,9 +317,25 @@ export const upsertLink = internalMutation({
       v.literal("pending_conflict"),
     ),
     resolutionNote: v.optional(v.string()),
+    // PL-SOURCE-DELTA: the values this import wrote into Capsule, so a later
+    // run can tell a source change from a person's edit.
+    appliedValues: v.optional(v.string()),
+    sourceVersion: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<Id<"externalRecordLinks">> => {
     const linkKey = commitLinkKey(args);
+    const baseline =
+      args.appliedValues !== undefined
+        ? {
+            appliedValues: args.appliedValues,
+            appliedSourceVersion: args.sourceVersion,
+            appliedAt: Date.now(),
+            appliedImportRunId: String(args.sourceImportRunId),
+            sourceVersion: args.sourceVersion,
+            lastSeenAt: Date.now(),
+            lastSeenImportRunId: String(args.sourceImportRunId),
+          }
+        : {};
     const existing = await ctx.db
       .query("externalRecordLinks")
       .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
@@ -335,6 +357,7 @@ export const upsertLink = internalMutation({
         rawSourceData: args.rawSourceData,
         conflictStatus: args.conflictStatus,
         resolutionNote: args.resolutionNote ?? existing.resolutionNote,
+        ...baseline,
         updatedAt: now,
         version: existing.version + 1,
       });
@@ -356,6 +379,7 @@ export const upsertLink = internalMutation({
       rawSourceData: args.rawSourceData,
       conflictStatus: args.conflictStatus,
       resolutionNote: args.resolutionNote,
+      ...baseline,
       // SoftDeletable shape: generated creates stamp deletedAt: null, and
       // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
       // the key leaves it undefined and every cross-dataset findLink
@@ -440,6 +464,14 @@ export type CommitResult = {
    * dedup makes the resume create only the missing records).
    */
   stoppedEarly?: boolean;
+  /**
+   * PL-SOURCE-DELTA: records already in Capsule whose source changed. `updated`
+   * took the source change; `conflicted` hold at least one field a person
+   * changed too (waiting in the review list). `skipped` is then only the
+   * records whose source did not change.
+   */
+  updated?: number;
+  conflicted?: number;
   /** Cumulative records handled across this run's commit invocations. */
   processedCount?: number;
 };
@@ -507,6 +539,40 @@ function mergeCheckpoint(
  * terminal outcome this invocation, `remaining` records (this one included)
  * are still unhandled.
  */
+/** PL-SOURCE-DELTA: the compared values a fresh create wrote, kept on its link. */
+function sourceBaseline(
+  dataset: SourceDeltaDataset,
+  record: object,
+): { appliedValues: string; sourceVersion: string } {
+  const values = SOURCE_FIELD_MAPS[dataset].fromSource(
+    record as Record<string, unknown>,
+  );
+  return {
+    appliedValues: JSON.stringify(values),
+    sourceVersion: sourceVersionOf(values),
+  };
+}
+
+/**
+ * PL-SOURCE-DELTA tallies for records that already had a link from an earlier
+ * run. The checkpoint still counts every such record as skipped (handled,
+ * nothing new created); the result splits out the ones that changed.
+ */
+type DeltaTally = { updated: number; conflicted: number };
+
+function countDelta(tally: DeltaTally, outcome: DeltaOutcome): void {
+  if (outcome === "updated") tally.updated += 1;
+  else if (outcome === "conflict") tally.conflicted += 1;
+}
+
+function deltaResult(skipped: number, tally: DeltaTally) {
+  return {
+    skipped: skipped - tally.updated - tally.conflicted,
+    updated: tally.updated,
+    conflicted: tally.conflicted,
+  };
+}
+
 function batchLimitReached(
   maxRecords: number | undefined,
   handled: number,
@@ -679,6 +745,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
       for (const [index, contact] of parsed.records.entries()) {
         // R2-6 batch stop: halt before the next record once maxRecords
         // records reached a terminal outcome this invocation.
@@ -702,12 +769,26 @@ export const commitImportRun = action({
           externalId: contact.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip. A link THIS run wrote
-          // was counted by the invocation that handled it, so a resume
-          // skips it silently (R2-6) and checkpoint counts stay exact.
+          // Already materialized. A link THIS run wrote was counted by the
+          // invocation that handled it, so a resume skips it silently (R2-6)
+          // and checkpoint counts stay exact.
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA: an earlier run's record takes a changed source
+          // row as a reviewed delta (never over a person's edit).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "contacts",
+            link: existing,
+            record: contact,
+            rawSourceData: withSourceRow(
+              contact,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -743,6 +824,7 @@ export const commitImportRun = action({
               args.rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
+            ...sourceBaseline("contacts", contact),
           });
           committed += 1;
         } catch (cause) {
@@ -782,7 +864,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -807,6 +889,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, event] of (
         parsed.records as ParsedCapsuleEvent[]
@@ -832,11 +915,24 @@ export const commitImportRun = action({
           externalId: event.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized (own-run links skip silently so resume
+          // counts stay exact, R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA (see the contacts branch).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "events",
+            link: existing,
+            record: event,
+            rawSourceData: withSourceRow(
+              event,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -988,6 +1084,7 @@ export const commitImportRun = action({
               args.rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
+            ...sourceBaseline("events", event),
           });
           committed += 1;
         } catch (cause) {
@@ -1046,7 +1143,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -1071,6 +1168,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, lead] of (
         parsed.records as ParsedCapsuleLead[]
@@ -1096,11 +1194,24 @@ export const commitImportRun = action({
           externalId: lead.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized (own-run links skip silently so resume
+          // counts stay exact, R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA (see the contacts branch).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "leads",
+            link: existing,
+            record: lead,
+            rawSourceData: withSourceRow(
+              lead,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -1148,6 +1259,7 @@ export const commitImportRun = action({
               args.rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
+            ...sourceBaseline("leads", lead),
           });
           committed += 1;
         } catch (cause) {
@@ -1187,7 +1299,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -1400,6 +1512,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, menu] of (
         parsed.records as ParsedCapsuleMenu[]
@@ -1425,11 +1538,24 @@ export const commitImportRun = action({
           externalId: menu.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized (own-run links skip silently so resume
+          // counts stay exact, R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA (see the contacts branch).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "menus",
+            link: existing,
+            record: menu,
+            rawSourceData: withSourceRow(
+              menu,
+              args.rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -1464,6 +1590,7 @@ export const commitImportRun = action({
               args.rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
+            ...sourceBaseline("menus", menu),
           });
           committed += 1;
         } catch (cause) {
@@ -1503,7 +1630,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -1764,6 +1891,7 @@ export const commitImportRun = action({
     let committed = 0;
     let skipped = 0;
     let pending = 0;
+    const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
     for (const [index, venue] of parsed.records.entries()) {
       // R2-6 batch stop (see the contacts branch).
@@ -1787,11 +1915,24 @@ export const commitImportRun = action({
         externalId: venue.externalId,
       });
       if (existing && existing.capsuleId) {
-        // Already materialized — idempotent skip (own-run links skip
-        // silently so resume counts stay exact, R2-6).
+        // Already materialized (own-run links skip silently so resume
+        // counts stay exact, R2-6).
         if (existing.sourceImportRunId === args.importRunId) {
           continue;
         }
+        // PL-SOURCE-DELTA (see the contacts branch).
+        const outcome = await reconcileExistingLink(ctx, {
+          dataset: "venues",
+          link: existing,
+          record: venue,
+          rawSourceData: withSourceRow(
+            venue,
+            args.rawRows[parsed.sourceIndexes[index]!],
+          ),
+          importRunId: args.importRunId,
+        });
+        if (outcome === "resumed") continue;
+        countDelta(delta, outcome);
         skipped += 1;
         continue;
       }
@@ -1830,6 +1971,7 @@ export const commitImportRun = action({
             args.rawRows[parsed.sourceIndexes[index]!],
           ),
           conflictStatus: "resolved",
+          ...sourceBaseline("venues", venue),
         });
         committed += 1;
       } catch (cause) {
@@ -1871,7 +2013,7 @@ export const commitImportRun = action({
 
     return {
       committed,
-      skipped,
+      ...deltaResult(skipped, delta),
       pending,
       parseErrors: parsed.errors.length,
       processedCount: mergeCheckpoint(checkpoint, {

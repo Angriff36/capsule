@@ -13,6 +13,7 @@ import { ImportedPaymentMatch } from "./ImportedPaymentMatch";
 import { OldInvoiceRebuild } from "./OldInvoiceRebuild";
 import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
 import { ServiceStyleMatch } from "./ServiceStyleMatch";
+import { SourceChangeReview } from "./SourceChangeReview";
 import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 
 // Source system labels
@@ -437,6 +438,12 @@ export function ExternalRecordsReconcilePage() {
           </table>
         </div>
       </div>
+
+      <SourceChangeReview
+        links={allRecords ?? []}
+        onDone={setNotice}
+        onError={setError}
+      />
 
       <OldInvoiceRebuild onDone={setNotice} onError={setError} />
 

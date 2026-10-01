@@ -83,13 +83,13 @@ export const PLAN_CHECKS: ReadonlyArray<{
   {
     key: "load",
     label: "Truck load",
-    hint: "The pack lines on a truck weigh more than it can carry.",
+    hint: "The pack lines on a truck weigh more than it can carry, or take more space than it has.",
     level: "fix",
   },
   {
     key: "towing",
     label: "Towing",
-    hint: "A trailer has no truck, or its truck cannot pull a trailer.",
+    hint: "A trailer has no truck, its hitch does not fit the truck, or it weighs more than the truck can pull.",
     level: "fix",
   },
   {
@@ -244,6 +244,8 @@ export type PlanVehicle = {
   towCapacityKg?: number | null;
   seatCount?: number | null;
   driverQualificationName?: string | null;
+  cargoVolumeM3?: number | null;
+  hitchType?: string | null;
   deletedAt?: number | null;
 };
 
@@ -254,6 +256,9 @@ export type PlanTrailer = {
   registration: string;
   operationalStatus: string;
   payloadCapacityKg: number;
+  cargoVolumeM3?: number | null;
+  hitchType?: string | null;
+  emptyWeightKg?: number | null;
   deletedAt?: number | null;
 };
 
@@ -335,6 +340,7 @@ export type PlanPackLine = {
   packListId: string;
   requiredQuantity: number;
   unitWeightKg?: number | null;
+  unitVolumeM3?: number | null;
   loadAssignmentId?: string | null;
   listedAt?: number | null;
   retiredAt?: number | null;
@@ -750,6 +756,16 @@ export function checkEventPlan(
           `${truckName} pulls a trailer, and its towing limit is not recorded.`,
           "Record the towing limit on the Fleet page.",
         );
+      const hitch = vehicle.hitchType?.trim().toLowerCase();
+      const coupler = trailer?.hitchType?.trim().toLowerCase();
+      if (hitch && coupler && hitch !== coupler)
+        add(
+          "towing",
+          "trailer",
+          rig.trailerId,
+          `${rigName(trailer, "Trailer")} needs a "${trailer?.hitchType?.trim()}" hitch; ${truckName} has "${vehicle.hitchType?.trim()}".`,
+          "Attach it to a truck with the same hitch.",
+        );
     }
 
     if (!rig.driverId)
@@ -818,6 +834,57 @@ export function checkEventPlan(
         `${truckName} carries ${shown(weight)} kg; it can carry ${shown(capacity)} kg.`,
         "Move pack lines to another truck, or use a bigger one.",
       );
+
+    // What the trailer weighs on the hitch: its own weight plus the load the
+    // truck itself can't take. Checked only when both weights are recorded.
+    if (
+      trailer &&
+      trailer.emptyWeightKg != null &&
+      vehicle.towCapacityKg != null &&
+      vehicle.towCapacityKg > 0
+    ) {
+      const pulled =
+        trailer.emptyWeightKg + Math.max(0, weight - vehicle.payloadCapacityKg);
+      if (pulled > vehicle.towCapacityKg)
+        add(
+          "towing",
+          "truck",
+          rig.vehicleId,
+          `${truckName} would pull ${shown(pulled)} kg; its towing limit is ${shown(vehicle.towCapacityKg)} kg.`,
+          "Move pack lines into the truck or another truck, or use a truck that tows more.",
+        );
+    }
+
+    // Cargo space, when the truck's (and trailer's) space is recorded.
+    const space =
+      vehicle.cargoVolumeM3 == null
+        ? null
+        : vehicle.cargoVolumeM3 +
+          (rig.trailerId ? (trailer?.cargoVolumeM3 ?? 0) : 0);
+    if (space != null) {
+      const sized = carried.filter((row) => row.unitVolumeM3 != null);
+      const volume = sized.reduce(
+        (sum, row) =>
+          sum + Number(row.unitVolumeM3) * Number(row.requiredQuantity),
+        0,
+      );
+      if (volume > space)
+        add(
+          "load",
+          "truck",
+          rig.vehicleId,
+          `${truckName} carries ${shown(volume)} m³; it has ${shown(space)} m³ of space.`,
+          "Move pack lines to another truck, or use a bigger one.",
+        );
+      else if (sized.length < carried.length)
+        add(
+          "unplanned",
+          "truck",
+          rig.vehicleId,
+          `${carried.length - sized.length} pack ${carried.length - sized.length === 1 ? "line on" : "lines on"} ${truckName} ${carried.length - sized.length === 1 ? "has" : "have"} no size, so the space check is not complete.`,
+          "Record the size on the load sheet (Truck load view).",
+        );
+    }
   }
 
   // --- Equipment ----------------------------------------------------------------
