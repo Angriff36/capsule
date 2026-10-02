@@ -435,6 +435,11 @@ import {
   LeadStageConversionParamsSchema,
   LeadStageProposalParamsSchema,
   LeadUpdatePipelineParamsSchema,
+  LeadershipItemAddParamsSchema,
+  LeadershipItemCompleteParamsSchema,
+  LeadershipItemDropParamsSchema,
+  LeadershipItemReopenParamsSchema,
+  LeadershipItemReviseParamsSchema,
   MenuArchiveParamsSchema,
   MenuDishAddParamsSchema,
   MenuDishRemoveParamsSchema,
@@ -716,6 +721,9 @@ import {
   SavedReportDefinitionRenameParamsSchema,
   SavedReportDefinitionRestoreParamsSchema,
   SavedReportDefinitionUpdateDefinitionParamsSchema,
+  ScorecardTargetRetireParamsSchema,
+  ScorecardTargetReviseParamsSchema,
+  ScorecardTargetSetParamsSchema,
   ServiceStyleActivateParamsSchema,
   ServiceStyleDeactivateParamsSchema,
   ServiceStyleKitItemAddParamsSchema,
@@ -6865,6 +6873,77 @@ export function useCreateLead() {
   };
 }
 
+/** Reactive list for LeadershipItem. */
+export function useListLeadershipItem() {
+  return useQuery(api.queries.listLeadershipItem);
+}
+
+/** Reactive get-by-id for LeadershipItem. Pass "skip" to suspend. */
+export function useGetLeadershipItem(id: string | "skip") {
+  return useQuery(api.queries.getLeadershipItem, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for LeadershipItem.add. */
+export function useLeadershipItemAdd() {
+  const mutate = useMutation(api.mutations.LeadershipItem_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipItem.complete. */
+export function useLeadershipItemComplete() {
+  const mutate = useMutation(api.mutations.LeadershipItem_complete);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemCompleteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipItem.drop. */
+export function useLeadershipItemDrop() {
+  const mutate = useMutation(api.mutations.LeadershipItem_drop);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemDropParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipItem.reopen. */
+export function useLeadershipItemReopen() {
+  const mutate = useMutation(api.mutations.LeadershipItem_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemReopenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipItem.revise. */
+export function useLeadershipItemRevise() {
+  const mutate = useMutation(api.mutations.LeadershipItem_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for LeadershipItem.add. */
+export function useCreateLeadershipItem() {
+  const mutate = useMutation(api.mutations.LeadershipItem_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for MaterializationReceipt. */
 export function useListMaterializationReceipt() {
   return useQuery(api.queries.listMaterializationReceipt);
@@ -10711,6 +10790,57 @@ export function useCreateSavedReportDefinition() {
   };
 }
 
+/** Reactive list for ScorecardTarget. */
+export function useListScorecardTarget() {
+  return useQuery(api.queries.listScorecardTarget);
+}
+
+/** Reactive get-by-id for ScorecardTarget. Pass "skip" to suspend. */
+export function useGetScorecardTarget(id: string | "skip") {
+  return useQuery(api.queries.getScorecardTarget, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ScorecardTarget.retire. */
+export function useScorecardTargetRetire() {
+  const mutate = useMutation(api.mutations.ScorecardTarget_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScorecardTargetRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ScorecardTarget.revise. */
+export function useScorecardTargetRevise() {
+  const mutate = useMutation(api.mutations.ScorecardTarget_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScorecardTargetReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ScorecardTarget.set. */
+export function useScorecardTargetSet() {
+  const mutate = useMutation(api.mutations.ScorecardTarget_set);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScorecardTargetSetParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ScorecardTarget.set. */
+export function useCreateScorecardTarget() {
+  const mutate = useMutation(api.mutations.ScorecardTarget_createViaSet);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ScorecardTargetSetParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for ServiceStyle. */
 export function useListServiceStyle() {
   return useQuery(api.queries.listServiceStyle);
@@ -13434,4 +13564,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1422 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1436 as const;

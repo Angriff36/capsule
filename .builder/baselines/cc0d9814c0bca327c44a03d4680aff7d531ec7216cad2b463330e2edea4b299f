@@ -417,6 +417,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-1", "companyName": "Lead 1", "givenName": "Lead 1", "familyName": "Lead 1", "email": "user1@example.com", "phone": "demo-phone-1", "source": "demo-source-1", "referralSourceId": "referralSourceId-lead-1", "estimatedValue": 1, "probability": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-2", "companyName": "Lead 2", "givenName": "Lead 2", "familyName": "Lead 2", "email": "user2@example.com", "phone": "demo-phone-2", "source": "demo-source-2", "referralSourceId": "referralSourceId-lead-2", "estimatedValue": 2, "probability": 2, "notes": "demo-notes-2" } as any);
+  // LeadershipItem → api.mutations.LeadershipItem_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-1", "title": "LeadershipItem 1", "ownerPersonId": "ownerPersonId-leadership-item-1", "dueAt": 1767268800000, "notes": "demo-notes-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-2", "title": "LeadershipItem 2", "ownerPersonId": "ownerPersonId-leadership-item-2", "dueAt": 1767355200000, "notes": "demo-notes-2" } as any);
   // skip MaterializationReceipt: no creation command in IR (2 rows unused)
   // Menu → api.mutations.Menu_createViaDraft
   rowsAttempted += 1;
@@ -681,6 +686,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.SavedReportDefinition_createViaCreateDefinition, { "name": "SavedReportDefinition 1", "subjectArea": "demo-subjectArea-1", "chartType": "demo-chartType-1", "definition": "demo-definition-1", "sharingScope": "demo-sharingScope-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.SavedReportDefinition_createViaCreateDefinition, { "name": "SavedReportDefinition 2", "subjectArea": "demo-subjectArea-2", "chartType": "demo-chartType-2", "definition": "demo-definition-2", "sharingScope": "demo-sharingScope-2" } as any);
+  // ScorecardTarget → api.mutations.ScorecardTarget_createViaSet
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-1", "target": 1, "direction": "demo-direction-1", "ownerPersonId": "ownerPersonId-scorecard-target-1", "notes": "demo-notes-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-2", "target": 2, "direction": "demo-direction-2", "ownerPersonId": "ownerPersonId-scorecard-target-2", "notes": "demo-notes-2" } as any);
   // ServiceStyle → api.mutations.ServiceStyle_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.ServiceStyle_createViaRegister, { "name": "ServiceStyle 1", "code": "demo-code-1", "sortOrder": 1, "description": "demo-description-1" } as any);
@@ -1355,6 +1365,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "LeadershipItem",
+      "createMutation": "LeadershipItem_createViaAdd",
+      "rowCount": 2
+    },
+    {
       "entity": "MaterializationReceipt",
       "createMutation": null,
       "rowCount": 2
@@ -1617,6 +1632,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "SavedReportDefinition",
       "createMutation": "SavedReportDefinition_createViaCreateDefinition",
+      "rowCount": 2
+    },
+    {
+      "entity": "ScorecardTarget",
+      "createMutation": "ScorecardTarget_createViaSet",
       "rowCount": 2
     },
     {

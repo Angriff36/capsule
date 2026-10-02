@@ -2322,6 +2322,27 @@ export const LeadComputedSchema = LeadSchema.extend({
 export type Lead = z.infer<typeof LeadSchema>;
 export type LeadWithComputed = z.infer<typeof LeadComputedSchema>;
 
+// Entity: LeadershipItem
+export const LeadershipItemSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  kind: z.enum(["rock", "issue", "todo"]).default("todo"),
+  title: z.string().default(""),
+  ownerPersonId: z.string().uuid().nullable().optional(),
+  dueAt: z.coerce.date().nullable().optional(),
+  status: z.enum(["open", "done", "dropped"]).default("open"),
+  notes: z.string().nullable().optional(),
+  openedAt: z.coerce.date().nullable().optional(),
+  openedByPersonId: z.string().uuid().nullable().optional(),
+  closedAt: z.coerce.date().nullable().optional(),
+  closedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type LeadershipItem = z.infer<typeof LeadershipItemSchema>;
+
 // Entity: MaterializationReceipt
 export const MaterializationReceiptSchema = z.object({
   id: z.string().uuid(),
@@ -3784,6 +3805,25 @@ export const SavedReportDefinitionSchema = z.object({
 });
 
 export type SavedReportDefinition = z.infer<typeof SavedReportDefinitionSchema>;
+
+// Entity: ScorecardTarget
+export const ScorecardTargetSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  metricKey: z.string().default(""),
+  target: z.number().min(0).default(0),
+  direction: z.enum(["higher_better", "lower_better"]).default("higher_better"),
+  ownerPersonId: z.string().uuid().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  setAt: z.coerce.date().nullable().optional(),
+  setByPersonId: z.string().uuid().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ScorecardTarget = z.infer<typeof ScorecardTargetSchema>;
 
 // Entity: ServiceStyle
 export const ServiceStyleSchema = z.object({
@@ -8723,6 +8763,42 @@ export const LeadUpdatePipelineParamsSchema = z.object({
 
 export type LeadUpdatePipelineParams = z.infer<typeof LeadUpdatePipelineParamsSchema>;
 
+// Command: add on LeadershipItem
+export const LeadershipItemAddParamsSchema = z.object({
+  kind: z.enum(["rock", "issue", "todo"]),
+  title: z.string(),
+  ownerPersonId: z.string().min(1).optional(),
+  dueAt: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type LeadershipItemAddParams = z.infer<typeof LeadershipItemAddParamsSchema>;
+
+// Command: complete on LeadershipItem
+export const LeadershipItemCompleteParamsSchema = z.object({});
+
+export type LeadershipItemCompleteParams = z.infer<typeof LeadershipItemCompleteParamsSchema>;
+
+// Command: drop on LeadershipItem
+export const LeadershipItemDropParamsSchema = z.object({});
+
+export type LeadershipItemDropParams = z.infer<typeof LeadershipItemDropParamsSchema>;
+
+// Command: reopen on LeadershipItem
+export const LeadershipItemReopenParamsSchema = z.object({});
+
+export type LeadershipItemReopenParams = z.infer<typeof LeadershipItemReopenParamsSchema>;
+
+// Command: revise on LeadershipItem
+export const LeadershipItemReviseParamsSchema = z.object({
+  title: z.string(),
+  ownerPersonId: z.string().min(1).optional(),
+  dueAt: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type LeadershipItemReviseParams = z.infer<typeof LeadershipItemReviseParamsSchema>;
+
 // Command: archive on Menu
 export const MenuArchiveParamsSchema = z.object({
   reason: z.string(),
@@ -11114,6 +11190,32 @@ export const SavedReportDefinitionUpdateDefinitionParamsSchema = z.object({
 });
 
 export type SavedReportDefinitionUpdateDefinitionParams = z.infer<typeof SavedReportDefinitionUpdateDefinitionParamsSchema>;
+
+// Command: retire on ScorecardTarget
+export const ScorecardTargetRetireParamsSchema = z.object({});
+
+export type ScorecardTargetRetireParams = z.infer<typeof ScorecardTargetRetireParamsSchema>;
+
+// Command: revise on ScorecardTarget
+export const ScorecardTargetReviseParamsSchema = z.object({
+  target: z.number(),
+  direction: z.enum(["higher_better", "lower_better"]),
+  ownerPersonId: z.string().min(1).optional(),
+  notes: z.string().optional(),
+});
+
+export type ScorecardTargetReviseParams = z.infer<typeof ScorecardTargetReviseParamsSchema>;
+
+// Command: set on ScorecardTarget
+export const ScorecardTargetSetParamsSchema = z.object({
+  metricKey: z.string(),
+  target: z.number(),
+  direction: z.enum(["higher_better", "lower_better"]),
+  ownerPersonId: z.string().min(1).optional(),
+  notes: z.string().optional(),
+});
+
+export type ScorecardTargetSetParams = z.infer<typeof ScorecardTargetSetParamsSchema>;
 
 // Command: activate on ServiceStyle
 export const ServiceStyleActivateParamsSchema = z.object({});

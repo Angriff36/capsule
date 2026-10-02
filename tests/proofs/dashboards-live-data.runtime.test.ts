@@ -27,6 +27,15 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useListRevenueAttribution: list("attributions"),
     useListPrepTask: list("prepTasks"),
     useListPackList: list("packLists"),
+    useListScorecardTarget: list("scorecardTargets"),
+    useListLeadershipItem: list("leadershipItems"),
+    useCreateScorecardTarget: () => vi.fn(),
+    useScorecardTargetRevise: () => vi.fn(),
+    useScorecardTargetRetire: () => vi.fn(),
+    useCreateLeadershipItem: () => vi.fn(),
+    useLeadershipItemComplete: () => vi.fn(),
+    useLeadershipItemDrop: () => vi.fn(),
+    useLeadershipItemReopen: () => vi.fn(),
   };
 });
 

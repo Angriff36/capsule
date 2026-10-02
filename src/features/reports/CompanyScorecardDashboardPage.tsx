@@ -1,165 +1,85 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useListEvent,
   useListEventCloseout,
   useListLead,
+  useListPerson,
+  useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
 import {
   DashboardGrid,
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
 import { BarChart } from "@/ui/charts/BarChart";
-import { EmptyState, PageHeader } from "@/ui/primitives";
-import { formatMoney, formatCount, formatPercent } from "@/lib/format";
-import {
-  COMPLETED_STAGES,
-  foodCostPercent,
-  isBookedEvent,
-  profitMarginPercent,
-} from "./dashboardRecordSets";
+import { EmptyState, PageHeader, StatusChip } from "@/ui/primitives";
+import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
+import { formatMoney } from "@/lib/format";
+import { isBookedEvent } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
+import {
+  SCORECARD_MEASURES,
+  SCORECARD_STATUS_LABEL,
+  formatScorecardValue,
+  scorecardRows,
+  type ScorecardRow,
+  type ScorecardStatus,
+  type ScorecardTargetRow,
+} from "./scorecardMeasures";
+import {
+  ScorecardTargetEditor,
+  type ScorecardPerson,
+} from "./ScorecardTargetEditor";
 
 /**
  * Company Scorecard Dashboard (Priority 37)
  *
  * Executive scorecard of the core monthly numbers — revenue, food cost,
- * profit margin, lead conversion, completed events, and guests — with
- * real month-over-month movement computed from events, closeouts, and
- * leads. Capsule doesn't store company targets or metric owners, so the
- * cards show live actuals and how they moved against last month.
+ * profit margin, lead conversion, completed events, and guests. Each number
+ * shows its live actual, its target and owner (ScorecardTarget), whether it
+ * is on track, and a six-month trend (scorecardMeasures.ts).
  */
 
-interface ScorecardMetric {
-  id: string;
-  name: string;
-  current: number | null;
-  previous: number | null;
-  unit: "currency" | "percent" | "count";
-  /** Which direction counts as an improvement for this metric. */
-  goodDirection: "up" | "down";
-}
-
-interface MonthNumbers {
-  revenue: number;
-  foodCostPct: number | null;
-  profitMargin: number | null;
-  conversionRate: number | null;
-  completedEvents: number;
-  guests: number;
-}
+const STATUS_TONE: Record<ScorecardStatus, string> = {
+  on_track: CHIP_TONE_CLASS.ok,
+  off_track: CHIP_TONE_CLASS.danger,
+  no_target: CHIP_TONE_CLASS.mute,
+  not_known: CHIP_TONE_CLASS.mute,
+};
 
 export function CompanyScorecardDashboardPage() {
   const events = useListEvent();
   const closeouts = useListEventCloseout();
   const leads = useListLead();
+  const targets = useListScorecardTarget();
+  const people = useListPerson();
+  const [editing, setEditing] = useState<string | null>(null);
 
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  const monthNumbers = useMemo(() => {
-    const compute = (year: number, month: number): MonthNumbers => {
-      const inMonth = (ts: number | null | undefined) => {
-        if (!ts) return false;
-        const date = new Date(ts);
-        return date.getMonth() === month && date.getFullYear() === year;
-      };
+  const rows = useMemo(
+    () =>
+      scorecardRows(
+        {
+          events: events ?? [],
+          closeouts: closeouts ?? [],
+          leads: leads ?? [],
+        },
+        (targets ?? []) as ScorecardTargetRow[],
+        new Date(currentYear, currentMonth, 15),
+      ),
+    [events, closeouts, leads, targets, currentYear, currentMonth],
+  );
 
-      const monthEvents = (events || []).filter((e) => inMonth(e.startsAt));
-      const bookedEvents = monthEvents.filter(isBookedEvent);
-      const revenue = bookedEvents.reduce(
-        (sum, e) => sum + (e.quotedPrice || 0),
-        0,
-      );
-      const completedEvents = monthEvents.filter((e) =>
-        COMPLETED_STAGES.includes(e.stage ?? ""),
-      ).length;
-      const guests = bookedEvents.reduce(
-        (sum, e) => sum + (e.expectedHeadcount || 0),
-        0,
-      );
-
-      const monthCloseouts = (closeouts || []).filter((c) =>
-        inMonth(c.finalizedAt ?? c.capturedAt ?? c.createdAt),
-      );
-      const foodCostPct = foodCostPercent(monthCloseouts);
-      const profitMargin = profitMarginPercent(monthCloseouts);
-
-      const monthLeads = (leads || []).filter((l) => inMonth(l.createdAt));
-      const conversionRate =
-        monthLeads.length > 0
-          ? (monthLeads.filter((l) => l.stage === "converted").length /
-              monthLeads.length) *
-            100
-          : null;
-
-      return {
-        revenue,
-        foodCostPct,
-        profitMargin,
-        conversionRate,
-        completedEvents,
-        guests,
-      };
-    };
-
-    const previousDate = new Date(currentYear, currentMonth - 1, 1);
-    return {
-      current: compute(currentYear, currentMonth),
-      previous: compute(previousDate.getFullYear(), previousDate.getMonth()),
-    };
-  }, [events, closeouts, leads, currentMonth, currentYear]);
-
-  const scorecardMetrics: ScorecardMetric[] = [
-    {
-      id: "monthly-revenue",
-      name: "Monthly Revenue",
-      current: monthNumbers.current.revenue,
-      previous: monthNumbers.previous.revenue,
-      unit: "currency",
-      goodDirection: "up",
-    },
-    {
-      id: "food-cost-pct",
-      name: "Food Cost %",
-      current: monthNumbers.current.foodCostPct,
-      previous: monthNumbers.previous.foodCostPct,
-      unit: "percent",
-      goodDirection: "down",
-    },
-    {
-      id: "profit-margin",
-      name: "Profit Margin",
-      current: monthNumbers.current.profitMargin,
-      previous: monthNumbers.previous.profitMargin,
-      unit: "percent",
-      goodDirection: "up",
-    },
-    {
-      id: "lead-conversion",
-      name: "Lead Conversion",
-      current: monthNumbers.current.conversionRate,
-      previous: monthNumbers.previous.conversionRate,
-      unit: "percent",
-      goodDirection: "up",
-    },
-    {
-      id: "event-count",
-      name: "Events Completed",
-      current: monthNumbers.current.completedEvents,
-      previous: monthNumbers.previous.completedEvents,
-      unit: "count",
-      goodDirection: "up",
-    },
-    {
-      id: "guests",
-      name: "Guests This Month",
-      current: monthNumbers.current.guests,
-      previous: monthNumbers.previous.guests,
-      unit: "count",
-      goodDirection: "up",
-    },
-  ];
+  const activePeople: ScorecardPerson[] = (people ?? []).filter(
+    (row) => row.deletedAt == null && row.status === "active",
+  );
+  const personName = (id: string | null | undefined) => {
+    if (!id) return null;
+    const person = people?.find((row) => row._id === id);
+    return person ? `${person.givenName} ${person.familyName}`.trim() : null;
+  };
 
   // Monthly trend data (last 6 months of revenue)
   const monthlyTrendData = useMemo(() => {
@@ -199,10 +119,25 @@ export function CompanyScorecardDashboardPage() {
     content: React.ReactNode;
     title?: string;
   }> = [
-    ...scorecardMetrics.map((metric) => ({
-      id: metric.id,
+    ...rows.map((row) => ({
+      id: row.measure.key,
       size: "medium" as const,
-      content: <MetricCard metric={metric} />,
+      content: (
+        <MetricCard
+          row={row}
+          ownerName={personName(row.target?.ownerPersonId)}
+          editing={editing === row.measure.key}
+          onEdit={() => setEditing(row.measure.key)}
+          editor={
+            <ScorecardTargetEditor
+              measure={row.measure}
+              target={row.target}
+              people={activePeople}
+              onDone={() => setEditing(null)}
+            />
+          }
+        />
+      ),
     })),
     {
       id: "monthly-trends",
@@ -230,7 +165,7 @@ export function CompanyScorecardDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Company Scorecard"
-        lead="The core monthly numbers with real month-over-month movement, live from your events, closeouts, and leads."
+        lead="The core monthly numbers against their targets, with owners and a six-month trend, live from your events, closeouts, and leads."
       />
 
       {events?.length === 0 ? (
@@ -251,56 +186,57 @@ export function CompanyScorecardDashboardPage() {
         <p className="mt-1 text-xs text-ink-2">
           Revenue and guest counts come from events scheduled this month. Food
           cost and profit margin come from finished event closeouts. Lead
-          conversion counts leads created this month that converted. Capsule
-          doesn't store company targets yet, so each card compares this month
-          against last month instead.
+          conversion counts leads created this month that converted. A number is
+          on track when this month meets its target; set a target and an owner
+          on each card.
         </p>
       </div>
 
       <MetricDefinitionList
-        metricIds={[
-          "dashboard.booked_revenue",
-          "dashboard.food_cost_percent",
-          "dashboard.profit_margin",
-          "dashboard.lead_conversion",
-          "dashboard.completed_events",
-          "dashboard.guests",
-        ]}
+        metricIds={SCORECARD_MEASURES.map((measure) => measure.metricId)}
       />
     </div>
   );
 }
 
-function MetricCard({ metric }: { metric: ScorecardMetric }) {
-  const formatValue = (value: number): string => {
-    switch (metric.unit) {
-      case "currency":
-        return formatMoney(value);
-      case "percent":
-        return formatPercent(value);
-      case "count":
-        return formatCount(value);
-    }
-  };
+function MetricCard({
+  row,
+  ownerName,
+  editing,
+  onEdit,
+  editor,
+}: {
+  row: ScorecardRow;
+  ownerName: string | null;
+  editing: boolean;
+  onEdit: () => void;
+  editor: React.ReactNode;
+}) {
+  const { measure } = row;
+  const formatValue = (value: number) =>
+    formatScorecardValue(value, measure.unit);
 
   const change =
-    metric.current != null && metric.previous != null && metric.previous !== 0
-      ? ((metric.current - metric.previous) / Math.abs(metric.previous)) * 100
+    row.actual != null && row.previous != null && row.previous !== 0
+      ? ((row.actual - row.previous) / Math.abs(row.previous)) * 100
       : null;
   const improving =
     change == null
       ? null
-      : metric.goodDirection === "up"
+      : measure.direction === "higher_better"
         ? change >= 0
         : change <= 0;
 
   return (
-    <div className="rounded-sm border border-line bg-panel p-4">
-      <h3 className="font-semibold text-ink">{metric.name}</h3>
+    <div
+      className="rounded-sm border border-line bg-panel p-4"
+      data-testid={`scorecard-row-${measure.key}`}
+    >
+      <h3 className="font-semibold text-ink">{measure.name}</h3>
 
       <div className="mt-2 flex items-baseline justify-between">
         <span className="text-xl font-bold text-ink">
-          {metric.current != null ? formatValue(metric.current) : "—"}
+          {row.actual != null ? formatValue(row.actual) : "—"}
         </span>
         {change != null ? (
           <span
@@ -313,12 +249,51 @@ function MetricCard({ metric }: { metric: ScorecardMetric }) {
       </div>
 
       <p className="mt-2 text-2xs text-ink-3">
-        {metric.current == null
+        {row.actual == null
           ? "Nothing recorded yet this month."
-          : metric.previous != null
-            ? `Last month: ${formatValue(metric.previous)}`
+          : row.previous != null
+            ? `Last month: ${formatValue(row.previous)}`
             : "No data for last month yet."}
       </p>
+
+      <dl className="mt-2 grid grid-cols-2 gap-x-2 text-2xs text-ink-2">
+        <dt>Target</dt>
+        <dd data-testid="scorecard-target">
+          {row.target
+            ? `${row.target.direction === "lower_better" ? "At most" : "At least"} ${formatValue(row.target.target)}`
+            : "Not set"}
+        </dd>
+        <dt>Owner</dt>
+        <dd data-testid="scorecard-owner">{ownerName ?? "No owner"}</dd>
+        <dt>Status</dt>
+        <dd data-testid="scorecard-status">
+          <StatusChip
+            status={SCORECARD_STATUS_LABEL[row.status]}
+            color={STATUS_TONE[row.status]}
+          />
+        </dd>
+      </dl>
+
+      <ol
+        className="mt-2 flex flex-wrap gap-x-2 text-2xs text-ink-3"
+        aria-label={`${measure.name}, last six months`}
+        data-testid="scorecard-trend"
+      >
+        {row.trend.map((point) => (
+          <li key={point.month}>
+            {point.month.slice(5)}:{" "}
+            {point.value == null ? "—" : formatValue(point.value)}
+          </li>
+        ))}
+      </ol>
+
+      {editing ? (
+        editor
+      ) : (
+        <button type="button" className="btn-link mt-2" onClick={onEdit}>
+          {row.target ? "Change target" : "Set target"}
+        </button>
+      )}
     </div>
   );
 }
