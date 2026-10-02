@@ -21,7 +21,28 @@ import {
   buildInvoiceReminderPdf,
   invoiceReminderPdfFileName,
 } from "./lib/invoiceReminderPdf";
-import { renderInvoiceReminderEmail } from "../src/lib/invoiceReminderEmail";
+import {
+  INVOICE_REMINDER_TEMPLATE,
+  renderInvoiceReminderEmail,
+} from "../src/lib/invoiceReminderEmail";
+import {
+  artifactFingerprint,
+  classifyReminderFailure,
+  emailServiceFailureKind,
+  maskEmail,
+  recentSameBalanceSend,
+  ReminderDeliveryError,
+  reminderHistory,
+  reminderRemedy,
+  type RecipientSource,
+  type ReminderHistoryItem,
+} from "./lib/reminderDelivery";
+import {
+  clientEmailChoice,
+  quietHoursEnd,
+  recipientKey,
+  type ClientEmailChoice,
+} from "./lib/clientEmailConsent";
 import {
   normalizeInvoiceReminderOffsets,
   reminderOffsetLabel,
@@ -71,13 +92,26 @@ interface PaymentSessionRecord {
 
 interface DeliveryContext {
   invoice: Doc<"invoices">;
-  recipient: { email: string; name: string } | null;
+  recipient: {
+    email: string;
+    name: string;
+    source: RecipientSource;
+    contactId: string | null;
+  } | null;
   organization: {
     displayName: string;
     address: string | null;
     primaryColor: string | null;
     accentColor: string | null;
+    /** Name clients see on the email; the company's own setting or its display name. */
+    senderName: string;
+    /** Where client replies go; null = Capsule's sending address. */
+    replyTo: string | null;
+    /** The kitchen's time zone (first active location with one); quiet hours use it. */
+    timeZone: string | null;
   };
+  /** The client's own email choice, read at the moment of sending. */
+  clientEmailPreference: ClientEmailChoice;
   eventTitle: string | null;
   ledger: LedgerEvent[];
 }
@@ -89,12 +123,29 @@ interface DeliveryAttempt {
   offsetDays: number;
   scheduledFor: number;
   source: "scheduled" | "manual";
+  /** 0 for the first try of this reminder, 1 for the first retry, ... */
+  attempt: number;
 }
 
 interface DeliveryResult {
-  status: "delivered" | "suppressed" | "already_delivered";
+  /** "delivered" = the email service took the email (kept for callers). */
+  status: "delivered" | "suppressed" | "already_delivered" | "deferred";
   reason?: string;
+  /** For "deferred": the scheduled reminder waits until the quiet hours end. */
+  deferredUntil?: number;
   emailId?: string;
+  /** For "already_delivered": when the earlier email went and to whom. */
+  sentAt?: number;
+  to?: string;
+}
+
+interface SentEmail {
+  emailId: string;
+  from: string;
+  subject: string;
+  text: string;
+  attachmentName: string;
+  fingerprint: string;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -174,7 +225,7 @@ function wasDelivered(
   );
 }
 
-async function decryptField(
+export async function decryptField(
   ctx: QueryCtx,
   entity: string,
   property: string,
@@ -230,9 +281,9 @@ function requireProviderEnvironment(): ProviderEnvironment {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
   const rawOrigin = process.env.CAPSULE_PUBLIC_APP_URL?.trim();
   if (!resendApiKey || !fromEmail || !stripeSecretKey || !rawOrigin) {
-    throw new ConvexError(
-      "Invoice reminders need RESEND_API_KEY, INVOICE_REMINDER_FROM_EMAIL, STRIPE_SECRET_KEY, and CAPSULE_PUBLIC_APP_URL in the Convex environment.",
-    );
+    // Server setup: RESEND_API_KEY, INVOICE_REMINDER_FROM_EMAIL,
+    // STRIPE_SECRET_KEY and CAPSULE_PUBLIC_APP_URL in the Convex environment.
+    throw new ConvexError(reminderRemedy("not_set_up"));
   }
   let appOrigin: string;
   try {
@@ -249,7 +300,7 @@ function requireProviderEnvironment(): ProviderEnvironment {
   return { resendApiKey, fromEmail, stripeSecretKey, appOrigin };
 }
 
-function safeProviderMessage(cause: unknown): string {
+export function safeProviderMessage(cause: unknown): string {
   const message = cause instanceof Error ? cause.message : String(cause);
   return message
     .replace(/[\r\n]+/gu, " ")
@@ -270,79 +321,118 @@ function assertOpenInvoice(invoice: Doc<"invoices">): void {
   }
 }
 
+/**
+ * Who a client email goes to (billing contact, then main contact, then any
+ * active contact with an email, then the client account) and the company it
+ * comes from. Shared by invoice, reminder and proposal emails.
+ */
+export async function clientRecipientAndCompany(
+  ctx: QueryCtx,
+  tenantId: string,
+  clientId: Id<"clients">,
+): Promise<
+  Pick<DeliveryContext, "recipient" | "organization" | "clientEmailPreference">
+> {
+  const [client, contacts, organizations, locations] = await Promise.all([
+    ctx.db.get(clientId),
+    ctx.db
+      .query("clientContacts")
+      .withIndex("by_clientId", (q) => q.eq("clientId", clientId))
+      .collect(),
+    ctx.db
+      .query("organizations")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect(),
+    ctx.db
+      .query("operatingLocations")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .take(50),
+  ]);
+  const kitchenTimeZone =
+    locations.find(
+      (row) => row.deletedAt == null && row.status === "active" && row.timeZone,
+    )?.timeZone ?? null;
+  const eligibleContacts = contacts.filter(
+    (contact) =>
+      contact.tenantId === tenantId &&
+      contact.deletedAt == null &&
+      contact.status === "active" &&
+      Boolean(contact.email),
+  );
+  const preferredContact =
+    eligibleContacts.find((contact) => contact.isBillingContact) ??
+    eligibleContacts.find((contact) => contact.isPrimary) ??
+    eligibleContacts[0];
+  const contactEmail = preferredContact
+    ? await decryptField(ctx, "ClientContact", "email", preferredContact.email)
+    : null;
+  const accountEmail = client
+    ? await decryptField(ctx, "Client", "email", client.email)
+    : null;
+  const recipientEmail = contactEmail?.trim() || accountEmail?.trim() || null;
+  const recipientSource: RecipientSource = !contactEmail?.trim()
+    ? "client account"
+    : preferredContact?.isBillingContact
+      ? "billing contact"
+      : preferredContact?.isPrimary
+        ? "main contact"
+        : "contact";
+  const organization =
+    organizations.find(
+      (row) => row.deletedAt == null && row.status === "active",
+    ) ?? organizations.find((row) => row.deletedAt == null);
+
+  const displayName =
+    organization?.brandDisplayName?.trim() ||
+    organization?.name.trim() ||
+    "Catering company";
+
+  return {
+    recipient: recipientEmail
+      ? {
+          email: recipientEmail,
+          name: preferredContact
+            ? contactName(preferredContact)
+            : clientName(client),
+          source: recipientSource,
+          contactId:
+            recipientSource === "client account" || !preferredContact
+              ? null
+              : String(preferredContact._id),
+        }
+      : null,
+    organization: {
+      displayName,
+      address: organization?.brandAddress?.trim() || null,
+      primaryColor: organization?.brandPrimaryColor ?? null,
+      accentColor: organization?.brandAccentColor ?? null,
+      ...companySender(organization, displayName),
+      timeZone: kitchenTimeZone,
+    },
+    clientEmailPreference: clientEmailChoice(
+      client && client.tenantId === tenantId ? client.emailPreference : null,
+    ),
+  };
+}
+
 export const loadDeliveryContext = internalQuery({
   args: { invoiceId: v.id("invoices"), tenantId: v.string() },
   handler: async (ctx, args): Promise<DeliveryContext | null> => {
     const invoice = await ctx.db.get(args.invoiceId);
     if (!invoice || invoice.tenantId !== args.tenantId) return null;
 
-    const [client, contacts, organizations, ledgerRows, linkedEvent] =
-      await Promise.all([
-        ctx.db.get(invoice.clientId),
-        ctx.db
-          .query("clientContacts")
-          .withIndex("by_clientId", (q) => q.eq("clientId", invoice.clientId))
-          .collect(),
-        ctx.db
-          .query("organizations")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-          .collect(),
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entityId", (q) =>
-            q.eq("entityId", String(invoice._id)),
-          )
-          .collect(),
-        invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
-      ]);
-
-    const eligibleContacts = contacts.filter(
-      (contact) =>
-        contact.tenantId === args.tenantId &&
-        contact.deletedAt == null &&
-        contact.status === "active" &&
-        Boolean(contact.email),
-    );
-    const preferredContact =
-      eligibleContacts.find((contact) => contact.isBillingContact) ??
-      eligibleContacts.find((contact) => contact.isPrimary) ??
-      eligibleContacts[0];
-    const contactEmail = preferredContact
-      ? await decryptField(
-          ctx,
-          "ClientContact",
-          "email",
-          preferredContact.email,
-        )
-      : null;
-    const accountEmail = client
-      ? await decryptField(ctx, "Client", "email", client.email)
-      : null;
-    const recipientEmail = contactEmail?.trim() || accountEmail?.trim() || null;
-    const organization =
-      organizations.find(
-        (row) => row.deletedAt == null && row.status === "active",
-      ) ?? organizations.find((row) => row.deletedAt == null);
+    const [people, ledgerRows, linkedEvent] = await Promise.all([
+      clientRecipientAndCompany(ctx, args.tenantId, invoice.clientId),
+      ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) => q.eq("entityId", String(invoice._id)))
+        .collect(),
+      invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
+    ]);
 
     return {
       invoice,
-      recipient: recipientEmail
-        ? {
-            email: recipientEmail,
-            name: preferredContact
-              ? contactName(preferredContact)
-              : clientName(client),
-          }
-        : null,
-      organization: {
-        displayName:
-          organization?.brandDisplayName?.trim() ||
-          organization?.name.trim() ||
-          "Catering company",
-        address: organization?.brandAddress?.trim() || null,
-        primaryColor: organization?.brandPrimaryColor ?? null,
-        accentColor: organization?.brandAccentColor ?? null,
-      },
+      ...people,
       eventTitle:
         linkedEvent && linkedEvent.tenantId === args.tenantId
           ? linkedEvent.title?.trim() || null
@@ -456,6 +546,37 @@ export const getSchedule = action({
       { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
     );
     return context ? latestSchedule(context.ledger) : null;
+  },
+});
+
+/** Every invoice email and reminder send, skip and failure for one invoice,
+ * newest first. */
+export const getHistory = action({
+  args: { invoiceId: v.id("invoices") },
+  handler: async (ctx, args): Promise<ReminderHistoryItem[]> => {
+    const invoice = await ctx.runQuery(api.queries.getInvoice, {
+      id: args.invoiceId,
+    });
+    if (!invoice) {
+      throw new ConvexError(
+        "Invoice unavailable. Check your workspace access.",
+      );
+    }
+    const context = await ctx.runQuery(
+      internal.invoiceReminders.loadDeliveryContext,
+      { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
+    );
+    return context
+      ? reminderHistory(context.ledger, {
+          delivered: EVENT.delivered,
+          suppressed: EVENT.suppressed,
+          failed: EVENT.failed,
+          // Literal names: importing them from invoiceEmail.ts would make
+          // the two files import each other.
+          invoiceSent: "InvoiceEmailSent",
+          invoiceFailed: "InvoiceEmailFailed",
+        })
+      : [];
   },
 });
 
@@ -612,7 +733,7 @@ async function createStripeSession(
   return { sessionId, url };
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
+export function bytesToBase64(bytes: Uint8Array): string {
   let binary = "";
   const chunkSize = 0x8000;
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
@@ -623,7 +744,25 @@ function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-function fromAddress(companyName: string, configuredFrom: string): string {
+/** The company's own email sender setting, with the display name as fallback. */
+export function companySender(
+  organization:
+    | { emailSenderName?: string | null; emailReplyTo?: string | null }
+    | null
+    | undefined,
+  displayName: string,
+): { senderName: string; replyTo: string | null } {
+  const replyTo = organization?.emailReplyTo?.replace(/[\r\n]/gu, "").trim();
+  return {
+    senderName: organization?.emailSenderName?.trim() || displayName,
+    replyTo: replyTo && replyTo.includes("@") ? replyTo : null,
+  };
+}
+
+export function fromAddress(
+  companyName: string,
+  configuredFrom: string,
+): string {
   if (configuredFrom.includes("<")) return configuredFrom;
   const safeName = companyName.replace(/[<>\r\n]/gu, "").trim();
   return `${safeName || "Catering company"} <${configuredFrom}>`;
@@ -634,7 +773,7 @@ async function sendReminderEmail(
   attempt: DeliveryAttempt,
   paymentUrl: string,
   environment: ProviderEnvironment,
-): Promise<string> {
+): Promise<SentEmail> {
   if (!context.recipient || context.invoice.dueDate == null) {
     throw new Error("Invoice delivery details are incomplete.");
   }
@@ -671,44 +810,70 @@ async function sendReminderEmail(
     primaryColor: context.organization.primaryColor,
     accentColor: context.organization.accentColor,
   });
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${environment.resendApiKey}`,
-      "Content-Type": "application/json",
-      "Idempotency-Key": `invoice-reminder/${context.invoice._id}/${attempt.configId}/${attempt.offsetDays}`,
-    },
-    body: JSON.stringify({
-      from: fromAddress(
-        context.organization.displayName,
-        environment.fromEmail,
-      ),
-      to: [context.recipient.email],
-      subject: email.subject,
-      html: email.html,
-      text: email.text,
-      attachments: [
-        {
-          filename: invoiceReminderPdfFileName(invoiceNumber),
-          content: bytesToBase64(pdf),
-        },
-      ],
-      tags: [
-        { name: "category", value: "invoice_reminder" },
-        { name: "invoice_id", value: String(context.invoice._id) },
-      ],
-    }),
-  });
+  const from = fromAddress(
+    context.organization.senderName,
+    environment.fromEmail,
+  );
+  const attachmentName = invoiceReminderPdfFileName(invoiceNumber);
+  let response: Response;
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${environment.resendApiKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `invoice-reminder/${context.invoice._id}/${attempt.configId}/${attempt.offsetDays}`,
+      },
+      body: JSON.stringify({
+        from,
+        to: [context.recipient.email],
+        ...(context.organization.replyTo
+          ? { reply_to: context.organization.replyTo }
+          : {}),
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+        attachments: [
+          {
+            filename: attachmentName,
+            content: bytesToBase64(pdf),
+          },
+        ],
+        tags: [
+          { name: "category", value: INVOICE_REMINDER_TEMPLATE.id },
+          { name: "invoice_id", value: String(context.invoice._id) },
+        ],
+      }),
+    });
+  } catch (cause) {
+    throw new ReminderDeliveryError(
+      "service_down",
+      `Email service unreachable: ${safeProviderMessage(cause)}`,
+    );
+  }
   const responseBody = asRecord(await response.json().catch(() => null));
   if (!response.ok) {
-    throw new Error(
+    throw new ReminderDeliveryError(
+      emailServiceFailureKind(response.status),
       stringValue(responseBody.message) ||
         `Reminder email delivery failed (${response.status}).`,
     );
   }
   const emailId = stringValue(responseBody.id);
   if (!emailId) throw new Error("Email provider did not return a delivery id.");
-  return emailId;
+  return {
+    emailId,
+    from,
+    subject: email.subject,
+    text: email.text,
+    attachmentName,
+    fingerprint: await artifactFingerprint([
+      email.subject,
+      email.text,
+      email.html,
+      pdf,
+    ]),
+  };
 }
 
 async function recordReminderEvent(
@@ -729,6 +894,27 @@ async function recordReminderEvent(
       ...payload,
     },
   });
+}
+
+function refusedAddressKey(
+  cause: unknown,
+  kind: string,
+): { recipientKey?: string } {
+  return kind === "refused" &&
+    cause instanceof ReminderDeliveryError &&
+    cause.recipientKey
+    ? { recipientKey: cause.recipientKey }
+    : {};
+}
+
+/** The email service refused this address on an earlier reminder. */
+function refusedBefore(ledger: LedgerEvent[], toKey: string): boolean {
+  return ledger.some(
+    (row) =>
+      row.type === EVENT.failed &&
+      row.payload.failureKind === "refused" &&
+      row.payload.recipientKey === toKey,
+  );
 }
 
 async function deliverReminder(
@@ -755,15 +941,54 @@ async function deliverReminder(
     return { status: "suppressed", reason: "invoice_not_payable" };
   }
   if (!context.recipient) {
-    throw new Error(
+    throw new ReminderDeliveryError(
+      "no_recipient",
       "No client account or active billing-contact email is available.",
     );
   }
   if (context.invoice.dueDate == null) {
     return { status: "suppressed", reason: "due_date_removed" };
   }
+  // The client's choice and the refused-address stop are read now, not when
+  // the reminder was scheduled, so a later change also stops queued ones.
+  if (context.clientEmailPreference !== "every_email") {
+    return {
+      status: "suppressed",
+      reason:
+        context.clientEmailPreference === "none"
+          ? "client_no_email"
+          : "client_no_reminders",
+    };
+  }
+  const toKey = await recipientKey(context.recipient.email);
+  if (attempt.source === "scheduled") {
+    if (refusedBefore(context.ledger, toKey)) {
+      return { status: "suppressed", reason: "address_refused" };
+    }
+    const quietUntil = quietHoursEnd(Date.now(), context.organization.timeZone);
+    if (quietUntil != null) {
+      return { status: "deferred", deferredUntil: quietUntil };
+    }
+  }
   if (wasDelivered(context.ledger, attempt.configId, attempt.offsetDays)) {
     return { status: "already_delivered" };
+  }
+  if (attempt.source === "manual") {
+    // A "send now" press right after a reminder went (scheduled or by hand)
+    // for the same balance would email the client the same thing twice.
+    const recent = recentSameBalanceSend(
+      context.ledger,
+      EVENT.delivered,
+      Number(context.invoice.amountDue),
+      Date.now(),
+    );
+    if (recent) {
+      return {
+        status: "already_delivered",
+        sentAt: recent.createdAt,
+        to: stringValue(recent.payload.recipientMasked) ?? undefined,
+      };
+    }
   }
   // Reminder payment links charge the caterer Stripe account (issue #112),
   // the same account the invoice payment sync reads them from.
@@ -813,20 +1038,65 @@ async function deliverReminder(
     });
   }
 
-  const emailId = await sendReminderEmail(
-    context,
-    attempt,
-    currentSession.url,
-    environment,
-  );
+  let sent: SentEmail;
+  try {
+    sent = await sendReminderEmail(
+      context,
+      attempt,
+      currentSession.url,
+      environment,
+    );
+  } catch (cause) {
+    // The failure record keeps which address was refused (as a key, never
+    // the address) so later scheduled reminders to it stop.
+    if (cause instanceof ReminderDeliveryError) cause.recipientKey = toKey;
+    throw cause;
+  }
   await recordReminderEvent(ctx, EVENT.delivered, attempt, {
-    emailId,
+    emailId: sent.emailId,
+    providerState: "accepted",
     sessionId: currentSession.sessionId,
     amountDue: Number(context.invoice.amountDue),
     dueDate: Number(context.invoice.dueDate),
     timing: reminderOffsetLabel(attempt.offsetDays),
+    attempt: attempt.attempt,
+    recipientMasked: maskEmail(context.recipient.email),
+    recipientSource: context.recipient.source,
+    recipientContactId: context.recipient.contactId,
+    sender: sent.from,
+    replyTo: context.organization.replyTo,
+    subject: sent.subject,
+    template: INVOICE_REMINDER_TEMPLATE.id,
+    templateVersion: INVOICE_REMINDER_TEMPLATE.version,
+    attachments: [sent.attachmentName],
+    artifactFingerprint: sent.fingerprint,
   });
-  return { status: "delivered", emailId };
+  try {
+    await ctx.runMutation(internal.outboundEmailThread.recordInvoiceEmail, {
+      tenantId: attempt.tenantId,
+      invoiceId: attempt.invoiceId,
+      senderAddress: environment.fromEmail,
+      recipientLabel: `${context.recipient.name} (${maskEmail(
+        context.recipient.email,
+      )})`,
+      contactId: context.recipient.contactId,
+      subject: sent.subject,
+      bodyText: sent.text,
+      providerMessageId: sent.emailId,
+      sentAt: Date.now(),
+    });
+  } catch (cause) {
+    // The email went and its send record is kept; a missing conversation
+    // entry must not make the job send it again.
+    console.error(
+      `Reminder ${sent.emailId} sent but not added to the conversation: ${safeProviderMessage(cause)}`,
+    );
+  }
+  return {
+    status: "delivered",
+    emailId: sent.emailId,
+    to: maskEmail(context.recipient.email),
+  };
 }
 
 export const deliverScheduled = internalAction({
@@ -846,6 +1116,7 @@ export const deliverScheduled = internalAction({
       offsetDays: args.offsetDays,
       scheduledFor: args.scheduledFor,
       source: "scheduled",
+      attempt: args.attempt,
     };
     try {
       const result = await deliverReminder(ctx, deliveryAttempt);
@@ -854,13 +1125,30 @@ export const deliverScheduled = internalAction({
           reason: result.reason,
         });
       }
+      if (result.status === "deferred" && result.deferredUntil != null) {
+        // Night in the kitchen's time zone: the same reminder runs in the
+        // morning and checks everything again then.
+        await ctx.scheduler.runAt(
+          result.deferredUntil,
+          internal.invoiceReminders.deliverScheduled,
+          args,
+        );
+      }
     } catch (cause) {
       const message = safeProviderMessage(cause);
-      const retryDelay = RETRY_DELAYS_MS[args.attempt];
+      const { kind, remedy } = classifyReminderFailure(cause);
+      // The same email refused once is refused again; anything else (a
+      // service that did not answer, setup or an address staff can add in
+      // the meantime) is worth another try.
+      const retryDelay =
+        kind === "refused" ? undefined : RETRY_DELAYS_MS[args.attempt];
       await recordReminderEvent(ctx, EVENT.failed, deliveryAttempt, {
         attempt: args.attempt,
         message,
+        failureKind: kind,
+        remedy,
         retryScheduled: retryDelay != null,
+        ...refusedAddressKey(cause, kind),
       });
       if (retryDelay != null) {
         await ctx.scheduler.runAfter(
@@ -897,6 +1185,7 @@ export const sendNow = action({
           : Math.trunc((Number(invoice.dueDate) - Date.now()) / 86_400_000),
       scheduledFor: Date.now(),
       source: "manual",
+      attempt: 0,
     };
     try {
       const result = await deliverReminder(ctx, attempt);
@@ -908,12 +1197,16 @@ export const sendNow = action({
       return result;
     } catch (cause) {
       const message = safeProviderMessage(cause);
+      const { kind, remedy } = classifyReminderFailure(cause);
       await recordReminderEvent(ctx, EVENT.failed, attempt, {
         attempt: 0,
         message,
+        failureKind: kind,
+        remedy,
         retryScheduled: false,
+        ...refusedAddressKey(cause, kind),
       });
-      throw new ConvexError(message);
+      throw new ConvexError(remedy);
     }
   },
 });

@@ -37,6 +37,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { VendorOrderBillMatch } from "./VendorOrderBillMatch";
 import { VendorOrderReceiptCorrection } from "./VendorOrderReceiptCorrection";
 import {
   activeLocations,
@@ -783,6 +784,7 @@ export function VendorOrderPage() {
                     busy={busy}
                     run={run}
                   />
+                  <VendorOrderBillMatch line={line} busy={busy} run={run} />
                   {receivingLineId === line._id ? (
                     <form
                       className="receipt-form"

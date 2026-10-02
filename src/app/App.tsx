@@ -6,6 +6,7 @@ import { SharedProposalPage } from "../features/clients/SharedProposalPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
 import { PublicMenuPage } from "../features/sales/PublicMenuPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
+import { EventRouteMapPage } from "../features/events/EventRouteMapPage";
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
@@ -136,6 +137,11 @@ const ProductionYieldDashboardPage = lazy(() =>
   import("../features/production/ProductionYieldDashboardPage").then(
     (module) => ({ default: module.ProductionYieldDashboardPage }),
   ),
+);
+const ProductionPlanPage = lazy(() =>
+  import("../features/production/ProductionPlanPage").then((module) => ({
+    default: module.ProductionPlanPage,
+  })),
 );
 const RosterPage = lazy(() =>
   import("../features/workforce/RosterPage").then((module) => ({
@@ -746,6 +752,7 @@ export function App() {
               path="/events/:id/allergen-briefing"
               element={<EventAllergenBriefingPage />}
             />
+            <Route path="/events/:id/map" element={<EventRouteMapPage />} />
             <Route
               path="/events/:id/menu"
               element={<RedirectEventMenuAlias />}
@@ -812,6 +819,7 @@ export function App() {
               element={<KitchenCatalogCleanupPage />}
             />
             <Route path="/kitchen/stations" element={<KitchenStationsPage />} />
+            <Route path="/kitchen/plan" element={<ProductionPlanPage />} />
             <Route
               path="/kitchen/yield"
               element={
@@ -1241,6 +1249,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <RevenueAttributionsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/attribution/new"
+              element={
+                <SupplyRoute>
+                  <RevenueAttributionDetailPage />
                 </SupplyRoute>
               }
             />

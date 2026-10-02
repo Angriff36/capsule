@@ -153,6 +153,12 @@ export const PACK_EVENT_FACTS: ReadonlyArray<{ key: string; label: string }> = [
   { key: "venuePowerAvailable", label: "Venue has power" },
   { key: "venueWaterAccess", label: "Venue has water" },
   { key: "venueLoadIn", label: "Load-in notes" },
+  { key: "venueOnPremise", label: "On-premise venue" },
+  { key: "venueParking", label: "Venue has parking" },
+  { key: "venueFreightElevator", label: "Venue has a freight elevator" },
+  { key: "venueStorage", label: "Venue has storage" },
+  { key: "venueHasOven", label: "Venue has an oven" },
+  { key: "venueHasRefrigeration", label: "Venue has a fridge or walk-in" },
 ];
 
 const NO_ANSWERS = new Set([

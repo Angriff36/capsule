@@ -16,6 +16,7 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { insertStepEvent } from "./lib/commandAudit";
 
 function canSetEmployeeNumber(role: string): boolean {
   return (
@@ -62,7 +63,7 @@ export const setEmployeeNumber = mutation({
       employeeNumber,
       version: (stored.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "PersonEmployeeNumberSet",
       entity: "Person",
       entityId: String(args.docId),

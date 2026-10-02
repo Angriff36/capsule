@@ -35,12 +35,31 @@ entity OrganizationCapabilitySetting mixin TenantScoped, SoftDeletable {
     mutate enabled = enabled
     mutate updatedBy = user.id
     mutate registeredAt = now()
+    emit OrganizationCapabilitySettingRegistered {
+      organizationCapabilitySettingId: self.id
+      tenantId: self.tenantId
+    }
   }
   command setEnabled(enabled: boolean) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
     mutate enabled = enabled
     mutate updatedBy = user.id
+    emit OrganizationCapabilitySettingEnabledSet {
+      organizationCapabilitySettingId: self.id
+      tenantId: self.tenantId
+    }
   }
   store OrganizationCapabilitySetting in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event OrganizationCapabilitySettingRegistered: "organization.capability.setting.registered" {
+  organizationCapabilitySettingId: string
+  tenantId: string
+}
+
+event OrganizationCapabilitySettingEnabledSet: "organization.capability.setting.enabled.set" {
+  organizationCapabilitySettingId: string
+  tenantId: string
 }

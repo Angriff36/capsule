@@ -65,12 +65,14 @@ entity Person mixin TenantScoped, SoftDeletable {
   property required encrypted masked(email) email: string unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
   property encrypted masked(phone) phone: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
   // Postal address: ordinary editable contact data for the Staff Address &
-  // Phone List (#272). Optional and never gating.
-  property encrypted addressLine1: string?
-  property encrypted addressLine2: string?
-  property encrypted city: string?
-  property encrypted region: string?
-  property encrypted postalCode: string?
+  // Phone List (#272). Optional and never gating. A home address is private
+  // like the phone number: workforce staff and the person see it, other
+  // staff see it hidden (PL-ROLE-PROOF).
+  property encrypted masked addressLine1: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked addressLine2: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked city: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked region: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked postalCode: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
   property required role: CapsuleRole = "staff"
   // Optional link to external auth subject (Clerk/etc.). When set on an active
   // Person, convex/lib/authContext.ts uses this row's role as runtime

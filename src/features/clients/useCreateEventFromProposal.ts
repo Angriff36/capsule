@@ -10,6 +10,9 @@ export type CreateEventFromProposalArgs = {
 
 export type CreateEventFromProposalResult = {
   docId: Id<"events">;
+  /** "reused": an earlier booking already made this event. */
+  outcome: "created" | "reused";
+  version: number;
 };
 
 /**

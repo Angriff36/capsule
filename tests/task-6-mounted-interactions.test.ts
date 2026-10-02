@@ -20,12 +20,18 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useCreateAttachment: () => vi.fn(),
   useGetRevenueAttribution: () => hooks.attribution,
   useGetEvent: () => hooks.event,
+  useListEvent: () => (hooks.event ? [hooks.event] : []),
   useListVenue: () => [],
   useListPerson: () => [],
   useListReferralSource: () => [],
   useListClient: () => [],
   useRevenueAttributionCreate: () => vi.fn(),
   useRevenueAttributionApply: () => vi.fn(),
+  useRevenueAttributionChangeSplit: () => vi.fn(),
+  useRevenueAttributionAllowOverRevenue: () => vi.fn(),
+  useRevenueAttributionApprove: () => vi.fn(),
+  useRevenueAttributionReject: () => vi.fn(),
+  useRevenueAttributionRequestApproval: () => vi.fn(),
   useRevenueAttributionUpdate: () => vi.fn(),
 }));
 

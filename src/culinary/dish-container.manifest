@@ -162,6 +162,10 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
 
   command refreshActiveKey() {
     mutate activeDishId = self.deletedAt == null and self.status == "active" ? self.dishId : null
+    emit DishContainerActiveKeyRefreshed {
+      dishContainerId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store DishContainer in durable
@@ -247,3 +251,9 @@ on EventDishContainerPackRequested fanOut DishContainer where activeDishId = pay
     unit: self.unit
     dishId: payload.dishId
   }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event DishContainerActiveKeyRefreshed: "dish.container.active.key.refreshed" {
+  dishContainerId: string
+  tenantId: string
+}

@@ -335,7 +335,14 @@ const TPP_CONTACT_MAPPINGS: DatasetConfig = {
     { sourceField: "IsPrimary", targetField: "isPrimary", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
     { sourceField: "IsBilling", targetField: "isBillingContact", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
     { sourceField: "Notes", targetField: "notes", mappingType: "directCopy", required: false, validationRules: [] },
-    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    // Address / Phone List and Birthday List report columns
+    // (specs/ralph/production-02-source-identity.md PR02-07).
+    { sourceField: "Address", targetField: "addressLine1", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "City", targetField: "city", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "State", targetField: "region", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ZipCode", targetField: "postalCode", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Birthday", targetField: "birthday", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseCalendarDate" }
   ]
 }
 
@@ -389,6 +396,35 @@ const TPP_LEAD_MAPPINGS: DatasetConfig = {
     { sourceField: "ProposalID", targetField: "proposalId", mappingType: "lookupReference", required: false, validationRules: [""] },
     { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
     { sourceField: "CloseDate", targetField: "closedAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}
+
+// ============================================================================
+// TPP CONTACT HISTORY DATASET CONFIGURATION (PL-SOURCE-HISTORY)
+// One row per old call, email, meeting, note or task. Each row becomes a
+// history entry under its client (or event) with the original date, author
+// and done state. History only: nothing is sent and no reminder opens.
+// ============================================================================
+
+const TPP_HISTORY_MAPPINGS: DatasetConfig = {
+  datasetCategory: "history",
+  targetEntity: "clientCommunication",
+  uniqueKey: ["tpp_history_id"],
+  importOrder: 4,  // After contacts, companies and events
+  dependsOn: ["contacts", "events"],
+  fieldMappings: [
+    { sourceField: "HistoryID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "ContactID", targetField: "clientId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "CompanyID", targetField: "clientId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "EventID", targetField: "eventId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "HistoryDate", targetField: "occurredAt", mappingType: "transformValue", required: true, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "HistoryType", targetField: "medium", mappingType: "transformValue", required: false, validationRules: [""], transformation: "mapHistoryType" },
+    { sourceField: "Subject", targetField: "summary", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Notes", targetField: "summary", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CreatedBy", targetField: "authorName", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "DueDate", targetField: "dueAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "CompletedDate", targetField: "completedAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "Status", targetField: "taskDone", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseTaskDone" }
   ]
 }
 

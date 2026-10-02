@@ -17,7 +17,6 @@ import { EventProposalSourceCard } from "../../clients/EventProposalSourceCard";
 import { eventDetailPath } from "../eventRoutes";
 import { EventImportDraftPanel } from "../import/EventImportDraftPanel";
 import { EventSourceProvenancePanel } from "../EventSourceProvenancePanel";
-import { eventOwnerLabel } from "../eventOwnerLabel";
 import { allergyLine, durationLabel, firstLine } from "./eventDashFacts";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
 import { useEventDayForecast } from "./useEventDayForecast";
@@ -156,18 +155,6 @@ export function EventDashOverview({
       (row.activityId == null || row.activityId === ""),
   ).length;
 
-  const owner = event.assignedToId
-    ? props.people?.find((person) => person._id === event.assignedToId)
-    : undefined;
-  const ownerLabel = event.assignedToId
-    ? eventOwnerLabel({
-        assignedToId: event.assignedToId,
-        ownerName: event.ownerName,
-        liveName: owner ? `${owner.givenName} ${owner.familyName}` : "—",
-        peopleLoading: props.people === undefined,
-      })
-    : null;
-
   const allergy = allergyLine(
     props.serviceRequirements,
     props.operationalRequirements,
@@ -175,9 +162,6 @@ export function EventDashOverview({
   const serviceLine = firstLine(props.serviceRequirements);
   const opsLine = firstLine(props.operationalRequirements);
   const travel = event.timingOutboundTravelMinutes;
-  const recurring = event.recurrenceFrequency
-    ? formatStatusLabel(event.recurrenceFrequency)
-    : null;
 
   const stats: [string, number, string][] = [
     ["Menu dishes", props.dishCount, eventDetailPath(eventId, "menu")],
@@ -186,11 +170,6 @@ export function EventDashOverview({
       "Timeline activities",
       props.timelineCount,
       eventDetailPath(eventId, "timeline"),
-    ],
-    [
-      "Recurrence occurrences",
-      event.recurrenceGeneratedCount ?? 0,
-      eventDetailPath(eventId, "recurring"),
     ],
   ];
 
@@ -219,7 +198,12 @@ export function EventDashOverview({
               {props.startsAt != null ? MONTH_DAY.format(props.startsAt) : "—"}
             </div>
           }
-          hint={`${props.startsAt != null ? `${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}` : "No time set"} · ${event.venueName || "No venue"}`}
+          tone={forecast.day?.adverse ? "alert" : undefined}
+          hint={`${props.startsAt != null ? `${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}` : "No time set"} · ${event.venueName || "No venue"}${
+            forecast.day
+              ? ` · ${forecast.day.highF}°/${forecast.day.lowF}°, ${forecast.day.rainProbability}% rain${forecast.day.adverse ? ", bad weather" : ""}`
+              : ""
+          }`}
         />
         <Tile
           id="ready"
@@ -311,53 +295,6 @@ export function EventDashOverview({
             travel
               ? `Drive out${opsLine ? ` · ${firstLine(opsLine, 60)}` : ""}`
               : (opsLine ?? "No operational requirements on file")
-          }
-        />
-        <Tile
-          id="weather"
-          label="Weather"
-          index={next()}
-          onOpen={onOpen}
-          tone={forecast.day?.adverse ? "alert" : undefined}
-          big={
-            <div className={`evd-big${forecast.day ? "" : " q"}`}>
-              {forecast.day
-                ? `${forecast.day.highF}° / ${forecast.day.lowF}°`
-                : "—"}
-            </div>
-          }
-          hint={
-            !forecast.located
-              ? "Add a venue address to see the outlook"
-              : forecast.loading
-                ? "Loading the forecast…"
-                : forecast.day
-                  ? `${forecast.day.rainProbability}% rain · ${forecast.day.windMph} mph${forecast.day.adverse ? " · adverse" : ""}`
-                  : "The event date is beyond the forecast window"
-          }
-        />
-        <Tile
-          id="team"
-          label="Owner & staff"
-          index={next()}
-          onOpen={onOpen}
-          big={
-            <div className={`evd-big${ownerLabel ? "" : " q"}`}>
-              {ownerLabel ?? "Unassigned"}
-            </div>
-          }
-          hint={`${ownerLabel ? "Owner set" : "No owner"} · ${formatCount(props.staffCount)} staff`}
-        />
-        <Tile
-          id="recurring"
-          label="Recurring"
-          index={next()}
-          onOpen={onOpen}
-          big={<div className="evd-big">{recurring ?? "One-time"}</div>}
-          hint={
-            recurring
-              ? `${formatCount(event.recurrenceGeneratedCount ?? 0)} occurrences so far`
-              : "This event does not repeat"
           }
         />
       </div>

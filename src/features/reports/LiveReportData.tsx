@@ -8,22 +8,44 @@ import {
   useListPrepTask,
   useListProposal,
   useListShift,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import type { ReportSubjectArea } from "./ReportCreateForm";
 import { buildLiveReportModel } from "./liveReportBuilders";
 import { canReadReportSubject } from "./liveReportSubjectAccess";
+import { rowsWithActualPayments } from "./liveReportPayments";
+import { reportSourceAsOf } from "./reportSnapshot";
 import type { LiveReportModel, ReportDateWindow } from "./liveReportModel";
+import {
+  applyReportEventFilters,
+  hasEventFilter,
+  reportFilterRange,
+  type ReportFilterEvent,
+  type ReportFilterLookups,
+  type ReportFilters,
+} from "./reportFilters";
+
+export interface ReportLeftOut {
+  /** Rows an event filter left out because they belong to no event. */
+  noEvent: number;
+  /** Rows the event filters left out. */
+  filteredOut: number;
+}
 
 interface LiveReportDataState {
   model: LiveReportModel | null;
   loading: boolean;
   sourceAvailable: boolean;
+  leftOut: ReportLeftOut;
+  /** Newest change in the source records (reportSnapshot.ts). */
+  sourceAsOf: number | null;
 }
 
 interface LiveReportDataProps {
   subject: ReportSubjectArea;
   dateWindow: ReportDateWindow;
+  filters: ReportFilters;
   children: (state: LiveReportDataState) => ReactNode;
 }
 
@@ -80,66 +102,64 @@ function FinanceData(props: LiveReportDataProps) {
   );
 }
 
-/**
- * Project the Payment ledger onto invoices before the generic builder runs.
- * PaymentSettled is the only cash event: pending/processing/failed payments
- * have not been received, while refunded payments no longer count. The
- * invoice.amountPaid field is a command-maintained balance, useful as
- * evidence, but the live finance report's Collected KPI is sourced from these
- * payment rows rather than inferred from Invoice.total - Invoice.amountDue.
- */
-function rowsWithActualPayments(
-  invoiceRows: readonly unknown[],
-  paymentRows: readonly unknown[],
-): readonly unknown[] {
-  const paidByInvoice = new Map<string, number>();
-  for (const payment of paymentRows) {
-    if (!isRecord(payment) || payment.deletedAt != null) continue;
-    if (payment.status !== "completed") continue;
-    const invoiceId = String(payment.invoiceId ?? "");
-    if (!invoiceId) continue;
-    paidByInvoice.set(
-      invoiceId,
-      (paidByInvoice.get(invoiceId) ?? 0) + numberValue(payment.amount),
-    );
-  }
-  return invoiceRows.map((invoice) => {
-    if (!isRecord(invoice)) return invoice;
-    const invoiceId = String(invoice._id ?? invoice.id ?? "");
-    return {
-      ...invoice,
-      amountPaid: paidByInvoice.get(invoiceId) ?? 0,
-    };
-  });
+type ResolvedDataProps = LiveReportDataProps & {
+  rows: readonly unknown[] | undefined;
+  paymentRows?: readonly unknown[] | undefined;
+};
+
+/** Events and venues load only when an event filter needs them. */
+function ResolvedData(props: ResolvedDataProps) {
+  return hasEventFilter(props.filters) ? (
+    <WithEventLookups {...props} />
+  ) : (
+    <ResolvedModel {...props} lookups={null} lookupsLoading={false} />
+  );
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function WithEventLookups(props: ResolvedDataProps) {
+  const events = useListEvent();
+  const venues = useListVenue();
+  const lookups = useMemo<ReportFilterLookups>(
+    () => ({
+      events: new Map(
+        (events ?? []).map((event) => [
+          String(event._id),
+          event as unknown as ReportFilterEvent,
+        ]),
+      ),
+      venueOnPremise: new Map(
+        (venues ?? []).map((venue) => [String(venue._id), venue.onPremise]),
+      ),
+    }),
+    [events, venues],
+  );
+  return (
+    <ResolvedModel
+      {...props}
+      lookups={lookups}
+      lookupsLoading={events === undefined || venues === undefined}
+    />
+  );
 }
 
-function numberValue(value: unknown): number {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-  return 0;
-}
-
-function ResolvedData({
+function ResolvedModel({
   rows,
   paymentRows,
   subject,
   dateWindow,
+  filters,
+  lookups,
+  lookupsLoading,
   children,
-}: LiveReportDataProps & {
-  rows: readonly unknown[] | undefined;
-  paymentRows?: readonly unknown[] | undefined;
+}: ResolvedDataProps & {
+  lookups: ReportFilterLookups | null;
+  lookupsLoading: boolean;
 }) {
   const authStatus = useAuthStatus();
   const loading =
     rows === undefined ||
     authStatus === undefined ||
+    lookupsLoading ||
     (subject === "finance" && paymentRows === undefined);
   const sourceAvailable = loading
     ? false
@@ -148,22 +168,43 @@ function ResolvedData({
         String(authStatus?.role ?? ""),
         authStatus?.disabledCapabilities,
       );
-  const model = useMemo(
-    () =>
-      !loading && sourceAvailable
-        ? buildLiveReportModel(
-            subject,
-            subject === "finance"
-              ? rowsWithActualPayments(rows ?? [], paymentRows ?? [])
-              : (rows ?? []),
-            dateWindow,
-          )
-        : null,
-    [dateWindow, loading, paymentRows, rows, sourceAvailable, subject],
-  );
+  const result = useMemo(() => {
+    if (loading || !sourceAvailable) return null;
+    const subjectRows =
+      subject === "finance"
+        ? rowsWithActualPayments(rows ?? [], paymentRows ?? [])
+        : (rows ?? []);
+    const filtered = lookups
+      ? applyReportEventFilters(subject, subjectRows, filters, lookups)
+      : { rows: [...subjectRows], noEvent: 0, filteredOut: 0 };
+    return {
+      model: buildLiveReportModel(
+        subject,
+        filtered.rows,
+        dateWindow,
+        reportFilterRange(filters),
+      ),
+      leftOut: { noEvent: filtered.noEvent, filteredOut: filtered.filteredOut },
+      sourceAsOf: reportSourceAsOf(
+        rows,
+        subject === "finance" ? paymentRows : undefined,
+      ),
+    };
+  }, [
+    dateWindow,
+    filters,
+    loading,
+    lookups,
+    paymentRows,
+    rows,
+    sourceAvailable,
+    subject,
+  ]);
   return children({
     loading,
     sourceAvailable,
-    model,
+    model: result?.model ?? null,
+    leftOut: result?.leftOut ?? { noEvent: 0, filteredOut: 0 },
+    sourceAsOf: result?.sourceAsOf ?? null,
   });
 }

@@ -6,6 +6,10 @@ import {
   useListVenue,
 } from "@/lib/manifest-convex-react";
 import {
+  eventServiceStyleKey,
+  eventServiceStyleLabel,
+} from "../events/eventServiceStyle";
+import {
   DashboardGrid,
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
@@ -13,8 +17,19 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatDate, formatMoney } from "@/lib/format";
+import {
+  budgetedFoodCostPercent,
+  foodCostPercent,
+  isCompletedEvent,
+  isQualifiedLead,
+  NOT_KNOWN,
+  percentOf,
+  percentText,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
+import { KpiRecordList } from "./KpiRecordList";
 
 /**
  * Tim's KPIs Dashboard (Priority 35)
@@ -43,13 +58,15 @@ export function TimsKPIsDashboardPage() {
   const revenueMetrics = useMemo(() => {
     if (!events) return null;
 
-    const completedEvents = events.filter((e) => e.stage === "completed");
+    const completedEvents = events.filter(isCompletedEvent);
     const totalRevenue = completedEvents.reduce(
       (sum, e) => sum + (e.quotedPrice || 0),
       0,
     );
-    const avgEventValue =
-      completedEvents.length > 0 ? totalRevenue / completedEvents.length : 0;
+    const avgEventValue: number | string =
+      completedEvents.length > 0
+        ? totalRevenue / completedEvents.length
+        : NOT_KNOWN;
     const totalHeadcount = completedEvents.reduce(
       (sum, e) => sum + (e.expectedHeadcount || 0),
       0,
@@ -68,29 +85,29 @@ export function TimsKPIsDashboardPage() {
 
   // Food Cost KPIs
   const foodCostMetrics = useMemo(() => {
-    if (!closeouts || closeouts.length === 0) return null;
+    const all = closeouts ?? [];
 
-    const totalActualCost = closeouts.reduce(
+    const totalActualCost = all.reduce(
       (sum, c) => sum + (c.actualIngredientCost || 0),
       0,
     );
-    const totalBudgetedCost = closeouts.reduce(
+    const totalBudgetedCost = all.reduce(
       (sum, c) => sum + (c.budgetedCost || 0),
       0,
     );
-    const totalRevenue = closeouts.reduce(
-      (sum, c) => sum + (c.grossProfit + (c.actualIngredientCost || 0)),
-      0,
-    );
-    const actualFoodCostPct =
-      totalRevenue > 0 ? (totalActualCost / totalRevenue) * 100 : 0;
-    const budgetedFoodCostPct =
-      totalRevenue > 0 ? (totalBudgetedCost / totalRevenue) * 100 : 0;
-    const costVariance = totalActualCost - totalBudgetedCost;
+    const actualFoodCostPct = foodCostPercent(all);
+    const budgetedFoodCostPct = budgetedFoodCostPercent(all);
+    const costVariance =
+      actualFoodCostPct == null || budgetedFoodCostPct == null
+        ? null
+        : totalActualCost - totalBudgetedCost;
 
-    const profitableEvents = closeouts.filter((c) => c.grossProfit > 0).length;
-    const profitRate =
-      closeouts.length > 0 ? (profitableEvents / closeouts.length) * 100 : 0;
+    const profitableEvents = all.filter((c) => c.grossProfit > 0).length;
+    const profitRate = percentOf(profitableEvents, all.length);
+    const avgProfit: number | string =
+      all.length > 0
+        ? all.reduce((s, c) => s + (c.grossProfit || 0), 0) / all.length
+        : NOT_KNOWN;
 
     return {
       totalActualCost,
@@ -98,25 +115,23 @@ export function TimsKPIsDashboardPage() {
       budgetedFoodCostPct,
       costVariance,
       profitRate,
-      closeoutCount: closeouts.length,
+      avgProfit,
+      closeoutCount: all.length,
     };
   }, [closeouts]);
 
   // Lead Pipeline KPIs
   const pipelineMetrics = useMemo(() => {
-    if (!leads) return null;
+    const all = leads ?? [];
+    const totalLeads = all.length;
+    const newLeads = all.filter((l) => l.stage === "new").length;
+    const converted = all.filter((l) => l.stage === "converted").length;
 
-    const totalLeads = leads.length;
-    const newLeads = leads.filter((l) => l.stage === "new").length;
-    const qualifiedLeads = leads.filter((l) => l.stage === "qualified").length;
-    const proposalSent = leads.filter((l) => l.stage === "proposalSent").length;
-    const converted = leads.filter((l) => l.stage === "converted").length;
-
-    const qualifiedRate =
-      totalLeads > 0
-        ? ((qualifiedLeads + proposalSent + converted) / totalLeads) * 100
-        : 0;
-    const conversionRate = totalLeads > 0 ? (converted / totalLeads) * 100 : 0;
+    const qualifiedRate = percentOf(
+      all.filter(isQualifiedLead).length,
+      totalLeads,
+    );
+    const conversionRate = percentOf(converted, totalLeads);
 
     return {
       totalLeads,
@@ -137,7 +152,7 @@ export function TimsKPIsDashboardPage() {
     >();
 
     events.forEach((event) => {
-      if (!event.venueId || event.quotedPrice == null) return;
+      if (!event.venueId || !isCompletedEvent(event)) return;
 
       const venue = venues.find((v) => v._id === event.venueId);
       if (!venue) return;
@@ -152,7 +167,7 @@ export function TimsKPIsDashboardPage() {
       }
 
       const data = venueMap.get(event.venueId)!;
-      data.revenue += event.quotedPrice;
+      data.revenue += event.quotedPrice ?? 0;
       data.eventCount += 1;
       data.headcount += event.expectedHeadcount || 0;
     });
@@ -176,7 +191,7 @@ export function TimsKPIsDashboardPage() {
     const monthMap = new Map<string, { revenue: number; eventCount: number }>();
 
     events.forEach((event) => {
-      if (event.quotedPrice == null || !event.startsAt) return;
+      if (!isCompletedEvent(event) || !event.startsAt) return;
 
       const date = new Date(event.startsAt);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -186,7 +201,7 @@ export function TimsKPIsDashboardPage() {
       }
 
       const data = monthMap.get(monthKey)!;
-      data.revenue += event.quotedPrice;
+      data.revenue += event.quotedPrice ?? 0;
       data.eventCount += 1;
     });
 
@@ -203,24 +218,31 @@ export function TimsKPIsDashboardPage() {
   const serviceStyleData = useMemo(() => {
     if (!events) return [];
 
-    const styleMap = new Map<string, { revenue: number; eventCount: number }>();
+    const styleMap = new Map<
+      string,
+      { label: string; revenue: number; eventCount: number }
+    >();
 
     events.forEach((event) => {
-      if (event.quotedPrice == null) return;
-      const style = event.serviceStyle || "Unknown";
+      if (!isCompletedEvent(event)) return;
+      const style = eventServiceStyleKey(event);
 
       if (!styleMap.has(style)) {
-        styleMap.set(style, { revenue: 0, eventCount: 0 });
+        styleMap.set(style, {
+          label: eventServiceStyleLabel(event),
+          revenue: 0,
+          eventCount: 0,
+        });
       }
 
       const data = styleMap.get(style)!;
-      data.revenue += event.quotedPrice;
+      data.revenue += event.quotedPrice ?? 0;
       data.eventCount += 1;
     });
 
-    return Array.from(styleMap.entries())
-      .map(([style, data]) => ({
-        serviceStyle: style,
+    return Array.from(styleMap.values())
+      .map((data) => ({
+        serviceStyle: data.label,
         revenue: data.revenue,
         eventCount: data.eventCount,
       }))
@@ -232,7 +254,7 @@ export function TimsKPIsDashboardPage() {
     if (!events) return [];
 
     return events
-      .filter((e) => e.quotedPrice != null && e.stage === "completed")
+      .filter(isCompletedEvent)
       .sort((a, b) => (b.quotedPrice || 0) - (a.quotedPrice || 0))
       .slice(0, 10)
       .map((event) => ({
@@ -286,23 +308,21 @@ export function TimsKPIsDashboardPage() {
           title="Food Cost %"
           main={{
             label: "Actual",
-            value: foodCostMetrics?.actualFoodCostPct || 0,
-            format: "percent" as const,
+            value: percentText(foodCostMetrics.actualFoodCostPct),
           }}
           rows={[
             {
               label: "Budgeted",
-              value: foodCostMetrics?.budgetedFoodCostPct || 0,
-              format: "percent" as const,
+              value: percentText(foodCostMetrics.budgetedFoodCostPct),
             },
             {
               label: "Variance",
-              value: foodCostMetrics?.costVariance || 0,
+              value: foodCostMetrics.costVariance ?? NOT_KNOWN,
               format: "currency" as const,
             },
           ]}
           tone={
-            foodCostMetrics?.costVariance && foodCostMetrics.costVariance > 0
+            foodCostMetrics.costVariance && foodCostMetrics.costVariance > 0
               ? "warn"
               : "ok"
           }
@@ -318,20 +338,17 @@ export function TimsKPIsDashboardPage() {
           title="Profit Rate"
           main={{
             label: "Rate",
-            value: foodCostMetrics?.profitRate || 0,
-            format: "percent" as const,
+            value: percentText(foodCostMetrics.profitRate),
           }}
           rows={[
             {
               label: "Closeouts",
-              value: foodCostMetrics?.closeoutCount || 0,
+              value: foodCostMetrics.closeoutCount,
               format: "number" as const,
             },
             {
               label: "Avg Profit/Event",
-              value:
-                (closeouts?.reduce((s, c) => s + (c.grossProfit || 0), 0) ||
-                  0) / (closeouts?.length || 1),
+              value: foodCostMetrics.avgProfit,
               format: "currency" as const,
             },
           ]}
@@ -348,19 +365,17 @@ export function TimsKPIsDashboardPage() {
           title="Lead Conversion"
           main={{
             label: "Rate",
-            value: pipelineMetrics?.conversionRate || 0,
-            format: "percent" as const,
+            value: percentText(pipelineMetrics.conversionRate),
           }}
           rows={[
             {
               label: "Total Leads",
-              value: pipelineMetrics?.totalLeads || 0,
+              value: pipelineMetrics.totalLeads,
               format: "number" as const,
             },
             {
               label: "Qualified",
-              value: pipelineMetrics?.qualifiedRate || 0,
-              format: "percent" as const,
+              value: percentText(pipelineMetrics.qualifiedRate),
             },
           ]}
           tone="info"
@@ -453,7 +468,22 @@ export function TimsKPIsDashboardPage() {
         lead="The numbers that run the business, live from your events, closeouts, and leads — with the detail behind each one a click away."
       />
 
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="The figures fill in as events are booked and completed."
+          />
+        </div>
+      ) : null}
+
       <DashboardGrid items={dashboardItems} />
+
+      <KpiRecordList
+        events={events ?? []}
+        closeouts={closeouts ?? []}
+        leads={leads ?? []}
+      />
 
       {/* Reconciliation Note */}
       <div className="mt-6 rounded-sm border border-line bg-inset p-4">
@@ -467,6 +497,20 @@ export function TimsKPIsDashboardPage() {
           your sales pipeline.
         </p>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.completed_revenue",
+          "dashboard.completed_events",
+          "dashboard.completed_average",
+          "dashboard.food_cost_percent",
+          "dashboard.food_cost_budget",
+          "dashboard.profitable_share",
+          "dashboard.lead_conversion",
+          "dashboard.lead_qualified",
+          "dashboard.leads",
+        ]}
+      />
     </div>
   );
 }

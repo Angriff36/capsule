@@ -176,6 +176,10 @@ entity PackList mixin TenantScoped, SoftDeletable {
   // Earlier packing/loading timestamps are facts; new requirements reopen work.
   command acknowledgePackingRequirement(additionalRequired: boolean) {
     mutate status = self.deletedAt == null and additionalRequired and (self.status == "packed" or self.status == "loaded") ? "packing" : self.status
+    emit PackListPackingRequirementAcknowledged {
+      packListId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command startPacking() {
@@ -515,6 +519,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId
     mutate followsDishServings = followsDishServings
     mutate containerServings = containerServings
+    emit PackListItemContainerLinkAdopted {
+      packListItemId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Restore a reviewed menu association without inventing container capacity.
@@ -533,6 +541,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate dishId = dishId
     mutate eventDishId = eventDishId
     mutate associationSource = sourceReference
+    emit PackListItemImportedAssociationRestored {
+      packListItemId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Legacy TPP Oz - Fld was imported as the mass unit ounce. This repair is
@@ -559,6 +571,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate loadedQuantity = self.loadedQuantity != null ? self.loadedQuantity / 8 : null
     mutate unit = "cup"
     mutate unitCorrectionSource = sourceReference
+    emit PackListItemImportedFluidOuncesCorrected {
+      packListItemId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command syncContainerServings(quantityServings: number) {
@@ -1320,6 +1336,27 @@ event PackListItemRequirementSynced: "pack_list_item.requirement_synced" {
 on PackListItemRequirementSynced run PackList.acknowledgePackingRequirement
   resolve payload.packListId
   params { additionalRequired: payload.additionalRequired }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event PackListPackingRequirementAcknowledged: "pack.list.packing.requirement.acknowledged" {
+  packListId: string
+  tenantId: string
+}
+
+event PackListItemContainerLinkAdopted: "pack.list.item.container.link.adopted" {
+  packListItemId: string
+  tenantId: string
+}
+
+event PackListItemImportedFluidOuncesCorrected: "pack.list.item.imported.fluid.ounces.corrected" {
+  packListItemId: string
+  tenantId: string
+}
+
+event PackListItemImportedAssociationRestored: "pack.list.item.imported.association.restored" {
+  packListItemId: string
+  tenantId: string
+}
 
 event PackListItemVolumeSet: "pack_list_item.volume_set" {
   packListItemId: string

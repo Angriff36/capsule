@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useListClient,
@@ -23,7 +23,8 @@ import {
 import { type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatMoneyExact } from "../../lib/format";
+import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
+import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { clientDisplayName } from "../events/clientName";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
@@ -32,6 +33,7 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import {
   downloadProposalPdf,
+  proposalPdfBase64,
   transformTimelineActivities,
   transformVenueLogistics,
   type ProposalPdfRecord,
@@ -106,6 +108,7 @@ export function ProposalsPage() {
   const shareLinks = useListShareLink();
   const createShareLink = useShareLinkCreate();
   const revokeShareLink = useShareLinkRevoke();
+  const emailProposal = useEmailProposal();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
@@ -196,10 +199,17 @@ export function ProposalsPage() {
       ?.scrollIntoView({ block: "start" });
   }, [focusedProposalId, proposalsLoaded]);
 
+  // "Create proposal" on an event navigates here with ?event=<id>: one click
+  // builds the proposal from the event (menu, prices, date, venue) and opens
+  // it (issue #415). Building again is safe: an unchanged event writes
+  // nothing. Only an event with no client yet falls back to the form.
+  const builtFor = useRef<string | null>(null);
   useEffect(() => {
-    // "Create proposal" on an event navigates here with ?event=<id>; open the
-    // draft form prefilled from that event (spec §5.3 create-proposal-from-event).
-    if (fromEvent) {
+    if (!fromEvent || builtFor.current === fromEvent._id) return;
+    builtFor.current = fromEvent._id;
+    if (fromEvent.clientId) {
+      void buildFromEvent(fromEvent._id as Id<"events">);
+    } else {
       setShowDraft(true);
     }
   }, [fromEvent?._id]);
@@ -331,9 +341,7 @@ export function ProposalsPage() {
         const revision = latestRevisionFor(row._id);
         if (!revision) {
           setFailure(
-            new Error(
-              "Send the proposal first — a share link needs a published revision.",
-            ),
+            new Error("Send the proposal first, then make its share link."),
           );
           return;
         }
@@ -395,7 +403,7 @@ export function ProposalsPage() {
         if (!proposalRevisionId) {
           setFailure(
             new Error(
-              "This proposal has no revision snapshot (sent before snapshots existed). Create a share link or accept it manually; signature requests need a snapshot.",
+              "This proposal was sent before Capsule kept a copy of each sent version, so it cannot ask for a signature. Send it again to ask for one, or mark it accepted by hand.",
             ),
           );
           return;
@@ -459,7 +467,7 @@ export function ProposalsPage() {
         if (key === "expire") await expire(args);
         setNotice(
           key === "send"
-            ? "Proposal published in Capsule. Copy its share link or PDF into your delivery channel; Capsule does not send it externally."
+            ? "Proposal published. Press Email the proposal to send the client the PDF, or copy its share link."
             : key === "markViewed"
               ? "Proposal marked as viewed."
               : key === "expire"
@@ -471,6 +479,145 @@ export function ProposalsPage() {
   };
 
   const loading = proposals === undefined || clients === undefined;
+
+  // The PDF a row's Download PDF saves: a sent proposal's published
+  // version, a draft's current data. Email the proposal sends the same file.
+  const pdfProjectionFor = (row: (typeof visibleRows)[number]) => {
+    if (String(row.status) !== "draft" && proposalRevisions === undefined)
+      return null;
+    if (
+      String(row.status) === "draft" &&
+      (proposalDishSelections === undefined || dishes === undefined)
+    )
+      return null;
+    // Enrich proposal with timeline and venue logistics data
+    const event = events?.find((e) => e._id === row.eventId);
+    const eventTimelineItems =
+      event && timelineActivities
+        ? timelineActivities.filter(
+            (a) => a.eventId === event._id && a.deletedAt == null,
+          )
+        : [];
+    const venue =
+      event?.venueId && venues
+        ? venues.find((v) => v._id === event.venueId)
+        : null;
+
+    const enrichedProposal: ProposalPdfRecord = {
+      ...row,
+      visibleSections: (row.visibleSections ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
+      sectionOrder: (row.sectionOrder ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
+      timelineItems: transformTimelineActivities(eventTimelineItems),
+      venueLogistics: event
+        ? transformVenueLogistics(venue || null, event)
+        : undefined,
+      dishSelections: (proposalDishSelections ?? [])
+        .filter(
+          (selection) =>
+            selection.proposalId === row._id && selection.deletedAt == null,
+        )
+        .flatMap((selection) => {
+          const dish = dishes?.find(
+            (candidate) => candidate._id === selection.dishId,
+          );
+          return dish
+            ? [
+                {
+                  dishName: dish.name,
+                  dishDescription: dish.description ?? null,
+                },
+              ]
+            : [];
+        }),
+      pricingLines: (proposalLineItems ?? [])
+        .filter((line) => line.proposalId === row._id && line.deletedAt == null)
+        .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder))
+        .map((line) => ({
+          description: line.description,
+          pricingBasis: line.pricingBasis as PricingBasis,
+          unitPrice: Number(line.unitPrice) || 0,
+          quantity: line.quantity,
+          unit: line.unit,
+        })),
+      enhancements: (proposalEnhancements ?? [])
+        .filter(
+          (item) =>
+            item.proposalId === row._id &&
+            item.deletedAt == null &&
+            item.addedAt != null,
+        )
+        .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder))
+        .map((item) => ({
+          name: item.name,
+          description: item.description ?? undefined,
+          price: Number(item.price) || 0,
+        })),
+    };
+    const pdfClientName = clientDisplayName(row.clientId, clients);
+
+    const publishedRevision = latestRevisionFor(row._id);
+    const pdfProjection =
+      String(row.status) === "draft"
+        ? {
+            proposal: enrichedProposal,
+            clientName: pdfClientName,
+            source: null,
+          }
+        : projectProposalPdf(
+            enrichedProposal,
+            pdfClientName,
+            publishedRevision,
+          );
+
+    return pdfProjection;
+  };
+
+  // Emails the published version's PDF (the Download PDF file) to the client.
+  const onEmailProposal = (row: (typeof visibleRows)[number]) => {
+    const projection = pdfProjectionFor(row);
+    const revision = latestRevisionFor(row._id);
+    if (!projection || !revision) return;
+    if (projection.source !== "revision") {
+      setFailure(
+        new Error(
+          "This proposal's published version could not be read, so Capsule will not email it. Send the proposal again from a draft.",
+        ),
+      );
+      return;
+    }
+    void run(`${row._id}:email`, async () => {
+      const pdf = await proposalPdfBase64({
+        proposal: projection.proposal,
+        clientName: projection.clientName,
+        branding,
+      });
+      const result = await emailProposal({
+        proposalId: row._id,
+        revisionId: revision._id,
+        pdfBase64: pdf.base64,
+        fileName: pdf.fileName,
+      });
+      if (result.status === "already_sent") {
+        setNotice(
+          `Not sent again — this version already went${
+            result.to ? ` to ${result.to}` : ""
+          }${
+            result.sentAt != null
+              ? ` at ${formatTime(result.sentAt)} on ${formatDate(result.sentAt)}`
+              : ""
+          }.`,
+        );
+        return;
+      }
+      setNotice(
+        `Proposal PDF emailed to ${result.to ?? "the client"} just now.`,
+      );
+    });
+  };
 
   return (
     <div className="operations-stage supply-stage">
@@ -656,128 +803,8 @@ export function ProposalsPage() {
                                 dishes === undefined))
                           }
                           onClick={() => {
-                            if (
-                              String(row.status) !== "draft" &&
-                              proposalRevisions === undefined
-                            )
-                              return;
-                            if (
-                              String(row.status) === "draft" &&
-                              (proposalDishSelections === undefined ||
-                                dishes === undefined)
-                            )
-                              return;
-                            // Enrich proposal with timeline and venue logistics data
-                            const event = events?.find(
-                              (e) => e._id === row.eventId,
-                            );
-                            const eventTimelineItems =
-                              event && timelineActivities
-                                ? timelineActivities.filter(
-                                    (a) =>
-                                      a.eventId === event._id &&
-                                      a.deletedAt == null,
-                                  )
-                                : [];
-                            const venue =
-                              event?.venueId && venues
-                                ? venues.find((v) => v._id === event.venueId)
-                                : null;
-
-                            const enrichedProposal: ProposalPdfRecord = {
-                              ...row,
-                              visibleSections: (
-                                row.visibleSections ?? []
-                              ).filter(
-                                (section): section is string =>
-                                  typeof section === "string",
-                              ),
-                              sectionOrder: (row.sectionOrder ?? []).filter(
-                                (section): section is string =>
-                                  typeof section === "string",
-                              ),
-                              timelineItems:
-                                transformTimelineActivities(eventTimelineItems),
-                              venueLogistics: event
-                                ? transformVenueLogistics(venue || null, event)
-                                : undefined,
-                              dishSelections: (proposalDishSelections ?? [])
-                                .filter(
-                                  (selection) =>
-                                    selection.proposalId === row._id &&
-                                    selection.deletedAt == null,
-                                )
-                                .flatMap((selection) => {
-                                  const dish = dishes?.find(
-                                    (candidate) =>
-                                      candidate._id === selection.dishId,
-                                  );
-                                  return dish
-                                    ? [
-                                        {
-                                          dishName: dish.name,
-                                          dishDescription:
-                                            dish.description ?? null,
-                                        },
-                                      ]
-                                    : [];
-                                }),
-                              pricingLines: (proposalLineItems ?? [])
-                                .filter(
-                                  (line) =>
-                                    line.proposalId === row._id &&
-                                    line.deletedAt == null,
-                                )
-                                .sort(
-                                  (a, b) =>
-                                    Number(a.sortOrder) - Number(b.sortOrder),
-                                )
-                                .map((line) => ({
-                                  description: line.description,
-                                  pricingBasis:
-                                    line.pricingBasis as PricingBasis,
-                                  unitPrice: Number(line.unitPrice) || 0,
-                                  quantity: line.quantity,
-                                  unit: line.unit,
-                                })),
-                              enhancements: (proposalEnhancements ?? [])
-                                .filter(
-                                  (item) =>
-                                    item.proposalId === row._id &&
-                                    item.deletedAt == null &&
-                                    item.addedAt != null,
-                                )
-                                .sort(
-                                  (a, b) =>
-                                    Number(a.sortOrder) - Number(b.sortOrder),
-                                )
-                                .map((item) => ({
-                                  name: item.name,
-                                  description: item.description ?? undefined,
-                                  price: Number(item.price) || 0,
-                                })),
-                            };
-                            const pdfClientName = clientDisplayName(
-                              row.clientId,
-                              clients,
-                            );
-
-                            const publishedRevision = latestRevisionFor(
-                              row._id,
-                            );
-                            const pdfProjection =
-                              String(row.status) === "draft"
-                                ? {
-                                    proposal: enrichedProposal,
-                                    clientName: pdfClientName,
-                                    source: null,
-                                  }
-                                : projectProposalPdf(
-                                    enrichedProposal,
-                                    pdfClientName,
-                                    publishedRevision,
-                                  );
-
+                            const pdfProjection = pdfProjectionFor(row);
+                            if (!pdfProjection) return;
                             if (pdfProjection.source) {
                               void downloadProjectedProposalPdf({
                                 projection: pdfProjection,
@@ -800,6 +827,22 @@ export function ProposalsPage() {
                         >
                           Download PDF
                         </button>
+                        {["sent", "viewed", "accepted"].includes(
+                          String(row.status),
+                        ) && (
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            disabled={
+                              busy != null || proposalRevisions === undefined
+                            }
+                            onClick={() => onEmailProposal(row)}
+                          >
+                            {busy === `${row._id}:email`
+                              ? "Emailing…"
+                              : "Email the proposal"}
+                          </button>
+                        )}
                         {(String(row.status) === "sent" ||
                           String(row.status) === "viewed") && (
                           <button

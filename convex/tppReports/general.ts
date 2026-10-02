@@ -10,6 +10,8 @@ import { getAuthContext } from "../lib/authContext";
 import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -98,7 +100,7 @@ function range(parameters: Parameters): [number, number] {
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown TPP General report");
@@ -115,12 +117,14 @@ export const run = query({
         ctx.db
           .query("clientOutreachTasks")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "contact tasks")),
         canRead(auth, CLIENT_READ)
           ? ctx.db
               .query("clients")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "clients"))
           : [],
       ]);
       const clientsById = new Map(
@@ -161,7 +165,8 @@ export const run = query({
       const leads = await ctx.db
         .query("leads")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "leads"));
       const [start, end] = range(parameters);
       return table(
         args.reportId,
@@ -195,7 +200,8 @@ export const run = query({
       const events = await ctx.db
         .query("events")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "events"));
       const [start, end] = range(parameters);
       // The event's own venue snapshot is event data; filling it from the
       // Venue record follows the venue read policy.
@@ -252,18 +258,21 @@ export const run = query({
         ctx.db
           .query("inventoryItems")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "stock items")),
         canRead(auth, INGREDIENT_READ)
           ? ctx.db
               .query("ingredients")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "ingredients"))
           : [],
         canRead(auth, STORAGE_LOCATION_READ)
           ? ctx.db
               .query("storageLocations")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "storage places"))
           : [],
       ]);
       const ingredientsById = new Map(
@@ -323,7 +332,8 @@ export const run = query({
       const rawClients = await ctx.db
         .query("clients")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "clients"));
       const clients = await Promise.all(
         rawClients.map((client) =>
           decryptReportFields(
@@ -373,23 +383,28 @@ export const run = query({
           ctx.db
             .query("dishes")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "dishes")),
           ctx.db
             .query("menuDishes")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "menu dishes")),
           ctx.db
             .query("menus")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "menus")),
           ctx.db
             .query("eventDishes")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "event dishes")),
           ctx.db
             .query("events")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "events")),
         ]);
       // Removed dishes, menus and events never show.
       const dishById = new Map(
@@ -511,11 +526,13 @@ export const run = query({
         ctx.db
           .query("eventCloseouts")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "event closeouts")),
         ctx.db
           .query("events")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "events")),
       ]);
       // Notes on a removed event never show.
       const eventById = new Map(
@@ -558,7 +575,8 @@ export const run = query({
       const rawPeople = await ctx.db
         .query("people")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "staff"));
       const people = await Promise.all(
         rawPeople.map((person) =>
           decryptReportFields(
@@ -615,7 +633,8 @@ export const run = query({
       const rawVendors = await ctx.db
         .query("vendors")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "vendors"));
       const vendors = await Promise.all(
         rawVendors.map((vendor) =>
           decryptReportFields(
@@ -660,7 +679,8 @@ export const run = query({
       const rawVenues = await ctx.db
         .query("venues")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "venues"));
       const venues = await Promise.all(
         rawVenues.map((venue) =>
           decryptReportFields(
@@ -752,5 +772,5 @@ export const run = query({
       );
     }
     throw new Error(`No TPP General resolver for ${args.reportId}`);
-  },
+  }),
 });

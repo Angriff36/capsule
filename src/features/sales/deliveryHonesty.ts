@@ -8,13 +8,27 @@ export function replyDisposition(provider: string): ReplyDisposition {
   return {
     canRecord: false,
     notice:
-      "No external delivery provider is connected, so this can't be sent. Your draft is kept — copy it into your email, SMS, or social provider.",
+      "Capsule cannot send text or social messages yet. Your draft is kept — copy it into the app the client used.",
   };
 }
 
-export function deliveryStatusLabel(status: string): string | null {
+// PL-INBOX (AC-106): an outside thread names every delivery state. "sent"
+// only means the provider took the message, never that the client got it.
+// An internal note is recorded, not delivered, so it carries no label.
+const OUTSIDE_DELIVERY_LABEL: Record<string, string> = {
+  sent: "Accepted by the provider — delivery not confirmed",
+  delivered: "Delivered",
+  bounced: "Bounced — not delivered",
+  unknown: "Delivery not known",
+};
+
+export function deliveryStatusLabel(
+  status: string,
+  provider = "internal",
+): string | null {
   if (status === "queued")
     return "Queued — not delivered; no provider is connected";
   if (status === "failed") return "Delivery failed — not delivered";
-  return null;
+  if (provider === "internal") return null;
+  return OUTSIDE_DELIVERY_LABEL[status] ?? "Delivery not known";
 }

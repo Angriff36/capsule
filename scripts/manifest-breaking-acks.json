@@ -1760,6 +1760,132 @@
       "reason": "Batch 2026-09-29 PL-CLOSEOUT: optional closeout fields (records behind the numbers, version number, correction reason and time); saved closeouts need no backfill."
     },
     {
+      "path": "ImportRun.sourceRowsStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-IMPORT-CANCEL: optional; the rows a run was given, kept so anyone can continue it. Stored runs need no backfill."
+    },
+    {
+      "path": "ClientCommunication.clientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; old-system history sits on its client. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; set only while a client merge moves the history. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.completedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; an old task's done date. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.dueAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; an old task's due date. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.importedFrom",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; set only on old-system history. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.importRunId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; the import that brought the history in. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; set only while a client merge moves the history. Stored notes need no backfill."
+    },
+    {
+      "path": "ClientCommunication.taskDone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-HISTORY: optional; an old task's done state. Stored notes need no backfill."
+    },
+    {
+      "path": "ImportRun.stopReport",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-IMPORT-CANCEL: optional; what Stop this import did. Stored runs need no backfill."
+    },
+    {
+      "path": "Lead.sourceStage",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; an imported lead's stage in the old system, word for word. Stored leads need no backfill."
+    },
+    {
+      "path": "Lead.eventDate",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; an imported lead's event date. Stored leads need no backfill."
+    },
+    {
+      "path": "reassignClient.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Command name shared by several entities (PL-SOURCE-MERGE adds it to Lead, ClientOutreachTask, QuoteSubmission); the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "stageClientMerge.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Command name shared by several entities (PL-SOURCE-MERGE adds it to Lead, ClientOutreachTask, QuoteSubmission); the diff pairs different entities' commands. No command moved."
+    },
+    {
+      "path": "Lead.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; set only while a client merge moves the lead. Stored leads need no backfill."
+    },
+    {
+      "path": "Lead.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; the client a merge moves the lead to. Stored leads need no backfill."
+    },
+    {
+      "path": "ClientOutreachTask.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; set only while a client merge moves the reminder. No backfill."
+    },
+    {
+      "path": "ClientOutreachTask.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; the client a merge moves the reminder to. No backfill."
+    },
+    {
+      "path": "QuoteSubmission.clientMergeAuthorizationId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; set only while a client merge moves the quote request. No backfill."
+    },
+    {
+      "path": "QuoteSubmission.mergeTargetClientId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-MERGE: optional; the client a merge moves the quote request to. No backfill."
+    },
+    {
+      "path": "Lead.closedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Batch 2026-10-01 PL-SOURCE-DATASETS: optional; the day the old system closed the deal. Stored leads stay open (no backfill)."
+    },
+    {
       "path": "EventCloseout.sourceSnapshot",
       "category": "property-added",
       "acknowledgedAt": "2026-09-29",
@@ -1886,6 +2012,342 @@
       "reason": "2026-09-30 event tracker parity: optional planning board facts (what equipment needs and gives, truck seats and driver certificate, how loud each planning check is); saved rows need no backfill."
     },
     {
+      "path": "Organization.stageMovesByHandJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Site comment #421: optional; unset reads as the default (only the sales lock is by hand). Stored companies need no backfill."
+    },
+    {
+      "path": "ProposalTemplate.serviceStyleId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "PL-CATALOGS AC-221/AC-222: optional; unset = the template is for any service style, which is what every saved template is today. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; unset = no vendor bill matched yet, which is true of every stored line. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billedQuantity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; set only by matchBill / correctBillMatch. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billedUnitPrice",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; set only by matchBill / correctBillMatch. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billMatchState",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; unset = no bill matched. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billReviewState",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; set only when a bill differs. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billReviewNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional buyer note. No backfill."
+    },
+    {
+      "path": "VendorOrderLine.billMatchCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENDOR-INVOICE-MATCH AC-456: optional; unset reads as zero matches. No backfill."
+    },
+    {
+      "path": "Component.coolingInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.equipmentNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.holdingInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.platingInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.primaryImageFileName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-453: optional recipe photo. No backfill."
+    },
+    {
+      "path": "Component.primaryImageStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-453: optional recipe photo. No backfill."
+    },
+    {
+      "path": "Component.reheatInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank reads 'Not on file'. No backfill."
+    },
+    {
+      "path": "Component.substitutionNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional approved swaps. No backfill."
+    },
+    {
+      "path": "Component.videoUrl",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-453: optional video link. No backfill."
+    },
+    {
+      "path": "Ingredient.shelfLifeDays",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank = not on file. No backfill."
+    },
+    {
+      "path": "Ingredient.storageInstructions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CULINARY-CATALOG AC-452: optional; blank = not on file. No backfill."
+    },
+    {
+      "path": "PerformanceReview.scorecardId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-327/AC-329: optional; unset = the review used no scorecard, which is true of every stored review. No backfill."
+    },
+    {
+      "path": "PerformanceReview.strengths",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional shared feedback; blank = none written. No backfill."
+    },
+    {
+      "path": "PerformanceReview.opportunities",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional shared feedback; blank = none written. No backfill."
+    },
+    {
+      "path": "PerformanceReview.comments",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional comments for the person reviewed; blank = none written. No backfill."
+    },
+    {
+      "path": "PerformanceReview.followUp",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional follow-up step; blank = none set. No backfill."
+    },
+    {
+      "path": "PerformanceReview.followUpDue",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-329: optional follow-up date; unset = no date. No backfill."
+    },
+    {
+      "path": "OneOnOne.scorecardId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-327: optional; unset = the meeting used no scorecard, which is true of every stored meeting. No backfill."
+    },
+    {
+      "path": "CutoverDecision.businessApprovedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional; unset = not signed off with the new attributable sign-off, so the switch check asks for it again. No backfill."
+    },
+    {
+      "path": "CutoverDecision.businessApprovedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional; unset = no attributable sign-off yet. No backfill."
+    },
+    {
+      "path": "CutoverDecision.businessEvidence",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional; unset = nothing written about what was checked. No backfill."
+    },
+    {
+      "path": "CutoverDecision.sourceFrozenAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-287: optional; unset = nobody said when TPP stopped taking entries, which the switch check asks for. No backfill."
+    },
+    {
+      "path": "CutoverDecision.openingStockAsOf",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; unset = opening stock not confirmed. No backfill."
+    },
+    {
+      "path": "CutoverDecision.openingStockCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; set together with openingStockAsOf. No backfill."
+    },
+    {
+      "path": "CutoverDecision.openingStockConfirmedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; set together with openingStockAsOf. No backfill."
+    },
+    {
+      "path": "CutoverDecision.financialMode",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; unset = not chosen yet, which the switch check asks for. No backfill."
+    },
+    {
+      "path": "CutoverDecision.backupEvidence",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-632: optional; unset = no backup written down. No backfill."
+    },
+    {
+      "path": "CutoverDecision.finalImportRuns",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-287: optional; stamped at go only. No backfill."
+    },
+    {
+      "path": "CutoverDecision.scheduledImportsDisabledAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-292: optional; stamped at go only. No backfill."
+    },
+    {
+      "path": "CutoverDecision.scheduledImportsNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-292: optional; stamped at go only. No backfill."
+    },
+    {
+      "path": "recordApprovals.parameters.businessEvidence",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-CUTOVER AC-289: optional parameter; the sign-off says what was checked. Old callers still work; the switch page sends it."
+    },
+    {
+      "path": "hold.parameters.scorecardId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-HR AC-327: optional parameter; a one-on-one links the scorecard in force. Old callers still work."
+    },
+    {
+      "path": "Venue.seatedCapacity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional; unset reads as 'Not known' and the overall capacity is used. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.standingCapacity",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional; unset reads as 'Not known' and the overall capacity is used. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.hasOven",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional yes/no; unset reads as 'Not known'. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.hasRefrigeration",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional yes/no; unset reads as 'Not known'. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.loadInFrom",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional time; unset means no load-in window on file. Stored venues need no backfill."
+    },
+    {
+      "path": "Venue.loadOutBy",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-PROFILE AC-312: optional time; unset means no load-out time on file. Stored venues need no backfill."
+    },
+    {
+      "path": "Event.finalVenueFacts",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-LAYOUT AC-315: optional; written once when an event is finalized. Events finished earlier keep none (their printed venue name/address/capacity snapshot stays). No backfill."
+    },
+    {
+      "path": "EventLayoutSection.sourceTemplateId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-LAYOUT AC-314: optional; unset = a section typed on the event. Earlier copies carry none. No backfill."
+    },
+    {
+      "path": "EventLayoutSection.sourceTemplateVersion",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-VENUE-LAYOUT AC-314: optional; goes with sourceTemplateId. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.venueCommissionTermId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set on the split captured at booking. Earlier splits name no term. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set only by changeSplit. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overriddenById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set only by changeSplit. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overriddenAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-321: optional; set only by changeSplit. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overRevenueReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-301: optional; set only by allowOverRevenue. No backfill."
+    },
+    {
+      "path": "RevenueAttribution.overRevenueAllowedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "PL-ATTRIBUTION AC-301: optional; set only by allowOverRevenue. No backfill."
+    },
+    {
       "path": "Vehicle.cargoVolumeM3",
       "category": "property-added",
       "acknowledgedAt": "2026-09-30",
@@ -1938,6 +2400,144 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-01",
       "reason": "Optional reason that lets a planned truck run through the same-time check; saved rigs need no backfill."
+    },
+    {
+      "path": "capture.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.changeSummary",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.figures",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.proposalId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.revisionNumber",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.savedReportDefinitionId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.sharingScope",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.snapshot",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.sourceAsOf",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.subjectArea",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.title",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.parameters.reason",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.parameters.targetIngredientId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.parameters.targetThreadId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "Message.mediaJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "MessageThread.eventId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "MessageThread.mergedIntoThreadId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Client.emailPreference",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Client.emailPreferenceNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Client.emailPreferenceSetAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Organization.emailReplyTo",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Organization.emailSenderName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
     }
   ]
 }

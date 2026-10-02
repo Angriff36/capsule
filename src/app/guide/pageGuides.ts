@@ -162,6 +162,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/kitchen/plan",
+    title: "Production plan",
+    purpose:
+      "What the kitchen makes each day across all events, by station, recipe and batch.",
+    steps: [
+      "Read one day at a time; work for the same step is pooled and each event keeps its own amount.",
+      "Check Make ahead and Waits for before you start a row.",
+      "Set a step's make-ahead days on the dish's prep steps.",
+    ],
+  },
+  {
     prefix: "/kitchen/yield",
     title: "Yield variance",
     purpose:

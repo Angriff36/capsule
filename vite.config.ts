@@ -261,13 +261,18 @@ export default defineConfig(({ mode }) => ({
     // script) lets jsdom provide the real implementation.
     poolOptions: {
       forks: { execArgv: ["--no-experimental-webstorage"] },
+      threads: { execArgv: ["--no-experimental-webstorage"] },
     },
     // Runtime proofs nominally take 3-5s; on this shared multi-session box
     // they blow past vitest's 5s default and the gate flakes (#398).
     testTimeout: 30_000,
     // Each worker loads the generated Convex runtime. Oversubscribing large
     // machines adds contention and makes otherwise fast proofs time out.
-    maxWorkers: Math.min(8, availableParallelism()),
+    // CAPSULE_TEST_WORKERS lowers it on a busy machine: on 2026-10-01 a
+    // release check lost a test worker to low memory with eight running.
+    maxWorkers:
+      Number(process.env.CAPSULE_TEST_WORKERS) ||
+      Math.min(8, availableParallelism()),
     include: ["tests/**/*.test.ts"],
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },

@@ -16,10 +16,19 @@ import { EventArchiveVisibility } from "./eventArchiveVisibility";
 import { clientDisplayName } from "./clientName";
 import { eventImportPath } from "./eventRoutes";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
+import {
+  eventServiceStyleChoices,
+  eventServiceStyleKey,
+} from "./eventServiceStyle";
 
 /** Question tabs first (what is upcoming / needs action), then the stages. */
 type Tab = "upcoming" | "attention" | "all" | EventStage;
-type EventsView = { tab: Tab; search: string; dir: "asc" | "desc" };
+type EventsView = {
+  tab: Tab;
+  search: string;
+  dir: "asc" | "desc";
+  style?: string;
+};
 
 const DAY = 86_400_000;
 const DONE_STAGES = new Set(["completed", "cancelled", "closed_out"]);
@@ -79,6 +88,8 @@ export function EventsListPage() {
   // page never opens empty. A user choice always wins.
   const [chosenTab, setTab] = useState<Tab | null>(null);
   const [search, setSearch] = useState("");
+  // Service style filter: "" = any style; otherwise a style id or "none".
+  const [style, setStyle] = useState("");
   const [dir, setDir] = useState<"asc" | "desc">("asc");
   const [filtersOpen, setFiltersOpen] = useState(false);
   // Archived events stay out of the ledger until the operator asks for them.
@@ -113,6 +124,7 @@ export function EventsListPage() {
     else if (tab === "attention")
       list = list.filter((e) => needsAction(e, now));
     else if (tab !== "all") list = list.filter((e) => e.stage === tab);
+    if (style) list = list.filter((e) => eventServiceStyleKey(e) === style);
     const q = search.trim().toLowerCase();
     if (q) {
       list = list.filter(
@@ -131,7 +143,8 @@ export function EventsListPage() {
       const bDate = b.startsAt ?? 0;
       return dir === "asc" ? aDate - bDate : bDate - aDate;
     });
-  }, [live, clients, tab, search, dir, now]);
+  }, [live, clients, tab, style, search, dir, now]);
+  const styleChoices = useMemo(() => eventServiceStyleChoices(live), [live]);
 
   const questionTabs: Tab[] = ["upcoming", "attention", "all"];
   const stageFilter: EventStage | "" = questionTabs.includes(tab)
@@ -226,6 +239,22 @@ export function EventsListPage() {
           ))}
         </select>
       </label>
+      <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
+        Service style
+        <select
+          className="input h-11 w-44 md:h-9"
+          aria-label="Filter by service style"
+          value={style}
+          onChange={(e) => setStyle(e.target.value)}
+        >
+          <option value="">Any style</option>
+          {styleChoices.map((choice) => (
+            <option key={choice.key} value={choice.key}>
+              {choice.label} ({choice.count})
+            </option>
+          ))}
+        </select>
+      </label>
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -245,11 +274,12 @@ export function EventsListPage() {
         <SavedViewsBar<EventsView>
           pageKey="events"
           subjectArea="events"
-          currentState={{ tab, search, dir }}
+          currentState={{ tab, search, dir, style }}
           onApply={(s) => {
             setTab(s.tab);
             setSearch(s.search);
             setDir(s.dir);
+            setStyle(s.style ?? "");
           }}
         />
       </div>

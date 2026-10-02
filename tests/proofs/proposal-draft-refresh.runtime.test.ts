@@ -65,6 +65,8 @@ describe("generate proposal draft from an event (AC-416 / AC-431)", () => {
       proposalId: first.proposalId,
       created: false,
       changed: false,
+      outcome: "reused",
+      version: expect.any(Number),
     });
     expect((await proposalRow(w, first.proposalId)).version).toBe(
       draft.version,
@@ -122,6 +124,8 @@ describe("generate proposal draft from an event (AC-416 / AC-431)", () => {
       proposalId: first.proposalId,
       created: false,
       changed: false,
+      outcome: "reused",
+      version: expect.any(Number),
     });
   });
 

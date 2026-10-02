@@ -192,5 +192,15 @@ export const TPP_FINANCIAL_REPORTS: readonly TppReportDefinition[] = [
     "venue-sales",
     "Venue Sales",
     "Event sales summary by venue assigned to event. Print by date range.",
+    [
+      ...DATE_RANGE_PARAMETER,
+      {
+        key: "venueId",
+        type: "entity",
+        entity: "venue",
+        label: "Venue (leave empty for every venue)",
+        required: false,
+      },
+    ],
   ),
 ];

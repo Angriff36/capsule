@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   formatDate,
   formatMoney,
+  formatTime,
   normalizeCurrencyCode,
 } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -56,6 +57,7 @@ import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { InvoiceNumberEditor } from "./InvoiceNumberEditor";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
+import { ReminderHistoryList } from "./ReminderHistoryList";
 import { useActionNotice } from "../../ui/action-result";
 import "./taxWorkspace.css";
 
@@ -99,6 +101,7 @@ export function InvoiceDetailPage() {
     getSchedule: getReminderSchedule,
     configureSchedule: configureReminderSchedule,
     sendNow: sendReminderNow,
+    emailInvoice,
   } = useInvoiceReminderActions();
   const { getPaymentLink, createPaymentLink, syncStripePayments } =
     useInvoicePaymentActions();
@@ -114,6 +117,7 @@ export function InvoiceDetailPage() {
   const [reminderSchedule, setReminderSchedule] =
     useState<ReminderScheduleView | null>(null);
   const [reminderScheduleLoading, setReminderScheduleLoading] = useState(true);
+  const [reminderHistoryKey, setReminderHistoryKey] = useState(0);
   const [paymentLink, setPaymentLink] = useState<InvoicePaymentLink | null>(
     null,
   );
@@ -349,7 +353,7 @@ export function InvoiceDetailPage() {
           await send(args);
           if (dueDate == null) {
             setNotice(
-              "Invoice marked sent in Capsule. Deliver it through your external channel. Automatic reminders need a due date set when the invoice is issued.",
+              "Invoice marked sent. Press Email the invoice to send the client the PDF. Automatic reminders need a due date set when the invoice is issued.",
             );
             return;
           }
@@ -361,20 +365,25 @@ export function InvoiceDetailPage() {
             setReminderSchedule(schedule);
             setReminderOffsetsInput(schedule.offsetsDays.join(", "));
             setNotice(
-              "Invoice marked sent in Capsule. Automatic payment reminder schedule saved; deliver the initial invoice through your external channel.",
+              "Invoice marked sent and payment reminders scheduled. Press Email the invoice to send the client the PDF.",
             );
           } catch (error) {
-            const detail =
-              error instanceof Error ? error.message : "setup failed";
+            const detail = error instanceof Error ? ` (${error.message})` : "";
             throw new Error(
-              `Invoice marked sent, but automatic reminder setup failed: ${detail}`,
+              `Invoice marked sent, but its automatic reminders were not saved${detail}. Check the due date, then press Enable reminders below.`,
             );
           }
           return;
         }
         if (key === "markViewed") await markViewed(args);
         if (key === "markOverdue") await markOverdue(args);
-        setNotice(`Invoice updated (${key}).`);
+        setNotice(
+          key === "markViewed"
+            ? "Invoice marked as seen by the client."
+            : key === "markOverdue"
+              ? "Invoice marked overdue."
+              : "Invoice updated.",
+        );
       });
     })();
   };
@@ -385,7 +394,9 @@ export function InvoiceDetailPage() {
   const balanceReminderSent = invoice.balanceReminderSentAt != null;
   const balanceDue = Number(invoice.amountDue ?? 0) > 0;
   const balanceReminderBlock = balanceReminderSent
-    ? "This invoice already has a balance reminder on file."
+    ? `A balance reminder was already noted on ${formatDate(
+        Number(invoice.balanceReminderSentAt),
+      )}. To email the client, use Send reminder now.`
     : balanceDue
       ? undefined
       : "Nothing remains due on this invoice.";
@@ -396,7 +407,9 @@ export function InvoiceDetailPage() {
         docId: invoice._id,
         version: invoice.version,
       });
-      setNotice("Balance reminder is on file for this invoice.");
+      setNotice(
+        "Balance reminder noted on this invoice. It does not email the client; use Send reminder now for that.",
+      );
     });
   };
 
@@ -442,15 +455,44 @@ export function InvoiceDetailPage() {
 
   const onSendReminderNow = () => {
     void run("sendReminder", async () => {
-      const result = await sendReminderNow(String(invoice._id));
+      const result = await sendReminderNow(String(invoice._id)).finally(() =>
+        setReminderHistoryKey((key) => key + 1),
+      );
       if (result.status === "delivered") {
         setNotice(
-          "Payment reminder emailed with the invoice PDF and payment link.",
+          `Payment reminder with the invoice PDF and payment link emailed${
+            result.to ? ` to ${result.to}` : ""
+          } just now.`,
+        );
+        return;
+      }
+      if (result.status === "already_delivered") {
+        setNotice(
+          `No reminder sent — one already went${
+            result.to ? ` to ${result.to}` : ""
+          }${
+            result.sentAt != null
+              ? ` at ${formatTime(result.sentAt)} on ${formatDate(result.sentAt)}`
+              : ""
+          } for the same balance.`,
+        );
+        return;
+      }
+      if (
+        result.reason === "client_no_reminders" ||
+        result.reason === "client_no_email"
+      ) {
+        setNotice(
+          result.reason === "client_no_email"
+            ? "No reminder sent — this client asked for no emails from us. Change it on the client's page if they want emails again."
+            : "No reminder sent — this client asked for no payment reminder emails. Change it on the client's page if they want them again.",
         );
         return;
       }
       if (result.reason === "stripe_payment_received") {
-        setNotice("No reminder sent — Stripe already shows this invoice paid.");
+        setNotice(
+          "No reminder sent — the client already paid through the payment link.",
+        );
         return;
       }
       setNotice(
@@ -459,11 +501,38 @@ export function InvoiceDetailPage() {
     });
   };
 
+  // One press: a draft is marked sent first, then the client gets the PDF.
+  const onEmailInvoice = () => {
+    void run("emailInvoice", async () => {
+      if (invoice.status === "draft") {
+        await send({ docId: invoice._id, version: invoice.version });
+      }
+      const result = await emailInvoice(String(invoice._id)).finally(() =>
+        setReminderHistoryKey((key) => key + 1),
+      );
+      if (result.status === "already_sent") {
+        setNotice(
+          `Not sent again — the invoice already went${
+            result.to ? ` to ${result.to}` : ""
+          }${
+            result.sentAt != null
+              ? ` at ${formatTime(result.sentAt)} on ${formatDate(result.sentAt)}`
+              : ""
+          } for the same balance.`,
+        );
+        return;
+      }
+      setNotice(
+        `Invoice PDF emailed to ${result.to ?? "the client"} just now.`,
+      );
+    });
+  };
+
   const onCreatePaymentLink = () => {
     void run("createPaymentLink", async () => {
       const link = await createPaymentLink(String(invoice._id));
       setPaymentLink(link);
-      setNotice("Stripe payment link ready. Copy it or send it to the client.");
+      setNotice("Payment link ready. Copy it or send it to the client.");
     });
   };
 
@@ -633,6 +702,18 @@ export function InvoiceDetailPage() {
             ) : null}
             <button className="btn btn-ghost" onClick={downloadPdf}>
               Download PDF
+            </button>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              disabled={
+                busy != null ||
+                invoice.status === "voided" ||
+                invoice.status === "written_off"
+              }
+              onClick={onEmailInvoice}
+            >
+              {busy === "emailInvoice" ? "Emailing…" : "Email the invoice"}
             </button>
             <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
               Add payment
@@ -1271,7 +1352,7 @@ export function InvoiceDetailPage() {
                 ? "Loading…"
                 : reminderSchedule
                   ? "Enabled"
-                  : "Not configured"}
+                  : "Not set up"}
             </dd>
           </div>
         </dl>
@@ -1345,6 +1426,10 @@ export function InvoiceDetailPage() {
             </button>
           </div>
         </form>
+        <ReminderHistoryList
+          invoiceId={String(invoice._id)}
+          refreshKey={reminderHistoryKey}
+        />
       </section>
 
       <section className="working-ledger">

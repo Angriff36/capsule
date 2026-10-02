@@ -100,9 +100,9 @@ describe("Event planning foundation", () => {
     expect(failure.category).toBe("guard_blocked");
     expect(failure.title).toBe("Ingredient wasn't created");
     expect(failure.detail).toBe(
-      "The ingredient could not be created because one of its requirements was not met. Nothing was saved. Request ID: a95c55eb16003c2d.",
+      "Something about this new ingredient, or what it belongs to, isn't allowed right now. Nothing was saved. Check the details, then try again.",
     );
-    expect(failure.detail).toContain("a95c55eb16003c2d");
+    expect(failure.detail).not.toContain("a95c55eb16003c2d");
     expect(failure.detail).not.toMatch(/lifecycle|refresh/i);
   });
 });

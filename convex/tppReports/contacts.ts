@@ -9,6 +9,8 @@ import { getAuthContext } from "../lib/authContext";
 import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -183,7 +185,8 @@ async function eventBundle(
       ctx.db
         .query("eventDishes")
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "event dishes")),
     ]);
   const menuLines = see.dishes
     ? eventDishes.filter((row) => isLiveTenantRow(row, tenantId))
@@ -233,7 +236,7 @@ async function eventBundle(
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown Contacts report");
@@ -254,7 +257,8 @@ export const run = query({
         await ctx.db
           .query("clients")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT)
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "clients"))
       ).filter(
         (row) => isLiveTenantRow(row, tenantId) && row.status === "active",
       );
@@ -382,12 +386,14 @@ export const run = query({
         ctx.db
           .query("events")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "events")),
         seeClients
           ? ctx.db
               .query("clients")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "clients"))
           : [],
       ]);
       const plainEvents = await Promise.all(
@@ -585,5 +591,5 @@ export const run = query({
     }
 
     throw new Error(`No Contacts resolver for ${args.reportId}`);
-  },
+  }),
 });

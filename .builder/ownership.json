@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "e0a7d79401d08676aef970491bba9e67b6306f8b9ba3442b272782a9c9d064d4"
+      "sha256": "e2015705d6645db80fe4738d4584e00e42033494b82e63c3a0b334147386bbf8"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "545d61c2f6d2613a9179f07e28983754c1e4d945821bccaffd5e196411693d8c"
+      "sha256": "7f4597959199e86d883b7f3863ae3c8504338434f731ea75db2cf5dc9b83a7fe"
     },
     "convex/lib/authContext.ts": {
       "sha256": "d18a22d82b44ddb5dbd519947c031b9d9ac0a50268b6c4603478b152a477be77",
@@ -18,19 +18,19 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "7f40133a6569769f93043fd12c2440555d546b77d5bcfdb9c65d53f80335935e"
+      "sha256": "e5d70d20baa4040fb080e1c129c2355ca62041c2e6b77a86c16744e926274d37"
     },
     "convex/queries.ts": {
-      "sha256": "ad577211c1573175e1c8953deabdc0e215bace89674d0d58f786caf92ff78d0e"
+      "sha256": "63f640b0d3de3dde802f4be714de6e881510b286dbcd338501ea0480d72c9eb5"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "8880c7b31ea09f6a3638d1c89f1139051239e1f8a30fdc6ffc6d1c8ea9ee0b7c"
+      "sha256": "76e8837b6f9e5602f25d281d3c6253473f82997eacfeac00918ef169e1b3a026"
     },
     "manifest-context-summary.json": {
-      "sha256": "85a975dea97403b47a5e6c5859e31b2af10aabed374834d11217764ac6dd9447"
+      "sha256": "173fb727ac9533dda275971f63893b1839d28d78ca4517f31915c541d68fa232"
     },
     "package.json": {
       "sha256": "8eaec7fa603c3cd1025cac03266f180f8bc33a69369ac3cb861bb3849981aa1c"
@@ -39,25 +39,25 @@
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "186cc96b32f8c4885ef8befda1c731c3c1ff26af6fc38074a93ec86c2ccabea4"
+      "sha256": "fd49dde1272be3369f19d9e14a592814e4598e48dc2c9380521cf962336f5b07"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "34fd1576217e5367893c54a63f3dfc6fe8359a58e01cf07a40c5871e8fa0ff47"
+      "sha256": "6ad0b91b317e57c8f8e4c3c29040ebf8d0d904ca5566a508cbca243d6119f5af"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "0821ea3eecfed1a1653f963c47cfd78eaedea72ddd69e67d9f0e4ef9d8eef9e8"
+      "sha256": "dbcf8d41e3c7ea8b8a3570e36606074533d6ae39eab60762c04d8b1a27af1d54"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "fec14422eb6c1c1146878bcaad25263efe4767119b06012bdacb2dbd7494cf49"
+      "sha256": "fb9c8fd098c29c975dfbea685f5940b879e7a536ff3e8d4b6d97da1202dd9a46"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "8b18b4e5e6839bb5b93115f70b7f15c6d2f49bc199e92a4aff2daec4c1c78f12"
+      "sha256": "6504e26959de517ecc850ca9797cbae0df8000541dc3c134963cead068f32285"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "31b39c15bfadb749ee0322fb5cc60ca7da6f2851352c5479ae76514748b2913c"
+      "sha256": "d5d106d32c30ba87eb6dccbf3fd94b8076f3a56cbbc8486f37f5307e78b9cd9f"
     }
   },
   "package": {
@@ -104,6 +104,7 @@
       "src/finance/payroll-input.manifest",
       "src/finance/revenue-attribution.manifest",
       "src/foundation/base.manifest",
+      "src/foundation/command-audit.manifest",
       "src/foundation/materialization-receipt.manifest",
       "src/identity/email-notification-subscription.manifest",
       "src/identity/person.manifest",
@@ -111,6 +112,8 @@
       "src/import/import-artifact.manifest",
       "src/import/import-dataset.manifest",
       "src/import/import-run.manifest",
+      "src/import/parallel-run-difference.manifest",
+      "src/insights/leadership.manifest",
       "src/insights/report.manifest",
       "src/insights/tpp-report-favorite.manifest",
       "src/integrations/integration-connection.manifest",

@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
-import { formatCount, formatDate } from "../../../lib/format";
+import { formatDate } from "../../../lib/format";
 import { formatStatusLabel } from "../../../lib/statusLabels";
+import { EventAllergenBriefingBody } from "../EventAllergenBriefingBody";
 import { EventBudgetCard } from "../EventBudgetCard";
+import { EventCalendarSyncNote } from "../EventCalendarSyncNote";
 import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
 import { EventInvoiceCard } from "../EventInvoiceCard";
 import { EventMapPanel } from "../EventMapPanel";
 import { EventOverviewRail } from "../EventOverviewRail";
 import { EventReadinessCard } from "../EventReadinessCard";
+import { EventAutomaticWhyCard } from "../EventAutomaticWhyCard";
 import { EventSetupProgress } from "../EventSetupProgress";
 import { EventStageActionsCard } from "../EventStageActionsCard";
 import { EventTimelineCommentsPanel } from "../EventTimelineCommentsPanel";
@@ -28,9 +31,7 @@ export const SHEET_LABEL: Record<DashSheetId, string> = {
   service: "Service & allergies",
   workbook: "Event workbook",
   ops: "Operations",
-  weather: "Weather",
-  team: "Owner & staff",
-  recurring: "Recurring schedule",
+  allergens: "Allergen briefing",
   notes: "Planning notes",
   stage: "Pipeline stage",
   edit: "Edit event basics",
@@ -113,6 +114,13 @@ export function EventDashSheetBody({
               accessibilityNeeds={reviseProps.accessibilityNeeds}
               editHref={editHref}
             />
+            <EventOverviewRail
+              assignedToId={event.assignedToId}
+              ownerName={event.ownerName}
+              people={people}
+              peopleLoading={people === undefined}
+            />
+            <EventCalendarSyncNote eventId={eventId} />
             <EventMapPanel venue={venue} startsAt={startsAt}>
               <EventWeatherChip venue={venue} startsAt={startsAt} />
             </EventMapPanel>
@@ -139,6 +147,7 @@ export function EventDashSheetBody({
           <div className="evd-sheet-body">
             <EventSetupProgress eventId={eventId} event={event} />
             <EventReadinessCard eventId={eventId} />
+            <EventAutomaticWhyCard eventId={eventId} />
           </div>
         </>
       );
@@ -193,12 +202,13 @@ export function EventDashSheetBody({
                 : "No accessibility notes."}
             </div>
             <div className="evd-center">
-              <Link
-                to={`/events/${eventId}/allergen-briefing`}
+              <button
+                type="button"
                 className="evd-btn"
+                onClick={() => onOpen("allergens")}
               >
                 Allergen briefing
-              </Link>
+              </button>
               <button
                 type="button"
                 className="evd-btn"
@@ -211,6 +221,30 @@ export function EventDashSheetBody({
         </>
       );
     }
+    case "allergens":
+      return (
+        <>
+          <EventDashSheetHead
+            kicker="Allergen briefing"
+            title={title}
+            lede="Every dish with its allergens, and each guest's restrictions. Read it at the pre-event huddle."
+          />
+          <div className="evd-sheet-body">
+            <EventAllergenBriefingBody
+              eventId={eventId}
+              expectedHeadcount={expectedHeadcount}
+            />
+            <div className="evd-center">
+              <Link
+                to={`/events/${eventId}/allergen-briefing`}
+                className="evd-btn pri"
+              >
+                Print briefing
+              </Link>
+            </div>
+          </div>
+        </>
+      );
     case "workbook":
       return (
         <>
@@ -239,102 +273,6 @@ export function EventDashSheetBody({
               ),
             )}
             {editButton}
-          </div>
-        </>
-      );
-    case "weather":
-      return (
-        <>
-          <EventDashSheetHead
-            kicker="Weather forecast"
-            title="Event-day outlook"
-            lede="The venue's forecast for the event date. Add a venue address or coordinates to see it."
-          />
-          <div className="evd-sheet-body">
-            <div className="evd-center">
-              <EventWeatherChip venue={venue} startsAt={startsAt} />
-            </div>
-            <EventMapPanel venue={venue} startsAt={startsAt} />
-          </div>
-        </>
-      );
-    case "team":
-      return (
-        <>
-          <EventDashSheetHead
-            kicker="Owner & staff"
-            title="The team"
-            lede="Who owns this event and who works it."
-          />
-          <div className="evd-sheet-body">
-            <EventOverviewRail
-              assignedToId={event.assignedToId}
-              ownerName={event.ownerName}
-              people={people}
-              peopleLoading={people === undefined}
-              dishCount={dishCount}
-              staffCount={staffCount}
-              timelineCount={timelineCount}
-              menuHref={eventDetailPath(eventId, "menu")}
-              staffingHref={eventDetailPath(eventId, "staffing")}
-              timelineHref={eventDetailPath(eventId, "timeline")}
-            />
-            <div className="evd-center">
-              <Link
-                to={eventDetailPath(eventId, "staffing")}
-                className="evd-btn pri"
-              >
-                Assign staff
-              </Link>
-            </div>
-          </div>
-        </>
-      );
-    case "recurring":
-      return (
-        <>
-          <EventDashSheetHead
-            kicker="Recurring schedule"
-            title={
-              event.recurrenceFrequency
-                ? formatStatusLabel(event.recurrenceFrequency)
-                : "One-time event"
-            }
-            lede={
-              event.recurrenceFrequency
-                ? "This event repeats."
-                : "This event does not repeat."
-            }
-          />
-          <div className="evd-sheet-body">
-            <div className="evd-figs">
-              <div>
-                <b>{formatCount(event.recurrenceGeneratedCount ?? 0)}</b>
-                <span className="evd-label">Occurrences</span>
-              </div>
-              <div>
-                <b>
-                  {event.recurrenceFrequency
-                    ? formatStatusLabel(event.recurrenceFrequency)
-                    : "Never"}
-                </b>
-                <span className="evd-label">Repeats</span>
-              </div>
-              <div>
-                <b>{event.recurrenceActive ? "On" : "—"}</b>
-                <span className="evd-label">Schedule</span>
-              </div>
-            </div>
-            <div className="evd-center">
-              <Link
-                to={eventDetailPath(eventId, "recurring")}
-                className="evd-btn pri"
-              >
-                {event.recurrenceFrequency
-                  ? "Open the schedule"
-                  : "Set up a schedule"}
-              </Link>
-            </div>
           </div>
         </>
       );

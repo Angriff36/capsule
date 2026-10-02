@@ -194,6 +194,96 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
   store SavedReportDefinition in durable
 }
 
+// A dated copy of one live report's figures, kept exactly as the person who
+// took it saw them (PR11-08: "a saved snapshot remains reproducible and
+// visibly dated"). figures holds the computed result (numbers, chart points,
+// rows, what was left out) plus the date window and filters it ran with;
+// sourceAsOf is the newest change in its source records. Nothing revises a
+// snapshot: it is only taken or removed. Who may read it follows the report's
+// sharing at capture time and the role's right to read that subject's data
+// (src/features/reports/liveReportSubjectAccess.ts). A row not yet taken
+// holds no figures and passes, so the take step can run on it (the same rule
+// as an undefined SavedReportDefinition draft).
+entity SavedReportSnapshot mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed savedReportDefinitionId: uuid?
+  property required title: string = ""
+  property required subjectArea: ReportSubjectArea = "events"
+  property required sharingScope: ReportSharingScope = "owner_only"
+  property required figures: json = {}
+  property sourceAsOf: datetime?
+  property capturedAt: datetime?
+  property capturedByPersonId: uuid?
+
+  ref report: SavedReportDefinition fields [tenantId, savedReportDefinitionId] references [tenantId, id]
+  ref capturedBy: Person fields [tenantId, capturedByPersonId] references [tenantId, id]
+
+  default policy savedReportSnapshotRead read: self.capturedAt == null or (self.capturedByPersonId == user.personId or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess")) and ((self.subjectArea == "events" and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess"))) or (self.subjectArea == "sales" and roleAllows(user.role, "salesAccess")) or (self.subjectArea == "inventory" and (roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess"))) or (self.subjectArea == "production" and (roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess"))) or (self.subjectArea == "workforce" and roleAllows(user.role, "workforceAccess")) or (self.subjectArea == "logistics" and (roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess"))) or (self.subjectArea == "finance" and (roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess"))))) "A report snapshot shows to the people its report is shared with, if they may see that kind of report"
+  default policy savedReportSnapshotWrite write: roleAllows(user.role, "staffAccess") "Staff may keep report snapshots"
+  default policy savedReportSnapshotExecute execute: roleAllows(user.role, "staffAccess") "Staff may take report snapshots"
+
+  command capture(
+    savedReportDefinitionId: uuid,
+    title: string,
+    subjectArea: ReportSubjectArea,
+    sharingScope: ReportSharingScope,
+    figures: json,
+    optional sourceAsOf: datetime
+  ) {
+    guard self.capturedAt == null
+    guard self.deletedAt == null
+    guard user.personId != null
+    constraint captureTitle: length(trim(title)) > 0 "Give the snapshot the report's name."
+    mutate savedReportDefinitionId = savedReportDefinitionId
+    mutate title = title
+    mutate subjectArea = subjectArea
+    mutate sharingScope = sharingScope
+    mutate figures = figures
+    mutate sourceAsOf = sourceAsOf
+    mutate capturedAt = now()
+    mutate capturedByPersonId = user.personId
+    emit SavedReportSnapshotCaptured {
+      savedReportSnapshotId: self.id
+      savedReportDefinitionId: savedReportDefinitionId
+      tenantId: self.tenantId
+      capturedByPersonId: user.personId
+      subjectArea: subjectArea
+    }
+  }
+
+  command remove() {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.capturedByPersonId == user.personId or roleAllows(user.role, "manageAccess")
+    mutate deletedAt = now()
+    emit SavedReportSnapshotRemoved {
+      savedReportSnapshotId: self.id
+      savedReportDefinitionId: self.savedReportDefinitionId
+      tenantId: self.tenantId
+    }
+  }
+
+  store SavedReportSnapshot in durable
+}
+
+event SavedReportSnapshotCaptured: "saved_report.snapshot_captured" {
+  savedReportSnapshotId: string
+  savedReportDefinitionId: string
+  tenantId: string
+  capturedByPersonId: string
+  subjectArea: ReportSubjectArea
+}
+
+event SavedReportSnapshotRemoved: "saved_report.snapshot_removed" {
+  savedReportSnapshotId: string
+  savedReportDefinitionId: string?
+  tenantId: string
+}
+
 event SavedReportDefinitionCreated: "saved_report.created" {
   savedReportDefinitionId: string
   tenantId: string

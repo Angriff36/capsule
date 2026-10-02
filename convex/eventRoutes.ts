@@ -49,6 +49,7 @@ import {
   type RoutePolicy,
   type VenueFacts,
 } from "../src/lib/routeFacts";
+import { insertStepEvent } from "./lib/commandAudit";
 
 export const ROUTE_FACT_ENTITY = "EventRoute";
 export const ROUTE_FACT_TYPE = "EventRouteFactRecorded";
@@ -304,7 +305,7 @@ export const recordRouteFacts = internalMutation({
       throw new ConvexError("Event not found");
     }
     for (const fact of facts) {
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: ROUTE_FACT_TYPE,
         entity: ROUTE_FACT_ENTITY,
         entityId: String(eventId),

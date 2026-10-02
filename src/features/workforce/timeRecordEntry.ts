@@ -61,27 +61,43 @@ export function toEpoch(value: unknown): number | null {
   return Number.isFinite(time) ? time : null;
 }
 
-/** Best current shift for a person — same ±2h window Timesheet already used. */
-export function currentShiftFor(
+/**
+ * Best shift for a clock-in at `now`: one whose window covers it (±2h slack),
+ * else the person's first shift starting that same day. Time sheet and My Day
+ * both use this, so a clock-in carries the shift's event either way.
+ */
+export function currentShiftFor<T extends ShiftLike>(
   personId: string,
-  shifts: readonly ShiftLike[] | undefined,
+  shifts: readonly T[] | undefined,
   now = Date.now(),
-): ShiftLike | undefined {
-  return (shifts ?? [])
+): T | undefined {
+  const mine = (shifts ?? [])
     .filter(
       (shift) =>
         shift.deletedAt == null &&
         String(shift.personId) === personId &&
         ["scheduled", "started"].includes(String(shift.status)),
     )
-    .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0))
-    .find(
+    .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
+  const dayStart = new Date(now);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(now);
+  dayEnd.setHours(23, 59, 59, 999);
+  return (
+    mine.find(
       (shift) =>
         shift.startsAt != null &&
         shift.endsAt != null &&
         now >= shift.startsAt - SHIFT_SLACK_MS &&
         now <= shift.endsAt + SHIFT_SLACK_MS,
-    );
+    ) ??
+    mine.find(
+      (shift) =>
+        shift.startsAt != null &&
+        shift.startsAt >= dayStart.getTime() &&
+        shift.startsAt <= dayEnd.getTime(),
+    )
+  );
 }
 
 /** Explicit event wins; otherwise inherit the current shift's event. */

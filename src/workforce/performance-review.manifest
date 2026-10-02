@@ -18,19 +18,31 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
   property required qualityRating: int = 0
   property required teamworkRating: int = 0
   property encrypted notes: string?
+  // The role scorecard version this review measured against (spec §9.2/§9.4).
+  // Scorecard rows are immutable versions, so the link stays interpretable.
+  property scorecardId: uuid?
+  // Shared with the person reviewed (My reviews). `notes` stays manager-private.
+  property strengths: string?
+  property opportunities: string?
+  property comments: string?
+  property followUp: string?
+  property followUpDue: datetime?
   property recordedAt: datetime?
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   belongsTo reviewer: Person fields [tenantId, reviewerId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo scorecard: RoleScorecard fields [tenantId, scorecardId] references [tenantId, id]
 
   // Ratings default to 0 on the draft; the strict 1..5 range is enforced by
   // the record command. Once recorded, all three dimensions must be in range.
   constraint reviewRatingsRange: self.recordedAt == null or (self.reliabilityRating >= 1 and self.reliabilityRating <= 5 and self.qualityRating >= 1 and self.qualityRating <= 5 and self.teamworkRating >= 1 and self.teamworkRating <= 5) "Once this review is on file, reliability, quality, and teamwork all need a rating between 1 and 5."
 
-  // Manager-only visibility: performance reviews inform shift assignment and
-  // compensation, so reads are gated to managers rather than all staff.
-  default policy performanceReviewRead read: roleAllows(user.role, "manageAccess") "Managers may see performance reviews"
+  // HR-only visibility (spec §9.4 "visibility follows HR permissions"): the
+  // private notes are personnel records, so other managers do not read them.
+  // The person reviewed sees their own reviews, without notes, through
+  // convex/staffSelfReviews.ts.
+  default policy performanceReviewRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may see performance reviews"
   default policy performanceReviewWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update performance reviews"
   default policy performanceReviewExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change performance reviews"
 
@@ -42,7 +54,13 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
     reliabilityRating: int,
     qualityRating: int,
     teamworkRating: int,
-    optional notes: string
+    optional notes: string,
+    optional scorecardId: uuid,
+    optional strengths: string,
+    optional opportunities: string,
+    optional comments: string,
+    optional followUp: string,
+    optional followUpDue: datetime
   ) {
     guard self.recordedAt == null
     guard self.deletedAt == null
@@ -60,6 +78,12 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
     mutate qualityRating = qualityRating
     mutate teamworkRating = teamworkRating
     mutate notes = notes
+    mutate scorecardId = scorecardId
+    mutate strengths = strengths
+    mutate opportunities = opportunities
+    mutate comments = comments
+    mutate followUp = followUp
+    mutate followUpDue = followUpDue
     mutate recordedAt = now()
     emit PerformanceReviewRecorded {
       performanceReviewId: self.id

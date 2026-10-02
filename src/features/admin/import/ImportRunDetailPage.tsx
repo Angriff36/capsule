@@ -36,6 +36,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
   stock: "Opening stock",
 };
 
@@ -80,11 +81,38 @@ const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
     { next: "committing", label: "Approve & Commit" },
     { next: "failed", label: "Fail" },
   ],
-  committing: [{ next: "completed", label: "Complete Commit" }],
+  committing: [
+    { next: "completed", label: "Complete Commit" },
+    // AC-631: stops part-way and takes back what nobody changed yet.
+    { next: "stopped", label: "Stop this import" },
+  ],
   completed: [{ next: "reverted", label: "Revert" }],
   failed: [],
   reverted: [],
 };
+
+/** What Stop this import did, saved on the run (AC-056). */
+function readStopReport(
+  raw: string | null | undefined,
+): { removed: number; kept: string[]; done: boolean } | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as {
+      removed?: unknown;
+      kept?: unknown;
+      done?: unknown;
+    };
+    return {
+      removed: typeof parsed.removed === "number" ? parsed.removed : 0,
+      kept: Array.isArray(parsed.kept)
+        ? parsed.kept.filter((name): name is string => typeof name === "string")
+        : [],
+      done: parsed.done === true,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export function ImportRunDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -102,6 +130,7 @@ export function ImportRunDetailPage() {
   // see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
+  const cancelImportRun = useAction(api.importCancel.cancelImportRun);
 
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
@@ -152,7 +181,8 @@ export function ImportRunDetailPage() {
     importRun.datasetType === "leads" ||
     importRun.datasetType === "payments" ||
     importRun.datasetType === "menus" ||
-    importRun.datasetType === "pack_list";
+    importRun.datasetType === "pack_list" ||
+    importRun.datasetType === "history";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
@@ -166,7 +196,9 @@ export function ImportRunDetailPage() {
               ? "menu"
               : importRun.datasetType === "pack_list"
                 ? "pack list"
-                : "venue";
+                : importRun.datasetType === "history"
+                  ? "message or task"
+                  : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -327,6 +359,62 @@ export function ImportRunDetailPage() {
     });
   };
 
+  // AC-056: a run keeps its rows on the server, so anyone can finish it after
+  // the browser that started it closed.
+  const handleContinue = async () => {
+    setError(null);
+    setNotice(null);
+    setBusy("continue");
+    try {
+      const result = await commitImportRun({
+        importRunId: importRun._id,
+        rawRows: [],
+      });
+      setNotice(
+        `Import finished: ${result.committed} more ${commitNoun}(s) brought in.`,
+      );
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Continue failed");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleStop = async () => {
+    const reason = await prompt.askReason({
+      title: "Stop this import",
+      description:
+        "Nothing more is brought in. Items this import already added are removed again, unless someone has changed them since — those stay.",
+      label: "Why are you stopping it?",
+      placeholder: "For example: wrong file",
+      confirmLabel: "Stop import",
+      tone: "danger",
+    });
+    if (!reason?.trim()) return;
+    setError(null);
+    setNotice(null);
+    setBusy("stopped");
+    void (async () => {
+      try {
+        const result = await cancelImportRun({
+          importRunId: importRun._id,
+          reason: reason.trim(),
+        });
+        setNotice(
+          `Stopped. ${result.removed} item(s) removed again` +
+            (result.kept.length > 0
+              ? `; kept because someone changed them: ${result.kept.join(", ")}`
+              : "") +
+            ".",
+        );
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Stop failed");
+      } finally {
+        setBusy(null);
+      }
+    })();
+  };
+
   const handleRevert = async () => {
     const confirmed = await prompt.askConfirm({
       title: "Revert Import",
@@ -363,6 +451,7 @@ export function ImportRunDetailPage() {
   };
 
   const counts = parseRecordCounts(importRun.recordCounts);
+  const stopReport = readStopReport(importRun.stopReport);
   const dispositionSummary = parseRecordCounts(
     importRun.dispositionCounts ?? "{}",
   );
@@ -475,6 +564,9 @@ export function ImportRunDetailPage() {
                 case "reverted":
                   void handleRevert();
                   break;
+                case "stopped":
+                  void handleStop();
+                  break;
               }
             };
             return (
@@ -484,7 +576,9 @@ export function ImportRunDetailPage() {
                 onClick={handleClick}
                 disabled={isBusy}
                 className={`btn ${
-                  transition.next === "failed" || transition.next === "reverted"
+                  transition.next === "failed" ||
+                  transition.next === "reverted" ||
+                  transition.next === "stopped"
                     ? "btn-ghost"
                     : "btn-primary"
                 }`}
@@ -493,12 +587,32 @@ export function ImportRunDetailPage() {
               </button>
             );
           })}
+          {importRun.status === "committing" &&
+          importRun.sourceRowsStorageId ? (
+            <button
+              type="button"
+              onClick={() => void handleContinue()}
+              disabled={busy === "continue"}
+              className="btn btn-primary"
+            >
+              {busy === "continue" ? "Processing..." : "Continue import"}
+            </button>
+          ) : null}
           {availableTransitions.length === 0 ? (
             <span className="text-ink-2 text-xs">
               No actions available for this status
             </span>
           ) : null}
         </div>
+        {stopReport ? (
+          <p className="border-t border-line px-4 py-3 text-xs text-ink-2">
+            {stopReport.done ? "Stopped. " : "Stopping… "}
+            {stopReport.removed} item(s) removed again.
+            {stopReport.kept.length > 0
+              ? ` Kept because someone changed them: ${stopReport.kept.join(", ")}.`
+              : ""}
+          </p>
+        ) : null}
       </div>
 
       {/* Report archive intake: upload, list, sort, explain (PL-ARCHIVE) */}

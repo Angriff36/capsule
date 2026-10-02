@@ -168,13 +168,24 @@ export function TrackerSheetRow({
         </label>
       </td>
       <td className="tracker-col-pack">
-        <span
-          className="tracker-pack-pill"
-          data-pack={row.packState}
-          title={row.packDetail ?? undefined}
-        >
-          {PACK_STATE_LABEL[row.packState]}
-        </span>
+        {row.packState === "question" ? (
+          <Link
+            className="tracker-pack-pill"
+            data-pack={row.packState}
+            title="See the open questions on this event"
+            to={`${eventDetailPath(row.id)}#event-questions`}
+          >
+            {PACK_STATE_LABEL[row.packState]}
+          </Link>
+        ) : (
+          <span
+            className="tracker-pack-pill"
+            data-pack={row.packState}
+            title={row.packDetail ?? undefined}
+          >
+            {PACK_STATE_LABEL[row.packState]}
+          </span>
+        )}
         {row.packListId ? (
           <Link
             className="tracker-pack-link"
@@ -192,7 +203,15 @@ export function TrackerSheetRow({
             Open pack list
           </button>
         ) : null}
-        {row.packDetail ? <small>{row.packDetail}</small> : null}
+        {row.packDetail && row.packState === "question" ? (
+          <small>
+            <Link to={`${eventDetailPath(row.id)}#event-questions`}>
+              {row.packDetail} – see them
+            </Link>
+          </small>
+        ) : row.packDetail ? (
+          <small>{row.packDetail}</small>
+        ) : null}
       </td>
     </tr>
   );

@@ -14,7 +14,8 @@
 // same importAccess capability as the entity's own read policy
 // (external-record-link.manifest:97) so the seam does not widen access.
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import { query, type QueryCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { getAuthContext } from "./lib/authContext";
 
 // Mirror of the roles granted `importAccess` in src/foundation/base.manifest
@@ -55,12 +56,16 @@ export const listByCapsuleId = query({
       .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
       .collect();
 
+    // AC-181: a client keeps the old-system links of every client merged
+    // into it, each marked with the name it was imported under.
+    const merged = await mergedClients(ctx, auth.tenantId, capsuleId);
+    const mergedName = new Map(merged.map((m) => [m.clientId, m.name]));
     const links = rows
       .filter(
         (row) =>
           row.deletedAt == null &&
           row.conflictStatus !== "superseded" &&
-          row.capsuleId === capsuleId,
+          (row.capsuleId === capsuleId || mergedName.has(row.capsuleId)),
       )
       .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
 
@@ -89,6 +94,58 @@ export const listByCapsuleId = query({
       importedAt: row.createdAt ?? null,
       resolutionNote: row.resolutionNote ?? null,
       rawSourceData: row.rawSourceData ?? null,
+      mergedFromName: mergedName.get(row.capsuleId) ?? null,
     }));
   },
 });
+
+/** AC-181: the earlier names of a client: every client merged into it. */
+export const listMergedClients = query({
+  args: { clientId: v.string() },
+  handler: async (ctx, { clientId }) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !IMPORT_ACCESS_ROLES.has(auth.role)) return [];
+    return await mergedClients(ctx, auth.tenantId, clientId);
+  },
+});
+
+async function mergedClients(
+  ctx: QueryCtx,
+  tenantId: string,
+  clientId: string,
+): Promise<Array<{ clientId: string; name: string; mergedAt: number | null }>> {
+  const root = ctx.db.normalizeId("clients", clientId);
+  if (!root) return [];
+  const found: Array<{
+    clientId: string;
+    name: string;
+    mergedAt: number | null;
+  }> = [];
+  const seen = new Set<string>([root]);
+  const queue: Id<"clients">[] = [root];
+  // A merge chain (C into B, then B into A) keeps every earlier name.
+  while (queue.length > 0) {
+    const into = queue.shift()!;
+    const rows = await ctx.db
+      .query("clients")
+      .withIndex("by_mergedIntoClientId", (q) =>
+        q.eq("mergedIntoClientId", into),
+      )
+      .collect();
+    for (const row of rows) {
+      if (row.tenantId !== tenantId || seen.has(row._id)) continue;
+      seen.add(row._id);
+      queue.push(row._id);
+      const name =
+        row.clientType === "company"
+          ? (row.companyName ?? "")
+          : [row.givenName, row.familyName].filter(Boolean).join(" ");
+      found.push({
+        clientId: row._id,
+        name: name || "Unnamed client",
+        mergedAt: row.mergedAt ?? null,
+      });
+    }
+  }
+  return found;
+}

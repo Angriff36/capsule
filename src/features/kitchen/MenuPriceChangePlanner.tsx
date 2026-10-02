@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useMenuDishSchedulePriceChange } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // Plan a dish's new price from a date. From that day on, new quotes, new
 // proposals and the public menu use it; proposals already sent keep the
@@ -132,9 +133,8 @@ export function MenuPriceChangePlanner({
         </label>
         <label className="field-label">
           <span>Starting on</span>
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             value={day}
             disabled={!canEdit || saving}
             onChange={(event) => setDay(event.target.value)}

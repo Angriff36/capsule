@@ -148,6 +148,8 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     guard user.personId != null
     constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Pick a venue."
     constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Pick a vendor."
+    constraint establishEffectiveDates: effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil "Effective from must be before effective until"
+    constraint establishDiscount: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "Discount percent must be between 0 and 100"
     mutate venueId = venueId
     mutate vendorId = vendorId
     mutate category = category
@@ -208,7 +210,9 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard user.personId != null
-    constraint reviseEffectiveDates: (effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil) "Effective from must be before effective until"
+    // Compare the dates as they will be after the change: a new end date is
+    // checked against the start already saved, and the other way round.
+    constraint reviseEffectiveDates: (effectiveFrom != null ? effectiveFrom : self.effectiveFrom) == null or (effectiveUntil != null ? effectiveUntil : self.effectiveUntil) == null or (effectiveFrom != null ? effectiveFrom : self.effectiveFrom) <= (effectiveUntil != null ? effectiveUntil : self.effectiveUntil) "Effective from must be before effective until"
     constraint reviseDiscount: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "Discount percent must be between 0 and 100"
     mutate category = category != null ? category : self.category
     mutate effectiveFrom = effectiveFrom != null ? effectiveFrom : self.effectiveFrom

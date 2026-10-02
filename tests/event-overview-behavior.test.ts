@@ -215,7 +215,7 @@ it("prints the booked client snapshot in the details card, not a later catalog r
   expect(card.textContent).not.toContain("Acme RENAMED");
 });
 
-it("prints the booked owner snapshot in the assigned-owner card, not a later catalog rename", async () => {
+it("prints the booked owner snapshot in the assigned-owner card (Event details), not a later catalog rename", async () => {
   backend.values.set("useGetEvent", {
     _id: eventId,
     title: "Garden dinner",
@@ -237,7 +237,7 @@ it("prints the booked owner snapshot in the assigned-owner card, not a later cat
     },
   ]);
   await mount(page(), `/events/${eventId}`);
-  await openTile("team", "event-assigned-owner");
+  await openTile("details", "event-assigned-owner");
   const name = container.querySelector(
     '[data-testid="event-assigned-owner-name"]',
   );

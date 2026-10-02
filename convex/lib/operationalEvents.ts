@@ -23,6 +23,9 @@ import { eventProposalReconciliation } from "./proposalReconciliation";
 import { eventPacketReconciliation } from "./packetReconciliation";
 import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
+import { freezeFinalVenueFacts } from "./venueFactsSnapshot";
+import { assertVendorAllowedAtEvent } from "../venueVendorPolicy";
+import { assertSplitsWithinRevenue, captureVenueTermAtBooking } from "./bookingAttribution";
 import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
@@ -57,8 +60,10 @@ import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 import { enforceOneOnly } from "./oneOnlyRules";
+import { recordCommandAudit } from "./commandAudit";
 import { queueRouteRefresh } from "./routeFollowUp";
 import { queueTimingRecalculation } from "./timingFollowUp";
+import { queueAutoStage } from "./autoStageFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
 import { validateEventVehicleAssignment, validateRigLoadForLine } from "./eventRouteLegRead";
 import { assertSignInUnclaimed } from "./personAuthPick";
@@ -72,9 +77,12 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  // PL-AUDIT: who ran this step, for which company, when (never undoes it).
+  await recordCommandAudit(ctx, event);
   await enforceOneOnly(ctx, event);
   await queueRouteRefresh(ctx, event);
   await queueTimingRecalculation(ctx, event);
+  await queueAutoStage(ctx, event);
   // Pack lines follow every event fact that asks for equipment (spec §13.2).
   const packEventId = packFactEventId(event);
   if (packEventId) await reconcileEventPackRules(ctx, packEventId);
@@ -107,6 +115,15 @@ export async function handleManifestEvent(
     await raiseReturnIssues(ctx, event.entityId as Id<"equipmentReservations">);
     return;
   }
+  // PL-VENDOR-POLICY (AC-319): the venue's banned vendors stay out.
+  if ((event.entity === "RentalOrderLine" && event.type === "RentalOrderLineRequested") ||
+    (event.entity === "VendorOrder" && event.type === "VendorOrderOpened")) {
+    await assertVendorAllowedAtEvent(
+      ctx,
+      event.payload.eventId as string | null | undefined,
+      event.payload.vendorId as string | null | undefined,
+    );
+  }
   if (event.entity === "RentalOrderLine" && event.type === "RentalOrderLineReturned") {
     await raiseVendorReturnIssue(ctx, event.entityId as Id<"rentalOrderLines">);
     return;
@@ -134,6 +151,19 @@ export async function handleManifestEvent(
     // One unsent draft invoice when the quoted price is above zero (AC-618).
     await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
+    // PL-ATTRIBUTION (AC-321): the venue term in force at booking.
+    await captureVenueTermAtBooking(ctx, event.entityId as Id<"events">);
+  }
+  if (event.entity === "RevenueAttribution" && event.type === "RevenueAttributionApplied") {
+    await assertSplitsWithinRevenue(
+      ctx,
+      event.entityId as Id<"revenueAttributions">,
+      Number(event.payload.eventRevenue ?? 0),
+    );
+  }
+  // PL-VENUE-LAYOUT (AC-315): the finished event keeps the venue as it was.
+  if (event.entity === "Event" && event.type === "EventFinalized") {
+    await freezeFinalVenueFacts(ctx, event.entityId as Id<"events">);
   }
   if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedDemandDescribed") {
     await validateDescribedDemand(ctx, event.entityId as Id<"eventStaffNeeds">);

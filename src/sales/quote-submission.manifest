@@ -93,9 +93,14 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   property completedAt: datetime?
   property errorMessage: string?
   property processingErrors: string?
+  // A client merge moves the request to the client kept (PL-SOURCE-MERGE).
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
 
   // Relations to created entities
   ref client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref lead: Lead fields [tenantId, leadId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
@@ -227,6 +232,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null "Cannot process a deleted quote submission"
 
     mutate status = "processing"
+    emit QuoteSubmissionProcessingStarted {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command complete(
@@ -284,6 +293,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
 
     mutate status = "dismissed"
     mutate errorMessage = reason
+    emit QuoteSubmissionDismissed {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Staff retries a failed conversion: the row reopens as pending with the
@@ -297,9 +310,58 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate status = "pending"
     mutate errorMessage = null
     mutate processingErrors = null
+    emit QuoteSubmissionRetried {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Quote request already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit QuoteSubmissionClientMergeStaged {
+      submissionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the quote request client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit QuoteSubmissionClientReassigned {
+      submissionId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
   }
 
   store QuoteSubmission in durable
+}
+
+event QuoteSubmissionClientMergeStaged: "quote.client_merge_staged" {
+  submissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionClientReassigned: "quote.client_reassigned" {
+  submissionId: string
+  tenantId: string
+  previousClientId: string?
+  clientId: string?
 }
 
 event QuoteSubmitted: "quote.submitted" {
@@ -325,4 +387,20 @@ event QuoteProcessingFailed: "quote.processing_failed" {
   submissionId: string
   tenantId: string
   errorMessage: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event QuoteSubmissionDismissed: "quote.submission.dismissed" {
+  quoteSubmissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionRetried: "quote.submission.retried" {
+  quoteSubmissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionProcessingStarted: "quote.submission.processing.started" {
+  quoteSubmissionId: string
+  tenantId: string
 }

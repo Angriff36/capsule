@@ -19,6 +19,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const SCRIPT = join(__dirname, "..", "scripts", "deploy-backend.sh");
+const STAMP = join(__dirname, "..", "convex", "lib", "backendRelease.ts");
 // Git Bash on Windows, never the WSL stub (same lookup as scripts/windowsGitBashPath.ts).
 const GIT_BASH = [
   process.env.GIT_BASH?.trim() ?? "",
@@ -34,8 +35,12 @@ const STUBS: Record<string, string> = {
 if [ "$1" = "--version" ]; then echo "\${STUB_BUN_VERSION:-9.9.9}"; exit 0; fi
 echo "bun $*" >> "$STUB_LOG"
 `,
+  // The "deployed code" is what the stamp file held at deploy time.
   npx: `#!/usr/bin/env bash
 echo "npx $*" >> "$STUB_LOG"
+if [ "$1 $2" = "convex deploy" ]; then
+  sed -n 's/.*BACKEND_RELEASE_SHA: string = "\\([^"]*\\)".*/\\1/p' convex/lib/backendRelease.ts > "$STUB_LOG.deployed"
+fi
 `,
   curl: `#!/usr/bin/env bash
 echo "curl $*" >> "$STUB_LOG"
@@ -43,6 +48,7 @@ body='{"status":"success","value":[]}'
 if [ -n "\${STUB_QUERY_BODY:-}" ]; then body="$STUB_QUERY_BODY"; fi
 case "$*" in
   *http_code*) printf '%s' "\${STUB_HTTP_CODE:-200}" ;;
+  *deploymentProbe:health*) printf '{"status":"success","value":{"status":"ok","releaseSha":"%s"}}' "\${STUB_RELEASE_SHA:-$(cat "$STUB_LOG.deployed" 2>/dev/null)}" ;;
   *) printf '%s' "$body" ;;
 esac
 `,
@@ -92,6 +98,8 @@ async function makeCheckout(
   writeFileSync(join(work, ".bun-version"), "9.9.9\n");
   writeFileSync(join(work, ".gitignore"), ".env.local\nconvex/scratch/\n");
   copyFileSync(SCRIPT, join(work, "scripts", "deploy-backend.sh"));
+  mkdirSync(join(work, "convex", "lib"), { recursive: true });
+  copyFileSync(STAMP, join(work, "convex", "lib", "backendRelease.ts"));
   await git(work, "add", "-A");
   await git(work, "commit", "-m", "[release] fixture");
   await git(work, "remote", "add", "origin", origin.replace(/\\/g, "/"));
@@ -392,6 +400,48 @@ describe("scripts/deploy-backend.sh", () => {
       expect(notJson.output).toContain("must be one JSON object");
       expect(notJson.status).toBe(1);
       expect(existsSync(fresh.log)).toBe(false);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "deploys code stamped with the release sha, puts the stamp back, and fails when the backend names another release",
+    async () => {
+      const checkout = await makeCheckout();
+      const real = ["--expect", checkout.sha];
+      const result = await checkout.run(real);
+      expect(result.output).toContain(
+        `ok    deploymentProbe:health names ${checkout.sha}`,
+      );
+      expect(result.status).toBe(0);
+      expect(readFileSync(`${checkout.log}.deployed`, "utf8").trim()).toBe(
+        checkout.sha,
+      );
+      expect(await git(checkout.work, "status", "--porcelain")).toBe("");
+
+      const stale = await checkout.run(real, {
+        STUB_RELEASE_SHA: "0123456789abcdef0123456789abcdef01234567",
+      });
+      expect(stale.output).toContain(
+        `the deployed backend does not name the release ${checkout.sha}`,
+      );
+      expect(stale.status).toBe(1);
+      expect(await git(checkout.work, "status", "--porcelain")).toBe("");
+
+      const unstamped = await makeCheckout();
+      writeFileSync(
+        join(unstamped.work, "convex", "lib", "backendRelease.ts"),
+        "export const BACKEND_RELEASE_SHA = 'x';\n",
+      );
+      await git(unstamped.work, "commit", "-qam", "drop marker");
+      await git(unstamped.work, "push", "-q", "origin", "main");
+      const sha = await git(unstamped.work, "rev-parse", "HEAD");
+      const missing = await unstamped.run(["--expect", sha]);
+      expect(missing.output).toContain('no "unreleased" marker to stamp');
+      expect(missing.status).toBe(1);
+      expect(readFileSync(unstamped.log, "utf8")).not.toContain(
+        "convex deploy",
+      );
     },
     TIMEOUT,
   );

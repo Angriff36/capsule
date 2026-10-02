@@ -344,11 +344,17 @@ export function TimeSheetPage() {
     const data = new FormData(form);
     void run("clock-in", async () => {
       const personId = String(data.get("personId"));
+      // Match the shift at the typed clock-in time, not the moment of saving.
+      const typedIn = toEpoch(data.get("clockInAt"));
       await persistPrimaryTimeRecord(timeApi, {
         personId,
         eventId: String(data.get("eventId") || "") || undefined,
         notes: String(data.get("notes") || "") || undefined,
-        shift: currentShiftFor(personId, shifts),
+        shift: currentShiftFor(
+          personId,
+          shifts,
+          Number.isFinite(typedIn) ? typedIn : Date.now(),
+        ),
         clockInAt: data.get("clockInAt"),
         clockOutAt: data.get("clockOutAt"),
       });

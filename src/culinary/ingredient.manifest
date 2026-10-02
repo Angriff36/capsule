@@ -107,6 +107,10 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   // Convex storage id for the catalog hero image (upload via Attachment).
   property primaryImageStorageId: string?
   property primaryImageFileName: string?
+  // How long the product keeps once received and how to store it
+  // (PL-CULINARY-CATALOG, AC-452). null = not on file, never guessed.
+  property shelfLifeDays: int?
+  property storageInstructions: string?
 
   // Nutrition per one `unit` of this ingredient. All optional so pre-field rows
   // validate under Convex schema push; component/menu panels aggregate the values
@@ -176,12 +180,32 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     guard self.introducedAt != null
     guard self.deletedAt == null
     mutate preferredVendorId = preferredVendorId
+    emit IngredientPreferredVendorSet {
+      ingredientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Both fields are restated on each save; a blank one clears to "not on file".
+  command setStorage(optional shelfLifeDays: int, optional storageInstructions: string) {
+    guard self.deletedAt == null
+    constraint ingredientShelfLifeNonnegative: shelfLifeDays == null or shelfLifeDays >= 0 "Shelf life can't be negative. Use zero or more days."
+    mutate shelfLifeDays = shelfLifeDays
+    mutate storageInstructions = storageInstructions
+    emit IngredientStorageSet {
+      ingredientId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command configureSubstitutes(substituteIngredientIds: list<uuid>) {
     guard self.introducedAt != null
     guard self.deletedAt == null
     mutate substituteIngredientIds = substituteIngredientIds
+    emit IngredientSubstitutesConfigured {
+      ingredientId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command setPreferredVendors(
@@ -192,6 +216,10 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate preferredVendorIds = preferredVendorIds
     mutate preferredVendorId = preferredVendorId
+    emit IngredientPreferredVendorsSet {
+      ingredientId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command updateDetails(
@@ -559,4 +587,25 @@ event ItemUnitMappingRetired: "item_unit_mapping.retired" {
   itemUnitMappingId: string
   tenantId: string
   reason: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event IngredientSubstitutesConfigured: "ingredient.substitutes.configured" {
+  ingredientId: string
+  tenantId: string
+}
+
+event IngredientPreferredVendorSet: "ingredient.preferred.vendor.set" {
+  ingredientId: string
+  tenantId: string
+}
+
+event IngredientPreferredVendorsSet: "ingredient.preferred.vendors.set" {
+  ingredientId: string
+  tenantId: string
+}
+
+event IngredientStorageSet: "ingredient.storage.set" {
+  ingredientId: string
+  tenantId: string
 }

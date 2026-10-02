@@ -186,6 +186,10 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     guard self.replacesProposal.status == "accepted"
     constraint changeSameClient: self.replacesProposal.clientId == self.clientId "A change stays with the client who accepted the proposal"
     mutate replacesProposalId = self.replacesProposalId
+    emit ProposalChangeSourceConfirmed {
+      proposalId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Event.changeHeadcount follow-through (AC-388 proposal draft slice): an
@@ -589,4 +593,10 @@ event ProposalSuperseded: "proposal.superseded" {
   supersededById: string
   reason: string
   supersededAt: datetime
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ProposalChangeSourceConfirmed: "proposal.change.source.confirmed" {
+  proposalId: string
+  tenantId: string
 }

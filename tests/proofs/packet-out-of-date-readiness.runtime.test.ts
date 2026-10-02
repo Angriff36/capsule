@@ -102,6 +102,10 @@ async function changeHeadcount(
     version: row.version,
     newHeadcount: n,
   });
+  // The change queues follow-up work (timing, stage check). Let it finish so
+  // it never overlaps the next packet upload in the test runtime (#405).
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await t.finishInProgressScheduledFunctions();
 }
 
 describe("readiness shows an out-of-date printed packet", () => {

@@ -53,6 +53,8 @@ enum CapsuleEntityType {
   prep_task
   // An old-system service style matched to a Capsule service style (AC-064).
   service_style
+  // Old-system message or task brought in as client history (PL-SOURCE-HISTORY).
+  client_communication
 }
 
 // Revision-2: whether a link is a machine suggestion, an approved identity, or
@@ -223,6 +225,10 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate rawSourceData = rawSourceData != null ? rawSourceData : self.rawSourceData
     mutate lastSeenAt = now()
     mutate lastSeenImportRunId = importRunId != null ? importRunId : self.lastSeenImportRunId
+    emit ExternalRecordLinkObserved {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Revision-2: import wrote these field values into Capsule. Advances the
@@ -235,6 +241,10 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate appliedSourceVersion = appliedSourceVersion != null ? appliedSourceVersion : self.sourceVersion
     mutate appliedAt = now()
     mutate appliedImportRunId = importRunId != null ? importRunId : self.lastSeenImportRunId
+    emit ExternalRecordLinkAppliedRecorded {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Revision-2: approve or reject a suggested identity. Approval is what makes
@@ -251,6 +261,10 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate lastVerifiedAt = now()
     mutate conflictStatus = decision == "approved" ? "resolved" : self.conflictStatus
     mutate resolvedByUserId = decision == "approved" ? user.id : self.resolvedByUserId
+    emit ExternalRecordLinkDecided {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // verifyLink - Mark a link as verified (e.g., after user confirmation).
@@ -574,6 +588,10 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
     mutate sourceVersion = sourceVersion != null ? sourceVersion : self.sourceVersion
     mutate capsuleValue = capsuleValue != null ? capsuleValue : self.capsuleValue
     mutate status = "pending"
+    emit ImportConflictSourceUpdated {
+      importConflictId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // The person who settles it is the signed-in person (spec CF-15).
@@ -611,4 +629,25 @@ event ImportConflictResolved: "import_conflict.resolved" {
   externalRecordLinkId: string
   field: string
   status: ImportConflictStatus
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ExternalRecordLinkDecided: "external.record.link.decided" {
+  externalRecordLinkId: string
+  tenantId: string
+}
+
+event ExternalRecordLinkObserved: "external.record.link.observed" {
+  externalRecordLinkId: string
+  tenantId: string
+}
+
+event ExternalRecordLinkAppliedRecorded: "external.record.link.applied.recorded" {
+  externalRecordLinkId: string
+  tenantId: string
+}
+
+event ImportConflictSourceUpdated: "import.conflict.source.updated" {
+  importConflictId: string
+  tenantId: string
 }

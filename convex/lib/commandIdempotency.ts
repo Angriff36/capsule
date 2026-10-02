@@ -33,6 +33,7 @@
  */
 import type { MutationCtx } from "../_generated/server";
 import { getAuthContext } from "./authContext";
+import { recordAuditRetryKey } from "./commandAudit";
 
 /** Retry-key prefix that claims a tenant-workflow receipt (operator handoff). */
 export const SHARED_KEY_PREFIX = "tenant-shared/";
@@ -151,4 +152,7 @@ export async function saveCommandIdempotency(
     result,
     createdAt: Date.now(),
   });
+  // PL-AUDIT (AC-635): the step's audit row names the retry key it ran under.
+  const [, , retryKey] = JSON.parse(scope.reservationKey) as [string, string, string];
+  await recordAuditRetryKey(ctx, retryKey);
 }

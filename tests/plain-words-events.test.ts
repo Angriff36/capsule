@@ -151,6 +151,7 @@ describe("plain words on event screens", () => {
       "src/features/events/EventClientContactsPanel.tsx",
       "src/features/events/EventCapacityPlannerPage.tsx",
       "src/features/events/EventAllergenBriefingPage.tsx",
+      "src/features/events/EventAllergenBriefingBody.tsx",
       "src/features/events/GuestListCoverageNotice.tsx",
     ];
     const all = files.map((path) => readFileSync(path, "utf8")).join("\n");

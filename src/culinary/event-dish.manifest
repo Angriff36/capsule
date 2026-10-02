@@ -130,6 +130,10 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   command refreshRecipeSync() {
     mutate recipeSyncDishId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.dishId : null
+    emit EventDishRecipeSyncRefreshed {
+      eventDishId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command adjustServings(quantityServings: number) {
@@ -571,4 +575,10 @@ event EventDishLineOverrideRevoked: "event_dish_line_override.revoked" {
   eventDishId: string
   eventId: string
   reason: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event EventDishRecipeSyncRefreshed: "event.dish.recipe.sync.refreshed" {
+  eventDishId: string
+  tenantId: string
 }

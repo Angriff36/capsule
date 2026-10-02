@@ -200,8 +200,19 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // Planning board: how loud each check is (JSON map of check to
   // fix | look | off, read by src/lib/planningChecks.ts). Unset = defaults.
   property planningChecksJson: string?
+  // Event stages a person moves an event into (JSON list read by
+  // src/lib/eventStageMoves.ts). Every other stage moves on by itself when
+  // its conditions are met. Unset = only the sales lock is by hand.
+  property stageMovesByHandJson: string?
+
   // The fields each equipment category asks for: {"Ovens": ["Fuel", "Burners"]}.
   property equipmentFieldsJson: string?
+
+  // Client email sender (PL-OUTBOUND): the name clients see on Capsule's
+  // emails and the address their replies go to. Unset = the display name and
+  // Capsule's sending address.
+  property emailSenderName: string?
+  property emailReplyTo: string?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
@@ -363,10 +374,32 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Which event stages stay a person's step. Empty goes back to the default.
+  command configureStageMoves(optional byHandJson: string) {
+    guard self.deletedAt == null
+    mutate stageMovesByHandJson = byHandJson
+    emit OrganizationStageMovesConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command configureEquipmentFields(optional fieldsJson: string) {
     guard self.deletedAt == null
     mutate equipmentFieldsJson = fieldsJson
     emit OrganizationEquipmentFieldsConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Who client emails come from. Empty values go back to the defaults.
+  command configureEmailSender(optional senderName: string, optional replyTo: string) {
+    guard self.deletedAt == null
+    constraint configureEmailSenderReplyTo: replyTo == null or length(trim(replyTo)) == 0 or indexOf(replyTo, "@") > 0 "Enter a full email address for replies, like events@yourcompany.com."
+    mutate emailSenderName = senderName
+    mutate emailReplyTo = replyTo
+    emit OrganizationEmailSenderConfigured {
       organizationId: self.id
       tenantId: self.tenantId
     }
@@ -473,6 +506,16 @@ event OrganizationEquipmentFieldsConfigured: "organization.equipment_fields_conf
 }
 
 event OrganizationPlanningChecksConfigured: "organization.planning_checks_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationStageMovesConfigured: "organization.stage_moves_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationEmailSenderConfigured: "organization.email_sender_configured" {
   organizationId: string
   tenantId: string
 }

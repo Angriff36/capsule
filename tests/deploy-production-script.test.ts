@@ -34,6 +34,7 @@ const STUBS: Record<string, string> = {
 case "$*" in
   *verify-vercel-release.ts*) echo "bun $*" >> "$STUB_LOG"; exit "\${STUB_VERCEL_EXIT:-0}" ;;
   *release-backend-scope.ts*) echo "bun $*" >> "$STUB_LOG"; printf '%b' "\${STUB_SCOPE:-backend=unchanged\\nverify=\\n}"; exit 0 ;;
+  *release-receipt.ts*) echo "bun $*" >> "$STUB_LOG.receipt"; exit 0 ;;
   "run check") echo "bun run check" >> "$STUB_LOG.gate"; exit 0 ;;
   *) exit 0 ;;
 esac
@@ -156,6 +157,10 @@ describe("scripts/deploy-production.sh", () => {
         `bun scripts/verify-vercel-release.ts --sha ${sha} --wait 900`,
         `bun scripts/release-backend-scope.ts --sha ${sha}`,
       ]);
+      // One receipt, after the deploy, for the release commit (#382).
+      expect(readFileSync(`${checkout.log}.receipt`, "utf8").trim()).toBe(
+        `bun scripts/release-receipt.ts --sha ${sha} --wait 0`,
+      );
     },
     TIMEOUT,
   );
@@ -185,6 +190,9 @@ describe("scripts/deploy-production.sh", () => {
         'exec bash scripts/deploy-backend.sh --expect "$sha" --verify "$verify"',
       );
       expect(remote).not.toContain("/home/");
+      expect(readFileSync(`${checkout.log}.receipt`, "utf8").trim()).toBe(
+        `bun scripts/release-receipt.ts --sha ${sha} --wait 0`,
+      );
     },
     TIMEOUT,
   );

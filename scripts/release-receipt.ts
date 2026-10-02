@@ -9,18 +9,22 @@
 //   - Convex: expected deployment (owner map flag) vs the production
 //     VITE_CONVEX_URL host label (pulled via `vercel env pull --environment
 //     production` into a temp file that is deleted after the check — values
-//     never reach the receipt), plus the deployed command-registry size from
-//     the authenticated workflow probe vs convex/http.ts's COMMAND_DISPATCH
-//     count in this integrated tree.
+//     never reach the receipt), plus the release sha that backend's
+//     deploymentProbe:health reports, and (when it is an earlier release)
+//     `scripts/release-backend-scope.ts --since` for backend changes since.
 //   - Config: scripts/check-deployment-config.ts --json over the pulled env.
 //   - Workflow: GET <canonical>/api/manifest/commands — 401 anonymous,
 //     200 authenticated (CAPSULE_API_KEY; the deployed API-key gateway does
-//     the Clerk exchange).
+//     the Clerk exchange) — then the real product step CAPSULE_RELEASE_WORKFLOW
+//     names, as JSON {"entity":"…","command":"…","body":{…}}, POSTed through
+//     the same gateway with idempotencyKey release-receipt-<sha>.
 //
 // Every leg degrades to "unverified" (receipt stays PARTIAL) when its
 // credential/tool is absent — vercel CLI auth, VERCEL_TOKEN, CAPSULE_API_KEY,
-// a linked project. Partial is the honest state; --strict turns it into
-// exit 1 for CI-style use. scripts/release.sh runs this in report mode.
+// CAPSULE_RELEASE_WORKFLOW, a linked project. Partial is the honest state;
+// --strict turns it into exit 1 for CI-style use. scripts/deploy-production.sh
+// runs this in report mode after the backend deploy (scripts/release.sh runs
+// it itself only when it is used alone).
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -34,9 +38,11 @@ import {
 import type { DeploymentConfigReport } from "../src/lib/deploymentConfigCheck";
 import { inspectVercelDeployment } from "./vercelInspectDeployment";
 
-/** Owner deployment map (CLAUDE.md): capsule production Convex deployment. */
-const DEFAULT_EXPECTED_DEPLOYMENT = "impartial-mule-193";
-const COMMAND_DISPATCH_COUNT_PATTERN = /\bref: api\./g;
+/** Owner deployment map (CLAUDE.md): production Convex is self-hosted on the
+ *  box pop-os (https://pop-os.<tailnet>.ts.net); impartial-mule-193 is only
+ *  the Cloud fallback. */
+const DEFAULT_EXPECTED_DEPLOYMENT = "pop-os";
+const IDENTITY_QUERY = "deploymentProbe:health";
 interface Options {
   sha?: string;
   url?: string;
@@ -155,6 +161,117 @@ async function probeCommandRegistry(canonicalUrl: string): Promise<{
   return { unauthenticatedStatus, authenticatedStatus, commandCount };
 }
 
+/** The real product step: one command named by CAPSULE_RELEASE_WORKFLOW,
+ *  through the deployed gateway with production credentials. */
+async function runProductStep(
+  canonicalUrl: string,
+  integratedSha: string | null,
+): Promise<ReleaseReceiptInput["workflow"]["productStep"]> {
+  const apiKey = process.env.CAPSULE_API_KEY?.trim();
+  const raw = process.env.CAPSULE_RELEASE_WORKFLOW?.trim();
+  if (!apiKey || !raw) return null;
+  let step: { entity?: unknown; command?: unknown; body?: unknown };
+  try {
+    step = JSON.parse(raw) as typeof step;
+  } catch {
+    return null;
+  }
+  if (
+    typeof step.entity !== "string" ||
+    typeof step.command !== "string" ||
+    !/^[A-Za-z0-9_]+$/.test(step.entity) ||
+    !/^[A-Za-z0-9_]+$/.test(step.command)
+  ) {
+    return null;
+  }
+  const body =
+    step.body && typeof step.body === "object" && !Array.isArray(step.body)
+      ? (step.body as Record<string, unknown>)
+      : {};
+  const name = `${step.entity}.${step.command}`;
+  try {
+    const response = await fetch(
+      `${canonicalUrl.replace(/\/$/, "")}/api/manifest/${step.entity}/commands/${step.command}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idempotencyKey: `release-receipt-${integratedSha ?? "unknown"}`,
+          ...body,
+        }),
+      },
+    );
+    const answer = (await response.json().catch(() => null)) as {
+      data?: unknown;
+    } | null;
+    return {
+      name,
+      status: response.status,
+      succeeded: answer !== null && "data" in answer,
+    };
+  } catch {
+    return { name, status: null, succeeded: false };
+  }
+}
+
+/** releaseSha the backend reports; "unreleased" when it answers without one
+ *  (a backend deployed before the stamp existed); null when it does not answer. */
+async function probeBackendRelease(
+  convexUrl: string | null,
+): Promise<string | null> {
+  if (!convexUrl) return null;
+  try {
+    const response = await fetch(`${convexUrl.replace(/\/$/, "")}/api/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: IDENTITY_QUERY, args: {}, format: "json" }),
+    });
+    const answer = (await response.json()) as {
+      status?: string;
+      value?: { releaseSha?: unknown };
+    };
+    if (answer.status !== "success") return null;
+    const sha = answer.value?.releaseSha;
+    return typeof sha === "string" ? sha : "unreleased";
+  } catch {
+    return null;
+  }
+}
+
+/** Backend-changing paths between the deployed release and this one, from
+ *  the same rule the deploy uses; null when it cannot be computed (working
+ *  tree not at the integrated sha, unknown commit). */
+function backendChangesSince(
+  integratedSha: string | null,
+  deployedSha: string | null,
+): string[] | null {
+  const sha40 = /^[0-9a-f]{40}$/i;
+  if (!integratedSha || !deployedSha) return null;
+  if (!sha40.test(integratedSha) || !sha40.test(deployedSha)) return null;
+  if (integratedSha.toLowerCase() === deployedSha.toLowerCase()) return [];
+  const scope = run(
+    "bun",
+    [
+      "scripts/release-backend-scope.ts",
+      "--sha",
+      integratedSha,
+      "--since",
+      deployedSha,
+    ],
+    60_000,
+  );
+  if (!scope || scope.status !== 0) return null;
+  const lines = scope.stdout.split(/\r?\n/);
+  if (lines.includes("backend=unchanged")) return [];
+  if (!lines.includes("backend=required")) return null;
+  return lines
+    .filter((line) => line.startsWith("reason="))
+    .map((line) => line.slice("reason=".length));
+}
+
 /** KEY=VALUE subset reader (same contract as check-deployment-config.ts). */
 function readEnvValue(path: string, name: string): string | null {
   let content: string;
@@ -183,12 +300,13 @@ function gatherConfig(
   outDir: string,
 ): {
   config: ReleaseReceiptInput["config"];
-  frontendDeployment: string | null;
+  /** Production VITE_CONVEX_URL: the backend the shipped frontend calls. */
+  convexUrl: string | null;
 } {
   if (!canonicalUrl) {
     return {
       config: { ok: null, blockerCount: 0, blockerCodes: [] },
-      frontendDeployment: null,
+      convexUrl: null,
     };
   }
   const envPath = `${outDir}/prod.env`;
@@ -203,13 +321,11 @@ function gatherConfig(
   if (!pulled || pulled.status !== 0) {
     return {
       config: { ok: null, blockerCount: 0, blockerCodes: [] },
-      frontendDeployment: null,
+      convexUrl: null,
     };
   }
   try {
-    const frontendDeployment = firstHostLabel(
-      readEnvValue(envPath, "VITE_CONVEX_URL") ?? "",
-    );
+    const convexUrl = readEnvValue(envPath, "VITE_CONVEX_URL");
     const checked = run(
       "bun",
       [
@@ -231,7 +347,7 @@ function gatherConfig(
     if (!checked) {
       return {
         config: { ok: null, blockerCount: 0, blockerCodes: [] },
-        frontendDeployment,
+        convexUrl,
       };
     }
     try {
@@ -245,25 +361,16 @@ function gatherConfig(
           blockerCount: blockers.length,
           blockerCodes: blockers.map((finding) => finding.code),
         },
-        frontendDeployment,
+        convexUrl,
       };
     } catch {
       return {
         config: { ok: null, blockerCount: 0, blockerCodes: [] },
-        frontendDeployment,
+        convexUrl,
       };
     }
   } finally {
     rmSync(envPath, { force: true });
-  }
-}
-
-function expectedCommandCount(): number | null {
-  try {
-    const http = readFileSync("convex/http.ts", "utf8");
-    return http.match(COMMAND_DISPATCH_COUNT_PATTERN)?.length ?? null;
-  } catch {
-    return null;
   }
 }
 
@@ -287,18 +394,23 @@ async function main(argv: readonly string[]): Promise<number> {
         integratedSha,
       )
     : null;
-  const workflow = options.url
-    ? await probeCommandRegistry(options.url)
+  const workflow: ReleaseReceiptInput["workflow"] = options.url
+    ? {
+        ...(await probeCommandRegistry(options.url)),
+        productStep: await runProductStep(options.url, integratedSha),
+      }
     : {
         unauthenticatedStatus: null,
         authenticatedStatus: null,
         commandCount: null,
+        productStep: null,
       };
-  const { config, frontendDeployment } = gatherConfig(
+  const { config, convexUrl } = gatherConfig(
     options.url,
     options.expectedDeployment,
     options.outDir,
   );
+  const backendReleaseSha = await probeBackendRelease(convexUrl);
 
   const input: ReleaseReceiptInput = {
     integratedSha,
@@ -306,10 +418,12 @@ async function main(argv: readonly string[]): Promise<number> {
     vercel: { canonicalUrl: options.url ?? null, deployment },
     convex: {
       expectedDeployment: options.expectedDeployment,
-      frontendDeployment,
-      functionsReachable: workflow.authenticatedStatus === 200 ? true : null,
-      commandCount: workflow.commandCount,
-      expectedCommandCount: expectedCommandCount(),
+      frontendDeployment: convexUrl ? firstHostLabel(convexUrl) : null,
+      backendReleaseSha,
+      backendChangesSinceDeployed: backendChangesSince(
+        integratedSha,
+        backendReleaseSha,
+      ),
     },
     config,
     workflow,

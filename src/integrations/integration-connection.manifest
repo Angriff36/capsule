@@ -118,6 +118,10 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint integrationAccountId: length(trim(externalAccountId)) > 0 "The provider did not name an account."
     mutate externalAccountId = externalAccountId
+    emit IntegrationConnectionAccountLinked {
+      integrationConnectionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Re-open onboarding on an existing row. Without this, a connection that was
@@ -216,4 +220,10 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
   }
 
   store IntegrationConnection in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event IntegrationConnectionAccountLinked: "integration.connection.account.linked" {
+  integrationConnectionId: string
+  tenantId: string
 }

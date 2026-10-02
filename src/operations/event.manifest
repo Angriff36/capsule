@@ -20,6 +20,14 @@ enum ClientStatus {
   archived
 }
 
+// Which emails Capsule sends a client (PL-CONSENT). Read at the moment of
+// sending, so a change also stops reminders already scheduled.
+enum ClientEmailPreference {
+  every_email
+  no_reminders
+  none
+}
+
 enum EventStage {
   quote
   planning
@@ -117,6 +125,11 @@ entity Client mixin TenantScoped, SoftDeletable {
   property registeredAt: datetime?
   property archivedAt: datetime?
   property mergedAt: datetime?
+  // Unset = every_email. no_reminders stops automatic payment reminders;
+  // none stops every email Capsule sends this client.
+  property emailPreference: ClientEmailPreference?
+  property emailPreferenceNote: string?
+  property emailPreferenceSetAt: datetime?
 
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -256,6 +269,20 @@ entity Client mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The client's own choice about email (for example "asked us to stop
+  // reminders on the phone"). Works on archived clients too.
+  command setEmailPreference(preference: ClientEmailPreference, optional note: string) {
+    guard self.deletedAt == null
+    mutate emailPreference = preference
+    mutate emailPreferenceNote = note
+    mutate emailPreferenceSetAt = now()
+    emit ClientEmailPreferenceSet {
+      clientId: self.id
+      tenantId: self.tenantId
+      preference: preference
+    }
+  }
+
   command assignOwner(optional assignedToId: uuid) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -374,6 +401,16 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property powerAvailable: boolean?
   property waterAccess: boolean?
   property hasStairs: boolean?
+  // Structured operating facts (PL-VENUE-PROFILE, spec §8.1): they drive the
+  // venue filter, pack rules, the proposal snapshot and the event-day sheet.
+  // Set by setSiteFacts only, so the details form never clears them.
+  property seatedCapacity: int?
+  property standingCapacity: int?
+  property hasOven: boolean?
+  property hasRefrigeration: boolean?
+  // Earliest load-in and latest load-out, "HH:MM" in the venue's own time.
+  property loadInFrom: string?
+  property loadOutBy: string?
   property wasteRules: string?
   property permitsInsuranceNotes: string?
   property restrictions: string?
@@ -388,6 +425,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
 
   constraint venueIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered venues require a name"
   constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity can't be negative. Use zero or more."
+  constraint venueSeatedNonnegative: self.seatedCapacity == null or self.seatedCapacity >= 0 "Seated capacity can't be negative. Use zero or more."
+  constraint venueStandingNonnegative: self.standingCapacity == null or self.standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
   constraint venueLatitudeRange: self.latitude == null or (self.latitude >= -90 and self.latitude <= 90) "Latitude must be between -90 and 90"
   constraint venueLongitudeRange: self.longitude == null or (self.longitude >= -180 and self.longitude <= 180) "Longitude must be between -180 and 180"
 
@@ -565,6 +604,31 @@ entity Venue mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Seated / standing capacity, oven, fridge and the load-in window. Each
+  // call states all six; a blank clears that fact.
+  command setSiteFacts(
+    optional seatedCapacity: number,
+    optional standingCapacity: number,
+    optional hasOven: boolean,
+    optional hasRefrigeration: boolean,
+    optional loadInFrom: string,
+    optional loadOutBy: string
+  ) {
+    guard self.deletedAt == null
+    constraint setVenueSeatedCapacity: seatedCapacity == null or seatedCapacity >= 0 "Seated capacity can't be negative. Use zero or more."
+    constraint setVenueStandingCapacity: standingCapacity == null or standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
+    mutate seatedCapacity = seatedCapacity
+    mutate standingCapacity = standingCapacity
+    mutate hasOven = hasOven
+    mutate hasRefrigeration = hasRefrigeration
+    mutate loadInFrom = loadInFrom != null and length(trim(loadInFrom)) > 0 ? trim(loadInFrom) : null
+    mutate loadOutBy = loadOutBy != null and length(trim(loadOutBy)) > 0 ? trim(loadOutBy) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command deactivate(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -682,6 +746,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Snapshot the selected venue limit so historical event planning does not
   // silently change when the reusable Venue record is revised later.
   property venueCapacity: int?
+  // Venue facts frozen when the event is finalized (spec §8.2, AC-315): a
+  // JSON copy written once by convex/lib/venueFactsSnapshot.ts, so later venue
+  // edits never change what the finished event says the venue was.
+  property finalVenueFacts: string?
   property expectedHeadcount: int?
   property encrypted primaryContactName: string?
   // Client contact PII: every staff role reads events, but only event/sales
@@ -1866,6 +1934,21 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Run by the finalize follow-up (convex/lib/venueFactsSnapshot.ts) with the
+  // venue facts as JSON. Written once: a second call is refused.
+  command recordFinalVenueFacts(facts: string) {
+    guard self.deletedAt == null
+    guard self.finalizedAt != null
+    guard self.finalVenueFacts == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint finalVenueFactsPresent: length(trim(facts)) > 0 "No venue facts to keep."
+    mutate finalVenueFacts = facts
+    emit EventFinalVenueFactsRecorded {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   store Event in durable
 }
 
@@ -2302,6 +2385,11 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   property instructions: string?
   property required sortOrder: int = 0
   property addedAt: datetime?
+  // The venue layout template (and its version) this row was copied from
+  // (PL-VENUE-LAYOUT, spec §8.2). Unset = typed on the event. Editing the row
+  // never touches the template.
+  property sourceTemplateId: uuid?
+  property sourceTemplateVersion: int?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
@@ -2316,7 +2404,9 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     type: string,
     optional instructions: string,
-    optional sortOrder: number
+    optional sortOrder: number,
+    optional sourceTemplateId: uuid,
+    optional sourceTemplateVersion: number
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -2326,6 +2416,8 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     mutate type = type
     mutate instructions = instructions
     mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate sourceTemplateId = sourceTemplateId
+    mutate sourceTemplateVersion = sourceTemplateVersion
     mutate addedAt = now()
     emit EventLayoutSectionAdded {
       sectionId: self.id
@@ -2413,6 +2505,12 @@ event ClientContactChanged: "client.contact_changed" {
 event ClientBirthdaySet: "client.birthday_set" {
   clientId: string
   tenantId: string
+}
+
+event ClientEmailPreferenceSet: "client.email_preference_set" {
+  clientId: string
+  tenantId: string
+  preference: string
 }
 
 event ClientBillingProfileChanged: "client.billing_profile_changed" {

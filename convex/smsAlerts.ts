@@ -34,6 +34,7 @@ import {
   sendSms,
   twilioConfigured,
 } from "./lib/twilio";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const CONFIG_ENTITY = "SmsAlertConfig";
 const ALERT_ENTITY = "SmsAlert";
@@ -239,7 +240,7 @@ export const recordConfigEvent = internalMutation({
     payload: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.type,
       entity: CONFIG_ENTITY,
       entityId: args.tenantId,
@@ -264,7 +265,7 @@ export const recordAlert = internalMutation({
     error: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.status === "sent" ? "SmsAlertSent" : "SmsAlertFailed",
       entity: ALERT_ENTITY,
       entityId: args.tenantId,
@@ -470,6 +471,19 @@ export const scanTenant = internalAction({
           continue;
         }
         if (result.sent >= MAX_SENDS_PER_SCAN) break outer;
+        // A scan running at the same moment may have claimed this text.
+        const claim = await ctx.runMutation(
+          internal.smsAlertClaims.claimAlert,
+          {
+            tenantId: args.tenantId,
+            triggerKey: trigger.triggerKey,
+            personId: recipient.personId,
+          },
+        );
+        if (!claim.claimed) {
+          result.skipped += 1;
+          continue;
+        }
         try {
           const messageSid = await sendSms({
             config,

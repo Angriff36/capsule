@@ -747,6 +747,20 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   return doc;
 }
 
+/** The same file Download PDF saves, as base64 for "Email the proposal". */
+export async function proposalPdfBase64(
+  input: ProposalPdfInput,
+): Promise<{ base64: string; fileName: string }> {
+  const branding = await loadTenantBrandingForPdf(input.branding);
+  const dataUri = buildProposalPdf({ ...input, branding }).output(
+    "datauristring",
+  );
+  return {
+    base64: dataUri.slice(dataUri.indexOf(",") + 1),
+    fileName: proposalPdfFileName(input.proposal),
+  };
+}
+
 export async function downloadProposalPdf(
   input: ProposalPdfInput,
 ): Promise<void> {

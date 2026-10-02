@@ -61,6 +61,7 @@ interface LeadRow {
   capturedAt?: number | null;
   convertedAt?: number | null;
   proposalLinkedAt?: number | null;
+  closedAt?: number | null;
   deletedAt?: number | null;
 }
 
@@ -119,9 +120,12 @@ export function LeadPipelinePage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
 
-  const activeLeads = ((leads ?? []) as LeadRow[]).filter(
+  const capturedLeads = ((leads ?? []) as LeadRow[]).filter(
     (lead) => lead.deletedAt == null && lead.capturedAt != null,
   );
+  // A lead the old system closed (won or lost) is history, not pipeline.
+  const activeLeads = capturedLeads.filter((lead) => lead.closedAt == null);
+  const closedCount = capturedLeads.length - activeLeads.length;
 
   const activeReferralSources = (
     (referralSources ?? []) as Array<{
@@ -753,8 +757,15 @@ export function LeadPipelinePage() {
           );
         })}
       </section>
+      {closedCount > 0 ? (
+        <p className="lead-pipeline-closed-note">
+          {closedCount === 1
+            ? "1 closed deal from the old system is kept off the board."
+            : `${closedCount} closed deals from the old system are kept off the board.`}
+        </p>
+      ) : null}
 
-      <LeadSourceReport leads={activeLeads} />
+      <LeadSourceReport leads={capturedLeads} />
     </div>
   );
 }

@@ -73,15 +73,23 @@ async function emitApproved(
 }
 
 /** Move earlier dispatch ticks out of the duplicate-chain collapse window so
- * the next dispatch is a real later tick, not a collapsed one. */
+ * the next dispatch is a real later tick, not a collapsed one. Earlier
+ * delivery tries move back too, so the wait before a retry (one minute, then
+ * two) has passed, as it would between real ticks. */
 async function ageTicks(t: TestConvex): Promise<void> {
   await t.run(async (ctx) => {
-    const ticks = await ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", "WebhookDispatchTick"))
-      .collect();
-    for (const tick of ticks) {
-      await ctx.db.patch(tick._id, { createdAt: tick.createdAt - 2 * MINUTE });
+    for (const entity of [
+      "WebhookDispatchTick",
+      "WebhookDelivery",
+      "WebhookDeliveryClaim",
+    ]) {
+      const rows = await ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entity", (q) => q.eq("entity", entity))
+        .collect();
+      for (const row of rows) {
+        await ctx.db.patch(row._id, { createdAt: row.createdAt - 2 * MINUTE });
+      }
     }
   });
 }

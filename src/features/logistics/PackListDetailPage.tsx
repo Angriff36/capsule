@@ -60,6 +60,7 @@ import { usePackRigs } from "./usePackRigs";
 import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PackScanPanel } from "./PackScanPanel";
+import { PackListSourcePanel } from "./PackListSourcePanel";
 import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
@@ -156,6 +157,8 @@ export function PackListDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
+  // The row action that failed, so the row can offer "Try again" in place.
+  const [failureRetryKey, setFailureRetryKey] = useState<string | null>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(packList);
@@ -239,6 +242,7 @@ export function PackListDetailPage() {
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setFailureItemId(null);
+    setFailureRetryKey(null);
     setNotice(null);
     setBusy(key);
     try {
@@ -249,6 +253,9 @@ export function PackListDetailPage() {
       // error can render next to it, not only in the page-top banner (#118).
       setFailureItemId(
         key.includes(":") ? key.slice(0, key.indexOf(":")) : null,
+      );
+      setFailureRetryKey(
+        key.includes(":") ? key.slice(key.indexOf(":") + 1) : null,
       );
     } finally {
       setBusy(null);
@@ -1136,10 +1143,16 @@ export function PackListDetailPage() {
           {activeTemplates.length === 0 ? (
             <p className="mt-2 text-base text-ink-3">
               No active pack list templates yet.{" "}
-              <Link className="link" to="/logistics/pack-templates">
+              <Link
+                className="link"
+                to="/logistics/pack-templates"
+                target="_blank"
+                rel="noopener"
+              >
                 Create one
-              </Link>
-              .
+              </Link>{" "}
+              (opens a new tab; this list stays as it is and the new template
+              shows up here right away).
             </p>
           ) : (
             <ul className="mt-2 grid gap-2">
@@ -1226,6 +1239,8 @@ export function PackListDetailPage() {
               ? {
                   id: failureItemId,
                   message: classifyCommandFailure(failure).title,
+                  detail: classifyCommandFailure(failure).detail,
+                  retryKey: failureRetryKey,
                 }
               : null
           }
@@ -1239,6 +1254,8 @@ export function PackListDetailPage() {
           selectableCount={selectableItems.length}
         />
       </section>
+
+      <PackListSourcePanel packListId={packList._id} />
 
       <BulkActionBar
         count={selection.count}

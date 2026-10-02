@@ -31,13 +31,25 @@ entity Lead mixin TenantScoped, SoftDeletable {
   property capturedAt: datetime?
   property convertedAt: datetime?
   property proposalLinkedAt: datetime?
+  // An imported lead's history from the old system (PL-SOURCE-DATASETS,
+  // AC-276): its stage word for word, its event date, and the day it closed.
+  // A lead with a close date is closed (won or lost); without one it is open.
+  property sourceStage: string?
+  property eventDate: datetime?
+  property closedAt: datetime?
+  // A client merge moves the lead to the client kept (PL-SOURCE-MERGE).
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
 
   ref client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
   ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
   ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
 
   computed displayName: string = self.leadType == "company" ? self.companyName : self.givenName + " " + self.familyName
+  computed isClosed: boolean = self.closedAt != null
 
   constraint leadIdentityComplete: self.capturedAt == null or (self.leadType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.leadType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Give a company name for a company lead, or a given name for a person lead"
   constraint leadSourceComplete: self.capturedAt == null or length(trim(self.source)) > 0 "Say where this lead came from"
@@ -139,6 +151,29 @@ entity Lead mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The import writes what the old system knew about the lead right after it
+  // captures it: the mapped stage, the stage word for word, the event date and
+  // the close date.
+  command recordSourceHistory(
+    stage: LeadStage,
+    sourceStage: string,
+    optional eventDate: datetime,
+    optional closedAt: datetime
+  ) {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    mutate stage = stage
+    mutate sourceStage = sourceStage
+    mutate eventDate = eventDate
+    mutate closedAt = closedAt
+    emit LeadSourceHistoryRecorded {
+      leadId: self.id
+      tenantId: self.tenantId
+      stage: stage
+      sourceStage: sourceStage
+    }
+  }
+
   // Two command steps let generated Convex hydrate and validate the newly
   // linked tenant-scoped records. The UI performs both behind one button.
   command stageConversion(clientId: uuid, optional clientContactId: uuid) {
@@ -146,6 +181,10 @@ entity Lead mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate clientId = clientId
     mutate clientContactId = clientContactId
+    emit LeadConversionStaged {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command confirmConversion() {
@@ -167,6 +206,10 @@ entity Lead mixin TenantScoped, SoftDeletable {
     guard self.convertedAt != null
     guard self.deletedAt == null
     mutate proposalId = proposalId
+    emit LeadProposalStaged {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command confirmProposalSent() {
@@ -187,7 +230,52 @@ entity Lead mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Lead already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit LeadClientMergeStaged {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the lead client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit LeadClientReassigned {
+      leadId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store Lead in durable
+}
+
+event LeadClientMergeStaged: "lead.client_merge_staged" {
+  leadId: string
+  tenantId: string
+}
+
+event LeadClientReassigned: "lead.client_reassigned" {
+  leadId: string
+  tenantId: string
+  previousClientId: string?
+  clientId: string?
 }
 
 event LeadCaptured: "lead.captured" {
@@ -213,6 +301,13 @@ event LeadPipelineUpdated: "lead.pipeline_updated" {
   probability: int
 }
 
+event LeadSourceHistoryRecorded: "lead.source_history_recorded" {
+  leadId: string
+  tenantId: string
+  stage: LeadStage
+  sourceStage: string
+}
+
 event LeadConverted: "lead.converted" {
   leadId: string
   tenantId: string
@@ -226,4 +321,15 @@ event LeadProposalLinked: "lead.proposal_linked" {
   clientId: string?
   proposalId: string?
   previousStage: LeadStage
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event LeadConversionStaged: "lead.conversion.staged" {
+  leadId: string
+  tenantId: string
+}
+
+event LeadProposalStaged: "lead.proposal.staged" {
+  leadId: string
+  tenantId: string
 }

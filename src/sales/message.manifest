@@ -21,6 +21,9 @@ enum MessageDeliveryStatus {
   delivered
   bounced
   failed
+  // PL-INBOX (AC-106): the provider gave no answer we can read. Never shown
+  // as sent.
+  unknown
 }
 
 entity Message mixin TenantScoped, SoftDeletable {
@@ -41,6 +44,10 @@ entity Message mixin TenantScoped, SoftDeletable {
   // Opaque serialized provider payload (JSON), kept for debugging/re-import.
   // Never rendered; bodyText is the only render surface.
   property rawPayload: string
+  // PL-INBOX (AC-104, AC-247, AC-112): photos and files that came with the
+  // message, as a JSON list of {id, kind, name} provider references. Never a
+  // link the app opens: a private attachment stays with the provider.
+  property mediaJson: string?
   property required status: MessageDeliveryStatus = "received"
   property sentAt: datetime?
   // Stamped from trusted auth context for outbound; for inbound this is the
@@ -67,7 +74,8 @@ entity Message mixin TenantScoped, SoftDeletable {
     optional providerMessageId: string,
     optional senderIdentity: string,
     optional sentAt: datetime,
-    optional rawPayload: string
+    optional rawPayload: string,
+    optional mediaJson: string
   ) {
     guard self.deletedAt == null
     guard user.id != null
@@ -80,6 +88,7 @@ entity Message mixin TenantScoped, SoftDeletable {
     mutate senderIdentity = senderIdentity
     mutate sentAt = sentAt
     mutate rawPayload = rawPayload
+    mutate mediaJson = mediaJson
     mutate authorAuthSubjectId = user.id
     emit MessagePosted {
       messageId: self.id

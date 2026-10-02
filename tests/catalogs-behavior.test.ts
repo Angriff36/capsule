@@ -10,8 +10,10 @@ import {
   button,
   click,
   submit,
+  field,
 } from "./support/mounted-app";
 import { CatalogsPage } from "../src/features/admin/CatalogsPage";
+import { EventCreatePage } from "../src/features/events/EventCreatePage";
 
 it.each([
   ["ServiceStyle", "service style"],
@@ -82,3 +84,43 @@ it.each([
     });
   },
 );
+
+it("catalog edits update an already-open Event selector (AC-012)", async () => {
+  backend.values.set("useListServiceStyle", [
+    { _id: "style-a", name: "Chef's table", status: "active", sortOrder: 0 },
+    { _id: "style-b", name: "Grazing", status: "active", sortOrder: 1 },
+  ]);
+  backend.values.set("useListOccasion", [
+    { _id: "occ-a", name: "Gala", status: "active" },
+  ]);
+  await mount(createElement(EventCreatePage));
+  input("title", "Board dinner");
+  const optionsOf = (name: string) =>
+    [
+      ...container.querySelector<HTMLSelectElement>(`select[name="${name}"]`)!
+        .options,
+    ].map((option) => option.text);
+  expect(optionsOf("serviceStyleId")).toEqual([
+    "Select a service style",
+    "Chef's table",
+    "Grazing",
+  ]);
+
+  // An admin renames one style, retires the other, and adds an occasion in
+  // another tab. The live lists change; this open form is not reloaded.
+  backend.values.set("useListServiceStyle", [
+    { _id: "style-a", name: "Chef's counter", status: "active", sortOrder: 0 },
+    { _id: "style-b", name: "Grazing", status: "inactive", sortOrder: 1 },
+  ]);
+  backend.values.set("useListOccasion", [
+    { _id: "occ-a", name: "Gala", status: "active" },
+    { _id: "occ-b", name: "Retirement party", status: "active" },
+  ]);
+  await mount(createElement(EventCreatePage));
+  expect(optionsOf("serviceStyleId")).toEqual([
+    "Select a service style",
+    "Chef's counter",
+  ]);
+  expect(optionsOf("occasionId")).toContain("Retirement party");
+  expect(field("title")).toHaveProperty("value", "Board dinner");
+});

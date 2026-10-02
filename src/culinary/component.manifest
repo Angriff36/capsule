@@ -41,6 +41,21 @@ entity Component mixin TenantScoped, SoftDeletable {
   // groups form only inside a confirmed window; null = not confirmed.
   property storageWindowDays: int?
   property storageWindowSource: string?
+  // Kitchen standards a cook reads at the station (PL-CULINARY-CATALOG,
+  // AC-453). Plain words a person wrote; null = not on file, never guessed.
+  property equipmentNotes: string?
+  property platingInstructions: string?
+  property coolingInstructions: string?
+  property holdingInstructions: string?
+  property reheatInstructions: string?
+  // Approved swaps and when they are allowed (for example "almond milk for
+  // dairy guests, chef sign-off"). Ingredient-level options stay on Ingredient.
+  property substitutionNotes: string?
+  // A link to a technique video (YouTube, Drive, and so on).
+  property videoUrl: string?
+  // Convex storage id for the recipe photo (upload via Attachment).
+  property primaryImageStorageId: string?
+  property primaryImageFileName: string?
 
   hasMany steps: ComponentStep
   hasMany ingredientLines: ComponentIngredient
@@ -163,6 +178,54 @@ entity Component mixin TenantScoped, SoftDeletable {
       componentId: self.id
       tenantId: self.tenantId
       storageWindowDays: storageWindowDays
+    }
+  }
+
+  // Kitchen standards are station facts, not formula changes: they can be
+  // corrected on a published recipe without a new edition. Every field is
+  // restated on each save; a blank field clears it back to "not on file".
+  command setKitchenStandards(
+    optional equipmentNotes: string,
+    optional platingInstructions: string,
+    optional coolingInstructions: string,
+    optional holdingInstructions: string,
+    optional reheatInstructions: string,
+    optional substitutionNotes: string,
+    optional videoUrl: string
+  ) {
+    guard self.deletedAt == null
+    mutate equipmentNotes = equipmentNotes
+    mutate platingInstructions = platingInstructions
+    mutate coolingInstructions = coolingInstructions
+    mutate holdingInstructions = holdingInstructions
+    mutate reheatInstructions = reheatInstructions
+    mutate substitutionNotes = substitutionNotes
+    mutate videoUrl = videoUrl
+    emit ComponentKitchenStandardsSet {
+      componentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setPrimaryImage(storageId: string, optional fileName: string) {
+    guard self.deletedAt == null
+    constraint componentPrimaryImageStorage: length(trim(storageId)) > 0 "Add a photo before you set it as the main picture."
+    mutate primaryImageStorageId = storageId
+    mutate primaryImageFileName = fileName
+    emit ComponentPrimaryImageSet {
+      componentId: self.id
+      tenantId: self.tenantId
+      storageId: storageId
+    }
+  }
+
+  command clearPrimaryImage() {
+    guard self.deletedAt == null
+    mutate primaryImageStorageId = null
+    mutate primaryImageFileName = null
+    emit ComponentPrimaryImageCleared {
+      componentId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -628,6 +691,22 @@ event ComponentStorageWindowSet: "component.storage_window_set" {
   componentId: string
   tenantId: string
   storageWindowDays: int
+}
+
+event ComponentKitchenStandardsSet: "component.kitchen_standards_set" {
+  componentId: string
+  tenantId: string
+}
+
+event ComponentPrimaryImageSet: "component.primary_image_set" {
+  componentId: string
+  tenantId: string
+  storageId: string
+}
+
+event ComponentPrimaryImageCleared: "component.primary_image_cleared" {
+  componentId: string
+  tenantId: string
 }
 
 // Revision-2 culinary model (2026-09-14). A recipe used inside another recipe.

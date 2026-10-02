@@ -165,8 +165,8 @@ async function writeCapsule(
       parkingAvailable: bool("parkingAvailable"),
       hasFreightElevator: bool("hasFreightElevator"),
       storageAvailable: bool("storageAvailable"),
-      logisticsNotes: keep(doc.logisticsNotes),
-      loadInInstructions: keep(doc.loadInInstructions),
+      logisticsNotes: put(detailWrites, doc, "logisticsNotes"),
+      loadInInstructions: put(detailWrites, doc, "loadInInstructions"),
       powerAvailable: bool("powerAvailable"),
       waterAccess: bool("waterAccess"),
       hasStairs: bool("hasStairs"),
@@ -339,7 +339,16 @@ export async function reconcileExistingLink(
       return kept ? map.fromSource(kept) : null;
     })();
 
-  const doc = await readCapsule(ctx, dataset, link.capsuleId);
+  // PL-SOURCE-MERGE (AC-061): a merged-away client's row updates the client
+  // it was merged into; the link itself keeps pointing where it did.
+  const capsuleId =
+    dataset === "contacts"
+      ? await ctx.runQuery(internal.importCommit.survivingClientId, {
+          tenantId: link.tenantId,
+          clientId: link.capsuleId,
+        })
+      : link.capsuleId;
+  const doc = await readCapsule(ctx, dataset, capsuleId);
   if (!doc) {
     // The record is gone or this person cannot open it: note the sighting only.
     await ctx.runMutation(internal.importSourceDelta.recordDelta, {
@@ -380,13 +389,13 @@ export async function reconcileExistingLink(
   let wrote = false;
   if (Object.keys(writes).length > 0) {
     try {
-      await writeCapsule(ctx, dataset, link.capsuleId, doc, writes);
+      await writeCapsule(ctx, dataset, capsuleId, doc, writes);
       wrote = true;
     } catch {
       // Someone saved the record meanwhile, or a save was refused: never
       // force it. Fields that did save count as taken; the rest become
       // review items with the value Capsule holds now.
-      const fresh = await readCapsule(ctx, dataset, link.capsuleId);
+      const fresh = await readCapsule(ctx, dataset, capsuleId);
       const now = map.fromCapsule(fresh ?? doc);
       for (const field of Object.keys(writes)) {
         if (valuesEqual(now[field], writes[field])) {
@@ -587,10 +596,17 @@ export const takeSourceValue = action({
         `Change the ${map.labels[conflict.field] ?? conflict.field} on the record, then mark this as fixed another way.`,
       );
     }
-    const doc = await readCapsule(ctx, dataset, link.capsuleId);
+    const capsuleId =
+      dataset === "contacts"
+        ? await ctx.runQuery(internal.importCommit.survivingClientId, {
+            tenantId: link.tenantId,
+            clientId: link.capsuleId,
+          })
+        : link.capsuleId;
+    const doc = await readCapsule(ctx, dataset, capsuleId);
     if (!doc) throw new ConvexError("The record could not be opened.");
     const value = readStoredValue(conflict.sourceValue);
-    await writeCapsule(ctx, dataset, link.capsuleId, doc, {
+    await writeCapsule(ctx, dataset, capsuleId, doc, {
       [conflict.field]: value ?? null,
     });
     await ctx.runMutation(api.mutations.ImportConflict_settle, {
