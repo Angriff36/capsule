@@ -715,8 +715,31 @@ export const run = query({
                 : args.reportId === "event-other-fees"
                   ? /other fee|service fee|delivery fee|fee/i
                   : null;
-      let rows = rangedInvoices.flatMap((invoice) =>
-        invoiceLines(invoice.lineItems).map((line, index) => ({
+      // #426: the invoice discount is shared across its lines by line amount
+      // (cents, the leftover cent on the last line), so the lines add back
+      // to the invoice discount instead of repeating it on every line.
+      const lineDiscounts = (
+        lines: ReturnType<typeof invoiceLines>,
+        discount: number,
+      ): number[] => {
+        const cents = Math.round(discount * 100);
+        const base = lines.reduce((sum, line) => sum + line.amount, 0);
+        const shares = lines.map((line, index) =>
+          base === 0
+            ? index === 0
+              ? cents
+              : 0
+            : Math.round((cents * line.amount) / base),
+        );
+        if (shares.length > 0)
+          shares[shares.length - 1]! +=
+            cents - shares.reduce((sum, share) => sum + share, 0);
+        return shares.map((share) => share / 100);
+      };
+      let rows = rangedInvoices.flatMap((invoice) => {
+        const lines = invoiceLines(invoice.lineItems);
+        const discounts = lineDiscounts(lines, invoice.discountAmount);
+        return lines.map((line, index) => ({
           id: `${invoice._id}-${index}`,
           values: {
             event: shownEvent(invoice.eventId)?.title ?? "",
@@ -731,11 +754,11 @@ export const run = query({
             profit: line.amount - line.cost,
             margin: percent(line.amount - line.cost, line.amount),
             tax: line.tax,
-            discount: invoice.discountAmount,
+            discount: discounts[index] ?? 0,
             total: line.amount + line.tax,
           },
-        })),
-      );
+        }));
+      });
       if (matcher)
         rows = rows.filter(
           (row) =>
