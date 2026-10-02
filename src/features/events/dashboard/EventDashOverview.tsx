@@ -17,7 +17,9 @@ import { EventProposalSourceCard } from "../../clients/EventProposalSourceCard";
 import { eventDetailPath } from "../eventRoutes";
 import { EventImportDraftPanel } from "../import/EventImportDraftPanel";
 import { EventSourceProvenancePanel } from "../EventSourceProvenancePanel";
+import { useMobileViewport } from "../../../app/shell/useMobileViewport";
 import { allergyLine, durationLabel, firstLine } from "./eventDashFacts";
+import { EventPhoneBrief } from "./EventPhoneBrief";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
 import { useEventDayForecast } from "./useEventDayForecast";
 
@@ -125,6 +127,7 @@ export function EventDashOverview({
   const canManagePacket = useEventPacketAccess(eventId);
   const forecast = useEventDayForecast(props.venue, props.startsAt);
   const serviceStyles = useListServiceStyle();
+  const mobile = useMobileViewport();
   // The event stores the style id; the booked name is filled only on some rows.
   const serviceStyle =
     event.serviceStyleName ||
@@ -178,6 +181,13 @@ export function EventDashOverview({
 
   return (
     <section data-testid="event-overview-tab">
+      {mobile ? (
+        <EventPhoneBrief
+          props={props}
+          serviceStyle={serviceStyle}
+          onOpen={onOpen}
+        />
+      ) : null}
       <div className="evd-stats">
         {stats.map(([label, value, to]) => (
           <Link key={label} to={to} className="evd-stat">
