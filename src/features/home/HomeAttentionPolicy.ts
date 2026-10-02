@@ -28,6 +28,10 @@ export interface HomeServiceDeskSnapshot {
   role: string;
   attention: HomeAttentionItem[];
   upcoming: HomeUpcomingService[];
+  /** Counted over every live event, before `upcoming` is cut to its limit. */
+  todayCount: number;
+  /** Dated services from tomorrow through the next seven days. */
+  weekAheadCount: number;
 }
 
 type SoftDeletable = { deletedAt?: number | null };
@@ -208,6 +212,22 @@ export class HomeAttentionPolicy {
     // the current local day means a lunch does not disappear off Home at
     // noon. Terminal stages are already excluded from liveEvents.
     const startOfToday = new Date(now).setHours(0, 0, 0, 0);
+    const startOfTomorrow = new Date(now);
+    startOfTomorrow.setHours(24, 0, 0, 0);
+    const endOfToday = startOfTomorrow.getTime();
+    const endOfWeekAhead = endOfToday + 7 * 24 * 60 * 60 * 1000;
+    const todayCount = liveEvents.filter(
+      (event) =>
+        event.startsAt != null &&
+        event.startsAt >= startOfToday &&
+        event.startsAt < endOfToday,
+    ).length;
+    const weekAheadCount = liveEvents.filter(
+      (event) =>
+        event.startsAt != null &&
+        event.startsAt >= endOfToday &&
+        event.startsAt < endOfWeekAhead,
+    ).length;
     const upcoming = [...liveEvents]
       .filter(
         (event) => event.startsAt == null || event.startsAt >= startOfToday,
@@ -242,6 +262,8 @@ export class HomeAttentionPolicy {
       role: facts.role,
       attention,
       upcoming,
+      todayCount,
+      weekAheadCount,
     };
   }
 }

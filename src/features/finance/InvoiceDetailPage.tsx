@@ -827,7 +827,7 @@ export function InvoiceDetailPage() {
           >
             {busy === "sendBalanceReminder"
               ? "Working…"
-              : "Send balance reminder"}
+              : "Note balance reminder"}
           </button>
         </div>
       </section>

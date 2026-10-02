@@ -111,12 +111,19 @@ export function CatalogsSection({
         sorted.reduce((max, row) => Math.max(max, row.sortOrder ?? 0), -1) + 1;
       let added = 0;
       for (const [index, row] of missing.entries()) {
-        await commands.register({
-          name: row.name,
-          code: row.code,
-          sortOrder: nextOrder + index,
-          description: row.description,
-        });
+        try {
+          await commands.register({
+            name: row.name,
+            code: row.code,
+            sortOrder: nextOrder + index,
+            description: row.description,
+          });
+        } catch (cause) {
+          const reason = cause instanceof Error ? cause.message : "";
+          throw new Error(
+            `Added ${added} of ${missing.length}; ${row.name} could not be added. Press the button again to add the rest. ${reason}`.trim(),
+          );
+        }
         added += 1;
       }
       setNotice(

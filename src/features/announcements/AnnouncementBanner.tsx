@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useCreateAnnouncementDismissal,
   useListAnnouncement,
@@ -54,6 +54,8 @@ export function AnnouncementBanner() {
   const announcements = useListAnnouncement();
   const dismissals = useListAnnouncementDismissal();
   const createDismissal = useCreateAnnouncementDismissal();
+  const [closing, setClosing] = useState<ReadonlySet<string>>(new Set());
+  const [closeError, setCloseError] = useState<string | null>(null);
 
   const visible = useMemo(() => {
     if (!announcements || !dismissals || !user?.id) return [];
@@ -69,18 +71,28 @@ export function AnnouncementBanner() {
           a.deletedAt == null &&
           a.expiresAt != null &&
           a.expiresAt > now &&
-          !dismissed.has(String(a._id)),
+          !dismissed.has(String(a._id)) &&
+          !closing.has(String(a._id)),
       )
       .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
-  }, [announcements, dismissals, user?.id]);
+  }, [announcements, dismissals, user?.id, closing]);
 
-  if (visible.length === 0) return null;
+  if (visible.length === 0 && closeError == null) return null;
 
+  // Hide at once; if the close was not saved, show the notice again with a
+  // short message. A repeat close fails the unique key, but then the saved
+  // dismissal already hides the notice.
   const dismiss = (announcementId: string) => {
+    setCloseError(null);
+    setClosing((current) => new Set(current).add(announcementId));
     void createDismissal({ announcementId: announcementId as never }).catch(
       () => {
-        // Repeat dismissals fail the unique key; the banner already hides
-        // optimistically via the reactive dismissal list.
+        setClosing((current) => {
+          const next = new Set(current);
+          next.delete(announcementId);
+          return next;
+        });
+        setCloseError("This notice could not be closed. Try again.");
       },
     );
   };
@@ -91,6 +103,14 @@ export function AnnouncementBanner() {
       role="region"
       aria-label="Announcements"
     >
+      {closeError ? (
+        <p
+          className="mx-auto max-w-[1440px] px-4 py-1.5 text-sm text-danger max-xl:px-8 max-md:px-5"
+          role="alert"
+        >
+          {closeError}
+        </p>
+      ) : null}
       <ul className="mx-auto max-w-[1440px] divide-y divide-line max-xl:px-8 max-md:px-5">
         {visible.map((a) => {
           const style = categoryStyle(String(a.category));

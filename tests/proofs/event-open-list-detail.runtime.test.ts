@@ -199,7 +199,9 @@ describe("runtime proof: events open, edit and list the same (AC-214..217)", () 
     )) as { docId: string };
     await owner.run(async (ctx) => {
       await ctx.db.patch(nativeId as never, { deletedAt: Date.now() } as never);
-      await ctx.db.delete(gone.docId as never);
+      await (ctx.db as unknown as { delete(id: never): Promise<void> }).delete(
+        gone.docId as never,
+      );
     });
     const reads = [
       await getEvent(owner, nativeId),

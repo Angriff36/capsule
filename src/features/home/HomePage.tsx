@@ -221,7 +221,7 @@ export function HomePage() {
             Today’s service
           </h1>
           <div className="fact-row mt-3">
-            <Fact label="Today" value={`${today.length} services`} />
+            <Fact label="Today" value={`${snapshot.todayCount} services`} />
             <Fact label="This week" value={String(thisWeek?.count ?? 0)} />
             {today[0] ? (
               <Fact
@@ -281,8 +281,8 @@ export function HomePage() {
       {later.length > 0 ? (
         <div className="mt-7">
           <SectionRule
-            label="Week ahead"
-            trailing={`${later.length} services`}
+            label="Coming up"
+            trailing={`${snapshot.weekAheadCount} in the next 7 days`}
           />
           <div className="fact-row mt-3 gap-x-8">
             {later.slice(0, 5).map((service) => (

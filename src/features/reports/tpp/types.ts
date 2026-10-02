@@ -119,7 +119,8 @@ export interface TppGroup {
 export interface TppTotal {
   key: string;
   label: string;
-  value: number;
+  /** Null only for a percentage with nothing to divide by. */
+  value: number | null;
   kind: "number" | "money" | "quantity" | "percentage";
 }
 

@@ -195,58 +195,64 @@ export function ExternalRecordsReconcilePage() {
     setNotice(null);
   }
 
-  // Verify selected records. The generated hook reads `docId` (not `id`); the
-  // server records the signed-in person as the one who checked each record.
-  async function verifySelected() {
+  // Run one write per selected item. Every item is tried; the ones that fail
+  // stay selected and the notice says how many went through.
+  async function runEachSelected(
+    write: (id: string) => Promise<unknown>,
+    doneLabel: string,
+    failedLabel: string,
+  ) {
     if (selectedIds.size === 0) return;
     setBusy(true);
     setError(null);
     setNotice(null);
-
-    try {
-      for (const id of selectedIds) {
-        await verifyLink({
-          docId: id,
-          verified: true,
-        });
+    const selectedList = [...selectedIds];
+    const failed = new Set<string>();
+    let firstFailure: string | null = null;
+    for (const id of selectedList) {
+      try {
+        await write(id);
+      } catch (cause: unknown) {
+        failed.add(id);
+        firstFailure ??=
+          cause instanceof Error ? cause.message : "Something went wrong.";
       }
-      setNotice(`Checked ${selectedIds.size} item(s).`);
-      setSelectedIds(new Set());
-      setBulkAction(null);
-    } catch (cause: unknown) {
-      setError(
-        cause instanceof Error ? cause.message : "Couldn't check those items.",
-      );
-    } finally {
-      setBusy(false);
     }
+    const done = selectedList.length - failed.size;
+    if (done > 0) setNotice(`${doneLabel}${done} item(s).`);
+    if (failed.size > 0) {
+      setError(
+        `${failedLabel} ${failed.size} item(s) are still selected. ${firstFailure}`,
+      );
+    } else {
+      setBulkAction(null);
+    }
+    setSelectedIds(failed);
+    setBusy(false);
+  }
+
+  // Verify selected records. The generated hook reads `docId` (not `id`); the
+  // server records the signed-in person as the one who checked each record.
+  function verifySelected() {
+    return runEachSelected(
+      (id) => verifyLink({ docId: id, verified: true }),
+      "Checked ",
+      "Couldn't check those items.",
+    );
   }
 
   // Skip selected records (mark as resolved with note).
-  async function skipSelected() {
-    if (selectedIds.size === 0) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-
-    try {
-      for (const id of selectedIds) {
-        await resolveConflict({
+  function skipSelected() {
+    return runEachSelected(
+      (id) =>
+        resolveConflict({
           docId: id,
           conflictStatus: "resolved",
           resolutionNote: "Skipped while matching leftover items",
-        });
-      }
-      setNotice(`Skipped ${selectedIds.size} item(s).`);
-      setSelectedIds(new Set());
-      setBulkAction(null);
-    } catch (cause: unknown) {
-      setError(
-        cause instanceof Error ? cause.message : "Couldn't skip those items.",
-      );
-    } finally {
-      setBusy(false);
-    }
+        }),
+      "Skipped ",
+      "Couldn't skip those items.",
+    );
   }
 
   return (

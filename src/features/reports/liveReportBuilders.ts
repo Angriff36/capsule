@@ -15,6 +15,7 @@ import type {
 import { metricDefinition, type MetricId } from "./metricDefinitions";
 import { date, REPORT_DATE_OF } from "./liveReportDates";
 import { countLeftOut, NO_LEFT_OUT } from "./liveReportLeftOut";
+import { NOT_KNOWN } from "./dashboardRecordSets";
 
 type SourceRow = Record<string, unknown>;
 
@@ -160,7 +161,9 @@ function buildSalesReport(
       ),
       kpi(
         "sales.acceptance_rate",
-        formatPercent(rows.length ? (accepted.length / rows.length) * 100 : 0),
+        rows.length
+          ? formatPercent((accepted.length / rows.length) * 100)
+          : NOT_KNOWN,
       ),
     ],
     breakdown: statusBreakdown(rows, "status"),
@@ -271,7 +274,9 @@ function buildProductionReport(
       kpi("production.blocked", formatCount(blocked), blockedRows),
       kpi(
         "production.completion_rate",
-        formatPercent(rows.length ? (completed / rows.length) * 100 : 0),
+        rows.length
+          ? formatPercent((completed / rows.length) * 100)
+          : NOT_KNOWN,
       ),
     ],
     breakdown: statusBreakdown(rows, "status"),
