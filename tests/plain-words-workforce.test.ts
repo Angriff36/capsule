@@ -152,7 +152,7 @@ describe("plain words on workforce manifests", () => {
       "Workforce staff may see training completions",
       "Workforce staff may see shift types",
       "Staff may see their own push devices",
-      "Managers may see performance reviews",
+      "Workforce managers may see performance reviews",
       "Workforce managers may see one-on-ones",
       "Workforce managers may see one-on-one actions",
       "Crew may see shared event staffing",
