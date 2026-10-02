@@ -345,7 +345,7 @@ export function validateSnapshot(input: unknown): EventPacketSnapshot {
   for (const issue of packet.issues)
     if (
       issue.status === "resolved" &&
-      !nativelyAnswered(issue.key, packet.facts) &&
+      !nativelyAnswered(issue.key, packet.facts, packet.artifacts.length > 0) &&
       !packet.resolutions.some(
         (r) =>
           r.issueId === issue.id &&

@@ -929,6 +929,14 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       expect(p.snapshot.identity.invoiceNumber).toBe("7001");
       expect(part("brief")).toContain("Event 7001 goes on the spine");
       expect(part("brief")).not.toContain("Two vegetarian guests");
+      // A native event has no imported paperwork to reconcile.
+      for (const importCheck of [
+        "tray, salad and roll",
+        "original units",
+        "recipe placeholders",
+        "TPP Final Approval",
+      ])
+        expect(part("cover")).not.toContain(importCheck);
       expect(part("menu")).toContain("Golden Caesar - 80 servings");
       expect(part("packlist-category")).toContain("[ ] Paper cones - 88 each");
       // Staff call times.
