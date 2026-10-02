@@ -1596,6 +1596,223 @@ describe.sequential(
   },
 );
 
+describe.sequential(
+  "golden event journey, the day and after (AC-670..AC-674)",
+  () => {
+    it(
+      "golden event 18: Require named people to perform the before-takeoff and arrival confirmations. Prove Capsule cannot auto-complete them",
+      async () => {
+        const fl = api.lib.eventPacket.finalLock as unknown as Record<
+          string,
+          never
+        >;
+        const report = async () =>
+          (await w.owner.query(fl.getFinalLock, {
+            eventId: id.golden,
+          } as never)) as {
+            answers: {
+              questionKey: string;
+              basis: string;
+              fieldWork: {
+                status: string;
+                confirmedAt: string | null;
+                confirmedBy: string | null;
+              } | null;
+            }[];
+          };
+        const answerOf = async (key: string) =>
+          (await report()).answers.find((a) => a.questionKey === key)!;
+        expect(
+          await w.owner.mutation(fl.prepareFieldForms, {
+            eventId: id.golden,
+          } as never),
+        ).toEqual({ prepared: 10 });
+        // Running it again sets up nothing new and signs nothing.
+        expect(
+          await w.owner.mutation(fl.prepareFieldForms, {
+            eventId: id.golden,
+          } as never),
+        ).toEqual({ prepared: 0 });
+        // The office cannot answer a day-of form for the crew.
+        await expect(
+          w.owner.mutation(fl.overrideFinalLockAnswer, {
+            eventId: id.golden,
+            questionKey: "field.arrival",
+            basedOn: (await answerOf("field.arrival")).basis,
+            answer: "Done",
+            reason: "Office says so",
+          } as never),
+        ).rejects.toThrow(/person who does it/);
+        for (const key of ["field.arrival", "field.takeoff-readiness"])
+          expect((await answerOf(key)).fieldWork).toMatchObject({
+            status: "open",
+            confirmedAt: null,
+          });
+
+        const forms = Object.fromEntries(
+          (
+            (await w.owner.query(fl.listEventFieldForms, {
+              eventId: id.golden,
+            } as never)) as { formKey: string; id: string }[]
+          ).map((row) => [row.formKey, row.id]),
+        );
+        const as = (subject: string) =>
+          w.raw.withIdentity({ subject, org_id: TENANT, role: "event_staff" });
+        const lena = as(crew.lead.subject);
+        const sam = as(crew.server.subject);
+
+        // Before takeoff: two different people, each for themselves.
+        await lena.mutation(M.FieldConfirmation_complete, {
+          docId: forms["field.takeoff-readiness"],
+          outcome: "all_good",
+        } as never);
+        await expect(
+          lena.mutation(M.FieldConfirmation_countersign, {
+            docId: forms["field.takeoff-readiness"],
+          } as never),
+        ).rejects.toThrow(/second, different person/);
+        expect(
+          (await answerOf("field.takeoff-readiness")).fieldWork,
+        ).toMatchObject({ status: "first_signed", confirmedAt: null });
+        await sam.mutation(M.FieldConfirmation_countersign, {
+          docId: forms["field.takeoff-readiness"],
+          note: "Straps on, doors locked",
+        } as never);
+        expect(
+          (await answerOf("field.takeoff-readiness")).fieldWork,
+        ).toMatchObject({
+          status: "done",
+          confirmedBy: "Lena Crew and Sam Crew",
+        });
+
+        // Arrival: signed by the lead with the time it really happened.
+        const seenAt = Date.now() - 5 * MIN;
+        await lena.mutation(M.FieldConfirmation_complete, {
+          docId: forms["field.arrival"],
+          outcome: "all_good",
+          observedAt: seenAt,
+        } as never);
+        expect((await answerOf("field.arrival")).fieldWork).toMatchObject({
+          status: "done",
+          confirmedBy: "Lena Crew",
+          confirmedAt: new Date(seenAt).toISOString(),
+        });
+        // Every other day-of form is still waiting for its person.
+        expect(
+          (await answerOf("field.leaving-event")).fieldWork?.confirmedAt,
+        ).toBe(null);
+      },
+      LONG,
+    );
+
+    it(
+      "golden event 19: Execute/finalize/complete the Event; return/inspect rental and owned equipment and record damage/missing facts",
+      async () => {
+        const startsAt = WEEK.golden.startsAt + 7 * DAY;
+        const endsAt = WEEK.golden.endsAt + 7 * DAY;
+        const chafers = await w.run.logistics(M.Equipment_createViaRegister, {
+          name: "Round chafer",
+          assetTag: "CH-10",
+          category: "holding",
+          ownership: "owned",
+          quantity: 10,
+        });
+        await w.proof.executeCommand(
+          w.roles.logistics,
+          api.equipmentCheckout.reserve,
+          {
+            equipmentId: chafers.docId,
+            eventId: id.golden,
+            startsAt,
+            endsAt,
+            quantity: 4,
+          } as never,
+        );
+        const holds = await eventRows<{
+          tenantId: string;
+          _id: string;
+          equipmentId: string;
+          status: string;
+        }>(w, "equipmentReservations", id.golden);
+        const live = holds.filter((h) => h.status !== "cancelled");
+        expect(live).toHaveLength(2);
+        for (const hold of live)
+          await w.run.logistics(M.EquipmentReservation_checkOut, {
+            docId: hold._id,
+            version: await versionOf(w, hold._id),
+            condition: "good",
+          });
+
+        const step = (role: "sales" | "events", cmd: unknown) => async () =>
+          w.run[role](cmd as never, {
+            docId: id.golden,
+            version: await versionOf(w, id.golden),
+          });
+        for (const [role, cmd] of [
+          ["sales", M.Event_lockForSales],
+          ["events", M.Event_beginExecution],
+          ["events", M.Event_finalizeEvent],
+          ["events", M.Event_complete],
+        ] as const)
+          await step(role, cmd)();
+        expect(
+          (await readRow<{ stage: string }>(w.owner, id.golden)).stage,
+        ).toBe("completed");
+
+        // Back at the warehouse: chargers come back 2 broken and 1 short; the
+        // chafers come back fine.
+        const staff = w.proof.asRole({
+          subject: `logistics-staff-${TENANT}`,
+          role: "logistics_staff",
+          tenantId: TENANT,
+        });
+        const chargerHold = live.find((h) => h.equipmentId !== chafers.docId)!;
+        const chaferHold = live.find((h) => h.equipmentId === chafers.docId)!;
+        await w.proof.executeCommand(
+          staff,
+          M.EquipmentReservation_markReturned,
+          {
+            docId: chargerHold._id,
+            version: await versionOf(w, chargerHold._id),
+            condition: "fair",
+            damagedQuantity: 2,
+            missingQuantity: 1,
+          } as never,
+        );
+        await w.proof.executeCommand(
+          staff,
+          M.EquipmentReservation_markReturned,
+          {
+            docId: chaferHold._id,
+            version: await versionOf(w, chaferHold._id),
+            condition: "good",
+          } as never,
+        );
+        const issues = await eventRows<{
+          tenantId: string;
+          kind: string;
+          quantity: number;
+          equipmentReservationId?: string | null;
+        }>(w, "equipmentIssues", id.golden);
+        expect(
+          issues
+            .map((i) => [i.kind, i.quantity, i.equipmentReservationId])
+            .sort(),
+        ).toEqual([
+          ["damaged", 2, chargerHold._id],
+          ["missing", 1, chargerHold._id],
+        ]);
+        const exceptions = (await w.owner.query(
+          api.equipmentCheckout.eventEquipmentExceptions,
+          { eventId: id.golden } as never,
+        )) as { problems: unknown[] };
+        expect(exceptions.problems).toHaveLength(2);
+      },
+      LONG,
+    );
+  },
+);
+
 async function routeFacts() {
   const rows = (await w.owner.run(async (ctx) =>
     ctx.db.query("manifestEvents").collect(),
