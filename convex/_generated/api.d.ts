@@ -44,6 +44,7 @@ import type * as eventCreateCatalog from "../eventCreateCatalog.js";
 import type * as eventDayBriefing from "../eventDayBriefing.js";
 import type * as eventCalendarMonth from "../eventCalendarMonth.js";
 import type * as eventLedger from "../eventLedger.js";
+import type * as eventLookup from "../eventLookup.js";
 import type * as eventReadiness from "../eventReadiness.js";
 import type * as eventRouteLegs from "../eventRouteLegs.js";
 import type * as eventRoutes from "../eventRoutes.js";
@@ -342,6 +343,7 @@ declare const fullApi: ApiFromModules<{
   eventDayBriefing: typeof eventDayBriefing;
   eventCalendarMonth: typeof eventCalendarMonth;
   eventLedger: typeof eventLedger;
+  eventLookup: typeof eventLookup;
   eventReadiness: typeof eventReadiness;
   eventRouteLegs: typeof eventRouteLegs;
   eventRoutes: typeof eventRoutes;
