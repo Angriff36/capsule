@@ -127,6 +127,7 @@ interface SentEmail {
   emailId: string;
   from: string;
   subject: string;
+  text: string;
   attachmentName: string;
   fingerprint: string;
 }
@@ -795,6 +796,7 @@ async function sendReminderEmail(
     emailId,
     from,
     subject: email.subject,
+    text: email.text,
     attachmentName,
     fingerprint: await artifactFingerprint([
       email.subject,
@@ -949,6 +951,27 @@ async function deliverReminder(
     attachments: [sent.attachmentName],
     artifactFingerprint: sent.fingerprint,
   });
+  try {
+    await ctx.runMutation(internal.outboundEmailThread.recordInvoiceEmail, {
+      tenantId: attempt.tenantId,
+      invoiceId: attempt.invoiceId,
+      senderAddress: environment.fromEmail,
+      recipientLabel: `${context.recipient.name} (${maskEmail(
+        context.recipient.email,
+      )})`,
+      contactId: context.recipient.contactId,
+      subject: sent.subject,
+      bodyText: sent.text,
+      providerMessageId: sent.emailId,
+      sentAt: Date.now(),
+    });
+  } catch (cause) {
+    // The email went and its send record is kept; a missing conversation
+    // entry must not make the job send it again.
+    console.error(
+      `Reminder ${sent.emailId} sent but not added to the conversation: ${safeProviderMessage(cause)}`,
+    );
+  }
   return { status: "delivered", emailId: sent.emailId };
 }
 

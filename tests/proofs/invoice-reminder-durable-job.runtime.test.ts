@@ -268,6 +268,45 @@ describe("payment reminders keep an honest send record", () => {
     );
   });
 
+  it("a sent reminder shows once in the invoice's email conversation as an outbound message", async () => {
+    const env = await setup();
+    stubProviders({ emailStatus: 200 });
+    const schedule = await env.finance.action(
+      api.invoiceReminders.configureSchedule,
+      { invoiceId: env.invoiceId, offsetsDays: [7, 3] },
+    );
+    for (const offset of [7, 7, 3]) {
+      await env.t.action(
+        internal.invoiceReminders.deliverScheduled,
+        job(env, schedule.configId, offset),
+      );
+    }
+
+    const { threads, messages } = await env.t.run(async (ctx) => ({
+      threads: await ctx.db.query("messageThreads").collect(),
+      messages: await ctx.db.query("messages").collect(),
+    }));
+    expect(threads).toHaveLength(1);
+    expect(threads[0]).toMatchObject({
+      tenantId: TENANT,
+      provider: "email",
+      providerThreadId: `invoice:${env.invoiceId}`,
+      senderIdentity: "Garden Club (b•••@garden.example)",
+    });
+    expect(
+      messages.map((message) => [
+        message.direction,
+        message.status,
+        message.providerMessageId,
+      ]),
+    ).toEqual([
+      ["outbound", "sent", "email_1"],
+      ["outbound", "sent", "email_2"],
+    ]);
+    expect(messages.every((m) => m.threadId === threads[0]!._id)).toBe(true);
+    expect(messages[0]!.bodyText).toMatch(/INV-OUT-1/u);
+  });
+
   it("send now with email not set up says so in plain words", async () => {
     const env = await setup();
     stubProviders({ emailStatus: 200 });
