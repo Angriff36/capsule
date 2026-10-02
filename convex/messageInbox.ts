@@ -3,6 +3,7 @@ import { api } from "./_generated/api";
 import { action, type ActionCtx } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { mediaRefsFromEnvelope } from "./lib/messageMedia";
+import { redactSecrets } from "./lib/redactPayload";
 
 // §4.4 retryable sync-error queue: record an ingest/parse failure as a SyncError.
 // Tenant-scoped find-or-upsert — REOPEN (bump attempts, refresh, return to
@@ -29,7 +30,7 @@ async function recordMessageSyncError(
   try {
     const sourceSystem = opts.provider || "unknown";
     const externalId = opts.providerMessageId?.trim() || undefined;
-    const fullPayload = JSON.stringify(opts.payloadObject);
+    const fullPayload = JSON.stringify(redactSecrets(opts.payloadObject));
     const rawPayload =
       fullPayload.length <= MAX_RAW_PAYLOAD ? fullPayload : undefined;
     if (externalId) {
@@ -238,7 +239,10 @@ export const ingestInboundMessage = action({
           providerMessageId,
           senderIdentity: args.senderIdentity,
           sentAt: args.sentAt,
-          rawPayload: args.rawPayload,
+          rawPayload:
+            args.rawPayload === undefined
+              ? undefined
+              : (redactSecrets(args.rawPayload) as string),
           mediaJson: args.mediaJson,
           idempotencyKey: `tenant-shared/msg:${threadId}:${providerMessageId}`,
         },
@@ -386,6 +390,7 @@ export const ingestProviderEnvelope = action({
     }
 
     const media = mediaRefsFromEnvelope(parsed);
+    const storedRaw = JSON.stringify(redactSecrets(parsed));
     try {
       const result = await ctx.runAction(
         api.messageInbox.ingestInboundMessage,
@@ -412,7 +417,7 @@ export const ingestProviderEnvelope = action({
             "date",
           ]),
           rawPayload:
-            args.rawJson.length <= MAX_RAW_PAYLOAD ? args.rawJson : undefined,
+            storedRaw.length <= MAX_RAW_PAYLOAD ? storedRaw : undefined,
           mediaJson: media.length > 0 ? JSON.stringify(media) : undefined,
         },
       );
