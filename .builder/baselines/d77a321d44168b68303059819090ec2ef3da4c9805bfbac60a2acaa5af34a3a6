@@ -3913,6 +3913,7 @@ async function __runClientPortalLinkCreate(ctx: MutationCtx, args: any) {
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change client links");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((args.expiresAt > Date.now()))) throw new Error("The client link must stay open until a later time");
+    if (!((args.expiresAt <= (Date.now() + ((((90 * 24) * 60) * 60) * 1000))))) throw new Error("A client link can stay open for 90 days at most");
     const _id = await ctx.db.insert("clientPortalLinks", doc as any);
     const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, clientPortalLinkId: _id, tenantId: doc.tenantId, _subject: { entity: "ClientPortalLink", command: "create", id: _id } };
     const __manifestEvent0 = { type: "ClientPortalLinkCreated", entity: "ClientPortalLink", entityId: _id, payload: { clientPortalLinkId: _id, tenantId: doc.tenantId }, createdAt: Date.now() };

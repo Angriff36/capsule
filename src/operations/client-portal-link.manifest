@@ -40,6 +40,9 @@ entity ClientPortalLink mixin TenantScoped, SoftDeletable {
   ) {
     guard user.id != null
     constraint clientPortalExpiresFuture: expiresAt > now() "The client link must stay open until a later time"
+    // Same 90-day limit the copy button sets, so a direct command call cannot
+    // make a link that stays open longer.
+    constraint clientPortalExpiresWithin90Days: expiresAt <= now() + (90 * 24 * 60 * 60 * 1000) "A client link can stay open for 90 days at most"
     mutate eventId = eventId
     mutate status = "active"
     mutate expiresAt = expiresAt
