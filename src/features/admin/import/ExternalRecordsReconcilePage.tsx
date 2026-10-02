@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api, type Id } from "../../../lib/api";
 import {
-  useListExternalRecordLink,
   useListInvoice,
   useListPayment,
   useExternalRecordLinkResolveConflict,
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
+import { useExternalRecordLinksFor } from "../../../lib/useExternalRecordLinkLists";
 import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
@@ -94,7 +94,13 @@ export function ExternalRecordsReconcilePage() {
   const { notice, setNotice } = useActionNotice();
 
   // Query for all external records + Capsule payments (for the §6.4 match flow).
-  const allRecords = useListExternalRecordLink();
+  // Only the rows this page works with: the ones waiting for a person, and
+  // payments (the match flow and the reference-only count). The full list is
+  // too long for one read.
+  const allRecords = useExternalRecordLinksFor({
+    pending: true,
+    recordTypes: ["payment"],
+  });
   const payments = useListPayment();
   const invoices = useListInvoice();
 

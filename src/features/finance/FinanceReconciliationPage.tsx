@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import {
   useCreateSavedReportDefinition,
-  useListExternalRecordLink,
   useListInvoice,
   useListPayment,
 } from "../../lib/manifest-convex-react";
+import { useExternalRecordLinksFor } from "../../lib/useExternalRecordLinkLists";
 import {
   buildFinanceReconciliation,
   sourceMoneySpan,
@@ -37,7 +37,8 @@ function endOfDay(value: string): number | null {
  * made, under Reports.
  */
 export function FinanceReconciliationPage() {
-  const links = useListExternalRecordLink();
+  // Only payment rows: the full link list is too long for one read.
+  const links = useExternalRecordLinksFor({ recordTypes: ["payment"] });
   const payments = useListPayment();
   const invoices = useListInvoice();
   const saveReport = useCreateSavedReportDefinition();
