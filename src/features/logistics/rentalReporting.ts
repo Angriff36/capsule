@@ -5,9 +5,10 @@
  * the live lists in. Unknown prices and costs stay unknown and are counted,
  * never read as zero.
  *
- * - equipment charged: each live hold on an event in the period, quantity x
- *   the item's client price; holds whose item has no client price are counted
- *   in unpricedHolds;
+ * - equipment charged: for an event whose accepted proposal names rental
+ *   items, what the client agreed to pay for those lines (soldEvents counts
+ *   them); for any other event, each live hold, quantity x the item's client
+ *   price; holds whose item has no client price are counted in unpricedHolds;
  * - vendor cost: rental lines from vendors for those events, cancelled out;
  * - loss and damage: missing / damaged problems raised in the period, units,
  *   known cost (unknown counted), and what the client or vendor will pay;
@@ -43,6 +44,11 @@ export type RentalLine = Live & {
   readonly vendorCost: number;
   readonly status: string;
 };
+/** What the client agreed to pay for rental items on one event. */
+export type RentalSale = {
+  readonly eventId: string;
+  readonly amount: number;
+};
 export type RentalIssue = Live & {
   readonly kind: string;
   readonly quantity: number;
@@ -61,6 +67,7 @@ export type ItemUse = {
 
 export type RentalReport = {
   readonly equipmentCharged: number;
+  readonly soldEvents: number;
   readonly unpricedHolds: number;
   readonly vendorCost: number;
   readonly vendorLines: number;
@@ -82,6 +89,7 @@ export function rentalReport(
     readonly holds: readonly RentalHold[];
     readonly lines: readonly RentalLine[];
     readonly issues: readonly RentalIssue[];
+    readonly sales?: readonly RentalSale[];
   },
   periodStart: number,
   periodEnd: number,
@@ -117,9 +125,15 @@ export function rentalReport(
   );
 
   let equipmentCharged = 0;
+  const sold = new Set<string>();
+  for (const sale of input.sales ?? []) {
+    if (!inPeriod.has(sale.eventId)) continue;
+    sold.add(sale.eventId);
+    equipmentCharged += Number(sale.amount);
+  }
   let unpricedHolds = 0;
   for (const hold of liveHolds) {
-    if (!inPeriod.has(hold.eventId)) continue;
+    if (!inPeriod.has(hold.eventId) || sold.has(hold.eventId)) continue;
     const price = items.get(hold.equipmentId)?.customerPrice;
     if (price == null) unpricedHolds += 1;
     else equipmentCharged += Number(price) * hold.quantity;
@@ -191,6 +205,7 @@ export function rentalReport(
 
   return {
     equipmentCharged: round2(equipmentCharged),
+    soldEvents: sold.size,
     unpricedHolds,
     vendorCost: round2(vendorCost),
     vendorLines: vendorLines.length,

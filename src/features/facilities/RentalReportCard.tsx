@@ -1,4 +1,6 @@
+import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
+import { api } from "../../lib/api";
 import {
   useListEquipment,
   useListEquipmentIssue,
@@ -30,9 +32,16 @@ export function rentalReportRows(
     [
       "Equipment charged to clients",
       formatMoneyExact(report.equipmentCharged),
-      report.unpricedHolds > 0
-        ? `${report.unpricedHolds} hold(s) on items with no client price - not counted.`
-        : "Every hold is on a priced item.",
+      [
+        report.soldEvents > 0
+          ? `${report.soldEvents} event(s) at the price the client accepted; others at list price.`
+          : "At list price for what is held.",
+        report.unpricedHolds > 0
+          ? `${report.unpricedHolds} hold(s) on items with no client price - not counted.`
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
     ],
     [
       "Vendor rental cost",
@@ -72,8 +81,14 @@ export function RentalReportCard() {
   const lines = useListRentalOrderLine();
   const issues = useListEquipmentIssue();
   const [month, setMonth] = useState(() => monthValue(new Date()));
+  const [periodStart, periodEnd] = monthRange(month);
+  const sales = useQuery(api.rentalSales.acceptedRentalSales, {
+    periodStart,
+    periodEnd,
+  });
   const report = useMemo(() => {
-    if (!events || !equipment || !holds || !lines || !issues) return null;
+    if (!events || !equipment || !holds || !lines || !issues || !sales)
+      return null;
     const [start, end] = monthRange(month);
     return rentalReport(
       {
@@ -98,11 +113,12 @@ export function RentalReportCard() {
           ...row,
           quantity: Number(row.quantity),
         })),
+        sales,
       },
       start,
       end,
     );
-  }, [events, equipment, holds, lines, issues, month]);
+  }, [events, equipment, holds, lines, issues, sales, month]);
 
   return (
     <section className="card p-5" data-testid="rental-report-card">

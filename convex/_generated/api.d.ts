@@ -255,6 +255,7 @@ import type * as quoteBuilder from "../quoteBuilder.js";
 import type * as reasonedChanges from "../reasonedChanges.js";
 import type * as recordHistory from "../recordHistory.js";
 import type * as recurringEvents from "../recurringEvents.js";
+import type * as rentalSales from "../rentalSales.js";
 import type * as rigTrailer from "../rigTrailer.js";
 import type * as runOfShowAlerts from "../runOfShowAlerts.js";
 import type * as runOfShowAlertsSend from "../runOfShowAlertsSend.js";
@@ -546,6 +547,7 @@ declare const fullApi: ApiFromModules<{
   reasonedChanges: typeof reasonedChanges;
   recordHistory: typeof recordHistory;
   recurringEvents: typeof recurringEvents;
+  rentalSales: typeof rentalSales;
   rigTrailer: typeof rigTrailer;
   runOfShowAlerts: typeof runOfShowAlerts;
   runOfShowAlertsSend: typeof runOfShowAlertsSend;
