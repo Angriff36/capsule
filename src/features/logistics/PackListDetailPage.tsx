@@ -1254,6 +1254,7 @@ export function PackListDetailPage() {
           onToggleItem={selection.toggle}
           onToggleAll={selection.toggleAll}
           selectableCount={selectableItems.length}
+          reviewEventId={String(packList.eventId)}
         />
       </section>
 
