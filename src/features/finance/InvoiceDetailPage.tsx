@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   formatDate,
   formatMoney,
+  formatTime,
   normalizeCurrencyCode,
 } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -56,6 +57,7 @@ import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { InvoiceNumberEditor } from "./InvoiceNumberEditor";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
+import { ReminderHistoryList } from "./ReminderHistoryList";
 import { useActionNotice } from "../../ui/action-result";
 import "./taxWorkspace.css";
 
@@ -114,6 +116,7 @@ export function InvoiceDetailPage() {
   const [reminderSchedule, setReminderSchedule] =
     useState<ReminderScheduleView | null>(null);
   const [reminderScheduleLoading, setReminderScheduleLoading] = useState(true);
+  const [reminderHistoryKey, setReminderHistoryKey] = useState(0);
   const [paymentLink, setPaymentLink] = useState<InvoicePaymentLink | null>(
     null,
   );
@@ -442,10 +445,24 @@ export function InvoiceDetailPage() {
 
   const onSendReminderNow = () => {
     void run("sendReminder", async () => {
-      const result = await sendReminderNow(String(invoice._id));
+      const result = await sendReminderNow(String(invoice._id)).finally(() =>
+        setReminderHistoryKey((key) => key + 1),
+      );
       if (result.status === "delivered") {
         setNotice(
-          "Payment reminder emailed with the invoice PDF and payment link.",
+          "Payment reminder with the invoice PDF and payment link was taken by the email service.",
+        );
+        return;
+      }
+      if (result.status === "already_delivered") {
+        setNotice(
+          `No reminder sent — one already went${
+            result.to ? ` to ${result.to}` : ""
+          }${
+            result.sentAt != null
+              ? ` at ${formatTime(result.sentAt)} on ${formatDate(result.sentAt)}`
+              : ""
+          } for the same balance.`,
         );
         return;
       }
@@ -1345,6 +1362,10 @@ export function InvoiceDetailPage() {
             </button>
           </div>
         </form>
+        <ReminderHistoryList
+          invoiceId={String(invoice._id)}
+          refreshKey={reminderHistoryKey}
+        />
       </section>
 
       <section className="working-ledger">

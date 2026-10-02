@@ -21,7 +21,22 @@ import {
   buildInvoiceReminderPdf,
   invoiceReminderPdfFileName,
 } from "./lib/invoiceReminderPdf";
-import { renderInvoiceReminderEmail } from "../src/lib/invoiceReminderEmail";
+import {
+  INVOICE_REMINDER_TEMPLATE,
+  renderInvoiceReminderEmail,
+} from "../src/lib/invoiceReminderEmail";
+import {
+  artifactFingerprint,
+  classifyReminderFailure,
+  emailServiceFailureKind,
+  maskEmail,
+  recentSameBalanceSend,
+  ReminderDeliveryError,
+  reminderHistory,
+  reminderRemedy,
+  type RecipientSource,
+  type ReminderHistoryItem,
+} from "./lib/reminderDelivery";
 import {
   normalizeInvoiceReminderOffsets,
   reminderOffsetLabel,
@@ -71,7 +86,12 @@ interface PaymentSessionRecord {
 
 interface DeliveryContext {
   invoice: Doc<"invoices">;
-  recipient: { email: string; name: string } | null;
+  recipient: {
+    email: string;
+    name: string;
+    source: RecipientSource;
+    contactId: string | null;
+  } | null;
   organization: {
     displayName: string;
     address: string | null;
@@ -89,12 +109,26 @@ interface DeliveryAttempt {
   offsetDays: number;
   scheduledFor: number;
   source: "scheduled" | "manual";
+  /** 0 for the first try of this reminder, 1 for the first retry, ... */
+  attempt: number;
 }
 
 interface DeliveryResult {
+  /** "delivered" = the email service took the email (kept for callers). */
   status: "delivered" | "suppressed" | "already_delivered";
   reason?: string;
   emailId?: string;
+  /** For "already_delivered": when the earlier email went and to whom. */
+  sentAt?: number;
+  to?: string;
+}
+
+interface SentEmail {
+  emailId: string;
+  from: string;
+  subject: string;
+  attachmentName: string;
+  fingerprint: string;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -230,9 +264,9 @@ function requireProviderEnvironment(): ProviderEnvironment {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
   const rawOrigin = process.env.CAPSULE_PUBLIC_APP_URL?.trim();
   if (!resendApiKey || !fromEmail || !stripeSecretKey || !rawOrigin) {
-    throw new ConvexError(
-      "Invoice reminders need RESEND_API_KEY, INVOICE_REMINDER_FROM_EMAIL, STRIPE_SECRET_KEY, and CAPSULE_PUBLIC_APP_URL in the Convex environment.",
-    );
+    // Server setup: RESEND_API_KEY, INVOICE_REMINDER_FROM_EMAIL,
+    // STRIPE_SECRET_KEY and CAPSULE_PUBLIC_APP_URL in the Convex environment.
+    throw new ConvexError(reminderRemedy("not_set_up"));
   }
   let appOrigin: string;
   try {
@@ -319,6 +353,13 @@ export const loadDeliveryContext = internalQuery({
       ? await decryptField(ctx, "Client", "email", client.email)
       : null;
     const recipientEmail = contactEmail?.trim() || accountEmail?.trim() || null;
+    const recipientSource: RecipientSource = !contactEmail?.trim()
+      ? "client account"
+      : preferredContact?.isBillingContact
+        ? "billing contact"
+        : preferredContact?.isPrimary
+          ? "main contact"
+          : "contact";
     const organization =
       organizations.find(
         (row) => row.deletedAt == null && row.status === "active",
@@ -332,6 +373,11 @@ export const loadDeliveryContext = internalQuery({
             name: preferredContact
               ? contactName(preferredContact)
               : clientName(client),
+            source: recipientSource,
+            contactId:
+              recipientSource === "client account" || !preferredContact
+                ? null
+                : String(preferredContact._id),
           }
         : null,
       organization: {
@@ -456,6 +502,32 @@ export const getSchedule = action({
       { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
     );
     return context ? latestSchedule(context.ledger) : null;
+  },
+});
+
+/** Every reminder send, skip and failure for one invoice, newest first. */
+export const getHistory = action({
+  args: { invoiceId: v.id("invoices") },
+  handler: async (ctx, args): Promise<ReminderHistoryItem[]> => {
+    const invoice = await ctx.runQuery(api.queries.getInvoice, {
+      id: args.invoiceId,
+    });
+    if (!invoice) {
+      throw new ConvexError(
+        "Invoice unavailable. Check your workspace access.",
+      );
+    }
+    const context = await ctx.runQuery(
+      internal.invoiceReminders.loadDeliveryContext,
+      { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
+    );
+    return context
+      ? reminderHistory(context.ledger, {
+          delivered: EVENT.delivered,
+          suppressed: EVENT.suppressed,
+          failed: EVENT.failed,
+        })
+      : [];
   },
 });
 
@@ -634,7 +706,7 @@ async function sendReminderEmail(
   attempt: DeliveryAttempt,
   paymentUrl: string,
   environment: ProviderEnvironment,
-): Promise<string> {
+): Promise<SentEmail> {
   if (!context.recipient || context.invoice.dueDate == null) {
     throw new Error("Invoice delivery details are incomplete.");
   }
@@ -671,44 +743,66 @@ async function sendReminderEmail(
     primaryColor: context.organization.primaryColor,
     accentColor: context.organization.accentColor,
   });
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${environment.resendApiKey}`,
-      "Content-Type": "application/json",
-      "Idempotency-Key": `invoice-reminder/${context.invoice._id}/${attempt.configId}/${attempt.offsetDays}`,
-    },
-    body: JSON.stringify({
-      from: fromAddress(
-        context.organization.displayName,
-        environment.fromEmail,
-      ),
-      to: [context.recipient.email],
-      subject: email.subject,
-      html: email.html,
-      text: email.text,
-      attachments: [
-        {
-          filename: invoiceReminderPdfFileName(invoiceNumber),
-          content: bytesToBase64(pdf),
-        },
-      ],
-      tags: [
-        { name: "category", value: "invoice_reminder" },
-        { name: "invoice_id", value: String(context.invoice._id) },
-      ],
-    }),
-  });
+  const from = fromAddress(
+    context.organization.displayName,
+    environment.fromEmail,
+  );
+  const attachmentName = invoiceReminderPdfFileName(invoiceNumber);
+  let response: Response;
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${environment.resendApiKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `invoice-reminder/${context.invoice._id}/${attempt.configId}/${attempt.offsetDays}`,
+      },
+      body: JSON.stringify({
+        from,
+        to: [context.recipient.email],
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+        attachments: [
+          {
+            filename: attachmentName,
+            content: bytesToBase64(pdf),
+          },
+        ],
+        tags: [
+          { name: "category", value: INVOICE_REMINDER_TEMPLATE.id },
+          { name: "invoice_id", value: String(context.invoice._id) },
+        ],
+      }),
+    });
+  } catch (cause) {
+    throw new ReminderDeliveryError(
+      "service_down",
+      `Email service unreachable: ${safeProviderMessage(cause)}`,
+    );
+  }
   const responseBody = asRecord(await response.json().catch(() => null));
   if (!response.ok) {
-    throw new Error(
+    throw new ReminderDeliveryError(
+      emailServiceFailureKind(response.status),
       stringValue(responseBody.message) ||
         `Reminder email delivery failed (${response.status}).`,
     );
   }
   const emailId = stringValue(responseBody.id);
   if (!emailId) throw new Error("Email provider did not return a delivery id.");
-  return emailId;
+  return {
+    emailId,
+    from,
+    subject: email.subject,
+    attachmentName,
+    fingerprint: await artifactFingerprint([
+      email.subject,
+      email.text,
+      email.html,
+      pdf,
+    ]),
+  };
 }
 
 async function recordReminderEvent(
@@ -755,7 +849,8 @@ async function deliverReminder(
     return { status: "suppressed", reason: "invoice_not_payable" };
   }
   if (!context.recipient) {
-    throw new Error(
+    throw new ReminderDeliveryError(
+      "no_recipient",
       "No client account or active billing-contact email is available.",
     );
   }
@@ -764,6 +859,23 @@ async function deliverReminder(
   }
   if (wasDelivered(context.ledger, attempt.configId, attempt.offsetDays)) {
     return { status: "already_delivered" };
+  }
+  if (attempt.source === "manual") {
+    // A "send now" press right after a reminder went (scheduled or by hand)
+    // for the same balance would email the client the same thing twice.
+    const recent = recentSameBalanceSend(
+      context.ledger,
+      EVENT.delivered,
+      Number(context.invoice.amountDue),
+      Date.now(),
+    );
+    if (recent) {
+      return {
+        status: "already_delivered",
+        sentAt: recent.createdAt,
+        to: stringValue(recent.payload.recipientMasked) ?? undefined,
+      };
+    }
   }
   // Reminder payment links charge the caterer Stripe account (issue #112),
   // the same account the invoice payment sync reads them from.
@@ -813,20 +925,31 @@ async function deliverReminder(
     });
   }
 
-  const emailId = await sendReminderEmail(
+  const sent = await sendReminderEmail(
     context,
     attempt,
     currentSession.url,
     environment,
   );
   await recordReminderEvent(ctx, EVENT.delivered, attempt, {
-    emailId,
+    emailId: sent.emailId,
+    providerState: "accepted",
     sessionId: currentSession.sessionId,
     amountDue: Number(context.invoice.amountDue),
     dueDate: Number(context.invoice.dueDate),
     timing: reminderOffsetLabel(attempt.offsetDays),
+    attempt: attempt.attempt,
+    recipientMasked: maskEmail(context.recipient.email),
+    recipientSource: context.recipient.source,
+    recipientContactId: context.recipient.contactId,
+    sender: sent.from,
+    subject: sent.subject,
+    template: INVOICE_REMINDER_TEMPLATE.id,
+    templateVersion: INVOICE_REMINDER_TEMPLATE.version,
+    attachments: [sent.attachmentName],
+    artifactFingerprint: sent.fingerprint,
   });
-  return { status: "delivered", emailId };
+  return { status: "delivered", emailId: sent.emailId };
 }
 
 export const deliverScheduled = internalAction({
@@ -846,6 +969,7 @@ export const deliverScheduled = internalAction({
       offsetDays: args.offsetDays,
       scheduledFor: args.scheduledFor,
       source: "scheduled",
+      attempt: args.attempt,
     };
     try {
       const result = await deliverReminder(ctx, deliveryAttempt);
@@ -856,10 +980,17 @@ export const deliverScheduled = internalAction({
       }
     } catch (cause) {
       const message = safeProviderMessage(cause);
-      const retryDelay = RETRY_DELAYS_MS[args.attempt];
+      const { kind, remedy } = classifyReminderFailure(cause);
+      // The same email refused once is refused again; anything else (a
+      // service that did not answer, setup or an address staff can add in
+      // the meantime) is worth another try.
+      const retryDelay =
+        kind === "refused" ? undefined : RETRY_DELAYS_MS[args.attempt];
       await recordReminderEvent(ctx, EVENT.failed, deliveryAttempt, {
         attempt: args.attempt,
         message,
+        failureKind: kind,
+        remedy,
         retryScheduled: retryDelay != null,
       });
       if (retryDelay != null) {
@@ -897,6 +1028,7 @@ export const sendNow = action({
           : Math.trunc((Number(invoice.dueDate) - Date.now()) / 86_400_000),
       scheduledFor: Date.now(),
       source: "manual",
+      attempt: 0,
     };
     try {
       const result = await deliverReminder(ctx, attempt);
@@ -908,12 +1040,15 @@ export const sendNow = action({
       return result;
     } catch (cause) {
       const message = safeProviderMessage(cause);
+      const { kind, remedy } = classifyReminderFailure(cause);
       await recordReminderEvent(ctx, EVENT.failed, attempt, {
         attempt: 0,
         message,
+        failureKind: kind,
+        remedy,
         retryScheduled: false,
       });
-      throw new ConvexError(message);
+      throw new ConvexError(remedy);
     }
   },
 });
