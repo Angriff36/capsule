@@ -46,7 +46,11 @@ const contactLink = {
 };
 
 function setUp() {
-  backend.values.set("useListExternalRecordLink", [venueLink, contactLink]);
+  // The page reads only the rows it works with (pending and payments).
+  backend.values.set("externalRecordLinkLists:listFor", [
+    venueLink,
+    contactLink,
+  ]);
   backend.values.set("importResolution:itemRecordLabels", {
     "link-venue": "Grand Hall at Main",
   });

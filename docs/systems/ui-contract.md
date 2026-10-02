@@ -3908,7 +3908,6 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.listEventAssignment` - live read
 - `queries.listEventCloseout` - live read
 - `queries.listEventDish` - live read
-- `queries.listExternalRecordLink` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
 - `queries.listIngredientPriceObservation` - live read
@@ -4283,6 +4282,8 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
 - `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
+- `externalRecordLinkLists.listFor` - query; live read, updates by itself
+- `externalRecordLinkLists.menuLinkStats` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
 - `invoiceEmail.send` - action; one-time call (not live); the live reads it changes update by themselves

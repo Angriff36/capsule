@@ -11,8 +11,11 @@ import {
   useListEvent,
   useListDish,
   useListImportRun,
-  useListExternalRecordLink,
 } from "../../../lib/manifest-convex-react";
+import {
+  useExternalRecordLinksFor,
+  useMenuLinkStats,
+} from "../../../lib/useExternalRecordLinkLists";
 import { formatCountNoun } from "../../../lib/format";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
@@ -122,7 +125,12 @@ export function ParallelRunDashboardPage() {
   const capsuleEvents = useListEvent();
   const capsuleDishes = useListDish();
   const importRuns = useListImportRun();
-  const externalLinks = useListExternalRecordLink();
+  // The full link list is too long for one read: the menu check is counted
+  // on the server, and only links to imported events are listed.
+  const menuStats = useMenuLinkStats();
+  const externalLinks = useExternalRecordLinksFor({
+    capsuleEntities: ["event_record"],
+  });
   const overview = useQuery(api.parallelRun.overview, {});
   const compareNow = useMutation(api.parallelRun.compareNow);
   const [comparing, setComparing] = useState(false);
@@ -181,27 +189,13 @@ export function ParallelRunDashboardPage() {
     const menuRuns = completedImportRuns.filter(
       (run) => run.datasetType === "menus",
     );
-    // Active TPP→Capsule links are the imported catalog. Counting links (not
-    // run recordCounts) stays correct across chunked and re-run imports.
-    // Restricted to tpp_legacy so a future non-TPP menu source cannot skew it.
-    const menuLinks = (externalLinks ?? []).filter(
-      (link) =>
-        link.recordType === "menu" &&
-        link.sourceSystem === "tpp_legacy" &&
-        link.deletedAt == null &&
-        link.conflictStatus !== "superseded",
-    );
+    // Active TPP→Capsule menu links are the imported catalog, counted on the
+    // server (menuLinkStats): a link is resolved only when its dish exists.
     // capsuleDishes === null means the read was denied, NOT an empty catalog.
     const dishesKnown = capsuleDishes !== null;
-    const dishIds = new Set((capsuleDishes ?? []).map((dish) => dish._id));
-    const linkedDishIds = new Set(
-      menuLinks.filter((link) => link.capsuleId).map((link) => link.capsuleId),
-    );
-    const tppTotal = menuLinks.length;
-    // A link is resolved only when its Capsule dish still exists.
-    const unresolvedLinks = menuLinks.filter(
-      (link) => !link.capsuleId || !dishIds.has(link.capsuleId),
-    ).length;
+    const linkedDishIds = new Set(menuStats?.linkedDishIds ?? []);
+    const tppTotal = menuStats?.tppTotal ?? 0;
+    const unresolvedLinks = menuStats?.unresolvedLinks ?? 0;
     const capsuleTotal = capsuleDishes?.length ?? 0;
     const dishesWithoutLink = capsuleDishes
       ? capsuleDishes.filter((dish) => !linkedDishIds.has(dish._id)).length
@@ -228,7 +222,7 @@ export function ParallelRunDashboardPage() {
             : ("warning" as const),
       runCount: menuRuns.length,
     };
-  }, [completedImportRuns, capsuleDishes, externalLinks]);
+  }, [completedImportRuns, capsuleDishes, menuStats]);
 
   // Both sides from the newest daily comparison (same rows as the list of
   // differences below).
@@ -348,6 +342,7 @@ export function ParallelRunDashboardPage() {
     capsuleDishes === undefined ||
     importRuns === undefined ||
     externalLinks === undefined ||
+    menuStats === undefined ||
     overview === undefined;
 
   return (

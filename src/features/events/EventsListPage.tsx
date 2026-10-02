@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../lib/api";
 import { formatCount } from "../../lib/format";
+import { useEventLedgerWindow } from "../../lib/useEventLedgerWindow";
 import { ChevronDownIcon, PlusIcon } from "../../ui/icons";
 import {
   DropdownMenu,
@@ -100,7 +100,7 @@ export function EventsListPage() {
   const tab: Tab = chosenTab ?? "upcoming";
 
   // One date-ordered window of events, never the whole table (PL-SCALE).
-  const ledger = useQuery(api.eventLedger.ledgerWindow, {
+  const ledger = useEventLedgerWindow({
     view: tab,
     dir,
     limit,
