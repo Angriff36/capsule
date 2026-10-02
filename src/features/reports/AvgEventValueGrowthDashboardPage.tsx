@@ -19,7 +19,7 @@ import { monthKeyLabel, trendFromSeries } from "@/ui/charts/Sparkline";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
 import {
   isCompletedEvent,
@@ -609,6 +609,15 @@ export function AvgEventValueGrowthDashboardPage() {
         title="Average Event Value Growth"
         lead="Event value trend analysis with breakdowns by service style, occasion, venue, salesperson, and event size. Track growth MoM and YoY."
       />
+
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="The figures fill in as events are booked and completed."
+          />
+        </div>
+      ) : null}
 
       <DashboardGrid items={dashboardItems} />
 

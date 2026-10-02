@@ -12,7 +12,7 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { trendFromSeries } from "@/ui/charts/Sparkline";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatCount } from "@/lib/format";
 import {
   COMPLETED_STAGES,
@@ -520,6 +520,15 @@ export function MangiaDashboardPage() {
         title="Mangia Operational Dashboard"
         lead="Today's events, prep and pack progress, staffing, and week-to-date performance — the day's operations at a glance."
       />
+
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="Today's work and this week's events show here once events are booked."
+          />
+        </div>
+      ) : null}
 
       <DashboardGrid items={dashboardItems} />
 

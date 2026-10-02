@@ -9,7 +9,7 @@ import {
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
 import { BarChart } from "@/ui/charts/BarChart";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatMoney, formatCount, formatPercent } from "@/lib/format";
 import {
   COMPLETED_STAGES,
@@ -232,6 +232,15 @@ export function CompanyScorecardDashboardPage() {
         title="Company Scorecard"
         lead="The core monthly numbers with real month-over-month movement, live from your events, closeouts, and leads."
       />
+
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="The figures fill in as events are booked and completed."
+          />
+        </div>
+      ) : null}
 
       <DashboardGrid items={dashboardItems} />
 

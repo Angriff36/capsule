@@ -11,7 +11,7 @@ import {
 import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
 import { calculateCommissionMetrics } from "./compMasterValues";
 import { MetricDefinitionList } from "./MetricDefinitionList";
@@ -204,6 +204,14 @@ export function CompMasterDashboardPage() {
         title="Comp Master Dashboard"
         lead="Applied sales commission allocations, taken straight from revenue attribution."
       />
+      {attributions?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No commission applied yet"
+            hint="Applied sales commission splits show here."
+          />
+        </div>
+      ) : null}
       <DashboardGrid items={dashboardItems} />
       <div className="mt-6 rounded-sm border border-line bg-panel p-4">
         <h4 className="text-xs font-semibold text-ink">

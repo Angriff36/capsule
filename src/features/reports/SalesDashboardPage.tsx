@@ -12,7 +12,7 @@ import {
 import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import {
   isBookedEvent,
@@ -352,6 +352,15 @@ export function SalesDashboardPage() {
         title="Sales Dashboard"
         lead="Pipeline visibility, conversion tracking, and sales performance metrics"
       />
+
+      {events?.length === 0 && leads?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events or leads yet"
+            hint="These figures fill in as leads come in and events are booked."
+          />
+        </div>
+      ) : null}
 
       <DashboardGrid items={dashboardItems} />
 

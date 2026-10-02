@@ -17,7 +17,7 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatDate, formatMoney } from "@/lib/format";
 import {
   budgetedFoodCostPercent,
@@ -466,6 +466,15 @@ export function TimsKPIsDashboardPage() {
         title="Tim's KPIs Dashboard"
         lead="The numbers that run the business, live from your events, closeouts, and leads — with the detail behind each one a click away."
       />
+
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="The figures fill in as events are booked and completed."
+          />
+        </div>
+      ) : null}
 
       <DashboardGrid items={dashboardItems} />
 

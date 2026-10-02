@@ -211,6 +211,15 @@ export function L10DashboardPage() {
         lead="Live numbers for your weekly leadership meeting: this week's wins and the company scorecard, straight from your events, leads, and closeouts."
       />
 
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="The figures fill in as events are booked and completed."
+          />
+        </div>
+      ) : null}
+
       <DashboardGrid items={dashboardItems} />
 
       <div className="mt-6">
