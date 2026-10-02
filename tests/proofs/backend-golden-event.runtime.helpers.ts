@@ -61,6 +61,7 @@ export const FACTS = {
   headcount: 80,
   rivalHeadcount: 50,
   newHeadcount: 100,
+  secondHeadcount: 120,
   flourPerServing: 0.1,
   saltPerServing: 0.01,
   herbPerServing: 0.02,

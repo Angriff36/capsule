@@ -84,6 +84,16 @@ type PacketRead = {
 };
 
 let w: World;
+/** Day-of facts recorded in step 16 that later steps must leave alone. */
+const facts = {
+  orderId: "",
+  flourLineId: "",
+  orderedFlour: 0,
+  doughId: "",
+  doughQuantity: 0,
+  clockInId: "",
+  wasteId: "",
+};
 const crew = {
   lead: { personId: "", subject: "" },
   server: { personId: "", subject: "" },
@@ -1322,6 +1332,269 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
     LONG,
   );
 });
+
+describe.sequential(
+  "golden event journey, day-of facts (AC-668..AC-674)",
+  () => {
+    it(
+      "golden event 16: Partially receive an order, partially complete prep, pack items, acknowledge/clock in staff, and record time/waste",
+      async () => {
+        const [flourId] = w.catalog.ingredientIds;
+        const buyer = w.roles.procurement;
+        const buy = (
+          cmd: Parameters<World["run"]["owner"]>[0],
+          args: Record<string, unknown>,
+        ) => w.proof.executeCommand(buyer, cmd, args as never);
+
+        // The new week's order goes out and half the flour arrives.
+        const order = (await drafts(buyer, TENANT)).find(
+          (d) => d.sourceRangeStart === WEEK.key + 7 * DAY,
+        )!;
+        facts.orderId = order._id;
+        await buy(M.VendorOrder_submit, {
+          docId: order._id,
+          version: await versionOf(w, order._id),
+        });
+        await buy(M.VendorOrder_confirm, {
+          docId: order._id,
+          version: await versionOf(w, order._id),
+        });
+        const flourLine = (await lineFor(buyer, TENANT, order._id, flourId))!;
+        facts.orderedFlour = flourLine.orderedQuantity;
+        facts.flourLineId = flourLine._id;
+        await buy(M.VendorOrderLine_recordReceipt, {
+          docId: flourLine._id,
+          quantity: flourLine.orderedQuantity / 2,
+          locationId: w.catalog.locationId,
+          unitPrice: 2,
+          supplierLotNumber: "GOLD-LOT-1",
+        });
+        await buy(M.VendorOrder_markPartiallyReceived, { docId: order._id });
+        expect(
+          (await readRow<{ status: string }>(w.owner, order._id)).status,
+        ).toBe("partially_received");
+        const lots = (
+          await liveRows<{
+            tenantId: string;
+            vendorOrderLineId: string;
+            receiptQuantity: number;
+          }>(w.owner, "inventoryLots", TENANT)
+        ).filter((lot) => lot.vendorOrderLineId === flourLine._id);
+        expect(lots.map((lot) => lot.receiptQuantity)).toEqual([
+          flourLine.orderedQuantity / 2,
+        ]);
+
+        // The bread recipe gains its prep steps; the kitchen finishes one.
+        for (const name of ["Mix dough", "Bake rolls"])
+          await w.run.kitchen(M.DishTask_createViaAdd, {
+            dishId: w.catalog.dishIds[0],
+            name,
+            defaultQuantity: 1,
+            defaultUnit: "portion",
+            station: "Bakery",
+          });
+        const prep = await eventRows<{
+          tenantId: string;
+          _id: string;
+          eventDishId: string;
+          name: string;
+          quantity: number;
+          status: string;
+        }>(w, "prepTasks", id.golden);
+        const breadPrep = prep.filter((p) => p.eventDishId === id.breadLine);
+        expect(breadPrep.map((p) => p.name).sort()).toEqual([
+          "Bake rolls",
+          "Mix dough",
+        ]);
+        const dough = breadPrep.find((p) => p.name === "Mix dough")!;
+        await w.run.kitchen(M.PrepTask_assign, {
+          docId: dough._id,
+          personId: crew.lead.personId,
+        });
+        await w.run.kitchen(M.PrepTask_start, { docId: dough._id });
+        await w.run.kitchen(M.PrepTask_complete, {
+          docId: dough._id,
+          completedQuantity: dough.quantity,
+        });
+        facts.doughId = dough._id;
+        facts.doughQuantity = dough.quantity;
+
+        // Packing goes on.
+        let { lines } = await goldenPack(w, id.golden);
+        const cups = packLine(lines, "Souffle cup");
+        await w.run.logistics(M.PackListItem_recordPackedCount, {
+          docId: cups._id,
+          version: cups.version,
+          packedQuantity: 40,
+          idempotencyKey: "golden-pack-cups",
+        });
+        ({ lines } = await goldenPack(w, id.golden));
+        expect(packLine(lines, "Souffle cup").packedQuantity).toBe(40);
+
+        // Ana confirms her shift and clocks in from her phone.
+        const ana = (
+          await liveRows<{
+            tenantId: string;
+            _id: string;
+            givenName: string;
+          }>(w.owner, "people", TENANT)
+        ).find((p) => p.givenName === "Ana")!;
+        const anaSelf = w.proof.asRole({
+          subject: `crew-ana-${TENANT}`,
+          role: "event_staff",
+          tenantId: TENANT,
+        });
+        const assignment = (
+          await eventRows<{ tenantId: string; _id: string; personId: string }>(
+            w,
+            "eventAssignments",
+            id.golden,
+          )
+        ).find((a) => a.personId === ana._id)!;
+        await w.proof.executeCommand(anaSelf, M.EventAssignment_confirm, {
+          docId: assignment._id,
+          version: await versionOf(w, assignment._id),
+        } as never);
+        const shift = (
+          await liveRows<{ tenantId: string; _id: string; personId: string }>(
+            w.owner,
+            "shifts",
+            TENANT,
+          )
+        ).find((s) => s.personId === ana._id)!;
+        const clock = (await w.proof.executeCommand(
+          anaSelf,
+          M.TimeRecord_createViaClockIn,
+          {
+            personId: ana._id,
+            shiftId: shift._id,
+            timeZone: "America/Denver",
+            idempotencyKey: "golden-ana-clock-in",
+          } as never,
+        )) as { docId: string };
+        facts.clockInId = clock.docId;
+        const record = await readRow<{ eventId: string; status: string }>(
+          w.owner,
+          clock.docId,
+        );
+        expect(record).toMatchObject({ eventId: id.golden, status: "open" });
+
+        // Spoiled flour is written off against the event.
+        const flourStock = (
+          await liveRows<{
+            tenantId: string;
+            _id: string;
+            ingredientId: string;
+          }>(w.owner, "inventoryItems", TENANT)
+        ).find((item) => item.ingredientId === flourId)!;
+        facts.wasteId = (
+          (await w.proof.executeCommand(
+            w.roles.inventory,
+            M.WasteRecord_createViaRecord,
+            {
+              ingredientId: flourId,
+              locationId: w.catalog.locationId,
+              inventoryItemId: flourStock._id,
+              quantity: 0.5,
+              unit: "kilogram",
+              reason: "spoilage",
+              unitCost: 2,
+              eventId: id.golden,
+            } as never,
+          )) as { docId: string }
+        ).docId;
+        expect(
+          await readRow<{ eventId: string; quantity: number }>(
+            w.owner,
+            facts.wasteId,
+          ),
+        ).toMatchObject({ eventId: id.golden, quantity: 0.5 });
+      },
+      LONG,
+    );
+
+    it(
+      "golden event 17: Change the Event again; verify committed actuals remain and only remaining work/deltas change",
+      async () => {
+        const herbId = w.catalog.ingredientIds[2];
+        const buyer = w.roles.procurement;
+        const before = {
+          herbOrdered: (await lineFor(buyer, TENANT, facts.orderId, herbId))!
+            .orderedQuantity,
+          flourOrdered: (await lineFor(
+            buyer,
+            TENANT,
+            facts.orderId,
+            w.catalog.ingredientIds[0],
+          ))!.orderedQuantity,
+          clock: await readRow<Record<string, unknown>>(
+            w.owner,
+            facts.clockInId,
+          ),
+          waste: await readRow<Record<string, unknown>>(w.owner, facts.wasteId),
+          lots: await liveRows<{ tenantId: string; _id: string }>(
+            w.owner,
+            "inventoryLots",
+            TENANT,
+          ),
+        };
+        await w.run.events(M.Event_changeHeadcount, {
+          docId: id.golden,
+          version: await versionOf(w, id.golden),
+          newHeadcount: FACTS.secondHeadcount,
+        });
+
+        // What was ordered, received, cooked, clocked and wasted stays.
+        expect(
+          (await lineFor(buyer, TENANT, facts.orderId, herbId))!
+            .orderedQuantity,
+        ).toBe(before.herbOrdered);
+        expect(
+          (await lineFor(
+            buyer,
+            TENANT,
+            facts.orderId,
+            w.catalog.ingredientIds[0],
+          ))!.orderedQuantity,
+        ).toBe(before.flourOrdered);
+        expect(await readRow(w.owner, facts.clockInId)).toEqual(before.clock);
+        expect(await readRow(w.owner, facts.wasteId)).toEqual(before.waste);
+        expect(
+          await liveRows<{ tenantId: string; _id: string }>(
+            w.owner,
+            "inventoryLots",
+            TENANT,
+          ),
+        ).toEqual(before.lots);
+        const dough = await readRow<{
+          status: string;
+          completedQuantity: number;
+        }>(w.owner, facts.doughId);
+        expect(dough).toMatchObject({
+          status: "completed",
+          completedQuantity: facts.doughQuantity,
+        });
+        const { lines } = await goldenPack(w, id.golden);
+        expect(packLine(lines, "Souffle cup")).toMatchObject({
+          packedQuantity: 40,
+          requiredQuantity: FACTS.secondHeadcount,
+        });
+
+        // Only the extra herb for the 20 new guests goes on a new draft.
+        const delta = (await drafts(buyer, TENANT)).find(
+          (d) => d.sourceRangeStart === WEEK.key + 7 * DAY,
+        )!;
+        expect(delta._id).not.toBe(facts.orderId);
+        const extraHerb = (await lineFor(buyer, TENANT, delta._id, herbId))!;
+        expect(extraHerb.orderedQuantity).toBeCloseTo(
+          FACTS.herbPerServing * (FACTS.secondHeadcount - FACTS.newHeadcount),
+          4,
+        );
+      },
+      LONG,
+    );
+  },
+);
 
 async function routeFacts() {
   const rows = (await w.owner.run(async (ctx) =>
