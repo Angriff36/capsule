@@ -19,6 +19,9 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
   property required packQuantity: decimal(12, 4) = 1
   property required packUnit: UnitOfMeasure = "each"
   property packPrice: money(12, 2)?
+  // packQuantity when the item has a price, else 0: weekly order lines divide
+  // the summed pack prices by this, so an item with no price adds nothing.
+  property pricedPackQuantity: decimal(12, 4)?
   property priceSetAt: datetime?
   property addedAt: datetime?
 
@@ -57,6 +60,7 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     mutate packUnit = packUnit
     mutate itemCode = itemCode
     mutate packPrice = packPrice
+    mutate pricedPackQuantity = packPrice != null ? packQuantity : 0
     mutate priceSetAt = packPrice != null ? now() : null
     mutate addedAt = now()
     emit VendorItemAdded {
@@ -86,6 +90,7 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     mutate packUnit = packUnit
     mutate itemCode = itemCode
     mutate packPrice = packPrice
+    mutate pricedPackQuantity = packPrice != null ? packQuantity : 0
     emit VendorItemUpdated {
       vendorItemId: self.id
       tenantId: self.tenantId
@@ -102,6 +107,7 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     mutate deletedAt = now()
+    mutate pricedPackQuantity = 0
     emit VendorItemRemoved {
       vendorItemId: self.id
       tenantId: self.tenantId

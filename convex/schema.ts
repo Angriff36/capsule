@@ -4355,6 +4355,7 @@ export default defineSchema({
     packQuantity: v.number(),
     packUnit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle"), v.literal("fluid_ounce"), v.literal("piece"), v.literal("slice"), v.literal("pizza"), v.literal("package"), v.literal("case"), v.literal("can"), v.literal("tub")),
     packPrice: v.optional(v.union(v.number(), v.null())),
+    pricedPackQuantity: v.optional(v.union(v.number(), v.null())),
     priceSetAt: v.optional(v.union(v.number(), v.null())),
     addedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),

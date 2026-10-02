@@ -108,7 +108,7 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Ingredients: storage, shelf life, nutrition, allergens | `/kitchen/ingredients/:id` | `features/kitchen/ingredient-data-breadth` | Built |
 | Allergen roll-up for a menu or event | `/kitchen/allergen-matrix` | `proofs/incident-allergen-corrective-action` | Built |
 | Units and conversions | ingredient page | `culinary-unit-meaning`, `proofs/incompatible-unit-review` | Built (never guesses) |
-| Pack sizes and vendor items | ingredient page, `/inventory/contracts` | `proofs/menu-profitability-direct-ingredient`, `proofs/vendor-item-record` | Built: vendor items per ingredient (item number, pack, pack price with history); order lines do not yet price from them |
+| Pack sizes and vendor items | ingredient page, `/inventory/contracts` | `proofs/menu-profitability-direct-ingredient`, `proofs/vendor-item-record`, `proofs/vendor-item-order-price` | Built: vendor items per ingredient (item number, pack, pack price with history); weekly order lines take the vendor's pack price |
 | Prices and price history | ingredient page | `culinary-model-cost-dated`, `proofs/receipt-exact-once` | Partly: history grows only from receipts |
 | Recipes, sub-recipes, yields, versions | `/kitchen/components/:id`, `/kitchen/dishes/:id` | `proofs/safe-culinary-operations` | Built |
 | Method, station, equipment | recipe page, `/kitchen/stations` | `proofs/prep-work-baselines` | Partly: station on tasks only, equipment is free text |

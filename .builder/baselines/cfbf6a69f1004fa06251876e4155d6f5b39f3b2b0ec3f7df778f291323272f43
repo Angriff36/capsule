@@ -66979,6 +66979,7 @@ async function __runVendorItemAdd(ctx: MutationCtx, { docId, vendorId, ingredien
       packUnit: packUnit,
       itemCode: itemCode,
       packPrice: packPrice,
+      pricedPackQuantity: ((packPrice != null) ? packQuantity : 0),
       priceSetAt: ((packPrice != null) ? Date.now() : null),
       addedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
@@ -67080,6 +67081,7 @@ export const VendorItem_createViaAdd = mutation({
     doc.packUnit = packUnit;
     doc.itemCode = itemCode;
     doc.packPrice = packPrice;
+    doc.pricedPackQuantity = ((packPrice != null) ? packQuantity : 0);
     doc.priceSetAt = ((packPrice != null) ? Date.now() : null);
     doc.addedAt = Date.now();
     const docId = await ctx.db.insert("vendorItems", doc as any);
@@ -67111,6 +67113,7 @@ async function __runVendorItemRemove(ctx: MutationCtx, { docId, version }: any, 
     }
     const updates = {
       deletedAt: Date.now(),
+      pricedPackQuantity: 0,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -67169,6 +67172,7 @@ async function __runVendorItemUpdate(ctx: MutationCtx, { docId, description, pac
       packUnit: packUnit,
       itemCode: itemCode,
       packPrice: packPrice,
+      pricedPackQuantity: ((packPrice != null) ? packQuantity : 0),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -67474,13 +67478,19 @@ async function __runVendorOrderEnsureWeeklyDraft(ctx: MutationCtx, { docId, vend
     const __agg5_rows = await ctx.db.query("vendorOrderLines").withIndex("by_ingredientId", (q) => q.eq("ingredientId", payload.ingredientId)).collect();
     const __agg5_rowsf = __agg5_rows.filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).status === "added").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg5 = __agg5_rowsf.reduce((acc, d) => { const n = Number((d as any).stockAppliedQuantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
+    const __agg6_rows = await ctx.db.query("vendorItems").withIndex("by_vendorId", (q) => q.eq("vendorId", payload.vendorId)).collect();
+    const __agg6_rowsf = __agg6_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).packUnit === payload.unit).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg6 = __agg6_rowsf.reduce((acc, d) => { const n = Number((d as any).packPrice); return acc + (Number.isFinite(n) ? n : 0); }, 0);
+    const __agg7_rows = await ctx.db.query("vendorItems").withIndex("by_vendorId", (q) => q.eq("vendorId", payload.vendorId)).collect();
+    const __agg7_rowsf = __agg7_rows.filter((d) => (d as any).ingredientId === payload.ingredientId).filter((d) => (d as any).packUnit === payload.unit).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg7 = __agg7_rowsf.reduce((acc, d) => { const n = Number((d as any).pricedPackQuantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __match0_raw = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q) => q.eq("vendorOrderId", payload.vendorOrderId)).collect();
     const __match0_rows = __match0_raw.filter((d) => (d as any).vendorOrderId === payload.vendorOrderId && (d as any).ingredientId === payload.ingredientId && (d as any).unit === payload.unit && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match0_id = __match0_rows.length > 0 ? (__match0_rows[0] as any)._id : null;
     if (__match0_id) {
-      await __runVendorOrderLineEnsureWeeklyLine(ctx, { docId: __match0_id, vendorOrderId: payload.vendorOrderId, ingredientId: payload.ingredientId, weekNeed: __agg0, orderedNeed: __agg1, fulfilledNeed: __agg2, onHand: __agg3, pendingSupply: __agg4, stockClaimed: __agg5, contributionQuantity: payload.requiredQuantity, unit: payload.unit, purchaseNeedId: payload.purchaseNeedId, ingredientDemandId: payload.ingredientDemandId } as any);
+      await __runVendorOrderLineEnsureWeeklyLine(ctx, { docId: __match0_id, vendorOrderId: payload.vendorOrderId, ingredientId: payload.ingredientId, weekNeed: __agg0, orderedNeed: __agg1, fulfilledNeed: __agg2, onHand: __agg3, pendingSupply: __agg4, stockClaimed: __agg5, vendorPackPrice: __agg6, vendorPackQuantity: __agg7, contributionQuantity: payload.requiredQuantity, unit: payload.unit, purchaseNeedId: payload.purchaseNeedId, ingredientDemandId: payload.ingredientDemandId } as any);
     } else {
-      const __elseArgs: Record<string, any> = { vendorOrderId: payload.vendorOrderId, ingredientId: payload.ingredientId, weekNeed: __agg0, orderedNeed: __agg1, fulfilledNeed: __agg2, onHand: __agg3, pendingSupply: __agg4, stockClaimed: __agg5, contributionQuantity: payload.requiredQuantity, unit: payload.unit, purchaseNeedId: payload.purchaseNeedId, ingredientDemandId: payload.ingredientDemandId };
+      const __elseArgs: Record<string, any> = { vendorOrderId: payload.vendorOrderId, ingredientId: payload.ingredientId, weekNeed: __agg0, orderedNeed: __agg1, fulfilledNeed: __agg2, onHand: __agg3, pendingSupply: __agg4, stockClaimed: __agg5, vendorPackPrice: __agg6, vendorPackQuantity: __agg7, contributionQuantity: payload.requiredQuantity, unit: payload.unit, purchaseNeedId: payload.purchaseNeedId, ingredientDemandId: payload.ingredientDemandId };
       const __elseDoc: Record<string, any> = {
         tenantId: __auth.tenantId,
         orderedQuantity: 0,
@@ -68797,7 +68807,7 @@ export const VendorOrderLine_correctReceipt = mutation({
   },
 });
 
-async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, vendorOrderId, ingredientId, weekNeed, onHand, contributionQuantity, unit, purchaseNeedId, ingredientDemandId, pendingSupply, orderedNeed, fulfilledNeed, stockClaimed, version }: any, __creation = false) {
+async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, vendorOrderId, ingredientId, weekNeed, onHand, contributionQuantity, unit, purchaseNeedId, ingredientDemandId, pendingSupply, orderedNeed, fulfilledNeed, stockClaimed, vendorPackPrice, vendorPackQuantity, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -68819,7 +68829,8 @@ async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, v
     const availableStock = Math.max(0, (onHand - claimedElsewhere));
     const requirement = Math.max(0, (((weekNeed + ((orderedNeed != null) ? orderedNeed : 0)) + ((fulfilledNeed != null) ? fulfilledNeed : 0)) - ((pendingSupply != null) ? pendingSupply : 0)));
     const orderQty = Math.max(0, (requirement - availableStock));
-    const effectiveUnitCost = ((doc.unitCost > 0) ? doc.unitCost : __rel_ingredient.costPerUnit);
+    const vendorUnitCost = (((((vendorPackQuantity != null) && (vendorPackQuantity > 0)) && (vendorPackPrice != null)) && (vendorPackPrice > 0)) ? (vendorPackPrice / vendorPackQuantity) : 0);
+    const effectiveUnitCost = ((doc.unitCost > 0) ? doc.unitCost : ((vendorUnitCost > 0) ? vendorUnitCost : __rel_ingredient.costPerUnit));
     const nextQuantity = (((doc.addedAt != null) && (doc.quantityIsManual !== false)) ? doc.orderedQuantity : orderQty);
     {
       const __cur = doc.status;
@@ -68906,6 +68917,8 @@ export const VendorOrderLine_ensureWeeklyLine = mutation({
     orderedNeed: v.optional(v.number()),
     fulfilledNeed: v.optional(v.number()),
     stockClaimed: v.optional(v.number()),
+    vendorPackPrice: v.optional(v.number()),
+    vendorPackQuantity: v.optional(v.number()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

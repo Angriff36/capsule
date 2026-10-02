@@ -4696,6 +4696,7 @@ export const VendorItemSchema = z.object({
   packQuantity: z.number().default(1),
   packUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   packPrice: z.number().nullable().optional(),
+  pricedPackQuantity: z.number().nullable().optional(),
   priceSetAt: z.coerce.date().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -12598,6 +12599,8 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   orderedNeed: z.number().optional(),
   fulfilledNeed: z.number().optional(),
   stockClaimed: z.number().optional(),
+  vendorPackPrice: z.number().optional(),
+  vendorPackQuantity: z.number().optional(),
 });
 
 export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLineEnsureWeeklyLineParamsSchema>;
