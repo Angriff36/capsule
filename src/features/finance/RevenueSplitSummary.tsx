@@ -34,7 +34,7 @@ export function RevenueSplitSummary({
     [
       "Booked revenue",
       measures.gross,
-      "Quoted revenue of the month's events, cancelled ones out.",
+      "Quoted price of the month's events the client said yes to. Quotes, planning and cancelled events are left out.",
     ],
     [
       "Venue-produced revenue",
