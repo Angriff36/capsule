@@ -80,7 +80,7 @@ delivery is not being built now (owner, 2026-09-29).
 | Schedule and change acknowledgement | `/my` | `proofs/schedule-change-ack` | Built |
 | Event instructions for crew | `/my` | `proofs/field-staff-booking-read` | Built |
 | Reminders | text and push alerts | `proofs/sms-reminder-dedupe`, `proofs/push-outbox-dedupe` | Built |
-| Announcements | `/admin/announcements`, banner | none | Built, no proof, no "read by" |
+| Announcements | `/admin/announcements`, banner | `proofs/announcement-board` | Built ("read and closed by" count for managers) |
 | Clock in and out, location at clock-in | `/my` | `proofs/time-correction-audit`, `proofs/offline-clock-reconcile` | Built (no location at clock-out) |
 | Late and no-show alerts | `/staff/time` | `proofs/clock-alerts` | Built |
 | Manager edits and time sheet approval | `/staff/time` | `proofs/time-correction-audit` | Built |
