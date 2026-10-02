@@ -324,6 +324,7 @@ Screens (23): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `messageInbox.ingestInboundMessage` - action; one-time call (not live); the live reads it changes update by themselves
 - `messageInbox.ingestProviderEnvelope` - action; one-time call (not live); the live reads it changes update by themselves
 - `messageInbox.qualifyThreadAsLead` - action; one-time call (not live); the live reads it changes update by themselves
+- `messageReply.sendEmailReply` - action; one-time call (not live); the live reads it changes update by themselves
 - `quoteBuilder.getQuoteFormOptions` - query; live read, updates by itself
 - `quoteBuilder.processQuoteSubmission` - action; one-time call (not live); the live reads it changes update by themselves
 - `quoteBuilder.submitQuote` - action; one-time call (not live); the live reads it changes update by themselves

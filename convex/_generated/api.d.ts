@@ -226,6 +226,7 @@ import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as messageInboxPages from "../messageInboxPages.js";
+import type * as messageReply from "../messageReply.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
 import type * as openingStock from "../openingStock.js";
@@ -506,6 +507,7 @@ declare const fullApi: ApiFromModules<{
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
   messageInbox: typeof messageInbox;
   messageInboxPages: typeof messageInboxPages;
+  messageReply: typeof messageReply;
   mutations: typeof mutations;
   notifications: typeof notifications;
   openingStock: typeof openingStock;

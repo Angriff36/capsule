@@ -15,10 +15,25 @@ const harness = vi.hoisted(() => ({
   linkEvent: vi.fn(async () => ({})),
   extraThreads: [] as Record<string, unknown>[],
   extraMessages: [] as Record<string, unknown>[],
+  sendReply: vi.fn(
+    async (_input: {
+      threadId: string;
+      bodyText: string;
+      requestId: string;
+    }) => ({
+      messageId: "message-sent",
+      emailId: "email_1",
+      to: "a•••@garden.example",
+    }),
+  ),
 }));
 
 vi.mock("convex/react", () => ({
   useAction: () => vi.fn(async () => ({})),
+}));
+
+vi.mock("../../../src/lib/messageReplyActions", () => ({
+  useSendEmailReply: () => harness.sendReply,
 }));
 
 vi.mock("../../../src/lib/manifest-convex-react", () => {
@@ -128,7 +143,47 @@ describe("MessageInboxPage delivery honesty", () => {
     act(() => thread?.click());
   }
 
-  for (const provider of ["email", "sms", "social", "other"]) {
+  // PL-OUTBOUND (AC-107, AC-109): an email reply goes out through the email
+  // service; a failed send keeps the typed reply and Send again reuses the
+  // same id, so the client never gets it twice.
+  it("sends an email reply, keeps the draft on failure and retries with the same id", async () => {
+    harness.provider = "email";
+    harness.sendReply.mockClear();
+    harness.sendReply.mockRejectedValueOnce(
+      new Error(
+        "The email service did not answer. Send again in a few minutes.",
+      ),
+    );
+    await renderSelectedThread();
+    const input = container.querySelector<HTMLInputElement>(
+      'input[aria-label="Reply text"]',
+    )!;
+    setInputValue(input, "Yes, Saturday works");
+    const send = () =>
+      Array.from(container.querySelectorAll("button")).find(
+        (node) => node.textContent === "Send email",
+      );
+
+    await act(async () => send()?.click());
+    expect(input.value).toBe("Yes, Saturday works");
+    expect(container.textContent).toContain("did not answer");
+
+    await act(async () => send()?.click());
+    expect(harness.sendReply).toHaveBeenCalledTimes(2);
+    const [first, second] = harness.sendReply.mock.calls.map((call) => call[0]);
+    expect(first).toMatchObject({
+      threadId: "thread-1",
+      bodyText: "Yes, Saturday works",
+    });
+    expect(second.requestId).toBe(first.requestId);
+    expect(input.value).toBe("");
+    expect(container.textContent).toContain(
+      "Reply taken by the email service for a•••@garden.example.",
+    );
+    expect(harness.createMessage).not.toHaveBeenCalled();
+  });
+
+  for (const provider of ["sms", "social", "other"]) {
     it(`keeps the ${provider} draft and creates no row when only manual delivery is available`, async () => {
       harness.provider = provider;
       await renderSelectedThread();
@@ -139,7 +194,7 @@ describe("MessageInboxPage delivery honesty", () => {
       setInputValue(input, "Please review this draft");
 
       expect(container.textContent).toContain(
-        "No external delivery provider is connected",
+        "Capsule cannot send text or social messages yet",
       );
       expect(container.textContent).toContain(
         "Queued — not delivered; no provider is connected",

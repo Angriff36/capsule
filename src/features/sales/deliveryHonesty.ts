@@ -8,7 +8,7 @@ export function replyDisposition(provider: string): ReplyDisposition {
   return {
     canRecord: false,
     notice:
-      "No external delivery provider is connected, so this can't be sent. Your draft is kept — copy it into your email, SMS, or social provider.",
+      "Capsule cannot send text or social messages yet. Your draft is kept — copy it into the app the client used.",
   };
 }
 

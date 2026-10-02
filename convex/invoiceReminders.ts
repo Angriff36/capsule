@@ -209,7 +209,7 @@ function wasDelivered(
   );
 }
 
-async function decryptField(
+export async function decryptField(
   ctx: QueryCtx,
   entity: string,
   property: string,

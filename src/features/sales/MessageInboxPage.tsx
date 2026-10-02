@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
+import { useSendEmailReply } from "../../lib/messageReplyActions";
 import {
   useCreateMessage,
   useListClientContact,
@@ -70,6 +71,10 @@ export function MessageInboxPage() {
   const linkLead = useMessageThreadLinkLead();
   const setStatus = useMessageThreadSetStatus();
   const qualify = useAction(api.messageInbox.qualifyThreadAsLead);
+  const sendEmailReply = useSendEmailReply();
+  // One id per typed email reply: pressing Send again after a failure or a
+  // lost answer never emails the client twice.
+  const replyRequestId = useRef<{ threadId: string; id: string } | null>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
@@ -178,6 +183,34 @@ export function MessageInboxPage() {
       });
       setReply("");
     } catch (e) {
+      fail(e);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const submitEmailReply = async () => {
+    if (!selected || sending) return;
+    const body = reply.trim();
+    if (!body) return;
+    setFailure(null);
+    setNotice(null);
+    const threadId = String(selected._id);
+    if (replyRequestId.current?.threadId !== threadId) {
+      replyRequestId.current = { threadId, id: crypto.randomUUID() };
+    }
+    setSending(true);
+    try {
+      const result = await sendEmailReply({
+        threadId,
+        bodyText: body,
+        requestId: replyRequestId.current.id,
+      });
+      replyRequestId.current = null;
+      setReply("");
+      setNotice(`Reply taken by the email service for ${result.to}.`);
+    } catch (e) {
+      // The typed reply stays; Send again reuses the same id.
       fail(e);
     } finally {
       setSending(false);
@@ -644,14 +677,22 @@ export function MessageInboxPage() {
                   )}
                 </div>
 
-                {selected.provider !== "internal" ? (
+                {selected.provider === "email" ? (
                   <p
                     className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
                     role="status"
                   >
-                    No external delivery provider is connected. Keep editing
-                    here, then copy the draft into your email, SMS, or social
-                    provider.
+                    Send email answers the client's last email from your company
+                    address.
+                  </p>
+                ) : selected.provider !== "internal" ? (
+                  <p
+                    className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
+                    role="status"
+                  >
+                    Capsule cannot send text or social messages yet. Keep
+                    editing here, then copy the draft into the app the client
+                    used.
                   </p>
                 ) : null}
                 <form
@@ -660,6 +701,8 @@ export function MessageInboxPage() {
                     e.preventDefault();
                     if (selected.provider === "internal") {
                       void submitReply();
+                    } else if (selected.provider === "email") {
+                      void submitEmailReply();
                     } else {
                       void copyExternalDraft();
                     }
@@ -670,17 +713,35 @@ export function MessageInboxPage() {
                     className="input min-w-0 flex-1"
                     placeholder="Reply to this thread…"
                     value={reply}
-                    onChange={(e) => setReply(e.target.value)}
+                    onChange={(e) => {
+                      // A changed reply is a new email.
+                      replyRequestId.current = null;
+                      setReply(e.target.value);
+                    }}
                     aria-label="Reply text"
                   />
+                  {selected.provider === "email" ? (
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      disabled={sending || reply.trim().length === 0}
+                      onClick={() => void copyExternalDraft()}
+                    >
+                      Copy draft
+                    </button>
+                  ) : null}
                   <button
                     type={
-                      selected.provider === "internal" ? "submit" : "button"
+                      selected.provider === "internal" ||
+                      selected.provider === "email"
+                        ? "submit"
+                        : "button"
                     }
                     className="btn btn-primary"
                     disabled={sending || reply.trim().length === 0}
                     onClick={
-                      selected.provider === "internal"
+                      selected.provider === "internal" ||
+                      selected.provider === "email"
                         ? undefined
                         : () => void copyExternalDraft()
                     }
@@ -688,10 +749,14 @@ export function MessageInboxPage() {
                     {sending
                       ? selected.provider === "internal"
                         ? "Logging…"
-                        : "Copying…"
+                        : selected.provider === "email"
+                          ? "Sending…"
+                          : "Copying…"
                       : selected.provider === "internal"
                         ? "Log note"
-                        : "Copy draft"}
+                        : selected.provider === "email"
+                          ? "Send email"
+                          : "Copy draft"}
                   </button>
                 </form>
               </>
