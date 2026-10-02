@@ -288,6 +288,7 @@ import type * as tppReports_general from "../tppReports/general.js";
 import type * as tppReports_options from "../tppReports/options.js";
 import type * as tppReports_shared from "../tppReports/shared.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
+import type * as vendorOrderEmail from "../vendorOrderEmail.js";
 import type * as venueVendorPolicy from "../venueVendorPolicy.js";
 import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
@@ -580,6 +581,7 @@ declare const fullApi: ApiFromModules<{
   "tppReports/options": typeof tppReports_options;
   "tppReports/shared": typeof tppReports_shared;
   vehicleAssignment: typeof vehicleAssignment;
+  vendorOrderEmail: typeof vendorOrderEmail;
   venueVendorPolicy: typeof venueVendorPolicy;
   webhookDeliveries: typeof webhookDeliveries;
   webhookIntegrations: typeof webhookIntegrations;

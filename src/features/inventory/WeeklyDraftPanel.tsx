@@ -11,7 +11,7 @@ export function draftCommitmentLabel(status: string): string {
     return "Draft · not sent to the vendor. Event changes update it until you mark it sent.";
   if (status === "pending_approval") return "Waiting for manager approval";
   if (status === "submitted")
-    return "Marked sent · Capsule does not send it, so send it to the vendor yourself. Later changes show as a review item";
+    return "Marked sent · email it to the vendor from the order page, or send it your own way. Later changes show as a review item";
   if (status === "confirmed") return "Vendor confirmed";
   if (status === "partially_received") return "Partly received";
   if (status === "received") return "Received";

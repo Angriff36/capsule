@@ -38,6 +38,7 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { VendorOrderBillMatch } from "./VendorOrderBillMatch";
+import { VendorOrderEmailSection } from "./VendorOrderEmailSection";
 import { VendorOrderReceiptCorrection } from "./VendorOrderReceiptCorrection";
 import {
   activeLocations,
@@ -480,6 +481,11 @@ export function VendorOrderPage() {
           </button>
         </div>
       </section>
+
+      <VendorOrderEmailSection
+        vendorOrderId={order._id}
+        status={String(order.status)}
+      />
 
       {showLineForm ? (
         <form className="supply-form" onSubmit={submitLine}>

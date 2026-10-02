@@ -477,9 +477,9 @@ export function PurchasingPage() {
         <strong>Automatic weekly draft</strong>
         <span>
           Add dishes, set headcount, approve the event — Capsule rolls the
-          ingredient shortages into one draft vendor order for the week. Capsule
-          does not send orders to vendors: send the order yourself, then mark it
-          sent here.
+          ingredient shortages into one draft vendor order for the week. Mark
+          the order sent, then email it to the vendor from the order page (or
+          send it your own way).
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
