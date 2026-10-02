@@ -244,6 +244,12 @@ export function QuoteSubmissionPage() {
           <p className="text-ink-2 mb-8">
             Tell us about your event and we'll get back to you within 24-48
             hours with a customized proposal.
+            {options?.company ? (
+              <span className="block mt-2 text-sm" data-testid="quote-company">
+                {options.company.name}
+                {options.company.address ? ` · ${options.company.address}` : ""}
+              </span>
+            ) : null}
           </p>
 
           {error && (

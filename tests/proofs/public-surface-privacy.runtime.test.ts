@@ -403,11 +403,17 @@ describe("AC-152 public pages reveal nothing private", () => {
     )) as {
       serviceStyles: Array<Record<string, unknown>>;
       occasions: Array<Record<string, unknown>>;
+      company: Record<string, unknown> | null;
     };
     for (const row of [...options.serviceStyles, ...options.occasions]) {
       for (const key of Object.keys(row)) {
         expect(["_id", "name", "sortOrder"]).toContain(key);
       }
+    }
+    // The caterer's public name and address only (#125), nothing else of
+    // the organization record.
+    for (const key of Object.keys(options.company ?? {})) {
+      expect(["name", "address"]).toContain(key);
     }
     expectNothingPrivate(options);
     expect(JSON.stringify(options)).not.toContain("Porter dinner");
