@@ -153,6 +153,7 @@ import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDi
 import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPrices.js";
 import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallback.js";
 import type * as lib_materializationReceipt from "../lib/materializationReceipt.js";
+import type * as lib_messageMedia from "../lib/messageMedia.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_oneOnlyRules from "../lib/oneOnlyRules.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
@@ -221,6 +222,7 @@ import type * as lib_venueFactsSnapshot from "../lib/venueFactsSnapshot.js";
 import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as messageInbox from "../messageInbox.js";
+import type * as messageInboxPages from "../messageInboxPages.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
 import type * as openingStock from "../openingStock.js";
@@ -425,6 +427,7 @@ declare const fullApi: ApiFromModules<{
   "lib/lookupCostFromOpenPrices": typeof lib_lookupCostFromOpenPrices;
   "lib/lookupCostTenantFallback": typeof lib_lookupCostTenantFallback;
   "lib/materializationReceipt": typeof lib_materializationReceipt;
+  "lib/messageMedia": typeof lib_messageMedia;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/oneOnlyRules": typeof lib_oneOnlyRules;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
@@ -493,6 +496,7 @@ declare const fullApi: ApiFromModules<{
   "lib/venueReconciliation": typeof lib_venueReconciliation;
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
   messageInbox: typeof messageInbox;
+  messageInboxPages: typeof messageInboxPages;
   mutations: typeof mutations;
   notifications: typeof notifications;
   openingStock: typeof openingStock;

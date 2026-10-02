@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
 import { action, type ActionCtx } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { mediaRefsFromEnvelope } from "./lib/messageMedia";
 
 // §4.4 retryable sync-error queue: record an ingest/parse failure as a SyncError.
 // Tenant-scoped find-or-upsert — REOPEN (bump attempts, refresh, return to
@@ -93,6 +94,7 @@ export const ingestInboundMessage = action({
     subject: v.optional(v.string()),
     sentAt: v.optional(v.number()),
     rawPayload: v.optional(v.string()),
+    mediaJson: v.optional(v.string()),
     contactId: v.optional(v.id("clientContacts")),
   },
   handler: async (
@@ -237,6 +239,7 @@ export const ingestInboundMessage = action({
           senderIdentity: args.senderIdentity,
           sentAt: args.sentAt,
           rawPayload: args.rawPayload,
+          mediaJson: args.mediaJson,
           idempotencyKey: `tenant-shared/msg:${threadId}:${providerMessageId}`,
         },
       );
@@ -311,6 +314,7 @@ export const ingestProviderEnvelope = action({
     recorded: "ingested" | "sync_error";
     threadId?: Id<"messageThreads">;
     messageId?: Id<"messages">;
+    isDuplicate?: boolean;
     reason?: string;
   }> => {
     const provider = args.provider.trim();
@@ -381,6 +385,7 @@ export const ingestProviderEnvelope = action({
       };
     }
 
+    const media = mediaRefsFromEnvelope(parsed);
     try {
       const result = await ctx.runAction(
         api.messageInbox.ingestInboundMessage,
@@ -408,12 +413,14 @@ export const ingestProviderEnvelope = action({
           ]),
           rawPayload:
             args.rawJson.length <= MAX_RAW_PAYLOAD ? args.rawJson : undefined,
+          mediaJson: media.length > 0 ? JSON.stringify(media) : undefined,
         },
       );
       return {
         recorded: "ingested",
         threadId: result.threadId,
         messageId: result.messageId,
+        isDuplicate: result.isDuplicate,
       };
     } catch (e) {
       // ingestInboundMessage already recorded the failure (validation or

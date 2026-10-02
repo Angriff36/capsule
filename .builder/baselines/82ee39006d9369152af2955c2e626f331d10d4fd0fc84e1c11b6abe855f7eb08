@@ -457,7 +457,9 @@ import {
   MessageSetDeliveryParamsSchema,
   MessageThreadCreateParamsSchema,
   MessageThreadLinkContactParamsSchema,
+  MessageThreadLinkEventParamsSchema,
   MessageThreadLinkLeadParamsSchema,
+  MessageThreadMergeIntoParamsSchema,
   MessageThreadSetStatusParamsSchema,
   OccasionActivateParamsSchema,
   OccasionDeactivateParamsSchema,
@@ -7199,12 +7201,32 @@ export function useMessageThreadLinkContact() {
   };
 }
 
+/** Mutation hook for MessageThread.linkEvent. */
+export function useMessageThreadLinkEvent() {
+  const mutate = useMutation(api.mutations.MessageThread_linkEvent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MessageThreadLinkEventParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for MessageThread.linkLead. */
 export function useMessageThreadLinkLead() {
   const mutate = useMutation(api.mutations.MessageThread_linkLead);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MessageThreadLinkLeadParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for MessageThread.mergeInto. */
+export function useMessageThreadMergeInto() {
+  const mutate = useMutation(api.mutations.MessageThread_mergeInto);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MessageThreadMergeIntoParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13607,4 +13629,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1441 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1443 as const;

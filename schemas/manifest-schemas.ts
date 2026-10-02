@@ -2423,7 +2423,8 @@ export const MessageSchema = z.object({
   senderIdentity: z.string().optional(),
   bodyText: z.string().default(""),
   rawPayload: z.string().optional(),
-  status: z.enum(["received", "queued", "sent", "delivered", "bounced", "failed"]).default("received"),
+  mediaJson: z.string().nullable().optional(),
+  status: z.enum(["received", "queued", "sent", "delivered", "bounced", "failed", "unknown"]).default("received"),
   sentAt: z.coerce.date().nullable().optional(),
   authorAuthSubjectId: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -2444,6 +2445,8 @@ export const MessageThreadSchema = z.object({
   senderIdentity: z.string().optional(),
   contactId: z.string().uuid().nullable().optional(),
   leadId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  mergedIntoThreadId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "non_lead", "archived"]).default("active"),
   openedByAuthSubjectId: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -8933,19 +8936,20 @@ export type MenuDishUpdateSellingPriceParams = z.infer<typeof MenuDishUpdateSell
 export const MessagePostParamsSchema = z.object({
   threadId: z.string().min(1),
   direction: z.enum(["inbound", "outbound"]),
-  status: z.enum(["received", "queued", "sent", "delivered", "bounced", "failed"]),
+  status: z.enum(["received", "queued", "sent", "delivered", "bounced", "failed", "unknown"]),
   bodyText: z.string(),
   providerMessageId: z.string().optional(),
   senderIdentity: z.string().optional(),
   sentAt: z.coerce.date().optional(),
   rawPayload: z.string().optional(),
+  mediaJson: z.string().optional(),
 });
 
 export type MessagePostParams = z.infer<typeof MessagePostParamsSchema>;
 
 // Command: setDelivery on Message
 export const MessageSetDeliveryParamsSchema = z.object({
-  status: z.enum(["received", "queued", "sent", "delivered", "bounced", "failed"]),
+  status: z.enum(["received", "queued", "sent", "delivered", "bounced", "failed", "unknown"]),
 });
 
 export type MessageSetDeliveryParams = z.infer<typeof MessageSetDeliveryParamsSchema>;
@@ -8969,12 +8973,26 @@ export const MessageThreadLinkContactParamsSchema = z.object({
 
 export type MessageThreadLinkContactParams = z.infer<typeof MessageThreadLinkContactParamsSchema>;
 
+// Command: linkEvent on MessageThread
+export const MessageThreadLinkEventParamsSchema = z.object({
+  eventId: z.string().min(1).optional(),
+});
+
+export type MessageThreadLinkEventParams = z.infer<typeof MessageThreadLinkEventParamsSchema>;
+
 // Command: linkLead on MessageThread
 export const MessageThreadLinkLeadParamsSchema = z.object({
   leadId: z.string().min(1),
 });
 
 export type MessageThreadLinkLeadParams = z.infer<typeof MessageThreadLinkLeadParamsSchema>;
+
+// Command: mergeInto on MessageThread
+export const MessageThreadMergeIntoParamsSchema = z.object({
+  targetThreadId: z.string().uuid(),
+});
+
+export type MessageThreadMergeIntoParams = z.infer<typeof MessageThreadMergeIntoParamsSchema>;
 
 // Command: setStatus on MessageThread
 export const MessageThreadSetStatusParamsSchema = z.object({

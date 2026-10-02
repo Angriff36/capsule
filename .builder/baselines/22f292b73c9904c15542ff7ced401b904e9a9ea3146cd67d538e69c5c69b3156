@@ -2234,7 +2234,8 @@ export default defineSchema({
     senderIdentity: v.optional(v.string()),
     bodyText: v.string(),
     rawPayload: v.optional(v.string()),
-    status: v.union(v.literal("received"), v.literal("queued"), v.literal("sent"), v.literal("delivered"), v.literal("bounced"), v.literal("failed")),
+    mediaJson: v.optional(v.union(v.string(), v.null())),
+    status: v.union(v.literal("received"), v.literal("queued"), v.literal("sent"), v.literal("delivered"), v.literal("bounced"), v.literal("failed"), v.literal("unknown")),
     sentAt: v.optional(v.union(v.number(), v.null())),
     authorAuthSubjectId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
@@ -2254,6 +2255,8 @@ export default defineSchema({
     senderIdentity: v.optional(v.string()),
     contactId: v.optional(v.union(v.id("clientContacts"), v.null())),
     leadId: v.optional(v.union(v.id("leads"), v.null())),
+    eventId: v.optional(v.union(v.id("events"), v.null())),
+    mergedIntoThreadId: v.optional(v.union(v.string(), v.null())),
     status: v.union(v.literal("active"), v.literal("non_lead"), v.literal("archived")),
     openedByAuthSubjectId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
@@ -2264,7 +2267,8 @@ export default defineSchema({
     .index("by_providerAccountId", ["providerAccountId"])
     .index("by_providerThreadId", ["providerThreadId"])
     .index("by_contactId", ["contactId"])
-    .index("by_leadId", ["leadId"]),
+    .index("by_leadId", ["leadId"])
+    .index("by_eventId", ["eventId"]),
   occasions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

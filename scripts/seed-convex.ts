@@ -436,9 +436,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.MenuDish_createViaAdd, { "menuId": "menuId-menu-dish-2", "dishId": "dishId-menu-dish-2", "sortOrder": 2, "sellingPrice": 2, "course": "demo-course-2", "serviceStyle": "demo-serviceStyle-2", "specialInstructions": "demo-specialInstructions-2" } as any);
   // Message → api.mutations.Message_createViaPost
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Message_createViaPost, { "threadId": "threadId-message-1", "direction": "demo-direction-1", "providerMessageId": "providerMessageId-message-1", "senderIdentity": "demo-senderIdentity-1", "bodyText": "demo-bodyText-1", "rawPayload": "demo-rawPayload-1", "status": "demo-status-1", "sentAt": 1767268800000 } as any);
+  await client.mutation(api.mutations.Message_createViaPost, { "threadId": "threadId-message-1", "direction": "demo-direction-1", "providerMessageId": "providerMessageId-message-1", "senderIdentity": "demo-senderIdentity-1", "bodyText": "demo-bodyText-1", "rawPayload": "demo-rawPayload-1", "mediaJson": "demo-mediaJson-1", "status": "demo-status-1", "sentAt": 1767268800000 } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Message_createViaPost, { "threadId": "threadId-message-2", "direction": "demo-direction-2", "providerMessageId": "providerMessageId-message-2", "senderIdentity": "demo-senderIdentity-2", "bodyText": "demo-bodyText-2", "rawPayload": "demo-rawPayload-2", "status": "demo-status-2", "sentAt": 1767355200000 } as any);
+  await client.mutation(api.mutations.Message_createViaPost, { "threadId": "threadId-message-2", "direction": "demo-direction-2", "providerMessageId": "providerMessageId-message-2", "senderIdentity": "demo-senderIdentity-2", "bodyText": "demo-bodyText-2", "rawPayload": "demo-rawPayload-2", "mediaJson": "demo-mediaJson-2", "status": "demo-status-2", "sentAt": 1767355200000 } as any);
   // MessageThread → api.mutations.MessageThread_create
   rowsAttempted += 1;
   await client.mutation(api.mutations.MessageThread_create, { "provider": "demo-provider-1", "providerAccountId": "providerAccountId-message-thread-1", "providerThreadId": "providerThreadId-message-thread-1", "subject": "demo-subject-1", "senderIdentity": "demo-senderIdentity-1", "contactId": "client-contact-1" } as any);

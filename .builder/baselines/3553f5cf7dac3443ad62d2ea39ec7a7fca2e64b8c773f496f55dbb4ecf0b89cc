@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:104817e9436d077c12278247f0b59a33724d88996732b5707a58ceb1f9944102:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:143e4c2a5a90e98fef6f835bb95290478f72f3e734ee36c1a5e2c19c6cf2ff57:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1a98a0ed9b78361440d3a2753067cc034f91d54aeeee8a4a2526ccf44ad95f65:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:25693d35ebc40dd39ede1464d6be1ec679ae96a98e7660d3e4037ec21e9a4fda:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:266219a20c85bcddabf837083f7946119556cb9e1618bc781dabf73c8a183f07:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3309b4f20badbf95e9472b35c025b0de4cbce132d3186c7f52cabc345419691e:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4dd0f7d4d8b351c5060d0e1dbab0c6453c90be2fd5b0647a34fa06912a9be95d:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:576b0f06b733b7f80d53e28d168698e1b262bb879a21c58913cee1712feeff40:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:78b3a3a832bea3a3dc8749a1c9e6ad1ffe8e0ac08d496c4f0aef7f7bf106cf78:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9cc77cba038a462e31789b3644270e23d850f38ce49f7bb617a58ab9322319c8:9d8a87180824e846e3de7cb74210b9b9937459761c68ef4f8a2423ea7f307903:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a134e201aae4a0a2a8d9ce9f3f28ee67cb100d1885392139c546ef1bbd292b78:a3b3072899bd6273b74a17dde35d7af6ae2f3e9e379b21b23b88ebc047fca499:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b51ce6741292ad2fb52cee22257eadcc158fe6c25069c51eb8346febcbe98ba5:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b5ff8c556963d803836d6d34baba38f02806f60e6c35414c750b895ef4a90b46:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bde40669e1a0ee7b05fdef1fa441356bed3d176e30ca1ffefc3f06b364a4eb71:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:df39e32343a2f728fc35f79d8cbc7e0b38a7df555ff26ff4e7d73e66c0771d1c:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e5ba96616bbcb2159a399efb9146be77678c7c4f84929f030a26706dbf5b10b6:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:104817e9436d077c12278247f0b59a33724d88996732b5707a58ceb1f9944102:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:143e4c2a5a90e98fef6f835bb95290478f72f3e734ee36c1a5e2c19c6cf2ff57:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1a98a0ed9b78361440d3a2753067cc034f91d54aeeee8a4a2526ccf44ad95f65:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:208fab97d6765ca7e43c3306442c7fa4180dbb3ec736a52d5e1ea1ef5d5e2fad:25693d35ebc40dd39ede1464d6be1ec679ae96a98e7660d3e4037ec21e9a4fda:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:266219a20c85bcddabf837083f7946119556cb9e1618bc781dabf73c8a183f07:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3309b4f20badbf95e9472b35c025b0de4cbce132d3186c7f52cabc345419691e:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3ddf6fc1b0249b01f71786c942529783aeaa1c9053e33709b449ab286e3b81d2:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fb10d1ec8ab6d8c42913af0124b46c976247551ec394a25e42766078c72500a:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4dd0f7d4d8b351c5060d0e1dbab0c6453c90be2fd5b0647a34fa06912a9be95d:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:576b0f06b733b7f80d53e28d168698e1b262bb879a21c58913cee1712feeff40:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:61a87a09f8e88581338bea1b241b1f23114dffa70fe208756006db16984f3227:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:78b3a3a832bea3a3dc8749a1c9e6ad1ffe8e0ac08d496c4f0aef7f7bf106cf78:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:91494765678fc03b0a3b9e73fb6ffcf253f784b239618d99a68ac114c5a9adf8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98d1169d1fafea9090ce0b1d9f002ddac7b9ad0c48874267a1b64f0f1bf7b9c7:9cc77cba038a462e31789b3644270e23d850f38ce49f7bb617a58ab9322319c8:9d8a87180824e846e3de7cb74210b9b9937459761c68ef4f8a2423ea7f307903:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a134e201aae4a0a2a8d9ce9f3f28ee67cb100d1885392139c546ef1bbd292b78:a3b3072899bd6273b74a17dde35d7af6ae2f3e9e379b21b23b88ebc047fca499:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b0152a499107c18af3f207f4aea7afc9e7ea62e8dd399285dab37ab972f107fa:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b51ce6741292ad2fb52cee22257eadcc158fe6c25069c51eb8346febcbe98ba5:b5ce23cf2aef65e772a2d11e0daf44f5c22949f9dc45ca2859d603294c1e3181:b5ff8c556963d803836d6d34baba38f02806f60e6c35414c750b895ef4a90b46:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bde40669e1a0ee7b05fdef1fa441356bed3d176e30ca1ffefc3f06b364a4eb71:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e184631b5cd8b4bb939907e872315b5768e6474514968da28502e68f62f9c5c7:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f5cc58981b33c3ef9163516dad2939c8fba4080abb9072be8e3e5717d94ac027:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -29932,6 +29932,20 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -30919,6 +30933,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -31922,6 +31950,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -32908,6 +32950,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -33881,6 +33937,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -34860,6 +34930,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -35846,6 +35930,20 @@ export const EventCancelInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -36906,6 +37004,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -38002,6 +38114,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -38977,6 +39103,20 @@ export const EventChangePricingInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -39960,6 +40100,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -40952,6 +41106,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -41939,6 +42107,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -42920,6 +43102,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -43915,6 +44111,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -44889,6 +45099,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -45853,6 +46077,20 @@ export const EventCloseOutInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -46837,6 +47075,20 @@ export const EventCompleteInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -47832,6 +48084,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -48875,6 +49141,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -49889,6 +50169,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -50879,6 +51173,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -51859,6 +52167,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -52851,6 +53173,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -53831,6 +54167,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -54819,6 +55169,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -55783,6 +56147,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -56784,6 +57162,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -57910,6 +58302,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -58874,6 +59280,20 @@ export const EventReassignClientInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -59844,6 +60264,20 @@ export const EventRecordFinalVenueFactsInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -60827,6 +61261,20 @@ export const EventRescheduleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -61804,6 +62252,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -62807,6 +63269,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -63780,6 +64256,20 @@ export const EventStageClientMergeInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -64763,6 +65253,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -65727,6 +66231,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -66715,6 +67233,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -67696,6 +68228,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -68773,6 +69319,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -69876,6 +70436,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -70900,6 +71474,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Occasion",
     "queryKeyHint": "queryKeys.occasion.lists()",
     "readId": "Occasion.list",
@@ -71913,6 +72501,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "Invoice",
     "queryKeyHint": "queryKeys.invoice.detail(id)",
     "readId": "Invoice.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
     "label": "related entity detail"
   },
   {
@@ -110730,13 +111332,14 @@ export interface MessagePostClientInput {
   threadId: string;
   /** Allowed: "inbound" | "outbound" */
   direction: "inbound" | "outbound";
-  /** Allowed: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" */
-  status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed";
+  /** Allowed: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown" */
+  status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown";
   bodyText: string;
   providerMessageId?: string;
   senderIdentity?: string;
   sentAt?: string;
   rawPayload?: string;
+  mediaJson?: string;
 }
 
 export const MessagePostCapability = {
@@ -110752,7 +111355,7 @@ export const MessagePostCapability = {
   acceptsIdempotencyKey: true,
   resultKind: "allocation",
   returnTsType: "{ docId: string }",
-  clientParameterNames: ["threadId","direction","status","bodyText","providerMessageId","senderIdentity","sentAt","rawPayload"],
+  clientParameterNames: ["threadId","direction","status","bodyText","providerMessageId","senderIdentity","sentAt","rawPayload","mediaJson"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see messages"},{"kind":"policy_denial","message":"Staff may update messages"},{"kind":"policy_denial","message":"Staff may change messages"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Write something in the message"}],
   emits: ["MessagePosted"],
@@ -110854,6 +111457,10 @@ export const MessagePostAction = {
         {
           "value": "failed",
           "label": "failed"
+        },
+        {
+          "value": "unknown",
+          "label": "unknown"
         }
       ]
     },
@@ -110881,14 +111488,19 @@ export const MessagePostAction = {
       "name": "rawPayload",
       "label": "Raw payload",
       "required": false
+    },
+    {
+      "name": "mediaJson",
+      "label": "Media json",
+      "required": false
     }
   ]
 } as const;
 
 // --- Message.setDelivery ---
 export interface MessageSetDeliveryClientInput {
-  /** Allowed: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" */
-  status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed";
+  /** Allowed: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown" */
+  status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown";
 }
 
 export const MessageSetDeliveryCapability = {
@@ -110903,14 +111515,14 @@ export const MessageSetDeliveryCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\" | \"unknown\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["status"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see messages"},{"kind":"policy_denial","message":"Staff may update messages"},{"kind":"policy_denial","message":"Staff may change messages"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Message not found"}],
   emits: ["MessageDeliveryUpdated"],
 } as const;
 
-export type MessageSetDeliveryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+export type MessageSetDeliveryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Message.setDelivery.
@@ -110986,6 +111598,10 @@ export const MessageSetDeliveryAction = {
         {
           "value": "failed",
           "label": "failed"
+        },
+        {
+          "value": "unknown",
+          "label": "unknown"
         }
       ]
     }
@@ -111015,14 +111631,14 @@ export const MessageThreadCreateCapability = {
   versionField: null,
   acceptsIdempotencyKey: true,
   resultKind: "created",
-  returnTsType: "{ _id: string; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["provider","providerAccountId","providerThreadId","subject","senderIdentity","contactId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see message threads"},{"kind":"policy_denial","message":"Staff may update conversations"},{"kind":"policy_denial","message":"Staff may change conversations"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"}],
   emits: ["MessageThreadCreated"],
 } as const;
 
-export type MessageThreadCreateResult = { _id: string; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+export type MessageThreadCreateResult = { _id: string; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for MessageThread.create.
@@ -111060,6 +111676,20 @@ export const MessageThreadCreateInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
     "label": "related entity detail"
   },
   {
@@ -111170,14 +111800,14 @@ export const MessageThreadLinkContactCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["contactId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see message threads"},{"kind":"policy_denial","message":"Staff may update conversations"},{"kind":"policy_denial","message":"Staff may change conversations"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"MessageThread not found"}],
   emits: ["MessageThreadContactLinked"],
 } as const;
 
-export type MessageThreadLinkContactResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+export type MessageThreadLinkContactResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for MessageThread.linkContact.
@@ -111215,6 +111845,20 @@ export const MessageThreadLinkContactInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
     "label": "related entity detail"
   },
   {
@@ -111261,6 +111905,128 @@ export const MessageThreadLinkContactAction = {
   ]
 } as const;
 
+// --- MessageThread.linkEvent ---
+export interface MessageThreadLinkEventClientInput {
+  eventId?: string;
+}
+
+export const MessageThreadLinkEventCapability = {
+  capabilityId: "MessageThread.linkEvent",
+  entity: "MessageThread",
+  command: "linkEvent",
+  route: "/api/manifest/MessageThread/commands/linkEvent",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["eventId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see message threads"},{"kind":"policy_denial","message":"Staff may update conversations"},{"kind":"policy_denial","message":"Staff may change conversations"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"MessageThread not found"}],
+  emits: ["MessageThreadEventLinked"],
+} as const;
+
+export type MessageThreadLinkEventResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for MessageThread.linkEvent.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindMessageThreadLinkEventInput(client: MessageThreadLinkEventClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful MessageThread.linkEvent. */
+export const MessageThreadLinkEventInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.lists()",
+    "readId": "ClientContact.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.detail(id)",
+    "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Message",
+    "queryKeyHint": "queryKeys.message.lists()",
+    "readId": "Message.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Message",
+    "queryKeyHint": "queryKeys.message.detail(id)",
+    "readId": "Message.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer MessageThread.linkEvent. Not a rendered control. */
+export const MessageThreadLinkEventAction = {
+  "exposure": "human",
+  "label": "Link event",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- MessageThread.linkLead ---
 export interface MessageThreadLinkLeadClientInput {
   leadId: string;
@@ -111278,14 +112044,14 @@ export const MessageThreadLinkLeadCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["leadId"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see message threads"},{"kind":"policy_denial","message":"Staff may update conversations"},{"kind":"policy_denial","message":"Staff may change conversations"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"MessageThread not found"}],
   emits: ["MessageThreadLeadLinked"],
 } as const;
 
-export type MessageThreadLinkLeadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+export type MessageThreadLinkLeadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for MessageThread.linkLead.
@@ -111323,6 +112089,20 @@ export const MessageThreadLinkLeadInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
     "label": "related entity detail"
   },
   {
@@ -111369,6 +112149,128 @@ export const MessageThreadLinkLeadAction = {
   ]
 } as const;
 
+// --- MessageThread.mergeInto ---
+export interface MessageThreadMergeIntoClientInput {
+  targetThreadId: string;
+}
+
+export const MessageThreadMergeIntoCapability = {
+  capabilityId: "MessageThread.mergeInto",
+  entity: "MessageThread",
+  command: "mergeInto",
+  route: "/api/manifest/MessageThread/commands/mergeInto",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["targetThreadId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see message threads"},{"kind":"policy_denial","message":"Staff may update conversations"},{"kind":"policy_denial","message":"Staff may change conversations"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick a different conversation to merge into."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"MessageThread not found"}],
+  emits: ["MessageThreadMerged"],
+} as const;
+
+export type MessageThreadMergeIntoResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for MessageThread.mergeInto.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindMessageThreadMergeIntoInput(client: MessageThreadMergeIntoClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful MessageThread.mergeInto. */
+export const MessageThreadMergeIntoInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.lists()",
+    "readId": "MessageThread.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "MessageThread",
+    "queryKeyHint": "queryKeys.messageThread.detail(id)",
+    "readId": "MessageThread.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.lists()",
+    "readId": "ClientContact.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientContact",
+    "queryKeyHint": "queryKeys.clientContact.detail(id)",
+    "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Message",
+    "queryKeyHint": "queryKeys.message.lists()",
+    "readId": "Message.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Message",
+    "queryKeyHint": "queryKeys.message.detail(id)",
+    "readId": "Message.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer MessageThread.mergeInto. Not a rendered control. */
+export const MessageThreadMergeIntoAction = {
+  "exposure": "human",
+  "label": "Merge into",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "targetThreadId",
+      "label": "Target thread id",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- MessageThread.setStatus ---
 export interface MessageThreadSetStatusClientInput {
   /** Allowed: "active" | "non_lead" | "archived" */
@@ -111387,14 +112289,14 @@ export const MessageThreadSetStatusCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["status"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see message threads"},{"kind":"policy_denial","message":"Staff may update conversations"},{"kind":"policy_denial","message":"Staff may change conversations"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"MessageThread not found"}],
   emits: ["MessageThreadStatusSet"],
 } as const;
 
-export type MessageThreadSetStatusResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
+export type MessageThreadSetStatusResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for MessageThread.setStatus.
@@ -111432,6 +112334,20 @@ export const MessageThreadSetStatusInvalidation = [
     "entity": "ClientContact",
     "queryKeyHint": "queryKeys.clientContact.detail(id)",
     "readId": "ClientContact.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
     "label": "related entity detail"
   },
   {
@@ -191326,7 +192242,9 @@ export const ALL_CAPABILITY_IDS = [
   "Message.setDelivery",
   "MessageThread.create",
   "MessageThread.linkContact",
+  "MessageThread.linkEvent",
   "MessageThread.linkLead",
+  "MessageThread.mergeInto",
   "MessageThread.setStatus",
   "Occasion.activate",
   "Occasion.deactivate",
@@ -192262,6 +193180,7 @@ export const ALL_READ_IDS = [
   "Message.get",
   "Message.list",
   "MessageThread.byContactId",
+  "MessageThread.byEventId",
   "MessageThread.byLeadId",
   "MessageThread.byProviderAccountId",
   "MessageThread.byProviderThreadId",
@@ -194212,41 +195131,44 @@ export type getMenuDishResult = { _id: string; _creationTime: number; tenantId: 
 export const listMenuDishRead = {"entity":"MenuDish","readId":"MenuDish.list","exportName":"listMenuDish","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; menuId: string; dishId: string; sortOrder: number; sellingPrice: number | null; scheduledSellingPrice: number | null; scheduledPriceEffectiveAt: number | null; course: string | null; serviceStyle: string | null; specialInstructions: string | null; addedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listMenuDishResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; menuId: string; dishId: string; sortOrder: number; sellingPrice: number | null; scheduledSellingPrice: number | null; scheduledPriceEffectiveAt: number | null; course: string | null; serviceStyle: string | null; specialInstructions: string | null; addedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageByProviderMessageIdRead = {"entity":"Message","readId":"Message.byProviderMessageId","exportName":"listMessageByProviderMessageId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"providerMessageId","tsType":"string","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageByProviderMessageIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageByProviderMessageIdRead = {"entity":"Message","readId":"Message.byProviderMessageId","exportName":"listMessageByProviderMessageId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"providerMessageId","tsType":"string","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\" | \"unknown\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageByProviderMessageIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageByTenantIdRead = {"entity":"Message","readId":"Message.byTenantId","exportName":"listMessageByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageByTenantIdRead = {"entity":"Message","readId":"Message.byTenantId","exportName":"listMessageByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\" | \"unknown\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageByThreadIdRead = {"entity":"Message","readId":"Message.byThreadId","exportName":"listMessageByThreadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"threadId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageByThreadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageByThreadIdRead = {"entity":"Message","readId":"Message.byThreadId","exportName":"listMessageByThreadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"threadId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\" | \"unknown\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageByThreadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getMessageRead = {"entity":"Message","readId":"Message.get","exportName":"getMessage","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getMessageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null;
+export const getMessageRead = {"entity":"Message","readId":"Message.get","exportName":"getMessage","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\" | \"unknown\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getMessageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listMessageRead = {"entity":"Message","readId":"Message.list","exportName":"listMessage","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageRead = {"entity":"Message","readId":"Message.list","exportName":"listMessage","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: \"inbound\" | \"outbound\"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: \"received\" | \"queued\" | \"sent\" | \"delivered\" | \"bounced\" | \"failed\" | \"unknown\"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; threadId: string; direction: "inbound" | "outbound"; providerMessageId: string; senderIdentity: string; bodyText: string; rawPayload: string; mediaJson: string | null; status: "received" | "queued" | "sent" | "delivered" | "bounced" | "failed" | "unknown"; sentAt: number | null; authorAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageThreadByContactIdRead = {"entity":"MessageThread","readId":"MessageThread.byContactId","exportName":"listMessageThreadByContactId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"contactId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageThreadByContactIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageThreadByContactIdRead = {"entity":"MessageThread","readId":"MessageThread.byContactId","exportName":"listMessageThreadByContactId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"contactId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadByContactIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageThreadByLeadIdRead = {"entity":"MessageThread","readId":"MessageThread.byLeadId","exportName":"listMessageThreadByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageThreadByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageThreadByEventIdRead = {"entity":"MessageThread","readId":"MessageThread.byEventId","exportName":"listMessageThreadByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageThreadByProviderAccountIdRead = {"entity":"MessageThread","readId":"MessageThread.byProviderAccountId","exportName":"listMessageThreadByProviderAccountId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"providerAccountId","tsType":"string","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageThreadByProviderAccountIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageThreadByLeadIdRead = {"entity":"MessageThread","readId":"MessageThread.byLeadId","exportName":"listMessageThreadByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageThreadByProviderThreadIdRead = {"entity":"MessageThread","readId":"MessageThread.byProviderThreadId","exportName":"listMessageThreadByProviderThreadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"providerThreadId","tsType":"string","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageThreadByProviderThreadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageThreadByProviderAccountIdRead = {"entity":"MessageThread","readId":"MessageThread.byProviderAccountId","exportName":"listMessageThreadByProviderAccountId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"providerAccountId","tsType":"string","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadByProviderAccountIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageThreadByTenantIdRead = {"entity":"MessageThread","readId":"MessageThread.byTenantId","exportName":"listMessageThreadByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageThreadByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const listMessageThreadByProviderThreadIdRead = {"entity":"MessageThread","readId":"MessageThread.byProviderThreadId","exportName":"listMessageThreadByProviderThreadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"providerThreadId","tsType":"string","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadByProviderThreadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const getMessageThreadRead = {"entity":"MessageThread","readId":"MessageThread.get","exportName":"getMessageThread","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getMessageThreadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null;
+export const listMessageThreadByTenantIdRead = {"entity":"MessageThread","readId":"MessageThread.byTenantId","exportName":"listMessageThreadByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listMessageThreadRead = {"entity":"MessageThread","readId":"MessageThread.list","exportName":"listMessageThread","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listMessageThreadResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
+export const getMessageThreadRead = {"entity":"MessageThread","readId":"MessageThread.get","exportName":"getMessageThread","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getMessageThreadResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listMessageThreadRead = {"entity":"MessageThread","readId":"MessageThread.list","exportName":"listMessageThread","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: \"internal\" | \"email\" | \"sms\" | \"social\" | \"other\"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: \"active\" | \"non_lead\" | \"archived\"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listMessageThreadResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; provider: "internal" | "email" | "sms" | "social" | "other"; providerAccountId: string; providerThreadId: string; subject: string; senderIdentity: string; contactId: string | null; leadId: string | null; eventId: string | null; mergedIntoThreadId: string | null; status: "active" | "non_lead" | "archived"; openedByAuthSubjectId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listOccasionByTenantIdRead = {"entity":"Occasion","readId":"Occasion.byTenantId","exportName":"listOccasionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; code: string; sortOrder: number; description: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOccasionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; code: string; sortOrder: number; description: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
