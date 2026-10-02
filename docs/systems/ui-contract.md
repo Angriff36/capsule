@@ -1184,20 +1184,6 @@ Screens (64): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Cargo space can't be negative. Use zero or more, or leave it empty."; and 3 more
   - effects: TrailerCargoFactsSet
   - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
-- `mutations.Vehicle_setCargoFacts` (Vehicle.setCargoFacts)
-  - inputs from the screen: cargoVolumeM3, hitchType; filled by the server: none
-  - version: required (`version`); retry key: accepted (same key = same result)
-  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Cargo space can't be negative. Use zero or more, or leave it empty."; and 2 more
-  - effects: VehicleCargoFactsSet
-  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
-- `mutations.Vehicle_setCrewFacts` (Vehicle.setCrewFacts)
-  - inputs from the screen: seatCount, driverQualificationName; filled by the server: none
-  - version: required (`version`); retry key: accepted (same key = same result)
-  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "A truck has at least one seat. Enter 1 or more, or leave it empty."; and 2 more
-  - effects: VehicleCrewFactsSet
-  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
 - `mutations.Venue_createViaRegister` (Venue.register)
   - inputs from the screen: name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -1248,6 +1234,7 @@ Screens (64): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `reasonedChanges.holdEquipmentWithReason` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.sendOutWithReason` - mutation; authored step; live reads update by themselves
 - `rigTrailer.hitchTrailer` - mutation; authored step; live reads update by themselves
+- `rigTrailer.saveTruckFacts` - mutation; authored step; live reads update by themselves
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
 - `teamChat.channelSummary` - query; live read, updates by itself

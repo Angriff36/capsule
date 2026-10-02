@@ -9,6 +9,8 @@
  * again. The rig keeps its riders, its loaded pack lines and its preload
  * record. The reason is PlanningOverride.record. When either is refused,
  * nothing is kept.
+ *
+ * Also: saveTruckFacts, a truck's crew and cargo facts in one save.
  */
 import { v } from "convex/values";
 import { api } from "./_generated/api";
@@ -41,5 +43,38 @@ export const hitchTrailer = mutation({
         });
     }
     return { rigId: args.rigId };
+  },
+});
+
+/**
+ * Save a truck's crew facts (seats, driver certificate) and its cargo facts
+ * (cargo space, hitch) in one save (#407). Planning setup's truck row has
+ * one Save button; it ran the generated Vehicle.setCrewFacts and
+ * Vehicle.setCargoFacts one after the other, so a refused second step left
+ * the seats saved and the cargo not. Here both run in one transaction: when
+ * either is refused, nothing is kept. Each keeps its own checks.
+ */
+export const saveTruckFacts = mutation({
+  args: {
+    vehicleId: v.id("vehicles"),
+    version: v.optional(v.number()),
+    seatCount: v.optional(v.number()),
+    driverQualificationName: v.optional(v.string()),
+    cargoVolumeM3: v.optional(v.number()),
+    hitchType: v.optional(v.string()),
+  },
+  handler: async (ctx, args): Promise<{ vehicleId: string }> => {
+    await ctx.runMutation(api.mutations.Vehicle_setCrewFacts, {
+      docId: args.vehicleId,
+      version: args.version,
+      seatCount: args.seatCount,
+      driverQualificationName: args.driverQualificationName,
+    });
+    await ctx.runMutation(api.mutations.Vehicle_setCargoFacts, {
+      docId: args.vehicleId,
+      cargoVolumeM3: args.cargoVolumeM3,
+      hitchType: args.hitchType,
+    });
+    return { vehicleId: args.vehicleId };
   },
 });
