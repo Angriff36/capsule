@@ -174,7 +174,7 @@ assigned as field work (§20.6).
 | Keep BEOs, worksheets, drawings with the event | Workbook sources, Photos tab | `proofs/event-packet-evidence`, `proofs/record-source-provenance` | Built (kept and linked) |
 | Route, map, load-in, setup drawings in the packet | packet venue part | `proofs/backend-golden-event` step 10 | Partly: map is a link, drawings are listed by name, not drawn |
 | Tracker board | `/events/tracker` | none | Built; the binder mark is a hand mark with no "reprint, the packet changed" hint |
-| Event chat (replaces Slack) | event Chat tab | `proofs/event-communication` | Built (no proof of posting in the event channel itself) |
+| Event chat (replaces Slack) | event Chat tab | `proofs/event-communication`, `proofs/event-chat-channel` | Built |
 
 History: BEO paste and TPP files on `/events/import`; original PDFs are kept
 and linked to the event, not added as pages to the printed packet.
