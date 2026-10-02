@@ -52,6 +52,7 @@ import {
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import { openNeedForApprovedEventDemand } from "./approvedDemandPurchasing";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { assertInvoiceIssueTotals } from "./invoiceIssueTotals";
@@ -145,6 +146,11 @@ export async function handleManifestEvent(
     await ctx.scheduler.runAfter(0, internal.schedulePushSend.deliver, {
       noticeId: event.entityId as Id<"weeklyScheduleNotices">,
     });
+    return;
+  }
+  if (event.entity === "IngredientDemand" && event.type === "IngredientDemandCalculated") {
+    // Food added after approval reaches the week's order (AC-666).
+    await openNeedForApprovedEventDemand(ctx, event);
     return;
   }
   if (event.entity === "Event" && event.type === "EventApproved") {

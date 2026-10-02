@@ -68,6 +68,7 @@ import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
 import type * as laborSummary from "../laborSummary.js";
 import type * as ledgerReconstruction from "../ledgerReconstruction.js";
+import type * as lib_approvedDemandPurchasing from "../lib/approvedDemandPurchasing.js";
 import type * as lib_assistantToolSurface from "../lib/assistantToolSurface.js";
 import type * as lib_authContext from "../lib/authContext.js";
 import type * as lib_autoStageFollowUp from "../lib/autoStageFollowUp.js";
@@ -356,6 +357,7 @@ declare const fullApi: ApiFromModules<{
   kmParser: typeof kmParser;
   laborSummary: typeof laborSummary;
   ledgerReconstruction: typeof ledgerReconstruction;
+  "lib/approvedDemandPurchasing": typeof lib_approvedDemandPurchasing;
   "lib/assistantToolSurface": typeof lib_assistantToolSurface;
   "lib/authContext": typeof lib_authContext;
   "lib/autoStageFollowUp": typeof lib_autoStageFollowUp;
