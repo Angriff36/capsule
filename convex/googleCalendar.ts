@@ -243,7 +243,41 @@ export const getConnectionStatus = query({
       )
       .sort((left, right) => right.createdAt - left.createdAt)[0];
     const sync = asRecord(lastSync?.payload);
+    // After a disconnect: when, and how many events stay on the calendar as
+    // last sent (Capsule no longer updates or removes them).
+    const lastDisconnect =
+      connection == null
+        ? rows
+            .filter(
+              (row) =>
+                row.entity === CONNECTION_ENTITY &&
+                row.type === "GoogleCalendarDisconnected",
+            )
+            .sort((left, right) => right.createdAt - left.createdAt)[0]
+        : undefined;
+    let entriesLeftOnCalendar = 0;
+    if (lastDisconnect) {
+      const latestByEvent = new Map<string, string>();
+      const syncRows = await ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entity", (q) => q.eq("entity", CALENDAR_EVENT_ENTITY))
+        .collect();
+      for (const row of syncRows.sort(
+        (left, right) => right.createdAt - left.createdAt,
+      )) {
+        if (asRecord(row.payload).tenantId !== tenantId) continue;
+        const state = parseSyncState(row.payload);
+        if (state && !latestByEvent.has(state.eventId)) {
+          latestByEvent.set(state.eventId, state.status);
+        }
+      }
+      entriesLeftOnCalendar = [...latestByEvent.values()].filter(
+        (status) => status !== "deleted",
+      ).length;
+    }
     return {
+      disconnectedAt: lastDisconnect?.createdAt ?? null,
+      entriesLeftOnCalendar,
       connected: connection != null,
       calendarId: connection?.calendarId ?? null,
       connectedAt: connection?.connectedAt ?? null,

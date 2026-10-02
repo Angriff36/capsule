@@ -294,6 +294,20 @@ export function IntegrationsPage() {
               </div>
             ) : null}
 
+            {!connection.connected && connection.disconnectedAt != null ? (
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-2">
+                Disconnected {formatWhen(connection.disconnectedAt)}. Capsule
+                stopped updating Google Calendar
+                {connection.entriesLeftOnCalendar > 0
+                  ? `; the ${connection.entriesLeftOnCalendar} event${
+                      connection.entriesLeftOnCalendar === 1 ? "" : "s"
+                    } already there stay as last sent`
+                  : ""}
+                . Connect again to update them; Capsule reuses the same calendar
+                entries, so nothing is added twice.
+              </p>
+            ) : null}
+
             <div className="mt-5 flex flex-wrap gap-2">
               {connection.connected ? (
                 <>
