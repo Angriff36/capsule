@@ -1,7 +1,5 @@
-import type {
-  useListEvent,
-  useListIngredientDemand,
-} from "../../lib/manifest-convex-react";
+import type { useListIngredientDemand } from "../../lib/manifest-convex-react";
+import type { EventLookupRow } from "../facilities/useEventsById";
 
 // ponytail: anomaly detection is a read-side derivation. IngredientDemand has no
 // hasMany edge to its own history, so Manifest computeds/aggregates can't express
@@ -39,7 +37,11 @@ const CANDIDATE = new Set(["pending", "calculated"]);
 // `threshold`. Returns only the flagged lines, keyed by demand _id.
 export function computeDemandAnomalies(
   demands: ReturnType<typeof useListIngredientDemand>,
-  events: ReturnType<typeof useListEvent>,
+  events:
+    | ReadonlyArray<
+        Pick<EventLookupRow, "_id" | "deletedAt" | "expectedHeadcount">
+      >
+    | undefined,
   threshold: number = DEFAULT_ANOMALY_THRESHOLD,
 ): Map<string, DemandAnomaly> {
   const flagged = new Map<string, DemandAnomaly>();

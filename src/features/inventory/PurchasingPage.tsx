@@ -4,7 +4,6 @@ import {
   useCreateVendor,
   useCreateVendorContact,
   useCreateVendorOrder,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListIngredientPriceObservation,
@@ -54,6 +53,7 @@ import {
   useWorkingEventScope,
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -66,10 +66,19 @@ export function PurchasingPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
   const inventoryItems = useListInventoryItem();
-  const events = useListEvent();
   const vendorContacts = useListVendorContact();
   const priceObservations = useListIngredientPriceObservation();
   const demands = useListIngredientDemand();
+  const events = usePickerAndNamedEvents(
+    needs && orders && demands
+      ? [
+          eventScope.scopeId,
+          ...needs.map((row) => row.eventId),
+          ...orders.map((row) => row.eventId),
+          ...demands.map((row) => row.eventId),
+        ]
+      : undefined,
+  );
   const unitMappings = useListItemUnitMapping();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();

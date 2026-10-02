@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import {
-  useListEvent,
   useListEventCloseout,
   useListLead,
+  useListServiceStyle,
   useListVenue,
 } from "@/lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import {
   eventServiceStyleKey,
   eventServiceStyleLabel,
@@ -49,10 +50,11 @@ import { KpiRecordList } from "./KpiRecordList";
  */
 
 export function TimsKPIsDashboardPage() {
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const closeouts = useListEventCloseout();
   const leads = useListLead();
   const venues = useListVenue();
+  const serviceStyles = useListServiceStyle();
 
   // Revenue KPIs
   const revenueMetrics = useMemo(() => {
@@ -229,7 +231,12 @@ export function TimsKPIsDashboardPage() {
 
       if (!styleMap.has(style)) {
         styleMap.set(style, {
-          label: eventServiceStyleLabel(event),
+          label: eventServiceStyleLabel({
+            ...event,
+            serviceStyle: (serviceStyles ?? []).find(
+              (row) => String(row._id) === String(event.serviceStyleId),
+            ),
+          }),
           revenue: 0,
           eventCount: 0,
         });
@@ -247,7 +254,7 @@ export function TimsKPIsDashboardPage() {
         eventCount: data.eventCount,
       }))
       .sort((a, b) => b.revenue - a.revenue);
-  }, [events]);
+  }, [events, serviceStyles]);
 
   // Top Performing Events
   const topEventsData = useMemo(() => {

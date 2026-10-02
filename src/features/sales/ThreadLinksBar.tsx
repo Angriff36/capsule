@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import {
-  useListEvent,
   useMessageThreadLinkEvent,
   useMessageThreadMergeInto,
   useMessageThreadSetStatus,
 } from "../../lib/manifest-convex-react";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 type Thread = Doc<"messageThreads">;
 type EventRow = Doc<"events">;
@@ -16,7 +16,9 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
 });
 
-export function eventChoiceLabel(event: EventRow): string {
+export function eventChoiceLabel(
+  event: Pick<EventRow, "title" | "eventNumber" | "startsAt">,
+): string {
   const title = event.title?.trim() || "Untitled event";
   const number = event.eventNumber ? `#${event.eventNumber} ` : "";
   const when = event.startsAt ? ` · ${dateFormat.format(event.startsAt)}` : "";
@@ -42,7 +44,7 @@ export function ThreadLinksBar({
   onFailure: (error: unknown) => void;
   onNotice: (notice: string) => void;
 }) {
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([thread.eventId]);
   const linkEvent = useMessageThreadLinkEvent();
   const mergeInto = useMessageThreadMergeInto();
   const setStatus = useMessageThreadSetStatus();

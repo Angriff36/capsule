@@ -69,6 +69,15 @@ vi.mock("../../../src/features/facilities/useEventsById", () => ({
       deletedAt: null,
     },
   ],
+  usePickerEvents: () => [
+    {
+      _id: "event-1",
+      title: "Harbor gala",
+      startsAt: EVENT_START,
+      stage: "approved",
+      deletedAt: null,
+    },
+  ],
 }));
 
 vi.mock("../../../src/lib/manifest-convex-react", () => ({

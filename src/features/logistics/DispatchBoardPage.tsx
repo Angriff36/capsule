@@ -5,7 +5,6 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useSendOutWithReason } from "../../lib/useReasonedChanges";
 import {
   useListDepartureOverride,
-  useListEvent,
   useListEventAssignment,
   useListEventStaffNeed,
   useListEventVehicleAssignment,
@@ -23,6 +22,7 @@ import { useActionNotice } from "../../ui/action-result";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import { eventDetailPath } from "../events/eventRoutes";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { readyToLeave, type LeaveSummary } from "./readyToLeave";
@@ -64,7 +64,6 @@ function personName(
  */
 export function DispatchBoardPage() {
   const authStatus = useAuthStatus();
-  const events = useListEvent();
   const packLists = useListPackList();
   const packLines = useListPackListItem();
   const rigs = useListEventVehicleAssignment();
@@ -82,6 +81,12 @@ export function DispatchBoardPage() {
   const [params, setParams] = useSearchParams();
   const rangeKey: RangeKey =
     RANGES.find((range) => range.key === params.get("days"))?.key ?? "today";
+  const dayStart = new Date().setHours(0, 0, 0, 0);
+  const range = RANGES.find((entry) => entry.key === rangeKey)!;
+  const from = dayStart + range.from * DAY_MS;
+  const to = dayStart + range.to * DAY_MS;
+  // Only the events starting in the chosen days are read.
+  const events = useEventsInRange({ from, to });
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -98,11 +103,6 @@ export function DispatchBoardPage() {
     assignments,
     staffNeeds,
   ].some((value) => value === undefined);
-
-  const dayStart = new Date().setHours(0, 0, 0, 0);
-  const range = RANGES.find((entry) => entry.key === rangeKey)!;
-  const from = dayStart + range.from * DAY_MS;
-  const to = dayStart + range.to * DAY_MS;
 
   const rows = useMemo(() => {
     if (loading) return [];

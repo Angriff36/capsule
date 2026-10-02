@@ -5,7 +5,6 @@ import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
   useIngredientDemandSupersede,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListPurchaseNeed,
@@ -24,6 +23,7 @@ import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const UNITS = [
   "each",
@@ -47,7 +47,9 @@ const policy = new SupplyLifecyclePolicy();
 export function DemandLedgerPage() {
   const workingId = useWorkingEventId();
   const demands = useListIngredientDemand();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    demands ? [workingId, ...demands.map((row) => row.eventId)] : undefined,
+  );
   const ingredients = useListIngredient();
   const purchaseNeeds = useListPurchaseNeed();
   const createDemand = useCreateIngredientDemand();

@@ -8,7 +8,6 @@ import { useState, useEffect, useRef, type FormEvent } from "react";
 import {
   useGetRevenueAttribution,
   useGetEvent,
-  useListEvent,
   useListVenue,
   useListPerson,
   useListReferralSource,
@@ -18,6 +17,7 @@ import {
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { usePickerEvents } from "../facilities/useEventsById";
 import { StatusChip, FormSkeleton } from "../../ui/primitives";
 import {
   formatDate as formatDateShared,
@@ -73,12 +73,12 @@ export function RevenueAttributionDetailPage() {
   const event = useGetEvent(
     isNew || !attribution?.eventId ? "skip" : attribution.eventId,
   );
-  const events = useListEvent();
+  const events = usePickerEvents();
   const [searchParams] = useSearchParams();
   const [eventId, setEventId] = useState(searchParams.get("eventId") ?? "");
   const eventChoices = (events ?? [])
     .filter((e) => e.deletedAt == null && e.stage !== "cancelled")
-    .sort((a, b) => b.startsAt - a.startsAt);
+    .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));
 
   const create = useRevenueAttributionCreate();
   const apply = useRevenueAttributionApply();

@@ -5,13 +5,13 @@ import {
   useListEquipment,
   useListEquipmentIssue,
   useListEquipmentReservation,
-  useListEvent,
   useListPackList,
   useListPackListItem,
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "../events/eventRoutes";
+import { useEventsById } from "../facilities/useEventsById";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { packReturnSummary, packReturnTotals, packWentOut } from "./packReturn";
 import { comesBack } from "./packViews";
@@ -44,12 +44,25 @@ const show = (value: number) =>
  * them up across events.
  */
 export function ReturnsPage() {
-  const events = useListEvent();
   const packLists = useListPackList();
   const packLines = useListPackListItem();
   const reservations = useListEquipmentReservation();
   const equipment = useListEquipment();
   const issues = useListEquipmentIssue();
+  // Only events with a dispatched load, a checked-out hold or an issue show.
+  const events = useEventsById(
+    packLists && reservations && issues
+      ? [
+          ...packLists
+            .filter((list) => String(list.status) === "dispatched")
+            .map((list) => list.eventId),
+          ...reservations
+            .filter((row) => String(row.status) === "checked_out")
+            .map((row) => row.eventId),
+          ...issues.map((issue) => issue.eventId),
+        ]
+      : undefined,
+  );
   const people = useListPerson();
   const [params, setParams] = useSearchParams();
   const tab: TabKey =

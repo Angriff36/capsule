@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDish,
-  useListEvent,
   useListEventDish,
   useListPerson,
   useListInvoice,
@@ -21,6 +20,7 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
@@ -75,7 +75,6 @@ import { prepTimeLabel } from "./prepTiming";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
-  const events = useListEvent();
   const eventDishes = useListEventDish();
   const dishes = useListDish();
   const components = useListComponent();
@@ -117,10 +116,18 @@ export function KitchenDashboardPage() {
     [horizonOffset],
   );
 
+  // Only the events starting inside the 7-day window are read (and only their
+  // id, title and start time are used here).
+  const events = useEventsInRange({
+    from: horizon.start().getTime(),
+    to: horizon.end().getTime(),
+  });
+
   const model = useMemo(
     () =>
       new KitchenCommandDeckModel(
-        events ?? [],
+        // Every row in the window has a start time.
+        (events ?? []) as EventLike[],
         eventDishes ?? [],
         dishes ?? [],
         tasks ?? [],

@@ -7,7 +7,6 @@ import {
 } from "../facilities/useCloseoutSources";
 import {
   useEventCloseoutFinalize,
-  useListEvent,
   useListEventCloseout,
   useListInvoice,
 } from "../../lib/manifest-convex-react";
@@ -43,6 +42,7 @@ import {
   useWorkingEventScope,
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CloseoutLifecyclePolicy();
 
@@ -53,7 +53,11 @@ export function CloseoutPage() {
   const eventScope = useWorkingEventScope();
   const authStatus = useAuthStatus();
   const closeouts = useListEventCloseout();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    closeouts
+      ? [eventScope.workingId, ...closeouts.map((row) => row.eventId)]
+      : undefined,
+  );
   const invoices = useListInvoice();
   const captureCloseout = useCaptureCloseoutFromSources();
   const correctCloseout = useCorrectCloseoutFromSources();

@@ -25,6 +25,7 @@ const harness = vi.hoisted(() => ({
 
 vi.mock("../../../src/features/facilities/useEventsById", () => ({
   useEventsById: () => [{ _id: "event-1", title: "Harbor gala" }],
+  usePickerEvents: () => [{ _id: "event-1", title: "Harbor gala" }],
 }));
 
 vi.mock("../../../src/lib/manifest-convex-react", () => ({

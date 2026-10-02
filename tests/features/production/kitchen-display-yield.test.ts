@@ -13,6 +13,7 @@ const harness = vi.hoisted(() => ({ complete: vi.fn<() => Promise<void>>() }));
 
 vi.mock("../../../src/features/facilities/useEventsById", () => ({
   useEventsById: () => [],
+  usePickerEvents: () => [],
 }));
 
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
