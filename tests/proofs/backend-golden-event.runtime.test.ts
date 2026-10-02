@@ -109,6 +109,7 @@ const id = {
   breadLine: "",
   saltLine: "",
   herbLine: "",
+  bitesLine: "",
   friesLine: "",
   caesarLine: "",
   truckRun: "",
@@ -1038,6 +1039,27 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
   it(
     "golden event 13: Change headcount; verify headcount-following dishes, food demand, prep, pack quantities, load rule, staffing/timeline inputs, proposal/change requirement, planning answers, and packet staleness reconcile once",
     async () => {
+      // A dish served to only part of the guests keeps its own count, and a
+      // pack quantity set by hand stays as set.
+      const bites = await w.run.kitchen(M.Dish_createViaIntroduce, {
+        name: "Golden passed bites",
+        portionSize: 1,
+        portionUnit: "portion",
+      });
+      id.bitesLine = (
+        await w.run.events(M.EventDish_createViaAddToEvent, {
+          eventId: id.golden,
+          dishId: bites.docId,
+          quantityServings: 24,
+        })
+      ).docId;
+      let { lines } = await goldenPack(w, id.golden);
+      const chafers = packLine(lines, "Chafing dish");
+      await w.run.logistics(M.PackListItem_adjustQuantity, {
+        docId: chafers._id,
+        version: chafers.version,
+        requiredQuantity: 12,
+      });
       const before = (await readReconciliationReceipts(w.owner, TENANT)).length;
       await w.run.events(M.Event_changeHeadcount, {
         docId: id.golden,
@@ -1053,9 +1075,43 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       expect(all.length - before).toBe(receipts.length);
       const domains = receipts.flatMap((r) => r.affectedDomains);
       expect(new Set(domains).size).toBe(domains.length);
-      expect(domains).toEqual(expect.arrayContaining(["demand", "menu"]));
+      expect(domains.sort()).toEqual([
+        "demand",
+        "menu",
+        "pack",
+        "packet",
+        "prep",
+        "proposal",
+        "staffing",
+      ]);
       for (const receipt of receipts)
         expect(receipt.checkpoint.state).toBe("complete");
+
+      // Following lines moved; the fixed dish and the hand-set count did not.
+      expect(
+        (await readRow<{ quantityServings: number }>(w.owner, id.bitesLine))
+          .quantityServings,
+      ).toBe(24);
+      ({ lines } = await goldenPack(w, id.golden));
+      expect(packLine(lines, "Chafing dish").requiredQuantity).toBe(12);
+      expect(packLine(lines, "Paper cones").requiredQuantity).toBe(110);
+      expect(packLine(lines, "Souffle cup").requiredQuantity).toBe(
+        FACTS.newHeadcount,
+      );
+      // The printed packet is now out of date; the planning answer moved.
+      const p = (await w.owner.query(
+        anyApi.lib.eventPacket.commands.getPacket,
+        { eventId: id.golden },
+      )) as PacketRead;
+      expect(p.latestRevision.stale).toBe(true);
+      const lock = (await w.owner.query(
+        api.lib.eventPacket.finalLock.getFinalLock,
+        { eventId: id.golden } as never,
+      )) as { answers: { questionKey: string; value: unknown }[] };
+      expect(
+        lock.answers.find((a) => a.questionKey === "identity.guest_count")
+          ?.value,
+      ).toEqual({ type: "count", count: FACTS.newHeadcount });
 
       const bread = await readRow<{ quantityServings: number }>(
         w.owner,
@@ -1120,7 +1176,13 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
           .map((d) => d._id)
           .sort(),
       ).toEqual(
-        [id.breadLine, id.herbLine, id.friesLine, id.caesarLine].sort(),
+        [
+          id.breadLine,
+          id.herbLine,
+          id.friesLine,
+          id.caesarLine,
+          id.bitesLine,
+        ].sort(),
       );
 
       // Demand: one live line per ingredient; salt retired, herb added once.
