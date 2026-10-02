@@ -170,11 +170,12 @@ export function MessagesPage() {
   const onWalkieSend = useCallback(
     async (take: { blob: Blob; durationMs: number }) => {
       if (!channel) return;
+      const sentFrom = channel;
       const sentBy = identity.sender;
       if (!sentBy) return;
       const seconds = Math.max(1, Math.round(take.durationMs / 1000));
       await sendMessage(
-        channel,
+        sentFrom,
         {
           body: "",
           files: [
@@ -190,7 +191,11 @@ export function MessagesPage() {
         },
         sentBy,
       );
-      setPinSignal((n) => n + 1);
+      // Same pin guard as onSubmit: the send finishes on the channel it
+      // left from, not wherever the user is looking now.
+      if (channelRef.current === chatChannelKey(sentFrom)) {
+        setPinSignal((n) => n + 1);
+      }
     },
     [channel, identity.sender, sendMessage],
   );

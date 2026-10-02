@@ -253,6 +253,16 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: "node",
+    // Node >=25 ships an experimental webstorage whose `localStorage` is
+    // undefined unless --localstorage-file is set; that broken global
+    // shadows jsdom's inside worker threads and killed every DOM test with
+    // "Cannot read properties of undefined (reading 'clear')". Turning it
+    // off here (not via NODE_OPTIONS in the test script — Builder owns that
+    // script) lets jsdom provide the real implementation.
+    poolOptions: {
+      forks: { execArgv: ["--no-experimental-webstorage"] },
+      threads: { execArgv: ["--no-experimental-webstorage"] },
+    },
     // Runtime proofs nominally take 3-5s; on this shared multi-session box
     // they blow past vitest's 5s default and the gate flakes (#398).
     testTimeout: 30_000,
@@ -263,14 +273,6 @@ export default defineConfig(({ mode }) => ({
     maxWorkers:
       Number(process.env.CAPSULE_TEST_WORKERS) ||
       Math.min(8, availableParallelism()),
-    // Node 25+ has its own localStorage that is undefined without
-    // --localstorage-file; it shadowed jsdom's and broke every jsdom test
-    // (2026-10-01). Turn it off in the test workers. Set here, not in the
-    // package.json test script, which the generator owns.
-    poolOptions: {
-      forks: { execArgv: ["--no-experimental-webstorage"] },
-      threads: { execArgv: ["--no-experimental-webstorage"] },
-    },
     include: ["tests/**/*.test.ts"],
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },
