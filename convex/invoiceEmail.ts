@@ -184,10 +184,8 @@ export const send = action({
         primaryColor: context.organization.primaryColor,
         accentColor: context.organization.accentColor,
       });
-      const from = fromAddress(
-        context.organization.displayName,
-        configuredFrom,
-      );
+      const from = fromAddress(context.organization.senderName, configuredFrom);
+      const replyTo = context.organization.replyTo;
       const attachmentName = invoiceReminderPdfFileName(invoiceNumber);
       let response: Response;
       try {
@@ -201,6 +199,7 @@ export const send = action({
           body: JSON.stringify({
             from,
             to: [recipient.email],
+            ...(replyTo ? { reply_to: replyTo } : {}),
             subject: email.subject,
             html: email.html,
             text: email.text,
@@ -244,6 +243,7 @@ export const send = action({
         recipientSource: recipient.source,
         recipientContactId: recipient.contactId,
         sender: from,
+        replyTo,
         subject: email.subject,
         template: INVOICE_EMAIL_TEMPLATE.id,
         templateVersion: INVOICE_EMAIL_TEMPLATE.version,

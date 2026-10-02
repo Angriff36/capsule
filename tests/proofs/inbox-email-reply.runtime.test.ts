@@ -109,7 +109,7 @@ describe("reply to an email conversation", () => {
       to: "a•••@garden.example",
     });
     expect(calls[0].body).toMatchObject({
-      from: "events@proof.example",
+      from: "Catering company <events@proof.example>",
       to: ["ana@garden.example"],
       subject: "Re: Saturday tasting",
       text: "Yes, Sunday at 2 works.",
@@ -129,6 +129,56 @@ describe("reply to an email conversation", () => {
     expect(new Set(calls.map((call) => call.key)).size).toBe(1);
     rows = await outbound(env);
     expect(rows).toHaveLength(1);
+  });
+
+  it("uses the company's own sender name and reply address", async () => {
+    const env = await setup("email");
+    const { calls } = stubEmail();
+    await env.staff.mutation(api.mutations.Organization_createViaRegister, {
+      name: "Garden Table Catering",
+    });
+    const organizationId = await env.t.run(
+      async (ctx) =>
+        (await ctx.db
+          .query("organizations")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", TENANT))
+          .first())!._id,
+    );
+    await expect(
+      env.staff.mutation(api.mutations.Organization_configureEmailSender, {
+        docId: organizationId,
+        replyTo: "not an address",
+      }),
+    ).rejects.toThrow(/full email address/u);
+    await env.staff.mutation(api.mutations.Organization_configureEmailSender, {
+      docId: organizationId,
+      senderName: "Garden Table Events",
+      replyTo: "events@gardentable.example",
+    });
+
+    await env.staff.action(api.messageReply.sendEmailReply, {
+      threadId: env.threadId,
+      bodyText: "See you Sunday.",
+      requestId: "req-sender",
+    });
+    expect(calls[0].body).toMatchObject({
+      from: "Garden Table Events <events@proof.example>",
+      reply_to: "events@gardentable.example",
+    });
+
+    // Cleared settings go back to the display name and no reply address.
+    await env.staff.mutation(api.mutations.Organization_configureEmailSender, {
+      docId: organizationId,
+    });
+    await env.staff.action(api.messageReply.sendEmailReply, {
+      threadId: env.threadId,
+      bodyText: "One more thing.",
+      requestId: "req-sender-2",
+    });
+    expect(calls[1].body.from).toBe(
+      "Garden Table Catering <events@proof.example>",
+    );
+    expect(calls[1].body).not.toHaveProperty("reply_to");
   });
 
   it("a text conversation is refused with a plain remedy and nothing is sent", async () => {

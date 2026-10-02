@@ -208,6 +208,12 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // The fields each equipment category asks for: {"Ovens": ["Fuel", "Burners"]}.
   property equipmentFieldsJson: string?
 
+  // Client email sender (PL-OUTBOUND): the name clients see on Capsule's
+  // emails and the address their replies go to. Unset = the display name and
+  // Capsule's sending address.
+  property emailSenderName: string?
+  property emailReplyTo: string?
+
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
   // tenants without a configured default continue to report in USD.
@@ -387,6 +393,18 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Who client emails come from. Empty values go back to the defaults.
+  command configureEmailSender(optional senderName: string, optional replyTo: string) {
+    guard self.deletedAt == null
+    constraint configureEmailSenderReplyTo: replyTo == null or length(trim(replyTo)) == 0 or indexOf(replyTo, "@") > 0 "Enter a full email address for replies, like events@yourcompany.com."
+    mutate emailSenderName = senderName
+    mutate emailReplyTo = replyTo
+    emit OrganizationEmailSenderConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -493,6 +511,11 @@ event OrganizationPlanningChecksConfigured: "organization.planning_checks_config
 }
 
 event OrganizationStageMovesConfigured: "organization.stage_moves_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationEmailSenderConfigured: "organization.email_sender_configured" {
   organizationId: string
   tenantId: string
 }

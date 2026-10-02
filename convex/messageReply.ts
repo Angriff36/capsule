@@ -19,7 +19,12 @@ import {
   ReminderDeliveryError,
   reminderRemedy,
 } from "./lib/reminderDelivery";
-import { decryptField, safeProviderMessage } from "./invoiceReminders";
+import {
+  companySender,
+  decryptField,
+  fromAddress,
+  safeProviderMessage,
+} from "./invoiceReminders";
 
 const EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/iu;
 
@@ -37,6 +42,8 @@ interface ReplyContext {
   subject: string | null;
   recipient: string | null;
   inReplyTo: string | null;
+  senderName: string;
+  replyTo: string | null;
 }
 
 export const loadReplyContext = internalQuery({
@@ -77,7 +84,21 @@ export const loadReplyContext = internalQuery({
         );
       }
     }
+    const organizations = await ctx.db
+      .query("organizations")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .collect();
+    const organization =
+      organizations.find(
+        (row) => row.deletedAt == null && row.status === "active",
+      ) ?? organizations.find((row) => row.deletedAt == null);
     return {
+      ...companySender(
+        organization,
+        organization?.brandDisplayName?.trim() ||
+          organization?.name.trim() ||
+          "Catering company",
+      ),
       tenantId: thread.tenantId,
       provider: String(thread.provider),
       subject: thread.subject?.trim() || null,
@@ -159,8 +180,9 @@ export const sendEmailReply = action({
             "Idempotency-Key": `inbox-reply/${args.threadId}/${requestId}`,
           },
           body: JSON.stringify({
-            from: configuredFrom,
+            from: fromAddress(context.senderName, configuredFrom),
             to: [to],
+            ...(context.replyTo ? { reply_to: context.replyTo } : {}),
             subject,
             text: body,
             ...(context.inReplyTo

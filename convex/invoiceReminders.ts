@@ -97,6 +97,10 @@ interface DeliveryContext {
     address: string | null;
     primaryColor: string | null;
     accentColor: string | null;
+    /** Name clients see on the email; the company's own setting or its display name. */
+    senderName: string;
+    /** Where client replies go; null = Capsule's sending address. */
+    replyTo: string | null;
   };
   eventTitle: string | null;
   ledger: LedgerEvent[];
@@ -356,6 +360,11 @@ export async function clientRecipientAndCompany(
       (row) => row.deletedAt == null && row.status === "active",
     ) ?? organizations.find((row) => row.deletedAt == null);
 
+  const displayName =
+    organization?.brandDisplayName?.trim() ||
+    organization?.name.trim() ||
+    "Catering company";
+
   return {
     recipient: recipientEmail
       ? {
@@ -371,13 +380,11 @@ export async function clientRecipientAndCompany(
         }
       : null,
     organization: {
-      displayName:
-        organization?.brandDisplayName?.trim() ||
-        organization?.name.trim() ||
-        "Catering company",
+      displayName,
       address: organization?.brandAddress?.trim() || null,
       primaryColor: organization?.brandPrimaryColor ?? null,
       accentColor: organization?.brandAccentColor ?? null,
+      ...companySender(organization, displayName),
     },
   };
 }
@@ -711,6 +718,21 @@ export function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+/** The company's own email sender setting, with the display name as fallback. */
+export function companySender(
+  organization:
+    | { emailSenderName?: string | null; emailReplyTo?: string | null }
+    | null
+    | undefined,
+  displayName: string,
+): { senderName: string; replyTo: string | null } {
+  const replyTo = organization?.emailReplyTo?.replace(/[\r\n]/gu, "").trim();
+  return {
+    senderName: organization?.emailSenderName?.trim() || displayName,
+    replyTo: replyTo && replyTo.includes("@") ? replyTo : null,
+  };
+}
+
 export function fromAddress(
   companyName: string,
   configuredFrom: string,
@@ -763,7 +785,7 @@ async function sendReminderEmail(
     accentColor: context.organization.accentColor,
   });
   const from = fromAddress(
-    context.organization.displayName,
+    context.organization.senderName,
     environment.fromEmail,
   );
   const attachmentName = invoiceReminderPdfFileName(invoiceNumber);
@@ -779,6 +801,9 @@ async function sendReminderEmail(
       body: JSON.stringify({
         from,
         to: [context.recipient.email],
+        ...(context.organization.replyTo
+          ? { reply_to: context.organization.replyTo }
+          : {}),
         subject: email.subject,
         html: email.html,
         text: email.text,
@@ -963,6 +988,7 @@ async function deliverReminder(
     recipientSource: context.recipient.source,
     recipientContactId: context.recipient.contactId,
     sender: sent.from,
+    replyTo: context.organization.replyTo,
     subject: sent.subject,
     template: INVOICE_REMINDER_TEMPLATE.id,
     templateVersion: INVOICE_REMINDER_TEMPLATE.version,

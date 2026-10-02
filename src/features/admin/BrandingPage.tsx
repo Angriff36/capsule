@@ -15,6 +15,7 @@ import {
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { EmailSenderSection } from "./EmailSenderSection";
 import { useBrandLogoManager } from "./brandLogoUpload";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
@@ -460,6 +461,12 @@ export function BrandingPage() {
             </div>
           </form>
         </Section>
+
+        <EmailSenderSection
+          record={record}
+          displayName={branding.displayName}
+          canEdit={canEdit}
+        />
 
         <section aria-label="Document preview" className="min-w-0">
           <p className="eyebrow">Live preview</p>
