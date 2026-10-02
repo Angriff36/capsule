@@ -2,12 +2,20 @@
 // The seven dashboards count only the company's own live rows: seeded rows
 // give the figures on screen, empty lists give an explicit empty state, and
 // no page carries an iframe or a typed-in dollar figure.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { act, createElement, type ComponentType } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 type Rows = Record<string, unknown>[];
 
@@ -54,6 +62,13 @@ const startOfToday = new Date(new Date(now).setHours(0, 0, 0, 0)).getTime();
 // Today, this week, this month, and not in the future.
 const at = Math.max(startOfToday, now - 60_000);
 
+const EVENT_TITLES: Record<string, string> = {
+  e1: "Ashley's wedding",
+  e2: "Acme holiday lunch",
+  e3: "Baker retirement party",
+  e4: "Cole graduation",
+};
+
 function event(
   _id: string,
   stage: string,
@@ -62,7 +77,7 @@ function event(
 ) {
   return {
     _id,
-    title: `Event ${_id}`,
+    title: EVENT_TITLES[_id] ?? "Sample event",
     stage,
     quotedPrice,
     expectedHeadcount,
@@ -95,6 +110,7 @@ function seedTenantRows() {
   seed.closeouts = [
     {
       _id: "co1",
+      eventId: "e2",
       grossProfit: 700,
       actualIngredientCost: 300,
       budgetedCost: 250,
@@ -199,6 +215,17 @@ const PAGES: PageCase[] = [
 describe("dashboards read live tenant rows", () => {
   let container: HTMLDivElement;
   let root: Root;
+  // The seeded render of every page, kept for the AC-370 rendered review.
+  const rendered: string[] = [];
+
+  afterAll(() => {
+    if (existsSync(".artifacts/llm-review")) {
+      writeFileSync(
+        ".artifacts/llm-review/AC-370-rendered.html",
+        rendered.join("\n"),
+      );
+    }
+  });
 
   beforeEach(() => {
     (
@@ -249,6 +276,9 @@ describe("dashboards read live tenant rows", () => {
       render(page.Page);
       expect(cardValue(page.card)).toContain(page.expected);
       expect(empty()).toBeNull();
+      rendered.push(
+        `<section data-page="${page.name}">${container.innerHTML}</section>`,
+      );
       act(() => root.unmount());
 
       // (b) every list loaded and empty: the explicit empty state.

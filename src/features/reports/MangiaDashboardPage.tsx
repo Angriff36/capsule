@@ -16,6 +16,7 @@ import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatCount } from "@/lib/format";
 import {
   COMPLETED_STAGES,
+  isBookedEvent,
   percentOf,
   percentText,
 } from "./dashboardRecordSets";
@@ -156,11 +157,14 @@ export function MangiaDashboardPage() {
       return eventDate >= weekStart && eventDate < weekEnd;
     });
 
-    const weekRevenue = weekEvents.reduce(
+    // Revenue counts booked events only (dashboard.booked_revenue): a quote
+    // on the calendar is not money yet.
+    const weekBooked = weekEvents.filter(isBookedEvent);
+    const weekRevenue = weekBooked.reduce(
       (sum, e) => sum + (e.quotedPrice || 0),
       0,
     );
-    const weekGuests = weekEvents.reduce(
+    const weekGuests = weekBooked.reduce(
       (sum, e) => sum + (e.expectedHeadcount || 0),
       0,
     );
@@ -178,11 +182,12 @@ export function MangiaDashboardPage() {
       weekEnd,
       nextEvent,
       totalEvents: weekEvents.length,
+      bookedEvents: weekBooked.length,
       completedEvents: weekCompleted,
       totalRevenue: weekRevenue,
       totalGuests: weekGuests,
       avgEventValue:
-        weekEvents.length > 0 ? weekRevenue / weekEvents.length : 0,
+        weekBooked.length > 0 ? weekRevenue / weekBooked.length : 0,
     };
   }, [events, today]);
 
@@ -243,7 +248,7 @@ export function MangiaDashboardPage() {
       date.setHours(0, 0, 0, 0);
 
       const dayEvents = (events || []).filter((e) => {
-        if (!e.startsAt) return false;
+        if (!e.startsAt || e.stage === "cancelled") return false;
         const eventDate = new Date(e.startsAt);
         eventDate.setHours(0, 0, 0, 0);
         return eventDate.getTime() === date.getTime();
@@ -434,8 +439,8 @@ export function MangiaDashboardPage() {
           }}
           rows={[
             {
-              label: "Events",
-              value: weekToDateMetrics.totalEvents,
+              label: "Booked events",
+              value: weekToDateMetrics.bookedEvents,
               format: "number" as const,
             },
             {
