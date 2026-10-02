@@ -110,6 +110,8 @@ import {
   CutoverDecisionRecordApprovalsParamsSchema,
   CutoverDecisionRollbackParamsSchema,
   CutoverDecisionSetTppReadOnlyParamsSchema,
+  DeckShareLinkCreateParamsSchema,
+  DeckShareLinkRevokeParamsSchema,
   DeliveryCancelParamsSchema,
   DeliveryConfirmDeliveryParamsSchema,
   DeliveryMarkFailedParamsSchema,
@@ -2517,6 +2519,36 @@ export function useCutoverDecisionSetTppReadOnly() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = CutoverDecisionSetTppReadOnlyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Reactive list for DeckShareLink. */
+export function useListDeckShareLink() {
+  return useQuery(api.queries.listDeckShareLink);
+}
+
+/** Reactive get-by-id for DeckShareLink. Pass "skip" to suspend. */
+export function useGetDeckShareLink(id: string | "skip") {
+  return useQuery(api.queries.getDeckShareLink, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DeckShareLink.create. */
+export function useDeckShareLinkCreate() {
+  const mutate = useMutation(api.mutations.DeckShareLink_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeckShareLinkCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DeckShareLink.revoke. */
+export function useDeckShareLinkRevoke() {
+  const mutate = useMutation(api.mutations.DeckShareLink_revoke);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeckShareLinkRevokeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13803,4 +13835,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1461 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1465 as const;

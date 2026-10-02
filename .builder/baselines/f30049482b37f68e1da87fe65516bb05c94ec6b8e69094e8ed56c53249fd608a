@@ -143,6 +143,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.CutoverDecision_create, { "reason": "demo-reason-1", "rollbackPlan": "demo-rollbackPlan-1", "businessApproved": false } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.CutoverDecision_create, { "reason": "demo-reason-2", "rollbackPlan": "demo-rollbackPlan-2", "businessApproved": false } as any);
+  // DeckShareLink → api.mutations.DeckShareLink_create
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DeckShareLink_create, { "attachmentId": "attachmentId-deck-share-link-1", "audience": "demo-audience-1", "expiresAt": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DeckShareLink_create, { "attachmentId": "attachmentId-deck-share-link-2", "audience": "demo-audience-2", "expiresAt": 1767355200000 } as any);
   // Delivery → api.mutations.Delivery_createViaSchedule
   rowsAttempted += 1;
   await client.mutation(api.mutations.Delivery_createViaSchedule, { "packListId": "packListId-delivery-1", "eventId": "eventId-delivery-1", "driverId": "driverId-delivery-1", "destination": "demo-destination-1", "windowStartsAt": 1767268800000, "windowEndsAt": 1767268800000, "notes": "demo-notes-1" } as any);
@@ -1084,6 +1089,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "CutoverDecision",
       "createMutation": "CutoverDecision_create",
+      "rowCount": 2
+    },
+    {
+      "entity": "DeckShareLink",
+      "createMutation": "DeckShareLink_create",
       "rowCount": 2
     },
     {

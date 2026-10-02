@@ -1314,7 +1314,7 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see attached files; chat files show up with their message"; "Staff may update attachments"; "Staff may change attachments"; "Guard 0 failed"; "Chat files are attached through their message"; "This file needs something to attach to"; and 3 more
   - effects: AttachmentAdded
-  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get
+  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get, DeckShareLink.list, DeckShareLink.get
 - `mutations.ComponentComponent_adjustQuantity` (ComponentComponent.adjustQuantity)
   - inputs from the screen: quantity, unit; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -3608,7 +3608,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see attached files; chat files show up with their message"; "Staff may update attachments"; "Staff may change attachments"; "Guard 0 failed"; "Chat files are attached through their message"; "This file needs something to attach to"; and 3 more
   - effects: AttachmentAdded
-  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get
+  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get, DeckShareLink.list, DeckShareLink.get
 - `mutations.EquipmentIssue_createViaRaise` (EquipmentIssue.raise)
   - inputs from the screen: kind, description, equipmentId, eventId, equipmentReservationId, rentalOrderLineId, quantity, severity, holdsUnits, dueAt, ownerName, vendorId, cost, payer, chargeAmount, notes; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
