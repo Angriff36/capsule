@@ -27,6 +27,9 @@ try {
   if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes -lt 10) { exit 0 }
   Set-Content $stamp (Get-Date -Format s)
 
+  # The saved Vercel login expires after some hours; the Vercel command line
+  # refreshes it whenever it runs (2026-10-01: the job got 401 from 14:49 on).
+  & vercel whoami *> $null
   $auth = Join-Path $env:APPDATA 'com.vercel.cli\Data\auth.json'
   $token = (Get-Content $auth -Raw | ConvertFrom-Json).token
   if (-not $token) { Say 'no Vercel login on this computer (vercel login) - skipped'; exit 0 }
