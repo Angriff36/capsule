@@ -23,6 +23,10 @@ const harness = vi.hoisted(() => ({
   correct: vi.fn<(args: unknown) => Promise<void>>(),
 }));
 
+vi.mock("../../../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => [{ _id: "event-1", title: "Harbor gala" }],
+}));
+
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListProductionBatch: () => [
     {

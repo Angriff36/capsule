@@ -17,6 +17,10 @@ vi.mock("../src/lib/manifest-convex-react", () => {
   };
 });
 
+vi.mock("../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => seed.events ?? [],
+}));
+
 import { CompMasterDashboardPage } from "../src/features/reports/CompMasterDashboardPage";
 
 describe("Comp Master source evidence", () => {

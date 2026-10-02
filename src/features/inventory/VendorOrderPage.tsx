@@ -1,13 +1,13 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import { useEventsById } from "../facilities/useEventsById";
 import { formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateStorageLocation,
   useCreateVendorOrderLine,
   useGetVendorOrder,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListInventoryLot,
@@ -69,7 +69,14 @@ export function VendorOrderPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const needs = useListPurchaseNeed();
   const demands = useListIngredientDemand();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      needs === undefined || demands === undefined
+        ? undefined
+        : [...needs, ...demands].map((row) => row.eventId),
+    [needs, demands],
+  );
+  const events = useEventsById(eventIds);
   const ingredients = useListIngredient();
   const inventoryLots = useListInventoryLot();
   const unitMappings = useListItemUnitMapping();

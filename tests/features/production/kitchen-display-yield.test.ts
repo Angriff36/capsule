@@ -11,6 +11,10 @@ import { KitchenDisplayPage } from "../../../src/features/production/KitchenDisp
 
 const harness = vi.hoisted(() => ({ complete: vi.fn<() => Promise<void>>() }));
 
+vi.mock("../../../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => [],
+}));
+
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListProductionBatch: () => [
     {

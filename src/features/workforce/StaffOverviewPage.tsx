@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
 import {
-  useListEvent,
   useListEventAssignment,
   useListPerson,
   useListShift,
@@ -16,6 +16,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
+import { useEventsById } from "../facilities/useEventsById";
 import { StaffPayRatesSection } from "./StaffPayRatesSection";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -37,7 +38,12 @@ export function StaffOverviewPage() {
   const assignments = useListEventAssignment();
   const swapRequests = useListShiftSwapRequest();
   const timeOffRequests = useListTimeOffRequest();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      assignments === undefined ? undefined : assignments.map((a) => a.eventId),
+    [assignments],
+  );
+  const events = useEventsById(eventIds);
 
   const loading =
     people === undefined ||

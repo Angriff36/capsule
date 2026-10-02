@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  useListEvent,
   useListPerson,
   useListShift,
   useListTimeRecord,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById } from "../facilities/useEventsById";
 import {
   buildStaffUtilizationReport,
   DEFAULT_WEEKLY_SCHEDULE_TARGET_HOURS,
@@ -516,7 +516,11 @@ export function StaffUtilizationPage() {
   const people = useListPerson();
   const shifts = useListShift();
   const timeRecords = useListTimeRecord();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () => (shifts === undefined ? undefined : shifts.map((s) => s.eventId)),
+    [shifts],
+  );
+  const events = useEventsById(eventIds);
   const now = useMemo(() => new Date(), []);
 
   return (

@@ -21,7 +21,6 @@ import {
   useInvoiceWriteOff,
   useListClient,
   useListCreditMemo,
-  useListEvent,
   useListInvoice,
   useListOrganization,
   useListPayment,
@@ -49,6 +48,7 @@ import {
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { clientDisplayName } from "../events/clientName";
 import { useTenantBranding } from "../admin/tenantBranding";
+import { useEventsById } from "../facilities/useEventsById";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -81,7 +81,9 @@ export function InvoiceDetailPage() {
   );
   const clients = useListClient();
   const creditMemos = useListCreditMemo();
-  const events = useListEvent();
+  const events = useEventsById(
+    invoice === undefined ? undefined : [invoice?.eventId],
+  );
   const invoices = useListInvoice();
   const payments = useListPayment();
   const organizations = useListOrganization();

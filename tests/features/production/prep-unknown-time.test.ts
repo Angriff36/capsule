@@ -59,6 +59,18 @@ const tasks = [
   }),
 ];
 
+vi.mock("../../../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => [
+    {
+      _id: "event-1",
+      title: "Harbor gala",
+      startsAt: EVENT_START,
+      stage: "approved",
+      deletedAt: null,
+    },
+  ],
+}));
+
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListProductionBatch: () => [],
   useListComponent: () => [],

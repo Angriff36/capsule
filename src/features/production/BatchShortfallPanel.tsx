@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   useCreateProductionBatch,
   useListComponent,
-  useListEvent,
   useListProductionBatch,
   useProductionBatchCorrectYield,
   useProductionBatchResolveShortfall,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { useEventsById } from "../facilities/useEventsById";
 import { batchShortfallLabel } from "./batchCompletion";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 
@@ -21,7 +21,12 @@ const RECENT_MS = 24 * 60 * 60 * 1000;
 export function BatchShortfallPanel() {
   const batches = useListProductionBatch();
   const components = useListComponent();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      batches === undefined ? undefined : batches.map((batch) => batch.eventId),
+    [batches],
+  );
+  const events = useEventsById(eventIds);
   const planBatch = useCreateProductionBatch();
   const resolveShortfall = useProductionBatchResolveShortfall();
   const correctYield = useProductionBatchCorrectYield();

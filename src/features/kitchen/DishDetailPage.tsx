@@ -9,9 +9,9 @@ import {
   useDishReinstate,
   useGetDish,
   useListDish,
-  useListEvent,
   useListEventDish,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
@@ -44,8 +44,14 @@ export function DishDetailPage() {
   const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
   const allDishes = useListDish();
-  const events = useListEvent();
   const eventDishes = useListEventDish();
+  const events = useEventsById(
+    dish === undefined || eventDishes === undefined
+      ? undefined
+      : eventDishes
+          .filter((entry) => entry.dishId === dish?._id)
+          .map((entry) => entry.eventId),
+  );
   const purge = useDishPurge();
   const reinstate = useDishReinstate();
   const createDish = useCreateDish();
@@ -390,7 +396,7 @@ export function DishDetailPage() {
                 key={entry._id}
                 className="flex items-center justify-between border-b border-line py-3"
               >
-                <span>{event!.title ?? event!.name}</span>
+                <span>{event!.title}</span>
                 <span className="font-mono text-sm text-ink-3">
                   {entry.quantityServings} servings · {entry.course || "—"}
                 </span>
