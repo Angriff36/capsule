@@ -93,6 +93,10 @@ export function useWalkieReceiver(options: {
   // speak. Re-armed mid-session uses the same idea: the snapshot at the
   // moment of arming becomes history, the next arrival is live.
   const watermarkRef = useRef<string | null>(null);
+  // The channel the watermark belongs to. The dossier component is reused
+  // across event→event navigation (no remount), so a watermark from event A
+  // must never judge event B's history — a channel switch re-seeds.
+  const watermarkChannelRef = useRef<string | null>(null);
   const armedRef = useRef(armed);
   armedRef.current = armed;
   const meRef = useRef(myPersonId);
@@ -121,15 +125,25 @@ export function useWalkieReceiver(options: {
     const messages = thread?.messages;
     if (!messages || messages.length === 0) return;
     const sorted = [...messages].sort((a, b) => a.createdAt - b.createdAt);
-    // First sight of this channel: everything on screen is history. Seed
-    // the watermark (and the played set) so neither an armed reload nor a
-    // mid-session arm ever replays it.
-    if (watermarkRef.current === null) {
+    // Channel switch (or first sight): everything on screen is history.
+    // Seed the watermark (and the played set) so neither an armed reload,
+    // an event→event navigation, nor a mid-session arm ever replays it.
+    if (
+      watermarkRef.current === null ||
+      watermarkChannelRef.current !== channelKey
+    ) {
+      watermarkRef.current = sorted[sorted.length - 1]._id;
+      watermarkChannelRef.current = channelKey;
+      playedRef.current = new Set(sorted.map((message) => message._id));
+      return;
+    }
+    if (!armedRef.current) {
+      // Unarmed, still advance the watermark: history moves on whether or
+      // not this device is listening, so arming later never replays.
       watermarkRef.current = sorted[sorted.length - 1]._id;
       for (const message of sorted) playedRef.current.add(message._id);
       return;
     }
-    if (!armedRef.current) return;
     const watermarkIndex = sorted.findIndex(
       (message) => message._id === watermarkRef.current,
     );

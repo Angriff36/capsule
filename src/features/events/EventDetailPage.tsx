@@ -48,6 +48,7 @@ import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
 import { WalkieToggle } from "../chat/WalkieToggle";
 import { useWalkieReceiver } from "../chat/useWalkieReceiver";
+import { useChatIdentity } from "../chat/useTeamChat";
 import { chatChannelKey, type ChatChannel } from "../chat/chatTypes";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
@@ -130,6 +131,7 @@ function EventDetailContent({
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
+  const identity = useChatIdentity();
   // The walkie receiver lives at the dossier level, not inside the chat tab:
   // an armed device must speak takes no matter which tab is open (Timeline,
   // Staffing, anywhere). The header WalkieToggle shares its arm state.
@@ -141,7 +143,7 @@ function EventDetailContent({
   const { receiving } = useWalkieReceiver({
     channel: eventChannel,
     channelKey: eventChannelKey,
-    myPersonId: null,
+    myPersonId: identity.personId,
   });
   const clients = useHeldQueryRows("clients", useListClient());
   const organizations = useListOrganization();

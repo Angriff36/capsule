@@ -96,30 +96,27 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
     const sentBy = identity.sender;
     if (!sentBy) return;
     const seconds = Math.max(1, Math.round(take.durationMs / 1000));
-    try {
-      await sendMessage(
-        sentFrom,
-        {
-          body: "",
-          files: [
-            new File([take.blob], `Voice message (${seconds}s).webm`, {
-              type: take.blob.type || "audio/webm",
-            }),
-          ],
-          mentionedPersonIds: [],
-          draft: { text: "", files: [], links: [], mentions: [] },
-          idempotencyKey: `walkie-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 10)}`,
-        },
-        sentBy,
-      );
-      if (channelRef.current === chatChannelKey(sentFrom)) {
-        setPinSignal((n) => n + 1);
-      }
-    } catch {
-      // A failed take stays on the recorder's own error surface; the crew
-      // never sees a half-sent walkie.
+    // No catch: a failure must propagate so ChatWalkieBar's "Didn't send"
+    // surface fires (MessagesPage's send behaves the same way).
+    await sendMessage(
+      sentFrom,
+      {
+        body: "",
+        files: [
+          new File([take.blob], `Voice message (${seconds}s).webm`, {
+            type: take.blob.type || "audio/webm",
+          }),
+        ],
+        mentionedPersonIds: [],
+        draft: { text: "", files: [], links: [], mentions: [] },
+        idempotencyKey: `walkie-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 10)}`,
+      },
+      sentBy,
+    );
+    if (channelRef.current === chatChannelKey(sentFrom)) {
+      setPinSignal((n) => n + 1);
     }
   };
 
