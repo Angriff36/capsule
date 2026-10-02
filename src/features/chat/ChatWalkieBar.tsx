@@ -16,7 +16,7 @@ type Props = {
 export function ChatWalkieBar({ onSend, disabled = false }: Props) {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
-  const pointerRef = useRef<{ id: number; inside: boolean } | null>(null);
+  const pointerRef = useRef<{ id: number } | null>(null);
   // Latch for the async getUserMedia warm-up: blocks a second pointerdown
   // during the gap (multi-touch would otherwise start two recordings and
   // leak the first mic stream) and lets the release handler know a press
@@ -52,7 +52,7 @@ export function ChatWalkieBar({ onSend, disabled = false }: Props) {
     event.preventDefault();
     // Capture so release/cancel keeps firing even if the pointer leaves.
     event.currentTarget.setPointerCapture(event.pointerId);
-    pointerRef.current = { id: event.pointerId, inside: true };
+    pointerRef.current = { id: event.pointerId };
     startingRef.current = true;
     void recorder.begin().finally(() => {
       startingRef.current = false;
@@ -65,17 +65,9 @@ export function ChatWalkieBar({ onSend, disabled = false }: Props) {
     });
   };
 
-  const onPointerEnter = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (pointerRef.current?.id === event.pointerId) {
-      pointerRef.current.inside = true;
-    }
-  };
-
-  const onPointerLeave = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (pointerRef.current?.id === event.pointerId) {
-      pointerRef.current.inside = false;
-    }
-  };
+  // Dead code removed: onPointerEnter/Leave inside-tracking served the old
+  // release logic; `finish` now hit-tests release coordinates, and boundary
+  // events don't fire under pointer capture anyway.
 
   const finish = (event: React.PointerEvent<HTMLButtonElement>) => {
     const held = pointerRef.current;
@@ -126,13 +118,17 @@ export function ChatWalkieBar({ onSend, disabled = false }: Props) {
             : "Hold to talk"
         }
         onPointerDown={onPointerDown}
-        onPointerEnter={onPointerEnter}
-        onPointerLeave={onPointerLeave}
         onPointerUp={finish}
         onPointerCancel={(event) => {
           pointerRef.current = null;
           recorder.cancel();
-          event.currentTarget.releasePointerCapture(event.pointerId);
+          // The browser may have implicitly released capture before this
+          // ran — a then-invalid releasePointerCapture would throw.
+          try {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          } catch {
+            // Already released: nothing to do.
+          }
         }}
         onContextMenu={(event) => event.preventDefault()}
       >

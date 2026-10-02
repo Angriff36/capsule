@@ -144,9 +144,12 @@ export function useVoiceRecorder(
       return;
     }
     // The hold ended while the mic warmed up: hand the stream straight
-    // back instead of starting an unattended recording.
+    // back instead of starting an unattended recording. Clear the flag
+    // here too — it described THAT press, and leaving it set would poison
+    // the next one (begin() would abort right after getUserMedia).
     if (cancelledRef.current) {
       for (const track of stream.getTracks()) track.stop();
+      cancelledRef.current = false;
       startingRef.current = false;
       return;
     }
@@ -171,8 +174,13 @@ export function useVoiceRecorder(
       const type = recorder.mimeType || mimeType || "audio/webm";
       const blob = new Blob(chunksRef.current, { type });
       chunksRef.current = [];
+      const wasCancelled = cancelledRef.current;
+      // Clear the cancel flag HERE: it describes this take only. Leaving it
+      // set would make the NEXT begin() abort right after getUserMedia —
+      // the user's following press would silently record nothing.
+      cancelledRef.current = false;
       teardown();
-      if (!cancelledRef.current && blob.size > 0) {
+      if (!wasCancelled && blob.size > 0) {
         onTakeRef.current({ blob, durationMs });
       }
     };
@@ -183,7 +191,7 @@ export function useVoiceRecorder(
     timerRef.current = window.setInterval(() => {
       const elapsed = Date.now() - startedAtRef.current;
       // Hard cap: a pocket hold must not record (and upload) unbounded. At
-      // the cap the take is cancelled through the same path as a release.
+      // the cap the take ends and DELIVERS, same as a release.
       if (elapsed >= WALKIE_MAX_MS && stopRef.current) {
         stopRef.current(false);
         return;
