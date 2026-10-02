@@ -22,6 +22,8 @@ import type { Doc } from "../../lib/api";
 import { useActionNotice } from "../../ui/action-result";
 import { deliveryStatusLabel, replyDisposition } from "./deliveryHonesty";
 import { messageTime } from "./messageOrder";
+import { MessageMedia } from "./MessageMedia";
+import { ThreadLinksBar } from "./ThreadLinksBar";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -101,15 +103,18 @@ export function MessageInboxPage() {
   );
   const selected = visibleThreads.find((t) => t._id === selectedId) ?? null;
 
-  const threadMessages = useMemo(
-    () =>
-      selected
-        ? (messages ?? [])
-            .filter((m) => m.threadId === selected._id && m.deletedAt == null)
-            .sort((a, b) => messageTime(a) - messageTime(b))
-        : [],
-    [messages, selected],
-  );
+  // A thread shows its own messages plus those of threads merged into it
+  // (AC-248: merging never moves or deletes source history).
+  const threadMessages = useMemo(() => {
+    if (!selected) return [];
+    const shown = new Set<string>([selected._id]);
+    for (const t of visibleThreads) {
+      if (t.mergedIntoThreadId === selected._id) shown.add(t._id);
+    }
+    return (messages ?? [])
+      .filter((m) => shown.has(m.threadId) && m.deletedAt == null)
+      .sort((a, b) => messageTime(a) - messageTime(b));
+  }, [messages, selected, visibleThreads]);
 
   const leadName = (leadId: string | null | undefined) => {
     if (!leadId) return null;
@@ -447,7 +452,13 @@ export function MessageInboxPage() {
                     <p className="text-xs text-ink-3">
                       {contactName(t.contactId) ?? t.senderIdentity ?? "—"}
                       {leadName(t.leadId) ? ` · ${leadName(t.leadId)}` : ""}
-                      {t.status === "archived" ? " · archived" : ""}
+                      {t.mergedIntoThreadId
+                        ? " · merged"
+                        : t.status === "archived"
+                          ? " · archived"
+                          : t.status === "non_lead"
+                            ? " · not a lead"
+                            : ""}
                     </p>
                     {lastAt > 0 ? (
                       <p className="text-2xs text-ink-3">
@@ -546,6 +557,14 @@ export function MessageInboxPage() {
                   </button>
                 </div>
 
+                <ThreadLinksBar
+                  thread={selected}
+                  threads={visibleThreads}
+                  threadTitle={threadTitle}
+                  onFailure={fail}
+                  onNotice={setNotice}
+                />
+
                 {showLog ? (
                   <form
                     className="grid gap-2 border-b border-line-2 bg-inset px-4 py-3 md:grid-cols-[1fr_auto]"
@@ -604,10 +623,21 @@ export function MessageInboxPage() {
                           <p className="mt-1 text-2xs text-ink-3">
                             {messageTime(m) ? formatTime(messageTime(m)) : ""}
                             {m.senderIdentity ? ` · ${m.senderIdentity}` : ""}
-                            {mine && deliveryStatusLabel(String(m.status))
-                              ? ` · ${deliveryStatusLabel(String(m.status))}`
+                            {mine &&
+                            deliveryStatusLabel(
+                              String(m.status),
+                              selected.provider,
+                            )
+                              ? ` · ${deliveryStatusLabel(String(m.status), selected.provider)}`
                               : ""}
                           </p>
+                          <MessageMedia
+                            mediaJson={m.mediaJson}
+                            providerLabel={
+                              PROVIDER_LABEL[selected.provider] ??
+                              selected.provider
+                            }
+                          />
                         </div>
                       );
                     })
