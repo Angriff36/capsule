@@ -164,9 +164,38 @@ export async function findGeneratedDraft(
     (row) =>
       row.tenantId === event.tenantId &&
       live(row) &&
-      row.status === "draft" &&
-      row.generationJson != null,
+      row.status === "draft",
   );
   drafts.sort((a, b) => b._creationTime - a._creationTime);
-  return drafts[0] ?? null;
+  const generated = drafts.find((row) => row.generationJson != null);
+  if (generated) return generated;
+  // The inquiry conversion links an empty draft to the event; building the
+  // proposal fills that draft instead of starting a second one. A draft
+  // someone already priced by hand is never taken over.
+  for (const draft of drafts) {
+    if (!(await hasHandEnteredContent(ctx, draft._id))) return draft;
+  }
+  return null;
+}
+
+async function hasHandEnteredContent(
+  ctx: Pick<QueryCtx, "db">,
+  proposalId: Id<"proposals">,
+): Promise<boolean> {
+  const kept = (row: {
+    deletedAt?: number | null;
+    removedAt?: number | null;
+  }) => row.deletedAt == null && row.removedAt == null;
+  for (const table of [
+    "proposalLineItems",
+    "proposalDishSelections",
+    "proposalEnhancements",
+  ] as const) {
+    const rows = await ctx.db
+      .query(table)
+      .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
+      .collect();
+    if (rows.some(kept)) return true;
+  }
+  return false;
 }
