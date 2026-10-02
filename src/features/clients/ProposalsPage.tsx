@@ -25,6 +25,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
+import { ProposalEmailHistory } from "./ProposalEmailHistory";
 import { clientDisplayName } from "../events/clientName";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
@@ -183,6 +184,8 @@ export function ProposalsPage() {
   const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(
     null,
   );
+  const [emailsOpenFor, setEmailsOpenFor] = useState<string | null>(null);
+  const [emailsKey, setEmailsKey] = useState(0);
 
   // Row deep link: /clients/proposals?proposal=<id> opens that proposal's
   // detail panels (menu, pricing, enhancements) and scrolls the row into view,
@@ -600,6 +603,10 @@ export function ProposalsPage() {
         revisionId: revision._id,
         pdfBase64: pdf.base64,
         fileName: pdf.fileName,
+      }).finally(() => {
+        // Sent or not, the row's email list opens with the newest try.
+        setEmailsOpenFor(row._id);
+        setEmailsKey((key) => key + 1);
       });
       if (result.status === "already_sent") {
         setNotice(
@@ -843,6 +850,23 @@ export function ProposalsPage() {
                               : "Email the proposal"}
                           </button>
                         )}
+                        {["sent", "viewed", "accepted"].includes(
+                          String(row.status),
+                        ) && (
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            onClick={() =>
+                              setEmailsOpenFor((current) =>
+                                current === row._id ? null : row._id,
+                              )
+                            }
+                          >
+                            {emailsOpenFor === row._id
+                              ? "Hide emails"
+                              : "Emails"}
+                          </button>
+                        )}
                         {(String(row.status) === "sent" ||
                           String(row.status) === "viewed") && (
                           <button
@@ -1001,6 +1025,16 @@ export function ProposalsPage() {
                             discountAmount={Number(row.discountAmount ?? 0)}
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                    {emailsOpenFor === row._id ? (
+                      <tr>
+                        <td colSpan={5}>
+                          <ProposalEmailHistory
+                            proposalId={row._id}
+                            refreshKey={emailsKey}
                           />
                         </td>
                       </tr>

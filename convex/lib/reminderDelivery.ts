@@ -261,3 +261,47 @@ export function reminderHistory(
   }
   return items.sort((left, right) => right.at - left.at);
 }
+
+/** Every email of one document (a proposal), newest first: the same words
+ * and fixes as the invoice list, named for the document. */
+export function documentEmailHistory(
+  ledger: LedgerRow[],
+  types: { sent: string; failed: string },
+  label: string,
+): ReminderHistoryItem[] {
+  const items: ReminderHistoryItem[] = [];
+  for (const row of ledger) {
+    const payload = row.payload;
+    const to = text(payload.recipientMasked);
+    const attempt =
+      typeof payload.attempt === "number" ? payload.attempt + 1 : null;
+    if (row.type === types.sent) {
+      items.push({
+        at: row.createdAt,
+        outcome: "accepted",
+        source: "manual",
+        attempt,
+        to,
+        words: to
+          ? `${label} emailed. Taken by the email service for ${to}.`
+          : `${label} emailed. Taken by the email service.`,
+        remedy: null,
+        willRetry: false,
+      });
+    } else if (row.type === types.failed) {
+      const kind = (text(payload.failureKind) ??
+        "unknown") as ReminderFailureKind;
+      items.push({
+        at: row.createdAt,
+        outcome: "failed",
+        source: "manual",
+        attempt,
+        to,
+        words: `${label} email not sent.`,
+        remedy: REMEDY[kind] ?? REMEDY.unknown,
+        willRetry: false,
+      });
+    }
+  }
+  return items.sort((left, right) => right.at - left.at);
+}
