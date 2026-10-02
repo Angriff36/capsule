@@ -6,16 +6,12 @@ import {
   type FocusEvent,
   type MouseEvent,
 } from "react";
+import { useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
-import type { Id } from "../../lib/api";
+import { api, type Id } from "../../lib/api";
 import { formatTime } from "../../lib/format";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
-  useListClient,
-  useListDelivery,
-  useListEvent,
-  useListEventNumberAssignment,
-  useListInvoice,
   useListPerson,
   useListServiceStyle,
   useListVehicle,
@@ -34,6 +30,7 @@ import { useEventReportList } from "./EventReportRail";
 import { openEventReports, useWorkingEventId } from "../events/workingEvent";
 import type { TppReportDefinition } from "../reports/tpp/types";
 import {
+  addDays,
   buildCalendarFacts,
   buildMonthGrid,
   LOCK_LABEL,
@@ -323,15 +320,10 @@ function tooltipPosition(target: HTMLElement): {
 export function HomeCalendarPage() {
   const navigate = useNavigate();
   const authStatus = useAuthStatus();
-  const events = useListEvent();
-  const clients = useListClient();
   const venues = useListVenue();
-  const deliveries = useListDelivery();
   const vehicles = useListVehicle();
   const serviceStyles = useListServiceStyle();
   const people = useListPerson();
-  const invoices = useListInvoice();
-  const numberAssignments = useListEventNumberAssignment();
   const assignVehicle = useAssignVehicle();
   const unassignVehicle = useUnassignVehicle();
 
@@ -340,6 +332,24 @@ export function HomeCalendarPage() {
     const d = new Date(today);
     return { year: d.getFullYear(), month: d.getMonth() };
   });
+  // Only the six weeks on screen, with their invoices, deliveries, clients
+  // and event numbers (PL-SCALE: never the whole event table).
+  const firstOfMonth = new Date(cursor.year, cursor.month, 1);
+  const gridStart = addDays(firstOfMonth.getTime(), -firstOfMonth.getDay());
+  const freshMonth = useQuery(api.eventCalendarMonth.month, {
+    from: gridStart,
+    to: addDays(gridStart, 42),
+  });
+  // Keep the last month drawn while the next one loads, so paging months
+  // never blanks the calendar.
+  const lastMonth = useRef(freshMonth);
+  if (freshMonth !== undefined) lastMonth.current = freshMonth;
+  const monthRead = freshMonth ?? lastMonth.current;
+  const events = monthRead === null ? [] : monthRead?.events;
+  const clients = monthRead === null ? [] : monthRead?.clients;
+  const deliveries = monthRead === null ? [] : monthRead?.deliveries;
+  const invoices = monthRead === null ? [] : monthRead?.invoices;
+  const numberAssignments = monthRead?.numberAssignments;
   // The calendar's selection is the working event; the shell rail shows it.
   const selectedId = useWorkingEventId();
   const [expandedDay, setExpandedDay] = useState<number | null>(null);

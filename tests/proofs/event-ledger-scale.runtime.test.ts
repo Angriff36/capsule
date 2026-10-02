@@ -17,6 +17,7 @@ import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
 import { needsAction, type LedgerWindow } from "../../convex/eventLedger";
+import type { CalendarMonth } from "../../convex/eventCalendarMonth";
 
 const TENANT = "tenant-event-ledger-scale";
 const OTHER = "tenant-event-ledger-scale-other";
@@ -128,6 +129,24 @@ describe("runtime proof: the Events page reads a bounded window at 10,000 events
           deletedAt: s.deleted ? today - DAY : null,
           version: 1,
         });
+        if (i === 733) {
+          // Starts three days from today: on the calendar grid below.
+          await ctx.db.insert("invoices", {
+            tenantId: TENANT,
+            clientId: clientIds[i % CLIENTS]!,
+            eventId,
+            invoiceNumber: "60733",
+            subtotal: 1000,
+            taxAmount: 0,
+            discountAmount: 0,
+            total: 1000,
+            amountPaid: 0,
+            amountDue: 1000,
+            paymentTermsDays: 30,
+            status: "sent",
+            version: 1,
+          });
+        }
         await ctx.db.insert("eventDishes", {
           tenantId: TENANT,
           eventId,
@@ -258,6 +277,46 @@ describe("runtime proof: the Events page reads a bounded window at 10,000 events
     expect(crewView!.rows.length).toBeGreaterThan(0);
     expect(crewView!.rows.every((r) => r.clientLabel === "—")).toBe(true);
     expect(crewView!.searchRows).toEqual([]);
+
+    // The calendar home reads the six weeks on screen only.
+    const from = today - 3 * DAY;
+    const to = from + 42 * DAY;
+    const month = (actor: typeof owner) =>
+      actor.query(api.eventCalendarMonth.month, {
+        from,
+        to,
+      }) as Promise<CalendarMonth | null>;
+    const ownerMonth = await month(owner);
+    const inGrid = seeds.filter(
+      (s) =>
+        !s.deleted &&
+        s.startsAt != null &&
+        s.startsAt >= from &&
+        s.startsAt < to,
+    ).length;
+    const undatedLive = seeds.filter(
+      (s) => !s.deleted && s.startsAt == null,
+    ).length;
+    expect(ownerMonth!.capped).toBe(false);
+    expect(ownerMonth!.events).toHaveLength(inGrid + undatedLive);
+    expect(ownerMonth!.events.length).toBeLessThan(EVENTS / 10);
+    expect(ownerMonth!.events.every((e) => e.importDraftJson == null)).toBe(
+      true,
+    );
+    expect(ownerMonth!.invoices.map((i) => i.invoiceNumber)).toEqual(["60733"]);
+    // Only the number travels: no amounts reach the calendar.
+    for (const key of Object.keys(ownerMonth!.invoices[0]!)) {
+      expect(["deletedAt", "eventId", "invoiceNumber"]).toContain(key);
+    }
+    expect(ownerMonth!.clients.length).toBeGreaterThan(0);
+    const crewMonth = await month(crew);
+    expect(crewMonth!.events).toHaveLength(inGrid + undatedLive);
+    expect(crewMonth!.invoices).toEqual([]);
+    expect(crewMonth!.clients).toEqual([]);
+    const theirMonth = await month(outsider);
+    expect(theirMonth!.events.map((e) => e.title)).toEqual([
+      "Other company event",
+    ]);
 
     // Another company sees only its own event.
     const theirs = await read(outsider, { view: "all" });
