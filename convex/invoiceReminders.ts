@@ -284,7 +284,7 @@ function requireProviderEnvironment(): ProviderEnvironment {
   return { resendApiKey, fromEmail, stripeSecretKey, appOrigin };
 }
 
-function safeProviderMessage(cause: unknown): string {
+export function safeProviderMessage(cause: unknown): string {
   const message = cause instanceof Error ? cause.message : String(cause);
   return message
     .replace(/[\r\n]+/gu, " ")
@@ -506,7 +506,8 @@ export const getSchedule = action({
   },
 });
 
-/** Every reminder send, skip and failure for one invoice, newest first. */
+/** Every invoice email and reminder send, skip and failure for one invoice,
+ * newest first. */
 export const getHistory = action({
   args: { invoiceId: v.id("invoices") },
   handler: async (ctx, args): Promise<ReminderHistoryItem[]> => {
@@ -527,6 +528,10 @@ export const getHistory = action({
           delivered: EVENT.delivered,
           suppressed: EVENT.suppressed,
           failed: EVENT.failed,
+          // Literal names: importing them from invoiceEmail.ts would make
+          // the two files import each other.
+          invoiceSent: "InvoiceEmailSent",
+          invoiceFailed: "InvoiceEmailFailed",
         })
       : [];
   },
@@ -685,7 +690,7 @@ async function createStripeSession(
   return { sessionId, url };
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
+export function bytesToBase64(bytes: Uint8Array): string {
   let binary = "";
   const chunkSize = 0x8000;
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
@@ -696,7 +701,10 @@ function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-function fromAddress(companyName: string, configuredFrom: string): string {
+export function fromAddress(
+  companyName: string,
+  configuredFrom: string,
+): string {
   if (configuredFrom.includes("<")) return configuredFrom;
   const safeName = companyName.replace(/[<>\r\n]/gu, "").trim();
   return `${safeName || "Catering company"} <${configuredFrom}>`;

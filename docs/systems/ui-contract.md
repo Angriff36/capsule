@@ -4220,6 +4220,7 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `invoiceEmail.send` - action; one-time call (not live); the live reads it changes update by themselves
 - `invoicePayments.createPaymentLink` - action; one-time call (not live); the live reads it changes update by themselves
 - `invoicePayments.getPaymentLink` - action; one-time call (not live); the live reads it changes update by themselves
 - `invoicePayments.syncStripePayments` - action; one-time call (not live); the live reads it changes update by themselves

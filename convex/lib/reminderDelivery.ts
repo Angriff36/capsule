@@ -167,7 +167,14 @@ function text(value: unknown): string | null {
 /** Newest first; what staff see under the invoice's reminders. */
 export function reminderHistory(
   ledger: LedgerRow[],
-  types: { delivered: string; suppressed: string; failed: string },
+  types: {
+    delivered: string;
+    suppressed: string;
+    failed: string;
+    /** The first email with the invoice ("Email the invoice"). */
+    invoiceSent?: string;
+    invoiceFailed?: string;
+  },
 ): ReminderHistoryItem[] {
   const items: ReminderHistoryItem[] = [];
   for (const row of ledger) {
@@ -176,7 +183,33 @@ export function reminderHistory(
     const attempt =
       typeof payload.attempt === "number" ? payload.attempt + 1 : null;
     const to = text(payload.recipientMasked);
-    if (row.type === types.delivered) {
+    if (types.invoiceSent && row.type === types.invoiceSent) {
+      items.push({
+        at: row.createdAt,
+        outcome: "accepted",
+        source,
+        attempt,
+        to,
+        words: to
+          ? `Invoice emailed. Taken by the email service for ${to}.`
+          : "Invoice emailed. Taken by the email service.",
+        remedy: null,
+        willRetry: false,
+      });
+    } else if (types.invoiceFailed && row.type === types.invoiceFailed) {
+      const kind = (text(payload.failureKind) ??
+        "unknown") as ReminderFailureKind;
+      items.push({
+        at: row.createdAt,
+        outcome: "failed",
+        source,
+        attempt,
+        to,
+        words: "Invoice email not sent.",
+        remedy: REMEDY[kind] ?? REMEDY.unknown,
+        willRetry: false,
+      });
+    } else if (row.type === types.delivered) {
       items.push({
         at: row.createdAt,
         outcome: "accepted",

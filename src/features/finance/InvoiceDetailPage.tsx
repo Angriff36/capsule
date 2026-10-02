@@ -101,6 +101,7 @@ export function InvoiceDetailPage() {
     getSchedule: getReminderSchedule,
     configureSchedule: configureReminderSchedule,
     sendNow: sendReminderNow,
+    emailInvoice,
   } = useInvoiceReminderActions();
   const { getPaymentLink, createPaymentLink, syncStripePayments } =
     useInvoicePaymentActions();
@@ -352,7 +353,7 @@ export function InvoiceDetailPage() {
           await send(args);
           if (dueDate == null) {
             setNotice(
-              "Invoice marked sent in Capsule. Deliver it through your external channel. Automatic reminders need a due date set when the invoice is issued.",
+              "Invoice marked sent. Press Email the invoice to send the client the PDF. Automatic reminders need a due date set when the invoice is issued.",
             );
             return;
           }
@@ -364,7 +365,7 @@ export function InvoiceDetailPage() {
             setReminderSchedule(schedule);
             setReminderOffsetsInput(schedule.offsetsDays.join(", "));
             setNotice(
-              "Invoice marked sent in Capsule. Automatic payment reminder schedule saved; deliver the initial invoice through your external channel.",
+              "Invoice marked sent and payment reminders scheduled. Press Email the invoice to send the client the PDF.",
             );
           } catch (error) {
             const detail =
@@ -473,6 +474,31 @@ export function InvoiceDetailPage() {
       setNotice(
         "No reminder sent because this invoice no longer needs payment.",
       );
+    });
+  };
+
+  // One press: a draft is marked sent first, then the client gets the PDF.
+  const onEmailInvoice = () => {
+    void run("emailInvoice", async () => {
+      if (invoice.status === "draft") {
+        await send({ docId: invoice._id, version: invoice.version });
+      }
+      const result = await emailInvoice(String(invoice._id)).finally(() =>
+        setReminderHistoryKey((key) => key + 1),
+      );
+      if (result.status === "already_sent") {
+        setNotice(
+          `Not sent again — the invoice already went${
+            result.to ? ` to ${result.to}` : ""
+          }${
+            result.sentAt != null
+              ? ` at ${formatTime(result.sentAt)} on ${formatDate(result.sentAt)}`
+              : ""
+          } for the same balance.`,
+        );
+        return;
+      }
+      setNotice("Invoice PDF emailed to the client.");
     });
   };
 
@@ -650,6 +676,18 @@ export function InvoiceDetailPage() {
             ) : null}
             <button className="btn btn-ghost" onClick={downloadPdf}>
               Download PDF
+            </button>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              disabled={
+                busy != null ||
+                invoice.status === "voided" ||
+                invoice.status === "written_off"
+              }
+              onClick={onEmailInvoice}
+            >
+              {busy === "emailInvoice" ? "Emailing…" : "Email the invoice"}
             </button>
             <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
               Add payment

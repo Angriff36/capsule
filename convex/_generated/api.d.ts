@@ -61,6 +61,7 @@ import type * as importServiceStyle from "../importServiceStyle.js";
 import type * as importSourceDelta from "../importSourceDelta.js";
 import type * as ingredientLookup from "../ingredientLookup.js";
 import type * as inventoryAudit from "../inventoryAudit.js";
+import type * as invoiceEmail from "../invoiceEmail.js";
 import type * as invoicePayments from "../invoicePayments.js";
 import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
@@ -340,6 +341,7 @@ declare const fullApi: ApiFromModules<{
   importSourceDelta: typeof importSourceDelta;
   ingredientLookup: typeof ingredientLookup;
   inventoryAudit: typeof inventoryAudit;
+  invoiceEmail: typeof invoiceEmail;
   invoicePayments: typeof invoicePayments;
   invoiceReminders: typeof invoiceReminders;
   kmParser: typeof kmParser;

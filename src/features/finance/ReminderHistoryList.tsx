@@ -7,7 +7,8 @@ type HistoryItem = Awaited<
 >[number];
 
 /**
- * Every payment reminder Capsule tried for one invoice: who it went to, what
+ * Every invoice email and payment reminder Capsule tried for one invoice: who
+ * it went to, what
  * happened, and what to do when it did not go. "Taken by the email service"
  * is the most Capsule knows; it does not hear about delivery or bounces yet.
  */
@@ -40,16 +41,18 @@ export function ReminderHistoryList({
   return (
     <div className="mt-4" aria-labelledby="reminder-history-title">
       <h3 id="reminder-history-title" className="text-base font-semibold">
-        Reminders sent
+        Emails to the client
       </h3>
       {failed ? (
         <p className="mt-2 text-base text-ink-2" role="status">
-          Could not load the reminder list. Reload the page to try again.
+          Could not load the email list. Reload the page to try again.
         </p>
       ) : items == null ? (
         <p className="mt-2 text-base text-ink-2">Loading…</p>
       ) : items.length === 0 ? (
-        <p className="mt-2 text-base text-ink-2">No reminders yet.</p>
+        <p className="mt-2 text-base text-ink-2">
+          No invoice or reminder emails yet.
+        </p>
       ) : (
         <ul className="mt-2 grid gap-2">
           {items.map((item, index) => (
