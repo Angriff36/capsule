@@ -595,4 +595,8 @@ export async function handleManifestEvent(
   await reconcileEventPrepWork(ctx, {
     eventDishId: event.entityId as Id<"eventDishes">,
   });
+  await lineOverridePurchasingFollowThrough.afterServingsChange(
+    ctx,
+    event.entityId,
+  );
 }
