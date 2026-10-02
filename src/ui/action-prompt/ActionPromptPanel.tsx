@@ -109,7 +109,7 @@ export function ActionPromptPanel({
   // Esc outside the dialog (fallback, non-modal environments) still cancels.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
+      if (event.key !== "Escape" || event.defaultPrevented) return;
       event.preventDefault();
       if (!busy) onDismiss();
     };

@@ -26,6 +26,8 @@ export function useDismissibleMenu({
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && details.open) {
+        // Own the press: a sheet or dialog around the menu must stay open.
+        event.preventDefault();
         close();
         (details.querySelector("summary") as HTMLElement | null)?.focus();
       }

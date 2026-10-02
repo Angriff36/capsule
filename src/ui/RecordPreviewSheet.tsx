@@ -50,6 +50,8 @@ export function RecordPreviewSheet({
         // A nested lifecycle prompt owns the first Escape press. Its own
         // keyboard handler dismisses it without also losing this record.
         if (panelRef.current?.querySelector("[data-action-prompt]")) return;
+        // So does an open menu or picker inside the sheet.
+        if (event.defaultPrevented) return;
         event.preventDefault();
         onClose();
         return;
