@@ -27,7 +27,8 @@
       "Bash(bunx vitest *)",
       "Bash(bunx tsc *)",
       "Bash(bunx prettier *)",
-      "Bash(rm *.loop-worktrees*)"
+      "Bash(rm *.loop-worktrees*)",
+      "Bash(bun run --cwd *.loop-worktrees* *)"
     ],
     "deny": [
       "Bash(git push *)",
@@ -37,6 +38,10 @@
       "Bash(git -C *.. *)",
       "Bash(rm *../*)",
       "Bash(rm *..\\*)",
+      "Bash(bun run --cwd *../*)",
+      "Bash(bun run --cwd *..\\*)",
+      "Bash(bun run --cwd *.. *)",
+      "Bash(bun run --cwd * deploy*)",
       "Bash(gh pr create *)",
       "Bash(gh pr merge *)",
       "Bash(gh pr ready *)",
