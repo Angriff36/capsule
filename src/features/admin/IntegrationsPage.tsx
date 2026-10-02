@@ -10,6 +10,7 @@ import { OutsideMessagesSection } from "./OutsideMessagesSection";
 import { SmsRecentTexts } from "./SmsRecentTexts";
 import { StepHistorySection } from "./StepHistorySection";
 import { StripeConnectSection } from "./StripeConnectSection";
+import { SystemHealthSection } from "./SystemHealthSection";
 import { WebhooksSection } from "./WebhooksSection";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
@@ -211,6 +212,8 @@ export function IntegrationsPage() {
           {notice}
         </p>
       ) : null}
+
+      <SystemHealthSection canManage={connection.canManage} />
 
       <GoogleCalendarSection connection={connection} />
 
