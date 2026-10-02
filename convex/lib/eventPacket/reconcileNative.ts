@@ -298,7 +298,10 @@ export async function readCurrentPacket(
     identity: {
       tenantId,
       eventId,
-      invoiceNumber: context.invoiceNumber ?? String(eventId),
+      // An imported workbook's own number wins (its files are matched by
+      // it); a native event prints its event number, never its record id.
+      invoiceNumber:
+        context.invoiceNumber ?? (event.eventNumber?.trim() || String(eventId)),
       eventDate:
         context.eventDate ??
         (event.startsAt ? localDate(event.startsAt, zone) : "1970-01-01"),
@@ -459,14 +462,25 @@ async function readNativeContent(
   for (const r of await eventRows(ctx, "equipmentReservations", tenantId, eventId)) {
     if (r.status === "cancelled") continue;
     const item = await related(ctx, "equipments", r.equipmentId, tenantId);
+    // Rented gear goes back to the rental company, not to our warehouse.
+    const rented = item?.ownership === "rented";
+    const rentalCompany = rented
+      ? ((await related(ctx, "vendors", item?.vendorId, tenantId))?.name ??
+        "the rental company")
+      : null;
     pullSheet.push({
       description: item?.name ?? "Equipment",
       quantity: r.quantity,
       unit: "each",
-      source: "ours",
+      source: rented ? "vendor" : "ours",
       decor: /decor/i.test(item?.category ?? ""),
-      vendor: null,
-      returnOwner: r.status === "returned" ? "Back in" : "Our crew",
+      vendor: rentalCompany,
+      returnOwner:
+        r.status === "returned"
+          ? "Back in"
+          : rented
+            ? `Back to ${rentalCompany}`
+            : "Our crew",
       returnBy: r.status === "returned" ? null : when(r.endsAt),
       status: r.status,
     });
@@ -516,6 +530,9 @@ async function readNativeContent(
   const diagrams = (await eventRows(ctx, "eventLayoutSections", tenantId, eventId))
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((s) => ({ name: s.type, instructions: text(s.instructions) }));
+  // The setup drawing written on the event's setup notes.
+  const drawn = text(event.setupDiagram);
+  if (drawn) diagrams.unshift({ name: "Setup diagram", instructions: drawn });
   const files = await ctx.db
     .query("attachments")
     .withIndex("by_parentId", (q) => q.eq("parentId", eventId))

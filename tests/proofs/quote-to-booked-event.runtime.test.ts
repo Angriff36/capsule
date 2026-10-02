@@ -232,8 +232,12 @@ describe("runtime proof: quote to booked event (AC-017)", () => {
     expect(eventRow.expectedHeadcount).toBe(75);
     expect(eventRow.venueName).toBe("Orchard Barn");
     expect(eventRow.venueAddress).toBe("12 Quarry Lane");
-    expect(eventRow.serviceRequirements).toBe("BBQ buffet, two mains");
-    expect(eventRow.operationalRequirements).toBe("One gluten-free guest");
+    // Dietary needs travel with the menu notes, not the operations notes
+    // (which print as setup and load-in notes).
+    expect(eventRow.serviceRequirements).toBe(
+      "BBQ buffet, two mains\nDietary needs: One gluten-free guest",
+    );
+    expect(eventRow.operationalRequirements ?? null).toBeNull();
 
     // 4. Sales prices the menu in the draft window: two dish selections (one
     //    then removed — only live rows copy, AC-001's rule) and enhancements
