@@ -838,9 +838,18 @@ export const processQuoteSubmission = action({
               occasionId: submission.occasionId ?? undefined,
               venueName: submission.venueName ?? undefined,
               venueAddress: submission.venueAddress ?? undefined,
-              serviceRequirements: submission.menuPreferences ?? undefined,
-              operationalRequirements:
-                submission.dietaryRestrictions ?? undefined,
+              // Dietary needs are a menu matter: they sit with the menu
+              // notes the kitchen reads, never in the operations notes
+              // (which the packet prints as setup and load-in notes).
+              serviceRequirements:
+                [
+                  submission.menuPreferences?.trim(),
+                  submission.dietaryRestrictions?.trim()
+                    ? `Dietary needs: ${submission.dietaryRestrictions.trim()}`
+                    : undefined,
+                ]
+                  .filter(Boolean)
+                  .join("\n") || undefined,
             },
           );
           eventId = eventResult.docId;

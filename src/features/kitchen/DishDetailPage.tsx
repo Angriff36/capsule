@@ -9,14 +9,16 @@ import {
   useDishReinstate,
   useGetDish,
   useListDish,
-  useListEvent,
   useListEventDish,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useUndoToast } from "../../ui/useUndoToast";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
@@ -42,8 +44,14 @@ export function DishDetailPage() {
   const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
   const allDishes = useListDish();
-  const events = useListEvent();
   const eventDishes = useListEventDish();
+  const events = useEventsById(
+    dish === undefined || eventDishes === undefined
+      ? undefined
+      : eventDishes
+          .filter((entry) => entry.dishId === dish?._id)
+          .map((entry) => entry.eventId),
+  );
   const purge = useDishPurge();
   const reinstate = useDishReinstate();
   const createDish = useCreateDish();
@@ -53,9 +61,19 @@ export function DishDetailPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { notifyUndo, host: undoHost } = useUndoToast();
   const { prompt, host } = useActionPrompt();
+  const { loadingTooLong } = useSlowQuery(dish);
 
   if (!id) return <ErrorState title="Dish not found" />;
   if (dish === undefined) {
+    if (loadingTooLong) {
+      return (
+        <QueryLoadState
+          title="This dish isn't loading"
+          detail="We couldn't load this dish. Check your connection, then refresh the page."
+          loadingTooLong
+        />
+      );
+    }
     return (
       <div className="culinary-document culinary-document-compact space-y-4">
         <Skeleton className="h-6 w-32" />
@@ -378,7 +396,7 @@ export function DishDetailPage() {
                 key={entry._id}
                 className="flex items-center justify-between border-b border-line py-3"
               >
-                <span>{event!.title ?? event!.name}</span>
+                <span>{event!.title}</span>
                 <span className="font-mono text-sm text-ink-3">
                   {entry.quantityServings} servings · {entry.course || "—"}
                 </span>

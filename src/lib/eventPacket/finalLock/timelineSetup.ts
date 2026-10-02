@@ -11,6 +11,9 @@ import type { FinalLockInput } from "./types";
 
 const MINUTE = 60_000;
 const INDOOR_VENUES = new Set(["banquet_hall", "office", "private_home"]);
+/** Words that make an event note about getting in to the venue. */
+const LOAD_IN_WORDS =
+  /load|unload|dock|entrance|door|elevator|lift|stair|ramp|park|gate|access|back of house/i;
 
 /** Day plan steps in order, with the plain words for a missing one. */
 const STEPS = [
@@ -192,8 +195,12 @@ export function setupAnswers(input: FinalLockInput): Record<string, Draft> {
       ],
     );
 
+  // The event's operational notes count only when they talk about getting
+  // in (an inquiry puts dietary notes there, which are not load-in notes).
+  const eventNotes = event.operationalRequirements?.trim();
   const loadIn =
-    venue?.loadInInstructions?.trim() || event.operationalRequirements?.trim();
+    venue?.loadInInstructions?.trim() ||
+    (eventNotes && LOAD_IN_WORDS.test(eventNotes) ? eventNotes : undefined);
   out["setup.load_in"] = loadIn
     ? answered(
         { type: "text", text: loadIn },

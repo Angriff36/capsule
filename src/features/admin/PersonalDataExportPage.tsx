@@ -11,6 +11,10 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { useActionNotice } from "../../ui/action-result";
 import {
+  PersonalDataErasureHistory,
+  PersonalDataErasurePanel,
+} from "./PersonalDataErasurePanel";
+import {
   createPersonalDataExportDocument,
   type PersonalDataExportFormat,
   type PersonalDataPackage,
@@ -119,7 +123,7 @@ export function PersonalDataExportView({
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Personal data exports"
-        lead="Prepare a complete, portable copy of everything on file for a client contact or staff person, without database access."
+        lead="Prepare a complete, portable copy of everything on file for a client contact or staff person, without database access, or erase their details when they ask."
       />
       <AdminWorkspaceNav />
 
@@ -289,6 +293,10 @@ export function PersonalDataExportView({
           </Section>
         </div>
       ) : null}
+      {canExport && selected ? (
+        <PersonalDataErasurePanel key={selectedKey} subject={selected} />
+      ) : null}
+      {canExport ? <PersonalDataErasureHistory /> : null}
     </div>
   );
 }

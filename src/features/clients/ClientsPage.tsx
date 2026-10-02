@@ -6,8 +6,8 @@ import {
   useListClient,
   useListClientCommunication,
   useListClientContact,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate, formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -50,7 +50,7 @@ export function ClientsPage() {
   const navigate = useNavigate();
   const clients = useListClient();
   const contacts = useListClientContact();
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const communications = useListClientCommunication();
   const createClient = useCreateClient();
   const createClientMerge = useCreateClientMerge();

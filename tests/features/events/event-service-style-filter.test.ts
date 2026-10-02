@@ -48,7 +48,7 @@ describe("event service style for lists and reports", () => {
   });
 
   it("filters the events list by service style (AC-221, AC-222)", async () => {
-    backend.values.set("useListEvent", [
+    const rows = [
       full("e1"),
       {
         ...full("e2"),
@@ -57,7 +57,17 @@ describe("event service style for lists and reports", () => {
         serviceStyleName: "Vending",
         serviceStyle: { name: "Vending" },
       },
-    ]);
+    ].map((row) => ({ ...row, clientLabel: "—", venueName: null }));
+    // The Events page reads one window (convex/eventLedger.ts, PL-SCALE).
+    backend.values.set("eventLedger:ledgerWindow", {
+      rows,
+      more: false,
+      searchRows: [],
+      upcomingCount: rows.length,
+      attentionCount: 0,
+      upcomingCapped: false,
+      attentionCapped: false,
+    });
     await mount(createElement(EventsListPage));
     const select = container.querySelector<HTMLSelectElement>(
       'select[aria-label="Filter by service style"]',

@@ -12,6 +12,9 @@ const SECTION_LABEL: Record<string, string> = {
   menu: "Menu",
   pricing: "Prices",
   terms: "Terms",
+  venue: "Venue",
+  service: "Service style",
+  rentals: "Rentals and decor",
 };
 
 /** Build (or build again) the draft proposal for an event. */

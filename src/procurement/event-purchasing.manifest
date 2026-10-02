@@ -606,6 +606,8 @@ on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
     onHand: sum(InventoryItem where ingredientId == payload.ingredientId, unit == payload.unit, of quantityOnHand)
     pendingSupply: sum(VendorOrderLine where ingredientId == payload.ingredientId, supplyWeekStart == payload.purchasingWeekStart, unit == payload.unit, of pendingSupplyQuantity)
     stockClaimed: sum(VendorOrderLine where ingredientId == payload.ingredientId, unit == payload.unit, status == "added", of stockAppliedQuantity)
+    vendorPackPrice: sum(VendorItem where vendorId == payload.vendorId, ingredientId == payload.ingredientId, packUnit == payload.unit, of packPrice)
+    vendorPackQuantity: sum(VendorItem where vendorId == payload.vendorId, ingredientId == payload.ingredientId, packUnit == payload.unit, of pricedPackQuantity)
     contributionQuantity: payload.requiredQuantity
     unit: payload.unit
     purchaseNeedId: payload.purchaseNeedId

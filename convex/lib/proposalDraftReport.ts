@@ -42,6 +42,9 @@ export const getProposalDraftReport = query({
     const issues: DraftIssue[] = [];
     const eventSources: SourceRef[] = [];
     const menuSources: SourceRef[] = [];
+    const venueSources: SourceRef[] = [];
+    const serviceSources: SourceRef[] = [];
+    const rentalSources: SourceRef[] = [];
     let staleEvent: string[] = [];
     let staleMenu: string[] = [];
     let legacy: ProposalDraftReport["legacy"] = null;
@@ -60,6 +63,22 @@ export const getProposalDraftReport = query({
       eventSources.push({ table: "events", id: String(event._id) });
       if (read.venue) eventSources.push({ table: "venues", id: String(read.venue._id) });
       for (const source of read.sources) menuSources.push(...source.sources);
+      // Venue, service style and rentals each name the records they show.
+      if (read.venue) venueSources.push({ table: "venues", id: String(read.venue._id) });
+      if (event.venueName?.trim() || event.venueAddress?.trim())
+        venueSources.push({ table: "events", id: String(event._id) });
+      const style = event.serviceStyleId ? await ctx.db.get(event.serviceStyleId) : null;
+      if (style && style.tenantId === event.tenantId && style.deletedAt == null)
+        serviceSources.push({ table: "serviceStyles", id: String(style._id) });
+      for (const table of ["equipmentReservations", "rentalOrderLines"] as const) {
+        const held = await ctx.db
+          .query(table)
+          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+          .collect();
+        for (const row of held)
+          if (row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "cancelled")
+            rentalSources.push({ table, id: String(row._id) });
+      }
       issues.push(...read.unpriced);
       if (read.facts.venueName && !read.venue) {
         issues.push({
@@ -114,6 +133,18 @@ export const getProposalDraftReport = query({
       },
       { key: "terms", sources: [{ table: "proposals", id: String(proposalId) }], stale: false, staleReasons: [] },
     ];
+    if (venueSources.length === 0 && proposal.venueName?.trim())
+      venueSources.push({ table: "proposals", id: String(proposalId) });
+    for (const line of liveLines)
+      if (line.equipmentId)
+        rentalSources.push({ table: "proposalLineItems", id: String(line._id) });
+    for (const [key, sources] of [
+      ["venue", venueSources],
+      ["service", serviceSources],
+      ["rentals", rentalSources],
+    ] as const)
+      if (sources.length > 0)
+        sections.push({ key, sources: [...sources], stale: false, staleReasons: [] });
     return {
       generated: record != null,
       eventId: proposal.eventId ? String(proposal.eventId) : null,

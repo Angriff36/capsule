@@ -13,11 +13,13 @@ import { getAuthContext } from "./lib/authContext";
 import {
   artifactFingerprint,
   classifyReminderFailure,
+  documentEmailHistory,
   emailServiceFailureKind,
   maskEmail,
   ReminderDeliveryError,
   reminderRemedy,
   RECENT_SEND_WINDOW_MS,
+  type ReminderHistoryItem,
 } from "./lib/reminderDelivery";
 import { clientEmailRefusal } from "./lib/clientEmailConsent";
 import {
@@ -116,6 +118,51 @@ export const recordEvent = internalMutation({
       payload: args.payload,
       createdAt: Date.now(),
     });
+  },
+});
+
+export const loadHistory = internalQuery({
+  args: { proposalId: v.id("proposals"), tenantId: v.string() },
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entityId", (q) =>
+        q.eq("entityId", String(args.proposalId)),
+      )
+      .collect();
+    return rows
+      .filter(
+        (row) =>
+          row.entity === "Proposal" &&
+          (row.type === EVENT.sent || row.type === EVENT.failed) &&
+          (row.payload as { tenantId?: unknown })?.tenantId === args.tenantId,
+      )
+      .map((row) => ({
+        type: row.type,
+        createdAt: row.createdAt,
+        payload: row.payload as Record<string, unknown>,
+      }));
+  },
+});
+
+/** Every "Email the proposal" try for one proposal, newest first: who it
+ * went to, or why it did not go and what to do. */
+export const getHistory = action({
+  args: { proposalId: v.id("proposals") },
+  handler: async (ctx, args): Promise<ReminderHistoryItem[]> => {
+    const visible = await ctx.runQuery(api.queries.getProposal, {
+      id: args.proposalId,
+    });
+    if (!visible) {
+      throw new ConvexError(
+        "Capsule could not find this proposal. It may have been removed, or your role cannot open it. Ask a manager.",
+      );
+    }
+    const ledger = await ctx.runQuery(internal.proposalEmail.loadHistory, {
+      proposalId: args.proposalId,
+      tenantId: visible.tenantId,
+    });
+    return documentEmailHistory(ledger, EVENT, "Proposal");
   },
 });
 

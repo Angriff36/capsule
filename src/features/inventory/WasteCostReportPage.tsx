@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { formatCountNoun, formatMoney } from "../../lib/format";
 import {
-  useListEvent,
   useListIngredient,
   useListWasteRecord,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById } from "../facilities/useEventsById";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { WasteRecentEntries } from "./WasteRecentEntries";
 import { WASTE_REASON_LABELS, WasteRecordForm } from "./WasteRecordForm";
@@ -32,7 +32,14 @@ type Bucket = {
 export function WasteCostReportPage() {
   const wasteRecords = useListWasteRecord();
   const ingredients = useListIngredient();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      wasteRecords === undefined
+        ? undefined
+        : wasteRecords.map((record) => record.eventId),
+    [wasteRecords],
+  );
+  const events = useEventsById(eventIds);
   const [periodKey, setPeriodKey] =
     useState<(typeof PERIODS)[number]["key"]>("30");
   const [recording, setRecording] = useState(false);

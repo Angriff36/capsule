@@ -1,13 +1,13 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import { useEventsById } from "../facilities/useEventsById";
 import { formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateStorageLocation,
   useCreateVendorOrderLine,
   useGetVendorOrder,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListInventoryLot,
@@ -38,6 +38,7 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { VendorOrderBillMatch } from "./VendorOrderBillMatch";
+import { VendorOrderEmailSection } from "./VendorOrderEmailSection";
 import { VendorOrderReceiptCorrection } from "./VendorOrderReceiptCorrection";
 import {
   activeLocations,
@@ -68,7 +69,14 @@ export function VendorOrderPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const needs = useListPurchaseNeed();
   const demands = useListIngredientDemand();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      needs === undefined || demands === undefined
+        ? undefined
+        : [...needs, ...demands].map((row) => row.eventId),
+    [needs, demands],
+  );
+  const events = useEventsById(eventIds);
   const ingredients = useListIngredient();
   const inventoryLots = useListInventoryLot();
   const unitMappings = useListItemUnitMapping();
@@ -480,6 +488,11 @@ export function VendorOrderPage() {
           </button>
         </div>
       </section>
+
+      <VendorOrderEmailSection
+        vendorOrderId={order._id}
+        status={String(order.status)}
+      />
 
       {showLineForm ? (
         <form className="supply-form" onSubmit={submitLine}>

@@ -47,6 +47,13 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   };
 });
 
+vi.mock("../../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => seed.events ?? [],
+  useAllEventReportRows: () => seed.events ?? [],
+  useEventsInRange: (window: unknown) =>
+    window === "skip" ? undefined : (seed.events ?? []),
+}));
+
 import { SalesDashboardPage } from "../../src/features/reports/SalesDashboardPage";
 import { TimsKPIsDashboardPage } from "../../src/features/reports/TimsKPIsDashboardPage";
 import { CompanyScorecardDashboardPage } from "../../src/features/reports/CompanyScorecardDashboardPage";

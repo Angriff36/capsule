@@ -1,6 +1,8 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
-import type { Id } from "../_generated/dataModel";
+import { api } from "../_generated/api";
+import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 /**
  * Records WHICH ProposalRevision an acceptance committed to, inside the
@@ -76,5 +78,42 @@ export async function recordAcceptedProposalRevision(
   await ctx.db.patch(proposal._id, { acceptedRevisionId: resolved });
   await ctx.db.patch(event.eventId as Id<"manifestEvents">, {
     payload: { ...event.payload, acceptedRevisionId: resolved },
+  });
+  await priceLinkedEventFromAcceptance(ctx, proposal);
+}
+
+const PRICEABLE_STAGES = new Set(["planning", "pending_approval", "approved"]);
+
+/**
+ * An event made from an inquiry is linked to its proposal before anything is
+ * priced, so it starts with no quoted price. When the client accepts, the
+ * accepted total becomes the event's price - the same value the "book event
+ * from proposal" screen fills in - so approval drafts the invoice without
+ * anyone typing the price again (golden event, AC-658). A price already on
+ * the event is never replaced. Runs the governed Event.changePricing as the
+ * company's system role: the public signature page has no signed-in person.
+ */
+async function priceLinkedEventFromAcceptance(
+  ctx: MutationCtx,
+  proposal: Doc<"proposals">,
+): Promise<void> {
+  if (!proposal.eventId || !(Number(proposal.total) > 0)) return;
+  const linked = await ctx.db.get(proposal.eventId as Id<"events">);
+  if (
+    !linked ||
+    linked.deletedAt != null ||
+    linked.tenantId !== proposal.tenantId ||
+    !PRICEABLE_STAGES.has(String(linked.stage)) ||
+    Number(linked.quotedPrice ?? 0) > 0
+  ) {
+    return;
+  }
+  const system = TenantSystemCommandRunner.forTenant(ctx, proposal.tenantId)
+    .context;
+  await system.runMutation(api.mutations.Event_changePricing, {
+    docId: linked._id,
+    version: linked.version,
+    budgetAmount: Number(linked.budgetAmount ?? 0),
+    quotedPrice: Number(proposal.total),
   });
 }

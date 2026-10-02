@@ -239,10 +239,24 @@ const NATIVE_ANSWERS: Record<string, RegExp[]> = {
     /^timeline\.arrive_onsite\.\d+\.time$/,
   ],
 };
+/**
+ * Checks about imported paperwork: tray and roll counts, units copied from an
+ * import, "***" recipe placeholders, the import system's final approval date.
+ * An event with no imported file has none of that paperwork, so these never
+ * ask a person to tick "not applicable" on it.
+ */
+const IMPORT_ONLY = new Set([
+  "check.menu.components",
+  "check.menu.unit-conversion",
+  "check.production.placeholders",
+  "check.live.tpp-final",
+]);
 export function nativelyAnswered(
   checkKey: string,
   facts: Pick<EventPacketSnapshot, "facts">["facts"],
+  imported = true,
 ): boolean {
+  if (!imported && IMPORT_ONLY.has(checkKey)) return true;
   const patterns = NATIVE_ANSWERS[checkKey];
   return (
     !!patterns &&

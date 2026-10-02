@@ -21,7 +21,6 @@ import {
   useInvoiceWriteOff,
   useListClient,
   useListCreditMemo,
-  useListEvent,
   useListInvoice,
   useListOrganization,
   useListPayment,
@@ -49,6 +48,7 @@ import {
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { clientDisplayName } from "../events/clientName";
 import { useTenantBranding } from "../admin/tenantBranding";
+import { useEventsById } from "../facilities/useEventsById";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -59,6 +59,8 @@ import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { ReminderHistoryList } from "./ReminderHistoryList";
 import { useActionNotice } from "../../ui/action-result";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import "./taxWorkspace.css";
 
 const policy = new CommercialLifecyclePolicy();
@@ -79,7 +81,9 @@ export function InvoiceDetailPage() {
   );
   const clients = useListClient();
   const creditMemos = useListCreditMemo();
-  const events = useListEvent();
+  const events = useEventsById(
+    invoice === undefined ? undefined : [invoice?.eventId],
+  );
   const invoices = useListInvoice();
   const payments = useListPayment();
   const organizations = useListOrganization();
@@ -123,6 +127,13 @@ export function InvoiceDetailPage() {
   );
   const [paymentLinkLoading, setPaymentLinkLoading] = useState(true);
   const { prompt, host } = useActionPrompt(busy != null);
+  const { loadingTooLong } = useSlowQuery(
+    [invoice, clients, creditMemos, events, invoices, payments].includes(
+      undefined,
+    ) || brandingLoading
+      ? undefined
+      : invoice,
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -187,7 +198,15 @@ export function InvoiceDetailPage() {
     return (
       <div className="operations-stage supply-stage">
         <FinanceWorkspaceNav />
-        <TableSkeleton rows={6} />
+        {loadingTooLong ? (
+          <QueryLoadState
+            title="This invoice isn't loading"
+            detail="We couldn't load this invoice. Check your connection, then refresh the page."
+            loadingTooLong
+          />
+        ) : (
+          <TableSkeleton rows={6} />
+        )}
       </div>
     );
   }
@@ -827,7 +846,7 @@ export function InvoiceDetailPage() {
           >
             {busy === "sendBalanceReminder"
               ? "Working…"
-              : "Send balance reminder"}
+              : "Note balance reminder"}
           </button>
         </div>
       </section>

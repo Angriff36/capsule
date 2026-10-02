@@ -88,7 +88,8 @@ const NEED_ACTIONS = [
 ] as const;
 
 const ORDER_ACTIONS = [
-  { key: "submit", label: "Submit", lifecycle: VendorOrderSubmitLifecycle },
+  // Capsule does not send the order to the vendor; these mark that it went.
+  { key: "submit", label: "Mark sent", lifecycle: VendorOrderSubmitLifecycle },
   {
     key: "submitForApproval",
     label: "Send for approval",
@@ -96,7 +97,7 @@ const ORDER_ACTIONS = [
   },
   {
     key: "approve",
-    label: "Approve & submit",
+    label: "Approve & mark sent",
     lifecycle: VendorOrderApproveLifecycle,
   },
   {

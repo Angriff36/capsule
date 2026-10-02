@@ -1,14 +1,14 @@
 import {
   useEventStaffNeedClaim,
   useEventStaffNeedReleaseClaim,
-  type useListEvent,
   type useListEventStaffNeed,
 } from "../../lib/manifest-convex-react";
+import type { EventLookupRow } from "../facilities/useEventsById";
 import { formatTime } from "../../lib/format";
 import { EmptyState, Section, StatusChip } from "../../ui/primitives";
 
 type NeedRow = NonNullable<ReturnType<typeof useListEventStaffNeed>>[number];
-type EventRow = NonNullable<ReturnType<typeof useListEvent>>[number];
+type EventRow = EventLookupRow;
 
 const dayLabel = (ms: number) =>
   new Date(ms).toLocaleDateString([], {

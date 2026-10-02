@@ -8,7 +8,6 @@ import {
   useEventAssignmentDecline,
   useEventAssignmentMarkNoShow,
   useEventAssignmentUnassign,
-  useListEvent,
   useListEventAssignment,
   useListEventStaffNeed,
   useListPerson,
@@ -31,7 +30,9 @@ import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { runBulkItems } from "../../ui/bulk-select";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
   DEFAULT_OVERTIME_THRESHOLD_HOURS,
@@ -91,7 +92,6 @@ export function RosterPage() {
   const assignments = useListEventAssignment();
   const shifts = useListShift();
   const scheduleNotices = useListWeeklyScheduleNotice();
-  const events = useListEvent();
   const people = useListPerson();
   const qualifications = useListQualification();
   const trainingModules = useListTrainingModule();
@@ -106,6 +106,18 @@ export function RosterPage() {
   const unassign = useEventAssignmentUnassign();
   const decline = useEventAssignmentDecline();
   const staffNeeds = useListEventStaffNeed();
+  const [assignEventId, setAssignEventId] = useState<string | null>(null);
+  const events = usePickerAndNamedEvents(
+    assignments && shifts && staffNeeds
+      ? [
+          workingId,
+          assignEventId,
+          ...assignments.map((row) => row.eventId),
+          ...shifts.map((row) => row.eventId),
+          ...staffNeeds.map((row) => row.eventId),
+        ]
+      : undefined,
+  );
   const scheduleShift = useScheduleShift();
   const createScheduleNotice = useCreateWeeklyScheduleNotice();
   const startShift = useShiftStart();
@@ -115,7 +127,6 @@ export function RosterPage() {
   const republishScheduleNotice = useWeeklyScheduleNoticeRepublishSchedule();
   const [showForm, setShowForm] = useState<"assignment" | "shift" | null>(null);
   const [shiftPersonId, setShiftPersonId] = useState("");
-  const [assignEventId, setAssignEventId] = useState<string | null>(null);
   const [shiftTypeId, setShiftTypeId] = useState("");
   const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
     startOfScheduleWeek(Date.now()),
@@ -390,8 +401,9 @@ export function RosterPage() {
   };
 
   const publishSelectedWeek = () => {
+    // A stop part way says how many were published; pressing again is safe.
     void run("publish-week", async () => {
-      for (const row of unpublishedPublicationRows) {
+      await runBulkItems(unpublishedPublicationRows, async (row) => {
         const recipientAuthSubjectId = row.person?.authSubjectId ?? undefined;
         if (row.notice) {
           await republishScheduleNotice({
@@ -412,7 +424,7 @@ export function RosterPage() {
             idempotencyKey: `weekly-schedule:${selectedWeekStartsAt}:${row.personId}`,
           });
         }
-      }
+      });
     });
   };
 

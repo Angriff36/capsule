@@ -2538,6 +2538,84 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "ensureWeeklyLine.parameters.vendorPackPrice",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (vendor pack price): optional input; existing callers keep working."
+    },
+    {
+      "path": "ensureWeeklyLine.parameters.vendorPackQuantity",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (vendor pack price): optional input; existing callers keep working."
+    },
+    {
+      "path": "update.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.description",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.itemCode",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.itemName",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.minQuantity",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.notes",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.packPrice",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.packQuantity",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.packUnit",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.unit",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
+    },
+    {
+      "path": "update.parameters.unitPrice",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Several procurement entities have a command named update (the check keys commands by name only); each command is unchanged on its own entity."
     }
   ]
 }

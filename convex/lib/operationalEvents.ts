@@ -52,6 +52,8 @@ import {
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import { openNeedForApprovedEventDemand } from "./approvedDemandPurchasing";
+import { holdApprovedRentals } from "./acceptedRentalHolds";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { assertInvoiceIssueTotals } from "./invoiceIssueTotals";
@@ -147,12 +149,19 @@ export async function handleManifestEvent(
     });
     return;
   }
+  if (event.entity === "IngredientDemand" && event.type === "IngredientDemandCalculated") {
+    // Food added after approval reaches the week's order (AC-666).
+    await openNeedForApprovedEventDemand(ctx, event);
+    return;
+  }
   if (event.entity === "Event" && event.type === "EventApproved") {
     // One unsent draft invoice when the quoted price is above zero (AC-618).
     await ensureEventDraftInvoice(ctx, event.entityId as Id<"events">);
     await ensureTemplateStaffNeeds(ctx, event.entityId as Id<"events">);
     // PL-ATTRIBUTION (AC-321): the venue term in force at booking.
     await captureVenueTermAtBooking(ctx, event.entityId as Id<"events">);
+    // Rental items the client approved are held for the event.
+    await holdApprovedRentals(ctx, event.entityId as Id<"events">);
   }
   if (event.entity === "RevenueAttribution" && event.type === "RevenueAttributionApplied") {
     await assertSplitsWithinRevenue(
@@ -467,6 +476,9 @@ export async function handleManifestEvent(
     // (AC-413/AC-434); a validation failure here rolls the acceptance — and
     // its cascade — back.
     await recordAcceptedProposalRevision(ctx, event);
+    // An accepted change on a booked event holds any rental it added.
+    const accepted = await ctx.db.get(event.entityId as Id<"proposals">);
+    if (accepted?.eventId) await holdApprovedRentals(ctx, accepted.eventId);
     return;
   }
   if (event.entity === "Invoice" &&

@@ -72,7 +72,70 @@ vi.mock("convex/react", async (importOriginal) => {
     ) => {
       const name = getFunctionName(reference);
       backend.reads(name, args);
-      return args === "skip" ? undefined : backend.values.get(name);
+      if (args === "skip") return undefined;
+      // Events by id (convex/eventLookup.ts) answer from the same event
+      // rows a test gives the generated list, unless the test sets its own.
+      if (name === "eventLookup:byIds" && !backend.values.has(name)) {
+        const ids = new Set((args as { ids: string[] }).ids);
+        const rows = (backend.values.get("useListEvent") ?? []) as {
+          _id: string;
+        }[];
+        return rows.filter((row) => ids.has(row._id));
+      }
+      if (name === "eventLookup:range" && !backend.values.has(name)) {
+        const { from, to, withUndated } = args as {
+          from: number;
+          to: number;
+          withUndated?: boolean;
+        };
+        const rows = (backend.values.get("useListEvent") ?? []) as {
+          startsAt?: number | null;
+        }[];
+        return {
+          rows: rows.filter((row) =>
+            row.startsAt == null
+              ? withUndated === true
+              : row.startsAt >= from && row.startsAt < to,
+          ),
+          capped: false,
+        };
+      }
+      // Whole event records for a window: the same rows, as they are.
+      if (name === "eventLookup:rangeDocs" && !backend.values.has(name)) {
+        const { from, to, withUndated } = args as {
+          from: number;
+          to: number;
+          withUndated?: boolean;
+        };
+        const rows = (backend.values.get("useListEvent") ?? []) as {
+          startsAt?: number | null;
+        }[];
+        return {
+          rows: rows.filter((row) =>
+            row.startsAt == null
+              ? withUndated === true
+              : row.startsAt >= from && row.startsAt < to,
+          ),
+          capped: false,
+        };
+      }
+      return backend.values.get(name);
+    },
+    // All-time event pages (eventLookup:reportPage) answer in one page from
+    // the generated list's rows, unless the test sets its own.
+    usePaginatedQuery: (
+      reference: Parameters<typeof getFunctionName>[0],
+      args?: unknown,
+    ) => {
+      const name = getFunctionName(reference);
+      backend.reads(name, args);
+      const rows =
+        name === "eventLookup:reportPage" && !backend.values.has(name)
+          ? backend.values.get("useListEvent")
+          : backend.values.get(name);
+      return rows === undefined
+        ? { results: [], status: "LoadingFirstPage", loadMore: () => {} }
+        : { results: rows, status: "Exhausted", loadMore: () => {} };
     },
     useMutation: command,
     useAction: command,

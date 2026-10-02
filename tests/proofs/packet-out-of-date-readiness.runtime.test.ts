@@ -110,10 +110,17 @@ async function changeHeadcount(
 
 describe("readiness shows an out-of-date printed packet", () => {
   it("shows nothing before a packet is printed or while it is current", async () => {
-    const { manager, eventId } = await setup();
+    const { t, manager, eventId } = await setup();
     expect(await packetIssues(manager, eventId)).toEqual([]);
+    // A binder marked built before the first print stays marked.
+    await manager.mutation(anyApi.mutations.Event_markBinderBuilt, {
+      docId: eventId,
+      version: 1,
+    });
     await printPacket(manager, eventId);
     expect(await packetIssues(manager, eventId)).toEqual([]);
+    const row: any = await t.run((ctx: any) => ctx.db.get(eventId));
+    expect(row.binderBuiltAt).toEqual(expect.any(Number));
   });
 
   it("warns after the event changes, and the warning goes once a new packet is printed", async () => {
@@ -133,9 +140,20 @@ describe("readiness shows an out-of-date printed packet", () => {
     const kept: any = await t.run((ctx: any) => ctx.db.get(first.id));
     expect(kept.supersededBy).toBeUndefined();
 
+    // The binder was built from the first print.
+    const built: any = await t.run((ctx: any) => ctx.db.get(eventId));
+    await manager.mutation(anyApi.mutations.Event_markBinderBuilt, {
+      docId: eventId,
+      version: built.version,
+    });
+
     const second = await printPacket(manager, eventId);
     expect(second.id).not.toBe(first.id);
     expect(await packetIssues(manager, eventId)).toEqual([]);
+    // A new print makes that binder out of date: the tracker shows it as
+    // not built until it is rebuilt.
+    const after: any = await t.run((ctx: any) => ctx.db.get(eventId));
+    expect(after.binderBuiltAt ?? null).toBeNull();
   });
 
   it("the warning goes when the event moves back to what was printed", async () => {

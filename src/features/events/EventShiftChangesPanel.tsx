@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Id } from "../../lib/api";
-import { useListEvent, useListShift } from "../../lib/manifest-convex-react";
+import { useListShift } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import {
   useApplyShiftTimingChange,
   useEventShiftChanges,
@@ -32,7 +33,14 @@ const shiftTimeLabel = (times: {
 export function EventShiftChangesPanel({ eventId }: { eventId: string }) {
   const changes = useEventShiftChanges(eventId as Id<"events">);
   const shifts = useListShift();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      shifts === undefined
+        ? undefined
+        : [eventId, ...shifts.map((row) => row.eventId)],
+    [eventId, shifts],
+  );
+  const events = useEventsById(eventIds);
   const apply = useApplyShiftTimingChange();
   const keep = useKeepShiftTime();
   const [busy, setBusy] = useState<string | null>(null);

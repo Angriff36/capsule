@@ -18,6 +18,9 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useListPerson: list("people"),
   };
 });
+vi.mock("../../src/features/facilities/useEventsById", () => ({
+  useAllEventReportRows: () => seed.events ?? [],
+}));
 
 import { SalesDashboardPage } from "../../src/features/reports/SalesDashboardPage";
 

@@ -1,4 +1,4 @@
-import { Fragment, useState, type FormEvent } from "react";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { formatCountNoun } from "../../lib/format";
@@ -9,12 +9,12 @@ import {
   useDeliveryMarkFailed,
   useDeliverySchedule,
   useDeliveryStartTransit,
-  useListEvent,
   useListDelivery,
   useListPackList,
   useListPerson,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import {
   useAssignDriver,
   useUnassignDriver,
@@ -48,7 +48,14 @@ export function DeliveriesPage() {
   const eventScope = useWorkingEventScope();
   const deliveries = useListDelivery();
   const packLists = useListPackList();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      deliveries === undefined || packLists === undefined
+        ? undefined
+        : [...deliveries, ...packLists].map((row) => row.eventId),
+    [deliveries, packLists],
+  );
+  const events = useEventsById(eventIds);
   const people = useListPerson();
   const vehicles = useListVehicle();
   const assignDriver = useAssignDriver();

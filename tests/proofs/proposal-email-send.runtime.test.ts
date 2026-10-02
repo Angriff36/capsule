@@ -180,4 +180,47 @@ describe("email the proposal", () => {
     ).rejects.toThrow(/could not be made/u);
     expect(sent).toHaveLength(0);
   });
+
+  it("lists every try on the proposal: a refused email with its fix, then the sent one", async () => {
+    const env = await setup();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json({ message: "invalid to address" }, { status: 422 }),
+      ),
+    );
+    const args = {
+      proposalId: env.proposalId,
+      revisionId: env.revisionId,
+      pdfBase64: PDF,
+      fileName: "proposal.pdf",
+    };
+    await expect(
+      env.sales.action(api.proposalEmail.send, args),
+    ).rejects.toThrow();
+    stubEmail();
+    await env.sales.action(api.proposalEmail.send, args);
+
+    const history = await env.sales.action(api.proposalEmail.getHistory, {
+      proposalId: env.proposalId,
+    });
+    expect(history.map((item) => item.outcome)).toEqual(["accepted", "failed"]);
+    expect(history[0].words).toBe(
+      "Proposal emailed. Taken by the email service for e•••@garden.example.",
+    );
+    expect(history[1].words).toBe("Proposal email not sent.");
+    expect(history[1].remedy).toMatch(/\S/u);
+
+    // Another company cannot read this proposal's emails.
+    const outsider = env.t.withIdentity({
+      subject: "other-company",
+      org_id: "tenant-proposal-email-b",
+      role: "admin",
+    });
+    await expect(
+      outsider.action(api.proposalEmail.getHistory, {
+        proposalId: env.proposalId,
+      }),
+    ).rejects.toThrow(/could not find this proposal/u);
+  });
 });

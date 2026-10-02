@@ -3,6 +3,10 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import type { Workbook, WorkbookOverlay } from "./buildWorkbook";
 import { finalLockPageCount } from "./finalLock/answersPage";
 import { printableText } from "./printableText";
+import {
+  appendAttachedFiles,
+  type AttachedPrintFile,
+} from "./appendAttachedFiles";
 import overlaysMeta from "./fixtures/event-forms-one-print.overlays.json";
 import { EVENT_FORMS_ONE_PRINT_B64 } from "./fixtures/event-forms-one-print.b64";
 export interface LayoutRecord {
@@ -77,6 +81,7 @@ export function validateLayout(
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 export async function renderWorkbook(
   workbook: Workbook,
+  attached: readonly AttachedPrintFile[] = [],
 ): Promise<RenderedWorkbook> {
   const doc = new jsPDF({ unit: "pt", format: "letter", compress: true });
   const records: LayoutRecord[] = [],
@@ -281,6 +286,9 @@ export async function renderWorkbook(
     merged.insertPage(entry.afterPage + offset, target);
     offset++;
   }
+  // Drawings, maps and uploaded papers print at the back, before the Final
+  // Lock answer pages the server adds.
+  await appendAttachedFiles(merged, attached, font);
   // Footer page numbers count the merged binder; source-form pages stay
   // chrome-free, so only generated pages carry the footer.
   // The server adds the Final Lock answer pages at the end; count them too.

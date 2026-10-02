@@ -1,4 +1,8 @@
-import { formatTppMoney, formatTppQuantity } from "./formatters";
+import {
+  formatTppMoney,
+  formatTppPercent,
+  formatTppQuantity,
+} from "./formatters";
 import { TppReportDocument } from "./TppReportDocument";
 import { TppReportLabels } from "./TppReportLabels";
 import { TppReportSummary } from "./TppReportSummary";
@@ -38,7 +42,7 @@ export function TppReportResult({
                 {measure.kind === "money"
                   ? formatTppMoney(measure.value)
                   : measure.kind === "percentage"
-                    ? `${formatTppQuantity(measure.value)}%`
+                    ? formatTppPercent(measure.value)
                     : formatTppQuantity(measure.value)}
               </dd>
             </div>

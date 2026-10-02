@@ -70,17 +70,41 @@ export function servingwareAnswer(input: FinalLockInput): {
         what: `${row.rented ? "Rental" : "Equipment"} "${row.name}"`,
         sources: equipmentSources(row),
       });
-  for (const [rows, table, what] of [
-    [input.kitItems, "serviceStyleKitItems", "Service style kit item"],
-    [input.packItems, "packListItems", "Pack list line"],
-  ] as const)
-    for (const row of rows)
-      if (WARE.test(row.description))
-        seen.push({
-          piece: pieceIn(row.description) ?? "Mangia pieces",
-          what: `${what} "${row.description}"`,
-          sources: source(table, row),
-        });
+  // A kit item that is on this event's pack list is decided by that line
+  // (it may be left off because the client brings it).
+  const listedKit = new Set(input.packItems.map((row) => row.kitItemId));
+  for (const row of input.kitItems)
+    if (!listedKit.has(row.id) && WARE.test(row.description))
+      seen.push({
+        piece: pieceIn(row.description) ?? "Mangia pieces",
+        what: `Service style kit item "${row.description}"`,
+        sources: source("serviceStyleKitItems", row),
+      });
+  for (const row of input.packItems) {
+    if (row.retired || !WARE.test(row.description)) continue;
+    // Left off: the client's or the vendor's pieces go instead of ours.
+    const listed: Piece =
+      row.ownership === "rented"
+        ? "Rented pieces"
+        : row.ownership === "client"
+          ? "Client-provided pieces"
+          : (pieceIn(row.description) ?? "Mangia pieces");
+    const piece = row.excluded
+      ? row.coveredBy === "client"
+        ? "Client-provided pieces"
+        : row.coveredBy === "vendor"
+          ? "Rented pieces"
+          : row.coveredBy === "equivalent"
+            ? listed
+            : null
+      : listed;
+    if (piece)
+      seen.push({
+        piece,
+        what: `Pack list line "${row.description}"`,
+        sources: source("packListItems", row),
+      });
+  }
 
   const pieces = [
     ...new Set<string>([

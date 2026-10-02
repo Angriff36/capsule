@@ -137,7 +137,11 @@ export function readiness(
       .filter((r) => !section || r.section === section)
       .every(
         (r) =>
-          nativelyAnswered(r.key, snapshot.facts) ||
+          nativelyAnswered(
+            r.key,
+            snapshot.facts,
+            snapshot.artifacts.length > 0,
+          ) ||
           snapshot.issues.some(
             (i) =>
               i.key === r.key &&
@@ -359,7 +363,11 @@ export async function reconcile(
     const check = snapshot.checklistVerifications.find(
       (c) => c.checkKey === r.key,
     );
-    const byNative = nativelyAnswered(r.key, facts);
+    const byNative = nativelyAnswered(
+      r.key,
+      facts,
+      snapshot.artifacts.length > 0,
+    );
     const resolved =
       byNative ||
       (!!resolution &&

@@ -462,6 +462,51 @@
   margin-top: 16px;
 }
 
+/* phone summary: one row per thing a lead checks first */
+.evd-brief {
+  margin-bottom: 16px;
+  border: 1px solid var(--evd-line);
+  border-radius: var(--evd-radius);
+  background: var(--evd-paper);
+}
+.evd-brief ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.evd-brief-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--evd-line);
+}
+.evd-brief-row:first-child {
+  /* The next step stays in reach while the summary scrolls. */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-top: 0;
+  border-radius: var(--evd-radius) var(--evd-radius) 0 0;
+  background: var(--evd-paper);
+}
+.evd-brief-row.alert .evd-brief-value {
+  color: var(--evd-accent);
+  font-weight: 600;
+}
+.evd-brief-value {
+  margin-top: 4px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.evd-brief .evd-btn {
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+}
+
 /* tab panels reuse the app's own screens inside the paper frame */
 .evd-panel {
   animation: evd-rise 0.5s both cubic-bezier(0.2, 0.8, 0.2, 1);

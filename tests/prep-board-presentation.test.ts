@@ -44,6 +44,10 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useQualityCheckReinspect: () => manifest.command,
 }));
 
+vi.mock("../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => manifest.events,
+}));
+
 vi.mock("../src/features/kitchen/KitchenBookNav", () => ({
   KitchenBookNav: () => null,
 }));

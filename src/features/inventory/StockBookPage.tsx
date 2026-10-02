@@ -14,7 +14,6 @@ import {
   useInventoryReservationRelease,
   useInventoryReservationReturnUnused,
   useInventorySettingsSetStockTracking,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
@@ -36,6 +35,7 @@ import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   reservedOn,
   stockBalance,
@@ -102,7 +102,12 @@ export function StockBookPage() {
   const locations = useListStorageLocation();
   const ingredients = useListIngredient();
   const demands = useListIngredientDemand();
-  const events = useListEvent();
+  const workingId = useWorkingEventId();
+  const events = usePickerAndNamedEvents(
+    reservations
+      ? [workingId, ...reservations.map((row) => row.eventId)]
+      : undefined,
+  );
   const inventorySettings = useListInventorySettings();
   const createLocation = useCreateStorageLocation();
   const createItem = useCreateInventoryItem();
@@ -530,7 +535,14 @@ export function StockBookPage() {
       if (!values) return;
       const quantity = Number(values.quantity);
       const reason = String(values.reason ?? "").trim();
-      if (!Number.isFinite(quantity) || quantity <= 0 || !reason) return;
+      if (!Number.isFinite(quantity) || quantity <= 0 || !reason) {
+        setFailure(
+          new Error(
+            "Nothing was put back. Enter an amount above 0 and say why it came back.",
+          ),
+        );
+        return;
+      }
       void run(`${reservation._id}:return`, async () => {
         await returnUnused({
           docId: reservation._id,

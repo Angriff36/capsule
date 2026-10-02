@@ -291,6 +291,13 @@ export async function readFinalLockInput(
         id: String(item._id),
         version: version(item),
         description: String(item.sentInstead ?? item.description),
+        retired: item.retiredAt != null,
+        excluded: item.excludedAt != null,
+        coveredBy: item.coveredBy ?? null,
+        ownership: item.ownership ?? null,
+        kitItemId: item.serviceStyleKitItemId
+          ? String(item.serviceStyleKitItemId)
+          : null,
       });
     packLists.push({
       id: String(row._id),

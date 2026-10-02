@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePayrollInput,
-  useListEvent,
   useListEventAssignment,
   useListPerson,
   useListShift,
@@ -17,6 +16,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { setWorkingEvent, workingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   distributeTipPool,
   formatTipPayrollNote,
@@ -47,12 +47,12 @@ const durationHours = (start: unknown, end: unknown) => {
 };
 
 export function TipDistributionPage() {
-  const events = useListEvent();
   const assignments = useListEventAssignment();
   const people = useListPerson();
   const shifts = useListShift();
   const createPayrollInput = useCreatePayrollInput();
   const [eventId, setEventId] = useState(() => workingEventId() ?? "");
+  const events = usePickerAndNamedEvents([eventId]);
   const [total, setTotal] = useState("0.00");
   const [method, setMethod] = useState<TipPoolingMethod>("equal");
   const [excluded, setExcluded] = useState<Record<string, boolean>>({});

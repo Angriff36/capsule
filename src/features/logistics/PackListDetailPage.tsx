@@ -5,7 +5,6 @@ import {
   useCreatePackListItem,
   useGetPackList,
   useListDish,
-  useListEvent,
   useListPerson,
   useListPackListItem,
   useListPackListTemplate,
@@ -50,6 +49,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure } from "../events/CommandFailure";
+import { useEventsById } from "../facilities/useEventsById";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -103,7 +103,9 @@ export function PackListDetailPage() {
   const { id } = useParams();
   const packList = useRouteRecord(useGetPackList, id);
   const items = useListPackListItem();
-  const events = useListEvent();
+  const events = useEventsById(
+    packList === undefined ? undefined : [packList?.eventId],
+  );
   const dishes = useListDish();
   const people = useListPerson();
   const createItem = useCreatePackListItem();

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import {
-  useListEvent,
   useListRevenueAttribution,
   useListPerson,
 } from "@/lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import {
   DashboardGrid,
   type DashboardGridSize,
@@ -20,9 +20,16 @@ import { MetricDefinitionList } from "./MetricDefinitionList";
 const LOADING = "Loading…";
 
 export function CompMasterDashboardPage() {
-  const events = useListEvent();
   const attributions = useListRevenueAttribution();
   const people = useListPerson();
+  const eventIds = useMemo(
+    () =>
+      attributions === undefined
+        ? undefined
+        : attributions.map((attr) => attr.eventId),
+    [attributions],
+  );
+  const events = useEventsById(eventIds);
   const cancelledEventIds = useMemo(
     () =>
       new Set(

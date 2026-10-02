@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import {
-  useListEvent,
   useListServiceStyle,
   useListOccasion,
   useListVenue,
   useListPerson,
 } from "@/lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import {
   eventServiceStyleKey,
   eventServiceStyleLabel,
@@ -49,7 +49,7 @@ const NOT_ENOUGH_HISTORY = "Not enough history";
  */
 
 export function AvgEventValueGrowthDashboardPage() {
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
   const venues = useListVenue();

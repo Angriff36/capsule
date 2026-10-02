@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import {
-  useListEvent,
   useListEventCloseout,
   useListLead,
   useListPerson,
@@ -14,11 +13,13 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { EmptyState, PageHeader, StatusChip } from "@/ui/primitives";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatMoney } from "@/lib/format";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { isBookedEvent } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
 import {
   SCORECARD_MEASURES,
   SCORECARD_STATUS_LABEL,
+  TREND_MONTHS,
   formatScorecardValue,
   scorecardRows,
   type ScorecardRow,
@@ -47,16 +48,23 @@ const STATUS_TONE: Record<ScorecardStatus, string> = {
 };
 
 export function CompanyScorecardDashboardPage() {
-  const events = useListEvent();
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  // The scorecard and its trend cover the last six months.
+  const eventWindow = useMemo(
+    () => ({
+      from: new Date(currentYear, currentMonth - TREND_MONTHS + 1, 1).getTime(),
+      to: new Date(currentYear, currentMonth + 1, 1).getTime(),
+    }),
+    [currentYear, currentMonth],
+  );
+  const events = useEventsInRange(eventWindow);
   const closeouts = useListEventCloseout();
   const leads = useListLead();
   const targets = useListScorecardTarget();
   const people = useListPerson();
   const [editing, setEditing] = useState<string | null>(null);
-
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
 
   const rows = useMemo(
     () =>

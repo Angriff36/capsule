@@ -4,7 +4,6 @@ import {
   useCreatePerformanceReview,
   useListPerformanceReview,
   useListPerson,
-  useListEvent,
   useListRoleScorecard,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
@@ -13,6 +12,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { ReviewFeedback } from "./ReviewFeedback";
 import { effectiveScorecard } from "./scorecardVersions";
 
@@ -30,7 +30,9 @@ export function PerformanceReviewsPage() {
   const workingId = useWorkingEventId();
   const reviews = useListPerformanceReview();
   const people = useListPerson();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    reviews ? [workingId, ...reviews.map((row) => row.eventId)] : undefined,
+  );
   const scorecards = useListRoleScorecard();
   const createReview = useCreatePerformanceReview();
   const [open, setOpen] = useState(false);

@@ -10,6 +10,7 @@ import {
   useListShift,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import type { ReportSubjectArea } from "./ReportCreateForm";
 import { buildLiveReportModel } from "./liveReportBuilders";
@@ -117,7 +118,7 @@ function ResolvedData(props: ResolvedDataProps) {
 }
 
 function WithEventLookups(props: ResolvedDataProps) {
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const venues = useListVenue();
   const lookups = useMemo<ReportFilterLookups>(
     () => ({

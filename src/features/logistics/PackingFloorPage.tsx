@@ -4,7 +4,6 @@ import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { packingItemDescription } from "../../lib/packingDisplay";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
-  useListEvent,
   useListPackList,
   useListPackListItem,
   useListPerson,
@@ -16,6 +15,7 @@ import {
 import { useActionNotice } from "../../ui/action-result";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
+import { useEventsById } from "../facilities/useEventsById";
 import { eventDetailPath } from "../events/eventRoutes";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -35,8 +35,15 @@ const show = (value: number) =>
  */
 export function PackingFloorPage() {
   const authStatus = useAuthStatus();
-  const events = useListEvent();
   const packLists = useListPackList();
+  const eventIds = useMemo(
+    () =>
+      packLists === undefined
+        ? undefined
+        : packLists.map((list) => list.eventId),
+    [packLists],
+  );
+  const events = useEventsById(eventIds);
   const packLines = useListPackListItem();
   const people = useListPerson();
   const startPacking = usePackListStartPacking();

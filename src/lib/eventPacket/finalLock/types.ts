@@ -209,7 +209,17 @@ export interface FinalLockInput {
     missingCount: number;
   })[];
   /** Every open line on the event's pack lists. */
-  packItems: (NativeRow & { description: string })[];
+  packItems: (NativeRow & {
+    description: string;
+    /** Not going: retired by its rule, or left off (who covers it, if anyone). */
+    retired?: boolean;
+    excluded?: boolean;
+    coveredBy?: string | null;
+    /** Whose pieces the line sends: owned, rented or client. */
+    ownership?: string | null;
+    /** The style kit item this line came from, if any. */
+    kitItemId?: string | null;
+  })[];
   /** The event's service style kit (what that style always brings). */
   kitItems: (NativeRow & { description: string })[];
   /** The accepted proposal's line items and extras, if one is accepted. */

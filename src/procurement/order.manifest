@@ -586,7 +586,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     optional pendingSupply: decimal(12, 4),
     optional orderedNeed: decimal(12, 4),
     optional fulfilledNeed: decimal(12, 4),
-    optional stockClaimed: decimal(12, 4)
+    optional stockClaimed: decimal(12, 4),
+    optional vendorPackPrice: money(12, 2),
+    optional vendorPackQuantity: decimal(12, 4)
   ) {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
@@ -600,7 +602,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     compute availableStock = max(0, onHand - claimedElsewhere)
     compute requirement = max(0, weekNeed + (orderedNeed != null ? orderedNeed : 0) + (fulfilledNeed != null ? fulfilledNeed : 0) - (pendingSupply != null ? pendingSupply : 0))
     compute orderQty = max(0, requirement - availableStock)
-    compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : self.ingredient.costPerUnit
+    // A new line takes this vendor's own pack price per unit (VendorItem in the
+    // line's unit) before the ingredient's general cost.
+    compute vendorUnitCost = vendorPackQuantity != null and vendorPackQuantity > 0 and vendorPackPrice != null and vendorPackPrice > 0 ? vendorPackPrice / vendorPackQuantity : 0
+    compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : (vendorUnitCost > 0 ? vendorUnitCost : self.ingredient.costPerUnit)
     compute nextQuantity = self.addedAt != null and self.quantityIsManual != false ? self.orderedQuantity : orderQty
     mutate vendorOrderId = vendorOrderId
     mutate ingredientId = ingredientId

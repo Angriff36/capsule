@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import {
-  useListEvent,
   useListLead,
   useListClient,
   useListPerson,
 } from "@/lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import {
   DashboardGrid,
   type DashboardGridSize,
@@ -52,7 +52,7 @@ const STAGE_ORDER: Record<LeadStage, number> = {
 };
 
 export function SalesDashboardPage() {
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const leads = useListLead();
   const clients = useListClient();
   const people = useListPerson();

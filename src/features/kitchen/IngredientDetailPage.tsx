@@ -29,6 +29,7 @@ import {
 } from "./IngredientPriceHistory";
 import { IngredientPriceTrendPanel } from "./IngredientPriceTrendPanel";
 import { VendorPriceComparisonPanel } from "./VendorPriceComparisonPanel";
+import { VendorItemsPanel } from "./VendorItemsPanel";
 import { IngredientCostingEditor } from "./IngredientCostingEditor";
 import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
 import { IngredientMergeControl } from "./IngredientMergeControl";
@@ -605,6 +606,13 @@ export function IngredientDetailPage() {
         version={ingredient.version}
         preferredVendorIds={ingredient.preferredVendorIds}
         legacyPreferredVendorId={ingredient.preferredVendorId}
+        vendors={vendors}
+        onFailure={setFailure}
+      />
+
+      <VendorItemsPanel
+        ingredientId={ingredient._id}
+        ingredientUnit={String(ingredient.unit)}
         vendors={vendors}
         onFailure={setFailure}
       />

@@ -117,8 +117,14 @@ describe("runtime proof: event food cost estimate vs actual", () => {
     });
 
     const after = await read(seed.roles.finance);
-    const waste = 2 * FOOD.butterPrice;
-    const actualTotal = CAPTURED_ACTUALS.actualIngredientCost + waste; // 808
+    // The finalized closeout is the event's frozen result (AC-673): waste
+    // logged after finalizing reaches it only through an audited closeout
+    // correction, so the report shows the closeout's own waste figure.
+    // Recorded waste reaching the closeout before finalizing is proven in
+    // backend-golden-event steps 20-21.
+    expect(2 * FOOD.butterPrice).not.toBe(CAPTURED_ACTUALS.actualWasteCost);
+    const waste = CAPTURED_ACTUALS.actualWasteCost;
+    const actualTotal = CAPTURED_ACTUALS.actualIngredientCost + waste; // 850
     expect(after.actual).toEqual({
       ingredientCost: CAPTURED_ACTUALS.actualIngredientCost,
       wasteCost: waste,

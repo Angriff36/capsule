@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListEvent,
   useListPerson,
   useListPrepTask,
   useListPrepTaskDependency,
@@ -17,6 +16,7 @@ import {
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById, usePickerEvents } from "../facilities/useEventsById";
 import { BatchAllocationsPanel } from "./BatchAllocationsPanel";
 import { BatchCompletionFields } from "./BatchCompletionFields";
 import { BatchShortfallPanel } from "./BatchShortfallPanel";
@@ -92,7 +92,21 @@ export function KitchenDisplayPage() {
   const tasks = useListPrepTask();
   const dependencies = useListPrepTaskDependency();
   const batches = useListProductionBatch();
-  const events = useListEvent();
+  // The filter offers events in the picker window (half a year back, two years
+  // ahead, undated); the names on cards come from the events the board's own
+  // tasks and batches name, wherever they fall.
+  const events = usePickerEvents();
+  const boardEventIds = useMemo(
+    () =>
+      tasks && batches
+        ? [
+            ...tasks.map((task) => task.eventId),
+            ...batches.map((batch) => batch.eventId),
+          ]
+        : undefined,
+    [tasks, batches],
+  );
+  const namedEvents = useEventsById(boardEventIds);
   const components = useListComponent();
   const people = useListPerson();
   const claim = usePrepTaskClaim();
@@ -116,10 +130,16 @@ export function KitchenDisplayPage() {
     dependencies === undefined ||
     batches === undefined ||
     events === undefined ||
+    namedEvents === undefined ||
     components === undefined;
 
   const eventName = (id: string | null) =>
-    (id && events?.find((event) => event._id === id)?.title) || "House";
+    (id &&
+      (
+        namedEvents?.find((event) => event._id === id) ??
+        events?.find((event) => event._id === id)
+      )?.title) ||
+    "House";
   const componentName = (id: string) =>
     components?.find((component) => component._id === id)?.name ?? "Recipe";
   const personName = (id: string | null | undefined) => {

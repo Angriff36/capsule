@@ -22,6 +22,7 @@ export function EventCreateServiceStyleField({
 }) {
   const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const options = serviceStyleSelectOptions(rows);
   const builtIn = usingBuiltInServiceStyles(rows);
   const resolver = new EventCreateServiceStyleResolver(
@@ -36,9 +37,14 @@ export function EventCreateServiceStyleField({
 
   const addStandardList = () => {
     setBusy(true);
+    setError(null);
     void resolver
       .registerMissing(rows)
-      .catch(() => undefined)
+      .catch((cause: unknown) =>
+        setError(
+          `Some service styles were not added. Press the button again to add the rest. ${cause instanceof Error ? cause.message : ""}`.trim(),
+        ),
+      )
       .finally(() => setBusy(false));
   };
 
@@ -76,6 +82,11 @@ export function EventCreateServiceStyleField({
           >
             {busy ? "Adding…" : "Add the standard list"}
           </button>
+          {error ? (
+            <p className="text-xs text-danger" role="alert">
+              {error}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>

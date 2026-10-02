@@ -2,6 +2,7 @@ import {
   formatTppDate,
   formatTppDateTime,
   formatTppMoney,
+  formatTppPercent,
   formatTppQuantity,
 } from "./formatters";
 import type { TppReportOptions } from "./TppReportParameters";
@@ -47,7 +48,7 @@ function totalText(total: TppTotal): string {
   return total.kind === "money"
     ? formatTppMoney(total.value)
     : total.kind === "percentage"
-      ? `${formatTppQuantity(total.value)}%`
+      ? formatTppPercent(total.value)
       : formatTppQuantity(total.value);
 }
 

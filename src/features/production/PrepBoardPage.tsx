@@ -5,7 +5,6 @@ import {
   useCreatePrepTaskDependency,
   useCreateQualityCheck,
   useListDish,
-  useListEvent,
   useListEventDish,
   useListIngredient,
   useListPrepTask,
@@ -31,6 +30,7 @@ import {
 } from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
+import { useEventsById } from "../facilities/useEventsById";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
@@ -86,8 +86,19 @@ export function PrepBoardPage() {
   const tasks = useListPrepTask();
   const dependencies = useListPrepTaskDependency();
   const checks = useListQualityCheck();
-  const events = useListEvent();
   const eventDishes = useListEventDish();
+  // Names only: read the events these tasks and dishes belong to (PL-SCALE).
+  const eventIds = useMemo(
+    () =>
+      tasks === undefined || eventDishes === undefined
+        ? undefined
+        : [
+            ...tasks.map((task) => task.eventId),
+            ...eventDishes.map((row) => row.eventId),
+          ],
+    [tasks, eventDishes],
+  );
+  const events = useEventsById(eventIds);
   const dishes = useListDish();
   const ingredients = useListIngredient();
   const comments = useListPrepTaskComment();
@@ -295,15 +306,25 @@ export function PrepBoardPage() {
           notes: String(data.get("notes") || "") || undefined,
         });
         const predecessorTaskIds = data.getAll("predecessorTaskId").map(String);
-        for (const predecessorTaskId of predecessorTaskIds) {
-          await createDependency({
-            dependentTaskId: created.docId,
-            predecessorTaskId,
-          });
-        }
+        // The task is saved first. Close the form either way, so a second
+        // press cannot make the task twice; say which waits were not saved.
         form.reset();
         setSelectedEventDishId("");
         setShowCreate(false);
+        let linked = 0;
+        try {
+          for (const predecessorTaskId of predecessorTaskIds) {
+            await createDependency({
+              dependentTaskId: created.docId,
+              predecessorTaskId,
+            });
+            linked += 1;
+          }
+        } catch (cause) {
+          throw new Error(
+            `The prep task was saved, but only ${linked} of ${predecessorTaskIds.length} "wait for" tasks were linked. To set the rest, cancel this task and open it again. ${cause instanceof Error ? cause.message : ""}`.trim(),
+          );
+        }
       },
       "Prep task opened and added to the production sheet.",
     );

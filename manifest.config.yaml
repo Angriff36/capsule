@@ -77,9 +77,23 @@ projections:
         # Invoice numbers are unique per tenant; the numbering seam
         # (convex/lib/invoiceNumbering.ts) checks a proposed number with a point
         # lookup instead of reading the tenant's invoice history.
+        # The Today page (convex/todayDesk.ts) counts open invoices, prep,
+        # pack lists and draft closeouts by status instead of reading every
+        # row of each table (PL-SCALE, AC-172).
         Invoice:
           - fields: [tenantId, invoiceNumber]
             name: by_tenantId_and_invoiceNumber
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        PrepTask:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        PackList:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        EventCloseout:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
         # One outside payment id is used by one payment, and one Capsule
         # payment is matched by one imported payment row (BE-15.2-01/04). The
         # seam (convex/lib/paymentAccounting.ts) checks with point lookups.
@@ -104,3 +118,11 @@ projections:
         EventIngredientContribution:
           - fields: [eventId, ingredientId]
             name: by_eventId_and_ingredientId
+        # The events ledger (convex/eventLedger.ts) reads one date-ordered
+        # window at a time instead of every event with its menu tree
+        # (PL-SCALE, AC-172: 10,000 events per tenant).
+        Event:
+          - fields: [tenantId, startsAt]
+            name: by_tenantId_and_startsAt
+          - fields: [tenantId, stage, startsAt]
+            name: by_tenantId_and_stage_and_startsAt

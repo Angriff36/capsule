@@ -39,6 +39,8 @@ import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -70,6 +72,11 @@ export function ClientDetailPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
+  const { loadingTooLong } = useSlowQuery(
+    [client, contacts, proposals, contracts, invoices].includes(undefined)
+      ? undefined
+      : client,
+  );
 
   if (!id) {
     return (
@@ -90,7 +97,15 @@ export function ClientDetailPage() {
     return (
       <div className="space-y-4">
         <ClientsWorkspaceNav />
-        <TableSkeleton rows={6} />
+        {loadingTooLong ? (
+          <QueryLoadState
+            title="This client isn't loading"
+            detail="We couldn't load this client. Check your connection, then refresh the page."
+            loadingTooLong
+          />
+        ) : (
+          <TableSkeleton rows={6} />
+        )}
       </div>
     );
   }

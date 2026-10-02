@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListClient,
-  useListEvent,
   useListIngredient,
   useListInventoryItem,
   useListInventoryLot,
@@ -12,6 +11,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById } from "../facilities/useEventsById";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { endOfDay, startOfDay } from "./PurchasingFormHelpers";
 import {
@@ -28,7 +28,14 @@ const quantity = new Intl.NumberFormat(undefined, {
 export function LotTraceabilityPage() {
   const lots = useListInventoryLot();
   const reservations = useListInventoryReservation();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      reservations === undefined
+        ? undefined
+        : reservations.map((row) => row.eventId),
+    [reservations],
+  );
+  const events = useEventsById(eventIds);
   const clients = useListClient();
   const ingredients = useListIngredient();
   const vendors = useListVendor();

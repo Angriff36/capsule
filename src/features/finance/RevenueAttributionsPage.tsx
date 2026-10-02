@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListRevenueAttribution,
-  useListEvent,
   useRevenueAttributionApprove,
   useRevenueAttributionReject,
   useRevenueAttributionRequestApproval,
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
@@ -43,7 +43,7 @@ const attributionTypeLabel = (type: string) => {
 
 export function RevenueAttributionsPage() {
   const attributions = useListRevenueAttribution();
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const approve = useRevenueAttributionApprove();
   const reject = useRevenueAttributionReject();
   const requestApproval = useRevenueAttributionRequestApproval();

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackList,
-  useListEvent,
   useListPackList,
   useListPackListItem,
   usePackListCancel,
@@ -23,6 +22,7 @@ import {
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -31,7 +31,9 @@ export function PackListsPage() {
   const workingId = useWorkingEventId();
   const packLists = useListPackList();
   const packListItems = useListPackListItem();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    packLists ? [workingId, ...packLists.map((row) => row.eventId)] : undefined,
+  );
   const createPackList = useCreatePackList();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();

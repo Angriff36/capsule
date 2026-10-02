@@ -152,4 +152,33 @@ describe("rental and equipment roll-up for a month", () => {
     expect(text).toContain("1 problem(s) with no cost on file - not counted.");
     expect(text).toContain("Busiest: Chairs 25%");
   });
+
+  it("uses the price the client accepted for an event that has one", () => {
+    // The picnic's accepted proposal sold the tent and urn for 1,050; its
+    // holds (tent at list 900, unpriced urn) no longer count. Cancelled and
+    // June events' sales stay out.
+    const report = rentalReport(
+      {
+        ...input,
+        sales: [
+          { eventId: "picnic", amount: 1050 },
+          { eventId: "dropped", amount: 400 },
+          { eventId: "june", amount: 700 },
+        ],
+      },
+      MAY,
+      JUNE,
+    );
+    expect(report).toMatchObject({
+      equipmentCharged: 50 * 4 + 1050,
+      soldEvents: 1,
+      unpricedHolds: 0,
+    });
+    const text = rentalReportRows(report)
+      .map((row) => row.join(" | "))
+      .join("\n");
+    expect(text).toContain(
+      "1 event(s) at the price the client accepted; others at list price.",
+    );
+  });
 });

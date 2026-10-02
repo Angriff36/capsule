@@ -33,6 +33,8 @@ export function OpeningStockImport() {
     setError(null);
     setMessage("");
     setBusy(true);
+    let added = 0;
+    let already = 0;
     try {
       const rows = sheetRows(await file.text()).map((row) => {
         const read = readOpeningStockRow(row);
@@ -42,8 +44,6 @@ export function OpeningStockImport() {
             : row;
         return { ...withDate, SourceFile: file.name };
       });
-      let added = 0;
-      let already = 0;
       for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const part = rows.slice(i, i + CHUNK_SIZE);
         setMessage(
@@ -63,8 +63,13 @@ export function OpeningStockImport() {
           : `${added} rows added to the list below${already > 0 ? `, ${already} were already on it` : ""}. Stock on hand does not change until you check a row and use it.`,
       );
     } catch (cause: unknown) {
+      const reason =
+        cause instanceof Error ? cause.message : "The import did not work.";
+      // Rows read before the stop are kept; reading the file again skips them.
       setError(
-        cause instanceof Error ? cause.message : "The import did not work.",
+        added + already > 0
+          ? `${reason} ${added} rows were added before it stopped. Read the file again to add the rest; rows already on the list are skipped.`
+          : reason,
       );
       setMessage("");
     } finally {

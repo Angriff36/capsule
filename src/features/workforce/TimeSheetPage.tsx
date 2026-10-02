@@ -4,7 +4,6 @@ import {
   useCreateAvailabilityWindow,
   useCreateTimeRecord,
   useListAvailabilityWindow,
-  useListEvent,
   useListPerson,
   useListShift,
   useListTimeRecord,
@@ -36,6 +35,7 @@ import {
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   hoursLabel,
   plannedComparison,
@@ -278,7 +278,10 @@ export function TimeSheetPage() {
   const records = useListTimeRecord();
   const windows = useListAvailabilityWindow();
   const people = useListPerson();
-  const events = useListEvent();
+  const workingId = useWorkingEventId();
+  const events = usePickerAndNamedEvents(
+    records ? [workingId, ...records.map((row) => row.eventId)] : undefined,
+  );
   const shifts = useListShift();
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();

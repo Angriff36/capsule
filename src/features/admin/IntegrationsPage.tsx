@@ -7,6 +7,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { GoogleCalendarSection } from "./GoogleCalendarSection";
 import { OutsideMessagesSection } from "./OutsideMessagesSection";
+import { SmsRecentTexts } from "./SmsRecentTexts";
 import { StepHistorySection } from "./StepHistorySection";
 import { StripeConnectSection } from "./StripeConnectSection";
 import { WebhooksSection } from "./WebhooksSection";
@@ -322,7 +323,10 @@ export function IntegrationsPage() {
               triggers: a delivery is dispatched, an event starts in about two
               hours, and a critical allergen incident is reported. Each person
               opts in from Staff → Roster, and only staff with a phone on file
-              are texted.
+              are texted. Each alert goes to each person once. From 9 pm to 8 am
+              in the kitchen's time zone, only the people on that event's shifts
+              get event and delivery texts; allergen texts go at any hour. A
+              person who texts STOP gets no more texts.
             </p>
 
             {!smsStatus.providerConfigured ? (
@@ -358,6 +362,8 @@ export function IntegrationsPage() {
                 </button>
               )}
             </div>
+
+            <SmsRecentTexts canManage={smsStatus.canManage} />
           </div>
 
           <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm">
@@ -383,6 +389,12 @@ export function IntegrationsPage() {
               <div className="border-t border-line pt-3 text-ink-2">
                 {smsStatus.lastScan.sent} sent · {smsStatus.lastScan.failed}{" "}
                 failed
+                {smsStatus.lastScan.heldForNight > 0
+                  ? ` · ${smsStatus.lastScan.heldForNight} held for the morning`
+                  : ""}
+                {smsStatus.lastScan.optedOut > 0
+                  ? ` · ${smsStatus.lastScan.optedOut} texted STOP`
+                  : ""}
                 {smsStatus.lastScan.error ? (
                   <span className="mt-2 block text-warn">
                     {smsStatus.lastScan.error}

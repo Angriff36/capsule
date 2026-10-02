@@ -9,8 +9,12 @@ export function sumRows(rows: readonly TppRow[], key: string): number {
   }, 0);
 }
 
-export function percentage(numerator: number, denominator: number): number {
-  return denominator === 0 ? 0 : (numerator / denominator) * 100;
+/** Null when there is nothing to divide by, so the report never shows a made-up 0%. */
+export function percentage(
+  numerator: number,
+  denominator: number,
+): number | null {
+  return denominator === 0 ? null : (numerator / denominator) * 100;
 }
 
 export function groupTotals(

@@ -4,7 +4,6 @@ import {
   useCreateVendor,
   useCreateVendorContact,
   useCreateVendorOrder,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListIngredientPriceObservation,
@@ -54,6 +53,7 @@ import {
   useWorkingEventScope,
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -66,10 +66,19 @@ export function PurchasingPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
   const inventoryItems = useListInventoryItem();
-  const events = useListEvent();
   const vendorContacts = useListVendorContact();
   const priceObservations = useListIngredientPriceObservation();
   const demands = useListIngredientDemand();
+  const events = usePickerAndNamedEvents(
+    needs && orders && demands
+      ? [
+          eventScope.scopeId,
+          ...needs.map((row) => row.eventId),
+          ...orders.map((row) => row.eventId),
+          ...demands.map((row) => row.eventId),
+        ]
+      : undefined,
+  );
   const unitMappings = useListItemUnitMapping();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
@@ -405,8 +414,14 @@ export function PurchasingPage() {
       if (!values) return;
       const raw = String(values.amount ?? "").trim();
       const amount = raw === "" ? undefined : Number(raw);
-      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0))
+      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0)) {
+        setFailure(
+          new Error(
+            "The approval threshold must be a number of 0 or more. Leave it empty for no threshold.",
+          ),
+        );
         return;
+      }
       void run("approval-threshold", async () => {
         await setApprovalThreshold({
           docId: purchasingConfig._id,
@@ -471,8 +486,9 @@ export function PurchasingPage() {
         <strong>Automatic weekly draft</strong>
         <span>
           Add dishes, set headcount, approve the event — Capsule rolls the
-          ingredient shortages into one draft vendor order for the week. Nothing
-          is sent to a vendor until you submit it.
+          ingredient shortages into one draft vendor order for the week. Mark
+          the order sent, then email it to the vendor from the order page (or
+          send it your own way).
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}

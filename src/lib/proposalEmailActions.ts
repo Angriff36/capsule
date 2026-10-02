@@ -21,3 +21,13 @@ export function useEmailProposal() {
     [sendAction],
   );
 }
+
+/** Every "Email the proposal" try for one proposal, newest first. */
+export function useProposalEmailHistory() {
+  const historyAction = useAction(api.proposalEmail.getHistory);
+  return useCallback(
+    (proposalId: string) =>
+      historyAction({ proposalId: proposalId as Id<"proposals"> }),
+    [historyAction],
+  );
+}

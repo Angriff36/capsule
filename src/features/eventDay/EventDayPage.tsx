@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import "./EventDay.css";
 import { useEventDayBriefing } from "../../lib/eventDayBriefing";
 import { formatCount, formatDate } from "../../lib/format";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { deriveEventDay, type EventDaySectionKey } from "./eventDayModel";
 import { EventDayMap } from "./EventDayMap";
 import { EventDayNav } from "./EventDayNav";
@@ -40,6 +41,7 @@ export function EventDayPage() {
   // fields), so there is no per-list loading race to guard against.
   const briefing = useEventDayBriefing(id);
   const [open, setOpen] = useState<EventDaySectionKey | null>(null);
+  const { loadingTooLong } = useSlowQuery(briefing);
 
   const data: EventDayDetailData | null = useMemo(() => {
     if (briefing == null) return null;
@@ -73,7 +75,13 @@ export function EventDayPage() {
   }, [briefing]);
 
   if (briefing === undefined)
-    return <CenteredNote>Lighting the estate…</CenteredNote>;
+    return (
+      <CenteredNote>
+        {loadingTooLong
+          ? "This event isn't loading. Check your connection, then refresh the page."
+          : "Lighting the estate…"}
+      </CenteredNote>
+    );
   if (briefing === null || data == null)
     return (
       <CenteredNote>

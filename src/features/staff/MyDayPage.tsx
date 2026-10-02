@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/react";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   useAvailabilityWindowWithdraw,
   useCreateAvailabilityWindow,
@@ -8,7 +8,6 @@ import {
   useListDelivery,
   useListDish,
   useListEventDish,
-  useListEvent,
   useListEventCloseout,
   useListPackList,
   useListPackListItem,
@@ -32,6 +31,7 @@ import {
   useListEventAssignment,
   useListEventStaffNeed,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { MyShiftWorkDetails, shiftWorkDetails } from "./MyShiftWorkDetails";
 import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -138,7 +138,6 @@ export function MyDayPage() {
     useListEventCloseout(),
     offlineScope,
   );
-  const events = useCachedRead("events", useListEvent(), offlineScope);
   const packLists = useCachedRead("packLists", useListPackList(), offlineScope);
   const packItems = useCachedRead(
     "packItems",
@@ -255,6 +254,43 @@ export function MyDayPage() {
   );
   const linkedPersonName = me ? `${me.givenName} ${me.familyName}` : undefined;
   useOfflineSync(runnersRef, me ? offlineScope : null);
+  // Read only the events these rows name; this person's own shifts lead.
+  const myId = me?._id;
+  const eventIds = useMemo(
+    () =>
+      shifts === undefined ||
+      tasks === undefined ||
+      eventDishes === undefined ||
+      deliveries === undefined ||
+      closeouts === undefined ||
+      packLists === undefined ||
+      assignments === undefined ||
+      staffNeeds === undefined
+        ? undefined
+        : [
+            ...shifts.filter((shift) => shift.personId === myId),
+            ...shifts,
+            ...assignments,
+            ...staffNeeds,
+            ...closeouts,
+            ...tasks,
+            ...eventDishes,
+            ...packLists,
+            ...deliveries,
+          ].map((row) => row.eventId),
+    [
+      shifts,
+      tasks,
+      eventDishes,
+      deliveries,
+      closeouts,
+      packLists,
+      assignments,
+      staffNeeds,
+      myId,
+    ],
+  );
+  const events = useCachedRead("events", useEventsById(eventIds), offlineScope);
   const replayScope = useRef<string | null>(null);
   replayScope.current = me ? offlineScope : null;
   useEffect(() => {

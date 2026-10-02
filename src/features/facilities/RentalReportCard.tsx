@@ -1,11 +1,13 @@
+import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
+import { api } from "../../lib/api";
 import {
   useListEquipment,
   useListEquipmentIssue,
   useListEquipmentReservation,
-  useListEvent,
   useListRentalOrderLine,
 } from "../../lib/manifest-convex-react";
+import { useEventsById, useEventsInRange } from "./useEventsById";
 import { formatMoneyExact } from "../../lib/format";
 import { rentalReport, type RentalReport } from "../logistics/rentalReporting";
 
@@ -30,9 +32,16 @@ export function rentalReportRows(
     [
       "Equipment charged to clients",
       formatMoneyExact(report.equipmentCharged),
-      report.unpricedHolds > 0
-        ? `${report.unpricedHolds} hold(s) on items with no client price - not counted.`
-        : "Every hold is on a priced item.",
+      [
+        report.soldEvents > 0
+          ? `${report.soldEvents} event(s) at the price the client accepted; others at list price.`
+          : "At list price for what is held.",
+        report.unpricedHolds > 0
+          ? `${report.unpricedHolds} hold(s) on items with no client price - not counted.`
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
     ],
     [
       "Vendor rental cost",
@@ -66,14 +75,41 @@ export function rentalReportRows(
 
 /** Rental revenue, vendor cost, loss and damage, and equipment use by month. */
 export function RentalReportCard() {
-  const events = useListEvent();
   const equipment = useListEquipment();
   const holds = useListEquipmentReservation();
   const lines = useListRentalOrderLine();
   const issues = useListEquipmentIssue();
   const [month, setMonth] = useState(() => monthValue(new Date()));
+  const [periodStart, periodEnd] = monthRange(month);
+  // Events that start in the month, plus the events of holds that overlap the
+  // month (a hold can reach into the month from an event that started before).
+  const monthEvents = useEventsInRange({ from: periodStart, to: periodEnd });
+  const holdEventIds = useMemo(
+    () =>
+      holds
+        ?.filter(
+          (hold) =>
+            hold.startsAt != null &&
+            hold.endsAt != null &&
+            hold.startsAt < periodEnd &&
+            hold.endsAt > periodStart,
+        )
+        .map((hold) => String(hold.eventId)),
+    [holds, periodStart, periodEnd],
+  );
+  const holdEvents = useEventsById(holdEventIds);
+  const events = useMemo(
+    () =>
+      monthEvents && holdEvents ? [...monthEvents, ...holdEvents] : undefined,
+    [monthEvents, holdEvents],
+  );
+  const sales = useQuery(api.rentalSales.acceptedRentalSales, {
+    periodStart,
+    periodEnd,
+  });
   const report = useMemo(() => {
-    if (!events || !equipment || !holds || !lines || !issues) return null;
+    if (!events || !equipment || !holds || !lines || !issues || !sales)
+      return null;
     const [start, end] = monthRange(month);
     return rentalReport(
       {
@@ -98,11 +134,12 @@ export function RentalReportCard() {
           ...row,
           quantity: Number(row.quantity),
         })),
+        sales,
       },
       start,
       end,
     );
-  }, [events, equipment, holds, lines, issues, month]);
+  }, [events, equipment, holds, lines, issues, sales, month]);
 
   return (
     <section className="card p-5" data-testid="rental-report-card">

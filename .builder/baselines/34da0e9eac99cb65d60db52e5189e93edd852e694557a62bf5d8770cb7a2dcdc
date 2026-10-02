@@ -4684,6 +4684,27 @@ export const VendorContractPriceTierSchema = z.object({
 
 export type VendorContractPriceTier = z.infer<typeof VendorContractPriceTierSchema>;
 
+// Entity: VendorItem
+export const VendorItemSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  itemCode: z.string().nullable().optional(),
+  description: z.string().default(""),
+  packQuantity: z.number().default(1),
+  packUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  packPrice: z.number().nullable().optional(),
+  pricedPackQuantity: z.number().nullable().optional(),
+  priceSetAt: z.coerce.date().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorItem = z.infer<typeof VendorItemSchema>;
+
 // Entity: VendorOrder
 export const VendorOrderSchema = z.object({
   id: z.string().uuid(),
@@ -12391,6 +12412,35 @@ export const VendorContractPriceTierUpdateParamsSchema = z.object({
 
 export type VendorContractPriceTierUpdateParams = z.infer<typeof VendorContractPriceTierUpdateParamsSchema>;
 
+// Command: add on VendorItem
+export const VendorItemAddParamsSchema = z.object({
+  vendorId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  description: z.string(),
+  packQuantity: z.number(),
+  packUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  itemCode: z.string().optional(),
+  packPrice: z.number().optional(),
+});
+
+export type VendorItemAddParams = z.infer<typeof VendorItemAddParamsSchema>;
+
+// Command: remove on VendorItem
+export const VendorItemRemoveParamsSchema = z.object({});
+
+export type VendorItemRemoveParams = z.infer<typeof VendorItemRemoveParamsSchema>;
+
+// Command: update on VendorItem
+export const VendorItemUpdateParamsSchema = z.object({
+  description: z.string(),
+  packQuantity: z.number(),
+  packUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  itemCode: z.string().optional(),
+  packPrice: z.number().optional(),
+});
+
+export type VendorItemUpdateParams = z.infer<typeof VendorItemUpdateParamsSchema>;
+
 // Command: approve on VendorOrder
 export const VendorOrderApproveParamsSchema = z.object({});
 
@@ -12549,6 +12599,8 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   orderedNeed: z.number().optional(),
   fulfilledNeed: z.number().optional(),
   stockClaimed: z.number().optional(),
+  vendorPackPrice: z.number().optional(),
+  vendorPackQuantity: z.number().optional(),
 });
 
 export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLineEnsureWeeklyLineParamsSchema>;

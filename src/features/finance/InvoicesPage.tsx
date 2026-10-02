@@ -8,7 +8,6 @@ import {
   useInvoiceSend,
   useInvoiceWriteOff,
   useListClient,
-  useListEvent,
   useListInvoice,
   useListOrganization,
   useListTaxRate,
@@ -36,6 +35,7 @@ import {
   useWorkingEventScope,
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CommercialLifecyclePolicy();
 
@@ -69,7 +69,10 @@ export function InvoicesPage() {
   const openFromLink = searchParams.get("issue") === "1";
   const invoices = useListInvoice();
   const clients = useListClient();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([
+    prefillEventId,
+    eventScope.workingId,
+  ]);
   const taxRates = useListTaxRate();
   const organizations = useListOrganization();
   const createInvoice = useCreateInvoice();

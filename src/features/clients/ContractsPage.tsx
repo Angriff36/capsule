@@ -9,7 +9,6 @@ import {
   useCreateContract,
   useListClient,
   useListContract,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -21,6 +20,7 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -28,7 +28,7 @@ export function ContractsPage() {
   const workingId = useWorkingEventId();
   const contracts = useListContract();
   const clients = useListClient();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
   const send = useContractSend();
   const markViewed = useContractMarkViewed();

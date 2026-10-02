@@ -5,7 +5,6 @@ import {
   useListEquipmentIssue,
   useListEquipmentPart,
   useListEquipmentReservation,
-  useListEvent,
   useListEventAssignment,
   useListEventPlanNeeds,
   useListEventStaffNeed,
@@ -24,6 +23,10 @@ import {
   type PlanLevels,
   type PlanSnapshot,
 } from "../../../lib/planningChecks";
+import { useEventRecordsInRange } from "../../facilities/useEventsById";
+import { DAY_MS } from "../../home/homeCalendar";
+
+const PLAN_WINDOW_DAYS = 90;
 
 export type PlanData = {
   loading: boolean;
@@ -38,8 +41,18 @@ export type PlanData = {
  * Everything the planning board reads, as one snapshot. A list this role may
  * not read comes back empty, so its checks simply find nothing.
  */
-export function usePlanSnapshot(): PlanData {
-  const events = useListEvent();
+export function usePlanSnapshot(anchor: number): PlanData {
+  // Events within 90 days either side of the day the board is showing: more
+  // than the 42-day month grid, so multi-day jobs and the events they could
+  // clash with are all here. The window moves with the board, not each render.
+  const eventWindow = useMemo(
+    () => ({
+      from: anchor - PLAN_WINDOW_DAYS * DAY_MS,
+      to: anchor + PLAN_WINDOW_DAYS * DAY_MS,
+    }),
+    [anchor],
+  );
+  const events = useEventRecordsInRange(eventWindow);
   const assignments = useListEventAssignment();
   const staffNeeds = useListEventStaffNeed();
   const rigs = useListEventVehicleAssignment();
