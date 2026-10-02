@@ -5,9 +5,12 @@
  * file walks the 22 steps in order over this one world; this file only seeds
  * and reads (assertion-free).
  */
+import { convexTest } from "convex-test";
+import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { api } from "../../convex/_generated/api";
+import schema from "../../convex/schema";
+import { modules } from "./convex-test-modules";
 import {
-  harness,
   liveRows,
   readRow,
   rolesFor,
@@ -22,6 +25,21 @@ export { liveRows, readRow };
 export type { Proof, Role };
 
 const M = api.mutations;
+
+/** ONE convex-test database shared by the proof-kit actors and raw calls
+ * (signed-in crew, scheduled follow-ups): a second convexTest() call would
+ * be a separate database. */
+function harness() {
+  const raw = convexTest(schema, modules);
+  return Object.assign(
+    createManifestTestContext({
+      convexTest: (() => raw) as never,
+      schema,
+      modules,
+    }),
+    { raw },
+  );
+}
 
 export const TENANT = "tenant-golden-event";
 export const OWNER_SUBJECT = `owner-${TENANT}`;
@@ -71,6 +89,8 @@ export const QUOTE = {
 
 export type World = {
   proof: Proof;
+  /** The same database, for signed-in crew and scheduled follow-ups. */
+  raw: ReturnType<typeof convexTest>;
   owner: Role;
   roles: ReturnType<typeof rolesFor> & { logistics: Role };
   run: {
@@ -135,7 +155,15 @@ export async function seedWorld(): Promise<World> {
     sellingPrice: FACTS.saltedPrice,
   });
   await run.owner(M.Menu_markPublished, { docId: menu.docId });
-  return { proof, owner, roles, run, catalog, menuId: menu.docId };
+  return {
+    proof,
+    raw: proof.raw,
+    owner,
+    roles,
+    run,
+    catalog,
+    menuId: menu.docId,
+  };
 }
 
 /** The proof-kit actor type declares mutations only; the convex-test

@@ -37,6 +37,7 @@ import {
 } from "../../src/features/logistics/packViews";
 import { fakeRoutes, stubRouteEnv } from "./route-facts.runtime.helpers";
 import { readReconciliationReceipts } from "./single-reconciliation.runtime.helpers";
+import { settle } from "./timing-rules.runtime.helpers";
 import {
   drafts,
   lineFor,
@@ -46,6 +47,7 @@ import {
 const M = api.mutations;
 const LONG = 120_000;
 const MIN = 60_000;
+const DAY = 24 * 60 * MIN;
 /** Kitchen-to-venue drive (the stubbed provider answer) and timing rules. */
 const ROUTE = {
   driveSeconds: 2400,
@@ -1163,4 +1165,176 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
     },
     LONG,
   );
+
+  it(
+    "golden event 15: Reschedule or change venue; verify a new route fact, old/new purchasing drafts, staffing-following windows, delivery/timeline/readiness, and packet staleness",
+    async () => {
+      vi.useFakeTimers();
+      stubRouteEnv();
+      const google = fakeRoutes(() => ROUTE.driveSeconds);
+      try {
+        // Ana's work follows the event; Cy's week was already sent and
+        // confirmed, so his shift may only move through the correction path.
+        const ana = await seedCrew(w, "Ana", "555-0111");
+        const cy = await seedCrew(w, "Cy", "555-0122");
+        const rows: Record<string, string> = {};
+        for (const [name, person] of Object.entries({ ana, cy }))
+          rows[name] = (
+            await w.run.owner(M.EventAssignment_createViaAssign, {
+              eventId: id.golden,
+              personId: person.personId,
+              role: "Server",
+            })
+          ).docId;
+        await settle(w.raw);
+        const shiftsOf = async (personId: string) =>
+          (
+            await liveRows<{
+              tenantId: string;
+              personId: string;
+              status: string;
+              startsAt: number;
+            }>(w.owner, "shifts", TENANT)
+          ).filter((s) => s.personId === personId && s.status !== "cancelled");
+        const [anaBefore] = await shiftsOf(ana.personId);
+        expect(anaBefore.startsAt).toEqual(expect.any(Number));
+        const notice = await w.run.owner(
+          M.WeeklyScheduleNotice_createViaPublishSchedule,
+          {
+            personId: cy.personId,
+            recipientAuthSubjectId: cy.subject,
+            weekStartsAt: WEEK.key,
+            weekEndsAt: WEEK.key + 7 * DAY,
+            shiftCount: 1,
+            shiftSummary: "Wed · 1:00 PM · Server · Golden event",
+          },
+        );
+        await w.raw
+          .withIdentity({
+            subject: cy.subject,
+            org_id: TENANT,
+            role: "event_staff",
+          })
+          .mutation(M.WeeklyScheduleNotice_acknowledge, {
+            docId: notice.docId,
+          } as never);
+        await settle(w.raw);
+        const factsBefore = await routeFacts();
+
+        // The client moves the event one week later.
+        await w.run.events(M.Event_reschedule, {
+          docId: id.golden,
+          version: await versionOf(w, id.golden),
+          startsAt: WEEK.golden.startsAt + 7 * DAY,
+          endsAt: WEEK.golden.endsAt + 7 * DAY,
+        });
+        await settle(w.raw);
+
+        // Staffing: Ana follows, Cy waits for a manager to send the change.
+        const [anaAfter] = await shiftsOf(ana.personId);
+        expect(anaAfter.startsAt).toBe(anaBefore.startsAt + 7 * DAY);
+        const [cyBefore] = await shiftsOf(cy.personId);
+        const changes = (await w.owner.query(
+          api.shiftTimingChanges.listEventShiftChanges,
+          { eventId: id.golden } as never,
+        )) as {
+          proposalId: string;
+          personName: string;
+          acknowledged: boolean;
+          to: { startsAt: number };
+        }[];
+        const cyChange = changes.find((c) => c.personName === "Cy Crew")!;
+        expect(cyChange.acknowledged).toBe(true);
+        expect(cyChange.to.startsAt).toBe(cyBefore.startsAt + 7 * DAY);
+        await w.owner.mutation(api.shiftTimingChanges.applyShiftTimingChange, {
+          proposalId: cyChange.proposalId,
+          shiftSummary: "Wed · 1:00 PM · Server · Golden event (moved)",
+        } as never);
+        const [cyAfter] = await shiftsOf(cy.personId);
+        expect(cyAfter.startsAt).toBe(cyBefore.startsAt + 7 * DAY);
+        const resent = await readRow<{ acknowledgedAt: number | null }>(
+          w.owner,
+          notice.docId,
+        );
+        expect(resent.acknowledgedAt ?? null).toBeNull();
+
+        // Purchasing: the golden event's food moved to the new week's draft;
+        // the competing event stays on the old week's draft.
+        const weekDrafts = await drafts(w.roles.procurement, TENANT);
+        const oldWeek = weekDrafts.find(
+          (d) => d.sourceRangeStart === WEEK.key,
+        )!;
+        const newWeek = weekDrafts.find(
+          (d) => d.sourceRangeStart === WEEK.key + 7 * DAY,
+        )!;
+        expect(oldWeek).toBeDefined();
+        expect(newWeek).toBeDefined();
+        const flourId = w.catalog.ingredientIds[0];
+        const oldFlour = await lineFor(
+          w.roles.procurement,
+          TENANT,
+          oldWeek._id,
+          flourId,
+        );
+        expect(
+          await linkedEventIds(w.roles.procurement, TENANT, oldFlour!._id),
+        ).toEqual([id.rival]);
+        const newFlour = await lineFor(
+          w.roles.procurement,
+          TENANT,
+          newWeek._id,
+          flourId,
+        );
+        expect(
+          await linkedEventIds(w.roles.procurement, TENANT, newFlour!._id),
+        ).toEqual([id.golden]);
+
+        // Timeline follows the new serve time.
+        const ev = (await w.roles.events.query(api.queries.getEvent, {
+          id: id.golden,
+        } as never)) as Record<string, number | null>;
+        expect(ev.serviceStartsAt).toBe(WEEK.golden.startsAt + 7 * DAY);
+        expect(ev.timingOnsiteAt).toBe(
+          WEEK.golden.startsAt + 7 * DAY - ROUTE.setup * MIN,
+        );
+        // A new route fact for the new date.
+        expect((await routeFacts()).length).toBeGreaterThan(factsBefore.length);
+        expect(google.requests.length).toBeGreaterThan(0);
+
+        // The printed packet is out of date, and readiness says so.
+        const p = (await w.owner.query(
+          anyApi.lib.eventPacket.commands.getPacket,
+          { eventId: id.golden },
+        )) as PacketRead;
+        expect(p.latestRevision.stale).toBe(true);
+        const readiness = JSON.stringify(
+          await w.roles.events.query(api.eventReadiness.getEventReadiness, {
+            eventId: id.golden,
+          } as never),
+        );
+        expect(readiness).toContain("packet.out_of_date");
+      } finally {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+        vi.unstubAllEnvs();
+      }
+    },
+    LONG,
+  );
 });
+
+async function routeFacts() {
+  const rows = (await w.owner.run(async (ctx) =>
+    ctx.db.query("manifestEvents").collect(),
+  )) as unknown as {
+    entity: string;
+    entityId: string;
+    payload: { fact?: unknown };
+  }[];
+  return rows.filter(
+    (row) =>
+      row.entity === "EventRoute" &&
+      row.entityId === id.golden &&
+      row.payload.fact,
+  );
+}
