@@ -1,8 +1,11 @@
-import { useAction, useQuery } from "convex/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { api, type Id } from "../../lib/api";
+import type { Id } from "../../lib/api";
 import { publicErrorMessage } from "../../lib/publicErrorMessage";
+import {
+  useEventCalendarSyncMarker,
+  useRetryEventCalendarSync,
+} from "../../lib/useEventCalendarSync";
 import { EventOverviewCard } from "./EventOverviewCard";
 
 /**
@@ -16,10 +19,8 @@ export function EventCalendarSyncNote({
 }: {
   readonly eventId: Id<"events">;
 }) {
-  const marker = useQuery(api.googleCalendarHealth.eventSyncMarker, {
-    eventId,
-  });
-  const retryEvent = useAction(api.googleCalendar.retryEvent);
+  const marker = useEventCalendarSyncMarker(eventId);
+  const retryEvent = useRetryEventCalendarSync();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   if (!marker || marker.status !== "failed") return null;
