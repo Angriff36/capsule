@@ -237,6 +237,7 @@ import type * as parallelRun from "../parallelRun.js";
 import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
 import type * as personalDataExport from "../personalDataExport.js";
+import type * as proposalEmail from "../proposalEmail.js";
 import type * as publicMenu from "../publicMenu.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as qboSync from "../qboSync.js";
@@ -518,6 +519,7 @@ declare const fullApi: ApiFromModules<{
   personEmail: typeof personEmail;
   personEmployeeNumber: typeof personEmployeeNumber;
   personalDataExport: typeof personalDataExport;
+  proposalEmail: typeof proposalEmail;
   publicMenu: typeof publicMenu;
   pushSubscriptions: typeof pushSubscriptions;
   qboSync: typeof qboSync;

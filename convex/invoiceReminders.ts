@@ -305,91 +305,101 @@ function assertOpenInvoice(invoice: Doc<"invoices">): void {
   }
 }
 
+/**
+ * Who a client email goes to (billing contact, then main contact, then any
+ * active contact with an email, then the client account) and the company it
+ * comes from. Shared by invoice, reminder and proposal emails.
+ */
+export async function clientRecipientAndCompany(
+  ctx: QueryCtx,
+  tenantId: string,
+  clientId: Id<"clients">,
+): Promise<Pick<DeliveryContext, "recipient" | "organization">> {
+  const [client, contacts, organizations] = await Promise.all([
+    ctx.db.get(clientId),
+    ctx.db
+      .query("clientContacts")
+      .withIndex("by_clientId", (q) => q.eq("clientId", clientId))
+      .collect(),
+    ctx.db
+      .query("organizations")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect(),
+  ]);
+  const eligibleContacts = contacts.filter(
+    (contact) =>
+      contact.tenantId === tenantId &&
+      contact.deletedAt == null &&
+      contact.status === "active" &&
+      Boolean(contact.email),
+  );
+  const preferredContact =
+    eligibleContacts.find((contact) => contact.isBillingContact) ??
+    eligibleContacts.find((contact) => contact.isPrimary) ??
+    eligibleContacts[0];
+  const contactEmail = preferredContact
+    ? await decryptField(ctx, "ClientContact", "email", preferredContact.email)
+    : null;
+  const accountEmail = client
+    ? await decryptField(ctx, "Client", "email", client.email)
+    : null;
+  const recipientEmail = contactEmail?.trim() || accountEmail?.trim() || null;
+  const recipientSource: RecipientSource = !contactEmail?.trim()
+    ? "client account"
+    : preferredContact?.isBillingContact
+      ? "billing contact"
+      : preferredContact?.isPrimary
+        ? "main contact"
+        : "contact";
+  const organization =
+    organizations.find(
+      (row) => row.deletedAt == null && row.status === "active",
+    ) ?? organizations.find((row) => row.deletedAt == null);
+
+  return {
+    recipient: recipientEmail
+      ? {
+          email: recipientEmail,
+          name: preferredContact
+            ? contactName(preferredContact)
+            : clientName(client),
+          source: recipientSource,
+          contactId:
+            recipientSource === "client account" || !preferredContact
+              ? null
+              : String(preferredContact._id),
+        }
+      : null,
+    organization: {
+      displayName:
+        organization?.brandDisplayName?.trim() ||
+        organization?.name.trim() ||
+        "Catering company",
+      address: organization?.brandAddress?.trim() || null,
+      primaryColor: organization?.brandPrimaryColor ?? null,
+      accentColor: organization?.brandAccentColor ?? null,
+    },
+  };
+}
+
 export const loadDeliveryContext = internalQuery({
   args: { invoiceId: v.id("invoices"), tenantId: v.string() },
   handler: async (ctx, args): Promise<DeliveryContext | null> => {
     const invoice = await ctx.db.get(args.invoiceId);
     if (!invoice || invoice.tenantId !== args.tenantId) return null;
 
-    const [client, contacts, organizations, ledgerRows, linkedEvent] =
-      await Promise.all([
-        ctx.db.get(invoice.clientId),
-        ctx.db
-          .query("clientContacts")
-          .withIndex("by_clientId", (q) => q.eq("clientId", invoice.clientId))
-          .collect(),
-        ctx.db
-          .query("organizations")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-          .collect(),
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entityId", (q) =>
-            q.eq("entityId", String(invoice._id)),
-          )
-          .collect(),
-        invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
-      ]);
-
-    const eligibleContacts = contacts.filter(
-      (contact) =>
-        contact.tenantId === args.tenantId &&
-        contact.deletedAt == null &&
-        contact.status === "active" &&
-        Boolean(contact.email),
-    );
-    const preferredContact =
-      eligibleContacts.find((contact) => contact.isBillingContact) ??
-      eligibleContacts.find((contact) => contact.isPrimary) ??
-      eligibleContacts[0];
-    const contactEmail = preferredContact
-      ? await decryptField(
-          ctx,
-          "ClientContact",
-          "email",
-          preferredContact.email,
-        )
-      : null;
-    const accountEmail = client
-      ? await decryptField(ctx, "Client", "email", client.email)
-      : null;
-    const recipientEmail = contactEmail?.trim() || accountEmail?.trim() || null;
-    const recipientSource: RecipientSource = !contactEmail?.trim()
-      ? "client account"
-      : preferredContact?.isBillingContact
-        ? "billing contact"
-        : preferredContact?.isPrimary
-          ? "main contact"
-          : "contact";
-    const organization =
-      organizations.find(
-        (row) => row.deletedAt == null && row.status === "active",
-      ) ?? organizations.find((row) => row.deletedAt == null);
+    const [people, ledgerRows, linkedEvent] = await Promise.all([
+      clientRecipientAndCompany(ctx, args.tenantId, invoice.clientId),
+      ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) => q.eq("entityId", String(invoice._id)))
+        .collect(),
+      invoice.eventId ? ctx.db.get(invoice.eventId) : Promise.resolve(null),
+    ]);
 
     return {
       invoice,
-      recipient: recipientEmail
-        ? {
-            email: recipientEmail,
-            name: preferredContact
-              ? contactName(preferredContact)
-              : clientName(client),
-            source: recipientSource,
-            contactId:
-              recipientSource === "client account" || !preferredContact
-                ? null
-                : String(preferredContact._id),
-          }
-        : null,
-      organization: {
-        displayName:
-          organization?.brandDisplayName?.trim() ||
-          organization?.name.trim() ||
-          "Catering company",
-        address: organization?.brandAddress?.trim() || null,
-        primaryColor: organization?.brandPrimaryColor ?? null,
-        accentColor: organization?.brandAccentColor ?? null,
-      },
+      ...people,
       eventTitle:
         linkedEvent && linkedEvent.tenantId === args.tenantId
           ? linkedEvent.title?.trim() || null

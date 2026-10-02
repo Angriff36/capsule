@@ -174,9 +174,9 @@ it("reports proposal publication and contract sent-recording as internal status 
     docId: "proposal-a",
     version: 3,
   });
-  expect(container.textContent).toContain("Proposal published in Capsule.");
+  expect(container.textContent).toContain("Proposal published.");
   expect(container.textContent).toContain(
-    "Capsule does not send it externally.",
+    "Press Email the proposal to send the client the PDF",
   );
   backend.values.set("useListContract", [
     { _id: "contract-a", title: "Supper terms", status: "draft", version: 4 },

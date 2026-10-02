@@ -508,6 +508,7 @@ Screens (29): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `lib.proposalPricing.reviseProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
 - `lib.quoteSelections.estimateQuote` - query; live read, updates by itself
+- `proposalEmail.send` - action; one-time call (not live); the live reads it changes update by themselves
 - `publicMenu.getPublicMenu` - query; live read, updates by itself
 - `quoteBuilder.getEventBookingDetails` - query; live read, updates by itself
 - `shareLinks.getSharedProposal` - query; live read, updates by itself
