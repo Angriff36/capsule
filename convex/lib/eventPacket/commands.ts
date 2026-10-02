@@ -12,6 +12,7 @@ import {
 import type { Id } from "../../_generated/dataModel";
 import { getAuthContext, requireTenant } from "../authContext";
 import { orgCapabilityDeniesAction } from "../orgCapabilityGate";
+import { TenantSystemCommandRunner } from "../tenantSystemCommandRunner";
 import {
   readCurrentPacket,
   scopedEvent,
@@ -890,6 +891,17 @@ export const recordPacketRevision = mutation({
           supersededBy: id,
           updatedAt: Date.now(),
         });
+    // A binder built from an earlier print is out of date now: the tracker
+    // shows it as not built until someone rebuilds it from this print.
+    const event = await ctx.db.get(args.eventId);
+    if (current.revisionRows.length > 0 && event?.binderBuiltAt != null)
+      await TenantSystemCommandRunner.forTenant(
+        ctx,
+        auth.tenantId,
+      ).context.runMutation(api.mutations.Event_clearBinderBuilt, {
+        docId: args.eventId,
+        version: event.version,
+      });
     return { id, fingerprint: args.inputFingerprint, reused: false };
   },
 });

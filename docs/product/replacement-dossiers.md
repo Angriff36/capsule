@@ -173,7 +173,7 @@ assigned as field work (§20.6).
 | Packet versions, out of date after a change | Workbook history | `proofs/packet-out-of-date-readiness` | Built |
 | Keep BEOs, worksheets, drawings with the event | Workbook sources, Photos tab | `proofs/event-packet-evidence`, `proofs/record-source-provenance` | Built (kept and linked) |
 | Route, map, load-in, setup drawings in the packet | packet venue part | `proofs/backend-golden-event` step 10 | Partly: map is a link, drawings are listed by name, not drawn |
-| Tracker board | `/events/tracker` | none | Built; the binder mark is a hand mark with no "reprint, the packet changed" hint |
+| Tracker board | `/events/tracker` | `proofs/packet-out-of-date-readiness` (binder mark) | Built; the binder mark is set by hand and clears itself when a changed packet is printed |
 | Event chat (replaces Slack) | event Chat tab | `proofs/event-communication`, `proofs/event-chat-channel` | Built |
 
 History: BEO paste and TPP files on `/events/import`; original PDFs are kept
