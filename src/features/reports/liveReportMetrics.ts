@@ -205,7 +205,8 @@ export const LIVE_REPORT_METRICS = {
     ...SHIFT_BASE,
     label: "Scheduled hours",
     measures: "Hours from shift start to shift end, added together.",
-    includes: "Every status. A shift with no end time adds no hours.",
+    includes:
+      "Shifts with a start and an end. Shifts with no end time are counted beside the total as not timed, never as zero hours.",
   },
   "workforce.completed": {
     ...SHIFT_BASE,

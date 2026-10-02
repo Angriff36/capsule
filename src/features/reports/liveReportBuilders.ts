@@ -321,6 +321,9 @@ function buildWorkforceReport(
   const hours = rows.reduce((total, row) => total + shiftHours(row), 0);
   const completedRows = withStatus(rows, "completed");
   const noShowRows = withStatus(rows, "no_show");
+  // A shift with no usable start and end has unknown hours, not zero.
+  const timed = rows.filter((row) => shiftHours(row) > 0);
+  const untimed = rows.filter((row) => shiftHours(row) <= 0);
   return model({
     subject: "workforce",
     sourceLabel: "Shifts",
@@ -332,7 +335,8 @@ function buildWorkforceReport(
       kpi("workforce.shifts", formatCount(rows.length)),
       kpi(
         "workforce.scheduled_hours",
-        hours.toLocaleString("en-US", { maximumFractionDigits: 1 }),
+        hoursWithCoverage(hours, untimed.length),
+        timed,
       ),
       kpi(
         "workforce.completed",
@@ -684,6 +688,12 @@ function kpi(
 
 function withStatus(rows: SourceRow[], status: string): SourceRow[] {
   return rows.filter((row) => row.status === status);
+}
+
+function hoursWithCoverage(hours: number, untimed: number): string {
+  const total = hours.toLocaleString("en-US", { maximumFractionDigits: 1 });
+  if (untimed === 0) return total;
+  return `${total} · ${formatCount(untimed)} ${untimed === 1 ? "shift" : "shifts"} not timed`;
 }
 
 function statusKpi(
