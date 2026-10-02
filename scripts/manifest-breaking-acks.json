@@ -2508,6 +2508,36 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-01",
       "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Client.emailPreference",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Client.emailPreferenceNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Client.emailPreferenceSetAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Organization.emailReplyTo",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "Organization.emailSenderName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-02",
+      "reason": "Builder batch 2026-10-02 (client email choices and company email sender): optional field; saved rows need no backfill."
     }
   ]
 }

@@ -27,6 +27,11 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useListClient: () => [],
   useRevenueAttributionCreate: () => vi.fn(),
   useRevenueAttributionApply: () => vi.fn(),
+  useRevenueAttributionChangeSplit: () => vi.fn(),
+  useRevenueAttributionAllowOverRevenue: () => vi.fn(),
+  useRevenueAttributionApprove: () => vi.fn(),
+  useRevenueAttributionReject: () => vi.fn(),
+  useRevenueAttributionRequestApproval: () => vi.fn(),
   useRevenueAttributionUpdate: () => vi.fn(),
 }));
 

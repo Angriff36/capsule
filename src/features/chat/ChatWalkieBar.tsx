@@ -16,7 +16,12 @@ type Props = {
 export function ChatWalkieBar({ onSend, disabled = false }: Props) {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
-  const pointerRef = useRef<{ id: number; inside: boolean } | null>(null);
+  const pointerRef = useRef<{ id: number } | null>(null);
+  // Latch for the async getUserMedia warm-up: blocks a second pointerdown
+  // during the gap (multi-touch would otherwise start two recordings and
+  // leak the first mic stream) and lets the release handler know a press
+  // is in flight even before the recorder exists.
+  const startingRef = useRef(false);
 
   const handleTake = useCallback(
     async (take: VoiceTake) => {
@@ -42,32 +47,43 @@ export function ChatWalkieBar({ onSend, disabled = false }: Props) {
   const recorder = useVoiceRecorder(handleTake);
 
   const onPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (disabled || sending || recorder.recording) return;
+    if (disabled || sending || recorder.recording || startingRef.current)
+      return;
     event.preventDefault();
     // Capture so release/cancel keeps firing even if the pointer leaves.
     event.currentTarget.setPointerCapture(event.pointerId);
-    pointerRef.current = { id: event.pointerId, inside: true };
-    void recorder.begin();
+    pointerRef.current = { id: event.pointerId };
+    startingRef.current = true;
+    void recorder.begin().finally(() => {
+      startingRef.current = false;
+      // The press ended while the mic was still warming up (quick tap):
+      // end() saw no recorder and no-op'd, so cancel the warm-up now or
+      // recording would start with nobody holding the button.
+      if (pointerRef.current === null) {
+        recorder.cancel();
+      }
+    });
   };
 
-  const onPointerEnter = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (pointerRef.current?.id === event.pointerId) {
-      pointerRef.current.inside = true;
-    }
-  };
-
-  const onPointerLeave = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (pointerRef.current?.id === event.pointerId) {
-      pointerRef.current.inside = false;
-    }
-  };
+  // Dead code removed: onPointerEnter/Leave inside-tracking served the old
+  // release logic; `finish` now hit-tests release coordinates, and boundary
+  // events don't fire under pointer capture anyway.
 
   const finish = (event: React.PointerEvent<HTMLButtonElement>) => {
     const held = pointerRef.current;
     if (!held || held.id !== event.pointerId) return;
     pointerRef.current = null;
-    // Off the button on release = thrown away, like every PTT app.
-    if (held.inside) {
+    // With capture held, pointerleave never fires — the W3C spec targets
+    // boundary events "as if the pointer is always over the capturing
+    // target". Hit-test the release coordinates instead: off the button
+    // means thrown away, like every PTT app.
+    const rect = event.currentTarget.getBoundingClientRect();
+    const inside =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+    if (inside) {
       recorder.end();
     } else {
       recorder.cancel();
@@ -102,13 +118,17 @@ export function ChatWalkieBar({ onSend, disabled = false }: Props) {
             : "Hold to talk"
         }
         onPointerDown={onPointerDown}
-        onPointerEnter={onPointerEnter}
-        onPointerLeave={onPointerLeave}
         onPointerUp={finish}
         onPointerCancel={(event) => {
           pointerRef.current = null;
           recorder.cancel();
-          event.currentTarget.releasePointerCapture(event.pointerId);
+          // The browser may have implicitly released capture before this
+          // ran — a then-invalid releasePointerCapture would throw.
+          try {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          } catch {
+            // Already released: nothing to do.
+          }
         }}
         onContextMenu={(event) => event.preventDefault()}
       >

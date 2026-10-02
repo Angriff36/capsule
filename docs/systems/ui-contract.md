@@ -1134,6 +1134,27 @@ Screens (62): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; "ReviewFlag not found"
   - effects: ReviewFlagReopened
   - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.StaffMessage_edit` (StaffMessage.edit)
+  - inputs from the screen: body, mentionedPersonIds; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageEdited
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_markRead` (StaffMessage.markRead)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageRead
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_remove` (StaffMessage.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffMessageRemoved
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
 - `mutations.Trailer_setCargoFacts` (Trailer.setCargoFacts)
   - inputs from the screen: cargoVolumeM3, hitchType, emptyWeightKg; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -1176,6 +1197,7 @@ Screens (62): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventChecklistApply.apply` - mutation; authored step; live reads update by themselves
 - `eventCreateCatalog.ensureBuiltInServiceStyle` - mutation; authored step; live reads update by themselves
 - `eventReadiness.getEventReadiness` - query; live read, updates by itself
+- `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
 - `lib.eventDuplicate.duplicateEvent` - mutation; authored step; live reads update by themselves
@@ -1199,6 +1221,12 @@ Screens (62): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `rigTrailer.hitchTrailer` - mutation; authored step; live reads update by themselves
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
+- `teamChat.channelSummary` - query; live read, updates by itself
+- `teamChat.listChannel` - query; live read, updates by itself
+- `teamChat.listConversations` - query; live read, updates by itself
+- `teamChat.searchLinkTargets` - query; live read, updates by itself
+- `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
+- `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
 - `venueVendorPolicy.forEvent` - query; live read, updates by itself
 
 ## 4. Menu and kitchen
