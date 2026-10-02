@@ -214,6 +214,7 @@ import type * as lib_shiftSchedulingEvents from "../lib/shiftSchedulingEvents.js
 import type * as lib_shiftTimingProposals from "../lib/shiftTimingProposals.js";
 import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
+import type * as lib_staffSummaryContent from "../lib/staffSummaryContent.js";
 import type * as lib_staffingReconciliation from "../lib/staffingReconciliation.js";
 import type * as lib_standInPurchaseNeed from "../lib/standInPurchaseNeed.js";
 import type * as lib_stripeCheckout from "../lib/stripeCheckout.js";
@@ -273,6 +274,7 @@ import type * as sourceProvenance from "../sourceProvenance.js";
 import type * as staffSelfReviews from "../staffSelfReviews.js";
 import type * as staffShiftSwaps from "../staffShiftSwaps.js";
 import type * as staffSignInEmail from "../staffSignInEmail.js";
+import type * as staffSummaries from "../staffSummaries.js";
 import type * as stripeConnect from "../stripeConnect.js";
 import type * as teamChat from "../teamChat.js";
 import type * as teamChatCursor from "../teamChatCursor.js";
@@ -507,6 +509,7 @@ declare const fullApi: ApiFromModules<{
   "lib/shiftTimingProposals": typeof lib_shiftTimingProposals;
   "lib/staffSignInMailer": typeof lib_staffSignInMailer;
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;
+  "lib/staffSummaryContent": typeof lib_staffSummaryContent;
   "lib/staffingReconciliation": typeof lib_staffingReconciliation;
   "lib/standInPurchaseNeed": typeof lib_standInPurchaseNeed;
   "lib/stripeCheckout": typeof lib_stripeCheckout;
@@ -566,6 +569,7 @@ declare const fullApi: ApiFromModules<{
   staffSelfReviews: typeof staffSelfReviews;
   staffShiftSwaps: typeof staffShiftSwaps;
   staffSignInEmail: typeof staffSignInEmail;
+  staffSummaries: typeof staffSummaries;
   stripeConnect: typeof stripeConnect;
   teamChat: typeof teamChat;
   teamChatCursor: typeof teamChatCursor;

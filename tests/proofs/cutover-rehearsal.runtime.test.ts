@@ -62,7 +62,7 @@ async function rows(owner: Actor, table: string): Promise<Row[]> {
 
 /** Modules that talk to outside services (email, text, push, webhooks, money, calendars, books). */
 const OUTSIDE_SENDERS =
-  /webhookDeliveries|smsAlerts|emailNotifications|teamChatPushSend|schedulePushSend|googleCalendar|qboSync|invoicePayments|staffSignInEmail|personEmail/;
+  /webhookDeliveries|smsAlerts|emailNotifications|teamChatPushSend|schedulePushSend|googleCalendar|qboSync|invoicePayments|staffSignInEmail|personEmail|staffSummaries|vendorOrderEmail/;
 
 describe("runtime proof: cutover rehearsal (AC-174)", () => {
   it("reconciled synthetic migration without external effects", async () => {
