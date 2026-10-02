@@ -164,6 +164,9 @@ export const ClientSchema = z.object({
   registeredAt: z.coerce.date().nullable().optional(),
   archivedAt: z.coerce.date().nullable().optional(),
   mergedAt: z.coerce.date().nullable().optional(),
+  emailPreference: z.enum(["every_email", "no_reminders", "none"]).nullable().optional(),
+  emailPreferenceNote: z.string().nullable().optional(),
+  emailPreferenceSetAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -5229,6 +5232,14 @@ export const ClientSetBirthdayParamsSchema = z.object({
 });
 
 export type ClientSetBirthdayParams = z.infer<typeof ClientSetBirthdayParamsSchema>;
+
+// Command: setEmailPreference on Client
+export const ClientSetEmailPreferenceParamsSchema = z.object({
+  preference: z.enum(["every_email", "no_reminders", "none"]),
+  note: z.string().optional(),
+});
+
+export type ClientSetEmailPreferenceParams = z.infer<typeof ClientSetEmailPreferenceParamsSchema>;
 
 // Command: stageClientMerge on Client
 export const ClientStageClientMergeParamsSchema = z.object({

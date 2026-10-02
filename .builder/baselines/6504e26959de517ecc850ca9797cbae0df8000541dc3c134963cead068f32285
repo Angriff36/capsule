@@ -41,6 +41,7 @@ import {
   ClientReactivateParamsSchema,
   ClientRegisterParamsSchema,
   ClientSetBirthdayParamsSchema,
+  ClientSetEmailPreferenceParamsSchema,
   ClientStageClientMergeParamsSchema,
   ComponentClearPrimaryImageParamsSchema,
   ComponentComponentAddParamsSchema,
@@ -1297,6 +1298,16 @@ export function useClientSetBirthday() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ClientSetBirthdayParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Client.setEmailPreference. */
+export function useClientSetEmailPreference() {
+  const mutate = useMutation(api.mutations.Client_setEmailPreference);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientSetEmailPreferenceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13738,4 +13749,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1454 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1455 as const;

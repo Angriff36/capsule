@@ -20,6 +20,14 @@ enum ClientStatus {
   archived
 }
 
+// Which emails Capsule sends a client (PL-CONSENT). Read at the moment of
+// sending, so a change also stops reminders already scheduled.
+enum ClientEmailPreference {
+  every_email
+  no_reminders
+  none
+}
+
 enum EventStage {
   quote
   planning
@@ -117,6 +125,11 @@ entity Client mixin TenantScoped, SoftDeletable {
   property registeredAt: datetime?
   property archivedAt: datetime?
   property mergedAt: datetime?
+  // Unset = every_email. no_reminders stops automatic payment reminders;
+  // none stops every email Capsule sends this client.
+  property emailPreference: ClientEmailPreference?
+  property emailPreferenceNote: string?
+  property emailPreferenceSetAt: datetime?
 
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -253,6 +266,20 @@ entity Client mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       paymentTermsDays: paymentTermsDays
       taxExempt: taxExempt
+    }
+  }
+
+  // The client's own choice about email (for example "asked us to stop
+  // reminders on the phone"). Works on archived clients too.
+  command setEmailPreference(preference: ClientEmailPreference, optional note: string) {
+    guard self.deletedAt == null
+    mutate emailPreference = preference
+    mutate emailPreferenceNote = note
+    mutate emailPreferenceSetAt = now()
+    emit ClientEmailPreferenceSet {
+      clientId: self.id
+      tenantId: self.tenantId
+      preference: preference
     }
   }
 
@@ -2478,6 +2505,12 @@ event ClientContactChanged: "client.contact_changed" {
 event ClientBirthdaySet: "client.birthday_set" {
   clientId: string
   tenantId: string
+}
+
+event ClientEmailPreferenceSet: "client.email_preference_set" {
+  clientId: string
+  tenantId: string
+  preference: string
 }
 
 event ClientBillingProfileChanged: "client.billing_profile_changed" {

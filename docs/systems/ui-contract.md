@@ -19,7 +19,7 @@ Shared rules for every area:
 
 ## 1. Lead and client
 
-Screens (23): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
+Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientEmailPreferencePanel.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
 
 ### Generated reads
 
@@ -151,6 +151,13 @@ Screens (23): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Birthday must be a YYYY-MM-DD date"; and 2 more
   - effects: ClientBirthdaySet
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 24 more
+- `mutations.Client_setEmailPreference` (Client.setEmailPreference)
+  - inputs from the screen: preference, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "ConcurrencyConflict:"; "Client not found"
+  - effects: ClientEmailPreferenceSet
   - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 24 more
 - `mutations.Contract_createViaDraft` (Contract.draft)
   - inputs from the screen: eventId, clientId, title, contractNumber, documentUrl, expiresAt, notes; filled by the server: none

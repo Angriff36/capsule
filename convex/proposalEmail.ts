@@ -19,6 +19,7 @@ import {
   reminderRemedy,
   RECENT_SEND_WINDOW_MS,
 } from "./lib/reminderDelivery";
+import { clientEmailRefusal } from "./lib/clientEmailConsent";
 import {
   clientRecipientAndCompany,
   fromAddress,
@@ -173,6 +174,11 @@ export const send = action({
         "Capsule could not find this proposal. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
+    const refusal = clientEmailRefusal(
+      context.clientEmailPreference,
+      "document",
+    );
+    if (refusal) throw new ConvexError(refusal);
     const { proposal } = context;
     if (
       proposal.deletedAt != null ||

@@ -227,7 +227,7 @@ describe("payment reminders keep an honest send record", () => {
 
   it("a refused email names a remedy and is not tried again; a silent service is", async () => {
     const env = await setup();
-    const state = { emailStatus: 422 };
+    const state = { emailStatus: 503 };
     stubProviders(state);
     const schedule = await env.finance.action(
       api.invoiceReminders.configureSchedule,
@@ -239,9 +239,12 @@ describe("payment reminders keep an honest send record", () => {
       internal.invoiceReminders.deliverScheduled,
       job(env, schedule.configId, 7),
     );
-    expect((await scheduledJobs(env)).length).toBe(before);
+    expect((await scheduledJobs(env)).length).toBe(before + 1);
 
-    state.emailStatus = 503;
+    // A refused address also stops later scheduled reminders to it
+    // (tests/proofs/reminder-preference-gate.runtime.test.ts), so the
+    // refusal comes second here.
+    state.emailStatus = 422;
     await env.t.action(
       internal.invoiceReminders.deliverScheduled,
       job(env, schedule.configId, 3),
@@ -252,10 +255,10 @@ describe("payment reminders keep an honest send record", () => {
       .filter((row) => row.type === "InvoiceReminderDeliveryFailed")
       .map((row) => row.payload as Record<string, unknown>);
     expect(failed.map((row) => row.failureKind)).toEqual([
-      "refused",
       "service_down",
+      "refused",
     ]);
-    expect(failed.map((row) => row.retryScheduled)).toEqual([false, true]);
+    expect(failed.map((row) => row.retryScheduled)).toEqual([true, false]);
 
     const history = await env.finance.action(api.invoiceReminders.getHistory, {
       invoiceId: env.invoiceId,

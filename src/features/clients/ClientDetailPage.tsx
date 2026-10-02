@@ -31,6 +31,7 @@ import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
 import { ClientContactsPanel } from "./ClientContactsPanel";
+import { ClientEmailPreferencePanel } from "./ClientEmailPreferencePanel";
 import { ClientProfilePanel } from "./ClientProfilePanel";
 import { ClientSourceProvenancePanel } from "./ClientSourceProvenancePanel";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -394,6 +395,14 @@ export function ClientDetailPage() {
           Save contact details
         </button>
       </form>
+
+      <ClientEmailPreferencePanel
+        key={`email-${client.version}`}
+        client={client}
+        busy={busy}
+        run={run}
+        onSaved={setNotice}
+      />
 
       <ClientProfilePanel
         key={`profile-${client.version}`}

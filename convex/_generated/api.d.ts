@@ -78,6 +78,7 @@ import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
 import type * as lib_cateringPackageOperations from "../lib/cateringPackageOperations.js";
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
 import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
+import type * as lib_clientEmailConsent from "../lib/clientEmailConsent.js";
 import type * as lib_clientOutreach from "../lib/clientOutreach.js";
 import type * as lib_clientPortalLinks from "../lib/clientPortalLinks.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
@@ -360,6 +361,7 @@ declare const fullApi: ApiFromModules<{
   "lib/cateringPackageOperations": typeof lib_cateringPackageOperations;
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
   "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
+  "lib/clientEmailConsent": typeof lib_clientEmailConsent;
   "lib/clientOutreach": typeof lib_clientOutreach;
   "lib/clientPortalLinks": typeof lib_clientPortalLinks;
   "lib/clientPortalToken": typeof lib_clientPortalToken;

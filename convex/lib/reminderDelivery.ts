@@ -39,6 +39,9 @@ const REMEDY: Record<ReminderFailureKind, string> = {
 
 /** A send failure whose cause Capsule knows. */
 export class ReminderDeliveryError extends Error {
+  /** Key of the address the email service refused (see recipientKey). */
+  recipientKey?: string;
+
   constructor(
     readonly kind: ReminderFailureKind,
     message: string,
@@ -158,6 +161,10 @@ const SKIP_WORDS: Record<string, string> = {
   invoice_missing: "Skipped: the invoice was removed.",
   due_date_removed: "Skipped: the invoice has no due date.",
   stripe_payment_received: "Skipped: Stripe shows this invoice paid.",
+  client_no_reminders: "Skipped: the client asked for no reminder emails.",
+  client_no_email: "Skipped: the client asked for no emails from us.",
+  address_refused:
+    "Skipped: the email service refused this address before. Fix the client's email address and later reminders go again.",
 };
 
 function text(value: unknown): string | null {

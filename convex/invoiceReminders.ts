@@ -38,6 +38,12 @@ import {
   type ReminderHistoryItem,
 } from "./lib/reminderDelivery";
 import {
+  clientEmailChoice,
+  quietHoursEnd,
+  recipientKey,
+  type ClientEmailChoice,
+} from "./lib/clientEmailConsent";
+import {
   normalizeInvoiceReminderOffsets,
   reminderOffsetLabel,
   reminderScheduledAt,
@@ -101,7 +107,11 @@ interface DeliveryContext {
     senderName: string;
     /** Where client replies go; null = Capsule's sending address. */
     replyTo: string | null;
+    /** The kitchen's time zone (first active location with one); quiet hours use it. */
+    timeZone: string | null;
   };
+  /** The client's own email choice, read at the moment of sending. */
+  clientEmailPreference: ClientEmailChoice;
   eventTitle: string | null;
   ledger: LedgerEvent[];
 }
@@ -119,8 +129,10 @@ interface DeliveryAttempt {
 
 interface DeliveryResult {
   /** "delivered" = the email service took the email (kept for callers). */
-  status: "delivered" | "suppressed" | "already_delivered";
+  status: "delivered" | "suppressed" | "already_delivered" | "deferred";
   reason?: string;
+  /** For "deferred": the scheduled reminder waits until the quiet hours end. */
+  deferredUntil?: number;
   emailId?: string;
   /** For "already_delivered": when the earlier email went and to whom. */
   sentAt?: number;
@@ -318,8 +330,10 @@ export async function clientRecipientAndCompany(
   ctx: QueryCtx,
   tenantId: string,
   clientId: Id<"clients">,
-): Promise<Pick<DeliveryContext, "recipient" | "organization">> {
-  const [client, contacts, organizations] = await Promise.all([
+): Promise<
+  Pick<DeliveryContext, "recipient" | "organization" | "clientEmailPreference">
+> {
+  const [client, contacts, organizations, locations] = await Promise.all([
     ctx.db.get(clientId),
     ctx.db
       .query("clientContacts")
@@ -329,7 +343,15 @@ export async function clientRecipientAndCompany(
       .query("organizations")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
       .collect(),
+    ctx.db
+      .query("operatingLocations")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .take(50),
   ]);
+  const kitchenTimeZone =
+    locations.find(
+      (row) => row.deletedAt == null && row.status === "active" && row.timeZone,
+    )?.timeZone ?? null;
   const eligibleContacts = contacts.filter(
     (contact) =>
       contact.tenantId === tenantId &&
@@ -385,7 +407,11 @@ export async function clientRecipientAndCompany(
       primaryColor: organization?.brandPrimaryColor ?? null,
       accentColor: organization?.brandAccentColor ?? null,
       ...companySender(organization, displayName),
+      timeZone: kitchenTimeZone,
     },
+    clientEmailPreference: clientEmailChoice(
+      client && client.tenantId === tenantId ? client.emailPreference : null,
+    ),
   };
 }
 
@@ -870,6 +896,27 @@ async function recordReminderEvent(
   });
 }
 
+function refusedAddressKey(
+  cause: unknown,
+  kind: string,
+): { recipientKey?: string } {
+  return kind === "refused" &&
+    cause instanceof ReminderDeliveryError &&
+    cause.recipientKey
+    ? { recipientKey: cause.recipientKey }
+    : {};
+}
+
+/** The email service refused this address on an earlier reminder. */
+function refusedBefore(ledger: LedgerEvent[], toKey: string): boolean {
+  return ledger.some(
+    (row) =>
+      row.type === EVENT.failed &&
+      row.payload.failureKind === "refused" &&
+      row.payload.recipientKey === toKey,
+  );
+}
+
 async function deliverReminder(
   ctx: ActionCtx,
   attempt: DeliveryAttempt,
@@ -901,6 +948,27 @@ async function deliverReminder(
   }
   if (context.invoice.dueDate == null) {
     return { status: "suppressed", reason: "due_date_removed" };
+  }
+  // The client's choice and the refused-address stop are read now, not when
+  // the reminder was scheduled, so a later change also stops queued ones.
+  if (context.clientEmailPreference !== "every_email") {
+    return {
+      status: "suppressed",
+      reason:
+        context.clientEmailPreference === "none"
+          ? "client_no_email"
+          : "client_no_reminders",
+    };
+  }
+  const toKey = await recipientKey(context.recipient.email);
+  if (attempt.source === "scheduled") {
+    if (refusedBefore(context.ledger, toKey)) {
+      return { status: "suppressed", reason: "address_refused" };
+    }
+    const quietUntil = quietHoursEnd(Date.now(), context.organization.timeZone);
+    if (quietUntil != null) {
+      return { status: "deferred", deferredUntil: quietUntil };
+    }
   }
   if (wasDelivered(context.ledger, attempt.configId, attempt.offsetDays)) {
     return { status: "already_delivered" };
@@ -970,12 +1038,20 @@ async function deliverReminder(
     });
   }
 
-  const sent = await sendReminderEmail(
-    context,
-    attempt,
-    currentSession.url,
-    environment,
-  );
+  let sent: SentEmail;
+  try {
+    sent = await sendReminderEmail(
+      context,
+      attempt,
+      currentSession.url,
+      environment,
+    );
+  } catch (cause) {
+    // The failure record keeps which address was refused (as a key, never
+    // the address) so later scheduled reminders to it stop.
+    if (cause instanceof ReminderDeliveryError) cause.recipientKey = toKey;
+    throw cause;
+  }
   await recordReminderEvent(ctx, EVENT.delivered, attempt, {
     emailId: sent.emailId,
     providerState: "accepted",
@@ -1049,6 +1125,15 @@ export const deliverScheduled = internalAction({
           reason: result.reason,
         });
       }
+      if (result.status === "deferred" && result.deferredUntil != null) {
+        // Night in the kitchen's time zone: the same reminder runs in the
+        // morning and checks everything again then.
+        await ctx.scheduler.runAt(
+          result.deferredUntil,
+          internal.invoiceReminders.deliverScheduled,
+          args,
+        );
+      }
     } catch (cause) {
       const message = safeProviderMessage(cause);
       const { kind, remedy } = classifyReminderFailure(cause);
@@ -1063,6 +1148,7 @@ export const deliverScheduled = internalAction({
         failureKind: kind,
         remedy,
         retryScheduled: retryDelay != null,
+        ...refusedAddressKey(cause, kind),
       });
       if (retryDelay != null) {
         await ctx.scheduler.runAfter(
@@ -1118,6 +1204,7 @@ export const sendNow = action({
         failureKind: kind,
         remedy,
         retryScheduled: false,
+        ...refusedAddressKey(cause, kind),
       });
       throw new ConvexError(remedy);
     }

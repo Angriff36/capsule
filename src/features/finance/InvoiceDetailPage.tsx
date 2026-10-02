@@ -478,6 +478,17 @@ export function InvoiceDetailPage() {
         );
         return;
       }
+      if (
+        result.reason === "client_no_reminders" ||
+        result.reason === "client_no_email"
+      ) {
+        setNotice(
+          result.reason === "client_no_email"
+            ? "No reminder sent — this client asked for no emails from us. Change it on the client's page if they want emails again."
+            : "No reminder sent — this client asked for no payment reminder emails. Change it on the client's page if they want them again.",
+        );
+        return;
+      }
       if (result.reason === "stripe_payment_received") {
         setNotice(
           "No reminder sent — the client already paid through the payment link.",

@@ -8,6 +8,7 @@ import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { action, internalMutation } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { clientEmailRefusal } from "./lib/clientEmailConsent";
 import {
   buildInvoiceReminderPdf,
   invoiceReminderPdfFileName,
@@ -111,6 +112,11 @@ export const send = action({
         "Capsule could not find this invoice. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
+    const refusal = clientEmailRefusal(
+      context.clientEmailPreference,
+      "document",
+    );
+    if (refusal) throw new ConvexError(refusal);
     const amountDue = Number(context.invoice.amountDue ?? 0);
     const recent = recentSameBalanceSend(
       context.ledger,
