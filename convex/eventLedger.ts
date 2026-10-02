@@ -13,8 +13,13 @@
 // - all / one stage: date order through the date or stage+date index.
 // Search: title and client-name hits across ALL events (search indexes); the
 // page also matches title/venue/client inside the loaded window.
+// Service style (#428): the style filter runs in the database read, so the
+// window holds only that style and "Show more" reaches every event of it. The
+// tab counts stay for all styles. `styles` lists every style the company has,
+// so the filter can pick one that is not in the loaded window.
 import { v } from "convex/values";
-import type { Doc, Id } from "./_generated/dataModel";
+import type { FilterBuilder, NamedTableInfo } from "convex/server";
+import type { DataModel, Doc, Id } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
@@ -56,6 +61,8 @@ export interface LedgerRow {
 
 export interface LedgerWindow {
   rows: LedgerRow[];
+  /** Every service style of the company, for the style filter. */
+  styles: { key: string; label: string }[];
   /** More rows exist past this window. */
   more: boolean;
   searchRows: LedgerRow[];
@@ -97,6 +104,8 @@ export const ledgerWindow = query({
     /** Start of the caller's day; rounded so the read does not re-run every render. */
     now: v.number(),
     search: v.optional(v.string()),
+    /** A service style id, or "none" for events with no style. */
+    style: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<LedgerWindow | null> => {
     const auth = await getAuthContext(ctx);
@@ -108,6 +117,25 @@ export const ledgerWindow = query({
       e.tenantId === tenantId &&
       e.deletedAt == null &&
       (args.showArchived || e.archivedAt == null);
+    const style = args.style?.trim() || null;
+    const ofStyle = (e: Doc<"events">) =>
+      style == null ||
+      (style === "none"
+        ? e.serviceStyleId == null
+        : String(e.serviceStyleId ?? "") === style);
+    // The same style rule inside a database read.
+    const styleWhere = (
+      q: FilterBuilder<NamedTableInfo<DataModel, "events">>,
+      styled: boolean,
+    ) =>
+      !styled || style == null
+        ? true
+        : style === "none"
+          ? q.or(
+              q.eq(q.field("serviceStyleId"), undefined),
+              q.eq(q.field("serviceStyleId"), null),
+            )
+          : q.eq(q.field("serviceStyleId"), style as Id<"serviceStyles">);
 
     const byDate = (order: "asc" | "desc") =>
       ctx.db
@@ -118,7 +146,7 @@ export const ledgerWindow = query({
         .order(order);
     // Upcoming reads skip deleted, archived and finished events in the
     // database read, so `take` counts only rows the tab shows.
-    const fromYesterday = (order: "asc" | "desc") =>
+    const fromYesterday = (order: "asc" | "desc", styled: boolean) =>
       ctx.db
         .query("events")
         .withIndex("by_tenantId_and_startsAt", (q) =>
@@ -140,9 +168,10 @@ export const ledgerWindow = query({
             q.neq(q.field("stage"), "completed"),
             q.neq(q.field("stage"), "cancelled"),
             q.neq(q.field("stage"), "closed_out"),
+            styleWhere(q, styled),
           ),
         );
-    const undated = async (take: number) => {
+    const undated = async (take: number, styled: boolean) => {
       const [none, missing] = await Promise.all(
         [null, undefined].map((startsAt) =>
           ctx.db
@@ -165,6 +194,7 @@ export const ledgerWindow = query({
                 q.neq(q.field("stage"), "completed"),
                 q.neq(q.field("stage"), "cancelled"),
                 q.neq(q.field("stage"), "closed_out"),
+                styleWhere(q, styled),
               ),
             )
             .take(take),
@@ -181,13 +211,19 @@ export const ledgerWindow = query({
         .order(order);
 
     // Upcoming window: from yesterday on, not done, plus undated.
-    const upcomingOf = async (order: "asc" | "desc", take: number) => {
+    const upcomingOf = async (
+      order: "asc" | "desc",
+      take: number,
+      styled: boolean,
+    ) => {
       const [dated, noDate] = await Promise.all([
-        fromYesterday(order).take(take + 1),
-        undated(take + 1),
+        fromYesterday(order, styled).take(take + 1),
+        undated(take + 1, styled),
       ]);
       const keep = (e: Doc<"events">) =>
-        visible(e) && !DONE_STAGES.has(String(e.stage));
+        visible(e) &&
+        !DONE_STAGES.has(String(e.stage)) &&
+        (!styled || ofStyle(e));
       const datedRows = dated.slice(0, take).filter(keep);
       const undatedRows = noDate.slice(0, take).filter(keep);
       return {
@@ -240,7 +276,7 @@ export const ledgerWindow = query({
     };
 
     const [upcoming, attention] = await Promise.all([
-      upcomingOf("asc", LEDGER_CAP),
+      upcomingOf("asc", LEDGER_CAP, false),
       attentionOf(LEDGER_CAP),
     ]);
 
@@ -248,15 +284,15 @@ export const ledgerWindow = query({
     let more = false;
     if (args.view === "upcoming") {
       const w =
-        args.dir === "asc" && limit <= LEDGER_CAP
+        args.dir === "asc" && limit <= LEDGER_CAP && style == null
           ? upcoming
-          : await upcomingOf(args.dir, limit);
+          : await upcomingOf(args.dir, limit, true);
       // The window limit applies to dated rows; events with no date always
       // list (they sit under "Date to confirm").
       docs = [...w.datedRows.slice(0, limit), ...w.undatedRows];
       more = w.capped || w.datedRows.length > limit;
     } else if (args.view === "attention") {
-      docs = attention.rows;
+      docs = attention.rows.filter(ofStyle);
       more = attention.capped;
     } else {
       const stage = (STAGES as readonly string[]).includes(args.view)
@@ -275,6 +311,7 @@ export const ledgerWindow = query({
                   q.eq(q.field("archivedAt"), undefined),
                   q.eq(q.field("archivedAt"), null),
                 ),
+            styleWhere(q, true),
           ),
         )
         .take(limit + 1);
@@ -339,8 +376,18 @@ export const ledgerWindow = query({
     const searchRows: LedgerRow[] = [];
     for (const e of searchDocs.filter(visible)) searchRows.push(await toRow(e));
 
+    const styleDocs = await ctx.db
+      .query("serviceStyles")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .take(200);
+    const styleList = styleDocs
+      .filter((s) => s.deletedAt == null)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name))
+      .map((s) => ({ key: String(s._id), label: s.name }));
+
     return {
       rows,
+      styles: styleList,
       more,
       searchRows,
       upcomingCount: upcoming.rows.length,
