@@ -768,21 +768,14 @@ export const commitImport = internalAction({
       };
     }
 
-    // TODO: Implement actual commit logic:
-    // 1. Create ExternalRecordLink entries for each imported record
-    // 2. Insert/update target entity records
-    // 3. Handle conflicts and duplicates
-    // 4. Track committed records
-
-    // Progress to completed stage
-    await ctx.runMutation(internal.importCoordinator.progressImportStage, {
-      importRunId: args.importRunId,
-      toStage: "completed",
-    });
-
+    // This step has no file rows, so it cannot save records. The real commit
+    // is importCommit.commitImportRun (it reads the rows and links each
+    // record). Refuse instead of marking the run completed with nothing saved.
     return {
-      success: true,
-      stage: "completed",
+      success: false,
+      stage: "committing",
+      failureReason:
+        "Nothing was saved. Finish the import from the import page, which reads the file rows.",
     };
   },
 });
@@ -876,18 +869,10 @@ export const revertImport = mutation({
       );
     }
 
-    // TODO: Implement revert logic:
-    // 1. Find all ExternalRecordLinks with sourceImportRunId
-    // 2. Delete or mark as reverted the linked Capsule entities
-    // 3. Mark links as superseded
-
-    await ctx.db.patch(args.importRunId, {
-      status: "reverted",
-      revertedAt: Date.now(),
-      endTime: Date.now(),
-      updatedAt: Date.now(),
-    });
-
-    return { success: true };
+    // The real undo is importCommit.revertImportRun (it supersedes the run's
+    // links). Marking the run "reverted" here would undo nothing.
+    throw new ConvexError(
+      "Nothing was undone. Undo the import from the import page.",
+    );
   },
 });
