@@ -6,7 +6,8 @@
  * - The same provider thread and message ids sent by two companies make two
  *   separate threads; neither sees the other's.
  * - The second company cannot link, merge, mark, or qualify the first
- *   company's thread.
+ *   company's thread, and no company can merge its own thread into
+ *   another company's thread (#427).
  * - A delivery with no sign-in is refused before anything is stored.
  * - A failed delivery shows the failure but not the provider's keys.
  */
@@ -90,6 +91,33 @@ describe("PL-INBOX conversations stay inside their company (AC-112)", () => {
     expect(after).toEqual(before);
     const leads = await t.run(async (ctx) => ctx.db.query("leads").collect());
     expect(leads).toHaveLength(0);
+  });
+
+  // #427: a company cannot point its own thread at another company's thread.
+  it("refuses merging a thread into another company's thread", async () => {
+    const t = convexTest(schema, modules);
+    const a = t.withIdentity(owner("tenant-merge-a"));
+    const b = t.withIdentity(owner("tenant-merge-b"));
+    const inA = await a.action(api.messageInbox.ingestProviderEnvelope, {
+      provider: "email",
+      rawJson: delivery,
+    });
+    const inB = await b.action(api.messageInbox.ingestProviderEnvelope, {
+      provider: "email",
+      rawJson: delivery,
+    });
+
+    const before = await t.run(async (ctx) => ctx.db.get(inA.threadId!));
+    await expect(
+      a.mutation(api.mutations.MessageThread_mergeInto, {
+        docId: inA.threadId!,
+        targetThreadId: inB.threadId! as never,
+      }),
+    ).rejects.toThrow("A linked record was not found");
+    const after = await t.run(async (ctx) => ctx.db.get(inA.threadId!));
+    expect(after).toEqual(before);
+    expect(after?.mergedIntoThreadId).toBeUndefined();
+    expect(after?.status).toBe("active");
   });
 
   it("refuses a delivery with no sign-in and stores nothing", async () => {
