@@ -557,7 +557,7 @@
 .chat-walkie-mic[data-recording="true"] {
   background: var(--color-danger);
   border-color: var(--color-danger);
-  color: #fff;
+  color: var(--color-chat-on-accent);
   animation: chat-walkie-pulse 1.2s ease-in-out infinite;
 }
 
@@ -598,7 +598,8 @@
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-danger) 45%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--color-danger) 0%, transparent);
+    box-shadow: 0 0 0 0.4rem
+      color-mix(in srgb, var(--color-danger) 0%, transparent);
   }
 }
 
@@ -665,4 +666,42 @@
     animation: none;
     opacity: 1;
   }
+}
+
+/* Walkie power switch (event header) — green dot when armed, flash on RX. */
+.walkie-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.walkie-toggle-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink-3);
+  flex-shrink: 0;
+}
+
+.walkie-toggle[data-armed="true"] .walkie-toggle-dot {
+  background: var(--color-ok);
+}
+
+.walkie-toggle[data-speaking="true"] .walkie-toggle-dot {
+  animation: chat-walkie-blink 0.6s ease-in-out infinite;
+}
+
+/* "Receiving…" line under the event chat thread. */
+.chat-walkie-status {
+  min-height: 1.25rem;
+  padding: 0 0.25rem;
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-3);
+}
+
+.chat-walkie-status[data-receiving="true"] {
+  color: var(--color-ok);
+  font-weight: 600;
 }

@@ -57,7 +57,7 @@ function ChatVoiceMessage({ attachment }: { attachment: ChatAttachmentView }) {
           const audio = audioRef.current;
           if (!audio) return;
           if (audio.paused) {
-            void audio.play();
+            audio.play().catch(() => setPlaying(false));
           } else {
             audio.pause();
           }
@@ -79,6 +79,7 @@ function ChatVoiceMessage({ attachment }: { attachment: ChatAttachmentView }) {
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
+        onError={() => undefined}
       />
     </div>
   );

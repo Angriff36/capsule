@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { normalizeCurrencyCode } from "../../lib/format";
@@ -46,6 +46,9 @@ import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
+import { WalkieToggle } from "../chat/WalkieToggle";
+import { useWalkieReceiver } from "../chat/useWalkieReceiver";
+import { chatChannelKey, type ChatChannel } from "../chat/chatTypes";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
@@ -127,6 +130,19 @@ function EventDetailContent({
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
+  // The walkie receiver lives at the dossier level, not inside the chat tab:
+  // an armed device must speak takes no matter which tab is open (Timeline,
+  // Staffing, anywhere). The header WalkieToggle shares its arm state.
+  const eventChannel = useMemo<ChatChannel>(
+    () => ({ kind: "event", eventId: event._id }),
+    [event._id],
+  );
+  const eventChannelKey = chatChannelKey(eventChannel);
+  const { receiving } = useWalkieReceiver({
+    channel: eventChannel,
+    channelKey: eventChannelKey,
+    myPersonId: null,
+  });
   const clients = useHeldQueryRows("clients", useListClient());
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
@@ -329,6 +345,7 @@ function EventDetailContent({
   ).length;
 
   const headerActions = [
+    <WalkieToggle key="walkie" channelKey={eventChannelKey} />,
     ...(headerPrimary
       ? [
           <button
