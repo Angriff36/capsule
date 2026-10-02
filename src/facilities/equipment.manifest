@@ -311,6 +311,10 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint writeOffMissingNonnegative: missingQuantity >= 0 "The missing amount can't be negative. Use zero or more."
     mutate quantity = self.quantity - missingQuantity >= 0 ? self.quantity - missingQuantity : 0
+    emit EquipmentMissingWrittenOff {
+      equipmentId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command retire(reason: string) {
@@ -798,6 +802,10 @@ entity EquipmentPart mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint changePartAmount: quantity > 0 "A part has to come in an amount of at least 1."
     mutate quantity = quantity
+    emit EquipmentPartAmountChanged {
+      equipmentPartId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command detach() {
@@ -826,6 +834,17 @@ event EquipmentPartDetached: "equipment.part_detached" {
   equipmentPartId: string
   tenantId: string
   equipmentId: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event EquipmentMissingWrittenOff: "equipment.missing.written.off" {
+  equipmentId: string
+  tenantId: string
+}
+
+event EquipmentPartAmountChanged: "equipment.part.amount.changed" {
+  equipmentPartId: string
+  tenantId: string
 }
 
 event EquipmentCustomFieldsSet: "equipment.custom_fields_set" {

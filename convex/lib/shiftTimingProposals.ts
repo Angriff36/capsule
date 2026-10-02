@@ -9,6 +9,7 @@
  */
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { insertStepEvent } from "./commandAudit";
 
 export const SHIFT_CHANGE_ENTITY = "ShiftTimingChange";
 export const SHIFT_CHANGE_PROPOSED = "ShiftTimingChangeProposed";
@@ -135,7 +136,7 @@ export async function proposeShiftChange(
     role: to.role,
     proposedAt: now,
   };
-  await ctx.db.insert("manifestEvents", {
+  await insertStepEvent(ctx, {
     type: SHIFT_CHANGE_PROPOSED,
     entity: SHIFT_CHANGE_ENTITY,
     entityId: String(shift._id),

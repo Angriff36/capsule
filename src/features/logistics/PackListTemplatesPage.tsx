@@ -196,6 +196,7 @@ export function PackListTemplatesPage() {
     if (!trimmed) {
       setFailure({
         category: "validation",
+        code: "VALIDATION_FAILED",
         title: "Check the entered details",
         detail: "Give this template a name.",
       });
@@ -206,6 +207,7 @@ export function PackListTemplatesPage() {
     if (min != null && max != null && max < min) {
       setFailure({
         category: "validation",
+        code: "VALIDATION_FAILED",
         title: "Check the entered details",
         detail: "Guests to has to be the same as or higher than guests from.",
       });

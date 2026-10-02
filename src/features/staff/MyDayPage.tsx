@@ -67,8 +67,12 @@ import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
 import { MyDayPrepList } from "./MyDayPrepList";
 import { MyDayFieldForms } from "./MyDayFieldForms";
 import { MyPastShiftsCard } from "./MyPastShiftsCard";
+import { OpenShiftsCard } from "./OpenShiftsCard";
 import { readClockEvidence } from "./clockLocation";
-import { breakMinutesInput } from "../workforce/timeRecordEntry";
+import {
+  breakMinutesInput,
+  currentShiftFor,
+} from "../workforce/timeRecordEntry";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
 const dayLabel = (ms?: number | null) =>
@@ -353,31 +357,8 @@ export function MyDayPage() {
 
   // Attach the clock-in to my current shift (and its event) so worked time is
   // event-attributable — labor cost in closeouts and margin reads from it.
-  // Best match: a shift whose window covers now (±2h slack), else today's
-  // first upcoming shift.
-  const clockInShift = (() => {
-    const now = Date.now();
-    const slack = 2 * 60 * 60 * 1000;
-    const dayStart = new Date();
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date();
-    dayEnd.setHours(23, 59, 59, 999);
-    return (
-      myShifts.find(
-        (shift) =>
-          shift.startsAt != null &&
-          shift.endsAt != null &&
-          now >= shift.startsAt - slack &&
-          now <= shift.endsAt + slack,
-      ) ??
-      myShifts.find(
-        (shift) =>
-          shift.startsAt != null &&
-          shift.startsAt >= dayStart.getTime() &&
-          shift.startsAt <= dayEnd.getTime(),
-      )
-    );
-  })();
+  // Same matcher as the time sheet: covering shift, else today's first shift.
+  const clockInShift = currentShiftFor(String(me._id), myShifts);
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -907,6 +888,14 @@ export function MyDayPage() {
           </div>
           <div className="my-day-secondary-grid">
             <div className="my-day-section-stack">
+              <OpenShiftsCard
+                personId={me._id}
+                needs={staffNeeds}
+                events={events}
+                now={now}
+                busy={busy}
+                run={run}
+              />
               <MyPastShiftsCard
                 records={myRecords}
                 eventTitle={eventTitle}

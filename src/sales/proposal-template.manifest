@@ -49,6 +49,12 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
   // Expiration policy (days until proposal expires, null for no default)
   property validityDays: int?
 
+  // PL-CATALOGS (AC-221/AC-222): the service style this template is for, like
+  // pack list and staffing templates. A proposal built from an event with that
+  // style starts from this template. Null = any style.
+  property serviceStyleId: uuid?
+  ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
+
   // Template status
   property required status: ProposalTemplateStatus = "active"
   property definedAt: datetime?
@@ -83,7 +89,8 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     optional defaultTaxRate: decimal(7, 4),
     optional defaultServiceChargePercent: decimal(7, 4),
     optional validityDays: int,
-    optional sectionOrder: list<string>
+    optional sectionOrder: list<string>,
+    optional serviceStyleId: uuid
   ) {
     guard self.definedAt == null
     guard self.deletedAt == null
@@ -101,6 +108,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     mutate defaultTaxRate = defaultTaxRate
     mutate defaultServiceChargePercent = defaultServiceChargePercent
     mutate validityDays = validityDays
+    mutate serviceStyleId = serviceStyleId
     mutate definedAt = now()
     mutate definedById = user.id
     emit ProposalTemplateDefined {
@@ -120,7 +128,8 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     optional defaultTaxRate: decimal(7, 4),
     optional defaultServiceChargePercent: decimal(7, 4),
     optional validityDays: int,
-    optional sectionOrder: list<string>
+    optional sectionOrder: list<string>,
+    optional serviceStyleId: uuid
   ) {
     guard self.definedAt != null
     guard self.status == "active"
@@ -139,6 +148,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
     mutate defaultTaxRate = defaultTaxRate
     mutate defaultServiceChargePercent = defaultServiceChargePercent
     mutate validityDays = validityDays
+    mutate serviceStyleId = serviceStyleId
     mutate updatedAt = now()
     mutate updatedById = user.id
     emit ProposalTemplateRevised {

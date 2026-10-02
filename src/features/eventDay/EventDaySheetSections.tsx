@@ -14,6 +14,7 @@ import { eventWorkbookReviewPath } from "../events/eventRoutes";
 import { compareActivities } from "../events/EventTimelinePanel";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
+import { loadWindowLabel } from "../facilities/venueOperatingFacts";
 import {
   allergenLabel,
   deriveDishAllergens,
@@ -172,13 +173,23 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
         venue.hasFreightElevator ? "Freight elevator" : null,
         venue.hasStairs ? "Stairs" : null,
         venue.storageAvailable ? "Storage" : null,
+        venue.hasOven ? "Oven" : null,
+        venue.hasRefrigeration ? "Fridge" : null,
       ].filter(Boolean)
     : [];
+  // A confirmed "no" changes what the crew brings, so say it out loud.
+  const missing = venue
+    ? [
+        venue.hasOven === false ? "no oven" : null,
+        venue.hasRefrigeration === false ? "no fridge" : null,
+      ].filter(Boolean)
+    : [];
+  const loadWindow = venue ? loadWindowLabel(venue) : null;
   return (
     <div>
       <Row
         title={String(name)}
-        sub={venue?.capacity != null ? `Capacity ${venue.capacity}` : undefined}
+        sub={venue?.capacity ? `Capacity ${venue.capacity}` : undefined}
       />
       {address ? <p className="evd-note">{address}</p> : null}
       {traits.length > 0 ? (
@@ -187,6 +198,13 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
           <p className="evd-note">{traits.join(" · ")}</p>
         </>
       ) : null}
+      {missing.length > 0 ? (
+        <Note
+          label="Bring your own"
+          text={`Venue has ${missing.join(" and ")}`}
+        />
+      ) : null}
+      <Note label="Load-in window" text={loadWindow} />
       <Note label="Load-in" text={venue?.loadInInstructions} />
       <Note label="Access" text={venue?.accessNotes} />
       <Note label="Catering notes" text={venue?.cateringNotes} />

@@ -303,6 +303,14 @@ export const cloneMenu = mutation({
       minGuests: source.minGuests,
       maxGuests: source.maxGuests,
     });
+    // The season travels with the copy like the category does (AC-050).
+    if (source.availableFrom != null || source.availableUntil != null) {
+      await ctx.runMutation(api.mutations.Menu_setSeason, {
+        docId: created.docId,
+        availableFrom: source.availableFrom ?? undefined,
+        availableUntil: source.availableUntil ?? undefined,
+      });
+    }
     const liveLines = lines.filter((row) => row.deletedAt == null);
     for (let index = 0; index < liveLines.length; index++) {
       const line = liveLines[index];

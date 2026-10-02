@@ -59,6 +59,10 @@ type SharedProposal = {
     wasteRules: string | null;
     permitsInsuranceNotes: string | null;
     restrictions: string | null;
+    seatedCapacity: number | null;
+    standingCapacity: number | null;
+    loadInFrom: string | null;
+    loadOutBy: string | null;
   } | null;
   clientName: string;
   lineItems: Array<{
@@ -225,6 +229,16 @@ export const getSharedProposal = query({
           wasteRules: str(venueSnap.wasteRules),
           permitsInsuranceNotes: str(venueSnap.permitsInsuranceNotes),
           restrictions: str(venueSnap.restrictions),
+          seatedCapacity:
+            typeof venueSnap.seatedCapacity === "number"
+              ? venueSnap.seatedCapacity
+              : null,
+          standingCapacity:
+            typeof venueSnap.standingCapacity === "number"
+              ? venueSnap.standingCapacity
+              : null,
+          loadInFrom: str(venueSnap.loadInFrom),
+          loadOutBy: str(venueSnap.loadOutBy),
         }
       : null;
 

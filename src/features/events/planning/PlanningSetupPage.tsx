@@ -60,6 +60,7 @@ import { useSuccessToast } from "../../../ui/useSuccessToast";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
+import { StageMovesSection } from "./StageMovesSection";
 
 const LEVEL_LABEL: Record<PlanLevel, string> = {
   fix: "Fix first",
@@ -301,7 +302,7 @@ export function PlanningSetupPage() {
       <PageHeader
         eyebrow="Events · Planning"
         title="Planning setup"
-        lead="How the planning board checks a plan, what it suggests, and the facts it needs about trucks and equipment."
+        lead="How the planning board checks a plan, which stages events move into by themselves, what the board suggests, and the facts it needs about trucks and equipment."
       />
       {savedToast}
       {failure ? <FailureBanner failure={failure} /> : null}
@@ -380,6 +381,14 @@ export function PlanningSetupPage() {
           </form>
         )}
       </section>
+
+      <StageMovesSection
+        organization={organization}
+        loading={loading}
+        canEdit={canChecks}
+        busy={busy}
+        run={run}
+      />
 
       <section className="mt-10" aria-label="Planning rules">
         <div className="section-rule">

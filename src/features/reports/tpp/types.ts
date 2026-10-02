@@ -144,35 +144,45 @@ export interface TppLabel {
   lines: readonly string[];
 }
 
-export type TppReportResult =
-  | {
-      kind: "table";
-      title: string;
-      context?: readonly TppReportContext[];
-      columns: readonly TppColumn[];
-      rows: readonly TppRow[];
-      groups: readonly TppGroup[];
-      totals: readonly TppTotal[];
-    }
-  | {
-      kind: "document";
-      title: string;
-      template: string;
-      sections: readonly TppDocumentSection[];
-      exportTable?: { columns: readonly TppColumn[]; rows: readonly TppRow[] };
-    }
-  | {
-      kind: "labels";
-      title: string;
-      stock: "avery_5160" | "avery_5163" | "table_tent" | "envelope_10";
-      labels: readonly TppLabel[];
-    }
-  | {
-      kind: "financial";
-      title: string;
-      columns: readonly TppColumn[];
-      rows: readonly TppRow[];
-      groups: readonly TppGroup[];
-      totals: readonly TppTotal[];
-      measures: readonly TppMeasure[];
-    };
+/** Missing-data notices every output (screen, print, CSV, Excel) repeats. */
+interface TppResultNotices {
+  notices?: readonly string[];
+}
+
+export type TppReportResult = TppResultNotices &
+  (
+    | {
+        kind: "table";
+        title: string;
+        context?: readonly TppReportContext[];
+        columns: readonly TppColumn[];
+        rows: readonly TppRow[];
+        groups: readonly TppGroup[];
+        totals: readonly TppTotal[];
+      }
+    | {
+        kind: "document";
+        title: string;
+        template: string;
+        sections: readonly TppDocumentSection[];
+        exportTable?: {
+          columns: readonly TppColumn[];
+          rows: readonly TppRow[];
+        };
+      }
+    | {
+        kind: "labels";
+        title: string;
+        stock: "avery_5160" | "avery_5163" | "table_tent" | "envelope_10";
+        labels: readonly TppLabel[];
+      }
+    | {
+        kind: "financial";
+        title: string;
+        columns: readonly TppColumn[];
+        rows: readonly TppRow[];
+        groups: readonly TppGroup[];
+        totals: readonly TppTotal[];
+        measures: readonly TppMeasure[];
+      }
+  );

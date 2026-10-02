@@ -33,6 +33,10 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
     guard self.defaultVendor != null and self.defaultVendor.status == "active"
     mutate defaultVendorId = defaultVendorId
     mutate configuredAt = self.configuredAt != null ? self.configuredAt : now()
+    emit WeeklyPurchasingConfigured {
+      weeklyPurchasingConfigId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Manager control on buyer spend — setting it is manage-gated so buyers
@@ -42,6 +46,10 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     constraint approvalThresholdNonnegative: amount == null or amount >= 0 "The order amount that needs a manager's OK can't be negative. Use zero or more, or leave it blank."
     mutate orderApprovalThresholdAmount = amount
+    emit WeeklyPurchasingOrderApprovalThresholdSet {
+      weeklyPurchasingConfigId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command routeNeed(
@@ -148,11 +156,19 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
 
   command refreshRecipeSync() {
     mutate recipeSyncComponentId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.componentId : null
+    emit EventDishComponentSeedRecipeSyncRefreshed {
+      eventDishComponentSeedId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command retire() {
     guard self.deletedAt == null
     mutate deletedAt = now()
+    emit EventDishComponentSeedRetired {
+      eventDishComponentSeedId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command refresh() {
@@ -304,6 +320,10 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command refreshRecipeSync() {
     mutate recipeSyncComponentId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.componentId : null
     mutate recipeSyncIngredientId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.ingredientId : null
+    emit EventIngredientContributionRecipeSyncRefreshed {
+      eventIngredientContributionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
@@ -758,3 +778,29 @@ on EventCancelled fanOut EventDishComponentSeed where eventId = payload.eventId
 
 on EventCancelled fanOut EventIngredientContribution where eventId = payload.eventId
   run refreshRecipeSync
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event EventDishComponentSeedRecipeSyncRefreshed: "event.dish.component.seed.recipe.sync.refreshed" {
+  eventDishComponentSeedId: string
+  tenantId: string
+}
+
+event EventDishComponentSeedRetired: "event.dish.component.seed.retired" {
+  eventDishComponentSeedId: string
+  tenantId: string
+}
+
+event EventIngredientContributionRecipeSyncRefreshed: "event.ingredient.contribution.recipe.sync.refreshed" {
+  eventIngredientContributionId: string
+  tenantId: string
+}
+
+event WeeklyPurchasingConfigured: "weekly.purchasing.configured" {
+  weeklyPurchasingConfigId: string
+  tenantId: string
+}
+
+event WeeklyPurchasingOrderApprovalThresholdSet: "weekly.purchasing.order.approval.threshold.set" {
+  weeklyPurchasingConfigId: string
+  tenantId: string
+}

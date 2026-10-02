@@ -17,6 +17,8 @@ export function installFakeClerk(seed: { id: string; email: string }[] = []) {
   for (const row of seed) add(row.id, row.email);
   const calls: FakeClerkCall[] = [];
   const invitations: { organizationId: string; email: string }[] = [];
+  /** The next N invitation sends answer with this status instead. */
+  const invitationFailures = { left: 0, status: 503 };
 
   const payload = (user: FakeUser) => ({
     id: user.id,
@@ -85,6 +87,13 @@ export function installFakeClerk(seed: { id: string; email: string }[] = []) {
       return json({ deleted: true });
     }
     if (parts[1] === "organizations" && parts[3] === "invitations") {
+      if (invitationFailures.left > 0) {
+        invitationFailures.left -= 1;
+        return json(
+          { errors: [{ code: "service_down", message: "sk_live_leak down" }] },
+          invitationFailures.status,
+        );
+      }
       invitations.push({
         organizationId: decodeURIComponent(parts[2]!),
         email: (body as { email_address: string }).email_address,
@@ -104,6 +113,10 @@ export function installFakeClerk(seed: { id: string; email: string }[] = []) {
     invitations,
     emailsOf: (id: string) => users.get(id)?.emails.map((row) => row.email),
     writes: () => calls.filter((call) => call.method !== "GET"),
+    failInvitations: (count: number, status = 503) => {
+      invitationFailures.left = count;
+      invitationFailures.status = status;
+    },
     restore: () => {
       vi.unstubAllGlobals();
       delete process.env.CLERK_SECRET_KEY;

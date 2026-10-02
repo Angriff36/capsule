@@ -476,6 +476,10 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "produced"
     mutate producedAt = now()
+    emit ProductionBatchAllocationProduced {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command markPortioned() {
@@ -483,6 +487,10 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "portioned"
     mutate portionedAt = now()
+    emit ProductionBatchAllocationPortioned {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command release(reason: string) {
@@ -492,6 +500,10 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
     mutate status = "released"
     mutate releaseReason = reason
     mutate deletedAt = now()
+    emit ProductionBatchAllocationReleased {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store ProductionBatchAllocation in durable
@@ -518,3 +530,19 @@ on ProductionBatchCompleted fanOut ProductionBatchAllocation where productionBat
 on ProductionBatchPlanned run ProductionBatch.resolveShortfall
   resolve payload.makeUpForBatchId
   params { resolution: "Make-up batch planned" }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ProductionBatchAllocationPortioned: "production.batch.allocation.portioned" {
+  productionBatchAllocationId: string
+  tenantId: string
+}
+
+event ProductionBatchAllocationProduced: "production.batch.allocation.produced" {
+  productionBatchAllocationId: string
+  tenantId: string
+}
+
+event ProductionBatchAllocationReleased: "production.batch.allocation.released" {
+  productionBatchAllocationId: string
+  tenantId: string
+}

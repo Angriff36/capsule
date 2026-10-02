@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useListClient,
@@ -196,10 +196,17 @@ export function ProposalsPage() {
       ?.scrollIntoView({ block: "start" });
   }, [focusedProposalId, proposalsLoaded]);
 
+  // "Create proposal" on an event navigates here with ?event=<id>: one click
+  // builds the proposal from the event (menu, prices, date, venue) and opens
+  // it (issue #415). Building again is safe: an unchanged event writes
+  // nothing. Only an event with no client yet falls back to the form.
+  const builtFor = useRef<string | null>(null);
   useEffect(() => {
-    // "Create proposal" on an event navigates here with ?event=<id>; open the
-    // draft form prefilled from that event (spec §5.3 create-proposal-from-event).
-    if (fromEvent) {
+    if (!fromEvent || builtFor.current === fromEvent._id) return;
+    builtFor.current = fromEvent._id;
+    if (fromEvent.clientId) {
+      void buildFromEvent(fromEvent._id as Id<"events">);
+    } else {
       setShowDraft(true);
     }
   }, [fromEvent?._id]);

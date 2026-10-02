@@ -216,27 +216,43 @@ export function canMarkNotApplicable(
   );
 }
 /**
- * Old report checks asked for an uploaded TPP / Nowsta report. When Capsule
- * holds the event's own pack list or crew, it prints those views itself, so
- * the check is answered without uploading anything again (spec §14.3).
+ * Checks Capsule answers from the event's own records, so nobody ticks them
+ * by hand (issue #418). Old report checks asked for an uploaded TPP / Nowsta
+ * report: when Capsule holds the event's own pack list or crew, it prints
+ * those views itself (spec §14.3). The same holds for the crew, the truck run,
+ * rentals, layouts and the tracker, which Capsule keeps itself, and for the
+ * load and travel times once the event's timeline has them. Every pattern in
+ * a list must match at least one of the event's own facts.
  */
-const NATIVE_REPORTS: Record<string, RegExp> = {
-  "check.report.packlist_item_type": /^packlist\.native-item-/,
-  "check.report.packlist_category": /^packlist\.native-item-/,
-  "check.report.nowsta_event_timesheet": /^crew\.native-/,
+const NATIVE_ANSWERS: Record<string, RegExp[]> = {
+  "check.report.packlist_item_type": [/^packlist\.native-item-/],
+  "check.report.packlist_category": [/^packlist\.native-item-/],
+  "check.report.nowsta_event_timesheet": [/^crew\.native-/],
+  "check.assignment.crew": [/^crew\.native-/],
+  "check.assignment.vehicle": [/^vehicle\.native-/],
+  "check.live.tracker": [/^crew\.native-/, /^packlist\.native-/],
+  "check.live.goodshuffle": [/^equipment\.native-/],
+  "check.live.dropbox": [/^layouts\.native-/],
+  "check.timeline.load-travel": [
+    /^timeline\.event_staff_on\.\d+\.time$/,
+    /^timeline\.nlt\.\d+\.time$/,
+    /^timeline\.arrive_onsite\.\d+\.time$/,
+  ],
 };
 export function nativelyAnswered(
   checkKey: string,
   facts: Pick<EventPacketSnapshot, "facts">["facts"],
 ): boolean {
-  const pattern = NATIVE_REPORTS[checkKey];
+  const patterns = NATIVE_ANSWERS[checkKey];
   return (
-    !!pattern &&
-    facts.some(
-      (f) =>
-        pattern.test(f.fieldKey) &&
-        f.status === "confirmed" &&
-        f.authority === "native_finalized",
+    !!patterns &&
+    patterns.every((pattern) =>
+      facts.some(
+        (f) =>
+          pattern.test(f.fieldKey) &&
+          f.status === "confirmed" &&
+          f.authority === "native_finalized",
+      ),
     )
   );
 }

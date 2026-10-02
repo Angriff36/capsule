@@ -31,6 +31,14 @@ export function TeamRolesPanel({
   const setPayRate = usePersonSetPayRate();
   const provisionSignIn = useAction(api.authProvision.provisionStaffSignIn);
   const myPersonId = useQuery(api.authStatus.getAuthStatus, {})?.personId;
+  const signInEmails = useQuery(
+    api.staffSignInEmail.listSignInEmailStates,
+    canEdit ? {} : "skip",
+  );
+  const signInEmailByPersonId = useMemo(
+    () => new Map((signInEmails ?? []).map((row) => [row.personId, row])),
+    [signInEmails],
+  );
   const payRates = usePayRates();
   const rateByPersonId = useMemo(
     () =>
@@ -312,6 +320,7 @@ export function TeamRolesPanel({
         onSetPayRate={onSetPayRate}
         rateByPersonId={rateByPersonId}
         onSendSignIn={onSendSignIn}
+        signInEmailByPersonId={signInEmailByPersonId}
         onUnlinkAccount={onUnlinkAccount}
         myPersonId={myPersonId ?? null}
         onPauseAccess={onPauseAccess}

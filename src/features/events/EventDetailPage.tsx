@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { normalizeCurrencyCode } from "../../lib/format";
@@ -81,7 +82,6 @@ import { EventTodosTab } from "./EventTodosTab";
 import { EventHistoryTab } from "./EventHistoryTab";
 import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
-import { RecurringEventPanel } from "./RecurringEventPanel";
 import {
   eventDetailPath,
   type EventDetailTab,
@@ -387,12 +387,20 @@ function EventDetailContent({
       >
         Save as template
       </Link>
+      <AllergenBriefingButton key="allergen-briefing" />
       <Link
-        key="allergen-briefing"
+        key="print-map"
         className="btn btn-ghost"
-        to={`/events/${event._id}/allergen-briefing`}
+        to={`/events/${event._id}/map?print=1`}
       >
-        Allergen briefing
+        Print map
+      </Link>
+      <Link
+        key="map-to-chat"
+        className="btn btn-ghost"
+        to={`/events/${event._id}/map`}
+      >
+        Send map and layouts to team chat
       </Link>
       {dangerActions.length > 0 ? <ActionMenuRule /> : null}
       {dangerActions.map((action) => (
@@ -627,27 +635,6 @@ function EventDetailContent({
       {activeTab === "layouts" ? (
         <EventTabErrorBoundary tabLabel="Layouts" key="layouts">
           <EventLayoutsTab eventId={event._id} />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "recurring" ? (
-        <EventTabErrorBoundary tabLabel="Recurring Schedule" key="recurring">
-          <RecurringEventPanel
-            eventId={event._id}
-            startsAt={event.startsAt}
-            version={version}
-            canConfigure={canRevise}
-            recurrenceFrequency={event.recurrenceFrequency}
-            recurrenceEndCondition={event.recurrenceEndCondition}
-            recurrenceEndsAt={event.recurrenceEndsAt}
-            recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
-            recurrenceNextStartsAt={event.recurrenceNextStartsAt}
-            recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-            recurrenceActive={event.recurrenceActive ?? undefined}
-            recurrenceStoppedAt={event.recurrenceStoppedAt}
-            recurrenceCompletedAt={event.recurrenceCompletedAt}
-            recurrenceTemplateEventId={event.recurrenceTemplateEventId}
-            recurrenceSequence={event.recurrenceSequence}
-          />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "staffing" ? (

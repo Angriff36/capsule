@@ -1,4 +1,7 @@
 import type { ReportChartType, ReportSubjectArea } from "./ReportCreateForm";
+import type { MetricId } from "./metricDefinitions";
+import { parseReportFilters, type ReportFilters } from "./reportFilters";
+import type { ReportPeriodLeftOut } from "./liveReportLeftOut";
 
 export const REPORT_DATE_WINDOWS = [
   "30_days",
@@ -15,11 +18,17 @@ export interface LiveReportDefinition {
   version: 2;
   dateWindow: ReportDateWindow;
   notes?: string;
+  /** Saved filters; a link's f_ address values win over these (reportFilters.ts). */
+  filters?: ReportFilters;
 }
 
 export interface ReportKpi {
+  /** The entry in metricDefinitions.ts that says how this figure is counted. */
+  metricId: MetricId;
   label: string;
   value: string;
+  /** Ids of the rows behind this figure; null = every row in the report. */
+  rowIds: string[] | null;
 }
 
 export interface ReportChartPoint extends Record<string, string | number> {
@@ -58,6 +67,8 @@ export interface LiveReportModel {
   columns: ReportColumn[];
   rows: ReportRow[];
   csvFilename: string;
+  /** Rows not counted, by reason, shown beside the figures. */
+  leftOut: ReportPeriodLeftOut;
 }
 
 export interface SavedReportRow {
@@ -92,6 +103,7 @@ export function parseLiveReportDefinition(
   )
     ? (requestedWindow as ReportDateWindow)
     : "all_time";
+  const filters = parseReportFilters(candidate.filters);
   return {
     version: 2,
     dateWindow,
@@ -99,6 +111,7 @@ export function parseLiveReportDefinition(
       typeof candidate.notes === "string" && candidate.notes.trim()
         ? candidate.notes.trim()
         : undefined,
+    ...(Object.keys(filters).length ? { filters } : {}),
   };
 }
 

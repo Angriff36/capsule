@@ -22,6 +22,7 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { PaymentsLedgerPresenter } from "./PaymentsLedgerPresenter";
 import { useActionNotice } from "../../ui/action-result";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const policy = new CommercialLifecyclePolicy();
 const ledger = new PaymentsLedgerPresenter();
@@ -408,7 +409,7 @@ export function PaymentsPage() {
                 </label>
                 <label className="field-label">
                   Date paid (optional)
-                  <input className="input" name="paidOn" type="date" />
+                  <BoundedDateInput className="input" name="paidOn" />
                 </label>
               </div>
               <label className="field-label">

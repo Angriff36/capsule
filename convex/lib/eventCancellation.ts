@@ -107,7 +107,11 @@ export async function standDownEventEquipmentReservations(
 }
 
 export type CancellationObligation = {
-  code: "pack_list_sent" | "equipment_still_out" | "vendor_rental_open";
+  code:
+    | "pack_list_sent"
+    | "equipment_still_out"
+    | "vendor_rental_open"
+    | "invoice_paid";
   recordId: string;
   label: string;
 };
@@ -123,7 +127,7 @@ export async function eventCancellationObligations(
   tenantId: string,
   eventId: Id<"events">,
 ): Promise<CancellationObligation[]> {
-  const [packs, holds, rentals] = await Promise.all([
+  const [packs, holds, rentals, invoices] = await Promise.all([
     ctx.db
       .query("packLists")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
@@ -134,6 +138,10 @@ export async function eventCancellationObligations(
       .collect(),
     ctx.db
       .query("rentalOrderLines")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect(),
+    ctx.db
+      .query("invoices")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
       .collect(),
   ]);
@@ -169,6 +177,18 @@ export async function eventCancellationObligations(
         line.status === "delivered"
           ? `${line.quantity} ${line.description} from the rental company is here. Send it back and enter the count.`
           : `${line.quantity} ${line.description} is ${line.status} with the rental company. Call them to cancel, then mark it cancelled.`,
+    });
+  }
+  // The cancel never voids an invoice with money on it. No amount here: this
+  // list is shown to logistics staff too.
+  for (const invoice of invoices) {
+    if (invoice.tenantId !== tenantId || invoice.deletedAt != null) continue;
+    if (invoice.status === "voided" || !(invoice.amountPaid > 0)) continue;
+    out.push({
+      code: "invoice_paid",
+      recordId: String(invoice._id),
+      label:
+        "The client already paid on an invoice for this event. Finance decides with them: refund it or keep it as credit.",
     });
   }
   return out;

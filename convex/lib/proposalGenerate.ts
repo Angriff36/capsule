@@ -39,7 +39,13 @@ export const generateProposalDraft = mutation({
   handler: async (
     ctx,
     { eventId },
-  ): Promise<{ proposalId: Id<"proposals">; created: boolean; changed: boolean }> => {
+  ): Promise<{
+    proposalId: Id<"proposals">;
+    created: boolean;
+    changed: boolean;
+    outcome: "created" | "updated" | "reused";
+    version: number;
+  }> => {
     const tenantId = requireTenant(await getAuthContext(ctx));
     const event = await readScopedEvent(ctx, tenantId, eventId);
     if (!event.clientId) {
@@ -145,7 +151,14 @@ export const generateProposalDraft = mutation({
         venueAddress: read.facts.venueAddress ?? undefined,
       });
     }
-    return { proposalId, created, changed };
+    const saved = await ctx.db.get(proposalId);
+    return {
+      proposalId,
+      created,
+      changed,
+      outcome: created ? "created" : changed ? "updated" : "reused",
+      version: saved?.version ?? 1,
+    };
   },
 });
 

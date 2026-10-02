@@ -1,5 +1,6 @@
 import type { PricingBasis } from "../../lib/pricing";
 import type { ProposalPdfRecord } from "./proposalPdf";
+import { loadWindowLabel } from "../facilities/venueOperatingFacts";
 
 type Revision = { snapshot?: string | null } | null | undefined;
 export type ProposalPdfSource =
@@ -99,7 +100,10 @@ export function projectProposalPdf(
           : [],
         venueLogistics: frozen.venue
           ? {
-              loadIn: frozen.venue.loadInInstructions ?? undefined,
+              loadIn:
+                [loadWindowLabel(frozen.venue), frozen.venue.loadInInstructions]
+                  .filter(Boolean)
+                  .join(". ") || undefined,
               access: frozen.venue.kitchenAccess ?? undefined,
               restrictions: frozen.venue.restrictions ?? undefined,
             }

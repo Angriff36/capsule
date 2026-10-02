@@ -20,6 +20,7 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useCreateAttachment: () => vi.fn(),
   useGetRevenueAttribution: () => hooks.attribution,
   useGetEvent: () => hooks.event,
+  useListEvent: () => (hooks.event ? [hooks.event] : []),
   useListVenue: () => [],
   useListPerson: () => [],
   useListReferralSource: () => [],

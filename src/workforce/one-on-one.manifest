@@ -38,10 +38,13 @@ entity OneOnOne mixin TenantScoped, SoftDeletable {
   property required wins: string = ""
   property required opportunities: string = ""
   property required decisions: string = "[]"
+  // The role scorecard version this meeting talked against (spec §9.2).
+  property scorecardId: uuid?
   property heldAt: datetime?
 
   belongsTo lead: Person fields [tenantId, leadPersonId] references [tenantId, id]
   belongsTo staffMember: Person fields [tenantId, staffMemberId] references [tenantId, id]
+  belongsTo scorecard: RoleScorecard fields [tenantId, scorecardId] references [tenantId, id]
 
   // A held meeting must record when it happened. Both participants are required
   // uuids; the UI offers two separate people pickers.
@@ -59,7 +62,8 @@ entity OneOnOne mixin TenantScoped, SoftDeletable {
     optional goals: string,
     optional wins: string,
     optional opportunities: string,
-    optional decisions: string
+    optional decisions: string,
+    optional scorecardId: uuid
   ) {
     guard self.heldAt == null
     guard self.deletedAt == null
@@ -72,6 +76,7 @@ entity OneOnOne mixin TenantScoped, SoftDeletable {
     mutate wins = wins != null ? wins : ""
     mutate opportunities = opportunities != null ? opportunities : ""
     mutate decisions = decisions != null ? decisions : "[]"
+    mutate scorecardId = scorecardId
     mutate heldAt = now()
     emit OneOnOneHeld {
       oneOnOneId: self.id

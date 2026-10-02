@@ -1,0 +1,283 @@
+// Leadership meeting records (spec §7.4, PL-DASHBOARDS).
+//
+// ScorecardTarget: the target and owner for one company scorecard number.
+// The actual value is never stored here; the scorecard and L10 pages compute
+// it live from events, closeouts and leads (src/features/reports/
+// scorecardMeasures.ts) and compare it with the target to show on track /
+// off track. metricKey names one of those measures. One live row per number:
+// the page revises it in place; retire takes a number off the scorecard.
+//
+// LeadershipItem: a 90-day priority (rock), an issue to solve, or a meeting
+// to-do, with an owner, due date and open / done / dropped. The L10 page lists
+// them and builds the meeting-period history from openedAt / closedAt, so no
+// separate meeting record has to be kept.
+
+use "../foundation/base.manifest"
+use "../identity/person.manifest"
+
+enum ScorecardDirection {
+  higher_better
+  lower_better
+}
+
+enum LeadershipItemKind {
+  rock
+  issue
+  todo
+}
+
+enum LeadershipItemStatus {
+  open
+  done
+  dropped
+}
+
+entity ScorecardTarget mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required metricKey: string = ""
+  property required target: decimal(14, 2) = 0
+  property required direction: ScorecardDirection = "higher_better"
+  property ownerPersonId: uuid?
+  property notes: string?
+  property setAt: datetime?
+  property setByPersonId: uuid?
+  property retiredAt: datetime?
+
+  ref owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
+  ref setBy: Person fields [tenantId, setByPersonId] references [tenantId, id]
+
+  constraint targetNotNegative: self.target >= 0 "A target can't be below zero."
+
+  default policy scorecardTargetRead read: roleAllows(user.role, "manageAccess") "Managers may see scorecard targets"
+  default policy scorecardTargetWrite write: roleAllows(user.role, "manageAccess") "Managers may update scorecard targets"
+  default policy scorecardTargetExecute execute: roleAllows(user.role, "manageAccess") "Managers may change scorecard targets"
+
+  command set(
+    metricKey: string,
+    target: decimal(14, 2),
+    direction: ScorecardDirection,
+    optional ownerPersonId: uuid,
+    optional notes: string
+  ) {
+    guard self.setAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint setMetricKey: length(trim(metricKey)) > 0 "Pick which number this target is for."
+    constraint setTargetNotNegative: target >= 0 "A target can't be below zero."
+    mutate metricKey = metricKey
+    mutate target = target
+    mutate direction = direction
+    mutate ownerPersonId = ownerPersonId
+    mutate notes = notes
+    mutate setAt = now()
+    mutate setByPersonId = user.personId
+    emit ScorecardTargetSet {
+      scorecardTargetId: self.id
+      tenantId: self.tenantId
+      metricKey: metricKey
+    }
+  }
+
+  command revise(
+    target: decimal(14, 2),
+    direction: ScorecardDirection,
+    optional ownerPersonId: uuid,
+    optional notes: string
+  ) {
+    guard self.deletedAt == null
+    guard self.retiredAt == null
+    guard user.id != null
+    constraint reviseTargetNotNegative: target >= 0 "A target can't be below zero."
+    mutate target = target
+    mutate direction = direction
+    mutate ownerPersonId = ownerPersonId
+    mutate notes = notes
+    mutate setAt = now()
+    mutate setByPersonId = user.personId
+    emit ScorecardTargetRevised {
+      scorecardTargetId: self.id
+      tenantId: self.tenantId
+      metricKey: self.metricKey
+    }
+  }
+
+  command retire() {
+    guard self.setAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate retiredAt = now()
+    emit ScorecardTargetRetired {
+      scorecardTargetId: self.id
+      tenantId: self.tenantId
+      metricKey: self.metricKey
+    }
+  }
+
+  store ScorecardTarget in durable
+}
+
+entity LeadershipItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required kind: LeadershipItemKind = "todo"
+  property required title: string = ""
+  property ownerPersonId: uuid?
+  property dueAt: datetime?
+  property required status: LeadershipItemStatus = "open"
+  property notes: string?
+  property openedAt: datetime?
+  property openedByPersonId: uuid?
+  property closedAt: datetime?
+  property closedByPersonId: uuid?
+
+  ref owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
+  ref openedBy: Person fields [tenantId, openedByPersonId] references [tenantId, id]
+  ref closedBy: Person fields [tenantId, closedByPersonId] references [tenantId, id]
+
+  constraint itemTitle: self.openedAt == null or length(trim(self.title)) > 0 "Give this a short title."
+
+  transition status from "open" to ["done", "dropped"]
+  transition status from "done" to ["open"]
+  transition status from "dropped" to ["open"]
+
+  default policy leadershipItemRead read: roleAllows(user.role, "manageAccess") "Managers may see meeting priorities, issues and to-dos"
+  default policy leadershipItemWrite write: roleAllows(user.role, "manageAccess") "Managers may update meeting priorities, issues and to-dos"
+  default policy leadershipItemExecute execute: roleAllows(user.role, "manageAccess") "Managers may change meeting priorities, issues and to-dos"
+
+  command add(
+    kind: LeadershipItemKind,
+    title: string,
+    optional ownerPersonId: uuid,
+    optional dueAt: datetime,
+    optional notes: string
+  ) {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint addTitle: length(trim(title)) > 0 "Give this a short title."
+    mutate kind = kind
+    mutate title = title
+    mutate ownerPersonId = ownerPersonId
+    mutate dueAt = dueAt
+    mutate notes = notes
+    mutate status = "open"
+    mutate openedAt = now()
+    mutate openedByPersonId = user.personId
+    mutate closedAt = null
+    mutate closedByPersonId = null
+    emit LeadershipItemAdded {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+      kind: kind
+    }
+  }
+
+  command revise(
+    title: string,
+    optional ownerPersonId: uuid,
+    optional dueAt: datetime,
+    optional notes: string
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseTitle: length(trim(title)) > 0 "Give this a short title."
+    mutate title = title
+    mutate ownerPersonId = ownerPersonId
+    mutate dueAt = dueAt
+    mutate notes = notes
+    emit LeadershipItemRevised {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command complete() {
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "done"
+    mutate closedAt = now()
+    mutate closedByPersonId = user.personId
+    emit LeadershipItemCompleted {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command drop() {
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "dropped"
+    mutate closedAt = now()
+    mutate closedByPersonId = user.personId
+    emit LeadershipItemDropped {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reopen() {
+    guard self.status != "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "open"
+    mutate closedAt = null
+    mutate closedByPersonId = null
+    emit LeadershipItemReopened {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store LeadershipItem in durable
+}
+
+event ScorecardTargetSet: "scorecard_target.set" {
+  scorecardTargetId: string
+  tenantId: string
+  metricKey: string
+}
+
+event ScorecardTargetRevised: "scorecard_target.revised" {
+  scorecardTargetId: string
+  tenantId: string
+  metricKey: string
+}
+
+event ScorecardTargetRetired: "scorecard_target.retired" {
+  scorecardTargetId: string
+  tenantId: string
+  metricKey: string
+}
+
+event LeadershipItemAdded: "leadership_item.added" {
+  leadershipItemId: string
+  tenantId: string
+  kind: string
+}
+
+event LeadershipItemRevised: "leadership_item.revised" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemCompleted: "leadership_item.completed" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemDropped: "leadership_item.dropped" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemReopened: "leadership_item.reopened" {
+  leadershipItemId: string
+  tenantId: string
+}

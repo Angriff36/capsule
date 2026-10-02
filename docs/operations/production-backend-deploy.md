@@ -40,7 +40,17 @@ handoff between machines.
    one must match), fast-forwards `main`, requires `HEAD` = the release sha, and
    runs `scripts/deploy-backend.sh --expect <sha>`, with `--verify` for the
    zero-argument `list*` queries that the release added to `convex/queries.ts`.
-5. Result. The last line is one of:
+   The deploy stamps the release sha into `convex/lib/backendRelease.ts` for
+   the deploy only; afterwards `deploymentProbe:health` must name that sha.
+5. Release receipt (`scripts/release-receipt.ts`, report only, before the
+   result line): the exact Vercel build, the sha the backend reports (or an
+   earlier release with no backend change since, via
+   `release-backend-scope.ts --since`), the config check, and a real signed-in
+   product step. The step is the command named by `CAPSULE_RELEASE_WORKFLOW`
+   (JSON `{"entity":"…","command":"…","body":{…}}`, run with
+   `CAPSULE_API_KEY` and idempotency key `release-receipt-<sha>`). A missing
+   leg keeps the receipt PARTIAL; it never undoes the deploy.
+6. Result. The last line is one of:
    - `RESULT: PASS - frontend and backend deployed at <sha>`
    - `RESULT: PASS - frontend deployed at <sha>; backend unchanged`
    - `RESULT: FAIL - <reason>`

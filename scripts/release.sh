@@ -234,10 +234,14 @@ rm -f "$proof"
 # only when their inputs exist (CAPSULE_RELEASE_URL for the canonical URL,
 # Vercel CLI/token for inspect + env pull, CAPSULE_API_KEY for the
 # authenticated workflow); missing inputs keep the receipt honestly partial.
-bun scripts/release-receipt.ts \
-  --sha "$(git rev-parse main)" \
-  --wait "${CAPSULE_RELEASE_WAIT:-600}" \
-  || echo "release: receipt gathering failed (see above); the release itself already shipped."
+# scripts/deploy-production.sh sets CAPSULE_RECEIPT_AFTER_BACKEND: it takes
+# the receipt itself once the self-hosted backend is deployed (#382).
+if [ -z "${CAPSULE_RECEIPT_AFTER_BACKEND:-}" ]; then
+  bun scripts/release-receipt.ts \
+    --sha "$(git rev-parse main)" \
+    --wait "${CAPSULE_RELEASE_WAIT:-600}" \
+    || echo "release: receipt gathering failed (see above); the release itself already shipped."
+fi
 
 backend_handoff "$(git rev-parse main)"
 archive_branch

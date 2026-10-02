@@ -8,6 +8,7 @@ import {
 import { PackLineWhy } from "./PackLineWhy";
 import type { PackLineFacts } from "./packLineExplanation";
 import { packReturnSummary } from "./packReturn";
+import { packRowFacts } from "./packRowFacts";
 
 export interface PackListItemRow extends PackLineFacts {
   _id: string;
@@ -55,7 +56,14 @@ export interface PackListItemTableProps {
   onToggleItem: (id: string, on: boolean) => void;
   onToggleAll: (on: boolean) => void;
   selectableCount: number;
-  failedItem?: { id: string; message: string } | null;
+  failedItem?: {
+    id: string;
+    message: string;
+    /** What went wrong and what to do next, in plain words. */
+    detail?: string;
+    /** The row action that failed; the row offers it again in place. */
+    retryKey?: string | null;
+  } | null;
   /** View-specific line buttons (the truck-load view adds "Truck"). */
   extraActions?: (
     item: PackListItemRow,
@@ -179,6 +187,22 @@ export function PackListItemTable({
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
+                    {failedItem.detail ? ` ${failedItem.detail}` : ""}
+                    {failedItem.retryKey ? (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="btn-link btn-link-compact"
+                          disabled={busy != null}
+                          onClick={() =>
+                            onInvokeItem(item, failedItem.retryKey!)
+                          }
+                        >
+                          Try again
+                        </button>
+                      </>
+                    ) : null}
                   </small>
                 ) : null}
               </td>
@@ -216,9 +240,19 @@ export function PackListItemTable({
                 {item.returnFinding ? (
                   <small className="block">Found: {item.returnFinding}</small>
                 ) : null}
+                {packRowFacts(item).notes.map((fact) => (
+                  <small key={fact} className="block">
+                    {fact}
+                  </small>
+                ))}
               </td>
               <td>
                 <StatusChip status={String(item.status)} />
+                {packRowFacts(item).blocking ? (
+                  <small className="block text-danger">
+                    Holds up Mark packed
+                  </small>
+                ) : null}
               </td>
               <td>
                 <div className="supply-row-actions">

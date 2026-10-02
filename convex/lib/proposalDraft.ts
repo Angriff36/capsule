@@ -57,7 +57,14 @@ export const draftProposalWithLines = mutation({
       }),
     ),
   },
-  handler: async (ctx, args): Promise<void> => {
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    docId: Id<"proposals">;
+    outcome: "created";
+    version: number;
+  }> => {
     // The created proposal's tenant is the caller's tenant (TenantScoped
     // creation sources tenantId from auth). Validate every catalog link against
     // it up front (codex review finding 3) — same-tenant published priced dish.
@@ -115,9 +122,9 @@ export const draftProposalWithLines = mutation({
         equipmentId: line.equipmentId,
       });
     }
-    // No return: an untyped `any` return here would cascade through the `api`
-    // composite and re-introduce the app-wide TS7006 cascade (the quoteBuilder/
-    // proposalRevision lesson). The proposal list is reactive; the UI needs no
-    // created-id back.
+    // Explicitly typed (an untyped return cascades TS7006 through `api`):
+    // the new proposal id and version, so a screen can open it (BE-18.4).
+    const saved = await ctx.db.get(proposalId);
+    return { docId: proposalId, outcome: "created", version: saved?.version ?? 1 };
   },
 });

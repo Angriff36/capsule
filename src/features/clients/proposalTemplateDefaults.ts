@@ -10,6 +10,35 @@ export type ProposalTemplateDefaultsSource = {
   sectionOrder?: string[] | null;
 };
 
+/**
+ * The active template made for this service style, if any (PL-CATALOGS
+ * AC-221/AC-222). Several: the first by name, so the pick never changes
+ * between visits.
+ */
+export function templateForServiceStyle<
+  T extends {
+    _id: string;
+    name?: string | null;
+    status?: string | null;
+    deletedAt?: number | null;
+    serviceStyleId?: string | null;
+  },
+>(templates: readonly T[], serviceStyleId: string | null | undefined) {
+  if (!serviceStyleId) return null;
+  return (
+    templates
+      .filter(
+        (row) =>
+          row.status === "active" &&
+          row.deletedAt == null &&
+          row.serviceStyleId === serviceStyleId,
+      )
+      .sort((a, b) =>
+        String(a.name ?? "").localeCompare(String(b.name ?? "")),
+      )[0] ?? null
+  );
+}
+
 const dateInput = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

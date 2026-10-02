@@ -181,6 +181,47 @@ describe("scripts/release-backend-scope.ts", () => {
   );
 
   it(
+    "--since compares with the commit the running backend came from (release receipt)",
+    async () => {
+      const work = makeRepo();
+      const deployed = git(work, "rev-parse", "HEAD");
+      writeFileSync(join(work, "src", "page.tsx"), "export {};\n");
+      git(work, "add", "-A");
+      git(work, "commit", "-m", "[release] frontend only");
+      const since = (sha: string) =>
+        runBun(
+          [
+            "scripts/release-backend-scope.ts",
+            "--sha",
+            git(work, "rev-parse", "HEAD"),
+            "--since",
+            sha,
+          ],
+          work,
+        );
+      expect((await since(deployed)).output).toContain("backend=unchanged");
+
+      // A backend change after the deployed commit, then another frontend-only
+      // release: the previous-release default would miss it, --since does not.
+      writeFileSync(join(work, "convex", "lib.ts"), "export const x = 1;\n");
+      git(work, "add", "-A");
+      git(work, "commit", "-m", "[release] backend");
+      writeFileSync(join(work, "src", "page.tsx"), "export const y = 2;\n");
+      git(work, "add", "-A");
+      git(work, "commit", "-m", "[release] frontend again");
+      const stale = await since(deployed);
+      expect(stale.output).toContain("backend=required");
+      expect(stale.output).toContain("reason=convex/lib.ts");
+      expect((await scopeOf(work)).output).toContain("backend=unchanged");
+
+      const unknown = await since("0123456789abcdef0123456789abcdef01234567");
+      expect(unknown.output).toContain("is not in this repository");
+      expect(unknown.status).toBe(2);
+    },
+    TIMEOUT,
+  );
+
+  it(
     "with no previous [release] commit the backend deploy is required",
     async () => {
       const work = makeRepo();

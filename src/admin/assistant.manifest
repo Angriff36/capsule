@@ -28,6 +28,10 @@ entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
     mutate apiKey = apiKey
     mutate model = trim(model)
     mutate configuredAt = now()
+    emit AssistantLlmConfigured {
+      assistantLlmConfigId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store AssistantLlmConfig in durable
@@ -50,4 +54,10 @@ entity AssistantUpload mixin TenantScoped {
   default policy assistantUploadExecute execute: user.id != null "Staff may change assistant uploads"
 
   store AssistantUpload in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event AssistantLlmConfigured: "assistant.llm.configured" {
+  assistantLlmConfigId: string
+  tenantId: string
 }

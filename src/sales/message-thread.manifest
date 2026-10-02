@@ -15,6 +15,7 @@
 
 use "./contact.manifest"
 use "./lead.manifest"
+use "../operations/event.manifest"
 
 enum MessageProvider {
   internal
@@ -50,6 +51,13 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
 
   property contactId: uuid?
   property leadId: uuid?
+  // PL-INBOX (AC-106, AC-249): the event this conversation is about, so the
+  // history view shows the linked event and the event can find its threads.
+  property eventId: uuid?
+  // PL-INBOX (AC-248): set when staff merge this thread into another. The
+  // messages stay on this thread (source history is never moved or deleted);
+  // the target thread shows them alongside its own.
+  property mergedIntoThreadId: uuid?
 
   property required status: MessageThreadStatus = "active"
   // Stamped from trusted auth context on open, never accepted from the browser.
@@ -57,6 +65,7 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
 
   belongsTo contact: ClientContact? fields [tenantId, contactId] references [tenantId, id]
   belongsTo lead: Lead? fields [tenantId, leadId] references [tenantId, id]
+  belongsTo event: Event? fields [tenantId, eventId] references [tenantId, id]
 
   default policy messageThreadRead read: roleAllows(user.role, "staffAccess") "Staff may see message threads"
   default policy messageThreadWrite write: roleAllows(user.role, "staffAccess") "Staff may update conversations"
@@ -134,7 +143,47 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Link this conversation to the event it is about; leaving eventId out
+  // clears the link. Version-free like linkLead, so a repeat is harmless.
+  command linkEvent(optional eventId: uuid) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate eventId = eventId
+    emit MessageThreadEventLinked {
+      threadId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+    }
+  }
+
+  // Fold a duplicate conversation into another one. Keeps every message on
+  // this thread and archives it; the target shows the merged messages.
+  command mergeInto(targetThreadId: uuid) {
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint mergeTargetIsOther: targetThreadId != self.id "Pick a different conversation to merge into."
+    mutate mergedIntoThreadId = targetThreadId
+    mutate status = "archived"
+    emit MessageThreadMerged {
+      threadId: self.id
+      tenantId: self.tenantId
+      targetThreadId: targetThreadId
+    }
+  }
+
   store MessageThread in durable
+}
+
+event MessageThreadEventLinked: "message_thread.event_linked" {
+  threadId: string
+  tenantId: string
+  eventId: string?
+}
+
+event MessageThreadMerged: "message_thread.merged" {
+  threadId: string
+  tenantId: string
+  targetThreadId: string
 }
 
 event MessageThreadCreated: "message_thread.created" {

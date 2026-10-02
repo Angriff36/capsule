@@ -12,6 +12,7 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { chatAuth, CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
+import { insertStepEvent } from "./lib/commandAudit";
 
 export const markChannelRead = mutation({
   args: {
@@ -51,7 +52,7 @@ export const markChannelRead = mutation({
         updatedAt: now,
         version: 1,
       });
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "StaffChatChannelRead",
         entity: "StaffChatReadCursor",
         entityId: cursorId,
@@ -77,7 +78,7 @@ export const markChannelRead = mutation({
         updatedAt: now,
         version: keep.version + 1,
       });
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "StaffChatChannelRead",
         entity: "StaffChatReadCursor",
         entityId: keep._id,

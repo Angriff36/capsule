@@ -6,6 +6,7 @@ import {
   conflictingVehicleDeliveries,
   vehicleStatusProblem,
 } from "./lib/vehicleDeliveryAvailability";
+import { insertStepEvent } from "./lib/commandAudit";
 
 // Delivery write policy: logisticsAccess or manageAccess (base.manifest roles).
 const DELIVERY_ROLES = new Set([
@@ -114,7 +115,7 @@ export const assign = mutation({
       updatedAt: now,
       version: (delivery.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "DeliveryVehicleAssigned",
       entity: "Delivery",
       entityId: args.deliveryId,
@@ -181,7 +182,7 @@ export const unassign = mutation({
       updatedAt: now,
       version: (delivery.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "DeliveryVehicleUnassigned",
       entity: "Delivery",
       entityId: args.deliveryId,

@@ -24,6 +24,9 @@ export interface StartProposalChangeResult {
   docId: Id<"proposals">;
   alreadyStarted: boolean;
   leftOffDishNames: string[];
+  /** BE-18.4: "reused" = an open change draft already existed. */
+  outcome: "created" | "reused";
+  version: number;
 }
 
 function presentText(value: string | null | undefined): string | undefined {
@@ -199,6 +202,8 @@ export const startProposalChange = mutation({
     docId: v.id("proposals"),
     alreadyStarted: v.boolean(),
     leftOffDishNames: v.array(v.string()),
+    outcome: v.union(v.literal("created"), v.literal("reused")),
+    version: v.number(),
   }),
   handler: async (ctx, args): Promise<StartProposalChangeResult> => {
     const proposal = await ctx.db.get(args.proposalId);
@@ -220,6 +225,8 @@ export const startProposalChange = mutation({
         docId: existing._id,
         alreadyStarted: true,
         leftOffDishNames: [],
+        outcome: "reused",
+        version: existing.version,
       };
     }
 
@@ -255,6 +262,13 @@ export const startProposalChange = mutation({
     ) {
       await followGuestCount(ctx, created.docId, event.expectedHeadcount);
     }
-    return { docId: created.docId, alreadyStarted: false, leftOffDishNames };
+    const draft = await ctx.db.get(created.docId as Id<"proposals">);
+    return {
+      docId: created.docId,
+      alreadyStarted: false,
+      leftOffDishNames,
+      outcome: "created",
+      version: draft?.version ?? 1,
+    };
   },
 });

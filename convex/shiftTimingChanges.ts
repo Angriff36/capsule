@@ -24,6 +24,7 @@ import {
   type ShiftChangeProposal,
   type ShiftTimes,
 } from "./lib/shiftTimingProposals";
+import { insertStepEvent } from "./lib/commandAudit";
 
 // Same people who publish the week on the roster page.
 const WORKFORCE_MANAGE_ROLES = new Set([
@@ -192,7 +193,7 @@ export const applyShiftTimingChange = mutation({
         },
       );
     }
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: SHIFT_CHANGE_APPLIED,
       entity: SHIFT_CHANGE_ENTITY,
       entityId: String(shift._id),
@@ -208,7 +209,7 @@ export const keepShiftTime = mutation({
   handler: async (ctx, { proposalId }) => {
     const tenantId = await requireManager(ctx);
     const { shift } = await loadWaiting(ctx, tenantId, proposalId);
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: SHIFT_CHANGE_KEPT,
       entity: SHIFT_CHANGE_ENTITY,
       entityId: String(shift._id),

@@ -92,6 +92,10 @@ export type EventDayVenue = {
   hasFreightElevator: boolean | null;
   hasStairs: boolean | null;
   storageAvailable: boolean | null;
+  hasOven?: boolean | null;
+  hasRefrigeration?: boolean | null;
+  loadInFrom?: string | null;
+  loadOutBy?: string | null;
   loadInInstructions: string | null;
   accessNotes: string | null;
   cateringNotes: string | null;

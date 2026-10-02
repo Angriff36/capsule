@@ -31,6 +31,20 @@ function valueText(value: unknown) {
     ? value.join(", ")
     : String(value ?? "Not on file");
 }
+const SECTION_TITLE: Record<string, string> = {
+  packlist: "Pack list",
+  staffing: "Staff and sign-offs",
+  vehicles: "Trucks and trailers",
+  timeline: "Timeline",
+  menu: "Menu",
+  layouts: "Layouts",
+  contacts: "Contacts",
+  equipment: "Equipment and rentals",
+  venue: "Venue",
+};
+const sectionTitle = (key: string) =>
+  SECTION_TITLE[key] ?? key[0].toUpperCase() + key.slice(1);
+
 function openBlank() {
   const target = window.open("about:blank", "_blank");
   if (target) target.opener = null;
@@ -325,75 +339,102 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
         report Capsule already has.
       </p>
       <FinalLockPanel eventId={eventId} />
-      <button
-        className="btn-link mt-3"
-        onClick={() => setExpanded(!expanded)}
-        aria-expanded={expanded}
-      >
-        {expanded
-          ? "Hide review"
-          : `Review ${open.length} open items and sources`}
-      </button>
-      {expanded && (
-        <div className="mt-4">
-          <label className="text-sm">
-            Review section
-            <select
-              className="input ml-2"
-              value={activeSection}
-              onChange={(e) => setSection(e.target.value)}
-            >
-              <option value="all">All sections</option>
-              {Array.from(new Set(open.map((i) => i.section))).map((key) => (
-                <option key={key} value={key}>
-                  {key === "packlist"
-                    ? "Pack list"
-                    : key[0].toUpperCase() + key.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="attention-band mt-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4">
-              <p className="text-sm font-semibold text-ink">Open decisions</p>
+      {/* The checklist is always shown, one heading per part of the
+          workbook. Checks Capsule can answer from the event (crew, truck,
+          rentals, layouts, pack list, load times) tick themselves. */}
+      {visibleOpen.length === 0 ? (
+        <p className="mt-4 text-sm text-ink-2">
+          Nothing left to check. Capsule ticked what the event already shows.
+        </p>
+      ) : (
+        <div className="attention-band mt-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4">
+            <p className="text-sm font-semibold text-ink">
+              Still to check ({visibleOpen.length})
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {new Set(open.map((i) => i.section)).size > 1 && (
+                <label className="text-sm">
+                  Show
+                  <select
+                    className="input ml-2"
+                    value={activeSection}
+                    onChange={(e) => setSection(e.target.value)}
+                  >
+                    <option value="all">Every part</option>
+                    {Array.from(new Set(open.map((i) => i.section))).map(
+                      (key) => (
+                        <option key={key} value={key}>
+                          {sectionTitle(key)}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </label>
+              )}
               {openChecks.length > 0 && (
                 <button
                   className="btn btn-secondary btn-sm"
                   disabled={busy}
                   onClick={verifyAllChecks}
                 >
-                  Verify all checks ({openChecks.length})
+                  Tick all checks ({openChecks.length})
                 </button>
               )}
             </div>
-            <ul className="divide-y divide-line px-4 pb-4">
-              {visibleOpen.map((issue) => (
-                <IssueRow
-                  key={`${issue.id}:${issue.evidenceFingerprint}`}
-                  issue={issue}
-                  snapshot={snapshot}
-                  targets={view.nativeTargets?.[issue.fieldKey] ?? []}
-                  busy={busy}
-                  onSave={(decision) =>
-                    run(async () => {
-                      await packet.resolve(decision);
-                    })
-                  }
-                  onSource={(fingerprint) => {
-                    const target = openBlank();
-                    return run(async () => {
-                      try {
-                        openLink(await packet.sourceUrl(fingerprint), target);
-                      } catch (error) {
-                        target?.close();
-                        throw error;
-                      }
-                    });
-                  }}
-                />
-              ))}
-            </ul>
           </div>
+          {Array.from(new Set(visibleOpen.map((i) => i.section))).map((key) => (
+            <div key={key} className="px-4 pb-2">
+              <h4 className="mt-3 text-xs font-semibold uppercase tracking-wide text-ink-2">
+                {sectionTitle(key)}
+              </h4>
+              <ul className="divide-y divide-line">
+                {visibleOpen
+                  .filter((issue) => issue.section === key)
+                  .map((issue) => (
+                    <IssueRow
+                      key={`${issue.id}:${issue.evidenceFingerprint}`}
+                      issue={issue}
+                      snapshot={snapshot}
+                      targets={view.nativeTargets?.[issue.fieldKey] ?? []}
+                      busy={busy}
+                      onSave={(decision) =>
+                        run(async () => {
+                          await packet.resolve(decision);
+                        })
+                      }
+                      onSource={(fingerprint) => {
+                        const target = openBlank();
+                        return run(async () => {
+                          try {
+                            openLink(
+                              await packet.sourceUrl(fingerprint),
+                              target,
+                            );
+                          } catch (error) {
+                            target?.close();
+                            throw error;
+                          }
+                        });
+                      }}
+                    />
+                  ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        className="btn-link mt-3"
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+      >
+        {expanded
+          ? "Hide sources and history"
+          : `Show sources and history (${snapshot.artifacts.length} files)`}
+      </button>
+      {expanded && (
+        <div className="mt-4">
           <details className="mt-4">
             <summary>Source evidence ({snapshot.artifacts.length})</summary>
             <ul>

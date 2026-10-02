@@ -23,6 +23,8 @@ import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
+import { VenueOperatingFactsPanel } from "./VenueOperatingFactsPanel";
+import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import {
   coordinatesFromFields,
   coordinatesMapUrl,
@@ -671,7 +673,7 @@ export function VenueDetailPage() {
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
             <dt className="text-xs font-medium text-ink-3">Capacity</dt>
             <dd className="col-span-2 text-xs text-ink">
-              {venue.capacity ?? "Not set"}
+              {venue.capacity ? venue.capacity : "Not known"}
             </dd>
           </div>
           {/* Logistics features */}
@@ -864,6 +866,8 @@ export function VenueDetailPage() {
         </dl>
       </div>
 
+      <VenueOperatingFactsPanel venue={venue} />
+
       {/* Venue Rooms & Spaces */}
       <VenueScorecardPanel venueId={venue._id} />
 
@@ -871,6 +875,9 @@ export function VenueDetailPage() {
 
       {/* Venue Notes */}
       <VenueNotesPanel venueId={venue._id} />
+
+      {/* Photos, floor plans, insurance papers */}
+      <AttachmentsSection parentType="venue" parentId={venue._id} />
 
       {/* Danger Zone */}
       {venue.status === "active" && (

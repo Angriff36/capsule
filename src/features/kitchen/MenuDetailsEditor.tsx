@@ -4,6 +4,7 @@ import {
   useMenuSetSeason,
   useMenuUpdatePricing,
 } from "../../lib/manifest-convex-react";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 type SaveKey = "details" | "pricing" | "season";
 
@@ -280,9 +281,8 @@ export function MenuDetailsEditor({
         </div>
         <label className="field-label">
           <span>Offered from</span>
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             value={seasonFrom}
             disabled={!canEditPricing || saving != null}
             title={pricingTitle}
@@ -291,9 +291,8 @@ export function MenuDetailsEditor({
         </label>
         <label className="field-label">
           <span>Offered until</span>
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             value={seasonUntil}
             min={seasonFrom || undefined}
             disabled={!canEditPricing || saving != null}

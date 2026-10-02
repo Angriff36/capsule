@@ -21,8 +21,13 @@ entity ClientOutreachTask mixin TenantScoped {
   property openedAt: datetime?
   property resolvedAt: datetime?
   property resolutionNote: string?
+  // A client merge moves the reminder to the client kept (PL-SOURCE-MERGE).
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
 
   constraint reminderReasonComplete: self.openedAt == null or length(trim(self.reason)) > 0 "Give this follow-up reminder a reason"
 
@@ -73,7 +78,50 @@ entity ClientOutreachTask mixin TenantScoped {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Reminder already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit ClientOutreachTaskClientMergeStaged {
+      reminderId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the reminder client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit ClientOutreachTaskClientReassigned {
+      reminderId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store ClientOutreachTask in durable
+}
+
+event ClientOutreachTaskClientMergeStaged: "client_outreach_task.client_merge_staged" {
+  reminderId: string
+  tenantId: string
+}
+
+event ClientOutreachTaskClientReassigned: "client_outreach_task.client_reassigned" {
+  reminderId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
 }
 
 event ClientOutreachTaskOpened: "client_outreach_task.opened" {

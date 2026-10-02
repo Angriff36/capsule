@@ -255,6 +255,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate recipeTemplateName = self.dishTask.name
     mutate recipeTemplateInstructions = self.dishTask.instructions
     mutate recipeTemplateStation = self.dishTask.station
+    emit PrepTaskRecipeTemplateRefreshed {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // A retired template stops untouched, unstarted work on live events.
@@ -268,6 +272,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate cancelledAt = now()
     mutate templateRetiredAt = now()
     mutate cancellationReason = self.dishTask.retirementReason != null ? self.dishTask.retirementReason : "Recipe step retired"
+    emit PrepTaskRetiredWithTemplate {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Derive the remaining work from this menu line and its recorded output.
@@ -316,6 +324,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate dishTaskId = dishTaskId
     mutate dishId = dishId
     mutate componentId = componentId != null ? componentId : self.componentId
+    emit PrepTaskRecipeLinked {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Correct a reviewed recipe link before work starts; retain assignments and quantities.
@@ -324,6 +336,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed"
     constraint replacementMatchesRecipe: self.componentId == previousComponentId "Prep recipe changed since replacement was reviewed"
     mutate componentId = componentId
+    emit PrepTaskRecipeComponentReplaced {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Replace this event's copy of a template step without touching the master
@@ -356,6 +372,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate choiceOptions = choiceOptions
     mutate resolution = resolution != null ? resolution : "choice_pending"
     mutate chosenOption = null
+    emit PrepTaskChoiceSet {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command resolveChoice(choice: string) {
@@ -664,6 +684,10 @@ entity PrepTaskDependency mixin TenantScoped {
     mutate isSatisfied = true
     mutate requirementReleasedAt = now()
     mutate requirementReleaseReason = "Prerequisite retired from recipe"
+    emit PrepTaskDependencyRetiredRequirementReleased {
+      prepTaskDependencyId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // A person drops a "must follow" link that should not hold the work: two
@@ -675,6 +699,10 @@ entity PrepTaskDependency mixin TenantScoped {
     mutate isSatisfied = true
     mutate requirementReleasedAt = now()
     mutate requirementReleaseReason = reason
+    emit PrepTaskDependencyLinkDropped {
+      prepTaskDependencyId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command satisfy() {
@@ -1005,4 +1033,40 @@ event PrepTaskMaterialUnlinked: "prep_task_material.unlinked" {
   tenantId: string
   prepTaskId: string
   reason: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event PrepTaskRecipeLinked: "prep.task.recipe.linked" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskRecipeTemplateRefreshed: "prep.task.recipe.template.refreshed" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskRecipeComponentReplaced: "prep.task.recipe.component.replaced" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskRetiredWithTemplate: "prep.task.retired.with.template" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskChoiceSet: "prep.task.choice.set" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskDependencyLinkDropped: "prep.task.dependency.link.dropped" {
+  prepTaskDependencyId: string
+  tenantId: string
+}
+
+event PrepTaskDependencyRetiredRequirementReleased: "prep.task.dependency.retired.requirement.released" {
+  prepTaskDependencyId: string
+  tenantId: string
 }

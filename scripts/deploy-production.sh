@@ -142,7 +142,7 @@ else
     [ -n "$reviewer" ] || run_review
     release_args=(--reviewer "$reviewer")
   fi
-  bash scripts/release.sh "${release_args[@]}" --candidate "$candidate" || fail "scripts/release.sh failed (above). Nothing after it ran"
+  CAPSULE_RECEIPT_AFTER_BACKEND=1 bash scripts/release.sh "${release_args[@]}" --candidate "$candidate" || fail "scripts/release.sh failed (above). Nothing after it ran"
   git fetch origin --quiet || fail "git fetch failed after the release"
 fi
 sha="$(git rev-parse origin/main)"
@@ -161,6 +161,15 @@ fi
 [ "$(git rev-parse HEAD)" = "$sha" ] || fail "the working tree is not at the release commit $sha"
 echo "deploy-production: release commit $sha"
 
+# The release receipt (PR13-06 / AC-030), taken once frontend AND backend are
+# deployed: exact Vercel build, the backend's own release sha, config, and a
+# real signed-in product step. Report only: a partial receipt is printed, it
+# does not undo a deploy that already happened.
+receipt() {
+  bun scripts/release-receipt.ts --sha "$sha" --wait 0 \
+    || echo "deploy-production: receipt gathering failed (above); the deploy itself is done."
+}
+
 # 2. The Vercel production deployment for that commit.
 bun scripts/verify-vercel-release.ts --sha "$sha" --wait "$VERCEL_WAIT_SECONDS" || fail "the Vercel production deployment for $sha did not succeed (above)"
 
@@ -169,6 +178,7 @@ scope="$(bun scripts/release-backend-scope.ts --sha "$sha")" || fail "cannot dec
 echo "$scope" | sed 's/^/deploy-production: scope /'
 case "$scope" in
   *"backend=unchanged"*)
+    receipt
     echo ""
     echo "RESULT: PASS - frontend deployed at $sha; backend unchanged"
     exit 0
@@ -213,5 +223,6 @@ ssh_status="${PIPESTATUS[0]}"
 [ "$ssh_status" = "0" ] || fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $ssh_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
 grep -q "^RESULT: PASS - backend deployed from $sha" "$remote_log" || fail "the production box did not report RESULT: PASS for $sha (log: $remote_log)"
 
+receipt
 echo ""
 echo "RESULT: PASS - frontend and backend deployed at $sha"

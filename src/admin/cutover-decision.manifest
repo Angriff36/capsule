@@ -12,6 +12,12 @@ enum CutoverDecisionType {
   no_go
 }
 
+// PL-CUTOVER (AC-632): how old money records live in Capsule after the switch.
+enum CutoverFinancialMode {
+  reference_history
+  ledger_reconstruction
+}
+
 entity CutoverDecision mixin TenantScoped {
   key [tenantId, id]
   property required status: CutoverStatus = "not_started"
@@ -21,6 +27,27 @@ entity CutoverDecision mixin TenantScoped {
   property required rollbackPlan: string
   property businessApproved: boolean = false
   property tppReadOnlyAt: int?
+  // PL-CUTOVER (AC-287..AC-292, AC-632): the facts the go decision rests on.
+  // Sign-off is attributable: who, when, and what they checked.
+  property businessApprovedById: string?
+  property businessApprovedAt: int?
+  property businessEvidence: string?
+  // When TPP stopped taking new entries; the last import of every dataset
+  // must start after it (source as-of evidence, no fixed age rule).
+  property sourceFrozenAt: int?
+  // Owner-confirmed opening stock: the as-of time and how many counts it holds.
+  property openingStockAsOf: int?
+  property openingStockCount: int?
+  property openingStockConfirmedById: string?
+  property financialMode: CutoverFinancialMode?
+  // Where the production backup is and when a restore was tried.
+  property backupEvidence: string?
+  // Stamped at go: the import runs the decision rests on, and the record
+  // that scheduled TPP imports are off.
+  // A short JSON text of dataset -> import run, not a single record link.
+  property finalImportRuns: string?
+  property scheduledImportsDisabledAt: int?
+  property scheduledImportsNote: string?
   default policy cutoverDecisionRead read: user.id != null "Signed-in staff may see cutover decisions"
   default policy cutoverDecisionWrite write: user.id != null "Signed-in staff may update cutover decisions"
   default policy cutoverDecisionExecute execute: user.id != null "Signed-in staff may change cutover decisions"
@@ -42,18 +69,33 @@ entity CutoverDecision mixin TenantScoped {
     mutate reason = reason
     mutate rollbackPlan = rollbackPlan
     mutate businessApproved = businessApproved != null ? businessApproved : false
+    emit CutoverDecisionCreated {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   // Entity commands stamp time with now() (→ Date.now()). Do NOT use
   // now(): the generator emits `const context = (ctx as any)` and
   // reads now(), which is undefined on Convex MutationCtx at
   // runtime (it typechecks only because of the `as any`) — writing undefined
   // into the required `int` timestamp fields silently breaks the command.
-  command recordApprovals(businessApproved: boolean, rollbackPlan: string) {
+  command recordApprovals(
+    businessApproved: boolean,
+    rollbackPlan: string,
+    optional businessEvidence: string
+  ) {
     guard roleAllows(user.role, "adminAccess")
     mutate businessApproved = businessApproved
     mutate rollbackPlan = rollbackPlan
+    mutate businessEvidence = businessEvidence
+    mutate businessApprovedById = businessApproved ? user.id : null
+    mutate businessApprovedAt = businessApproved ? now() : null
     mutate decidedAt = now()
     mutate decidedBy = user.id
+    emit CutoverDecisionApprovalsRecorded {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   command execute(decision: CutoverDecisionType, reason: string) {
     guard roleAllows(user.role, "adminAccess")
@@ -61,11 +103,19 @@ entity CutoverDecision mixin TenantScoped {
     mutate reason = reason
     mutate decidedAt = now()
     mutate decidedBy = user.id
+    emit CutoverDecisionExecuted {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   command setTppReadOnly(reason: string) {
     guard status == "go"
     guard roleAllows(user.role, "adminAccess")
     mutate tppReadOnlyAt = now()
+    emit CutoverDecisionTppReadOnlySet {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   command rollback(reason: string) {
     guard status == "go"
@@ -74,6 +124,36 @@ entity CutoverDecision mixin TenantScoped {
     mutate reason = reason
     mutate decidedAt = now()
     mutate decidedBy = user.id
+    emit CutoverDecisionRolledBack {
+      cutoverDecisionId: self.id
+      tenantId: self.tenantId
+    }
   }
   store CutoverDecision in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event CutoverDecisionCreated: "cutover.decision.created" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionExecuted: "cutover.decision.executed" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionApprovalsRecorded: "cutover.decision.approvals.recorded" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionRolledBack: "cutover.decision.rolled.back" {
+  cutoverDecisionId: string
+  tenantId: string
+}
+
+event CutoverDecisionTppReadOnlySet: "cutover.decision.tpp.read.only.set" {
+  cutoverDecisionId: string
+  tenantId: string
 }

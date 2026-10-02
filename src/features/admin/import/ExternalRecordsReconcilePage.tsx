@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "convex/react";
+import { api, type Id } from "../../../lib/api";
 import {
   useListExternalRecordLink,
   useListInvoice,
@@ -15,6 +17,14 @@ import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
 import { ServiceStyleMatch } from "./ServiceStyleMatch";
 import { SourceChangeReview } from "./SourceChangeReview";
 import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
+import { isDerivedSourceId } from "../../../../convex/lib/importIdentity";
+import { sourceSummary } from "../../../../convex/lib/importResolution";
+import { ResolveImportItem } from "./ResolveImportItem";
+import {
+  BulkActionPreview,
+  type BulkAction,
+  type BulkPreviewItem,
+} from "./BulkActionPreview";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -33,6 +43,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   contact: "Contact",
   lead: "Lead",
   menu: "Menu",
+  dish: "Dish",
   venue: "Venue",
   payment: "Payment",
   invoice: "Invoice",
@@ -49,6 +60,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   location: "Location",
   pack_list: "Pack List",
   service_style: "Service style",
+  client_communication: "Message or task",
 };
 
 // Conflict status labels
@@ -58,12 +70,26 @@ const CONFLICT_STATUS_LABELS: Record<string, string> = {
   superseded: "Superseded",
 };
 
+/** The old-system row's name and details, under its id. */
+function SourceRowSummary({ raw }: Readonly<{ raw?: string | null }>) {
+  const { name, detail } = sourceSummary(raw);
+  return (
+    <>
+      {name ? <p className="mt-1 font-sans text-xs text-ink">{name}</p> : null}
+      {detail ? (
+        <p className="font-sans text-2xs text-ink-2">{detail}</p>
+      ) : null}
+    </>
+  );
+}
+
 export function ExternalRecordsReconcilePage() {
   const [selectedSourceSystem, setSelectedSourceSystem] = useState<
     string | null
   >(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
+  const [bulkAction, setBulkAction] = useState<BulkAction | null>(null);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
 
@@ -90,6 +116,28 @@ export function ExternalRecordsReconcilePage() {
     }
     return records;
   }, [allRecords, selectedSourceSystem]);
+
+  // PL-SOURCE-RESOLUTION: the Capsule record each waiting item points at, by
+  // name, shown beside the old-system row.
+  const recordLabels = useQuery(
+    api.importResolution.itemRecordLabels,
+    filteredRecords.length > 0
+      ? {
+          linkIds: filteredRecords
+            .slice(0, 200)
+            .map((r) => r._id as Id<"externalRecordLinks">),
+        }
+      : "skip",
+  );
+
+  const bulkItems: BulkPreviewItem[] = filteredRecords
+    .filter((r) => selectedIds.has(r._id))
+    .map((r) => ({
+      id: r._id,
+      sourceId: isDerivedSourceId(r.externalId) ? "" : r.externalId,
+      sourceName: sourceSummary(r.rawSourceData).name,
+      recordLabel: r.capsuleId ? (recordLabels?.[r._id] ?? r.capsuleId) : null,
+    }));
 
   const referenceOnly = useMemo(
     () => referenceOnlyMoneyRows(allRecords ?? []),
@@ -130,6 +178,7 @@ export function ExternalRecordsReconcilePage() {
       newSelected.add(id);
     }
     setSelectedIds(newSelected);
+    if (newSelected.size === 0) setBulkAction(null);
   }
 
   // Toggle all
@@ -163,6 +212,7 @@ export function ExternalRecordsReconcilePage() {
       }
       setNotice(`Checked ${selectedIds.size} item(s).`);
       setSelectedIds(new Set());
+      setBulkAction(null);
     } catch (cause: unknown) {
       setError(
         cause instanceof Error ? cause.message : "Couldn't check those items.",
@@ -189,6 +239,7 @@ export function ExternalRecordsReconcilePage() {
       }
       setNotice(`Skipped ${selectedIds.size} item(s).`);
       setSelectedIds(new Set());
+      setBulkAction(null);
     } catch (cause: unknown) {
       setError(
         cause instanceof Error ? cause.message : "Couldn't skip those items.",
@@ -281,15 +332,23 @@ export function ExternalRecordsReconcilePage() {
           </div>
         </div>
 
-        {/* Bulk actions */}
-        {selectedIds.size > 0 ? (
+        {/* Bulk actions: a preview of every affected item comes first. */}
+        {selectedIds.size > 0 && bulkAction ? (
+          <BulkActionPreview
+            action={bulkAction}
+            items={bulkItems}
+            busy={busy}
+            onApply={bulkAction === "verify" ? verifySelected : skipSelected}
+            onCancel={() => setBulkAction(null)}
+          />
+        ) : selectedIds.size > 0 ? (
           <div className="flex items-center gap-3 p-4 bg-inset border-b border-line">
             <span className="text-xs font-medium">
               {selectedIds.size} item(s) selected
             </span>
             <button
               type="button"
-              onClick={verifySelected}
+              onClick={() => setBulkAction("verify")}
               disabled={busy}
               className="btn btn-primary"
             >
@@ -297,7 +356,7 @@ export function ExternalRecordsReconcilePage() {
             </button>
             <button
               type="button"
-              onClick={skipSelected}
+              onClick={() => setBulkAction("skip")}
               disabled={busy}
               className="btn btn-secondary"
             >
@@ -379,14 +438,24 @@ export function ExternalRecordsReconcilePage() {
                         record.capsuleEntity}
                     </td>
                     <td className="py-3 px-4 font-mono text-2xs">
-                      {record.externalId}
+                      {isDerivedSourceId(record.externalId)
+                        ? "None — known by its name and details"
+                        : record.externalId}
+                      {/* PL-SOURCE-RESOLUTION: the old row beside the result. */}
+                      <SourceRowSummary raw={record.rawSourceData} />
                     </td>
                     <td className="py-3 px-4">
                       {RECORD_TYPE_LABELS[record.capsuleEntity] ||
                         record.capsuleEntity}
                     </td>
-                    <td className="py-3 px-4 font-mono text-2xs">
-                      {record.capsuleId || (
+                    <td className="py-3 px-4 text-xs">
+                      {record.capsuleId ? (
+                        (recordLabels?.[record._id] ?? (
+                          <span className="font-mono text-2xs">
+                            {record.capsuleId}
+                          </span>
+                        ))
+                      ) : (
                         <span className="text-ink-3 italic">
                           Not linked yet
                         </span>
@@ -403,6 +472,13 @@ export function ExternalRecordsReconcilePage() {
                       ) : (
                         <span className="text-ink-2">—</span>
                       )}
+                      {/* PL-SOURCE-IDENTITY: why this item waits (for example
+                          the same name as a client Capsule already has). */}
+                      {record.resolutionNote ? (
+                        <p className="mt-1 max-w-80 text-2xs text-ink-2">
+                          {record.resolutionNote}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="py-3 px-4 text-ink-2">
                       {record.createdAt
@@ -428,7 +504,12 @@ export function ExternalRecordsReconcilePage() {
                           onError={setError}
                         />
                       ) : (
-                        <span className="text-ink-3">—</span>
+                        <ResolveImportItem
+                          link={record}
+                          disabled={busy}
+                          onDone={setNotice}
+                          onError={setError}
+                        />
                       )}
                     </td>
                   </tr>
@@ -468,9 +549,21 @@ export function ExternalRecordsReconcilePage() {
               marked done and leaves this list.
             </li>
             <li>
-              • <strong>Skip</strong>: Mark as resolved with a note. Use this
-              for items that shouldn&apos;t be linked or need manual review
-              later.
+              • <strong>Same name or email</strong>: An imported client or venue
+              that looks like one you already have is added on its own and waits
+              here. Verify it if it is a different one. If it is the same, merge
+              the two on the Clients page; the old names and old-system links
+              stay on the client you keep.
+            </li>
+            <li>
+              • <strong>Pick existing</strong>: Point the old row at a record
+              you already have. <strong>Add as new</strong> makes a new one of
+              the right kind from the old row. Later imports of the same row use
+              your choice.
+            </li>
+            <li>
+              • <strong>Skip</strong>: Mark as resolved with a note. Later
+              imports leave a skipped row out.
             </li>
           </ul>
           <h3 className="font-medium text-xs mb-2 mt-4">Status Guide</h3>
@@ -484,7 +577,8 @@ export function ExternalRecordsReconcilePage() {
               QuickBooks, etc.).
             </li>
             <li>
-              • Select multiple items to perform bulk Verify / Skip actions.
+              • Select multiple items to Verify or Skip them together; you see
+              every item it changes before it runs.
             </li>
           </ul>
         </div>

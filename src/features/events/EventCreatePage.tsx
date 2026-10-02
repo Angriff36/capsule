@@ -886,6 +886,25 @@ export function EventCreatePage() {
                     </option>
                   ))}
                 </select>
+                {referralSources !== undefined &&
+                activeReferralSources.length === 0 ? (
+                  <span
+                    className="field-hint"
+                    data-testid="referral-empty-hint"
+                  >
+                    No referral sources yet. You can leave this blank, or add
+                    them in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      target="_blank"
+                      rel="noopener"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>{" "}
+                    (new tab; this form stays put and the list fills in here).
+                  </span>
+                ) : null}
               </label>
             </div>
           </FormSection>

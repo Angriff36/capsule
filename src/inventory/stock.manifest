@@ -358,12 +358,20 @@ entity InventorySettings mixin TenantScoped, SoftDeletable {
     guard self.registeredAt == null
     mutate stockLevelsTracked = stockLevelsTracked
     mutate registeredAt = now()
+    emit InventorySettingsRegistered {
+      inventorySettingsId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command setStockTracking(stockLevelsTracked: boolean) {
     guard self.deletedAt == null
     guard self.registeredAt != null
     mutate stockLevelsTracked = stockLevelsTracked
+    emit InventorySettingsStockTrackingSet {
+      inventorySettingsId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store InventorySettings in durable
@@ -702,3 +710,14 @@ on InventoryReservationReturned run InventoryItem.adjustQuantity
     delta: payload.quantity,
     reason: "Returned from event"
   }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event InventorySettingsRegistered: "inventory.settings.registered" {
+  inventorySettingsId: string
+  tenantId: string
+}
+
+event InventorySettingsStockTrackingSet: "inventory.settings.stock.tracking.set" {
+  inventorySettingsId: string
+  tenantId: string
+}

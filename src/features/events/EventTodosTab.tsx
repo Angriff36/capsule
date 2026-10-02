@@ -31,6 +31,7 @@ import { eventDetailPath } from "./eventRoutes";
 import { EventTabIntro } from "./EventTabIntro";
 import { FailureBanner } from "./FailureBanner";
 import { useEventChecklistApply } from "../../lib/useEventChecklistApply";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type TaskRow = {
   _id: string;
@@ -454,9 +455,8 @@ export function EventTodosTab({
           </label>
           <label className="field-label">
             <span>Due</span>
-            <input
+            <BoundedDateTimeLocalInput
               name="dueAt"
-              type="datetime-local"
               className="input min-h-10 w-full"
             />
           </label>

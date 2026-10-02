@@ -12,7 +12,11 @@ export type ClerkStaffAccount = {
 };
 
 export class ClerkStaffAccountError extends Error {
-  constructor(message: string, readonly code?: string) {
+  constructor(
+    message: string,
+    readonly code?: string,
+    readonly httpStatus?: number,
+  ) {
     super(message);
   }
 }
@@ -271,9 +275,9 @@ async function readClerkError(response: Response): Promise<ClerkStaffAccountErro
       first?.long_message ||
       first?.message ||
       body.message ||
-      "The sign-in service rejected the request.", first?.code
+      "The sign-in service rejected the request.", first?.code, response.status
     );
   } catch {
-    return new ClerkStaffAccountError("The sign-in service rejected the request.");
+    return new ClerkStaffAccountError("The sign-in service rejected the request.", undefined, response.status);
   }
 }

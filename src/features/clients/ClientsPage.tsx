@@ -137,6 +137,7 @@ export function ClientsPage() {
     );
     const communicationCount = (communications ?? []).filter(
       (communication) =>
+        String(communication.clientId) === clientId ||
         (communication.clientContactId != null &&
           contactIds.has(communication.clientContactId)) ||
         (communication.eventId != null && eventIds.has(communication.eventId)),

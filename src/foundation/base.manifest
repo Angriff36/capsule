@@ -200,6 +200,11 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // Planning board: how loud each check is (JSON map of check to
   // fix | look | off, read by src/lib/planningChecks.ts). Unset = defaults.
   property planningChecksJson: string?
+  // Event stages a person moves an event into (JSON list read by
+  // src/lib/eventStageMoves.ts). Every other stage moves on by itself when
+  // its conditions are met. Unset = only the sales lock is by hand.
+  property stageMovesByHandJson: string?
+
   // The fields each equipment category asks for: {"Ovens": ["Fuel", "Burners"]}.
   property equipmentFieldsJson: string?
 
@@ -363,6 +368,16 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Which event stages stay a person's step. Empty goes back to the default.
+  command configureStageMoves(optional byHandJson: string) {
+    guard self.deletedAt == null
+    mutate stageMovesByHandJson = byHandJson
+    emit OrganizationStageMovesConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command configureEquipmentFields(optional fieldsJson: string) {
     guard self.deletedAt == null
     mutate equipmentFieldsJson = fieldsJson
@@ -473,6 +488,11 @@ event OrganizationEquipmentFieldsConfigured: "organization.equipment_fields_conf
 }
 
 event OrganizationPlanningChecksConfigured: "organization.planning_checks_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationStageMovesConfigured: "organization.stage_moves_configured" {
   organizationId: string
   tenantId: string
 }

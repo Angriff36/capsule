@@ -28,6 +28,20 @@ export function useEventEquipmentExceptions(eventId: string | null) {
   );
 }
 
+/** PL-VENDOR-POLICY: the event venue's vendor rules (preferred, approved,
+ * restricted, banned) in force on the event's date. */
+export function useVenueVendorRules(eventId: Id<"events">) {
+  return useQuery(api.venueVendorPolicy.forEvent, { eventId });
+}
+
+/** Words after a vendor's name in a picker; banned ones cannot be picked. */
+export const VENUE_VENDOR_NOTE: Record<string, string> = {
+  preferred: " - the venue's preferred vendor",
+  approved: " - approved by the venue",
+  restricted: " - restricted at this venue, check with the venue first",
+  banned: " - not allowed at this venue",
+};
+
 /** Vendor names (no contact details) for picking who a rental comes from. */
 export function useRentalVendorChoices() {
   return useQuery(api.equipmentCheckout.rentalVendorChoices, {});

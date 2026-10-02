@@ -1,6 +1,6 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
@@ -61,9 +61,18 @@ export function DemandLedgerPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const activeDemands = (demands ?? []).filter(
-    (demand) => demand.deletedAt == null,
-  );
+  const eventStart = (id: string) =>
+    events?.find((event) => event._id === id)?.startsAt ?? null;
+  // Grouped by event, soonest event first, so each block reads as
+  // "this event needs these ingredients".
+  const activeDemands = (demands ?? [])
+    .filter((demand) => demand.deletedAt == null)
+    .sort(
+      (a, b) =>
+        Number(eventStart(a.eventId) ?? Infinity) -
+          Number(eventStart(b.eventId) ?? Infinity) ||
+        a.eventId.localeCompare(b.eventId),
+    );
   const anomalies = useMemo(
     () => computeDemandAnomalies(demands, events, thresholdPct / 100),
     [demands, events, thresholdPct],
@@ -144,7 +153,7 @@ export function DemandLedgerPage() {
         </div>
         <div className="supply-masthead-actions">
           <label className="field-label" style={{ marginBottom: 0 }}>
-            Anomaly threshold
+            Flag amounts off from past events by
             <select
               className="input"
               value={thresholdPct}
@@ -306,93 +315,116 @@ export function DemandLedgerPage() {
                 </tr>
               </thead>
               <tbody>
-                {activeDemands.map((demand) => {
+                {activeDemands.map((demand, index) => {
                   const need = existingNeed(demand._id);
                   const actions = policy.demandActions(String(demand.status));
+                  const firstOfEvent =
+                    index === 0 ||
+                    activeDemands[index - 1].eventId !== demand.eventId;
+                  const lineCount = activeDemands.filter(
+                    (line) => line.eventId === demand.eventId,
+                  ).length;
                   return (
-                    <tr key={demand._id}>
-                      <td>
-                        <strong>{eventName(demand.eventId)}</strong>
-                        <small>{demand.eventId.slice(-8)}</small>
-                      </td>
-                      <td>
-                        {(() => {
-                          const ingredient = ingredients?.find(
-                            (i) => i._id === demand.ingredientId,
-                          );
-                          if (!ingredient)
-                            return ingredientName(demand.ingredientId);
-                          return (
-                            <HoverPreview
-                              card={
-                                <IngredientPreviewCard
-                                  ingredient={ingredient}
-                                />
-                              }
+                    <Fragment key={demand._id}>
+                      {firstOfEvent ? (
+                        <tr className="bg-inset">
+                          <td colSpan={6}>
+                            <Link
+                              to={`/events/${demand.eventId}`}
+                              className="font-semibold text-ink hover:underline"
                             >
-                              <IngredientCatalogLabel
-                                ingredientId={ingredient._id}
-                                ingredients={ingredients}
-                                link
-                              />
-                            </HoverPreview>
-                          );
-                        })()}
-                      </td>
-                      <td className="supply-number">
-                        {demand.requiredQuantity} {demand.unit}
-                        {(() => {
-                          const anomaly = anomalies.get(demand._id);
-                          if (!anomaly) return null;
-                          return (
-                            <span
-                              className="chip ml-2 chip-tone-warn"
-                              data-testid="demand-anomaly-flag"
-                              title={`Historical avg ${anomaly.expectedQuantity.toFixed(
-                                2,
-                              )} ${demand.unit} across ${anomaly.sampleSize} past ${
-                                anomaly.tier
-                              } events — this is ${Math.round(
-                                anomaly.deviation * 100,
-                              )}% ${anomaly.direction}`}
-                            >
-                              ⚠ {Math.round(anomaly.deviation * 100)}%{" "}
-                              {anomaly.direction}
+                              {eventName(demand.eventId)}
+                            </Link>{" "}
+                            <span className="text-ink-2">
+                              · {formatDate(eventStart(demand.eventId))} ·{" "}
+                              {formatCountNoun(lineCount, "ingredient")} needed
                             </span>
-                          );
-                        })()}
-                      </td>
-                      <td>
-                        <StatusChip status={String(demand.status)} />
-                      </td>
-                      <td>
-                        {need ? (
-                          <StatusChip status={String(need.status)} />
-                        ) : (
-                          <span className="supply-muted">
-                            Opens on Event approve
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <div className="supply-row-actions">
-                          {actions.map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() =>
-                                invokeDemandAction(demand, action.key)
-                              }
-                            >
-                              {busy === `${demand._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
-                            </button>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
+                          </td>
+                        </tr>
+                      ) : null}
+                      <tr>
+                        <td>
+                          <strong>{eventName(demand.eventId)}</strong>
+                        </td>
+                        <td>
+                          {(() => {
+                            const ingredient = ingredients?.find(
+                              (i) => i._id === demand.ingredientId,
+                            );
+                            if (!ingredient)
+                              return ingredientName(demand.ingredientId);
+                            return (
+                              <HoverPreview
+                                card={
+                                  <IngredientPreviewCard
+                                    ingredient={ingredient}
+                                  />
+                                }
+                              >
+                                <IngredientCatalogLabel
+                                  ingredientId={ingredient._id}
+                                  ingredients={ingredients}
+                                  link
+                                />
+                              </HoverPreview>
+                            );
+                          })()}
+                        </td>
+                        <td className="supply-number">
+                          {demand.requiredQuantity} {demand.unit}
+                          {(() => {
+                            const anomaly = anomalies.get(demand._id);
+                            if (!anomaly) return null;
+                            return (
+                              <span
+                                className="chip ml-2 chip-tone-warn"
+                                data-testid="demand-anomaly-flag"
+                                title={`Historical avg ${anomaly.expectedQuantity.toFixed(
+                                  2,
+                                )} ${demand.unit} across ${anomaly.sampleSize} past ${
+                                  anomaly.tier
+                                } events — this is ${Math.round(
+                                  anomaly.deviation * 100,
+                                )}% ${anomaly.direction}`}
+                              >
+                                ⚠ {Math.round(anomaly.deviation * 100)}%{" "}
+                                {anomaly.direction}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td>
+                          <StatusChip status={String(demand.status)} />
+                        </td>
+                        <td>
+                          {need ? (
+                            <StatusChip status={String(need.status)} />
+                          ) : (
+                            <span className="supply-muted">
+                              Opens on Event approve
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="supply-row-actions">
+                            {actions.map((action) => (
+                              <button
+                                key={action.key}
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() =>
+                                  invokeDemandAction(demand, action.key)
+                                }
+                              >
+                                {busy === `${demand._id}:${action.key}`
+                                  ? "Working…"
+                                  : action.label}
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    </Fragment>
                   );
                 })}
               </tbody>

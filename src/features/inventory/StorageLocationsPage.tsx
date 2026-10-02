@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  useListIngredient,
   useListInventoryItem,
   useListStorageLocation,
   useStorageLocationActivate,
@@ -40,6 +41,7 @@ const temperatureLabel = (location: {
 export function StorageLocationsPage() {
   const locations = useListStorageLocation();
   const stockItems = useListInventoryItem();
+  const ingredients = useListIngredient();
   const reviseDetails = useStorageLocationReviseDetails();
   const deactivate = useStorageLocationDeactivate();
   const activate = useStorageLocationActivate();
@@ -63,7 +65,12 @@ export function StorageLocationsPage() {
     if (held.length === 0) return "Empty";
     const named = held
       .slice(0, 3)
-      .map((item) => `${item.quantityOnHand} ${item.unit}`)
+      .map((item) => {
+        const name = ingredients?.find(
+          (ingredient) => ingredient._id === item.ingredientId,
+        )?.name;
+        return `${name ?? "Item"} ${item.quantityOnHand} ${item.unit}`;
+      })
       .join(", ");
     return `${formatCountNoun(held.length, "line")} · ${named}${held.length > 3 ? ", …" : ""}`;
   };

@@ -24,6 +24,21 @@ enum VendorOrderLineStatus {
   cancelled
 }
 
+// PL-VENDOR-INVOICE-MATCH: how a vendor's bill line compares with what arrived.
+// Each difference is a named exception a buyer accepts or disputes.
+enum VendorBillMatchState {
+  matched
+  quantity_differs
+  price_differs
+  quantity_and_price_differ
+}
+
+enum VendorBillReviewState {
+  open
+  accepted
+  disputed
+}
+
 // Order to one Vendor (capsule-pro PurchaseOrder). Totals are money facts;
 // receipt lots update on-hand stock in the same transaction as line receiving.
 entity VendorOrder mixin TenantScoped, SoftDeletable {
@@ -418,6 +433,10 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     compute reopen = lineStillShort and self.status == "received"
     mutate status = reopen ? "partially_received" : self.status
     mutate receivedAt = reopen ? null : self.receivedAt
+    emit VendorOrderReceiptCorrectionNoted {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store VendorOrder in durable
@@ -462,6 +481,15 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   property discrepancyQuantity: decimal(12, 4)?
   property discrepancyNotes: string?
   property required status: VendorOrderLineStatus = "pending"
+  // The vendor's bill for this line (PL-VENDOR-INVOICE-MATCH). Compared with the
+  // received count and the confirmed receipt price; history in VendorBillMatch.
+  property billNumber: string?
+  property billedQuantity: decimal(12, 4)?
+  property billedUnitPrice: money(12, 2)?
+  property billMatchState: VendorBillMatchState?
+  property billReviewState: VendorBillReviewState?
+  property billReviewNote: string?
+  property billMatchCount: int?
   property addedAt: datetime?
   property completedAt: datetime?
   property cancelledAt: datetime?
@@ -608,6 +636,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.vendorOrder != null and self.vendorOrder.status != "draft" and self.vendorOrder.status != "cancelled"
     mutate supplyWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.vendorOrder.sourceRangeStart
     mutate pendingSupplyQuantity = self.status == "cancelled" ? 0 : max(0, self.orderedQuantity - self.receivedQuantity)
+    emit VendorOrderLineSupplyCommitted {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command releaseSupply() {
@@ -615,6 +647,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     // A cancelled order no longer holds stock for its week; a draft reopened
     // for changes keeps its claim until the next weekly recalculation.
     mutate stockAppliedQuantity = self.vendorOrder != null and self.vendorOrder.status == "cancelled" ? 0 : self.stockAppliedQuantity
+    emit VendorOrderLineSupplyReleased {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command reviseQuantity(
@@ -775,6 +811,121 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       unit: self.unit
       reason: reason
       correctionSequence: correctionSequence
+    }
+  }
+
+  // A received line matches its vendor bill line once. Sending the same bill
+  // again changes nothing; a different bill or amount needs correctBillMatch.
+  // A match sets the line's actual cost to the bill; a difference waits for a
+  // buyer to accept or dispute it. No payment or accounting entry is made.
+  command matchBill(
+    billNumber: string,
+    billedQuantity: decimal(12, 4),
+    billedUnitPrice: money(12, 2)
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.status == "receiving" or self.status == "complete"
+    guard self.receivedQuantity > 0
+    guard self.vendorOrder != null
+    constraint billNumberRequired: length(trim(billNumber)) > 0 "Enter the bill number from the vendor's bill."
+    constraint billQuantityNonnegative: billedQuantity >= 0 "The billed amount can't be negative. Use zero or more."
+    constraint billPriceNonnegative: billedUnitPrice >= 0 "The billed price can't be negative. Use zero or more."
+    constraint billMatchedOnce: self.billNumber == null or (self.billNumber == billNumber and self.billedQuantity == billedQuantity and self.billedUnitPrice == billedUnitPrice) "This line is already matched to a vendor bill. Use Fix the bill match to change it."
+    compute fresh = self.billNumber == null
+    compute quantityDiffers = billedQuantity != self.receivedQuantity
+    compute priceDiffers = billedUnitPrice != self.unitCost
+    compute newState = quantityDiffers and priceDiffers ? "quantity_and_price_differ" : (quantityDiffers ? "quantity_differs" : (priceDiffers ? "price_differs" : "matched"))
+    compute state = fresh ? newState : self.billMatchState
+    compute sequence = fresh ? (self.billMatchCount != null ? self.billMatchCount : 0) + 1 : self.billMatchCount
+    mutate billNumber = billNumber
+    mutate billedQuantity = billedQuantity
+    mutate billedUnitPrice = billedUnitPrice
+    mutate billMatchState = state
+    mutate billMatchCount = sequence
+    mutate billReviewState = fresh ? (newState == "matched" ? null : "open") : self.billReviewState
+    mutate billReviewNote = fresh ? null : self.billReviewNote
+    mutate lineTotalAmount = fresh ? (newState == "matched" ? billedQuantity * billedUnitPrice : self.lineTotalAmount) : self.lineTotalAmount
+    emit VendorOrderLineBillMatched {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      vendorId: self.vendorOrder.vendorId
+      ingredientId: self.ingredientId
+      billNumber: billNumber
+      billedQuantity: billedQuantity
+      billedUnitPrice: billedUnitPrice
+      receivedQuantity: self.receivedQuantity
+      receiptUnitPrice: self.unitCost
+      unit: self.unit
+      matchState: state
+      matchSequence: sequence
+      reason: ""
+    }
+  }
+
+  // Fix a wrong bill match with a reason. The earlier match stays in history.
+  command correctBillMatch(
+    billNumber: string,
+    billedQuantity: decimal(12, 4),
+    billedUnitPrice: money(12, 2),
+    reason: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.billNumber != null
+    guard self.vendorOrder != null
+    constraint fixBillNumberRequired: length(trim(billNumber)) > 0 "Enter the bill number from the vendor's bill."
+    constraint fixBillQuantityNonnegative: billedQuantity >= 0 "The billed amount can't be negative. Use zero or more."
+    constraint fixBillPriceNonnegative: billedUnitPrice >= 0 "The billed price can't be negative. Use zero or more."
+    constraint fixBillReason: length(trim(reason)) > 0 "Say why the bill match changed."
+    constraint fixBillChanged: self.billNumber != billNumber or self.billedQuantity != billedQuantity or self.billedUnitPrice != billedUnitPrice "Change the bill number, billed amount or billed price, or keep the match as it is."
+    compute quantityDiffers = billedQuantity != self.receivedQuantity
+    compute priceDiffers = billedUnitPrice != self.unitCost
+    compute state = quantityDiffers and priceDiffers ? "quantity_and_price_differ" : (quantityDiffers ? "quantity_differs" : (priceDiffers ? "price_differs" : "matched"))
+    compute sequence = (self.billMatchCount != null ? self.billMatchCount : 0) + 1
+    mutate billNumber = billNumber
+    mutate billedQuantity = billedQuantity
+    mutate billedUnitPrice = billedUnitPrice
+    mutate billMatchState = state
+    mutate billMatchCount = sequence
+    mutate billReviewState = state == "matched" ? null : "open"
+    mutate billReviewNote = null
+    mutate lineTotalAmount = state == "matched" ? billedQuantity * billedUnitPrice : self.orderedQuantity * self.unitCost
+    emit VendorOrderLineBillMatched {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      vendorId: self.vendorOrder.vendorId
+      ingredientId: self.ingredientId
+      billNumber: billNumber
+      billedQuantity: billedQuantity
+      billedUnitPrice: billedUnitPrice
+      receivedQuantity: self.receivedQuantity
+      receiptUnitPrice: self.unitCost
+      unit: self.unit
+      matchState: state
+      matchSequence: sequence
+      reason: reason
+    }
+  }
+
+  // Accept: the bill is the actual cost. Dispute: the receipt stays the cost
+  // while the buyer sorts it out with the vendor.
+  command reviewBillDifference(decision: VendorBillReviewState, note: string) {
+    guard self.deletedAt == null
+    guard self.billMatchState != null and self.billMatchState != "matched"
+    constraint billDecisionMade: decision == "accepted" or decision == "disputed" "Choose Accept or Dispute."
+    constraint billDecisionNote: length(trim(note)) > 0 "Say why you accept or dispute this bill."
+    mutate billReviewState = decision
+    mutate billReviewNote = note
+    mutate lineTotalAmount = decision == "accepted" ? self.billedQuantity * self.billedUnitPrice : self.orderedQuantity * self.unitCost
+    emit VendorOrderLineBillReviewed {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      matchSequence: self.billMatchCount
+      decision: decision
+      note: note
     }
   }
 
@@ -992,6 +1143,97 @@ entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
   store ReceiptCorrection in durable
 }
 
+// One vendor bill match on a received line (PL-VENDOR-INVOICE-MATCH). The bill
+// number, billed amount and price, and what had arrived are kept as first
+// recorded; a fix makes a new numbered row. The buyer's accept/dispute is kept here.
+entity VendorBillMatch mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, vendorOrderLineId, matchSequence]
+  timestamps
+  versionProperty version: number
+
+  property indexed required vendorOrderLineId: uuid
+  property required vendorOrderId: uuid
+  property indexed required vendorId: uuid
+  property required ingredientId: uuid
+  property indexed required billNumber: string = ""
+  property required billedQuantity: decimal(12, 4) = 0
+  property required billedUnitPrice: money(12, 2) = 0
+  property required receivedQuantity: decimal(12, 4) = 0
+  property required receiptUnitPrice: money(12, 2) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required matchState: VendorBillMatchState = "matched"
+  property required matchSequence: int = 0
+  property reason: string?
+  property reviewState: VendorBillReviewState?
+  property reviewNote: string?
+  property matchedAt: datetime?
+  property reviewedAt: datetime?
+
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  constraint vendorBillMatchNumber: self.matchedAt == null or length(trim(self.billNumber)) > 0 "Enter the bill number from the vendor's bill."
+
+  default policy vendorBillMatchRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may see vendor bill matches"
+  default policy vendorBillMatchWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update vendor bill matches"
+  default policy vendorBillMatchExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change vendor bill matches"
+
+  command record(
+    vendorOrderLineId: uuid,
+    vendorOrderId: uuid,
+    vendorId: uuid,
+    ingredientId: uuid,
+    billNumber: string,
+    billedQuantity: decimal(12, 4),
+    billedUnitPrice: money(12, 2),
+    receivedQuantity: decimal(12, 4),
+    receiptUnitPrice: money(12, 2),
+    unit: UnitOfMeasure,
+    matchState: VendorBillMatchState,
+    matchSequence: int,
+    reason: string
+  ) {
+    guard self.matchedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.billNumber == billNumber and self.billedQuantity == billedQuantity and self.billedUnitPrice == billedUnitPrice and self.matchSequence == matchSequence)
+    guard self.deletedAt == null
+    mutate vendorOrderLineId = self.matchedAt == null ? vendorOrderLineId : self.vendorOrderLineId
+    mutate vendorOrderId = self.matchedAt == null ? vendorOrderId : self.vendorOrderId
+    mutate vendorId = self.matchedAt == null ? vendorId : self.vendorId
+    mutate ingredientId = self.matchedAt == null ? ingredientId : self.ingredientId
+    mutate billNumber = self.matchedAt == null ? billNumber : self.billNumber
+    mutate billedQuantity = self.matchedAt == null ? billedQuantity : self.billedQuantity
+    mutate billedUnitPrice = self.matchedAt == null ? billedUnitPrice : self.billedUnitPrice
+    mutate receivedQuantity = self.matchedAt == null ? receivedQuantity : self.receivedQuantity
+    mutate receiptUnitPrice = self.matchedAt == null ? receiptUnitPrice : self.receiptUnitPrice
+    mutate unit = self.matchedAt == null ? unit : self.unit
+    mutate matchState = self.matchedAt == null ? matchState : self.matchState
+    mutate matchSequence = self.matchedAt == null ? matchSequence : self.matchSequence
+    mutate reason = self.matchedAt == null ? (length(trim(reason)) > 0 ? reason : null) : self.reason
+    mutate reviewState = self.matchedAt == null ? (matchState == "matched" ? null : "open") : self.reviewState
+    mutate matchedAt = self.matchedAt == null ? now() : self.matchedAt
+    emit VendorBillMatchRecorded {
+      vendorBillMatchId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command recordDecision(decision: VendorBillReviewState, note: string) {
+    guard self.deletedAt == null
+    guard self.matchedAt != null and self.matchState != "matched"
+    mutate reviewState = decision
+    mutate reviewNote = note
+    mutate reviewedAt = now()
+    emit VendorBillMatchReviewed {
+      vendorBillMatchId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store VendorBillMatch in durable
+}
+
 event InventoryLotStockRecorded: "inventory_lot.stock_recorded" {
   tenantId: string
   ingredientId: string
@@ -1067,6 +1309,10 @@ entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
     mutate unit = unit
     mutate unitPrice = unitPrice
     mutate observedAt = self.observedAt == null ? now() : self.observedAt
+    emit IngredientPriceObserved {
+      ingredientPriceObservationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store IngredientPriceObservation in durable
@@ -1526,4 +1772,86 @@ on ReceiptCorrectionStock run InventoryItem.applyReceiptCorrection
     delta: payload.delta
     unit: payload.unit
     reason: payload.reason
+  }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event IngredientPriceObserved: "ingredient.price.observed" {
+  ingredientPriceObservationId: string
+  tenantId: string
+}
+
+event VendorOrderReceiptCorrectionNoted: "vendor.order.receipt.correction.noted" {
+  vendorOrderId: string
+  tenantId: string
+}
+
+event VendorOrderLineSupplyCommitted: "vendor.order.line.supply.committed" {
+  vendorOrderLineId: string
+  tenantId: string
+}
+
+event VendorOrderLineSupplyReleased: "vendor.order.line.supply.released" {
+  vendorOrderLineId: string
+  tenantId: string
+}
+
+event VendorOrderLineBillMatched: "vendor_order_line.bill_matched" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  vendorId: string
+  ingredientId: string
+  billNumber: string
+  billedQuantity: decimal(12, 4)
+  billedUnitPrice: money(12, 2)
+  receivedQuantity: decimal(12, 4)
+  receiptUnitPrice: money(12, 2)
+  unit: UnitOfMeasure
+  matchState: VendorBillMatchState
+  matchSequence: int
+  reason: string
+}
+
+event VendorOrderLineBillReviewed: "vendor_order_line.bill_reviewed" {
+  vendorOrderLineId: string
+  tenantId: string
+  matchSequence: int
+  decision: VendorBillReviewState
+  note: string
+}
+
+event VendorBillMatchRecorded: "vendor_bill_match.recorded" {
+  vendorBillMatchId: string
+  tenantId: string
+}
+
+event VendorBillMatchReviewed: "vendor_bill_match.reviewed" {
+  vendorBillMatchId: string
+  tenantId: string
+}
+
+on VendorOrderLineBillMatched run VendorBillMatch.record
+  match vendorOrderLineId = payload.vendorOrderLineId, matchSequence = payload.matchSequence
+  else create
+  params {
+    vendorOrderLineId: payload.vendorOrderLineId
+    vendorOrderId: payload.vendorOrderId
+    vendorId: payload.vendorId
+    ingredientId: payload.ingredientId
+    billNumber: payload.billNumber
+    billedQuantity: payload.billedQuantity
+    billedUnitPrice: payload.billedUnitPrice
+    receivedQuantity: payload.receivedQuantity
+    receiptUnitPrice: payload.receiptUnitPrice
+    unit: payload.unit
+    matchState: payload.matchState
+    matchSequence: payload.matchSequence
+    reason: payload.reason
+  }
+
+on VendorOrderLineBillReviewed run VendorBillMatch.recordDecision
+  match vendorOrderLineId = payload.vendorOrderLineId, matchSequence = payload.matchSequence
+  params {
+    decision: payload.decision
+    note: payload.note
   }

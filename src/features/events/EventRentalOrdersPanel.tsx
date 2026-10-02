@@ -3,6 +3,7 @@ import type { Id } from "../../lib/api";
 import { formatMoney } from "../../lib/format";
 import {
   useCreateRentalOrderLine,
+  useCreateVendor,
   useListEquipment,
   useListRentalOrderLine,
   useRentalOrderLineCancel,
@@ -12,9 +13,16 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice } from "../../ui/action-result";
-import { useRentalVendorChoices } from "../facilities/equipmentCheckout";
+import { Link } from "react-router-dom";
+import {
+  useRentalVendorChoices,
+  useVenueVendorRules,
+  VENUE_VENDOR_NOTE,
+} from "../facilities/equipmentCheckout";
+import { ADD_NEW_CHOICE, findByName } from "../inventory/inlineCatalogChoice";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { rentalAvailability } from "../logistics/eventRequirements";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type RentalRow = {
   _id: string;
@@ -55,7 +63,15 @@ function shortTime(value?: number | null): string {
 export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
   const lines = useListRentalOrderLine() as RentalRow[] | undefined;
   const equipment = useListEquipment();
-  const vendors = useRentalVendorChoices() ?? [];
+  const vendorChoices = useRentalVendorChoices();
+  const venueRuleRows = useVenueVendorRules(eventId);
+  const vendors = vendorChoices ?? [];
+  const createVendor = useCreateVendor();
+  // No vendors yet, or "New vendor…" picked: name one here and the rental
+  // adds it first, so the rest of the form stays filled in (PR10-08).
+  const [addingVendor, setAddingVendor] = useState(false);
+  const typingVendor =
+    addingVendor || (vendorChoices !== undefined && vendors.length === 0);
   const askVendor = useCreateRentalOrderLine();
   const confirm = useRentalOrderLineConfirm();
   const markDelivered = useRentalOrderLineMarkDelivered();
@@ -68,6 +84,10 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
   const { prompt, host } = useActionPrompt(busy != null);
 
   const vendorName = new Map(vendors.map((v) => [String(v.vendorId), v.name]));
+  const venueRules = new Map(
+    (venueRuleRows ?? []).map((rule) => [rule.vendorId, rule.status]),
+  );
+  const [pickedVendor, setPickedVendor] = useState("");
   const rentedItems = (equipment ?? []).filter(
     (row) =>
       row.deletedAt == null &&
@@ -100,12 +120,28 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
     const data = new FormData(form);
     const equipmentId = String(data.get("equipmentId") ?? "");
     const item = rentedItems.find((row) => row._id === equipmentId);
-    const vendorId =
+    const newVendorName = String(data.get("newVendorName") ?? "").trim();
+    const pickedVendorId =
       String(data.get("vendorId") ?? "") || String(item?.vendorId ?? "");
     const description =
       String(data.get("description") ?? "").trim() || item?.name || "";
     const costText = String(data.get("vendorCost") ?? "").trim();
+    // Keep the typed vendor box after a failed save, even once the vendor it
+    // added shows up in the list, so a retry sends the same name.
+    if (newVendorName) setAddingVendor(true);
     void run("ask", async () => {
+      // A retry, or a teammate, may already have added this name: reuse it.
+      const vendorId = newVendorName
+        ? String(
+            findByName(vendors, newVendorName)?.vendorId ??
+              (
+                (await createVendor({
+                  name: newVendorName,
+                  paymentTermsDays: 30,
+                })) as { docId: string }
+              ).docId,
+          )
+        : pickedVendorId;
       await askVendor({
         eventId,
         vendorId,
@@ -118,6 +154,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
         pickupAt: toTime(data.get("pickupAt")),
       });
       form.reset();
+      setAddingVendor(false);
       setShowForm(false);
       setNotice("Rental added. Mark it confirmed when the vendor says yes.");
     });
@@ -309,6 +346,20 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                   </option>
                 ))}
               </select>
+              {equipment !== undefined && rentedItems.length === 0 ? (
+                <span className="field-hint">
+                  Nothing on the rental list yet. Type what it is below, or{" "}
+                  <Link
+                    to="/facilities/equipment"
+                    target="_blank"
+                    rel="noopener"
+                    className="underline font-medium"
+                  >
+                    add it to the equipment list
+                  </Link>{" "}
+                  (opens a new tab; this form stays filled in).
+                </span>
+              ) : null}
             </label>
             <label className="field-label">
               What it is
@@ -318,17 +369,71 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                 placeholder="Blank uses the list item's name"
               />
             </label>
-            <label className="field-label">
-              Vendor
-              <select name="vendorId" className="input" defaultValue="">
-                <option value="">The list item's vendor</option>
-                {vendors.map((vendor) => (
-                  <option key={vendor.vendorId} value={vendor.vendorId}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {typingVendor ? (
+              <label className="field-label">
+                Vendor
+                <input
+                  name="newVendorName"
+                  className="input"
+                  placeholder="e.g. Party Rentals Co"
+                  autoComplete="off"
+                  required
+                />
+                <span className="field-hint">
+                  {vendors.length === 0
+                    ? "No vendors yet. Name one here and this rental adds it."
+                    : "Name the new vendor. This rental adds it; add contact details later."}
+                  {vendors.length > 0 ? (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        className="underline font-medium"
+                        onClick={() => setAddingVendor(false)}
+                      >
+                        Pick an existing vendor
+                      </button>
+                    </>
+                  ) : null}
+                </span>
+              </label>
+            ) : (
+              <label className="field-label">
+                Vendor
+                <select
+                  name="vendorId"
+                  className="input"
+                  defaultValue=""
+                  onChange={(event) => {
+                    if (event.target.value === ADD_NEW_CHOICE)
+                      setAddingVendor(true);
+                    setPickedVendor(event.target.value);
+                  }}
+                >
+                  <option value="">The list item's vendor</option>
+                  {vendors.map((vendor) => {
+                    const rule = venueRules.get(String(vendor.vendorId));
+                    return (
+                      <option
+                        key={vendor.vendorId}
+                        value={vendor.vendorId}
+                        disabled={rule === "banned"}
+                      >
+                        {vendor.name}
+                        {rule ? VENUE_VENDOR_NOTE[rule] : ""}
+                      </option>
+                    );
+                  })}
+                  <option value={ADD_NEW_CHOICE}>New vendor…</option>
+                </select>
+                {venueRules.get(pickedVendor) === "restricted" ? (
+                  <span className="text-xs text-warn" role="status">
+                    This venue restricts this vendor. Check with the venue
+                    before you book.
+                  </span>
+                ) : null}
+              </label>
+            )}
             <label className="field-label">
               How many
               <input
@@ -353,11 +458,11 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
             </label>
             <label className="field-label">
               Drop-off by
-              <input name="deliverBy" className="input" type="datetime-local" />
+              <BoundedDateTimeLocalInput name="deliverBy" className="input" />
             </label>
             <label className="field-label">
               Pick-up
-              <input name="pickupAt" className="input" type="datetime-local" />
+              <BoundedDateTimeLocalInput name="pickupAt" className="input" />
             </label>
           </div>
           <div className="supply-row-actions">

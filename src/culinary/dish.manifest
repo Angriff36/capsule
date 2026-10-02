@@ -757,6 +757,10 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   // triggers it. Wired as a fanOut ahead of PrepTask generation.
   command backfillActiveKey() {
     mutate activeDishId = (self.deletedAt == null and self.status == "active" and self.activeDishId == null) ? self.dishId : self.activeDishId
+    emit DishTaskActiveKeyBackfilled {
+      dishTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store DishTask in durable
@@ -1000,4 +1004,10 @@ event DishTaskMaterialUnlinked: "dish_task_material.unlinked" {
   tenantId: string
   dishTaskId: string
   reason: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event DishTaskActiveKeyBackfilled: "dish.task.active.key.backfilled" {
+  dishTaskId: string
+  tenantId: string
 }

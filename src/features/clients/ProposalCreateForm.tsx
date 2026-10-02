@@ -25,7 +25,10 @@ import {
 } from "../../ui/BoundedDateInputs";
 import { toDatetimeLocalValue } from "../../lib/format";
 import { useListProposalTemplate } from "../../lib/manifest-convex-react";
-import { proposalTemplateDefaults } from "./proposalTemplateDefaults";
+import {
+  proposalTemplateDefaults,
+  templateForServiceStyle,
+} from "./proposalTemplateDefaults";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -158,6 +161,10 @@ export function ProposalCreateForm({
   const [templateServiceLineKey, setTemplateServiceLineKey] = useState<
     string | null
   >(null);
+  const [templateChoice, setTemplateChoice] = useState("");
+  // The event's service style picked this template (shown under the field).
+  const [templatePickedForStyle, setTemplatePickedForStyle] = useState(false);
+  const templateAutoPickedFor = useRef<string | null>(null);
 
   // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
   const draftPricing = useMemo(
@@ -342,6 +349,24 @@ export function ProposalCreateForm({
     }
   }, [fromEvent?._id]);
 
+  useEffect(() => {
+    // A proposal from an event starts from the template made for the event's
+    // service style (PL-CATALOGS AC-221/AC-222). Once per event, and never over
+    // a template the person already picked.
+    if (!fromEvent || proposalTemplates === undefined) return;
+    if (templateAutoPickedFor.current === fromEvent._id) return;
+    templateAutoPickedFor.current = fromEvent._id;
+    if (templateChoice) return;
+    const match = templateForServiceStyle(
+      proposalTemplates,
+      fromEvent.serviceStyleId,
+    );
+    if (!match) return;
+    setTemplateChoice(match._id);
+    setTemplatePickedForStyle(true);
+    selectTemplate(match._id);
+  }, [fromEvent?._id, proposalTemplates]);
+
   const submitDraft = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -515,8 +540,13 @@ export function ProposalCreateForm({
               Proposal template
               <select
                 className="input"
-                defaultValue=""
-                onChange={(event) => selectTemplate(event.target.value)}
+                aria-label="Proposal template"
+                value={templateChoice}
+                onChange={(event) => {
+                  setTemplateChoice(event.target.value);
+                  setTemplatePickedForStyle(false);
+                  selectTemplate(event.target.value);
+                }}
               >
                 <option value="">No template</option>
                 {(proposalTemplates ?? [])
@@ -528,6 +558,9 @@ export function ProposalCreateForm({
                   ))}
               </select>
               <span className="text-2xs text-ink-3">
+                {templatePickedForStyle && fromEvent?.serviceStyleName
+                  ? `Picked because this event is ${fromEvent.serviceStyleName}. Change it if you like. `
+                  : ""}
                 Selecting a template initializes this draft. Your later edits
                 stay unchanged.
               </span>

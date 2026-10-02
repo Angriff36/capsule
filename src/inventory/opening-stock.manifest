@@ -198,6 +198,10 @@ entity OpeningStockRecord mixin TenantScoped, SoftDeletable {
     constraint refreshOpeningStockIssues: length(trim(issues)) >= 2 "Each stock row needs its list of open issues, even an empty one."
     mutate issues = issues
     mutate status = issues == "[]" ? "ready" : "needs_review"
+    emit OpeningStockIssuesRefreshed {
+      openingStockRecordId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command setAside(reason: string) {
@@ -276,4 +280,10 @@ event OpeningStockApplied: "opening_stock.applied" {
   itemName: string
   inventoryItemId: string
   catalogQuantity: decimal(12, 4)?
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event OpeningStockIssuesRefreshed: "opening.stock.issues.refreshed" {
+  openingStockRecordId: string
+  tenantId: string
 }
