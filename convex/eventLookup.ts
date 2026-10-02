@@ -35,6 +35,9 @@ export type EventLookupRow = Pick<
   | "assignedToId"
   | "referralSourceId"
   | "serviceStyleName"
+  | "budgetAmount"
+  | "createdAt"
+  | "updatedAt"
 >;
 
 export const byIds = query({
@@ -220,5 +223,8 @@ function lookupRow(e: Doc<"events">): EventLookupRow {
     assignedToId: e.assignedToId ?? null,
     referralSourceId: e.referralSourceId ?? null,
     serviceStyleName: e.serviceStyleName ?? null,
+    budgetAmount: e.budgetAmount ?? null,
+    createdAt: e.createdAt,
+    updatedAt: e.updatedAt,
   };
 }
