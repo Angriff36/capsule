@@ -70,6 +70,80 @@ async function byEvent<T extends string>(
     .collect();
 }
 
+/**
+ * This event's part of the shared weekly orders. A weekly order belongs to
+ * no one event: each line is linked to the food amounts (per event) it buys
+ * for. The event's part of a line is its linked amount over all live linked
+ * amounts on that line, so two events sharing one flour line each carry
+ * their own part of what was ordered and received - never the whole line
+ * twice. Orders already tied to this event are counted directly and skipped.
+ */
+async function weeklyOrderShares(
+  ctx: QueryCtx,
+  tenantId: string,
+  eventId: Id<"events">,
+  counted: Set<string>,
+) {
+  const demands = (
+    await ctx.db
+      .query("ingredientDemands")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect()
+  ).filter((row) => row.tenantId === tenantId);
+  const share = new Map<string, number>();
+  for (const demand of demands) {
+    const links = await ctx.db
+      .query("vendorOrderLineDemands")
+      .withIndex("by_ingredientDemandId", (q) =>
+        q.eq("ingredientDemandId", demand._id),
+      )
+      .collect();
+    for (const link of links) {
+      if (link.tenantId !== tenantId || link.removedAt != null) continue;
+      const key = String(link.vendorOrderLineId);
+      share.set(key, (share.get(key) ?? 0) + Number(link.contributionQuantity));
+    }
+  }
+  const byOrder = new Map<
+    string,
+    { order: Doc<"vendorOrders">; lines: Array<Record<string, unknown>> }
+  >();
+  for (const [lineKey, mineQuantity] of share) {
+    const line = await ctx.db.get(lineKey as Id<"vendorOrderLines">);
+    if (!line || line.tenantId !== tenantId || line.deletedAt != null) continue;
+    const order = await ctx.db.get(line.vendorOrderId);
+    if (!order || order.tenantId !== tenantId || counted.has(String(order._id)))
+      continue;
+    const all = (
+      await ctx.db
+        .query("vendorOrderLineDemands")
+        .withIndex("by_vendorOrderLineId", (q) =>
+          q.eq("vendorOrderLineId", line._id),
+        )
+        .collect()
+    ).filter((link) => link.tenantId === tenantId && link.removedAt == null);
+    const total = all.reduce(
+      (sum, l) => sum + Number(l.contributionQuantity),
+      0,
+    );
+    if (!(total > 0)) continue;
+    const part = Math.min(1, mineQuantity / total);
+    const entry = byOrder.get(String(order._id)) ?? { order, lines: [] };
+    entry.lines.push({
+      ...line,
+      _id: String(line._id),
+      orderedQuantity: Number(line.orderedQuantity) * part,
+      receivedQuantity: Number(line.receivedQuantity ?? 0) * part,
+    });
+    byOrder.set(String(order._id), entry);
+  }
+  return [...byOrder.values()].map(({ order, lines }) => ({
+    ...order,
+    _id: String(order._id),
+    lines: lines as never[],
+  }));
+}
+
 async function loadProjection(
   ctx: QueryCtx,
   tenantId: string,
@@ -121,6 +195,14 @@ async function loadProjection(
       lines: mine(lines).map((line) => ({ ...line, _id: String(line._id) })),
     });
   }
+  vendorOrders.push(
+    ...(await weeklyOrderShares(
+      ctx,
+      tenantId,
+      event._id,
+      new Set(vendorOrders.map((order) => order._id)),
+    )),
+  );
   const labor = await loadEventLabor(ctx, tenantId, eventId);
   const minutesOf = (record: Doc<"timeRecords">) =>
     Math.max(
