@@ -258,7 +258,11 @@ export default defineConfig(({ mode }) => ({
     testTimeout: 30_000,
     // Each worker loads the generated Convex runtime. Oversubscribing large
     // machines adds contention and makes otherwise fast proofs time out.
-    maxWorkers: Math.min(8, availableParallelism()),
+    // CAPSULE_TEST_WORKERS lowers it on a busy machine: on 2026-10-01 a
+    // release check lost a test worker to low memory with eight running.
+    maxWorkers:
+      Number(process.env.CAPSULE_TEST_WORKERS) ||
+      Math.min(8, availableParallelism()),
     // Node 25+ has its own localStorage that is undefined without
     // --localstorage-file; it shadowed jsdom's and broke every jsdom test
     // (2026-10-01). Turn it off in the test workers. Set here, not in the
