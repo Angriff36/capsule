@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { formatCount, formatDate, formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -22,6 +22,10 @@ import {
   type SavedReportRow,
 } from "./liveReportModel";
 import { SAVED_REPORT_READ_ONLY_NOTICE } from "./reportEditAccess";
+import { MetricDefinitionList } from "./MetricDefinitionList";
+import { ReportFilterBar } from "./ReportFilterBar";
+import { activeFilterCount, type ReportFilters } from "./reportFilters";
+import type { ReportLeftOut } from "./LiveReportData";
 
 interface LiveReportWorkspaceProps {
   report: SavedReportRow;
@@ -40,6 +44,11 @@ interface LiveReportWorkspaceProps {
    */
   canEditSettings: boolean;
   onApply: (dateWindow: ReportDateWindow, chartType: ReportChartType) => void;
+  /** Filters on screen (page address first, else the saved ones). */
+  filters: ReportFilters;
+  /** Changes the view at once for every reader; Apply also saves it. */
+  onFiltersChange: (filters: ReportFilters) => void;
+  leftOut: ReportLeftOut;
 }
 
 export function LiveReportWorkspace({
@@ -54,6 +63,9 @@ export function LiveReportWorkspace({
   busy,
   canEditSettings,
   onApply,
+  filters,
+  onFiltersChange,
+  leftOut,
 }: LiveReportWorkspaceProps) {
   const [dateWindow, setDateWindow] = useState(savedDateWindow);
   const [chartType, setChartType] = useState(savedChartType);
@@ -134,6 +146,18 @@ export function LiveReportWorkspace({
         </button>
       </form>
 
+      <ReportFilterBar
+        filters={filters}
+        disabled={busy}
+        onChange={onFiltersChange}
+      />
+      <p className="live-report-notice" role="status">
+        {activeFilterCount(filters) > 0
+          ? `${formatCount(activeFilterCount(filters))} filters on. The page address keeps them, so a copied link opens this same view.`
+          : "No filters on. Filters change the figures, the chart, the rows and the export together."}
+        {canEditSettings ? " Apply also saves them with the report." : ""}
+      </p>
+
       {canEditSettings ? null : (
         <p className="live-report-notice" role="status">
           {SAVED_REPORT_READ_ONLY_NOTICE}
@@ -164,6 +188,7 @@ export function LiveReportWorkspace({
           reportName={String(report.name || "Untitled")}
           chartType={chartType}
           model={model}
+          leftOut={leftOut}
         />
       ) : null}
     </section>
@@ -174,12 +199,22 @@ function ReportResult({
   reportName,
   chartType,
   model,
+  leftOut,
 }: {
   reportName: string;
   chartType: ReportChartType;
   model: LiveReportModel;
+  leftOut: ReportLeftOut;
 }) {
   const noRows = model.rows.length === 0;
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const focus = model.kpis.find((item) => item.metricId === focusId) ?? null;
+  const visibleRows = useMemo(() => {
+    if (!focus?.rowIds) return model.rows;
+    const behind = new Set(focus.rowIds);
+    return model.rows.filter((row) => behind.has(row.id));
+  }, [focus, model.rows]);
+  const periodLeftOut = model.leftOut;
   return (
     <>
       <div className="report-kpi-grid">
@@ -187,9 +222,49 @@ function ReportResult({
           <div className="report-kpi" key={item.label}>
             <span>{item.label}</span>
             <strong>{item.value}</strong>
+            <button
+              type="button"
+              className="mt-1 text-xs text-brand underline"
+              aria-pressed={focusId === item.metricId}
+              data-testid={`report-kpi-drill-${item.metricId}`}
+              onClick={() =>
+                setFocusId(focusId === item.metricId ? null : item.metricId)
+              }
+            >
+              {focusId === item.metricId
+                ? "Show all rows"
+                : `See the ${formatCount(item.rowIds?.length ?? model.rows.length)} rows behind it`}
+            </button>
           </div>
         ))}
       </div>
+      <p
+        className="live-report-notice"
+        role="status"
+        data-testid="report-period-left-out"
+      >
+        Not counted: {formatCount(periodLeftOut.outsidePeriod)} outside the
+        period, {formatCount(periodLeftOut.deleted)} deleted
+        {periodLeftOut.noDate > 0
+          ? `, ${formatCount(periodLeftOut.noDate)} with no date`
+          : ""}
+        .
+        {periodLeftOut.repeatedNumbers > 0
+          ? ` ${formatCount(periodLeftOut.repeatedNumbers)} counted rows share a number with another row; check them for doubles.`
+          : ""}
+      </p>
+      {leftOut.filteredOut + leftOut.noEvent > 0 ? (
+        <p
+          className="live-report-notice"
+          role="status"
+          data-testid="report-left-out"
+        >
+          Left out by the filters: {formatCount(leftOut.filteredOut)} rows.
+          {leftOut.noEvent > 0
+            ? ` ${formatCount(leftOut.noEvent)} more rows belong to no event you can see, so an event filter cannot keep them.`
+            : ""}
+        </p>
+      ) : null}
 
       {noRows ? (
         <div className="document-empty live-report-empty">
@@ -246,13 +321,19 @@ function ReportResult({
       <div className="live-report-detail-heading">
         <div>
           <span>Evidence</span>
-          <h3>{formatCount(model.rows.length)} matching rows</h3>
+          <h3>
+            {focus?.rowIds
+              ? `${formatCount(visibleRows.length)} rows behind ${focus.label}`
+              : `${formatCount(model.rows.length)} matching rows`}
+          </h3>
         </div>
         <button
           className="btn btn-ghost btn-sm"
           type="button"
-          disabled={noRows}
-          onClick={() => downloadLiveReportCsv(model, reportName)}
+          disabled={visibleRows.length === 0}
+          onClick={() =>
+            downloadLiveReportCsv({ ...model, rows: visibleRows }, reportName)
+          }
         >
           Export CSV
         </button>
@@ -271,7 +352,7 @@ function ReportResult({
             </tr>
           </thead>
           <tbody>
-            {model.rows.map((row) => (
+            {visibleRows.map((row) => (
               <tr key={row.id}>
                 {model.columns.map((column) => (
                   <td key={column.key}>
@@ -294,6 +375,10 @@ function ReportResult({
           Open source workspace
         </Link>
       </div>
+
+      <MetricDefinitionList
+        metricIds={model.kpis.map((item) => item.metricId)}
+      />
     </>
   );
 }

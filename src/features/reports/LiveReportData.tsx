@@ -8,22 +8,40 @@ import {
   useListPrepTask,
   useListProposal,
   useListShift,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import type { ReportSubjectArea } from "./ReportCreateForm";
 import { buildLiveReportModel } from "./liveReportBuilders";
 import { canReadReportSubject } from "./liveReportSubjectAccess";
 import type { LiveReportModel, ReportDateWindow } from "./liveReportModel";
+import {
+  applyReportEventFilters,
+  hasEventFilter,
+  reportFilterRange,
+  type ReportFilterEvent,
+  type ReportFilterLookups,
+  type ReportFilters,
+} from "./reportFilters";
+
+export interface ReportLeftOut {
+  /** Rows an event filter left out because they belong to no event. */
+  noEvent: number;
+  /** Rows the event filters left out. */
+  filteredOut: number;
+}
 
 interface LiveReportDataState {
   model: LiveReportModel | null;
   loading: boolean;
   sourceAvailable: boolean;
+  leftOut: ReportLeftOut;
 }
 
 interface LiveReportDataProps {
   subject: ReportSubjectArea;
   dateWindow: ReportDateWindow;
+  filters: ReportFilters;
   children: (state: LiveReportDataState) => ReactNode;
 }
 
@@ -126,20 +144,64 @@ function numberValue(value: unknown): number {
   return 0;
 }
 
-function ResolvedData({
+type ResolvedDataProps = LiveReportDataProps & {
+  rows: readonly unknown[] | undefined;
+  paymentRows?: readonly unknown[] | undefined;
+};
+
+/** Events and venues load only when an event filter needs them. */
+function ResolvedData(props: ResolvedDataProps) {
+  return hasEventFilter(props.filters) ? (
+    <WithEventLookups {...props} />
+  ) : (
+    <ResolvedModel {...props} lookups={null} lookupsLoading={false} />
+  );
+}
+
+function WithEventLookups(props: ResolvedDataProps) {
+  const events = useListEvent();
+  const venues = useListVenue();
+  const lookups = useMemo<ReportFilterLookups>(
+    () => ({
+      events: new Map(
+        (events ?? []).map((event) => [
+          String(event._id),
+          event as unknown as ReportFilterEvent,
+        ]),
+      ),
+      venueOnPremise: new Map(
+        (venues ?? []).map((venue) => [String(venue._id), venue.onPremise]),
+      ),
+    }),
+    [events, venues],
+  );
+  return (
+    <ResolvedModel
+      {...props}
+      lookups={lookups}
+      lookupsLoading={events === undefined || venues === undefined}
+    />
+  );
+}
+
+function ResolvedModel({
   rows,
   paymentRows,
   subject,
   dateWindow,
+  filters,
+  lookups,
+  lookupsLoading,
   children,
-}: LiveReportDataProps & {
-  rows: readonly unknown[] | undefined;
-  paymentRows?: readonly unknown[] | undefined;
+}: ResolvedDataProps & {
+  lookups: ReportFilterLookups | null;
+  lookupsLoading: boolean;
 }) {
   const authStatus = useAuthStatus();
   const loading =
     rows === undefined ||
     authStatus === undefined ||
+    lookupsLoading ||
     (subject === "finance" && paymentRows === undefined);
   const sourceAvailable = loading
     ? false
@@ -148,22 +210,38 @@ function ResolvedData({
         String(authStatus?.role ?? ""),
         authStatus?.disabledCapabilities,
       );
-  const model = useMemo(
-    () =>
-      !loading && sourceAvailable
-        ? buildLiveReportModel(
-            subject,
-            subject === "finance"
-              ? rowsWithActualPayments(rows ?? [], paymentRows ?? [])
-              : (rows ?? []),
-            dateWindow,
-          )
-        : null,
-    [dateWindow, loading, paymentRows, rows, sourceAvailable, subject],
-  );
+  const result = useMemo(() => {
+    if (loading || !sourceAvailable) return null;
+    const subjectRows =
+      subject === "finance"
+        ? rowsWithActualPayments(rows ?? [], paymentRows ?? [])
+        : (rows ?? []);
+    const filtered = lookups
+      ? applyReportEventFilters(subject, subjectRows, filters, lookups)
+      : { rows: [...subjectRows], noEvent: 0, filteredOut: 0 };
+    return {
+      model: buildLiveReportModel(
+        subject,
+        filtered.rows,
+        dateWindow,
+        reportFilterRange(filters),
+      ),
+      leftOut: { noEvent: filtered.noEvent, filteredOut: filtered.filteredOut },
+    };
+  }, [
+    dateWindow,
+    filters,
+    loading,
+    lookups,
+    paymentRows,
+    rows,
+    sourceAvailable,
+    subject,
+  ]);
   return children({
     loading,
     sourceAvailable,
-    model,
+    model: result?.model ?? null,
+    leftOut: result?.leftOut ?? { noEvent: 0, filteredOut: 0 },
   });
 }

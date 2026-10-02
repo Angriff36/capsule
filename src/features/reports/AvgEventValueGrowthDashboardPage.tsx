@@ -21,6 +21,14 @@ import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
+import {
+  isCompletedEvent,
+  NOT_KNOWN,
+  percentText,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
+
+const NOT_ENOUGH_HISTORY = "Not enough history";
 
 /**
  * Avg Event Value Growth Dashboard (Priority 38)
@@ -48,10 +56,7 @@ export function AvgEventValueGrowthDashboardPage() {
 
   // Filter completed events with quoted price
   const completedEvents = useMemo(() => {
-    return (events || []).filter(
-      (e) =>
-        e.quotedPrice != null && e.quotedPrice > 0 && e.stage === "completed",
-    );
+    return (events || []).filter(isCompletedEvent);
   }, [events]);
 
   // Overall average event value
@@ -63,18 +68,27 @@ export function AvgEventValueGrowthDashboardPage() {
       0,
     );
     const avgEventValue = totalRevenue / completedEvents.length;
-    const totalHeadcount = completedEvents.reduce(
+    const withGuests = completedEvents.filter(
+      (e) => (e.expectedHeadcount || 0) > 0,
+    );
+    const totalHeadcount = withGuests.reduce(
       (sum, e) => sum + (e.expectedHeadcount || 0),
       0,
     );
-    const avgHeadcount = totalHeadcount / completedEvents.length;
+    const revenueWithGuests = withGuests.reduce(
+      (sum, e) => sum + (e.quotedPrice || 0),
+      0,
+    );
+    const avgHeadcount =
+      withGuests.length > 0 ? totalHeadcount / withGuests.length : null;
     const revenuePerHead =
-      totalHeadcount > 0 ? totalRevenue / totalHeadcount : 0;
+      totalHeadcount > 0 ? revenueWithGuests / totalHeadcount : null;
 
     return {
       avgEventValue,
       totalRevenue,
       totalEvents: completedEvents.length,
+      totalHeadcount,
       avgHeadcount,
       revenuePerHead,
     };
@@ -122,34 +136,29 @@ export function AvgEventValueGrowthDashboardPage() {
 
   // Calculate growth rates
   const growthMetrics = useMemo(() => {
-    if (monthlyTrendData.length < 2) return null;
+    // Calendar months in local time: this month vs last month (MoM) and vs
+    // the same month last year (YoY). A month with no events gives null.
+    const now = new Date();
+    const keyOf = (year: number, month: number) => {
+      const date = new Date(year, month, 1);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    };
+    const avgFor = (key: string) =>
+      monthlyTrendData.find((d) => d.month === key)?.avgEventValue ?? null;
+    const growth = (current: number | null, base: number | null) =>
+      current != null && base != null && base > 0
+        ? ((current - base) / base) * 100
+        : null;
 
-    const latest = monthlyTrendData[monthlyTrendData.length - 1];
-    const previous = monthlyTrendData[monthlyTrendData.length - 2];
-
-    const momGrowth =
-      latest.avgEventValue > 0 && previous.avgEventValue > 0
-        ? ((latest.avgEventValue - previous.avgEventValue) /
-            previous.avgEventValue) *
-          100
-        : 0;
-
-    // Year-over-year (compare with same month last year)
-    let yoyGrowth = 0;
-    const lastYearSameMonth = monthlyTrendData.find((d) => {
-      const [latestYear, latestMonth] = latest.month.split("-");
-      const [dYear, dMonth] = d.month.split("-");
-      return (
-        dMonth === latestMonth && parseInt(dYear) === parseInt(latestYear) - 1
-      );
-    });
-
-    if (lastYearSameMonth && lastYearSameMonth.avgEventValue > 0) {
-      yoyGrowth =
-        ((latest.avgEventValue - lastYearSameMonth.avgEventValue) /
-          lastYearSameMonth.avgEventValue) *
-        100;
-    }
+    const current = avgFor(keyOf(now.getFullYear(), now.getMonth()));
+    const momGrowth = growth(
+      current,
+      avgFor(keyOf(now.getFullYear(), now.getMonth() - 1)),
+    );
+    const yoyGrowth = growth(
+      current,
+      avgFor(keyOf(now.getFullYear() - 1, now.getMonth())),
+    );
 
     return { momGrowth, yoyGrowth };
   }, [monthlyTrendData]);
@@ -357,7 +366,7 @@ export function AvgEventValueGrowthDashboardPage() {
         <StatCard
           title="Avg Event Value"
           main={{
-            value: overallMetrics?.avgEventValue || 0,
+            value: overallMetrics?.avgEventValue ?? NOT_KNOWN,
             format: "currency" as const,
           }}
           rows={[
@@ -389,22 +398,26 @@ export function AvgEventValueGrowthDashboardPage() {
         <StatCard
           title="MoM Growth"
           main={{
-            value: growthMetrics?.momGrowth || 0,
-            format: "percent" as const,
+            value: percentText(growthMetrics.momGrowth, NOT_ENOUGH_HISTORY),
           }}
           rows={[
             {
               label: "YoY Growth",
-              value: growthMetrics?.yoyGrowth || 0,
-              format: "percent" as const,
+              value: percentText(growthMetrics.yoyGrowth, NOT_ENOUGH_HISTORY),
             },
             {
               label: "Revenue/Head",
-              value: overallMetrics?.revenuePerHead || 0,
+              value: overallMetrics?.revenuePerHead ?? NOT_KNOWN,
               format: "currency" as const,
             },
           ]}
-          tone={(growthMetrics?.momGrowth || 0) >= 0 ? "ok" : "warn"}
+          tone={
+            growthMetrics.momGrowth == null
+              ? "ink"
+              : growthMetrics.momGrowth >= 0
+                ? "ok"
+                : "warn"
+          }
           isLive
         />
       ),
@@ -416,15 +429,13 @@ export function AvgEventValueGrowthDashboardPage() {
         <StatCard
           title="Avg Headcount"
           main={{
-            value: overallMetrics?.avgHeadcount || 0,
+            value: overallMetrics?.avgHeadcount ?? NOT_KNOWN,
             format: "number" as const,
           }}
           rows={[
             {
               label: "Total Guests",
-              value:
-                (overallMetrics?.totalEvents || 0) *
-                (overallMetrics?.avgHeadcount || 0),
+              value: overallMetrics?.totalHeadcount ?? 0,
               format: "number" as const,
             },
           ]}
@@ -440,7 +451,7 @@ export function AvgEventValueGrowthDashboardPage() {
         <StatCard
           title="Revenue Per Head"
           main={{
-            value: overallMetrics?.revenuePerHead || 0,
+            value: overallMetrics?.revenuePerHead ?? NOT_KNOWN,
             format: "currency" as const,
           }}
           tone="accent"
@@ -614,6 +625,18 @@ export function AvgEventValueGrowthDashboardPage() {
           events, and how event size affects the price.
         </p>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.completed_average",
+          "dashboard.completed_events",
+          "dashboard.completed_revenue",
+          "dashboard.growth_month",
+          "dashboard.growth_year",
+          "dashboard.guests",
+          "dashboard.revenue_per_guest",
+        ]}
+      />
     </div>
   );
 }

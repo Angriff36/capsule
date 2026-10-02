@@ -14,6 +14,12 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { PageHeader } from "@/ui/primitives";
 import { formatCount } from "@/lib/format";
+import {
+  COMPLETED_STAGES,
+  percentOf,
+  percentText,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
 
 /**
  * Mangia Dashboard Round 4 (Priority 41)
@@ -37,7 +43,7 @@ export function MangiaDashboardPage() {
   // Today's operations snapshot
   const todaySnapshot = useMemo(() => {
     const todayEvents = (events || []).filter((e) => {
-      if (!e.startsAt) return false;
+      if (!e.startsAt || e.stage === "cancelled") return false;
       const eventDate = new Date(e.startsAt);
       eventDate.setHours(0, 0, 0, 0);
       return eventDate.getTime() === today.getTime();
@@ -56,8 +62,9 @@ export function MangiaDashboardPage() {
     return {
       totalEvents: todayEvents.length,
       executingEvents: executingEvents.length,
-      completedEvents: todayEvents.filter((e) => e.stage === "completed")
-        .length,
+      completedEvents: todayEvents.filter((e) =>
+        COMPLETED_STAGES.includes(e.stage ?? ""),
+      ).length,
       totalGuests,
       totalRevenue,
     };
@@ -85,8 +92,7 @@ export function MangiaDashboardPage() {
       inProgress,
       completed,
       blocked,
-      pctComplete:
-        todayPrep.length > 0 ? (completed / todayPrep.length) * 100 : 0,
+      pctComplete: percentOf(completed, todayPrep.length),
     };
   }, [prepTasks, today]);
 
@@ -112,7 +118,7 @@ export function MangiaDashboardPage() {
       packing,
       packed,
       dispatched,
-      pctReady: todayPacks.length > 0 ? (packed / todayPacks.length) * 100 : 0,
+      pctReady: percentOf(packed + dispatched, todayPacks.length),
     };
   }, [packLists, today]);
 
@@ -120,7 +126,7 @@ export function MangiaDashboardPage() {
   const staffStatus = useMemo(() => {
     // Count unique assigned staff for today's events
     const todayEvents = (events || []).filter((e) => {
-      if (!e.startsAt) return false;
+      if (!e.startsAt || e.stage === "cancelled") return false;
       const eventDate = new Date(e.startsAt);
       eventDate.setHours(0, 0, 0, 0);
       return eventDate.getTime() === today.getTime();
@@ -145,7 +151,7 @@ export function MangiaDashboardPage() {
     weekEnd.setDate(weekEnd.getDate() + 7); // Next Sunday: the whole week, not just to date
 
     const weekEvents = (events || []).filter((e) => {
-      if (!e.startsAt) return false;
+      if (!e.startsAt || e.stage === "cancelled") return false;
       const eventDate = new Date(e.startsAt);
       return eventDate >= weekStart && eventDate < weekEnd;
     });
@@ -158,8 +164,8 @@ export function MangiaDashboardPage() {
       (sum, e) => sum + (e.expectedHeadcount || 0),
       0,
     );
-    const weekCompleted = weekEvents.filter(
-      (e) => e.stage === "completed",
+    const weekCompleted = weekEvents.filter((e) =>
+      COMPLETED_STAGES.includes(e.stage ?? ""),
     ).length;
 
     // Soonest event from today on, so an empty week still says what is next.
@@ -198,7 +204,7 @@ export function MangiaDashboardPage() {
       });
     }
 
-    if (packStatus.pctReady < 80 && packStatus.total > 0) {
+    if (packStatus.pctReady != null && packStatus.pctReady < 80) {
       alerts.push({
         severity: "medium",
         message: `Pack lists only ${Math.round(packStatus.pctReady)}% ready`,
@@ -341,8 +347,7 @@ export function MangiaDashboardPage() {
           title="Prep Progress"
           main={{
             label: "Complete",
-            value: prepStatus.pctComplete,
-            format: "percent" as const,
+            value: percentText(prepStatus.pctComplete, "None due today"),
           }}
           rows={[
             {
@@ -369,8 +374,7 @@ export function MangiaDashboardPage() {
           title="Pack Lists"
           main={{
             label: "Ready",
-            value: packStatus.pctReady,
-            format: "percent" as const,
+            value: percentText(packStatus.pctReady, "None today"),
           }}
           rows={[
             {
@@ -384,7 +388,11 @@ export function MangiaDashboardPage() {
               format: "number" as const,
             },
           ]}
-          tone={packStatus.pctReady < 80 ? "warn" : "ok"}
+          tone={
+            packStatus.pctReady != null && packStatus.pctReady < 80
+              ? "warn"
+              : "ok"
+          }
           isLive
         />
       ),
@@ -394,7 +402,7 @@ export function MangiaDashboardPage() {
       size: "small",
       content: (
         <StatCard
-          title="Staff On-Site"
+          title="Event owners today"
           main={{
             label: "On-Site",
             value: staffStatus.totalStaff,
@@ -418,9 +426,9 @@ export function MangiaDashboardPage() {
       size: "medium",
       content: (
         <StatCard
-          title="Week-to-Date Revenue"
+          title="This week's revenue"
           main={{
-            label: "WTD Revenue",
+            label: "This week",
             value: weekToDateMetrics.totalRevenue,
             format: "currency" as const,
           }}
@@ -562,6 +570,17 @@ export function MangiaDashboardPage() {
           </div>
         </div>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.events_today",
+          "dashboard.guests_today",
+          "dashboard.prep_done_today",
+          "dashboard.packs_ready",
+          "dashboard.event_owners_today",
+          "dashboard.booked_revenue",
+        ]}
+      />
     </div>
   );
 }

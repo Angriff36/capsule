@@ -14,6 +14,9 @@ import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
 import { calculateCommissionMetrics } from "./compMasterValues";
+import { MetricDefinitionList } from "./MetricDefinitionList";
+
+const LOADING = "Loading…";
 
 export function CompMasterDashboardPage() {
   const events = useListEvent();
@@ -95,7 +98,7 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Applied Commission"
           main={{
-            value: allTime?.totalCommission ?? 0,
+            value: allTime?.totalCommission ?? LOADING,
             format: "currency" as const,
           }}
           rows={[
@@ -117,7 +120,7 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Applied This Month"
           main={{
-            value: thisMonth?.totalCommission ?? 0,
+            value: thisMonth?.totalCommission ?? LOADING,
             format: "currency" as const,
           }}
           rows={[{ label: "Period", value: "Calendar month" }]}
@@ -133,7 +136,7 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Salespeople"
           main={{
-            value: allTime?.salespeople.length ?? 0,
+            value: allTime?.salespeople.length ?? LOADING,
             format: "number" as const,
           }}
           rows={[{ label: "Basis", value: "Applied allocations" }]}
@@ -213,6 +216,13 @@ export function CompMasterDashboardPage() {
           Cancelled events are excluded consistently.
         </p>
       </div>
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.commission_applied",
+          "dashboard.commission_month",
+          "dashboard.salespeople",
+        ]}
+      />
     </div>
   );
 }

@@ -11,6 +11,13 @@ import {
 import { BarChart } from "@/ui/charts/BarChart";
 import { PageHeader } from "@/ui/primitives";
 import { formatMoney, formatCount, formatPercent } from "@/lib/format";
+import {
+  COMPLETED_STAGES,
+  foodCostPercent,
+  isBookedEvent,
+  profitMarginPercent,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
 
 /**
  * Company Scorecard Dashboard (Priority 37)
@@ -59,14 +66,15 @@ export function CompanyScorecardDashboardPage() {
       };
 
       const monthEvents = (events || []).filter((e) => inMonth(e.startsAt));
-      const revenue = monthEvents.reduce(
+      const bookedEvents = monthEvents.filter(isBookedEvent);
+      const revenue = bookedEvents.reduce(
         (sum, e) => sum + (e.quotedPrice || 0),
         0,
       );
-      const completedEvents = monthEvents.filter(
-        (e) => e.stage === "completed",
+      const completedEvents = monthEvents.filter((e) =>
+        COMPLETED_STAGES.includes(e.stage ?? ""),
       ).length;
-      const guests = monthEvents.reduce(
+      const guests = bookedEvents.reduce(
         (sum, e) => sum + (e.expectedHeadcount || 0),
         0,
       );
@@ -74,22 +82,8 @@ export function CompanyScorecardDashboardPage() {
       const monthCloseouts = (closeouts || []).filter((c) =>
         inMonth(c.finalizedAt ?? c.capturedAt ?? c.createdAt),
       );
-      const closeoutCost = monthCloseouts.reduce(
-        (sum, c) => sum + (c.actualIngredientCost || 0),
-        0,
-      );
-      const closeoutRevenue = monthCloseouts.reduce(
-        (sum, c) => sum + c.grossProfit + (c.actualIngredientCost || 0),
-        0,
-      );
-      const closeoutProfit = monthCloseouts.reduce(
-        (sum, c) => sum + c.grossProfit,
-        0,
-      );
-      const foodCostPct =
-        closeoutRevenue > 0 ? (closeoutCost / closeoutRevenue) * 100 : null;
-      const profitMargin =
-        closeoutRevenue > 0 ? (closeoutProfit / closeoutRevenue) * 100 : null;
+      const foodCostPct = foodCostPercent(monthCloseouts);
+      const profitMargin = profitMarginPercent(monthCloseouts);
 
       const monthLeads = (leads || []).filter((l) => inMonth(l.createdAt));
       const conversionRate =
@@ -181,7 +175,7 @@ export function CompanyScorecardDashboardPage() {
     }
 
     events.forEach((event) => {
-      if (!event.startsAt) return;
+      if (!event.startsAt || !isBookedEvent(event)) return;
       const date = new Date(event.startsAt);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
@@ -253,6 +247,17 @@ export function CompanyScorecardDashboardPage() {
           against last month instead.
         </p>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.booked_revenue",
+          "dashboard.food_cost_percent",
+          "dashboard.profit_margin",
+          "dashboard.lead_conversion",
+          "dashboard.completed_events",
+          "dashboard.guests",
+        ]}
+      />
     </div>
   );
 }

@@ -11,6 +11,13 @@ import {
 import { StatCard } from "@/ui/charts/StatCard";
 import { PageHeader, Section, EmptyState } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
+import {
+  foodCostPercent,
+  isBookedEvent,
+  isCompletedEvent,
+  percentText,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
 
 /**
  * L10 Dashboard (Priority 40)
@@ -32,9 +39,9 @@ export function L10DashboardPage() {
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     const recentCompleted = (events || []).filter((e) => {
-      if (!e.updatedAt) return false;
-      const updated = new Date(e.updatedAt);
-      return e.stage === "completed" && updated >= weekAgo && updated <= now;
+      if (!e.startsAt || !isCompletedEvent(e)) return false;
+      const starts = new Date(e.startsAt);
+      return starts >= weekAgo && starts <= now;
     });
 
     const revenueWin = recentCompleted.reduce(
@@ -68,7 +75,7 @@ export function L10DashboardPage() {
     const currentYear = now.getFullYear();
 
     const monthEvents = (events || []).filter((e) => {
-      if (!e.startsAt) return false;
+      if (!e.startsAt || !isBookedEvent(e)) return false;
       const date = new Date(e.startsAt);
       return (
         date.getMonth() === currentMonth && date.getFullYear() === currentYear
@@ -89,15 +96,7 @@ export function L10DashboardPage() {
       );
     });
 
-    const totalCost = monthCloseouts.reduce(
-      (sum, c) => sum + (c.actualIngredientCost || 0),
-      0,
-    );
-    const totalRev = monthCloseouts.reduce(
-      (sum, c) => sum + c.grossProfit + (c.actualIngredientCost || 0),
-      0,
-    );
-    const foodCostPct = totalRev > 0 ? (totalCost / totalRev) * 100 : 0;
+    const foodCostPct = foodCostPercent(monthCloseouts);
 
     const monthLeads = (leads || []).filter((l) => {
       if (!l.createdAt) return false;
@@ -139,7 +138,7 @@ export function L10DashboardPage() {
               <p className="text-xl font-bold text-ok">
                 {formatMoney(weeklyWins.revenue)}
               </p>
-              <p className="text-xs text-ok">Revenue Booked</p>
+              <p className="text-xs text-ok">Completed revenue</p>
             </div>
             <div>
               <p className="text-xl font-bold text-ok">{weeklyWins.newLeads}</p>
@@ -185,8 +184,7 @@ export function L10DashboardPage() {
         <StatCard
           title="Food Cost %"
           main={{
-            value: scorecardMetrics.foodCostPct,
-            format: "percent" as const,
+            value: percentText(scorecardMetrics.foodCostPct),
           }}
           isLive
         />
@@ -234,6 +232,17 @@ export function L10DashboardPage() {
           right this week.
         </p>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.events_completed_week",
+          "dashboard.leads",
+          "dashboard.leads_converted_week",
+          "dashboard.booked_revenue",
+          "dashboard.booked_events",
+          "dashboard.food_cost_percent",
+        ]}
+      />
     </div>
   );
 }

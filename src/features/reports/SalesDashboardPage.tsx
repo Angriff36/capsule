@@ -14,6 +14,14 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import {
+  isBookedEvent,
+  isQualifiedLead,
+  NOT_KNOWN,
+  percentOf,
+  percentText,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
 
 /**
  * Sales Dashboard (Priority 36)
@@ -71,53 +79,29 @@ export function SalesDashboardPage() {
 
   // Calculate conversion metrics
   const conversionMetrics = useMemo(() => {
-    if (!leads || leads.length === 0) {
-      return {
-        totalLeads: 0,
-        conversionRate: 0,
-        qualifiedRate: 0,
-        convertedCount: 0,
-      };
-    }
-
-    const totalLeads = leads.length;
-    const QUALIFIED_STAGES: readonly string[] = [
-      "qualified",
-      "proposalSent",
-      "negotiating",
-      "converted",
-    ];
-    const converted = leads.filter((l) => l.stage === "converted").length;
-    const qualified = leads.filter((l) =>
-      QUALIFIED_STAGES.includes(l.stage || ""),
-    ).length;
+    const all = leads ?? [];
+    const totalLeads = all.length;
+    const converted = all.filter((l) => l.stage === "converted").length;
+    const qualified = all.filter(isQualifiedLead).length;
 
     return {
       totalLeads,
-      conversionRate: (converted / totalLeads) * 100,
-      qualifiedRate: (qualified / totalLeads) * 100,
+      conversionRate: percentOf(converted, totalLeads),
+      qualifiedRate: percentOf(qualified, totalLeads),
       convertedCount: converted,
     };
   }, [leads]);
 
   // Calculate revenue metrics
   const revenueMetrics = useMemo(() => {
-    if (!events)
-      return { totalRevenue: 0, averageEventValue: 0, bookedEvents: 0 };
-
-    const bookedEvents = events.filter(
-      (e) =>
-        e.quotedPrice != null &&
-        e.stage !== "planning" &&
-        e.stage !== "cancelled",
-    );
+    const bookedEvents = (events ?? []).filter(isBookedEvent);
 
     const totalRevenue = bookedEvents.reduce(
       (sum, e) => sum + (e.quotedPrice || 0),
       0,
     );
-    const averageEventValue =
-      bookedEvents.length > 0 ? totalRevenue / bookedEvents.length : 0;
+    const averageEventValue: number | string =
+      bookedEvents.length > 0 ? totalRevenue / bookedEvents.length : NOT_KNOWN;
 
     return {
       totalRevenue,
@@ -136,7 +120,7 @@ export function SalesDashboardPage() {
     >();
 
     events.forEach((event) => {
-      if (!event.assignedToId || !event.quotedPrice) return;
+      if (!event.assignedToId || !isBookedEvent(event)) return;
 
       const person = people.find((p) => p._id === event.assignedToId);
       if (!person) return;
@@ -148,7 +132,7 @@ export function SalesDashboardPage() {
       }
 
       const data = salesMap.get(event.assignedToId)!;
-      data.revenue += event.quotedPrice;
+      data.revenue += event.quotedPrice ?? 0;
       data.count += 1;
     });
 
@@ -172,7 +156,7 @@ export function SalesDashboardPage() {
     >();
 
     events.forEach((event) => {
-      if (!event.clientId || !event.quotedPrice) return;
+      if (!event.clientId || !isBookedEvent(event)) return;
 
       const client = clients.find((c) => c._id === event.clientId);
       if (!client) return;
@@ -184,7 +168,7 @@ export function SalesDashboardPage() {
       }
 
       const data = clientMap.get(event.clientId)!;
-      data.revenue += event.quotedPrice;
+      data.revenue += event.quotedPrice ?? 0;
       data.eventCount += 1;
     });
 
@@ -218,13 +202,11 @@ export function SalesDashboardPage() {
           rows={[
             {
               label: "Qualified",
-              value: conversionMetrics.qualifiedRate,
-              format: "percent" as const,
+              value: percentText(conversionMetrics.qualifiedRate),
             },
             {
               label: "Converted",
-              value: conversionMetrics.conversionRate,
-              format: "percent" as const,
+              value: percentText(conversionMetrics.conversionRate),
             },
           ]}
           tone="info"
@@ -268,8 +250,7 @@ export function SalesDashboardPage() {
           title="Conversion Rate"
           main={{
             label: "Rate",
-            value: conversionMetrics.conversionRate,
-            format: "percent" as const,
+            value: percentText(conversionMetrics.conversionRate),
           }}
           rows={[
             {
@@ -382,6 +363,17 @@ export function SalesDashboardPage() {
           Master dashboard has the full commission breakdown by salesperson.
         </p>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.leads",
+          "dashboard.lead_qualified",
+          "dashboard.lead_conversion",
+          "dashboard.booked_revenue",
+          "dashboard.booked_events",
+          "dashboard.booked_average",
+        ]}
+      />
     </div>
   );
 }
