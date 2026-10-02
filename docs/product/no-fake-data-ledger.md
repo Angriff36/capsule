@@ -51,6 +51,10 @@ shows nothing to users.
 
 ## Plan tasks from this sweep
 
+Both built 2026-10-03: vendor order email (035cdcfc, `convex/vendorOrderEmail.ts`)
+and staff email summaries (05f7e336, `convex/staffSummaries.ts`). They send
+once the email account is set up on the deployment.
+
 - **Staff email summaries** (event updates, invoice follow-ups, low stock, shift
   changes): build a sender that reads each person's saved choices on
   `/settings/email` and emails real summaries. Needs the email account
