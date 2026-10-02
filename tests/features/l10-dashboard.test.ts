@@ -30,6 +30,10 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   };
 });
 
+vi.mock("../../src/features/facilities/useEventsById", () => ({
+  useEventsInRange: () => seed.events ?? [],
+}));
+
 import { L10DashboardPage } from "../../src/features/reports/L10DashboardPage";
 
 const now = new Date();

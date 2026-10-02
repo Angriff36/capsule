@@ -6,6 +6,7 @@
 import { useEffect, useMemo } from "react";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import type { Doc } from "../../../convex/_generated/dataModel";
 import type { EventLookupRow } from "../../../convex/eventLookup";
 
 export type { EventLookupRow };
@@ -42,6 +43,32 @@ export function useEventsInRange(
   const result = useQuery(api.eventLookup.range, window);
   if (result === undefined) return undefined;
   return result?.rows ?? [];
+}
+
+/**
+ * Whole event records (less the import draft and contact fields) that start
+ * in [from, to), for screens that read planning fields (convex/eventLookup.ts
+ * `rangeDocs`, at most 3000). Same loading/empty rules as useEventsInRange.
+ */
+export function useEventRecordsInRange(
+  window: { from: number; to: number; withUndated?: boolean } | "skip",
+): Doc<"events">[] | undefined {
+  const result = useQuery(api.eventLookup.rangeDocs, window);
+  if (result === undefined) return undefined;
+  return result?.rows ?? [];
+}
+
+/** One client's live events, light rows (at most 2000). */
+export function useClientEvents(
+  clientId: string | null | undefined,
+): EventLookupRow[] | undefined {
+  const rows = useQuery(
+    api.eventLookup.byClient,
+    clientId ? { clientId } : "skip",
+  );
+  if (!clientId) return [];
+  if (rows === undefined) return undefined;
+  return rows ?? [];
 }
 
 const REPORT_PAGE = 500;

@@ -2,21 +2,24 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCount, formatCountNoun, formatTime } from "../../lib/format";
 import {
-  useListEvent,
   useListEventGuest,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { TableSkeleton } from "../../ui/primitives";
 import {
   addLocalDays,
   buildCapacityPlan,
   localDateInput,
+  parseLocalDate,
   startOfLocalDay,
   type CapacityEventCard,
 } from "./eventCapacityPlanner";
 import "./EventCapacityPlannerPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+
+const CAPACITY_LOOKBACK_DAYS = 7;
 
 const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 const monthDay = new Intl.DateTimeFormat("en-US", {
@@ -103,11 +106,25 @@ export function EventCapacityPlannerPage() {
   const initial = useMemo(defaultRange, []);
   const [startDate, setStartDate] = useState(initial.startDate);
   const [endDate, setEndDate] = useState(initial.endDate);
-  const events = useListEvent();
+  // Only the chosen range is read, plus the week before it so a multi-day
+  // booking that started earlier still shows.
+  const eventWindow = useMemo(() => {
+    const from = parseLocalDate(startDate);
+    const through = parseLocalDate(endDate);
+    return Number.isFinite(from) && Number.isFinite(through) && from <= through
+      ? {
+          from: addLocalDays(from, -CAPACITY_LOOKBACK_DAYS),
+          to: addLocalDays(through, 1),
+        }
+      : ("skip" as const);
+  }, [endDate, startDate]);
+  const events = useEventRecordsInRange(eventWindow);
   const guests = useListEventGuest();
   const venues = useListVenue();
   const loading =
-    events === undefined || guests === undefined || venues === undefined;
+    (events === undefined && eventWindow !== "skip") ||
+    guests === undefined ||
+    venues === undefined;
   const plan = useMemo(
     () =>
       buildCapacityPlan({

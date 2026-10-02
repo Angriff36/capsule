@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import type { Doc } from "../../lib/api";
+import type { EventLookupRow } from "../facilities/useEventsById";
 import { formatCount, formatDate, formatMoney } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { eventDetailPath } from "./eventRoutes";
 
 type Props = {
-  events: Doc<"events">[];
+  events: EventLookupRow[];
   currentEventId: string;
 };
 

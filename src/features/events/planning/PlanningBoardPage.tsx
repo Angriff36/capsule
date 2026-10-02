@@ -144,7 +144,8 @@ function candidateOf(draft: Draft): PlanCandidate {
  */
 export function PlanningBoardPage() {
   const authStatus = useAuthStatus();
-  const { loading, snap, levels } = usePlanSnapshot();
+  const [anchor, setAnchor] = useState(() => startOfDay(Date.now()));
+  const { loading, snap, levels } = usePlanSnapshot(anchor);
   const rules = useListPlanningRule();
   const receipts = useListPlanningReceipt();
   const overrides = useListPlanningOverride();
@@ -167,7 +168,6 @@ export function PlanningBoardPage() {
   const recordReceipt = useCreatePlanningReceipt();
   const answerAgain = usePlanningReceiptAnswerAgain();
 
-  const [anchor, setAnchor] = useState(() => startOfDay(Date.now()));
   const [view, setView] = useState<View>("month");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [eventSearch, setEventSearch] = useState("");

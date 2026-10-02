@@ -32,6 +32,17 @@ vi.mock("convex/react", () => ({
   useAction: () => vi.fn(async () => ({})),
 }));
 
+vi.mock("../../../src/features/facilities/usePickerAndNamedEvents", () => ({
+  usePickerAndNamedEvents: () => [
+    {
+      _id: "event-1",
+      title: "Smith wedding",
+      eventNumber: "6014",
+      deletedAt: null,
+    },
+  ],
+}));
+
 vi.mock("../../../src/lib/messageReplyActions", () => ({
   useSendEmailReply: () => harness.sendReply,
 }));

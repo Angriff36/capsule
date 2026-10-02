@@ -324,8 +324,10 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 ### Authored reads and steps
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
@@ -347,6 +349,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ### Generated reads
 
+- `queries.getEvent` - live read
 - `queries.listClient` - live read
 - `queries.listDish` - live read
 - `queries.listEvent` - live read
@@ -504,6 +507,11 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 ### Authored reads and steps
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
 - `lib.proposalChangeDraft.startProposalChange` - mutation; authored step; live reads update by themselves
@@ -1202,6 +1210,11 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventChecklistApply.apply` - mutation; authored step; live reads update by themselves
 - `eventCreateCatalog.ensureBuiltInServiceStyle` - mutation; authored step; live reads update by themselves
 - `eventLedger.ledgerWindow` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
 - `eventReadiness.getEventReadiness` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
@@ -2180,8 +2193,10 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.publishRecipeEdition` - mutation; authored step; live reads update by themselves
 - `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
@@ -2351,8 +2366,10 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 ### Authored reads and steps
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
@@ -3044,8 +3061,10 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `candidateHireRevocation.revokeHire` - mutation; authored step; live reads update by themselves
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
@@ -3534,8 +3553,10 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `driverAssignment.assign` - mutation; authored step; live reads update by themselves
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
@@ -3799,8 +3820,10 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
 - `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
@@ -4300,8 +4323,10 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
 - `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `externalRecordLinkLists.listFor` - query; live read, updates by itself
 - `externalRecordLinkLists.menuLinkStats` - query; live read, updates by itself

@@ -100,6 +100,25 @@ vi.mock("convex/react", async (importOriginal) => {
           capped: false,
         };
       }
+      // Whole event records for a window: the same rows, as they are.
+      if (name === "eventLookup:rangeDocs" && !backend.values.has(name)) {
+        const { from, to, withUndated } = args as {
+          from: number;
+          to: number;
+          withUndated?: boolean;
+        };
+        const rows = (backend.values.get("useListEvent") ?? []) as {
+          startsAt?: number | null;
+        }[];
+        return {
+          rows: rows.filter((row) =>
+            row.startsAt == null
+              ? withUndated === true
+              : row.startsAt >= from && row.startsAt < to,
+          ),
+          capped: false,
+        };
+      }
       return backend.values.get(name);
     },
     // All-time event pages (eventLookup:reportPage) answer in one page from

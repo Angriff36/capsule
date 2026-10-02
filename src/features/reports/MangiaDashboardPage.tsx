@@ -1,9 +1,6 @@
 import { useMemo } from "react";
-import {
-  useListEvent,
-  useListPrepTask,
-  useListPackList,
-} from "@/lib/manifest-convex-react";
+import { useListPrepTask, useListPackList } from "@/lib/manifest-convex-react";
+import { useEventsInRange } from "../facilities/useEventsById";
 import {
   DashboardGrid,
   type DashboardGridSize,
@@ -31,7 +28,6 @@ import { MetricDefinitionList } from "./MetricDefinitionList";
  */
 
 export function MangiaDashboardPage() {
-  const events = useListEvent();
   const prepTasks = useListPrepTask();
   const packLists = useListPackList();
 
@@ -40,6 +36,62 @@ export function MangiaDashboardPage() {
     date.setHours(0, 0, 0, 0);
     return date;
   }, []);
+
+  // The board shows the last seven days and the current Sunday-to-Sunday week.
+  const [eventWindow, weekRange] = useMemo(() => {
+    const weekStart = new Date(today);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    const trendStart = new Date(today);
+    trendStart.setDate(trendStart.getDate() - 6);
+    const dayEnd = new Date(today);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    return [
+      {
+        from: Math.min(weekStart.getTime(), trendStart.getTime()),
+        to: Math.max(weekEnd.getTime(), dayEnd.getTime()),
+      },
+      { from: weekStart.getTime(), to: weekEnd.getTime() },
+    ];
+  }, [today]);
+  const windowEvents = useEventsInRange(eventWindow);
+  // The next-event hint only shows in a week with no events, so the events
+  // from today onward are read only then.
+  const weekIsEmpty =
+    windowEvents !== undefined &&
+    !windowEvents.some(
+      (e) =>
+        e.startsAt != null &&
+        e.stage !== "cancelled" &&
+        e.startsAt >= weekRange.from &&
+        e.startsAt < weekRange.to,
+    );
+  const upcomingEvents = useEventsInRange(
+    weekIsEmpty
+      ? {
+          from: today.getTime(),
+          to: new Date(
+            today.getFullYear() + 10,
+            today.getMonth(),
+            today.getDate(),
+          ).getTime(),
+        }
+      : "skip",
+  );
+  const events = useMemo(
+    () =>
+      windowEvents === undefined ||
+      (weekIsEmpty && upcomingEvents === undefined)
+        ? undefined
+        : [
+            ...windowEvents,
+            ...(upcomingEvents ?? []).filter(
+              (e) => !windowEvents.some((w) => w._id === e._id),
+            ),
+          ],
+    [windowEvents, upcomingEvents],
+  );
 
   // Today's operations snapshot
   const todaySnapshot = useMemo(() => {

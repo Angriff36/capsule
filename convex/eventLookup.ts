@@ -8,7 +8,7 @@
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
-import { query } from "./_generated/server";
+import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
 
@@ -76,41 +76,104 @@ export const range = query({
   },
   handler: async (
     ctx,
-    { from, to, withUndated },
+    args,
   ): Promise<{ rows: EventLookupRow[]; capped: boolean } | null> => {
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !canRead(auth, ["staffAccess"])) return null;
-    const tenantId = auth.tenantId;
-    const [dated, none, missing] = await Promise.all([
-      ctx.db
-        .query("events")
-        .withIndex("by_tenantId_and_startsAt", (q) =>
-          q.eq("tenantId", tenantId).gte("startsAt", from).lt("startsAt", to),
-        )
-        .take(RANGE_CAP + 1),
-      withUndated
-        ? ctx.db
-            .query("events")
-            .withIndex("by_tenantId_and_startsAt", (q) =>
-              q.eq("tenantId", tenantId).eq("startsAt", null),
-            )
-            .take(UNDATED_CAP)
-        : Promise.resolve([]),
-      withUndated
-        ? ctx.db
-            .query("events")
-            .withIndex("by_tenantId_and_startsAt", (q) =>
-              q.eq("tenantId", tenantId).eq("startsAt", undefined),
-            )
-            .take(UNDATED_CAP)
-        : Promise.resolve([]),
-    ]);
-    const rows = [...dated.slice(0, RANGE_CAP), ...none, ...missing]
-      .filter((e) => e.deletedAt == null)
-      .map(lookupRow);
-    return { rows, capped: dated.length > RANGE_CAP };
+    const { docs, capped } = await readRange(ctx, auth.tenantId, args);
+    return { rows: docs.map(lookupRow), capped };
   },
 });
+
+/**
+ * The same window as `range`, but whole event records (less the import
+ * draft and the encrypted contact fields, which these screens never show),
+ * for screens that read planning fields: tracker, planning checks, capacity.
+ */
+export const rangeDocs = query({
+  args: {
+    from: v.number(),
+    to: v.number(),
+    withUndated: v.optional(v.boolean()),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ rows: Doc<"events">[]; capped: boolean } | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, ["staffAccess"])) return null;
+    const { docs, capped } = await readRange(ctx, auth.tenantId, args);
+    return {
+      rows: docs.map((e) => ({
+        ...e,
+        importDraftJson: null,
+        primaryContactName: null,
+        primaryContactEmail: null,
+        primaryContactPhone: null,
+      })),
+      capped,
+    };
+  },
+});
+
+export const CLIENT_CAP = 2000;
+
+/** One client's live events (light rows), at most CLIENT_CAP. */
+export const byClient = query({
+  args: { clientId: v.string() },
+  handler: async (ctx, { clientId }): Promise<EventLookupRow[] | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, ["staffAccess"])) return null;
+    const id = ctx.db.normalizeId("clients", clientId);
+    if (!id) return [];
+    const rows = await ctx.db
+      .query("events")
+      .withIndex("by_clientId", (q) => q.eq("clientId", id))
+      .take(CLIENT_CAP);
+    return rows
+      .filter((e) => e.tenantId === auth.tenantId && e.deletedAt == null)
+      .map(lookupRow);
+  },
+});
+
+async function readRange(
+  ctx: QueryCtx,
+  tenantId: string,
+  {
+    from,
+    to,
+    withUndated,
+  }: { from: number; to: number; withUndated?: boolean },
+): Promise<{ docs: Doc<"events">[]; capped: boolean }> {
+  const [dated, none, missing] = await Promise.all([
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_startsAt", (q) =>
+        q.eq("tenantId", tenantId).gte("startsAt", from).lt("startsAt", to),
+      )
+      .take(RANGE_CAP + 1),
+    withUndated
+      ? ctx.db
+          .query("events")
+          .withIndex("by_tenantId_and_startsAt", (q) =>
+            q.eq("tenantId", tenantId).eq("startsAt", null),
+          )
+          .take(UNDATED_CAP)
+      : Promise.resolve([]),
+    withUndated
+      ? ctx.db
+          .query("events")
+          .withIndex("by_tenantId_and_startsAt", (q) =>
+            q.eq("tenantId", tenantId).eq("startsAt", undefined),
+          )
+          .take(UNDATED_CAP)
+      : Promise.resolve([]),
+  ]);
+  const docs = [...dated.slice(0, RANGE_CAP), ...none, ...missing].filter(
+    (e) => e.deletedAt == null,
+  );
+  return { docs, capped: dated.length > RANGE_CAP };
+}
 
 /**
  * Every event of the company in pages (deleted ones too, with deletedAt), in

@@ -1,8 +1,8 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useListClient,
-  useListEvent,
+  useGetEvent,
   useListEventTimelineActivity,
   useListVenue,
   useListProposal,
@@ -27,6 +27,7 @@ import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
 import { clientDisplayName } from "../events/clientName";
+import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -76,6 +77,9 @@ const LINKABLE_EVENT_STAGES = [
 // Proposal statuses where the client is still choosing dishes.
 const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
 
+const DAY_MS = 86_400_000;
+const PROPOSAL_EVENT_DAYS = 731;
+
 const policy = new CrmLifecyclePolicy();
 
 // Proposal money math lives in the shared pricing engine (src/lib/pricing.ts).
@@ -85,7 +89,19 @@ export function ProposalsPage() {
   const { branding } = useTenantBranding();
   const proposals = useListProposal();
   const clients = useListClient();
-  const events = useListEvent();
+  // Events from two years back to two years ahead, plus undated ones: the
+  // linked events of recent proposals and the accept-time link picker. The
+  // window moves once a day.
+  const today = Math.floor(Date.now() / DAY_MS) * DAY_MS;
+  const eventWindow = useMemo(
+    () => ({
+      from: today - PROPOSAL_EVENT_DAYS * DAY_MS,
+      to: today + PROPOSAL_EVENT_DAYS * DAY_MS,
+      withUndated: true,
+    }),
+    [today],
+  );
+  const events = useEventRecordsInRange(eventWindow);
   const timelineActivities = useListEventTimelineActivity();
   const venues = useListVenue();
   // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
@@ -173,12 +189,19 @@ export function ProposalsPage() {
     }
   };
   const fromEventId = searchParams.get("event");
-  const fromEvent =
+  const windowFromEvent =
     fromEventId && events
-      ? (events ?? []).find(
-          (row) => row._id === fromEventId && row.deletedAt == null,
-        )
+      ? events.find((row) => row._id === fromEventId && row.deletedAt == null)
       : undefined;
+  // An event outside the window above is read on its own.
+  const singleFromEvent = useGetEvent(
+    fromEventId && events && !windowFromEvent ? fromEventId : "skip",
+  );
+  const fromEvent =
+    windowFromEvent ??
+    (singleFromEvent && singleFromEvent.deletedAt == null
+      ? singleFromEvent
+      : undefined);
 
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
   const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(

@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListEvent,
   useListLead,
   useListEventCloseout,
   useListLeadershipItem,
@@ -30,7 +29,12 @@ import {
   scorecardRows,
   type ScorecardTargetRow,
 } from "./scorecardMeasures";
-import { weeklyHistory, type LeadershipItemRow } from "./leadershipHistory";
+import {
+  weekStartOf,
+  weeklyHistory,
+  type LeadershipItemRow,
+} from "./leadershipHistory";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
 import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
@@ -43,13 +47,34 @@ import type { ScorecardPerson } from "./ScorecardTargetEditor";
  */
 
 export function L10DashboardPage() {
-  const events = useListEvent();
+  const now = useMemo(() => new Date(), []);
+  // Every figure here is this month or one of the last eight weeks.
+  const eventWindow = useMemo(() => {
+    const week = weekStartOf(now);
+    const from = Math.min(
+      new Date(now.getFullYear(), now.getMonth(), 1).getTime(),
+      new Date(
+        week.getFullYear(),
+        week.getMonth(),
+        week.getDate() - 49,
+      ).getTime(),
+    );
+    const to = Math.max(
+      new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime(),
+      new Date(
+        week.getFullYear(),
+        week.getMonth(),
+        week.getDate() + 7,
+      ).getTime(),
+    );
+    return { from, to };
+  }, [now]);
+  const events = useEventsInRange(eventWindow);
   const leads = useListLead();
   const closeouts = useListEventCloseout();
   const items = useListLeadershipItem();
   const targets = useListScorecardTarget();
   const people = useListPerson();
-  const now = useMemo(() => new Date(), []);
 
   const activePeople: ScorecardPerson[] = (people ?? []).filter(
     (row) => row.deletedAt == null && row.status === "active",
