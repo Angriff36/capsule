@@ -535,3 +535,123 @@
 .chat-lightbox-next {
   right: 0.75rem;
 }
+
+/* ── Walkie-talkie (push to talk) ──────────────────────────────────────── */
+
+.chat-walkie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.chat-walkie-mic {
+  flex: 1;
+  min-height: 2.75rem;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.chat-walkie-mic[data-recording="true"] {
+  background: var(--color-danger, #d64545);
+  border-color: var(--color-danger, #d64545);
+  color: #fff;
+  animation: chat-walkie-pulse 1.2s ease-in-out infinite;
+}
+
+.chat-walkie-mic[data-sending="true"] {
+  opacity: 0.7;
+}
+
+.chat-walkie-label,
+.chat-walkie-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.chat-walkie-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  background: #fff;
+  animation: chat-walkie-blink 1s steps(2, start) infinite;
+}
+
+.chat-walkie-cancel {
+  color: var(--color-danger, #d64545);
+}
+
+.chat-walkie-error {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: var(--text-sm);
+  color: var(--color-danger, #d64545);
+}
+
+@keyframes chat-walkie-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(214 69 69 / 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 0.4rem rgb(214 69 69 / 0);
+  }
+}
+
+@keyframes chat-walkie-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ── Voice message playback ────────────────────────────────────────────── */
+
+.chat-voice {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  max-width: 22rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line-2, #e3e3e3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2, #f7f7f7);
+}
+
+.chat-voice[data-playing="true"] {
+  border-color: var(--color-brand, #2f6f4f);
+}
+
+.chat-voice-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: none;
+  background: var(--color-brand, #2f6f4f);
+  color: #fff;
+  cursor: pointer;
+}
+
+.chat-voice-body {
+  min-width: 0;
+}
+
+.chat-voice-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink, #1c1c1c);
+  line-height: 1.2;
+}
+
+.chat-voice-meta {
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3, #8a8a8a);
+}
