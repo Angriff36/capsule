@@ -31,11 +31,14 @@ function ChatVoiceMessage({ attachment }: { attachment: ChatAttachmentView }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
 
-  // Leaving the thread must silence the clip; the element unmounts but a
-  // backgrounded audio element can keep playing until GC.
+  // Leaving the thread must silence the clip. React nulls the ref BEFORE
+  // passive effect cleanups run on unmount, so reading audioRef there sees
+  // null and never pauses — ghost playback. Capture the element in the
+  // effect body instead (same pattern useWalkieReceiver uses).
   useEffect(() => {
+    const audio = audioRef.current;
     return () => {
-      audioRef.current?.pause();
+      audio?.pause();
     };
   }, []);
 

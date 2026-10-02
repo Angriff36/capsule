@@ -144,9 +144,12 @@ export function useVoiceRecorder(
       return;
     }
     // The hold ended while the mic warmed up: hand the stream straight
-    // back instead of starting an unattended recording.
+    // back instead of starting an unattended recording. Clear the flag
+    // here too — it described THAT press, and leaving it set would poison
+    // the next one (begin() would abort right after getUserMedia).
     if (cancelledRef.current) {
       for (const track of stream.getTracks()) track.stop();
+      cancelledRef.current = false;
       startingRef.current = false;
       return;
     }
