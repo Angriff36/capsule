@@ -226,6 +226,13 @@ export default defineConfig(({ mode }) => ({
     port: 7811,
     strictPort: true,
   },
+  // The running page knows its own commit (same value as version.json), so it
+  // can tell when a newer Capsule is live (src/app/shell/NewVersionBanner.tsx).
+  define: {
+    __CAPSULE_BUILD__: JSON.stringify(
+      process.env.VERCEL_GIT_COMMIT_SHA ?? null,
+    ),
+  },
   plugins: [
     react(),
     tailwindcss(),

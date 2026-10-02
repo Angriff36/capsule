@@ -8,6 +8,7 @@ import { WorkingEventErrorBoundary } from "../../features/events/WorkingEventErr
 import { WorkingEventReports } from "../../features/home/WorkingEventReports";
 import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
+import { NewVersionBanner } from "./NewVersionBanner";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
@@ -84,6 +85,7 @@ export function AppShell() {
               until you're back online.
             </div>
           )}
+          <NewVersionBanner />
           <AnnouncementBanner />
           <ActionResultHost />
           <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
