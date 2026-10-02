@@ -2,6 +2,7 @@ import { buildWorkbook } from "./buildWorkbook";
 import { renderWorkbook } from "./renderWorkbook";
 import { canonicalJson, type EventPacketSnapshot } from "./model";
 import type { FinalLockPrint } from "./finalLock/evaluate";
+import type { AttachedPrintFile } from "./appendAttachedFiles";
 
 export interface PacketPreparationPorts {
   read(): Promise<{
@@ -19,6 +20,8 @@ export interface PacketPreparationPorts {
     inputFingerprint?: string;
     finalLockFingerprint?: string;
   }): Promise<{ storageId: string }>;
+  /** Drawings, maps and uploaded papers that print at the back. */
+  files?(): Promise<AttachedPrintFile[]>;
   record(input: {
     inputFingerprint: string;
     finalLockFingerprint: string;
@@ -42,7 +45,10 @@ export async function prepareNativeWorkbook(ports: PacketPreparationPorts) {
     generatedAt: new Date().toISOString(),
     finalLock: current.finalLock.lines,
   });
-  const rendered = await renderWorkbook(workbook);
+  const rendered = await renderWorkbook(
+    workbook,
+    ports.files ? await ports.files() : [],
+  );
   if (rendered.audit.violations.length)
     throw new Error(
       "The workbook did not pass its page layout check. Please retry before printing.",

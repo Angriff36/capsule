@@ -19,6 +19,7 @@ import {
   eventRows,
   persistIssues,
   localDate,
+  isPacketDrawing,
 } from "./reconcileNative";
 import { readFinalLockInput } from "./finalLockInput";
 import {
@@ -913,6 +914,47 @@ export const sourceUrl = query({
       await eventRows(ctx, "eventPacketArtifacts", auth.tenantId, args.eventId)
     ).find((r) => r.fingerprint === args.fingerprint && r.purpose === "source");
     return file ? ctx.storage.getUrl(file.storageId as Id<"_storage">) : null;
+  },
+});
+const PRINTABLE = new Set(["application/pdf", "image/png", "image/jpeg"]);
+/**
+ * Files that print at the back of the packet: the event's setup drawings,
+ * floor plans and maps (the same files the venue part names), then the
+ * uploaded BEOs and worksheets kept as sources. PDF, PNG and JPEG only.
+ */
+export const packetPrintFiles = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => {
+    const auth = await authorize(ctx, args.eventId);
+    const out: { name: string; contentType: string; url: string }[] = [];
+    const attachments = await ctx.db
+      .query("attachments")
+      .withIndex("by_parentId", (q) => q.eq("parentId", args.eventId))
+      .collect();
+    for (const f of attachments) {
+      if (!isPacketDrawing(f, auth.tenantId) || !PRINTABLE.has(f.contentType))
+        continue;
+      const url = await ctx.storage.getUrl(f.storageId as Id<"_storage">);
+      if (url) out.push({ name: f.fileName, contentType: f.contentType, url });
+    }
+    const sources = (
+      await eventRows(ctx, "eventPacketArtifacts", auth.tenantId, args.eventId)
+    ).filter(
+      (r) =>
+        r.purpose === "source" &&
+        r.storageId &&
+        PRINTABLE.has(String(r.mimeType)),
+    );
+    for (const r of sources) {
+      const url = await ctx.storage.getUrl(r.storageId as Id<"_storage">);
+      if (url)
+        out.push({
+          name: String(r.name ?? "Source file"),
+          contentType: String(r.mimeType),
+          url,
+        });
+    }
+    return out;
   },
 });
 export const revisionUrl = query({

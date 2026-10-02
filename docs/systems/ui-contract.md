@@ -1184,6 +1184,7 @@ Screens (62): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `lib.eventPacket.commands.getPacket` - query; live read, updates by itself
 - `lib.eventPacket.commands.importEvidence` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.commands.listPacketSummaries` - query; live read, updates by itself
+- `lib.eventPacket.commands.packetPrintFiles` - query; live read, updates by itself
 - `lib.eventPacket.commands.recordPacketRevision` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.commands.registerPacketUpload` - action; one-time call (not live); the live reads it changes update by themselves
 - `lib.eventPacket.commands.resolveOperationalIssue` - mutation; authored step; live reads update by themselves
@@ -3821,6 +3822,7 @@ Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 - `lib.eventPacket.commands.getPacket` - query; live read, updates by itself
 - `lib.eventPacket.commands.importEvidence` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.commands.listPacketSummaries` - query; live read, updates by itself
+- `lib.eventPacket.commands.packetPrintFiles` - query; live read, updates by itself
 - `lib.eventPacket.commands.recordPacketRevision` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.commands.registerPacketUpload` - action; one-time call (not live); the live reads it changes update by themselves
 - `lib.eventPacket.commands.resolveOperationalIssue` - mutation; authored step; live reads update by themselves

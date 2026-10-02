@@ -172,12 +172,12 @@ assigned as field work (§20.6).
 | Binder color and event number on the cover | packet cover and brief | `event-packet-workbook`, `proofs/event-packet-native-parts` | Built (cover says "Event" since 2026-10-03) |
 | Packet versions, out of date after a change | Workbook history | `proofs/packet-out-of-date-readiness` | Built |
 | Keep BEOs, worksheets, drawings with the event | Workbook sources, Photos tab | `proofs/event-packet-evidence`, `proofs/record-source-provenance` | Built (kept and linked) |
-| Route, map, load-in, setup drawings in the packet | packet venue part | `proofs/backend-golden-event` step 10 | Partly: map is a link, drawings are listed by name, not drawn |
+| Route, map, load-in, setup drawings in the packet | packet venue part, pages at the back | `proofs/backend-golden-event` step 10, `proofs/packet-print-files`, `event-packet-attached-files` | Built (drawings, maps and uploaded BEOs print at the back as PDF pages or pictures; the venue map itself is still a link) |
 | Tracker board | `/events/tracker` | `proofs/packet-out-of-date-readiness` (binder mark) | Built; the binder mark is set by hand and clears itself when a changed packet is printed |
 | Event chat (replaces Slack) | event Chat tab | `proofs/event-communication`, `proofs/event-chat-channel` | Built |
 
 History: BEO paste and TPP files on `/events/import`; original PDFs are kept
-and linked to the event, not added as pages to the printed packet.
+on the event and, since 2026-10-03, print at the back of the packet.
 
 ## Not done here (needs people)
 

@@ -119,6 +119,21 @@ export function useEventPacket(eventId: Id<"events">) {
         read: async () =>
           (await client.query(commands.getPacket, { eventId })) as PacketView,
         upload,
+        files: async () => {
+          const listed = (await client.query(commands.packetPrintFiles, {
+            eventId,
+          })) as { name: string; contentType: string; url: string }[];
+          return Promise.all(
+            listed.map(async (file) => {
+              const response = await fetch(file.url);
+              // An unreadable file still gets a page that names it.
+              const bytes = response.ok
+                ? new Uint8Array(await response.arrayBuffer())
+                : new Uint8Array();
+              return { name: file.name, contentType: file.contentType, bytes };
+            }),
+          );
+        },
         record: async (input) =>
           record({
             eventId,

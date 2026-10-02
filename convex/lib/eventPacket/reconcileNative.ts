@@ -538,12 +538,7 @@ async function readNativeContent(
     .withIndex("by_parentId", (q) => q.eq("parentId", eventId))
     .collect();
   for (const f of files)
-    if (
-      f.tenantId === tenantId &&
-      f.deletedAt == null &&
-      f.parentType === "eventRecord" &&
-      (f.evidenceType === "setup" || /diagram|layout|floor|plan|map|drawing/i.test(f.fileName))
-    )
+    if (isPacketDrawing(f, tenantId))
       diagrams.push({ name: f.fileName, instructions: null });
   return {
     eventNumber: known.eventNumber,
@@ -570,6 +565,25 @@ async function readNativeContent(
       diagrams,
     },
   };
+}
+/** An event file that is a setup drawing, floor plan or map. */
+export function isPacketDrawing(
+  f: {
+    tenantId: string;
+    deletedAt?: number | null;
+    parentType: string;
+    evidenceType?: string | null;
+    fileName: string;
+  },
+  tenantId: string,
+): boolean {
+  return (
+    f.tenantId === tenantId &&
+    f.deletedAt == null &&
+    f.parentType === "eventRecord" &&
+    (f.evidenceType === "setup" ||
+      /diagram|layout|floor|plan|map|drawing/i.test(f.fileName))
+  );
 }
 export function projectPacketReadiness(snapshot: EventPacketSnapshot) {
   const requiredOpenIssueCount = snapshot.issues.filter(
