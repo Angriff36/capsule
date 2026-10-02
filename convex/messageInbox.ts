@@ -67,6 +67,34 @@ async function recordMessageSyncError(
   }
 }
 
+// §4.4 / AC-247: a new conversation is matched to the client contact whose
+// email or phone is the sender. Only an exact, single match links; a sender
+// two contacts share stays unlinked for staff to pick. No contact is made
+// up from an unknown sender (that would fill the client list with spam).
+async function matchSenderContact(
+  ctx: ActionCtx,
+  senderIdentity: string | undefined,
+): Promise<Id<"clientContacts"> | undefined> {
+  const sender = (senderIdentity ?? "").trim().toLowerCase();
+  if (!sender) return undefined;
+  const digits = sender.replace(/\D/g, "");
+  const phoneKey = digits.length >= 10 ? digits.slice(-10) : null;
+  // A reader without client access just gets no match, never a failed intake.
+  const contacts = await ctx
+    .runQuery(api.queries.listClientContact, {})
+    .catch(() => []);
+  const matches = contacts.filter((c) => {
+    if (c.deletedAt != null) return false;
+    if (sender.includes("@"))
+      return (c.email ?? "").trim().toLowerCase() === sender;
+    if (!phoneKey) return false;
+    return [c.phone, c.mobile].some(
+      (p) => (p ?? "").replace(/\D/g, "").slice(-10) === phoneKey,
+    );
+  });
+  return matches.length === 1 ? matches[0]!._id : undefined;
+}
+
 // Idempotent inbound message ingestion (spec §4.4 "Done when": replaying the
 // same provider delivery creates no duplicate message — including under
 // concurrent retry). Provider-neutral: a provider sync action (authenticated,
@@ -190,6 +218,9 @@ export const ingestInboundMessage = action({
         threadId = existingThread._id;
         threadCreated = false;
       } else {
+        const contactId =
+          args.contactId ??
+          (await matchSenderContact(ctx, args.senderIdentity));
         const created = await ctx.runMutation(
           api.mutations.MessageThread_create,
           {
@@ -198,7 +229,7 @@ export const ingestInboundMessage = action({
             providerThreadId,
             subject: args.subject,
             senderIdentity: args.senderIdentity,
-            contactId: args.contactId,
+            contactId,
             idempotencyKey: `tenant-shared/mt:${provider}:${account}:${providerThreadId}`,
           },
         );

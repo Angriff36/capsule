@@ -183,6 +183,47 @@ describe("PL-INBOX provider messages come in once", () => {
     expect(threads[0]!.leadId).toBe(a.leadId);
   });
 
+  it("matches a new conversation to the one client contact with the sender's email (AC-247)", async () => {
+    const t = convexTest(schema, modules);
+    const staff = t.withIdentity(owner("tenant-inbox-contact"));
+    const client = await staff.mutation(
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Lakeside Weddings" },
+    );
+    const contact = await staff.mutation(
+      api.mutations.ClientContact_createViaAdd,
+      {
+        clientId: client.docId,
+        givenName: "Robin",
+        email: "Robin@Lakeside.test",
+      } as never,
+    );
+    const known = await staff.action(api.messageInbox.ingestInboundMessage, {
+      provider: "email",
+      providerThreadId: "c-1",
+      providerMessageId: "c-1-a",
+      senderIdentity: "robin@lakeside.test",
+      bodyText: "Tasting next week?",
+    });
+    const unknown = await staff.action(api.messageInbox.ingestInboundMessage, {
+      provider: "email",
+      providerThreadId: "c-2",
+      providerMessageId: "c-2-a",
+      senderIdentity: "stranger@elsewhere.test",
+      bodyText: "Hello",
+    });
+    const threads = await t.run(async (ctx) =>
+      ctx.db.query("messageThreads").collect(),
+    );
+    const byId = new Map(threads.map((x) => [x._id, x]));
+    expect(byId.get(known.threadId)!.contactId).toBe(contact.docId);
+    expect(byId.get(unknown.threadId)!.contactId ?? null).toBeNull();
+    const contacts = await t.run(async (ctx) =>
+      ctx.db.query("clientContacts").collect(),
+    );
+    expect(contacts).toHaveLength(1);
+  });
+
   it("keeps each attachment once, as a reference with no link, and hides provider keys (AC-104, AC-112)", async () => {
     const t = convexTest(schema, modules);
     const staff = t.withIdentity(owner("tenant-inbox-media"));
