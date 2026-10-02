@@ -158,6 +158,7 @@ export function AttachmentsSection({
                   {row.uploadedAt
                     ? ` · ${formatDate(row.uploadedAt)} ${formatTime(row.uploadedAt)}`
                     : ""}
+                  {row.uploadedByName ? ` · by ${row.uploadedByName}` : ""}
                 </p>
                 {parentType === "client" || parentType === "venue" ? (
                   <DeckShareActions attachmentId={row._id} />

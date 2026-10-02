@@ -68,6 +68,7 @@ describe("task 6 mounted interactions", () => {
         fileName: "menu.pdf",
         fileSize: 10,
         uploadedAt: 1,
+        uploadedByName: "Jane Cook",
         url: null,
       },
     ];
@@ -85,6 +86,8 @@ describe("task 6 mounted interactions", () => {
         }),
       ),
     );
+    // Who uploaded the file shows by name (#125).
+    expect(container.textContent).toContain("by Jane Cook");
     const button = [...container.querySelectorAll("button")].find(
       (node) => node.textContent === "Remove",
     )!;
