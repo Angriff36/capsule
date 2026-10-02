@@ -12,6 +12,8 @@ import { getAuthContext } from "../lib/authContext";
 import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -163,7 +165,7 @@ function invoiceLines(value: unknown): {
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown Financial report");
@@ -180,15 +182,18 @@ export const run = query({
       ctx.db
         .query("events")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "events")),
       ctx.db
         .query("invoices")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "invoices")),
       ctx.db
         .query("clients")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "clients")),
     ]);
     // The event's own venue snapshot follows eventRead; filling it from the
     // Venue record follows venueRead.
@@ -307,7 +312,8 @@ export const run = query({
       const payments = await ctx.db
         .query("payments")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "payments"));
       let settled = payments.filter(
         (row) =>
           isLiveTenantRow(row, tenantId) &&
@@ -401,7 +407,8 @@ export const run = query({
       const proposals = await ctx.db
         .query("proposals")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "proposals"));
       const rows = proposals
         .filter(
           (row) =>
@@ -442,15 +449,18 @@ export const run = query({
         ctx.db
           .query("ingredientPriceObservations")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "ingredient prices")),
         ctx.db
           .query("ingredients")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "ingredients")),
         ctx.db
           .query("vendors")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "vendors")),
       ]);
       const ingredientById = new Map(
         canRead(auth, INGREDIENT_READ)
@@ -516,7 +526,8 @@ export const run = query({
       const closeouts = await ctx.db
         .query("eventCloseouts")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "event closeouts"));
       const rows = closeouts
         .filter(
           (row) =>
@@ -607,15 +618,18 @@ export const run = query({
         ctx.db
           .query("payrollInputs")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "pay records")),
         ctx.db
           .query("people")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "staff")),
         ctx.db
           .query("events")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "events")),
       ]);
       const peopleById = new Map(
         canRead(auth, PERSON_READ)
@@ -971,5 +985,5 @@ export const run = query({
       );
     }
     throw new Error(`No Financial resolver for ${args.reportId}`);
-  },
+  }),
 });

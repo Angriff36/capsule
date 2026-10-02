@@ -3011,6 +3011,24 @@
   font-weight: 700;
 }
 
+.tpp-run-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  padding-bottom: 0.75rem;
+  color: var(--color-ink-2);
+  font-size: 13px;
+}
+
+.tpp-run-summary > div {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tpp-run-summary dt {
+  color: var(--color-ink-3);
+}
+
 .tpp-measures [data-emphasis="primary"] {
   background: var(--color-brand-soft);
 }
@@ -4346,9 +4364,20 @@
   .print-sheet .supply-table-wrap {
     overflow: visible;
   }
-  .tpp-result-table:has(.tpp-report-context) {
+  /* Long reports: every column on the page, the header on each page, no
+     row split across pages. */
+  .tpp-result-scroll {
+    overflow: visible;
+  }
+  .tpp-result-table {
     min-width: 0;
     width: 100%;
+  }
+  .tpp-result-table thead {
+    display: table-header-group;
+  }
+  .tpp-result-table tr {
+    break-inside: avoid;
   }
   body:has(.tpp-report-context),
   .tpp-print-area:has(.tpp-report-context) {

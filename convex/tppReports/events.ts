@@ -30,6 +30,8 @@ import { getAuthContext } from "../lib/authContext";
 import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -168,7 +170,8 @@ async function eventsInRange(
     await ctx.db
       .query("events")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .take(REPORT_ROW_LIMIT)
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "events"))
   ).filter(
     (event) =>
       isLiveTenantRow(event, tenantId) &&
@@ -204,7 +207,8 @@ async function eventMenu(
     await ctx.db
       .query("eventDishes")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT)
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "event dishes"))
   ).filter((row) => isLiveTenantRow(row, tenantId) && row.removedAt == null);
   const dishes = await Promise.all(
     eventDishes.map((row) => ctx.db.get(row.dishId)),
@@ -225,20 +229,24 @@ async function eventStaffing(
     ctx.db
       .query("eventAssignments")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT),
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "crew assignments")),
     ctx.db
       .query("eventStaffNeeds")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT),
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "crew needs")),
     ctx.db
       .query("shifts")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT),
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "shifts")),
     seePeople
       ? ctx.db
           .query("people")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT)
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "staff"))
       : [],
   ]);
   const reportAssignments = await Promise.all(
@@ -403,7 +411,8 @@ async function productionWorksheet(
       ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "prep tasks")),
     ]);
     sections.push({
       id: event._id,
@@ -651,7 +660,7 @@ const EVENT_COLUMNS: TppColumn[] = [
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId)) throw new Error("Unknown Event report");
     const auth = await getAuthContext(ctx);
@@ -709,7 +718,8 @@ export const run = query({
         const deliveries = await ctx.db
           .query("deliveries")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT);
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "deliveries"));
         const eventIds = new Set(events.map((event) => String(event._id)));
         return table(
           args.reportId,
@@ -745,7 +755,8 @@ export const run = query({
         const activities = await ctx.db
           .query("eventTimelineActivities")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT);
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "timeline steps"));
         const eventById = new Map(
           events.map((event) => [String(event._id), event]),
         );
@@ -794,7 +805,8 @@ export const run = query({
         const invoices = await ctx.db
           .query("invoices")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT);
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "invoices"));
         return table(
           args.reportId,
           [
@@ -829,12 +841,14 @@ export const run = query({
         ctx.db
           .query("shifts")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "shifts")),
         canRead(auth, PERSON_READ)
           ? ctx.db
               .query("people")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "staff"))
           : [],
       ]);
       // Removed people never show.
@@ -915,18 +929,21 @@ export const run = query({
             ctx.db
               .query("purchaseNeeds")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT),
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "purchase needs")),
             canRead(auth, INGREDIENT_READ)
               ? ctx.db
                   .query("ingredients")
                   .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-                  .take(REPORT_ROW_LIMIT)
+                  .take(REPORT_ROW_LIMIT + 1)
+                  .then(keepReportRows(ctx, "ingredients"))
               : [],
             seeVendors
               ? ctx.db
                   .query("vendors")
                   .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-                  .take(REPORT_ROW_LIMIT)
+                  .take(REPORT_ROW_LIMIT + 1)
+                  .then(keepReportRows(ctx, "vendors"))
               : [],
           ]);
       // Removed ingredients and vendors never show.
@@ -986,11 +1003,13 @@ export const run = query({
           ctx.db
             .query("equipmentReservations")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "equipment holds")),
           ctx.db
             .query("equipments")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "equipment items")),
         ]);
         // Removed equipment never shows.
         const equipmentById = new Map(
@@ -1132,7 +1151,8 @@ export const run = query({
             ? ctx.db
                 .query("eventTimelineActivities")
                 .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-                .take(REPORT_ROW_LIMIT)
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "timeline steps"))
             : [],
           canRead(auth, STAFFING_READ)
             ? eventStaffing(
@@ -1146,19 +1166,22 @@ export const run = query({
             ? ctx.db
                 .query("equipmentReservations")
                 .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-                .take(REPORT_ROW_LIMIT)
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "equipment holds"))
             : [],
           canRead(auth, EQUIPMENT_READ)
             ? ctx.db
                 .query("equipments")
                 .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-                .take(REPORT_ROW_LIMIT)
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "equipment items"))
             : [],
           seeRentals
             ? ctx.db
                 .query("rentalOrderLines")
                 .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-                .take(REPORT_ROW_LIMIT)
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "rental lines"))
             : [],
           seeVenues && event.venueId ? ctx.db.get(event.venueId) : null,
         ]);
@@ -1309,7 +1332,8 @@ export const run = query({
       const prep = await ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "prep tasks"));
       return table(
         args.reportId,
         [
@@ -1346,12 +1370,14 @@ export const run = query({
         ctx.db
           .query("equipmentReservations")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "equipment holds")),
         canRead(auth, EQUIPMENT_READ)
           ? ctx.db
               .query("equipments")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "equipment items"))
           : [],
       ]);
       // Removed equipment never shows.
@@ -1502,12 +1528,14 @@ export const run = query({
         ctx.db
           .query("ingredientDemands")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "ingredient needs")),
         canRead(auth, INGREDIENT_READ)
           ? ctx.db
               .query("ingredients")
               .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-              .take(REPORT_ROW_LIMIT)
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "ingredients"))
           : [],
       ]);
       // Removed ingredients never show.
@@ -1567,11 +1595,13 @@ export const run = query({
           ctx.db
             .query("dishIngredients")
             .withIndex("by_dishId", (q) => q.eq("dishId", dish._id))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "dish ingredients")),
           ctx.db
             .query("dishComponents")
             .withIndex("by_dishId", (q) => q.eq("dishId", dish._id))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "dish recipe parts")),
         ]);
         const rows: TppDocumentSection["rows"][number][] = [
           {
@@ -1631,7 +1661,8 @@ export const run = query({
             .withIndex("by_componentId", (q) =>
               q.eq("componentId", component._id),
             )
-            .take(REPORT_ROW_LIMIT);
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "recipe ingredients"));
           const componentRows: TppDocumentSection["rows"][number][] = [
             {
               label: "Recipe",
@@ -1699,5 +1730,5 @@ export const run = query({
       };
     }
     throw new Error(`No Event resolver for ${args.reportId}`);
-  },
+  }),
 });
