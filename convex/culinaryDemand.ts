@@ -812,13 +812,20 @@ export const eventFoodCostReport = query({
           actualHeadcount: Number(closeout.actualHeadcount ?? 0),
           finalized,
         };
-      recordedWasteCost = (await byTenant(ctx, "wasteRecords", tenantId))
-        .filter(
-          (w) =>
-            String(w.eventId ?? "") === String(args.eventId) &&
-            w.status === "recorded",
-        )
-        .reduce((sum, w) => sum + Number(w.quantity) * Number(w.unitCost), 0);
+      // A finalized closeout is the event's frozen result: waste logged later
+      // reaches it only through an audited closeout correction.
+      recordedWasteCost = finalized
+        ? Number(closeout?.actualWasteCost ?? 0)
+        : (await byTenant(ctx, "wasteRecords", tenantId))
+            .filter(
+              (w) =>
+                String(w.eventId ?? "") === String(args.eventId) &&
+                w.status === "recorded",
+            )
+            .reduce(
+              (sum, w) => sum + Number(w.quantity) * Number(w.unitCost),
+              0,
+            );
       const billed = (await byTenant(ctx, "invoices", tenantId))
         .filter(
           (i) =>
