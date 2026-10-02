@@ -5,6 +5,7 @@ import { api } from "../../lib/api";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { GoogleCalendarSection } from "./GoogleCalendarSection";
 import { OutsideMessagesSection } from "./OutsideMessagesSection";
 import { StepHistorySection } from "./StepHistorySection";
 import { StripeConnectSection } from "./StripeConnectSection";
@@ -22,10 +23,7 @@ function formatWhen(value: number | null | undefined): string {
 
 export function IntegrationsPage() {
   const status = useQuery(api.googleCalendar.getConnectionStatus, {});
-  const beginConnection = useAction(api.googleCalendar.beginConnection);
   const completeConnection = useAction(api.googleCalendar.completeConnection);
-  const disconnect = useAction(api.googleCalendar.disconnect);
-  const syncNow = useAction(api.googleCalendar.syncNow);
 
   const qboStatus = useQuery(api.qboSync.getConnectionStatus, {});
   const qboBeginConnection = useAction(api.qboSync.beginConnection);
@@ -130,64 +128,6 @@ export function IntegrationsPage() {
   }
   const connection = status;
 
-  async function connect() {
-    if (busy || !connection.canManage) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      const result = await beginConnection({});
-      window.location.assign(result.authorizationUrl);
-    } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Google Calendar could not be opened.",
-      );
-      setBusy(false);
-    }
-  }
-
-  async function removeConnection() {
-    if (busy || !connection.canManage) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      await disconnect({});
-      setNotice(
-        "Google Calendar disconnected. Existing calendar entries were left in place.",
-      );
-    } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Google Calendar could not be disconnected.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function runSync() {
-    if (busy || !connection.canManage) return;
-    setBusy(true);
-    setError(null);
-    setNotice(null);
-    try {
-      const result = await syncNow({});
-      setNotice(
-        `Calendar sync finished: ${result.createdOrUpdated} saved, ${result.deleted} removed, ${result.skipped} already current.`,
-      );
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Calendar sync failed.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function connectQbo() {
     if (busy || !qboStatus!.canManage) return;
     setBusy(true);
@@ -271,120 +211,7 @@ export function IntegrationsPage() {
         </p>
       ) : null}
 
-      <Section title="Google Calendar">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
-          <div>
-            <p className="max-w-2xl text-base leading-relaxed text-ink-2">
-              Approved events are added to the connected primary calendar with
-              their name, date and time, venue, and expected headcount.
-              Reschedules and planning changes update the same entry;
-              cancellations remove it.
-            </p>
-
-            {!connection.providerConfigured ? (
-              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-sm leading-relaxed text-warn">
-                Google Calendar isn't set up on the server yet. Ask your
-                technician to add the Google OAuth client ID, client secret, and
-                authorized redirect URI, then connect.
-                {connection.redirectUri ? (
-                  <span className="mt-1 block font-mono">
-                    {connection.redirectUri}
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
-
-            {!connection.connected && connection.disconnectedAt != null ? (
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-2">
-                Disconnected {formatWhen(connection.disconnectedAt)}. Capsule
-                stopped updating Google Calendar
-                {connection.entriesLeftOnCalendar > 0
-                  ? `; the ${connection.entriesLeftOnCalendar} event${
-                      connection.entriesLeftOnCalendar === 1 ? "" : "s"
-                    } already there stay as last sent`
-                  : ""}
-                . Connect again to update them; Capsule reuses the same calendar
-                entries, so nothing is added twice.
-              </p>
-            ) : null}
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              {connection.connected ? (
-                <>
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    disabled={busy || !connection.canManage}
-                    onClick={() => void runSync()}
-                  >
-                    {busy ? "Working…" : "Sync now"}
-                  </button>
-                  <button
-                    className="btn btn-ghost"
-                    type="button"
-                    disabled={busy || !connection.canManage}
-                    onClick={() => void removeConnection()}
-                  >
-                    Disconnect
-                  </button>
-                </>
-              ) : (
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  disabled={
-                    busy ||
-                    !connection.canManage ||
-                    !connection.providerConfigured
-                  }
-                  onClick={() => void connect()}
-                >
-                  {busy ? "Connecting…" : "Connect Google Calendar"}
-                </button>
-              )}
-            </div>
-          </div>
-
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm">
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-ink-3">Connection</dt>
-              <dd className="font-semibold text-ink">
-                {connection.connected ? "Connected" : "Not connected"}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-ink-3">Calendar</dt>
-              <dd className="font-semibold text-ink">
-                {connection.connected ? "Primary calendar" : "—"}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-ink-3">Connected</dt>
-              <dd className="text-right font-semibold text-ink">
-                {formatWhen(connection.connectedAt)}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-ink-3">Last sync</dt>
-              <dd className="text-right font-semibold text-ink">
-                {formatWhen(connection.lastSync?.at)}
-              </dd>
-            </div>
-            {connection.lastSync ? (
-              <div className="border-t border-line pt-3 text-ink-2">
-                {connection.lastSync.createdOrUpdated} saved ·{" "}
-                {connection.lastSync.deleted} removed ·{" "}
-                {connection.lastSync.failed} failed
-                {connection.lastSync.error ? (
-                  <span className="mt-2 block text-warn">
-                    {connection.lastSync.error}
-                  </span>
-                ) : null}
-              </div>
-            ) : null}
-          </dl>
-        </div>
-      </Section>
+      <GoogleCalendarSection connection={connection} />
 
       <Section title="QuickBooks Online">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">

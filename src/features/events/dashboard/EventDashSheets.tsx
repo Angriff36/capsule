@@ -3,6 +3,7 @@ import { formatDate } from "../../../lib/format";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { EventAllergenBriefingBody } from "../EventAllergenBriefingBody";
 import { EventBudgetCard } from "../EventBudgetCard";
+import { EventCalendarSyncNote } from "../EventCalendarSyncNote";
 import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
 import { EventInvoiceCard } from "../EventInvoiceCard";
@@ -119,6 +120,7 @@ export function EventDashSheetBody({
               people={people}
               peopleLoading={people === undefined}
             />
+            <EventCalendarSyncNote eventId={eventId} />
             <EventMapPanel venue={venue} startsAt={startsAt}>
               <EventWeatherChip venue={venue} startsAt={startsAt} />
             </EventMapPanel>
