@@ -159,9 +159,18 @@ describe("waste void reconciliation", () => {
       voidedById: manager.personId,
     });
 
-    // The event roll-up counts only the 2 lb still recorded.
+    // The event roll-up counts only the 2 lb still recorded. A finalized
+    // closeout is the event's frozen result, so the books are closed with
+    // the waste the records hold (the voided entry left out).
     const closeoutId = await closeOut(proof, tenantId, eventId);
-    await captureCloseout(proof, tenantId, closeoutId, eventId);
+    const waste = 2 * FOOD.butterPrice;
+    const total = 800 + waste + 900 + 200;
+    await captureCloseout(proof, tenantId, closeoutId, eventId, {
+      actualWasteCost: waste,
+      totalActualCost: total,
+      costVariance: 3000 - total,
+      grossProfit: 4500 - total,
+    });
     await finalizeCloseout(proof, tenantId, closeoutId, 2);
     const report = (await seed.roles.finance.query(
       api.culinaryDemand.eventFoodCostReport,
