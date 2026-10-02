@@ -11,7 +11,11 @@ import {
 import { eventCancellationObligations } from "./lib/eventCancellation";
 import { summarizeEquipmentProblems } from "./lib/equipmentReturns";
 import { placeEquipmentHold } from "./lib/equipmentHold";
-import { approvedRentalUnits, heldUnits } from "./lib/acceptedRentalHolds";
+import {
+  approvedRentalUnits,
+  heldUnits,
+  vendorRentedUnits,
+} from "./lib/acceptedRentalHolds";
 
 const EQUIPMENT_ROLES = new Set([
   "inventory_staff",
@@ -309,14 +313,17 @@ export const eventEquipmentExceptions = query({
     const notHeld = [];
     if (event.stage !== "cancelled") {
       const held = await heldUnits(ctx, event);
+      const rented = await vendorRentedUnits(ctx, event);
       for (const [itemId, approved] of await approvedRentalUnits(ctx, event)) {
         const have = held.get(itemId) ?? 0;
-        if (have >= approved) continue;
+        const fromVendor = rented.get(itemId) ?? 0;
+        if (have + fromVendor >= approved) continue;
         notHeld.push({
           equipmentId: itemId,
           name: (await nameOf(itemId)) ?? "Equipment",
           approved,
           held: have,
+          fromVendor,
         });
       }
     }

@@ -224,12 +224,59 @@ describe("runtime proof: accepted rental lines are held on approval", () => {
       { eventId: booked.docId },
     )) as any;
     expect(exceptions.notHeld).toEqual([
-      { equipmentId: arch, name: "Birch arch", approved: 2, held: 1 },
+      {
+        equipmentId: arch,
+        name: "Birch arch",
+        approved: 2,
+        held: 1,
+        fromVendor: 0,
+      },
     ]);
 
-    // The other event lets one arch go; the next run tops the hold up.
+    // Renting the missing arch from a vendor clears the warning.
+    const inventory = proof.asRole({
+      subject: "rental-hold-inventory",
+      role: "inventory_manager",
+      tenantId: TENANT,
+    });
+    const vendor = (await proof.executeCommand(
+      inventory,
+      api.mutations.Vendor_createViaOnboard,
+      { name: "Party Rentals Co" },
+    )) as { docId: string };
+    const vendorLine = (await proof.executeCommand(
+      events,
+      api.mutations.RentalOrderLine_createViaAskVendor,
+      {
+        eventId: booked.docId,
+        vendorId: vendor.docId,
+        equipmentId: arch,
+        description: "Birch arch",
+        quantity: 1,
+      },
+    )) as { docId: string };
+    const withVendor = (await events.query(
+      (api as any).equipmentCheckout.eventEquipmentExceptions,
+      { eventId: booked.docId },
+    )) as any;
+    expect(withVendor.notHeld).toEqual([]);
+
+    // The other event lets one arch go: the vendor already covers it, so no
+    // second arch of ours is held.
     await sales.run((ctx) =>
       ctx.db.patch(otherHold, { quantity: 1, version: 1 }),
+    );
+    await sales.run((ctx) =>
+      holdApprovedRentals(ctx as never, booked.docId as never),
+    );
+    expect(byItem(await holdsFor(sales, booked.docId))).toEqual({
+      [arch]: 1,
+      [linens]: 1,
+    });
+
+    // The vendor rental is cancelled; the next run holds our free arch.
+    await sales.run((ctx) =>
+      ctx.db.patch(vendorLine.docId as never, { status: "cancelled" }),
     );
     await sales.run((ctx) =>
       holdApprovedRentals(ctx as never, booked.docId as never),

@@ -15,6 +15,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice } from "../../ui/action-result";
 import { Link } from "react-router-dom";
 import {
+  useEventEquipmentExceptions,
   useRentalVendorChoices,
   useVenueVendorRules,
   VENUE_VENDOR_NOTE,
@@ -78,6 +79,26 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
   const markReturned = useRentalOrderLineMarkReturned();
   const cancel = useRentalOrderLineCancel();
   const [showForm, setShowForm] = useState(false);
+  // Approved rental items the event could not hold: one click opens the
+  // form filled in with the item and the missing count.
+  const exceptions = useEventEquipmentExceptions(eventId) as
+    | {
+        notHeld?: Array<{
+          equipmentId: string;
+          name: string;
+          approved: number;
+          held: number;
+          fromVendor: number;
+        }>;
+      }
+    | null
+    | undefined;
+  const short = (exceptions?.notHeld ?? []).map((row) => ({
+    equipmentId: row.equipmentId,
+    name: row.name,
+    missing: row.approved - row.held - row.fromVendor,
+  }));
+  const [prefill, setPrefill] = useState<(typeof short)[number] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -118,7 +139,9 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
     formEvent.preventDefault();
     const form = formEvent.currentTarget;
     const data = new FormData(form);
-    const equipmentId = String(data.get("equipmentId") ?? "");
+    const equipmentId =
+      String(data.get("equipmentId") ?? "") ||
+      String(data.get("approvedEquipmentId") ?? "");
     const item = rentedItems.find((row) => row._id === equipmentId);
     const newVendorName = String(data.get("newVendorName") ?? "").trim();
     const pickedVendorId =
@@ -156,6 +179,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
       form.reset();
       setAddingVendor(false);
       setShowForm(false);
+      setPrefill(null);
       setNotice("Rental added. Mark it confirmed when the vendor says yes.");
     });
   };
@@ -333,8 +357,36 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
           ))}
         </ul>
       )}
+      {!showForm && short.length > 0 ? (
+        <div className="supply-row-actions">
+          {short.map((row) => (
+            <button
+              key={row.equipmentId}
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setPrefill(row);
+                setShowForm(true);
+              }}
+            >
+              Rent {row.missing} {row.name} from a vendor
+            </button>
+          ))}
+        </div>
+      ) : null}
       {showForm ? (
-        <form className="supply-form" onSubmit={submit}>
+        <form
+          key={prefill?.equipmentId ?? "blank"}
+          className="supply-form"
+          onSubmit={submit}
+        >
+          {prefill ? (
+            <input
+              type="hidden"
+              name="approvedEquipmentId"
+              value={prefill.equipmentId}
+            />
+          ) : null}
           <div className="supply-form-grid">
             <label className="field-label">
               From our rental list
@@ -367,6 +419,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                 name="description"
                 className="input"
                 placeholder="Blank uses the list item's name"
+                defaultValue={prefill?.name ?? ""}
               />
             </label>
             {typingVendor ? (
@@ -442,7 +495,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                 type="number"
                 min={1}
                 step={1}
-                defaultValue={1}
+                defaultValue={prefill?.missing ?? 1}
                 required
               />
             </label>
@@ -469,7 +522,10 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
             <button
               type="button"
               className="btn btn-ghost"
-              onClick={() => setShowForm(false)}
+              onClick={() => {
+                setShowForm(false);
+                setPrefill(null);
+              }}
             >
               Close
             </button>
@@ -482,7 +538,10 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
         <button
           type="button"
           className="btn btn-secondary"
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            setPrefill(null);
+            setShowForm(true);
+          }}
         >
           Rent from a vendor
         </button>

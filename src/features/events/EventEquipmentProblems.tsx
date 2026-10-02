@@ -81,6 +81,7 @@ export function EventEquipmentProblems({
       name: string;
       approved: number;
       held: number;
+      fromVendor: number;
     }>;
     late: Array<{
       recordId: string;
@@ -299,9 +300,13 @@ export function EventEquipmentProblems({
           <ul className="list-disc pl-5 text-sm text-ink-2">
             {notHeld.map((row) => (
               <li key={row.equipmentId}>
-                {row.name} · {row.held} of {row.approved} held · not enough free
-                for this event. Hold the rest on the equipment list, rent it
-                from a vendor, or change the proposal.
+                {row.name} · {row.held} of {row.approved} held
+                {row.fromVendor > 0
+                  ? ` · ${row.fromVendor} from a vendor`
+                  : ""}{" "}
+                · not enough free for this event. Hold the rest on the equipment
+                list, rent it from a vendor under &quot;Rented from
+                vendors&quot;, or change the proposal.
               </li>
             ))}
           </ul>

@@ -86,12 +86,38 @@ export async function heldUnits(
   return held;
 }
 
+/** Units of each item an outside vendor brings for the event (any rental
+ * line not cancelled that names the item). */
+export async function vendorRentedUnits(
+  ctx: QueryCtx,
+  event: Doc<"events">,
+): Promise<Map<string, number>> {
+  const rented = new Map<string, number>();
+  const lines = await ctx.db
+    .query("rentalOrderLines")
+    .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+    .collect();
+  for (const line of lines) {
+    if (
+      line.tenantId !== event.tenantId ||
+      line.deletedAt != null ||
+      line.status === "cancelled" ||
+      !line.equipmentId
+    )
+      continue;
+    const key = String(line.equipmentId);
+    rented.set(key, (rented.get(key) ?? 0) + line.quantity);
+  }
+  return rented;
+}
+
 /**
  * Goodshuffle replacement (BE-13 rentals, criterion "no re-entry"): a rental
  * item on the proposal the client accepted is held for the event once the
  * event is booked, so nobody reserves it a second time by hand. Runs on
  * approval and on every later accepted change. It only adds what is missing
- * (a replay adds nothing) and holds only what is free; the rest shows on the
+ * after our holds and what a vendor brings (a replay adds nothing) and holds
+ * only what is free; the rest shows on the
  * event's equipment problems as "approved but not held". It never blocks the
  * approval - an item that cannot be held is a problem to sort out, not a
  * reason to stop the booking.
@@ -109,9 +135,11 @@ export async function holdApprovedRentals(
   const wanted = await approvedRentalUnits(ctx, event);
   if (wanted.size === 0) return;
   const held = await heldUnits(ctx, event);
+  const rented = await vendorRentedUnits(ctx, event);
   const now = Date.now();
   for (const [rawId, units] of wanted) {
-    const missing = units - (held.get(rawId) ?? 0);
+    const missing =
+      units - (held.get(rawId) ?? 0) - (rented.get(rawId) ?? 0);
     if (missing <= 0) continue;
     const equipmentId = ctx.db.normalizeId("equipments", rawId);
     if (!equipmentId) continue;
