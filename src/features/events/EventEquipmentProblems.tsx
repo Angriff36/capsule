@@ -74,8 +74,14 @@ export function EventEquipmentProblems({
   const [failure, setFailure] = useState<unknown>(null);
 
   if (data == null) return null;
-  const { problems, late, obligations, totals } = data as {
+  const { problems, late, obligations, notHeld, totals } = data as {
     problems: Problem[];
+    notHeld: Array<{
+      equipmentId: string;
+      name: string;
+      approved: number;
+      held: number;
+    }>;
     late: Array<{
       recordId: string;
       name: string;
@@ -94,7 +100,12 @@ export function EventEquipmentProblems({
       companyCost: number;
     };
   };
-  if (problems.length === 0 && late.length === 0 && obligations.length === 0)
+  if (
+    problems.length === 0 &&
+    late.length === 0 &&
+    obligations.length === 0 &&
+    notHeld.length === 0
+  )
     return hideWhenEmpty ? null : (
       <p className="text-sm text-ink-3" data-testid="equipment-problems-none">
         No equipment problems for this event.
@@ -278,6 +289,23 @@ export function EventEquipmentProblems({
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {notHeld.length > 0 ? (
+        <div className="space-y-1" data-testid="equipment-not-held">
+          <p className="text-sm font-semibold text-ink">
+            Approved by the client but not held
+          </p>
+          <ul className="list-disc pl-5 text-sm text-ink-2">
+            {notHeld.map((row) => (
+              <li key={row.equipmentId}>
+                {row.name} · {row.held} of {row.approved} held · not enough free
+                for this event. Hold the rest on the equipment list, rent it
+                from a vendor, or change the proposal.
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
 
       {late.length > 0 ? (

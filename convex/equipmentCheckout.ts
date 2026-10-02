@@ -4,48 +4,14 @@ import { getAuthContext, requireTenant } from "./lib/authContext";
 import type { Id } from "./_generated/dataModel";
 import type { QueryCtx } from "./_generated/server";
 import {
-  availableEquipmentQuantity,
   equipmentBlock,
   equipmentConflicts,
   unitsOutOfUse,
-  type EquipmentConflict,
 } from "./lib/equipmentReservationAvailability";
-import { reconcileEventPackRules } from "./lib/packRuleReconciliation";
 import { eventCancellationObligations } from "./lib/eventCancellation";
 import { summarizeEquipmentProblems } from "./lib/equipmentReturns";
-import { insertStepEvent } from "./lib/commandAudit";
-
-const day = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  timeZone: "UTC",
-});
-
-function dayRange(startsAt: number, endsAt: number): string {
-  const from = day.format(startsAt);
-  const to = day.format(endsAt);
-  return from === to ? from : `${from} to ${to}`;
-}
-
-/** "Smith wedding, Oct 3, 2 held" - one line per conflicting hold. */
-async function describeConflicts(
-  ctx: QueryCtx,
-  tenantId: string,
-  conflicts: EquipmentConflict[],
-): Promise<string[]> {
-  const lines: string[] = [];
-  for (const conflict of conflicts) {
-    const event = await ctx.db.get(conflict.eventId as Id<"events">);
-    const title =
-      event && event.tenantId === tenantId ? event.title : "another event";
-    lines.push(
-      conflict.overdue
-        ? `${title}, still out and late coming back, ${conflict.quantity} held`
-        : `${title}, ${dayRange(conflict.startsAt, conflict.endsAt)}, ${conflict.quantity} held`,
-    );
-  }
-  return lines;
-}
+import { placeEquipmentHold } from "./lib/equipmentHold";
+import { approvedRentalUnits, heldUnits } from "./lib/acceptedRentalHolds";
 
 const EQUIPMENT_ROLES = new Set([
   "inventory_staff",
@@ -103,140 +69,16 @@ export const reserve = mutation({
         "Only an inventory or logistics manager can book equipment that is out of use. Ask a manager, or pick other equipment.",
       );
     }
-    if (
-      !Number.isFinite(args.startsAt) ||
-      !Number.isFinite(args.endsAt) ||
-      args.endsAt <= args.startsAt
-    ) {
-      throw new ConvexError("Return time must be after checkout time.");
-    }
-    if (!Number.isSafeInteger(args.quantity) || args.quantity <= 0) {
-      throw new ConvexError(
-        "Reserved quantity must be a positive whole number.",
-      );
-    }
-
-    const [equipment, event] = await Promise.all([
-      ctx.db.get(args.equipmentId),
-      ctx.db.get(args.eventId),
-    ]);
-    if (
-      !equipment ||
-      equipment.tenantId !== tenantId ||
-      equipment.deletedAt != null
-    ) {
-      throw new ConvexError("Equipment is unavailable in this workspace.");
-    }
-    const block = equipmentBlock(equipment);
-    if (block === "retired") {
-      throw new ConvexError("Only active equipment can be reserved.");
-    }
-    // CF-11.4: out-of-service equipment is never newly booked. The way back is
-    // to mark it in service again once it is fixed (Equipment.updateCondition).
-    if (block === "out_of_service" && !overrideReason) {
-      throw new ConvexError(
-        `${equipment.name} is marked out of service, so it can't be booked. Pick other equipment, rent one, mark it back in service once it is fixed, or have a manager book it anyway with a reason.`,
-      );
-    }
-    if (!event || event.tenantId !== tenantId || event.deletedAt != null) {
-      throw new ConvexError("Event is unavailable in this workspace.");
-    }
-
-    const now = Date.now();
-    const [reservations, issues] = await Promise.all([
-      ctx.db
-        .query("equipmentReservations")
-        .withIndex("by_equipmentId", (query) =>
-          query.eq("equipmentId", args.equipmentId),
-        )
-        .collect(),
-      ctx.db
-        .query("equipmentIssues")
-        .withIndex("by_equipmentId", (query) =>
-          query.eq("equipmentId", args.equipmentId),
-        )
-        .collect(),
-    ]);
-    const window = {
+    return placeEquipmentHold(ctx, {
       tenantId,
+      equipmentId: args.equipmentId,
+      eventId: args.eventId,
       startsAt: args.startsAt,
       endsAt: args.endsAt,
-      now,
-    };
-    // PL-RETURNS: broken, dirty or in-repair units are not free to book. A
-    // manager's override puts them back in reach; other events' holds never.
-    const outOfUse = overrideReason ? 0 : unitsOutOfUse(issues, tenantId);
-    const availableQuantity = availableEquipmentQuantity(
-      equipment.quantity - outOfUse,
-      reservations,
-      window,
-    );
-    if (args.quantity > availableQuantity) {
-      // PR10-03: the loser of a race for the last units sees who holds them
-      // and when, where the item is kept, and the ways out.
-      const held = await describeConflicts(
-        ctx,
-        tenantId,
-        equipmentConflicts(reservations, window),
-      );
-      const place = equipment.currentLocation ?? equipment.homeLocation;
-      throw new ConvexError(
-        [
-          `${equipment.name} has ${Math.max(availableQuantity, 0)} free for that time and you asked for ${args.quantity}.`,
-          held.length > 0 ? `Already booked: ${held.join("; ")}.` : null,
-          outOfUse > 0
-            ? `${outOfUse} out of use (broken, being cleaned or in repair).`
-            : null,
-          place ? `Kept at ${place}.` : null,
-          "Pick other equipment, move one from another place, rent it from a vendor, or reduce the amount.",
-        ]
-          .filter(Boolean)
-          .join(" "),
-      );
-    }
-
-    const equipmentReservationId = await ctx.db.insert(
-      "equipmentReservations",
-      {
-        tenantId,
-        equipmentId: args.equipmentId,
-        eventId: args.eventId,
-        startsAt: args.startsAt,
-        endsAt: args.endsAt,
-        quantity: args.quantity,
-        status: "reserved",
-        reservedAt: now,
-        ...(overrideReason
-          ? {
-              overrideReason,
-              ...(auth.personId ? { overrideApprovedById: auth.personId } : {}),
-            }
-          : {}),
-        createdAt: now,
-        updatedAt: now,
-        version: 0,
-      },
-    );
-    await insertStepEvent(ctx, {
-      type: "EquipmentReserved",
-      entity: "EquipmentReservation",
-      entityId: equipmentReservationId,
-      payload: {
-        equipmentReservationId,
-        equipmentId: args.equipmentId,
-        eventId: args.eventId,
-        tenantId,
-        startsAt: args.startsAt,
-        endsAt: args.endsAt,
-        quantity: args.quantity,
-        ...(overrideReason ? { overrideReason } : {}),
-      },
-      createdAt: now,
+      quantity: args.quantity,
+      overrideReason,
+      personId: auth.personId ?? null,
     });
-    // The held item goes on the event's pack list as a pull-sheet line.
-    await reconcileEventPackRules(ctx, args.eventId);
-
-    return { equipmentReservationId };
   },
 });
 
@@ -463,10 +305,26 @@ export const eventEquipmentExceptions = query({
       event.stage === "cancelled"
         ? await eventCancellationObligations(ctx, tenantId, args.eventId)
         : [];
+    // Rental items the client approved that the event does not hold in full.
+    const notHeld = [];
+    if (event.stage !== "cancelled") {
+      const held = await heldUnits(ctx, event);
+      for (const [itemId, approved] of await approvedRentalUnits(ctx, event)) {
+        const have = held.get(itemId) ?? 0;
+        if (have >= approved) continue;
+        notHeld.push({
+          equipmentId: itemId,
+          name: (await nameOf(itemId)) ?? "Equipment",
+          approved,
+          held: have,
+        });
+      }
+    }
     return {
       problems,
       late,
       obligations,
+      notHeld,
       totals: summarizeEquipmentProblems(problems),
     };
   },
