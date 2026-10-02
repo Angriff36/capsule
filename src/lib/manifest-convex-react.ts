@@ -847,6 +847,9 @@ import {
   VendorContractPriceTierUpdateParamsSchema,
   VendorContractTerminateParamsSchema,
   VendorContractUpdateTermsParamsSchema,
+  VendorItemAddParamsSchema,
+  VendorItemRemoveParamsSchema,
+  VendorItemUpdateParamsSchema,
   VendorOnboardParamsSchema,
   VendorOrderApproveParamsSchema,
   VendorOrderCancelParamsSchema,
@@ -12857,6 +12860,57 @@ export function useCreateVendorContractPriceTier() {
   };
 }
 
+/** Reactive list for VendorItem. */
+export function useListVendorItem() {
+  return useQuery(api.queries.listVendorItem);
+}
+
+/** Reactive get-by-id for VendorItem. Pass "skip" to suspend. */
+export function useGetVendorItem(id: string | "skip") {
+  return useQuery(api.queries.getVendorItem, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for VendorItem.add. */
+export function useVendorItemAdd() {
+  const mutate = useMutation(api.mutations.VendorItem_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorItem.remove. */
+export function useVendorItemRemove() {
+  const mutate = useMutation(api.mutations.VendorItem_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorItemRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorItem.update. */
+export function useVendorItemUpdate() {
+  const mutate = useMutation(api.mutations.VendorItem_update);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorItemUpdateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for VendorItem.add. */
+export function useCreateVendorItem() {
+  const mutate = useMutation(api.mutations.VendorItem_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for VendorOrder. */
 export function useListVendorOrder() {
   return useQuery(api.queries.listVendorOrder);
@@ -13749,4 +13803,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1455 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1461 as const;

@@ -1,0 +1,139 @@
+// Capsule procurement — what a vendor sells us for one ingredient: the vendor's
+// item number, the pack it comes in, and the pack price. Replaces Galley's
+// vendor item list (PL-REPLACEMENT-PROOF). One ingredient can have items from
+// several vendors. A price change is an update; its event keeps the price
+// before and after, so the item's price history is the event history.
+// Compile entry: uses vendor → culinary (Ingredient, UnitOfMeasure).
+
+use "./vendor.manifest"
+
+entity VendorItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required vendorId: uuid
+  property indexed required ingredientId: uuid
+  property itemCode: string?
+  property required searchable description: string = ""
+  property required packQuantity: decimal(12, 4) = 1
+  property required packUnit: UnitOfMeasure = "each"
+  property packPrice: money(12, 2)?
+  property priceSetAt: datetime?
+  property addedAt: datetime?
+
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  constraint vendorItemPackPositive: self.addedAt == null or self.packQuantity > 0 "The pack amount has to be more than zero."
+  constraint vendorItemPriceNonnegative: self.packPrice == null or self.packPrice >= 0 "The pack price can't be negative. Use zero or more."
+
+  default policy vendorItemRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Purchasing, kitchen and managers may see vendor items"
+  default policy vendorItemWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Purchasing and managers may update vendor items"
+  default policy vendorItemExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Purchasing and managers may change vendor items"
+
+  command add(
+    vendorId: uuid,
+    ingredientId: uuid,
+    description: string,
+    packQuantity: decimal(12, 4),
+    packUnit: UnitOfMeasure,
+    optional itemCode: string,
+    optional packPrice: money(12, 2)
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.vendor != null and self.vendor.deletedAt == null
+    guard self.ingredient != null and self.ingredient.deletedAt == null
+    constraint addVendorItemVendorMatch: vendorId == self.vendorId "This item is for a different vendor. Pick the vendor already on this item."
+    constraint addVendorItemIngredientMatch: ingredientId == self.ingredientId "This item is for a different ingredient. Pick the ingredient already on this item."
+    constraint addVendorItemDescription: length(trim(description)) > 0 "Say what the vendor calls this item."
+    constraint addVendorItemPack: packQuantity > 0 "The pack amount has to be more than zero."
+    constraint addVendorItemPrice: packPrice == null or packPrice >= 0 "The pack price can't be negative. Use zero or more."
+    mutate vendorId = vendorId
+    mutate ingredientId = ingredientId
+    mutate description = description
+    mutate packQuantity = packQuantity
+    mutate packUnit = packUnit
+    mutate itemCode = itemCode
+    mutate packPrice = packPrice
+    mutate priceSetAt = packPrice != null ? now() : null
+    mutate addedAt = now()
+    emit VendorItemAdded {
+      vendorItemId: self.id
+      tenantId: self.tenantId
+      vendorId: vendorId
+      ingredientId: ingredientId
+    }
+  }
+
+  command update(
+    description: string,
+    packQuantity: decimal(12, 4),
+    packUnit: UnitOfMeasure,
+    optional itemCode: string,
+    optional packPrice: money(12, 2)
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint updateVendorItemDescription: length(trim(description)) > 0 "Say what the vendor calls this item."
+    constraint updateVendorItemPack: packQuantity > 0 "The pack amount has to be more than zero."
+    constraint updateVendorItemPrice: packPrice == null or packPrice >= 0 "The pack price can't be negative. Use zero or more."
+    compute previousPackPrice = self.packPrice
+    mutate priceSetAt = packPrice != self.packPrice ? now() : self.priceSetAt
+    mutate description = description
+    mutate packQuantity = packQuantity
+    mutate packUnit = packUnit
+    mutate itemCode = itemCode
+    mutate packPrice = packPrice
+    emit VendorItemUpdated {
+      vendorItemId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      ingredientId: self.ingredientId
+      previousPackPrice: previousPackPrice
+      packPrice: packPrice
+      packQuantity: packQuantity
+      packUnit: packUnit
+    }
+  }
+
+  command remove() {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit VendorItemRemoved {
+      vendorItemId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      ingredientId: self.ingredientId
+    }
+  }
+
+  store VendorItem in durable
+}
+
+event VendorItemAdded: "vendor_item.added" {
+  vendorItemId: string
+  tenantId: string
+  vendorId: string
+  ingredientId: string
+}
+
+event VendorItemUpdated: "vendor_item.updated" {
+  vendorItemId: string
+  tenantId: string
+  vendorId: string
+  ingredientId: string
+  previousPackPrice: number?
+  packPrice: number?
+  packQuantity: number
+  packUnit: string
+}
+
+event VendorItemRemoved: "vendor_item.removed" {
+  vendorItemId: string
+  tenantId: string
+  vendorId: string
+  ingredientId: string
+}

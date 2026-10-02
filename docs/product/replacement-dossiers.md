@@ -56,8 +56,8 @@ did not go (invoice page and the proposal's "Emails" list). Capsule knows
 callbacks wait on issue #52).
 
 Open:
-- Imported events all start in Planning; the TPP status is kept only on the
-  import link.
+- Imported events all start in Planning; the TPP status shows on the event's
+  "Imported from" panel as "Status in the old system".
 - Old invoices are not created as invoices; finance gets a rebuild preview
   (`/admin/imports`, old invoice rebuild).
 - Old payments wait on `/admin/reconcile` to be matched by hand.
@@ -108,7 +108,7 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Ingredients: storage, shelf life, nutrition, allergens | `/kitchen/ingredients/:id` | `features/kitchen/ingredient-data-breadth` | Built |
 | Allergen roll-up for a menu or event | `/kitchen/allergen-matrix` | `proofs/incident-allergen-corrective-action` | Built |
 | Units and conversions | ingredient page | `culinary-unit-meaning`, `proofs/incompatible-unit-review` | Built (never guesses) |
-| Pack sizes and vendor items | ingredient page, `/inventory/contracts` | `proofs/menu-profitability-direct-ingredient` | Partly: pack size is per ingredient, no vendor item record |
+| Pack sizes and vendor items | ingredient page, `/inventory/contracts` | `proofs/menu-profitability-direct-ingredient`, `proofs/vendor-item-record` | Built: vendor items per ingredient (item number, pack, pack price with history); order lines do not yet price from them |
 | Prices and price history | ingredient page | `culinary-model-cost-dated`, `proofs/receipt-exact-once` | Partly: history grows only from receipts |
 | Recipes, sub-recipes, yields, versions | `/kitchen/components/:id`, `/kitchen/dishes/:id` | `proofs/safe-culinary-operations` | Built |
 | Method, station, equipment | recipe page, `/kitchen/stations` | `proofs/prep-work-baselines` | Partly: station on tasks only, equipment is free text |
@@ -147,7 +147,7 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 | Pull, scan, pack, load, deliver, pick up, return, inspect | `/logistics/packs/:id`, `/logistics/dispatch`, `/logistics/returns` | `proofs/pull-inspect-flow`, `proofs/pack-scan-load-truck`, `proofs/custody-trail` | Built |
 | Routes, trucks and trailers, crew, windows | `/logistics/route`, `/logistics/fleet` | `proofs/route-capacity`, `proofs/vehicle-assignment-conflict` | Built |
 | Broken, missing, dirty, late, short to vendor; billing | `/logistics/returns`, event Equipment problems, invoice | `proofs/damage-to-billing`, `proofs/closeout-source-projection` | Built (late returns are read from the return times) |
-| Rental money, vendor cost, losses, use | `/facilities` rentals card | `features/logistics/rental-reporting` | Partly: revenue is held amount x list price, no export |
+| Rental money, vendor cost, losses, use | `/facilities` rentals card | `features/logistics/rental-reporting`, `proofs/accepted-rental-sales` | Partly: revenue is the accepted price where the event has one, else held amount x list price; no export |
 
 No retyping: since 2026-10-03 an item on the accepted proposal is held for the
 event on approval (and on an accepted change), as many as are free; the rest
@@ -166,7 +166,7 @@ assigned as field work (§20.6).
 | --- | --- | --- | --- |
 | Prove the event is ready | event page Workbook, `/workbooks` | `proofs/final-lock-readiness`, `proofs/readiness-projections` | Built |
 | Ops Final Lock questions | Workbook, Final Lock questions | `proofs/event-packet-final-lock`, `proofs/event-packet-final-lock-sources` | Built |
-| Sales Lock | event stage actions | `proofs/lifecycle-sales-lock-completeness` | Built as a completeness check, not a question sheet |
+| Sales Lock | event stage actions | `proofs/lifecycle-sales-lock-completeness` | Built as a completeness check (spec §3.3 asks for gate checks) |
 | The eight packet parts in binder order | Workbook, prepare | `proofs/event-packet-native-parts` | Built |
 | Office answers and blank field forms | Workbook field forms, `/my` | `proofs/event-packet-field-confirmation` | Built (field forms never pre-filled) |
 | Binder color and event number on the cover | packet cover and brief | `event-packet-workbook`, `proofs/event-packet-native-parts` | Built (cover says "Event" since 2026-10-03) |

@@ -871,6 +871,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.VendorContractPriceTier_createViaAdd, { "contractId": "contractId-vendor-contract-price-tier-1", "itemName": "VendorContractPriceTier 1", "unit": "demo-unit-1", "minQuantity": 1, "unitPrice": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.VendorContractPriceTier_createViaAdd, { "contractId": "contractId-vendor-contract-price-tier-2", "itemName": "VendorContractPriceTier 2", "unit": "demo-unit-2", "minQuantity": 2, "unitPrice": 2, "notes": "demo-notes-2" } as any);
+  // VendorItem has multiple initialization commands (add, remove); using the selected initialization command: add.
+  // VendorItem → api.mutations.VendorItem_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.VendorItem_createViaAdd, { "vendorId": "vendorId-vendor-item-1", "ingredientId": "ingredientId-vendor-item-1", "itemCode": "demo-itemCode-1", "description": "demo-description-1", "packQuantity": 1, "packUnit": "demo-packUnit-1", "packPrice": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.VendorItem_createViaAdd, { "vendorId": "vendorId-vendor-item-2", "ingredientId": "ingredientId-vendor-item-2", "itemCode": "demo-itemCode-2", "description": "demo-description-2", "packQuantity": 2, "packUnit": "demo-packUnit-2", "packPrice": 2 } as any);
   // VendorOrder has multiple initialization commands (ensureWeeklyDraft, open); using the selected initialization command: open.
   // VendorOrder → api.mutations.VendorOrder_createViaOpen
   rowsAttempted += 1;
@@ -1838,6 +1844,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "VendorContractPriceTier",
       "createMutation": "VendorContractPriceTier_createViaAdd",
+      "rowCount": 2
+    },
+    {
+      "entity": "VendorItem",
+      "createMutation": "VendorItem_createViaAdd",
       "rowCount": 2
     },
     {
