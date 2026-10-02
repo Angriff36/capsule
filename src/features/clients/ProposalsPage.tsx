@@ -27,7 +27,10 @@ import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
 import { clientDisplayName } from "../events/clientName";
-import { useEventRecordsInRange } from "../facilities/useEventsById";
+import {
+  useEventRecordsById,
+  useEventRecordsInRange,
+} from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -101,7 +104,27 @@ export function ProposalsPage() {
     }),
     [today],
   );
-  const events = useEventRecordsInRange(eventWindow);
+  const windowEvents = useEventRecordsInRange(eventWindow);
+  // A proposal linked to an event outside that window keeps its event too.
+  const olderEventIds = useMemo(() => {
+    if (!proposals || !windowEvents) return undefined;
+    const inWindow = new Set(windowEvents.map((e) => String(e._id)));
+    return [
+      ...new Set(
+        proposals
+          .map((p) => (p.eventId ? String(p.eventId) : ""))
+          .filter((id) => id && !inWindow.has(id)),
+      ),
+    ];
+  }, [proposals, windowEvents]);
+  const olderEvents = useEventRecordsById(olderEventIds);
+  const events = useMemo(
+    () =>
+      windowEvents && olderEvents
+        ? [...windowEvents, ...olderEvents]
+        : windowEvents,
+    [windowEvents, olderEvents],
+  );
   const timelineActivities = useListEventTimelineActivity();
   const venues = useListVenue();
   // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and

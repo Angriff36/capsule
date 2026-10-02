@@ -60,6 +60,36 @@ export const byIds = query({
   },
 });
 
+/**
+ * Whole event records by id (less the import draft and the encrypted contact
+ * fields, as `rangeDocs`), for a screen that already reads a window of whole
+ * records and must add the older events its own rows point at (#430:
+ * proposals linked to an event outside the window). Same caps as `byIds`.
+ */
+export const docsByIds = query({
+  args: { ids: v.array(v.string()) },
+  handler: async (ctx, { ids }): Promise<Doc<"events">[] | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, ["staffAccess"])) return null;
+    const tenantId = auth.tenantId;
+    const rows: Doc<"events">[] = [];
+    for (const raw of [...new Set(ids)].slice(0, LOOKUP_CAP)) {
+      const id = ctx.db.normalizeId("events", raw);
+      if (!id) continue;
+      const e = await ctx.db.get(id);
+      if (!e || e.tenantId !== tenantId) continue;
+      rows.push({
+        ...e,
+        importDraftJson: null,
+        primaryContactName: null,
+        primaryContactEmail: null,
+        primaryContactPhone: null,
+      });
+    }
+    return rows;
+  },
+});
+
 /** A busy year for a large caterer is a few thousand events. */
 export const RANGE_CAP = 3000;
 const UNDATED_CAP = 300;

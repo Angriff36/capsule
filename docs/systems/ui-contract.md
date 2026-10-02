@@ -326,6 +326,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -509,6 +510,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -1219,6 +1221,7 @@ Screens (64): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventLedger.ledgerWindow` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -2202,6 +2205,7 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -2375,6 +2379,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3070,6 +3075,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3562,6 +3568,7 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3829,6 +3836,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -4332,6 +4340,7 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
