@@ -211,6 +211,9 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       };
       for (const section of report.sections)
         expect(section.sources.length, section.key).toBeGreaterThan(0);
+      expect(
+        report.sections.find((s) => s.key === "venue")?.sources,
+      ).toContainEqual({ table: "events", id: id.golden });
       const menu = report.sections.find((s) => s.key === "menu")!;
       expect(menu.sources).toContainEqual({
         table: "eventDishes",
@@ -685,6 +688,24 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       expect(
         await eventRows(w, "eventVehicleAssignments", id.golden),
       ).toHaveLength(1);
+
+      // The proposal's service style and rentals sections name their records.
+      const report = (await w.roles.sales.query(
+        api.lib.proposalDraftReport.getProposalDraftReport,
+        { proposalId: id.proposal } as never,
+      )) as {
+        sections: { key: string; sources: { table: string; id: string }[] }[];
+      };
+      const section = (key: string) =>
+        report.sections.find((s) => s.key === key)?.sources ?? [];
+      expect(section("service")).toEqual([
+        { table: "serviceStyles", id: buffet.docId },
+      ]);
+      expect(section("rentals").map((s) => s.table)).toEqual([
+        "equipmentReservations",
+      ]);
+      for (const s of report.sections)
+        expect(s.sources.length, s.key).toBeGreaterThan(0);
     },
     LONG,
   );
