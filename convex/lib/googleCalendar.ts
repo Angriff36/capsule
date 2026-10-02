@@ -18,6 +18,8 @@ export interface GoogleOAuthState {
   tenantId: string;
   nonce: string;
   expiresAt: number;
+  /** PL-CONNECTIONS (AC-114): the manager's "also add past events" choice. */
+  includePast?: boolean;
 }
 
 export interface CapsuleCalendarEvent {
@@ -46,6 +48,8 @@ export interface GoogleTokenResponse {
   accessToken: string;
   refreshToken?: string;
   expiresIn?: number;
+  /** Space-separated scopes Google actually granted. */
+  scope?: string;
 }
 
 export class GoogleProviderError extends Error {
@@ -108,7 +112,9 @@ export async function verifyGoogleOAuthState(
       typeof parsed.nonce !== "string" ||
       !parsed.nonce ||
       typeof parsed.expiresAt !== "number" ||
-      parsed.expiresAt < now
+      parsed.expiresAt < now ||
+      (parsed.includePast !== undefined &&
+        typeof parsed.includePast !== "boolean")
     ) {
       return null;
     }
@@ -305,6 +311,7 @@ async function requestToken(
     ...(typeof data.expires_in === "number"
       ? { expiresIn: data.expires_in }
       : {}),
+    ...(typeof data.scope === "string" ? { scope: data.scope } : {}),
   };
 }
 

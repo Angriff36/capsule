@@ -7,6 +7,7 @@ import {
   internalMutation,
   internalQuery,
   query,
+  type ActionCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { decrypt, encrypt } from "./lib/encryption";
@@ -26,14 +27,21 @@ import {
   type GoogleOAuthConfig,
 } from "./lib/googleCalendar";
 import { insertStepEvent } from "./lib/commandAudit";
+import { mirrorCalendarConnection } from "./lib/calendarConnectionMirror";
+import {
+  eventInCalendarBasis,
+  newCalendarBasis,
+  parseCalendarBasis,
+  type CalendarSyncBasis,
+} from "./lib/googleCalendarBasis";
 
-const CONNECTION_ENTITY = "GoogleCalendarConnection";
-const CALENDAR_EVENT_ENTITY = "GoogleCalendarEvent";
+export const CONNECTION_ENTITY = "GoogleCalendarConnection";
+export const CALENDAR_EVENT_ENTITY = "GoogleCalendarEvent";
 const CALENDAR_ID = "primary";
 const SYNC_INTERVAL_MS = 60_000;
 const RETRY_INTERVAL_MS = 15 * 60_000;
 const OAUTH_STATE_TTL_MS = 10 * 60_000;
-const CALENDAR_ELIGIBLE_STAGES = new Set([
+export const CALENDAR_ELIGIBLE_STAGES = new Set([
   "approved",
   "executing",
   "completed",
@@ -45,16 +53,19 @@ interface EncryptedRefreshToken {
   keyId: string;
 }
 
-interface ConnectionPayload {
+export interface ConnectionPayload {
   tenantId: string;
   connectionId: string;
   calendarId: string;
   connectedAt: number;
   connectedBy: string;
   refreshToken: EncryptedRefreshToken;
+  /** Null on connections made before the basis was recorded. */
+  basis: CalendarSyncBasis | null;
+  scopes: string | null;
 }
 
-interface EventSyncState {
+export interface EventSyncState {
   eventId: string;
   connectionId: string;
   googleEventId: string;
@@ -114,7 +125,7 @@ function providerConfigured(): boolean {
   );
 }
 
-function canManage(role: string): boolean {
+export function canManage(role: string): boolean {
   return (
     role === "manager" ||
     role === "admin" ||
@@ -132,7 +143,7 @@ function requireManager(role: string): void {
   }
 }
 
-function asRecord(value: unknown): Record<string, unknown> {
+export function asRecord(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === "object"
     ? (value as Record<string, unknown>)
     : {};
@@ -174,10 +185,12 @@ function parseConnection(payload: unknown): ConnectionPayload | null {
     connectedAt,
     connectedBy,
     refreshToken: { ciphertext, keyId },
+    basis: parseCalendarBasis(value.basis),
+    scopes: stringValue(value.scopes),
   };
 }
 
-function parseSyncState(payload: unknown): EventSyncState | null {
+export function parseSyncState(payload: unknown): EventSyncState | null {
   const value = asRecord(payload);
   const status = stringValue(value.status);
   const eventId = stringValue(value.eventId);
@@ -204,7 +217,7 @@ function parseSyncState(payload: unknown): EventSyncState | null {
   };
 }
 
-function latestActiveConnection(
+export function latestActiveConnection(
   rows: Array<{
     type: string;
     entity: string;
@@ -301,8 +314,10 @@ export const getConnectionStatus = query({
 });
 
 export const beginConnection = action({
-  args: {},
-  handler: async (ctx): Promise<{ authorizationUrl: string }> => {
+  // includePast: also add events that ended before today (AC-114). Carried
+  // through Google's sign-in inside the signed state.
+  args: { includePast: v.optional(v.boolean()) },
+  handler: async (ctx, args): Promise<{ authorizationUrl: string }> => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
     requireManager(auth.role);
@@ -313,6 +328,7 @@ export const beginConnection = action({
         tenantId,
         nonce: crypto.randomUUID(),
         expiresAt: Date.now() + OAUTH_STATE_TTL_MS,
+        includePast: args.includePast === true,
       },
       environment.clientSecret,
     );
@@ -360,13 +376,18 @@ export const completeConnection = action({
         property: "refreshToken",
       });
       const connectionId = crypto.randomUUID();
+      const connectedAt = Date.now();
+      // AC-114: the basis is recorded in the same row as the connection, so
+      // no sync can run without it.
       await ctx.runMutation(internal.googleCalendar.recordConnection, {
         tenantId,
         connectionId,
         calendarId: CALENDAR_ID,
-        connectedAt: Date.now(),
+        connectedAt,
         connectedBy: auth.id,
         refreshToken: encrypted,
+        basis: newCalendarBasis(connectedAt, state.includePast === true),
+        ...(tokens.scope ? { scopes: tokens.scope } : {}),
       });
       await ctx.scheduler.runAfter(0, internal.googleCalendar.reconcileTenant, {
         tenantId,
@@ -488,6 +509,16 @@ export const recordConnection = internalMutation({
     connectedAt: v.number(),
     connectedBy: v.string(),
     refreshToken: v.object({ ciphertext: v.string(), keyId: v.string() }),
+    basis: v.optional(
+      v.object({
+        direction: v.literal("capsule_to_google"),
+        fieldsOwnedByCapsule: v.array(v.string()),
+        startsFrom: v.number(),
+        includePast: v.boolean(),
+        recordedAt: v.number(),
+      }),
+    ),
+    scopes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await insertStepEvent(ctx, {
@@ -496,6 +527,11 @@ export const recordConnection = internalMutation({
       entityId: args.tenantId,
       payload: args,
       createdAt: args.connectedAt,
+    });
+    await mirrorCalendarConnection(ctx, args.tenantId, {
+      kind: "connected",
+      calendarId: args.calendarId,
+      scopes: args.scopes ?? null,
     });
   },
 });
@@ -513,6 +549,9 @@ export const recordDisconnection = internalMutation({
       entityId: args.tenantId,
       payload: args,
       createdAt: args.disconnectedAt,
+    });
+    await mirrorCalendarConnection(ctx, args.tenantId, {
+      kind: "disconnected",
     });
   },
 });
@@ -568,6 +607,232 @@ export const recordReconciliation = internalMutation({
       payload: args,
       createdAt: args.reconciledAt,
     });
+    // Only a run of the CURRENT connection speaks for it.
+    const rows = await ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
+      .collect();
+    if (latestActiveConnection(rows)?.connectionId !== args.connectionId) {
+      return;
+    }
+    await mirrorCalendarConnection(
+      ctx,
+      args.tenantId,
+      args.status === "ok"
+        ? { kind: "synced" }
+        : {
+            kind: "failed",
+            reason:
+              args.status === "needs_reconnect"
+                ? "Google no longer accepts Capsule's access. Connect again."
+                : `${args.failed} event${args.failed === 1 ? "" : "s"} did not reach Google Calendar${args.error ? `: ${args.error}` : "."}`,
+          },
+    );
+  },
+});
+
+type EventSyncOutcome =
+  | { status: "synced" | "deleted" | "skipped" }
+  | { status: "failed"; error: string };
+
+/**
+ * Brings ONE event's calendar entry in line with Capsule and records the
+ * answer. Shared by the full run and the one-event retry, so both write under
+ * the same Google id (one entry per event, never a second one).
+ */
+async function syncOneEvent(
+  ctx: ActionCtx,
+  input: {
+    tenantId: string;
+    connection: ConnectionPayload;
+    accessToken: string;
+    event: Doc<"events">;
+    state: EventSyncState | undefined;
+    /** Retry: send even when the last sent copy looks current. */
+    force: boolean;
+  },
+): Promise<EventSyncOutcome> {
+  const { event, state, connection } = input;
+  const eventId = String(event._id);
+  const googleEventId = await googleCalendarEventId(eventId);
+  // AC-114: events outside the recorded basis are left off - unless Capsule
+  // already put them there, then Capsule keeps them current.
+  const eligible =
+    event.deletedAt == null &&
+    CALENDAR_ELIGIBLE_STAGES.has(String(event.stage)) &&
+    event.startsAt != null &&
+    event.endsAt != null &&
+    (eventInCalendarBasis(connection.basis, event.endsAt as number) ||
+      (state != null && state.status !== "deleted"));
+  try {
+    if (eligible) {
+      const resource = buildGoogleCalendarEvent({
+        eventId,
+        title: event.title,
+        startsAt: event.startsAt as number,
+        endsAt: event.endsAt as number,
+        venueName: event.venueName,
+        venueAddress: event.venueAddress,
+        expectedHeadcount: event.expectedHeadcount,
+      });
+      const signature = await googleCalendarEventSignature(resource);
+      if (
+        !input.force &&
+        state?.connectionId === connection.connectionId &&
+        state.status === "synced" &&
+        state.signature === signature
+      ) {
+        return { status: "skipped" };
+      }
+      await upsertGoogleCalendarEvent({
+        accessToken: input.accessToken,
+        calendarId: connection.calendarId,
+        eventId: googleEventId,
+        resource,
+        previouslySynced: state?.status === "synced",
+      });
+      await ctx.runMutation(internal.googleCalendar.recordEventSync, {
+        tenantId: input.tenantId,
+        eventId,
+        connectionId: connection.connectionId,
+        googleEventId,
+        signature,
+        status: "synced",
+        syncedAt: Date.now(),
+        error: null,
+      });
+      return { status: "synced" };
+    }
+    if (state && state.status !== "deleted") {
+      await deleteGoogleCalendarEvent({
+        accessToken: input.accessToken,
+        calendarId: connection.calendarId,
+        eventId: googleEventId,
+      });
+      await ctx.runMutation(internal.googleCalendar.recordEventSync, {
+        tenantId: input.tenantId,
+        eventId,
+        connectionId: connection.connectionId,
+        googleEventId,
+        signature: null,
+        status: "deleted",
+        syncedAt: Date.now(),
+        error: null,
+      });
+      return { status: "deleted" };
+    }
+    return { status: "skipped" };
+  } catch (cause) {
+    const error = safeGoogleProviderMessage(cause);
+    await ctx.runMutation(internal.googleCalendar.recordEventSync, {
+      tenantId: input.tenantId,
+      eventId,
+      connectionId: connection.connectionId,
+      googleEventId,
+      signature: state?.signature ?? null,
+      status: "failed",
+      syncedAt: Date.now(),
+      error,
+    });
+    return { status: "failed", error };
+  }
+}
+
+export const loadEventSyncContext = internalQuery({
+  args: { tenantId: v.string(), eventId: v.id("events") },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    connection: ConnectionPayload;
+    event: Doc<"events">;
+    state: EventSyncState | null;
+  } | null> => {
+    const connectionRows = await ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
+      .collect();
+    const connection = latestActiveConnection(connectionRows);
+    const event = await ctx.db.get(args.eventId);
+    if (!connection || !event || event.tenantId !== args.tenantId) return null;
+    const syncRows = await ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entityId", (q) => q.eq("entityId", String(args.eventId)))
+      .collect();
+    const latest = syncRows
+      .filter(
+        (row) =>
+          row.entity === CALENDAR_EVENT_ENTITY &&
+          asRecord(row.payload).tenantId === args.tenantId,
+      )
+      .sort((left, right) => right.createdAt - left.createdAt)[0];
+    return {
+      connection,
+      event,
+      state: latest ? parseSyncState(latest.payload) : null,
+    };
+  },
+});
+
+/**
+ * AC-113 scoped retry: send ONE event to Google Calendar again, now, without
+ * waiting for the next run and without touching any other event.
+ */
+export const retryEvent = action({
+  args: { eventId: v.id("events") },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ status: EventSyncOutcome["status"]; error: string | null }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    requireManager(auth.role);
+    const context: {
+      connection: ConnectionPayload;
+      event: Doc<"events">;
+      state: EventSyncState | null;
+    } | null = await ctx.runQuery(
+      internal.googleCalendar.loadEventSyncContext,
+      {
+        tenantId,
+        eventId: args.eventId,
+      },
+    );
+    if (!context) {
+      throw new ConvexError(
+        "Google Calendar is not connected, or this event is not in your workspace.",
+      );
+    }
+    let accessToken: string;
+    try {
+      const refreshToken = await decrypt(
+        context.connection.refreshToken.ciphertext,
+        context.connection.refreshToken.keyId,
+        { ctx, entity: CONNECTION_ENTITY, property: "refreshToken" },
+      );
+      accessToken = (
+        await refreshGoogleAccessToken(providerEnvironment(), refreshToken)
+      ).accessToken;
+    } catch (cause) {
+      const error = safeGoogleProviderMessage(cause);
+      throw new ConvexError(
+        /invalid_grant|revoked|expired/iu.test(error)
+          ? "Google no longer accepts Capsule's access. Connect Google Calendar again on the Integrations page."
+          : "Google Calendar did not answer. Capsule tries again by itself; you can also try later.",
+      );
+    }
+    const outcome = await syncOneEvent(ctx, {
+      tenantId,
+      connection: context.connection,
+      accessToken,
+      event: context.event,
+      state: context.state ?? undefined,
+      force: true,
+    });
+    return {
+      status: outcome.status,
+      error: outcome.status === "failed" ? outcome.error : null,
+    };
   },
 });
 
@@ -645,88 +910,21 @@ export const reconcileTenant = internalAction({
     };
 
     for (const event of context.events) {
-      const eventId = String(event._id);
-      const googleEventId = await googleCalendarEventId(eventId);
-      const state = states.get(eventId);
-      const eligible =
-        event.deletedAt == null &&
-        CALENDAR_ELIGIBLE_STAGES.has(String(event.stage)) &&
-        event.startsAt != null &&
-        event.endsAt != null;
-      try {
-        if (eligible) {
-          const resource = buildGoogleCalendarEvent({
-            eventId,
-            title: event.title,
-            startsAt: event.startsAt as number,
-            endsAt: event.endsAt as number,
-            venueName: event.venueName,
-            venueAddress: event.venueAddress,
-            expectedHeadcount: event.expectedHeadcount,
-          });
-          const signature = await googleCalendarEventSignature(resource);
-          if (
-            state?.connectionId === args.connectionId &&
-            state.status === "synced" &&
-            state.signature === signature
-          ) {
-            result.skipped += 1;
-            continue;
-          }
-          await upsertGoogleCalendarEvent({
-            accessToken,
-            calendarId: context.connection.calendarId,
-            eventId: googleEventId,
-            resource,
-            previouslySynced: state?.status === "synced",
-          });
-          await ctx.runMutation(internal.googleCalendar.recordEventSync, {
-            tenantId: args.tenantId,
-            eventId,
-            connectionId: args.connectionId,
-            googleEventId,
-            signature,
-            status: "synced",
-            syncedAt: Date.now(),
-            error: null,
-          });
-          result.createdOrUpdated += 1;
-        } else if (state && state.status !== "deleted") {
-          await deleteGoogleCalendarEvent({
-            accessToken,
-            calendarId: context.connection.calendarId,
-            eventId: googleEventId,
-          });
-          await ctx.runMutation(internal.googleCalendar.recordEventSync, {
-            tenantId: args.tenantId,
-            eventId,
-            connectionId: args.connectionId,
-            googleEventId,
-            signature: null,
-            status: "deleted",
-            syncedAt: Date.now(),
-            error: null,
-          });
-          result.deleted += 1;
-        } else {
-          result.skipped += 1;
-        }
-      } catch (cause) {
-        const error = safeGoogleProviderMessage(cause);
-        await ctx.runMutation(internal.googleCalendar.recordEventSync, {
-          tenantId: args.tenantId,
-          eventId,
-          connectionId: args.connectionId,
-          googleEventId,
-          signature: state?.signature ?? null,
-          status: "failed",
-          syncedAt: Date.now(),
-          error,
-        });
+      const outcome = await syncOneEvent(ctx, {
+        tenantId: args.tenantId,
+        connection: context.connection,
+        accessToken,
+        event,
+        state: states.get(String(event._id)),
+        force: false,
+      });
+      if (outcome.status === "failed") {
         result.failed += 1;
         result.status = "partial";
-        result.error ??= error;
-      }
+        result.error ??= outcome.error;
+      } else if (outcome.status === "synced") result.createdOrUpdated += 1;
+      else if (outcome.status === "deleted") result.deleted += 1;
+      else result.skipped += 1;
     }
 
     await ctx.runMutation(internal.googleCalendar.recordReconciliation, {
