@@ -3806,6 +3806,25 @@ export const SavedReportDefinitionSchema = z.object({
 
 export type SavedReportDefinition = z.infer<typeof SavedReportDefinitionSchema>;
 
+// Entity: SavedReportSnapshot
+export const SavedReportSnapshotSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  savedReportDefinitionId: z.string().uuid().nullable().optional(),
+  title: z.string().default(""),
+  subjectArea: z.enum(["events", "sales", "inventory", "production", "workforce", "logistics", "finance"]).default("events"),
+  sharingScope: z.enum(["owner_only", "team", "tenant_wide"]).default("owner_only"),
+  figures: z.unknown().default({  }),
+  sourceAsOf: z.coerce.date().nullable().optional(),
+  capturedAt: z.coerce.date().nullable().optional(),
+  capturedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type SavedReportSnapshot = z.infer<typeof SavedReportSnapshotSchema>;
+
 // Entity: ScorecardTarget
 export const ScorecardTargetSchema = z.object({
   id: z.string().uuid(),
@@ -11190,6 +11209,23 @@ export const SavedReportDefinitionUpdateDefinitionParamsSchema = z.object({
 });
 
 export type SavedReportDefinitionUpdateDefinitionParams = z.infer<typeof SavedReportDefinitionUpdateDefinitionParamsSchema>;
+
+// Command: capture on SavedReportSnapshot
+export const SavedReportSnapshotCaptureParamsSchema = z.object({
+  savedReportDefinitionId: z.string().min(1),
+  title: z.string(),
+  subjectArea: z.enum(["events", "sales", "inventory", "production", "workforce", "logistics", "finance"]),
+  sharingScope: z.enum(["owner_only", "team", "tenant_wide"]),
+  figures: z.unknown(),
+  sourceAsOf: z.coerce.date().optional(),
+});
+
+export type SavedReportSnapshotCaptureParams = z.infer<typeof SavedReportSnapshotCaptureParamsSchema>;
+
+// Command: remove on SavedReportSnapshot
+export const SavedReportSnapshotRemoveParamsSchema = z.object({});
+
+export type SavedReportSnapshotRemoveParams = z.infer<typeof SavedReportSnapshotRemoveParamsSchema>;
 
 // Command: retire on ScorecardTarget
 export const ScorecardTargetRetireParamsSchema = z.object({});

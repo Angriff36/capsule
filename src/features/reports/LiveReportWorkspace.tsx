@@ -1,6 +1,18 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Link } from "react-router-dom";
-import { formatCount, formatDate, formatMoney } from "../../lib/format";
+import {
+  formatCount,
+  formatDate,
+  formatMoney,
+  formatTime,
+} from "../../lib/format";
+import { reportStaleNotice, type ReportFreshness } from "./reportSnapshot";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { TableSkeleton } from "../../ui/primitives";
 import { BarChart } from "../../ui/charts/BarChart";
@@ -49,6 +61,12 @@ interface LiveReportWorkspaceProps {
   /** Changes the view at once for every reader; Apply also saves it. */
   onFiltersChange: (filters: ReportFilters) => void;
   leftOut: ReportLeftOut;
+  /** Newest change in the source records; null before they load. */
+  sourceAsOf?: number | null;
+  /** Off-line screens say so instead of calling the figures current. */
+  freshness?: ReportFreshness;
+  /** The report's saved snapshots, under the live result. */
+  snapshots?: ReactNode;
 }
 
 export function LiveReportWorkspace({
@@ -66,7 +84,11 @@ export function LiveReportWorkspace({
   filters,
   onFiltersChange,
   leftOut,
+  sourceAsOf = null,
+  freshness = { live: true, lastLiveAt: null },
+  snapshots,
 }: LiveReportWorkspaceProps) {
+  const staleNotice = reportStaleNotice(freshness, dateTime);
   const [dateWindow, setDateWindow] = useState(savedDateWindow);
   const [chartType, setChartType] = useState(savedChartType);
   const controlsLocked = busy || !canEditSettings;
@@ -87,7 +109,7 @@ export function LiveReportWorkspace({
       <div className="live-report-heading">
         <div>
           <div className="live-report-eyebrow">
-            <span>Current data</span>
+            <span>{staleNotice ? "Not up to date" : "Current data"}</span>
             <span>{formatStatusLabel(subject)}</span>
             <span>{REPORT_DATE_WINDOW_LABELS[savedDateWindow]}</span>
           </div>
@@ -95,6 +117,9 @@ export function LiveReportWorkspace({
           <p>
             This result stays connected to what's happening in Capsule now, and
             updates when its source changes.
+            {sourceAsOf != null && model
+              ? ` Figures as of ${dateTime(sourceAsOf)}, the newest change in its records.`
+              : ""}
           </p>
         </div>
         <span className="live-report-sharing">
@@ -164,6 +189,16 @@ export function LiveReportWorkspace({
         </p>
       )}
 
+      {staleNotice ? (
+        <p
+          className="live-report-notice"
+          role="alert"
+          data-testid="report-stale-notice"
+        >
+          {staleNotice}
+        </p>
+      ) : null}
+
       {usedChartFallback ? (
         <p className="live-report-notice" role="status">
           This saved report used an unsupported chart type, so Capsule opened it
@@ -191,11 +226,16 @@ export function LiveReportWorkspace({
           leftOut={leftOut}
         />
       ) : null}
+      {snapshots}
     </section>
   );
 }
 
-function ReportResult({
+function dateTime(value: number): string {
+  return `${formatDate(value)} ${formatTime(value)}`;
+}
+
+export function ReportResult({
   reportName,
   chartType,
   model,

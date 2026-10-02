@@ -2569,35 +2569,35 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "This person's hourly rate can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
   - effects: PersonPayRateSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 76 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 78 more
 - `mutations.Person_setSchedulingHold` (Person.setSchedulingHold)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonSchedulingHoldSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 76 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 78 more
 - `mutations.Person_setSmsAlerts` (Person.setSmsAlerts)
   - inputs from the screen: optIn; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonSmsAlertsChanged
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 76 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 78 more
 - `mutations.Person_setStaffingVendor` (Person.setStaffingVendor)
   - inputs from the screen: vendorName; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonStaffingVendorSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 76 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 78 more
 - `mutations.Person_setWorkPreferences` (Person.setWorkPreferences)
   - inputs from the screen: preferredRoles, approvedWorkLocations; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonWorkPreferencesSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 76 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 78 more
 - `mutations.PrepTask_claim` (PrepTask.claim)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -4107,7 +4107,7 @@ Screens (65): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see unfinished reports; a just-for-you report can only be seen by its owner or a manager"; "Staff may update saved reports"; "Staff may change saved reports"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: SavedReportDefinitionCreated
-  - refresh: live reads update by themselves; reads affected: SavedReportDefinition.list, SavedReportDefinition.get, Person.list, Person.get
+  - refresh: live reads update by themselves; reads affected: SavedReportDefinition.list, SavedReportDefinition.get, Person.list, Person.get, SavedReportSnapshot.list, SavedReportSnapshot.get
 - `mutations.TaxRate_createViaDefine` (TaxRate.define)
   - inputs from the screen: name, percentage, appliesToFood, appliesToService, appliesToRental; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)

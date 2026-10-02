@@ -686,6 +686,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.SavedReportDefinition_createViaCreateDefinition, { "name": "SavedReportDefinition 1", "subjectArea": "demo-subjectArea-1", "chartType": "demo-chartType-1", "definition": "demo-definition-1", "sharingScope": "demo-sharingScope-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.SavedReportDefinition_createViaCreateDefinition, { "name": "SavedReportDefinition 2", "subjectArea": "demo-subjectArea-2", "chartType": "demo-chartType-2", "definition": "demo-definition-2", "sharingScope": "demo-sharingScope-2" } as any);
+  // SavedReportSnapshot has multiple initialization commands (capture, remove); using the selected initialization command: capture.
+  // SavedReportSnapshot → api.mutations.SavedReportSnapshot_createViaCapture
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.SavedReportSnapshot_createViaCapture, { "savedReportDefinitionId": "savedReportDefinitionId-saved-report-snapshot-1", "title": "SavedReportSnapshot 1", "subjectArea": "demo-subjectArea-1", "sharingScope": "demo-sharingScope-1", "figures": "demo-figures-1", "sourceAsOf": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.SavedReportSnapshot_createViaCapture, { "savedReportDefinitionId": "savedReportDefinitionId-saved-report-snapshot-2", "title": "SavedReportSnapshot 2", "subjectArea": "demo-subjectArea-2", "sharingScope": "demo-sharingScope-2", "figures": "demo-figures-2", "sourceAsOf": 1767355200000 } as any);
   // ScorecardTarget → api.mutations.ScorecardTarget_createViaSet
   rowsAttempted += 1;
   await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-1", "target": 1, "direction": "demo-direction-1", "ownerPersonId": "ownerPersonId-scorecard-target-1", "notes": "demo-notes-1" } as any);
@@ -1632,6 +1638,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "SavedReportDefinition",
       "createMutation": "SavedReportDefinition_createViaCreateDefinition",
+      "rowCount": 2
+    },
+    {
+      "entity": "SavedReportSnapshot",
+      "createMutation": "SavedReportSnapshot_createViaCapture",
       "rowCount": 2
     },
     {

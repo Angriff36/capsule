@@ -43,6 +43,8 @@ import {
   type ReportFilters,
 } from "./reportFilters";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
+import { ReportSnapshots } from "./ReportSnapshots";
+import { useReportFreshness } from "./useReportFreshness";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
 import { TppReportCatalog } from "./tpp/TppReportCatalog";
 
@@ -466,6 +468,7 @@ function SelectedReport({
   ) => void;
 }) {
   const authStatus = useAuthStatus();
+  const freshness = useReportFreshness();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchKey = searchParams.toString();
   // The page address wins, so a copied link opens the view it was sent with.
@@ -516,7 +519,7 @@ function SelectedReport({
       dateWindow={definition.dateWindow}
       filters={filters}
     >
-      {({ model, loading, sourceAvailable, leftOut }) => (
+      {({ model, loading, sourceAvailable, leftOut, sourceAsOf }) => (
         <LiveReportWorkspace
           report={report}
           subject={subject}
@@ -538,6 +541,21 @@ function SelectedReport({
             })
           }
           leftOut={leftOut}
+          sourceAsOf={sourceAsOf}
+          freshness={freshness}
+          snapshots={
+            <ReportSnapshots
+              report={report}
+              subject={subject}
+              model={model}
+              chartType={chart.chartType}
+              dateWindow={definition.dateWindow}
+              filters={filters}
+              leftOut={leftOut}
+              sourceAsOf={sourceAsOf}
+              canTake={!loading && sourceAvailable && freshness.live}
+            />
+          }
         />
       )}
     </LiveReportData>

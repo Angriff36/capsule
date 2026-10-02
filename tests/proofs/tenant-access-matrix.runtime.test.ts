@@ -166,6 +166,7 @@ const LINK_TABLE: Record<string, string> = {
   cancelledById: "@sign-in",
   capsuleId: "events",
   capturedByAuthSubjectId: "@sign-in",
+  capturedByPersonId: "people",
   channelId: "@outside",
   checkedByPersonId: "people",
   checklistTemplateId: "eventChecklists",

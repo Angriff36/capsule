@@ -721,6 +721,8 @@ import {
   SavedReportDefinitionRenameParamsSchema,
   SavedReportDefinitionRestoreParamsSchema,
   SavedReportDefinitionUpdateDefinitionParamsSchema,
+  SavedReportSnapshotCaptureParamsSchema,
+  SavedReportSnapshotRemoveParamsSchema,
   ScorecardTargetRetireParamsSchema,
   ScorecardTargetReviseParamsSchema,
   ScorecardTargetSetParamsSchema,
@@ -10790,6 +10792,47 @@ export function useCreateSavedReportDefinition() {
   };
 }
 
+/** Reactive list for SavedReportSnapshot. */
+export function useListSavedReportSnapshot() {
+  return useQuery(api.queries.listSavedReportSnapshot);
+}
+
+/** Reactive get-by-id for SavedReportSnapshot. Pass "skip" to suspend. */
+export function useGetSavedReportSnapshot(id: string | "skip") {
+  return useQuery(api.queries.getSavedReportSnapshot, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SavedReportSnapshot.capture. */
+export function useSavedReportSnapshotCapture() {
+  const mutate = useMutation(api.mutations.SavedReportSnapshot_capture);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SavedReportSnapshotCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SavedReportSnapshot.remove. */
+export function useSavedReportSnapshotRemove() {
+  const mutate = useMutation(api.mutations.SavedReportSnapshot_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SavedReportSnapshotRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SavedReportSnapshot.capture. */
+export function useCreateSavedReportSnapshot() {
+  const mutate = useMutation(api.mutations.SavedReportSnapshot_createViaCapture);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SavedReportSnapshotCaptureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for ScorecardTarget. */
 export function useListScorecardTarget() {
   return useQuery(api.queries.listScorecardTarget);
@@ -13564,4 +13607,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1436 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1441 as const;

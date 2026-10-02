@@ -15,6 +15,7 @@ import type { ReportSubjectArea } from "./ReportCreateForm";
 import { buildLiveReportModel } from "./liveReportBuilders";
 import { canReadReportSubject } from "./liveReportSubjectAccess";
 import { rowsWithActualPayments } from "./liveReportPayments";
+import { reportSourceAsOf } from "./reportSnapshot";
 import type { LiveReportModel, ReportDateWindow } from "./liveReportModel";
 import {
   applyReportEventFilters,
@@ -37,6 +38,8 @@ interface LiveReportDataState {
   loading: boolean;
   sourceAvailable: boolean;
   leftOut: ReportLeftOut;
+  /** Newest change in the source records (reportSnapshot.ts). */
+  sourceAsOf: number | null;
 }
 
 interface LiveReportDataProps {
@@ -182,6 +185,10 @@ function ResolvedModel({
         reportFilterRange(filters),
       ),
       leftOut: { noEvent: filtered.noEvent, filteredOut: filtered.filteredOut },
+      sourceAsOf: reportSourceAsOf(
+        rows,
+        subject === "finance" ? paymentRows : undefined,
+      ),
     };
   }, [
     dateWindow,
@@ -198,5 +205,6 @@ function ResolvedModel({
     sourceAvailable,
     model: result?.model ?? null,
     leftOut: result?.leftOut ?? { noEvent: 0, filteredOut: 0 },
+    sourceAsOf: result?.sourceAsOf ?? null,
   });
 }

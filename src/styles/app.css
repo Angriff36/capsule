@@ -3264,6 +3264,26 @@
   font-size: 13px;
 }
 
+.live-report-snapshots {
+  border-top: 1px solid var(--color-line-2);
+}
+
+.live-report-snapshot-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.75rem;
+}
+
+.live-report-snapshot-list > li {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.live-report-snapshot {
+  border-top: 1px solid var(--color-line);
+}
+
 .report-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
