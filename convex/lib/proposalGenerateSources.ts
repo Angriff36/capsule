@@ -171,8 +171,10 @@ export async function findGeneratedDraft(
   if (generated) return generated;
   // The inquiry conversion links an empty draft to the event; building the
   // proposal fills that draft instead of starting a second one. A draft
-  // someone already priced by hand is never taken over.
+  // someone already priced by hand, or a change of an earlier proposal, is
+  // never taken over.
   for (const draft of drafts) {
+    if (draft.replacesProposalId != null) continue;
     if (!(await hasHandEnteredContent(ctx, draft._id))) return draft;
   }
   return null;
