@@ -2087,8 +2087,122 @@ describe.sequential(
       },
       LONG,
     );
+
+    it(
+      "golden event 22: Replay every external request and reaction; prove no duplicate business record or side effect",
+      async () => {
+        const counts = async () => {
+          const out: Record<string, number> = {};
+          for (const table of BUSINESS_TABLES)
+            out[table] = (
+              await liveRows<{ tenantId: string }>(w.owner, table, TENANT)
+            ).length;
+          for (const type of ["ProposalAccepted", "SignatureCompleted"])
+            out[type] = (await emitted(w, type)).length;
+          return out;
+        };
+        const before = await counts();
+        const anaSelf = w.proof.asRole({
+          subject: `crew-ana-${TENANT}`,
+          role: "event_staff",
+          tenantId: TENANT,
+        });
+
+        // The public form is sent again: same submission, nothing new.
+        const again = await action<{
+          submissionId: string;
+          isDuplicate: boolean;
+        }>(w.owner, api.quoteBuilder.submitQuote, {
+          ...QUOTE,
+          eventDate: WEEK.golden.startsAt,
+          eventEndTime: WEEK.golden.endsAt,
+        });
+        expect(again.isDuplicate).toBe(true);
+        // Converting it again is refused.
+        await expect(
+          action(w.owner, api.quoteBuilder.processQuoteSubmission, {
+            submissionId: again.submissionId,
+          }),
+        ).rejects.toThrow(/Only pending submissions can be converted/);
+        // The signing link is opened and clicked again.
+        const [request] = await liveRows<{ tenantId: string; _id: string }>(
+          w.owner,
+          "signatureRequests",
+          TENANT,
+        );
+        const click = (await w.raw.mutation(
+          api.signatureAcceptance.completeSignature,
+          { token: request._id } as never,
+        )) as { ok: boolean };
+        expect(click.ok).toBe(true);
+        // The phone retries a clock-in and a pack count with the same key.
+        const replayed = (await w.proof.executeCommand(
+          anaSelf,
+          M.TimeRecord_createViaClockIn,
+          {
+            personId: (
+              await readRow<{ personId: string }>(w.owner, facts.clockInId)
+            ).personId,
+            idempotencyKey: "golden-ana-clock-in",
+          } as never,
+        )) as { docId: string };
+        expect(replayed.docId).toBe(facts.clockInId);
+        // Follow-up work runs again: food amounts, day-of forms, field
+        // setup and the scheduled follow-ups find nothing to add.
+        await w.owner.mutation(api.culinaryDemand.reconcileEventDemand, {
+          eventId: id.golden,
+        } as never);
+        expect(
+          await w.owner.mutation(
+            (api.lib.eventPacket.finalLock as unknown as Record<string, never>)
+              .prepareFieldForms,
+            { eventId: id.golden } as never,
+          ),
+        ).toEqual({ prepared: 0 });
+        vi.useFakeTimers();
+        try {
+          await settle(w.raw);
+        } finally {
+          vi.useRealTimers();
+        }
+
+        expect(await counts()).toEqual(before);
+      },
+      LONG,
+    );
   },
 );
+
+/** Every business record the journey writes; a replay may add none. */
+const BUSINESS_TABLES = [
+  "clients",
+  "clientContacts",
+  "leads",
+  "events",
+  "proposals",
+  "proposalRevisions",
+  "signatureRequests",
+  "eventDishes",
+  "ingredientDemands",
+  "eventIngredientContributions",
+  "purchaseNeeds",
+  "vendorOrders",
+  "vendorOrderLines",
+  "inventoryLots",
+  "prepTasks",
+  "packLists",
+  "packListItems",
+  "eventAssignments",
+  "shifts",
+  "timeRecords",
+  "wasteRecords",
+  "fieldConfirmations",
+  "equipmentReservations",
+  "equipmentIssues",
+  "invoices",
+  "payments",
+  "eventCloseouts",
+] as const;
 
 async function routeFacts() {
   const rows = (await w.owner.run(async (ctx) =>
