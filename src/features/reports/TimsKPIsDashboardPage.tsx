@@ -29,6 +29,7 @@ import {
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
+import { KpiRecordList } from "./KpiRecordList";
 
 /**
  * Tim's KPIs Dashboard (Priority 35)
@@ -477,6 +478,12 @@ export function TimsKPIsDashboardPage() {
       ) : null}
 
       <DashboardGrid items={dashboardItems} />
+
+      <KpiRecordList
+        events={events ?? []}
+        closeouts={closeouts ?? []}
+        leads={leads ?? []}
+      />
 
       {/* Reconciliation Note */}
       <div className="mt-6 rounded-sm border border-line bg-inset p-4">

@@ -55,6 +55,13 @@ export function isQualifiedLead(lead: { readonly stage?: string | null }) {
   return QUALIFIED_LEAD_STAGES.includes(lead.stage ?? "");
 }
 
+/** The sales compensation basis named in the spec (§7.4): 3% of booked revenue. */
+export const COMMISSION_BASIS_RATE = 0.03;
+
+export function commissionBasis(bookedRevenue: number): number {
+  return Math.round(bookedRevenue * COMMISSION_BASIS_RATE * 100) / 100;
+}
+
 /** top / bottom as a percent, or null when there is nothing to divide by. */
 export function percentOf(top: number, bottom: number): number | null {
   return bottom > 0 ? (top / bottom) * 100 : null;

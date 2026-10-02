@@ -10,6 +10,7 @@ import {
   eventServiceStyleKey,
   eventServiceStyleLabel,
 } from "../events/eventServiceStyle";
+import { breakdownBy } from "./avgEventBreakdowns";
 import {
   DashboardGrid,
   type DashboardGridSize,
@@ -166,162 +167,73 @@ export function AvgEventValueGrowthDashboardPage() {
   // Breakdown by service style
   const byServiceStyle = useMemo(() => {
     if (!serviceStyles) return [];
-
-    const styleMap = new Map<
-      string,
-      {
-        label: string;
-        totalRevenue: number;
-        eventCount: number;
-        totalHeadcount: number;
-      }
-    >();
-
-    completedEvents.forEach((event) => {
-      const styleId = eventServiceStyleKey(event);
-      if (!styleMap.has(styleId)) {
-        styleMap.set(styleId, {
-          label: eventServiceStyleLabel(event),
-          totalRevenue: 0,
-          eventCount: 0,
-          totalHeadcount: 0,
-        });
-      }
-      const data = styleMap.get(styleId)!;
-      data.totalRevenue += event.quotedPrice || 0;
-      data.eventCount += 1;
-      data.totalHeadcount += event.expectedHeadcount || 0;
-    });
-
-    return Array.from(styleMap.entries())
-      .map(([styleId, data]) => {
-        const style = serviceStyles.find((s) => s._id === styleId);
-        return {
-          serviceStyle: style?.name || data.label,
-          avgEventValue: data.totalRevenue / data.eventCount,
-          eventCount: data.eventCount,
-          totalRevenue: data.totalRevenue,
-          revenuePerHead:
-            data.totalHeadcount > 0
-              ? data.totalRevenue / data.totalHeadcount
-              : 0,
-        };
-      })
-      .sort((a, b) => b.avgEventValue - a.avgEventValue);
+    return breakdownBy(
+      completedEvents,
+      (event) => eventServiceStyleKey(event),
+      (styleId, event) =>
+        serviceStyles.find((s) => s._id === styleId)?.name ||
+        eventServiceStyleLabel(event),
+      "No service style",
+    ).map((row) => ({
+      serviceStyle: row.label,
+      avgEventValue: row.avgEventValue,
+      eventCount: row.eventCount,
+      totalRevenue: row.totalRevenue,
+      revenuePerHead: row.revenuePerHead ?? 0,
+    }));
   }, [completedEvents, serviceStyles]);
 
   // Breakdown by occasion
   const byOccasion = useMemo(() => {
     if (!occasions) return [];
-
-    const occasionMap = new Map<
-      string,
-      { totalRevenue: number; eventCount: number; totalHeadcount: number }
-    >();
-
-    completedEvents.forEach((event) => {
-      const occasionId = event.occasionId || "unknown";
-      if (!occasionMap.has(occasionId)) {
-        occasionMap.set(occasionId, {
-          totalRevenue: 0,
-          eventCount: 0,
-          totalHeadcount: 0,
-        });
-      }
-      const data = occasionMap.get(occasionId)!;
-      data.totalRevenue += event.quotedPrice || 0;
-      data.eventCount += 1;
-      data.totalHeadcount += event.expectedHeadcount || 0;
-    });
-
-    return Array.from(occasionMap.entries())
-      .map(([occasionId, data]) => {
-        const occasion = occasions.find((o) => o._id === occasionId);
-        return {
-          occasion: occasion?.name || occasionId,
-          avgEventValue: data.totalRevenue / data.eventCount,
-          eventCount: data.eventCount,
-          totalRevenue: data.totalRevenue,
-        };
-      })
-      .sort((a, b) => b.avgEventValue - a.avgEventValue);
+    return breakdownBy(
+      completedEvents,
+      (event) => event.occasionId,
+      (id) => occasions.find((o) => o._id === id)?.name || "Occasion not found",
+      "No occasion",
+    ).map((row) => ({
+      occasion: row.label,
+      avgEventValue: row.avgEventValue,
+      eventCount: row.eventCount,
+      totalRevenue: row.totalRevenue,
+    }));
   }, [completedEvents, occasions]);
 
   // Breakdown by venue
   const byVenue = useMemo(() => {
     if (!venues) return [];
-
-    const venueMap = new Map<
-      string,
-      { totalRevenue: number; eventCount: number; totalHeadcount: number }
-    >();
-
-    completedEvents.forEach((event) => {
-      const venueId = event.venueId || "unknown";
-      if (!venueMap.has(venueId)) {
-        venueMap.set(venueId, {
-          totalRevenue: 0,
-          eventCount: 0,
-          totalHeadcount: 0,
-        });
-      }
-      const data = venueMap.get(venueId)!;
-      data.totalRevenue += event.quotedPrice || 0;
-      data.eventCount += 1;
-      data.totalHeadcount += event.expectedHeadcount || 0;
-    });
-
-    return Array.from(venueMap.entries())
-      .map(([venueId, data]) => {
-        const venue = venues.find((v) => v._id === venueId);
-        return {
-          venue: venue?.name || venueId,
-          avgEventValue: data.totalRevenue / data.eventCount,
-          eventCount: data.eventCount,
-          totalRevenue: data.totalRevenue,
-        };
-      })
-      .sort((a, b) => b.avgEventValue - a.avgEventValue)
-      .slice(0, 10);
+    return breakdownBy(
+      completedEvents,
+      (event) => event.venueId,
+      (id) => venues.find((v) => v._id === id)?.name || "Venue not found",
+      "No venue",
+    ).map((row) => ({
+      venue: row.label,
+      avgEventValue: row.avgEventValue,
+      eventCount: row.eventCount,
+      totalRevenue: row.totalRevenue,
+    }));
   }, [completedEvents, venues]);
 
   // Breakdown by salesperson
   const bySalesperson = useMemo(() => {
     if (!people) return [];
-
-    const salesMap = new Map<
-      string,
-      { totalRevenue: number; eventCount: number; totalHeadcount: number }
-    >();
-
-    completedEvents.forEach((event) => {
-      const salesId = event.assignedToId || "unassigned";
-      if (!salesMap.has(salesId)) {
-        salesMap.set(salesId, {
-          totalRevenue: 0,
-          eventCount: 0,
-          totalHeadcount: 0,
-        });
-      }
-      const data = salesMap.get(salesId)!;
-      data.totalRevenue += event.quotedPrice || 0;
-      data.eventCount += 1;
-      data.totalHeadcount += event.expectedHeadcount || 0;
-    });
-
-    return Array.from(salesMap.entries())
-      .map(([salesId, data]) => {
-        const person = people.find((p) => p._id === salesId);
-        return {
-          salesperson: person
-            ? `${person.givenName} ${person.familyName}`.trim()
-            : salesId,
-          avgEventValue: data.totalRevenue / data.eventCount,
-          eventCount: data.eventCount,
-          totalRevenue: data.totalRevenue,
-        };
-      })
-      .sort((a, b) => b.avgEventValue - a.avgEventValue);
+    return breakdownBy(
+      completedEvents,
+      (event) => event.assignedToId,
+      (id) => {
+        const person = people.find((p) => p._id === id);
+        return person
+          ? `${person.givenName} ${person.familyName}`.trim()
+          : "Person not found";
+      },
+      "No salesperson",
+    ).map((row) => ({
+      salesperson: row.label,
+      avgEventValue: row.avgEventValue,
+      eventCount: row.eventCount,
+      totalRevenue: row.totalRevenue,
+    }));
   }, [completedEvents, people]);
 
   // Event size vs value correlation

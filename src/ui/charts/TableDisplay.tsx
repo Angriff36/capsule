@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { clsx } from "@/lib/utils";
 import { formatMoney, formatCount, formatDate } from "@/lib/format";
 
@@ -30,6 +31,8 @@ export interface TableColumn {
   align?: "left" | "center" | "right";
   sortable?: boolean;
   format?: (value: unknown) => string;
+  /** Makes the cell a link to the record behind it (null = plain text). */
+  href?: (row: Record<string, unknown>) => string | null;
 }
 
 export interface TableDisplayProps {
@@ -196,7 +199,13 @@ export function TableDisplay({
                       alignClass[col.align || "left"],
                     )}
                   >
-                    {formatValue(row[col.key], col)}
+                    {col.href?.(row) ? (
+                      <Link to={col.href(row)!} className="btn-link">
+                        {formatValue(row[col.key], col)}
+                      </Link>
+                    ) : (
+                      formatValue(row[col.key], col)
+                    )}
                   </td>
                 ))}
               </tr>

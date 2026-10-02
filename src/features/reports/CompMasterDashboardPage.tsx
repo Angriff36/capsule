@@ -13,6 +13,7 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
+import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { calculateCommissionMetrics } from "./compMasterValues";
 import { MetricDefinitionList } from "./MetricDefinitionList";
 
@@ -78,10 +79,13 @@ export function CompMasterDashboardPage() {
         !cancelledEventIds.has(String(attr.eventId)),
     )
     .map((attr) => ({
+      attributionId: String(attr._id),
+      eventId: String(attr.eventId),
       event: eventName.get(String(attr.eventId)) ?? "Unknown event",
       salesperson:
         personName.get(String(attr.salespersonId)) ?? "Unknown salesperson",
       commission: Number(attr.allocatedAmount) || 0,
+      appliedAt: attr.appliedAt ?? null,
       status: "Applied",
     }))
     .sort((a, b) => b.commission - a.commission);
@@ -175,7 +179,12 @@ export function CompMasterDashboardPage() {
       content: (
         <TableDisplay
           columns={[
-            { key: "event", header: "Event", type: "string" as const },
+            {
+              key: "event",
+              header: "Event",
+              type: "string" as const,
+              href: (row) => `/events/${String(row.eventId)}`,
+            },
             {
               key: "salesperson",
               header: "Salesperson",
@@ -185,7 +194,12 @@ export function CompMasterDashboardPage() {
               key: "commission",
               header: "Allocated Commission",
               type: "currency" as const,
+              href: (row) =>
+                FINANCE_ROUTES.revenueAttributionDetail(
+                  String(row.attributionId),
+                ),
             },
+            { key: "appliedAt", header: "Applied", type: "date" as const },
             {
               key: "status",
               header: "Attribution Status",
@@ -221,7 +235,8 @@ export function CompMasterDashboardPage() {
           Only revenue attribution entries marked as sales commission with a
           status of applied are included. Allocated amount is already the
           commission amount; no percentage or payment status is inferred.
-          Cancelled events are excluded consistently.
+          Cancelled events are excluded consistently. Open an event or an amount
+          in the list to see the record behind it.
         </p>
       </div>
       <MetricDefinitionList

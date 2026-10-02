@@ -98,6 +98,16 @@ export const DASHBOARD_METRICS = {
     currency: "company",
     tax: QUOTED_TAX,
   },
+  "dashboard.commission_basis": {
+    ...BOOKED_BASE,
+    label: "3% basis",
+    measures:
+      "Booked revenue of the events a salesperson is assigned to, times 3%. A guide figure; the amount actually owed is the applied split on Comp Master.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    leftOut:
+      "Quotes, planning, waiting-for-approval and cancelled events, events with no quoted price, and events with no salesperson.",
+  },
   "dashboard.completed_revenue": {
     ...COMPLETED_BASE,
     label: "Completed revenue",

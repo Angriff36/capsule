@@ -14,7 +14,9 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { EmptyState, PageHeader } from "@/ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { formatMoney } from "@/lib/format";
 import {
+  commissionBasis,
   isBookedEvent,
   isQualifiedLead,
   NOT_KNOWN,
@@ -142,6 +144,7 @@ export function SalesDashboardPage() {
         revenue: data.revenue,
         count: data.count,
         avgValue: data.count > 0 ? data.revenue / data.count : 0,
+        commissionBasis: commissionBasis(data.revenue),
       }))
       .sort((a, b) => b.revenue - a.revenue);
   }, [events, people]);
@@ -317,6 +320,11 @@ export function SalesDashboardPage() {
             { key: "count", header: "Events", type: "number" as const },
             { key: "revenue", header: "Revenue", type: "currency" as const },
             { key: "avgValue", header: "Avg Value", type: "currency" as const },
+            {
+              key: "commissionBasis",
+              header: "3% Basis",
+              type: "currency" as const,
+            },
           ]}
           data={salespersonData}
           height={300}
@@ -368,8 +376,10 @@ export function SalesDashboardPage() {
       <div className="mt-6 rounded-sm border border-line bg-inset p-4">
         <h4 className="text-xs font-semibold text-ink">Commission Basis</h4>
         <p className="mt-1 text-xs text-ink-2">
-          Sales commissions are calculated at 3% of booked revenue. The Comp
-          Master dashboard has the full commission breakdown by salesperson.
+          The 3% basis column is 3% of each salesperson&apos;s booked revenue (
+          {formatMoney(commissionBasis(revenueMetrics.totalRevenue))} across all
+          salespeople and unassigned events). It is a guide; the amount actually
+          owed is the applied split on the Comp Master dashboard.
         </p>
       </div>
 
@@ -381,6 +391,7 @@ export function SalesDashboardPage() {
           "dashboard.booked_revenue",
           "dashboard.booked_events",
           "dashboard.booked_average",
+          "dashboard.commission_basis",
         ]}
       />
     </div>
