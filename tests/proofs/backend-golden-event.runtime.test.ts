@@ -8,7 +8,10 @@
  * commands and seams the product screens use.
  */
 import { beforeAll, describe, expect, it, vi } from "vitest";
+import { anyApi } from "convex/server";
+import { PDFDocument } from "pdf-lib";
 import { api } from "../../convex/_generated/api";
+import { buildWorkbook } from "../../src/lib/eventPacket/buildWorkbook";
 import {
   action,
   emitted,
@@ -19,6 +22,7 @@ import {
   packLine,
   QUOTE,
   readRow,
+  seedCrew,
   seedOperatorPerson,
   seedWorld,
   TENANT,
@@ -66,7 +70,22 @@ type Converted = {
   errors: string[];
 };
 
+/** What the packet screen reads (lib/eventPacket/commands.getPacket). */
+type PacketRead = {
+  snapshot: Parameters<typeof buildWorkbook>[0];
+  finalLock: {
+    lines: NonNullable<Parameters<typeof buildWorkbook>[1]>["finalLock"];
+  };
+  currentFingerprint: string;
+  finalLockFingerprint: string;
+  latestRevision: { stale: boolean; staleSections: string[] };
+};
+
 let w: World;
+const crew = {
+  lead: { personId: "", subject: "" },
+  server: { personId: "", subject: "" },
+};
 const id = {
   client: "",
   golden: "",
@@ -808,6 +827,135 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       expect(JSON.stringify(readiness)).toContain(
         "packet.final_lock_needs_review",
       );
+    },
+    LONG,
+  );
+
+  it(
+    "golden event 10: Prepare the event packet and verify its eight required sections",
+    async () => {
+      await w.run.events(M.Event_setEventNumber, {
+        docId: id.golden,
+        eventNumber: "7001",
+        version: await versionOf(w, id.golden),
+      });
+      await w.run.events(M.Event_updateSetupNotes, {
+        docId: id.golden,
+        venueSurface: "Grass lawn",
+        rainPlan: "Tent on standby",
+        tentAndFlooring: "20x40 frame tent",
+        handwashing: "Yes, none on site",
+        setupDiagram: "Buffet along the tent's north side, bar by the gate",
+        version: await versionOf(w, id.golden),
+      });
+      const lead = await seedCrew(w, "Lena", "555-0101");
+      const server = await seedCrew(w, "Sam", "555-0199");
+      crew.lead = lead;
+      crew.server = server;
+      const callAt = WEEK.golden.startsAt - 4 * 60 * MIN;
+      for (const [person, role] of [
+        [lead, "Event lead"],
+        [server, "Server"],
+      ] as const)
+        await w.run.owner(M.EventAssignment_createViaAssign, {
+          eventId: id.golden,
+          personId: person.personId,
+          role,
+          startsAt: callAt,
+          endsAt: WEEK.golden.endsAt,
+        });
+
+      const packet = anyApi.lib.eventPacket.commands;
+      const p = (await w.owner.query(packet.getPacket, {
+        eventId: id.golden,
+      })) as PacketRead;
+      const book = buildWorkbook(p.snapshot, { finalLock: p.finalLock.lines });
+      const sectionIds = book.sections.map((s) => s.id);
+      const order = [
+        "brief",
+        "menu",
+        "packlist-item",
+        "packlist-category",
+        "forms",
+        "staffing",
+        "equipment",
+        "venue",
+      ];
+      const at = (sid: string) => sectionIds.indexOf(sid);
+      for (const sid of order) expect(at(sid), sid).toBeGreaterThanOrEqual(0);
+      expect(order.map(at)).toEqual([...order.map(at)].sort((a, b) => a - b));
+      const part = (sid: string) =>
+        book.sections
+          .find((s) => s.id === sid)!
+          .blocks.map((b) => b.text)
+          .join("\n");
+
+      // Printable binder instruction, on the event's own number.
+      expect(p.snapshot.identity.invoiceNumber).toBe("7001");
+      expect(part("brief")).toContain("Event 7001 goes on the spine");
+      expect(part("brief")).not.toContain("Two vegetarian guests");
+      expect(part("menu")).toContain("Golden Caesar - 80 servings");
+      expect(part("packlist-category")).toContain("[ ] Paper cones - 88 each");
+      // Staff call times.
+      const staff = part("staffing");
+      expect(staff).toContain("Lena Crew - Event lead | call ");
+      expect(staff).toContain("Sam Crew - Server | call ");
+      // Rental pull sheet: rented chargers go back to the rental company.
+      const pull = part("equipment");
+      expect(pull).toContain("Gold charger - 80 each | back: Back to");
+      expect(pull).not.toContain("Gold charger - 80 each | back: Our crew");
+      // Route, map and setup drawing.
+      const route = part("venue");
+      expect(route).toContain("Venue: 4 Orchard Road");
+      expect(route).toContain(
+        "https://www.google.com/maps/search/?api=1&query=4%20Orchard%20Road",
+      );
+      expect(route).toContain("Truck run: Isuzu NPR GOLD-1");
+      expect(route).toContain(
+        "Setup: Setup diagram - Buffet along the tent's north side, bar by the gate",
+      );
+
+      // Printed: the stored revision matches the current sources.
+      const doc = await PDFDocument.create();
+      doc.addPage();
+      const pdf = await action<{ storageId: string }>(
+        w.owner,
+        packet.uploadPacketFile,
+        {
+          eventId: id.golden,
+          bytes: (await doc.save()).buffer,
+          name: "workbook.pdf",
+          mimeType: "application/pdf",
+          purpose: "pdf",
+          inputFingerprint: p.currentFingerprint,
+          finalLockFingerprint: p.finalLockFingerprint,
+        },
+      );
+      const snap = await action<{ storageId: string }>(
+        w.owner,
+        packet.uploadPacketFile,
+        {
+          eventId: id.golden,
+          bytes: new TextEncoder().encode(
+            JSON.stringify({ ...p.snapshot, finalLock: p.finalLock }),
+          ).buffer,
+          name: "snapshot.json",
+          mimeType: "application/json",
+          purpose: "snapshot",
+        },
+      );
+      await w.owner.mutation(packet.recordPacketRevision, {
+        eventId: id.golden,
+        inputFingerprint: p.currentFingerprint,
+        finalLockFingerprint: p.finalLockFingerprint,
+        pdfStorageId: pdf.storageId,
+        snapshotStorageId: snap.storageId,
+      });
+      const fresh = (await w.owner.query(packet.getPacket, {
+        eventId: id.golden,
+      })) as PacketRead;
+      expect(fresh.latestRevision.stale).toBe(false);
+      expect(fresh.latestRevision.staleSections).toEqual([]);
     },
     LONG,
   );

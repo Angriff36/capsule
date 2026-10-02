@@ -167,6 +167,28 @@ export async function seedOperatorPerson(w: World): Promise<string> {
   })) as unknown as string;
 }
 
+/** A crew member with a sign-in, so they can do their own day-of steps. */
+export async function seedCrew(
+  w: World,
+  givenName: string,
+  phone: string,
+): Promise<{ personId: string; subject: string }> {
+  const subject = `crew-${givenName.toLowerCase()}-${TENANT}`;
+  const personId = (await w.proof.seedEntity(w.owner, "people", {
+    tenantId: TENANT,
+    givenName,
+    familyName: "Crew",
+    email: `${subject}@example.com`,
+    phone,
+    role: "event_staff",
+    employmentType: "part_time",
+    status: "active",
+    authSubjectId: subject,
+    version: 1,
+  })) as unknown as string;
+  return { personId, subject };
+}
+
 export async function versionOf(w: World, docId: string): Promise<number> {
   return (await readRow<{ version: number }>(w.owner, docId)).version;
 }
