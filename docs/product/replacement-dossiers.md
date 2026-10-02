@@ -143,7 +143,7 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 | Availability across events, repairs, late returns | event Equipment panel | `proofs/availability-realtime`, `proofs/equipment-reservation-conflict` | Built |
 | Rental lines on proposals, approval, changes | `/clients/proposals` Pricing | `proofs/rental-proposal-lines`, `proofs/post-acceptance-change-order` | Built |
 | Approved rentals held for the event | automatic on approval | `proofs/accepted-rental-holds` | Built 2026-10-03 |
-| Vendor rentals and client-owned items | event Rental orders panel, pack list | `proofs/sub-rental-orders` | Built (a shortfall is not turned into a vendor order by itself) |
+| Vendor rentals and client-owned items | event Rental orders panel, pack list | `proofs/sub-rental-orders`, `proofs/accepted-rental-holds` | Built (a short approved item opens the vendor rental form filled in) |
 | Pull, scan, pack, load, deliver, pick up, return, inspect | `/logistics/packs/:id`, `/logistics/dispatch`, `/logistics/returns` | `proofs/pull-inspect-flow`, `proofs/pack-scan-load-truck`, `proofs/custody-trail` | Built |
 | Routes, trucks and trailers, crew, windows | `/logistics/route`, `/logistics/fleet` | `proofs/route-capacity`, `proofs/vehicle-assignment-conflict` | Built |
 | Broken, missing, dirty, late, short to vendor; billing | `/logistics/returns`, event Equipment problems, invoice | `proofs/damage-to-billing`, `proofs/closeout-source-projection` | Built (late returns are read from the return times) |
