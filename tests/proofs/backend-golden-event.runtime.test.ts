@@ -1949,6 +1949,144 @@ describe.sequential(
       },
       LONG,
     );
+
+    it(
+      "golden event 21: Finalize closeout and prove reporting reads the frozen snapshot",
+      async () => {
+        const finance = w.proof.asRole({
+          subject: `finance-${TENANT}`,
+          role: "finance_manager",
+          tenantId: TENANT,
+        });
+        await w.run.events(M.Event_closeOut, {
+          docId: id.golden,
+          version: await versionOf(w, id.golden),
+        });
+        // Lines the records cannot finish yet are typed once, by finance.
+        await w.proof.executeCommand(
+          finance,
+          api.closeoutSources.captureCloseoutFromSources,
+          {
+            eventId: id.golden,
+            entered: { ingredient: 25, labor: 180, headcount: 118 },
+          } as never,
+        );
+        type Closeout = {
+          _id: string;
+          status: string;
+          version: number;
+          actualIngredientCost: number;
+          actualWasteCost: number;
+          actualRevenue: number;
+          totalActualCost: number;
+          sourceSnapshot: string;
+        };
+        const closeout = async () =>
+          (
+            await eventRows<Closeout & { tenantId: string }>(
+              w,
+              "eventCloseouts",
+              id.golden,
+            )
+          )[0];
+        const draft = await closeout();
+        expect(draft).toMatchObject({
+          status: "draft",
+          actualIngredientCost: 25,
+          actualWasteCost: 1,
+          actualRevenue: facts.invoiceTotal,
+        });
+        await w.proof.executeCommand(finance, M.EventCloseout_finalize, {
+          docId: draft._id,
+          version: draft.version,
+        } as never);
+        const frozen = await closeout();
+        expect(frozen.status).toBe("finalized");
+        expect(frozen.sourceSnapshot).toContain(facts.wasteId);
+
+        const report = async () =>
+          (await w.owner.query(api.culinaryDemand.eventFoodCostReport, {
+            eventId: id.golden,
+          } as never)) as {
+            estimated: { knownCost: number };
+            actual: {
+              ingredientCost: number;
+              wasteCost: number;
+              finalized: boolean;
+            } | null;
+            revenue: { amount: number; source: string } | null;
+          };
+        const before = await report();
+        // Estimated versus actual food cost on the completed event (AC-338).
+        expect(before.estimated.knownCost).toBeGreaterThan(0);
+        expect(before.actual).toMatchObject({
+          ingredientCost: 25,
+          wasteCost: 1,
+          finalized: true,
+        });
+        expect(before.revenue).toEqual({
+          amount: facts.invoiceTotal,
+          source: "closeout",
+        });
+
+        // Facts that arrive after finalizing do not move the frozen result:
+        // the rest of the flour comes in and more waste is logged.
+        const flour = await readRow<{
+          orderedQuantity: number;
+          receivedQuantity: number;
+        }>(w.owner, facts.flourLineId);
+        await w.proof.executeCommand(
+          w.roles.procurement,
+          M.VendorOrderLine_recordReceipt,
+          {
+            docId: facts.flourLineId,
+            quantity: flour.orderedQuantity - flour.receivedQuantity,
+            locationId: w.catalog.locationId,
+            unitPrice: 2,
+            supplierLotNumber: "GOLD-LOT-2",
+          } as never,
+        );
+        const flourStock = (
+          await liveRows<{
+            tenantId: string;
+            _id: string;
+            ingredientId: string;
+          }>(w.owner, "inventoryItems", TENANT)
+        ).find((item) => item.ingredientId === w.catalog.ingredientIds[0])!;
+        await w.proof.executeCommand(
+          w.roles.inventory,
+          M.WasteRecord_createViaRecord,
+          {
+            ingredientId: w.catalog.ingredientIds[0],
+            locationId: w.catalog.locationId,
+            inventoryItemId: flourStock._id,
+            quantity: 2,
+            unit: "kilogram",
+            reason: "overproduction",
+            unitCost: 2,
+            eventId: id.golden,
+          } as never,
+        );
+        expect(await closeout()).toEqual(frozen);
+        // The estimate stays live (it prices at the newest receipt); the
+        // actual and the revenue are the frozen closeout's.
+        const after = await report();
+        expect(after.actual).toEqual(before.actual);
+        expect(after.revenue).toEqual(before.revenue);
+        // The frozen result can only change through an audited correction.
+        await expect(
+          w.proof.executeCommand(
+            finance,
+            api.closeoutSources.captureCloseoutFromSources,
+            {
+              eventId: id.golden,
+              entered: { ingredient: 30, labor: 180, headcount: 118 },
+            } as never,
+          ),
+        ).rejects.toThrow(/final/);
+      },
+      LONG,
+    );
   },
 );
 
