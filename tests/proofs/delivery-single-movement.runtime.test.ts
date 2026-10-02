@@ -30,7 +30,10 @@ const M = api.mutations;
 
 describe("delivery single movement (AC-135)", () => {
   it("a replayed schedule/dispatch creates one delivery and one transit record and loaded stamp names the loader", async () => {
-    const { t, owner, plannerActor, plannerId, event } = await timingWorld();
+    // A delivery is the Drop Off service style (#377).
+    const { t, owner, plannerActor, plannerId, event } = await timingWorld({
+      style: "Drop Off",
+    });
     const driver = (
       (await owner.mutation(M.Person_createViaHire, {
         givenName: "Dana",

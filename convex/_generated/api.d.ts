@@ -112,6 +112,7 @@ import type * as lib_cutoverProviders from "../lib/cutoverProviders.js";
 import type * as lib_deliveryState from "../lib/deliveryState.js";
 import type * as lib_demandReconciliation from "../lib/demandReconciliation.js";
 import type * as lib_dishRecipeRepair from "../lib/dishRecipeRepair.js";
+import type * as lib_dropOffDelivery from "../lib/dropOffDelivery.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentHold from "../lib/equipmentHold.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
@@ -413,6 +414,7 @@ declare const fullApi: ApiFromModules<{
   "lib/deliveryState": typeof lib_deliveryState;
   "lib/demandReconciliation": typeof lib_demandReconciliation;
   "lib/dishRecipeRepair": typeof lib_dishRecipeRepair;
+  "lib/dropOffDelivery": typeof lib_dropOffDelivery;
   "lib/encryption": typeof lib_encryption;
   "lib/equipmentHold": typeof lib_equipmentHold;
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;

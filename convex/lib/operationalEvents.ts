@@ -68,6 +68,7 @@ import { queueTimingRecalculation } from "./timingFollowUp";
 import { queueAutoStage } from "./autoStageFollowUp";
 import { handleTravelLegEvent } from "./travelLegEvents";
 import { validateEventVehicleAssignment, validateRigLoadForLine } from "./eventRouteLegRead";
+import { scheduleDropOffDelivery } from "./dropOffDelivery";
 import { assertSignInUnclaimed } from "./personAuthPick";
 import { assertHireNotDuplicate } from "../personEmail";
 import {
@@ -106,6 +107,8 @@ export async function handleManifestEvent(
   }
   if (event.entity === "PackList" && event.type === "PackListPacked") {
     await validatePackReadiness(ctx, event.entityId as Id<"packLists">);
+    // A delivery is the Drop Off service style, not every truck trip (#377).
+    await scheduleDropOffDelivery(ctx, event.payload);
     return;
   }
   // PL-RETURNS: the truck leaving, the return check and the vendor return.

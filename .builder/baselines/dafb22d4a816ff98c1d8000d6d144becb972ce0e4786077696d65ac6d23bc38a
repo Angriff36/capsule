@@ -39288,28 +39288,6 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListId: docId, tenantId: __after.tenantId, eventId: __after.eventId, name: __after.name, previousStatus: previousStatus, status: "packed", packedAt: __after.packedAt, destination: ((((__rel_event != null) && (__rel_event.venueAddress != null)) && (((__rel_event.venueAddress).trim()).length > 0)) ? __rel_event.venueAddress : ((((__rel_event != null) && (__rel_event.venueName != null)) && (((__rel_event.venueName).trim()).length > 0)) ? __rel_event.venueName : "Event site")), windowStartsAt: ((__rel_event != null) ? __rel_event.startsAt : Date.now()), windowEndsAt: ((__rel_event != null) ? __rel_event.endsAt : Date.now()), _subject: { entity: "PackList", command: "markPacked", id: docId } };
     const __manifestEvent0 = { type: "PackListPacked", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: __after.tenantId, eventId: __after.eventId, name: __after.name, previousStatus: previousStatus, status: "packed", packedAt: __after.packedAt, destination: ((((__rel_event != null) && (__rel_event.venueAddress != null)) && (((__rel_event.venueAddress).trim()).length > 0)) ? __rel_event.venueAddress : ((((__rel_event != null) && (__rel_event.venueName != null)) && (((__rel_event.venueName).trim()).length > 0)) ? __rel_event.venueName : "Event site")), windowStartsAt: ((__rel_event != null) ? __rel_event.startsAt : Date.now()), windowEndsAt: ((__rel_event != null) ? __rel_event.endsAt : Date.now()) }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
-    // Reactions
-    const __match0_raw = await ctx.db.query("deliveries").withIndex("by_packListId", (q) => q.eq("packListId", payload.packListId)).collect();
-    const __match0_rows = __match0_raw.filter((d) => (d as any).packListId === payload.packListId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
-    const __match0_id = __match0_rows.length > 0 ? (__match0_rows[0] as any)._id : null;
-    if (__match0_id) {
-      await __runDeliverySchedule(ctx, { docId: __match0_id, packListId: payload.packListId, eventId: payload.eventId, destination: payload.destination, windowStartsAt: payload.windowStartsAt, windowEndsAt: payload.windowEndsAt } as any);
-    } else {
-      const __elseArgs: Record<string, any> = { packListId: payload.packListId, eventId: payload.eventId, destination: payload.destination, windowStartsAt: payload.windowStartsAt, windowEndsAt: payload.windowEndsAt };
-      const __elseDoc: Record<string, any> = {
-        tenantId: __auth.tenantId,
-        destination: "",
-        status: "scheduled",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        version: 0,
-      };
-      for (const __k of ["deletedAt","packListId","eventId","driverId","vehicleId","destination","windowStartsAt","windowEndsAt","notes","status","scheduledAt","departedAt","deliveredAt","failedAt","failureReason","cancelledAt","cancellationReason","departedByPersonId","deliveredByPersonId","receivedByName","deliveryNote","createdAt","updatedAt"] as string[]) {
-        if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
-      }
-      const __elseId = await ctx.db.insert("deliveries", __elseDoc as any);
-      await __runDeliverySchedule(ctx, { docId: __elseId, ...__elseArgs } as any, true);
-    }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "markPacked", emitIndex: 0 });
     return { ...doc, ...updates };
 }
