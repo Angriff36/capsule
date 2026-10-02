@@ -240,6 +240,7 @@ import type * as packSections from "../packSections.js";
 import type * as parallelRun from "../parallelRun.js";
 import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
+import type * as personalDataErasure from "../personalDataErasure.js";
 import type * as personalDataExport from "../personalDataExport.js";
 import type * as proposalEmail from "../proposalEmail.js";
 import type * as publicMenu from "../publicMenu.js";
@@ -527,6 +528,7 @@ declare const fullApi: ApiFromModules<{
   parallelRun: typeof parallelRun;
   personEmail: typeof personEmail;
   personEmployeeNumber: typeof personEmployeeNumber;
+  personalDataErasure: typeof personalDataErasure;
   personalDataExport: typeof personalDataExport;
   proposalEmail: typeof proposalEmail;
   publicMenu: typeof publicMenu;
