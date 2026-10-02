@@ -41,6 +41,33 @@ export function isSendablePhone(phone: string | null | undefined): boolean {
   return digits.length >= 7 && digits.length <= 15;
 }
 
+/** Twilio's code for "this person texted STOP"; it refuses every later text. */
+export const TWILIO_UNSUBSCRIBED_CODE = 21610;
+
+export class TwilioSendError extends Error {
+  constructor(
+    message: string,
+    readonly code: number | null,
+  ) {
+    super(message);
+  }
+}
+
+export function twilioErrorCode(cause: unknown): number | null {
+  return cause instanceof TwilioSendError ? cause.code : null;
+}
+
+/** A stable key for a phone the text service refused (never the number). */
+export async function phoneKey(phone: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(toE164(phone)),
+  );
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 function toE164(phone: string): string {
   const trimmed = phone.trim();
   if (trimmed.startsWith("+")) return `+${trimmed.slice(1).replace(/[^0-9]/gu, "")}`;
@@ -90,7 +117,7 @@ export async function sendSms(args: {
     const detail = payload?.message
       ? `${payload.message}${payload.code ? ` (code ${payload.code})` : ""}`
       : `Twilio send failed (${response.status}).`;
-    throw new Error(detail);
+    throw new TwilioSendError(detail, payload?.code ?? null);
   }
   if (!payload?.sid) {
     throw new Error("Twilio did not return a message id.");

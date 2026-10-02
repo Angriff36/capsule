@@ -262,6 +262,7 @@ import type * as shareLinks from "../shareLinks.js";
 import type * as shiftTimingChanges from "../shiftTimingChanges.js";
 import type * as signatureAcceptance from "../signatureAcceptance.js";
 import type * as smsAlertClaims from "../smsAlertClaims.js";
+import type * as smsAlertTexts from "../smsAlertTexts.js";
 import type * as smsAlerts from "../smsAlerts.js";
 import type * as sourceProvenance from "../sourceProvenance.js";
 import type * as staffSelfReviews from "../staffSelfReviews.js";
@@ -548,6 +549,7 @@ declare const fullApi: ApiFromModules<{
   shiftTimingChanges: typeof shiftTimingChanges;
   signatureAcceptance: typeof signatureAcceptance;
   smsAlertClaims: typeof smsAlertClaims;
+  smsAlertTexts: typeof smsAlertTexts;
   smsAlerts: typeof smsAlerts;
   sourceProvenance: typeof sourceProvenance;
   staffSelfReviews: typeof staffSelfReviews;
