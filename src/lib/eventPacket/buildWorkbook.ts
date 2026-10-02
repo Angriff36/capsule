@@ -207,7 +207,7 @@ export function buildWorkbook(
     "Time not recorded";
   add("cover", "Event workbook / action sheet", [
     text(
-      `${status}\nInvoice ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate}\n${field("eventTitle")}`,
+      `${status}\nEvent ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate}\n${field("eventTitle")}`,
     ),
     text(
       `Revision ${revision} | Inputs current through ${generatedAt}\n${open.length} required open pre-print actions. Known values are printed from native data and imported sources; blanks are unresolved; field forms stay blank for their named owner.`,
