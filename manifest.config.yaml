@@ -104,3 +104,11 @@ projections:
         EventIngredientContribution:
           - fields: [eventId, ingredientId]
             name: by_eventId_and_ingredientId
+        # The events ledger (convex/eventLedger.ts) reads one date-ordered
+        # window at a time instead of every event with its menu tree
+        # (PL-SCALE, AC-172: 10,000 events per tenant).
+        Event:
+          - fields: [tenantId, startsAt]
+            name: by_tenantId_and_startsAt
+          - fields: [tenantId, stage, startsAt]
+            name: by_tenantId_and_stage_and_startsAt

@@ -1091,6 +1091,8 @@ export default defineSchema({
     .index("by_assignedToId", ["assignedToId"])
     .index("by_referralSourceId", ["referralSourceId"])
     .index("by_recurrenceTemplateEventId", ["recurrenceTemplateEventId"])
+    .index("by_tenantId_and_startsAt", ["tenantId", "startsAt"])
+    .index("by_tenantId_and_stage_and_startsAt", ["tenantId", "stage", "startsAt"])
     .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] }),
   eventAllergenChecks: defineTable({
     tenantId: v.string(),

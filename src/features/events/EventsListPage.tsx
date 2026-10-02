@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
+import { api } from "../../lib/api";
 import { formatCount } from "../../lib/format";
-import { useListClient, useListEvent } from "../../lib/manifest-convex-react";
 import { ChevronDownIcon, PlusIcon } from "../../ui/icons";
 import {
   DropdownMenu,
@@ -12,8 +13,6 @@ import {
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { SavedViewsBar } from "../views/SavedViewsBar";
-import { EventArchiveVisibility } from "./eventArchiveVisibility";
-import { clientDisplayName } from "./clientName";
 import { eventImportPath } from "./eventRoutes";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
 import {
@@ -31,6 +30,8 @@ type EventsView = {
 };
 
 const DAY = 86_400_000;
+/** Rows per window; "Show more" adds another window (PL-SCALE). */
+const WINDOW = 200;
 const DONE_STAGES = new Set(["completed", "cancelled", "closed_out"]);
 
 type EventRow = {
@@ -82,8 +83,6 @@ function timeLabel(startsAt: number | null | undefined): string {
 
 export function EventsListPage() {
   const navigate = useNavigate();
-  const events = useListEvent();
-  const clients = useListClient();
   // Open on "Upcoming"; when nothing is upcoming, fall back to "All" so the
   // page never opens empty. A user choice always wins.
   const [chosenTab, setTab] = useState<Tab | null>(null);
@@ -94,56 +93,71 @@ export function EventsListPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   // Archived events stay out of the ledger until the operator asks for them.
   const [showArchived, setShowArchived] = useState(false);
+  const [limit, setLimit] = useState(WINDOW);
+  // The read takes the start of today, so it does not re-run every render.
+  const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
   const now = Date.now();
+  const tab: Tab = chosenTab ?? "upcoming";
 
-  const live = useMemo(
-    () => EventArchiveVisibility.visibleRows(events, { showArchived }),
-    [events, showArchived],
-  );
+  // One date-ordered window of events, never the whole table (PL-SCALE).
+  const ledger = useQuery(api.eventLedger.ledgerWindow, {
+    view: tab,
+    dir,
+    limit,
+    showArchived,
+    now: today,
+    search: search.trim().length >= 2 ? search.trim() : undefined,
+  });
+  const events = ledger?.rows;
 
-  const counts = useMemo(() => {
-    const c: Record<string, number> = {
-      all: live.length,
-      upcoming: live.filter((e) => isUpcoming(e, now)).length,
-      attention: live.filter((e) => needsAction(e, now)).length,
-    };
-    for (const s of EVENT_STAGES) c[s] = 0;
-    for (const e of live) {
-      const stage = String(e.stage);
-      c[stage] = (c[stage] ?? 0) + 1;
-    }
-    return c;
-  }, [live, now]);
+  useEffect(() => {
+    if (chosenTab == null && ledger && ledger.upcomingCount === 0)
+      setTab("all");
+  }, [chosenTab, ledger]);
+  useEffect(() => setLimit(WINDOW), [tab, dir, showArchived]);
 
-  const tab: Tab =
-    chosenTab ?? ((counts.upcoming ?? 0) > 0 ? "upcoming" : "all");
+  const live = useMemo(() => events ?? [], [events]);
+  const counts = {
+    upcoming: ledger?.upcomingCount ?? 0,
+    attention: ledger?.attentionCount ?? 0,
+  };
+  const countLabel = (t: "upcoming" | "attention") =>
+    `${counts[t]}${
+      (t === "upcoming" ? ledger?.upcomingCapped : ledger?.attentionCapped)
+        ? "+"
+        : ""
+    }`;
 
   const rows = useMemo(() => {
-    let list = live;
+    const q = search.trim().toLowerCase();
+    // Title / venue / client inside the loaded window, plus title and client
+    // hits across every event from the search indexes.
+    let list = q
+      ? [
+          ...live.filter(
+            (e) =>
+              e.title.toLowerCase().includes(q) ||
+              String(e.venueName ?? "")
+                .toLowerCase()
+                .includes(q) ||
+              e.clientLabel.toLowerCase().includes(q),
+          ),
+          ...(ledger?.searchRows ?? []),
+        ].filter(
+          (e, index, all) => all.findIndex((x) => x._id === e._id) === index,
+        )
+      : live;
     if (tab === "upcoming") list = list.filter((e) => isUpcoming(e, now));
     else if (tab === "attention")
       list = list.filter((e) => needsAction(e, now));
     else if (tab !== "all") list = list.filter((e) => e.stage === tab);
     if (style) list = list.filter((e) => eventServiceStyleKey(e) === style);
-    const q = search.trim().toLowerCase();
-    if (q) {
-      list = list.filter(
-        (e) =>
-          String(e.title ?? "")
-            .toLowerCase()
-            .includes(q) ||
-          String(e.venueName ?? "")
-            .toLowerCase()
-            .includes(q) ||
-          clientDisplayName(e.clientId, clients).toLowerCase().includes(q),
-      );
-    }
     return [...list].sort((a, b) => {
       const aDate = a.startsAt ?? 0;
       const bDate = b.startsAt ?? 0;
       return dir === "asc" ? aDate - bDate : bDate - aDate;
     });
-  }, [live, clients, tab, style, search, dir, now]);
+  }, [live, ledger, tab, style, search, dir, now]);
   const styleChoices = useMemo(() => eventServiceStyleChoices(live), [live]);
 
   const questionTabs: Tab[] = ["upcoming", "attention", "all"];
@@ -213,11 +227,13 @@ export function EventsListPage() {
             }`}
           >
             {TAB_LABEL[t as keyof typeof TAB_LABEL]}
-            <span
-              className={`ml-1.5 ${t === "attention" && (counts[t] ?? 0) > 0 ? "font-bold text-warn" : "text-ink-2"}`}
-            >
-              {counts[t] ?? 0}
-            </span>
+            {t === "all" ? null : (
+              <span
+                className={`ml-1.5 ${t === "attention" && counts[t] > 0 ? "font-bold text-warn" : "text-ink-2"}`}
+              >
+                {countLabel(t as "upcoming" | "attention")}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -234,7 +250,7 @@ export function EventsListPage() {
           <option value="">Any stage</option>
           {EVENT_STAGES.map((s) => (
             <option key={s} value={s}>
-              {STAGE_LABEL[s]} ({counts[s] ?? 0})
+              {STAGE_LABEL[s]}
             </option>
           ))}
         </select>
@@ -294,16 +310,14 @@ export function EventsListPage() {
           <div className="fact-row mt-3">
             <span className="fact">
               <b>Upcoming:</b>
-              {counts.upcoming ?? 0}
+              {countLabel("upcoming")}
             </span>
             <span className="fact">
               <b>Needs action:</b>
               <span
-                className={
-                  (counts.attention ?? 0) > 0 ? "font-medium text-warn" : ""
-                }
+                className={counts.attention > 0 ? "font-medium text-warn" : ""}
               >
-                {counts.attention ?? 0}
+                {countLabel("attention")}
               </span>
             </span>
             <span className="fact">
@@ -373,7 +387,7 @@ export function EventsListPage() {
         </div>
       </div>
 
-      {events === undefined ? (
+      {ledger === undefined ? (
         <div className="mt-6">
           <TableSkeleton rows={8} />
         </div>
@@ -445,8 +459,7 @@ export function EventsListPage() {
                         {e.title}
                       </Link>
                       <div className="truncate text-sm text-ink-2">
-                        {formatStatusLabel(e.eventType)} ·{" "}
-                        {clientDisplayName(e.clientId, clients)}
+                        {formatStatusLabel(e.eventType)} · {e.clientLabel}
                       </div>
                       {/* Venue and covers take their own line on a phone.
                           Appended to the line above they truncate away at
@@ -488,6 +501,18 @@ export function EventsListPage() {
           })}
           <p className="mt-7 text-base text-ink-2">
             {rows.length} {rows.length === 1 ? "event" : "events"} in this view.
+            {ledger?.more && tab !== "attention" ? (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  onClick={() => setLimit((current) => current + WINDOW)}
+                  className="cursor-pointer text-brand underline underline-offset-4"
+                >
+                  Show more
+                </button>
+              </>
+            ) : null}
             {tab !== "all" ? (
               <>
                 {" "}
@@ -496,7 +521,7 @@ export function EventsListPage() {
                   onClick={() => setTab("all")}
                   className="cursor-pointer text-brand underline underline-offset-4"
                 >
-                  See all {counts.all ?? 0}
+                  See all
                 </button>
               </>
             ) : null}
