@@ -50,7 +50,7 @@ const note = (data: FormData, name: string) =>
   String(data.get(name) || "").trim() || undefined;
 
 export function CloseoutPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("closeout");
   const authStatus = useAuthStatus();
   const closeouts = useListEventCloseout();
   const events = usePickerAndNamedEvents(
