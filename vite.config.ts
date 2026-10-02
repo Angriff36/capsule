@@ -259,6 +259,14 @@ export default defineConfig(({ mode }) => ({
     // Each worker loads the generated Convex runtime. Oversubscribing large
     // machines adds contention and makes otherwise fast proofs time out.
     maxWorkers: Math.min(8, availableParallelism()),
+    // Node 25+ has its own localStorage that is undefined without
+    // --localstorage-file; it shadowed jsdom's and broke every jsdom test
+    // (2026-10-01). Turn it off in the test workers. Set here, not in the
+    // package.json test script, which the generator owns.
+    poolOptions: {
+      forks: { execArgv: ["--no-experimental-webstorage"] },
+      threads: { execArgv: ["--no-experimental-webstorage"] },
+    },
     include: ["tests/**/*.test.ts"],
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },
