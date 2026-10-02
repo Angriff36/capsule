@@ -251,6 +251,68 @@ describe("multiple legs (AC-429)", () => {
     ]);
   });
 
+  it("a truck booked twice on purpose keeps its reason when times move, and the clash stays on show (#408)", async () => {
+    const { t, owner, event } = await timingWorld();
+    await owner.mutation(M.Event_configureTiming, {
+      docId: event,
+      serviceStartsAt: SERVE_AT,
+      setupMinutes: 180,
+      loadMinutes: 60,
+      outboundTravelMinutes: 30,
+      cleanupMinutes: 60,
+      returnTravelMinutes: 30,
+      unloadMinutes: 30,
+    });
+    await settle(t);
+    const truckB = (
+      (await owner.mutation(M.Vehicle_createViaRegister, {
+        make: "Isuzu",
+        model: "NPR",
+        registration: "TRUCK-B",
+        ownership: "owned",
+        payloadCapacityKg: 3000,
+        operationalStatus: "available",
+      })) as { docId: Id<"vehicles"> }
+    ).docId;
+    const assign = async (args: Record<string, unknown>) =>
+      (
+        (await owner.mutation(M.EventVehicleAssignment_createViaAssign, {
+          eventId: event,
+          ...args,
+        })) as { docId: Id<"eventVehicleAssignments"> }
+      ).docId;
+    const legsAt = async () =>
+      (await owner.query(api.eventRouteLegs.getEventRouteLegs, {
+        eventId: event,
+      }))!;
+
+    const firstRun = await assign({ vehicleId: truckB });
+    // The planner books the same truck again on purpose, with a reason.
+    const secondRun = await assign({
+      vehicleId: truckB,
+      bookedTwiceReason: "Driver swaps trailers at the venue",
+    });
+    expect((await legsAt()).conflicts).toHaveLength(1);
+
+    // Later the second run's times move. The planner's reason still lets the
+    // run through (no new stop on a live board)...
+    const version = (await t.run((ctx) => ctx.db.get(secondRun)))!.version;
+    await owner.mutation(M.EventVehicleAssignment_planLeg, {
+      docId: secondRun,
+      version,
+      arriveBeforeServeMinutes: 120,
+      loadMinutes: 30,
+    });
+    // ...and the runs panel still shows the clash with its new times, so the
+    // same-time check is not lost: it shows instead of blocking.
+    const after = await legsAt();
+    expect(after.conflicts).toHaveLength(1);
+    expect(after.conflicts[0].legIds.sort()).toEqual(
+      [String(firstRun), String(secondRun)].sort(),
+    );
+    expect(after.conflicts[0].message).toContain("same truck");
+  });
+
   it("a person cannot ride a truck that is not on the event", async () => {
     const { t, owner, event } = await timingWorld();
     const outside = await t.run((ctx) =>
