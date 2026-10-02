@@ -119,7 +119,7 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Production plan and prep lists | `/kitchen/plan`, `/kitchen/prep` | `proofs/event-approve-plans-production-batch` | Built |
 | Combined demand | `/inventory/demand` | `proofs/event-weekly-purchasing`, `proofs/purchasing-week-demand` | Built |
 | Stock, holds, transfers, waste | `/inventory/stock`, `/inventory/counts`, `/inventory/waste` | `proofs/stock-movement-reconcile-replay`, `proofs/waste-void-trace` | Built |
-| Choosing the vendor | `/inventory/purchasing` | `proofs/event-weekly-purchasing` | Partly: default vendor proven, preferred vendor not |
+| Choosing the vendor | `/inventory/purchasing`, ingredient page | `proofs/event-weekly-purchasing`, `proofs/preferred-vendor-routing` | Built (preferred vendor, else the default; not chosen by price) |
 | Orders, receipts, bill matching | `/inventory/purchasing`, `/inventory/orders/:id` | `proofs/receipt-invoice-match`, `proofs/partial-receipt-correction` | Built |
 | Cook sees the current method | `/kitchen/display` | `proofs/prep-work-baselines` | Built (no proof that a draft stays hidden) |
 | Actual yield and waste back to closeout | `/kitchen/yield`, event closeout | `proofs/batch-actual-ledger`, `proofs/event-food-cost-closeout` | Built (variance shown, recipe yield not suggested) |
