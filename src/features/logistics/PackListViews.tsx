@@ -120,6 +120,7 @@ export function PackListViews({
       if (table.canEditLines) {
         if (rigs.length > 1) actions.push({ key: "truck", label: "Truck" });
         actions.push({ key: "weight", label: "Weight" });
+        actions.push({ key: "size", label: "Size" });
       }
       if (packed && table.canCount)
         actions.push({ key: "onTruck", label: "On truck" });

@@ -2346,6 +2346,168 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-02",
       "reason": "PL-ATTRIBUTION AC-301: optional; set only by allowOverRevenue. No backfill."
+    },
+    {
+      "path": "Vehicle.cargoVolumeM3",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Vehicle.hitchType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Trailer.cargoVolumeM3",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Trailer.hitchType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Trailer.emptyWeightKg",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "PackListItem.unitVolumeM3",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Equipment.customFieldsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "Organization.equipmentFieldsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-09-30",
+      "reason": "2026-09-30 event tracker parity: optional cargo space, hitch and trailer weight, pack line size, and equipment custom fields; saved rows need no backfill."
+    },
+    {
+      "path": "EventVehicleAssignment.bookedTwiceReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Optional reason that lets a planned truck run through the same-time check; saved rigs need no backfill."
+    },
+    {
+      "path": "capture.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.changeSummary",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.figures",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.proposalId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.revisionNumber",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.savedReportDefinitionId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.sharingScope",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.snapshot",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.sourceAsOf",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.subjectArea",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "capture.parameters.title",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.parameters.reason",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.parameters.targetIngredientId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "mergeInto.parameters.targetThreadId",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Two entities now have a command with this name (the check keys commands by name only); the existing command is unchanged."
+    },
+    {
+      "path": "Message.mediaJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "MessageThread.eventId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
+    },
+    {
+      "path": "MessageThread.mergedIntoThreadId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-01",
+      "reason": "Builder batch 2026-10-01 (inbox): optional field; saved rows need no backfill."
     }
   ]
 }

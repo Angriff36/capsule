@@ -883,6 +883,7 @@ export const EquipmentSchema = z.object({
   providesJson: z.string().nullable().optional(),
   needsJson: z.string().nullable().optional(),
   operatingFactsCheckedAt: z.coerce.date().nullable().optional(),
+  customFieldsJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1722,6 +1723,7 @@ export const EventVehicleAssignmentSchema = z.object({
   loadMinutes: z.number().nullable().optional(),
   leaveAfterMinutes: z.number().nullable().optional(),
   loadingZone: z.string().nullable().optional(),
+  bookedTwiceReason: z.string().nullable().optional(),
   preloadedByPersonId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -2616,6 +2618,7 @@ export const OrganizationSchema = z.object({
   timingLoadRulesJson: z.string().nullable().optional(),
   planningChecksJson: z.string().nullable().optional(),
   stageMovesByHandJson: z.string().nullable().optional(),
+  equipmentFieldsJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2709,6 +2712,7 @@ export const PackListItemSchema = z.object({
   coveredBy: z.enum(["equivalent", "client", "vendor"]).nullable().optional(),
   loadAssignmentId: z.string().uuid().nullable().optional(),
   unitWeightKg: z.number().nullable().optional(),
+  unitVolumeM3: z.number().nullable().optional(),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
@@ -2805,6 +2809,27 @@ export const PackRuleSchema = z.object({
 });
 
 export type PackRule = z.infer<typeof PackRuleSchema>;
+
+// Entity: PackScan
+export const PackScanSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  packListId: z.string().uuid(),
+  packListItemId: z.string().uuid().nullable().optional(),
+  step: z.string().default(""),
+  label: z.string().default(""),
+  outcome: z.string().default(""),
+  message: z.string().default(""),
+  quantity: z.number().nullable().optional(),
+  scannedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid().nullable().optional(),
+  personName: z.string().optional().default(""),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PackScan = z.infer<typeof PackScanSchema>;
 
 // Entity: PackSectionClaim
 export const PackSectionClaimSchema = z.object({
@@ -4354,6 +4379,9 @@ export const TrailerSchema = z.object({
   insuranceProvider: z.string().nullable().optional(),
   insurancePolicyNumber: z.string().nullable().optional(),
   insuranceExpiresAt: z.coerce.date().nullable().optional(),
+  cargoVolumeM3: z.number().nullable().optional(),
+  hitchType: z.string().nullable().optional(),
+  emptyWeightKg: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -4420,6 +4448,8 @@ export const VehicleSchema = z.object({
   towCapacityKg: z.number().int().nullable().optional(),
   seatCount: z.number().int().nullable().optional(),
   driverQualificationName: z.string().nullable().optional(),
+  cargoVolumeM3: z.number().nullable().optional(),
+  hitchType: z.string().nullable().optional(),
   registrationNumber: z.string().nullable().optional(),
   registrationExpiresAt: z.coerce.date().nullable().optional(),
   insuranceProvider: z.string().nullable().optional(),
@@ -6325,6 +6355,13 @@ export const EquipmentReviseDetailsParamsSchema = z.object({
 
 export type EquipmentReviseDetailsParams = z.infer<typeof EquipmentReviseDetailsParamsSchema>;
 
+// Command: setCustomFields on Equipment
+export const EquipmentSetCustomFieldsParamsSchema = z.object({
+  customFieldsJson: z.string().optional(),
+});
+
+export type EquipmentSetCustomFieldsParams = z.infer<typeof EquipmentSetCustomFieldsParamsSchema>;
+
 // Command: setOperatingFacts on Equipment
 export const EquipmentSetOperatingFactsParamsSchema = z.object({
   providesJson: z.string().optional(),
@@ -7679,9 +7716,18 @@ export const EventVehicleAssignmentAssignParamsSchema = z.object({
   loadMinutes: z.number().optional(),
   leaveAfterMinutes: z.number().optional(),
   loadingZone: z.string().optional(),
+  bookedTwiceReason: z.string().optional(),
 });
 
 export type EventVehicleAssignmentAssignParams = z.infer<typeof EventVehicleAssignmentAssignParamsSchema>;
+
+// Command: attachTrailer on EventVehicleAssignment
+export const EventVehicleAssignmentAttachTrailerParamsSchema = z.object({
+  trailerId: z.string().min(1),
+  bookedTwiceReason: z.string().optional(),
+});
+
+export type EventVehicleAssignmentAttachTrailerParams = z.infer<typeof EventVehicleAssignmentAttachTrailerParamsSchema>;
 
 // Command: clearPreloaded on EventVehicleAssignment
 export const EventVehicleAssignmentClearPreloadedParamsSchema = z.object({});
@@ -9174,6 +9220,13 @@ export const OrganizationConfigureBrandingParamsSchema = z.object({
 
 export type OrganizationConfigureBrandingParams = z.infer<typeof OrganizationConfigureBrandingParamsSchema>;
 
+// Command: configureEquipmentFields on Organization
+export const OrganizationConfigureEquipmentFieldsParamsSchema = z.object({
+  fieldsJson: z.string().optional(),
+});
+
+export type OrganizationConfigureEquipmentFieldsParams = z.infer<typeof OrganizationConfigureEquipmentFieldsParamsSchema>;
+
 // Command: configurePlanningChecks on Organization
 export const OrganizationConfigurePlanningChecksParamsSchema = z.object({
   checksJson: z.string().optional(),
@@ -9548,6 +9601,13 @@ export const PackListItemSetResponsibilityParamsSchema = z.object({
 
 export type PackListItemSetResponsibilityParams = z.infer<typeof PackListItemSetResponsibilityParamsSchema>;
 
+// Command: setUnitVolume on PackListItem
+export const PackListItemSetUnitVolumeParamsSchema = z.object({
+  unitVolumeM3: z.number().optional(),
+});
+
+export type PackListItemSetUnitVolumeParams = z.infer<typeof PackListItemSetUnitVolumeParamsSchema>;
+
 // Command: setUnitWeight on PackListItem
 export const PackListItemSetUnitWeightParamsSchema = z.object({
   unitWeightKg: z.number().optional(),
@@ -9663,6 +9723,19 @@ export const PackRuleReviseParamsSchema = z.object({
 });
 
 export type PackRuleReviseParams = z.infer<typeof PackRuleReviseParamsSchema>;
+
+// Command: record on PackScan
+export const PackScanRecordParamsSchema = z.object({
+  packListId: z.string().min(1),
+  step: z.string(),
+  label: z.string(),
+  outcome: z.string(),
+  message: z.string(),
+  packListItemId: z.string().min(1).optional(),
+  quantity: z.number().optional(),
+});
+
+export type PackScanRecordParams = z.infer<typeof PackScanRecordParamsSchema>;
 
 // Command: release on PackSectionClaim
 export const PackSectionClaimReleaseParamsSchema = z.object({});
@@ -11911,6 +11984,15 @@ export const TrailerReviseDetailsParamsSchema = z.object({
 
 export type TrailerReviseDetailsParams = z.infer<typeof TrailerReviseDetailsParamsSchema>;
 
+// Command: setCargoFacts on Trailer
+export const TrailerSetCargoFactsParamsSchema = z.object({
+  cargoVolumeM3: z.number().optional(),
+  hitchType: z.string().optional(),
+  emptyWeightKg: z.number().int().optional(),
+});
+
+export type TrailerSetCargoFactsParams = z.infer<typeof TrailerSetCargoFactsParamsSchema>;
+
 // Command: updateInsurance on Trailer
 export const TrailerUpdateInsuranceParamsSchema = z.object({
   insuranceProvider: z.string(),
@@ -11990,6 +12072,14 @@ export const VehicleReviseDetailsParamsSchema = z.object({
 });
 
 export type VehicleReviseDetailsParams = z.infer<typeof VehicleReviseDetailsParamsSchema>;
+
+// Command: setCargoFacts on Vehicle
+export const VehicleSetCargoFactsParamsSchema = z.object({
+  cargoVolumeM3: z.number().optional(),
+  hitchType: z.string().optional(),
+});
+
+export type VehicleSetCargoFactsParams = z.infer<typeof VehicleSetCargoFactsParamsSchema>;
 
 // Command: setCrewFacts on Vehicle
 export const VehicleSetCrewFactsParamsSchema = z.object({

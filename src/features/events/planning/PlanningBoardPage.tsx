@@ -53,6 +53,7 @@ import { useSlowQuery } from "../../../ui/useSlowQuery";
 import { useSuccessToast } from "../../../ui/useSuccessToast";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import { useReserveEquipment } from "../../facilities/equipmentCheckout";
+import { useHitchTrailer } from "../../../lib/useHitchTrailer";
 import {
   useAcceptSuggestion,
   useAssignPersonWithReason,
@@ -161,6 +162,7 @@ export function PlanningBoardPage() {
   const assignPersonWithReason = useAssignPersonWithReason();
   const acceptSuggestion = useAcceptSuggestion();
   const holdEquipmentWithReason = useHoldEquipmentWithReason();
+  const hitchTrailer = useHitchTrailer();
   const assignRigWithReason = useAssignRigWithReason();
   const recordReceipt = useCreatePlanningReceipt();
   const answerAgain = usePlanningReceiptAnswerAgain();
@@ -456,6 +458,17 @@ export function PlanningBoardPage() {
               personId: draft.personId,
               role: draft.role.trim(),
             });
+        } else if (
+          draft.kind === "trailer" &&
+          draft.pulledBy.startsWith("rig:")
+        ) {
+          // A truck already on the event: one save keeps its riders and the
+          // pack lines loaded on it.
+          await hitchTrailer({
+            rigId: draft.pulledBy.slice(4) as never,
+            trailerId: draft.trailerId as never,
+            ...kept,
+          });
         } else if (draft.kind === "truck" || draft.kind === "trailer") {
           const rig =
             draft.kind === "truck"
@@ -1175,6 +1188,13 @@ export function PlanningBoardPage() {
                       }
                     >
                       <option value="">Pick a truck</option>
+                      {rigs
+                        .filter((rig) => rig.vehicleId && !rig.trailerId)
+                        .map((rig) => (
+                          <option key={rig._id} value={`rig:${rig._id}`}>
+                            {rigLabel(rig)} (on this event)
+                          </option>
+                        ))}
                       {snap.vehicles
                         .filter(
                           (row) =>
@@ -1188,12 +1208,8 @@ export function PlanningBoardPage() {
                           </option>
                         ))}
                     </select>
-                    <small className="text-sm text-ink-2">
-                      A truck already on this event is not listed. To give it a
-                      trailer, change that truck on the Event tracker sheet.
-                    </small>
                   </label>
-                  {draft.pulledBy ? (
+                  {draft.pulledBy && !draft.pulledBy.startsWith("rig:") ? (
                     <label className="field-label">
                       <span>Driver</span>
                       <select

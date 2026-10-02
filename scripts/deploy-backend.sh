@@ -138,6 +138,16 @@ fi
 # 2. The machine.
 pinned="$(tr -d '[:space:]' < .bun-version)"
 active="$(bun --version 2>/dev/null || true)"
+# Bun went missing on the production box (2026-09-28: a tool there ran its own
+# Bun installer, and the 2026-09-30 release stopped half done: new screens,
+# old backend). A real deploy now puts the pinned Bun back in ~/.bun from the
+# official installer instead of stopping; a dry run only reports.
+if [ "$active" != "$pinned" ] && [ "$dry_run" = 0 ] && [ "$(uname -s)" = Linux ]; then
+  echo "deploy-backend: bun is ${active:-not found}; installing the pinned bun $pinned in ~/.bun"
+  curl -fsSL https://bun.sh/install | bash -s "bun-v$pinned" >/dev/null 2>&1 || true
+  export PATH="$HOME/.bun/bin:$PATH"
+  active="$(bun --version 2>/dev/null || true)"
+fi
 if [ "$active" != "$pinned" ]; then
   fail "bun is ${active:-not found}; .bun-version pins $pinned. Put bun $pinned first in PATH"
 fi

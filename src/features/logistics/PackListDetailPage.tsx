@@ -14,6 +14,7 @@ import {
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
   usePackListItemAssignLoad,
+  usePackListItemSetUnitVolume,
   usePackListItemSetUnitWeight,
   usePackListItemExclude,
   usePackListItemRemove,
@@ -113,6 +114,7 @@ export function PackListDetailPage() {
   const excludeItem = usePackListItemExclude();
   const assignLoad = usePackListItemAssignLoad();
   const setUnitWeight = usePackListItemSetUnitWeight();
+  const setUnitVolume = usePackListItemSetUnitVolume();
   const restoreExcluded = usePackListItemRestoreExcluded();
   const refreshPackRules = useRefreshPackRules();
   const removeItem = usePackListItemRemove();
@@ -788,6 +790,35 @@ export function PackListDetailPage() {
           unitWeightKg: kg === "" ? undefined : Number(kg),
         });
         setNotice(kg === "" ? "Weight cleared." : "Weight saved.");
+      });
+      return;
+    }
+    if (key === "size") {
+      const current = (item as { unitVolumeM3?: number | null }).unitVolumeM3;
+      const values = await prompt.askFields({
+        title: "How much space does one take?",
+        description:
+          "Space of one unit in cubic metres (a 60 × 40 × 40 cm crate is 0.1), so a truck is not loaded past the space it has. Leave it empty if you do not know.",
+        confirmLabel: "Save size",
+        fields: [
+          {
+            name: "m3",
+            label: "Space of one (m³)",
+            inputType: "number",
+            required: false,
+            defaultValue: current == null ? "" : String(current),
+          },
+        ],
+      });
+      if (!values) return;
+      const m3 = values.m3?.trim() ?? "";
+      void run(`${item._id}:size`, async () => {
+        await setUnitVolume({
+          docId: item._id,
+          version: item.version,
+          unitVolumeM3: m3 === "" ? undefined : Number(m3),
+        });
+        setNotice(m3 === "" ? "Size cleared." : "Size saved.");
       });
       return;
     }

@@ -1,16 +1,26 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
+  fieldSetsFromText,
+  fieldSetsJson,
+  fieldSetsToText,
+  parseEquipmentFieldSets,
+} from "../../../lib/equipmentFields";
+import {
   useCreatePlanningRule,
   useEquipmentSetOperatingFacts,
   useListEquipment,
   useListOrganization,
   useListPlanningRule,
+  useListTrailer,
   useListVehicle,
+  useOrganizationConfigureEquipmentFields,
   useOrganizationConfigurePlanningChecks,
   usePlanningRuleReinstate,
   usePlanningRuleRetire,
   usePlanningRuleRevise,
+  useTrailerSetCargoFacts,
+  useVehicleSetCargoFacts,
   useVehicleSetCrewFacts,
 } from "../../../lib/manifest-convex-react";
 import {
@@ -96,8 +106,10 @@ const emptyRule = (): RuleDraft => ({
 
 /**
  * Planning setup: how loud each planning check is, the rules that suggest
- * what else an event needs, each truck's seats and driver certificate, and
- * what each piece of equipment needs and gives (power, fuel, water).
+ * what else an event needs, each truck's seats, driver certificate, cargo
+ * space and hitch, each trailer's space, coupler and own weight, what each
+ * piece of equipment needs and gives (power, fuel, water), and the company's
+ * own fields for each equipment category.
  */
 export function PlanningSetupPage() {
   const authStatus = useAuthStatus();
@@ -108,12 +120,16 @@ export function PlanningSetupPage() {
   const rules = useListPlanningRule();
   const equipment = useListEquipment();
   const vehicles = useListVehicle();
+  const trailers = useListTrailer();
   const saveChecks = useOrganizationConfigurePlanningChecks();
   const defineRule = useCreatePlanningRule();
   const reviseRule = usePlanningRuleRevise();
   const retireRule = usePlanningRuleRetire();
   const reinstateRule = usePlanningRuleReinstate();
   const setCrewFacts = useVehicleSetCrewFacts();
+  const setTruckCargo = useVehicleSetCargoFacts();
+  const setTrailerCargo = useTrailerSetCargoFacts();
+  const saveEquipmentFields = useOrganizationConfigureEquipmentFields();
   const setOperatingFacts = useEquipmentSetOperatingFacts();
 
   const [ruleDraft, setRuleDraft] = useState<RuleDraft | null>(null);
@@ -170,6 +186,17 @@ export function PlanningSetupPage() {
         row.deletedAt == null && String(row.operationalStatus) !== "retired",
     )
     .sort((a, b) => rigName(a, "").localeCompare(rigName(b, "")));
+  const liveTrailers = (trailers ?? [])
+    .filter(
+      (row) =>
+        row.deletedAt == null && String(row.operationalStatus) !== "retired",
+    )
+    .sort((a, b) => rigName(a, "").localeCompare(rigName(b, "")));
+  const fieldSets = parseEquipmentFieldSets(organization?.equipmentFieldsJson);
+  const optionalNumber = (raw: FormDataEntryValue | null) => {
+    const text = String(raw ?? "").trim();
+    return text === "" ? undefined : Number(text);
+  };
   const needle = equipmentFind.trim().toLowerCase();
   const shownEquipment = liveEquipment.filter(
     (row) =>
@@ -734,12 +761,14 @@ export function PlanningSetupPage() {
         <div className="section-rule">
           <span>Trucks</span>
           <i />
-          <em>Seats and driver certificate</em>
+          <em>Seats, driver certificate, space and hitch</em>
         </div>
         <p className="mt-2 max-w-[72ch] text-base text-ink-2">
           Seats count the driver. The certificate is the name of the staff
           qualification a driver of this truck has to hold; leave it empty when
-          any driver will do.
+          any driver will do. Cargo space is in cubic metres. Write the hitch
+          the same way on the truck and its trailers (“50 mm ball”), so the
+          board can see when they don’t fit.
         </p>
         {trucks.length === 0 ? (
           <p className="mt-2 text-base text-ink-2">No trucks in the fleet.</p>
@@ -756,8 +785,8 @@ export function PlanningSetupPage() {
                     const seats = String(data.get("seatCount") ?? "").trim();
                     void run(
                       `truck:${truck._id}`,
-                      () =>
-                        setCrewFacts({
+                      async () => {
+                        await setCrewFacts({
                           docId: truck._id,
                           version: truck.version,
                           seatCount:
@@ -768,7 +797,17 @@ export function PlanningSetupPage() {
                             String(
                               data.get("driverQualificationName") ?? "",
                             ).trim() || undefined,
-                        }),
+                        });
+                        await setTruckCargo({
+                          docId: truck._id,
+                          cargoVolumeM3: optionalNumber(
+                            data.get("cargoVolumeM3"),
+                          ),
+                          hitchType:
+                            String(data.get("hitchType") ?? "").trim() ||
+                            undefined,
+                        });
+                      },
                       "Truck saved",
                     );
                   }}
@@ -799,6 +838,29 @@ export function PlanningSetupPage() {
                       disabled={!canTrucks}
                     />
                   </label>
+                  <label className="field-label">
+                    <span>Cargo space (m³)</span>
+                    <input
+                      name="cargoVolumeM3"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      className="input min-h-10 w-28"
+                      defaultValue={truck.cargoVolumeM3 ?? ""}
+                      placeholder="Not said"
+                      disabled={!canTrucks}
+                    />
+                  </label>
+                  <label className="field-label">
+                    <span>Hitch</span>
+                    <input
+                      name="hitchType"
+                      className="input min-h-10 w-36"
+                      defaultValue={truck.hitchType ?? ""}
+                      placeholder="None"
+                      disabled={!canTrucks}
+                    />
+                  </label>
                   {canTrucks ? (
                     <button
                       type="submit"
@@ -813,6 +875,163 @@ export function PlanningSetupPage() {
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="mt-10" aria-label="Trailers">
+        <div className="section-rule">
+          <span>Trailers</span>
+          <i />
+          <em>Space, coupler and own weight</em>
+        </div>
+        <p className="mt-2 max-w-[72ch] text-base text-ink-2">
+          The coupler has to match the truck’s hitch. The trailer’s own weight
+          counts against the truck’s towing limit.
+        </p>
+        {liveTrailers.length === 0 ? (
+          <p className="mt-2 text-base text-ink-2">No trailers in the fleet.</p>
+        ) : (
+          <ul className="mt-3 border-t-[1.5px] border-ink">
+            {liveTrailers.map((trailer) => (
+              <li key={trailer._id} className="border-b border-line py-2">
+                <form
+                  key={`${trailer._id}:${trailer.version}`}
+                  className="flex flex-wrap items-end gap-3"
+                  onSubmit={(formEvent) => {
+                    formEvent.preventDefault();
+                    const data = new FormData(formEvent.currentTarget);
+                    const weight = optionalNumber(data.get("emptyWeightKg"));
+                    void run(
+                      `trailer:${trailer._id}`,
+                      () =>
+                        setTrailerCargo({
+                          docId: trailer._id,
+                          version: trailer.version,
+                          cargoVolumeM3: optionalNumber(
+                            data.get("cargoVolumeM3"),
+                          ),
+                          hitchType:
+                            String(data.get("hitchType") ?? "").trim() ||
+                            undefined,
+                          emptyWeightKg:
+                            weight == null ? undefined : Math.round(weight),
+                        }),
+                      "Trailer saved",
+                    );
+                  }}
+                >
+                  <p className="min-w-48 flex-1 text-base font-semibold">
+                    {rigName(trailer, "Trailer")}
+                  </p>
+                  <label className="field-label">
+                    <span>Cargo space (m³)</span>
+                    <input
+                      name="cargoVolumeM3"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      className="input min-h-10 w-28"
+                      defaultValue={trailer.cargoVolumeM3 ?? ""}
+                      placeholder="Not said"
+                      disabled={!canTrucks}
+                    />
+                  </label>
+                  <label className="field-label">
+                    <span>Coupler</span>
+                    <input
+                      name="hitchType"
+                      className="input min-h-10 w-36"
+                      defaultValue={trailer.hitchType ?? ""}
+                      placeholder="Not said"
+                      disabled={!canTrucks}
+                    />
+                  </label>
+                  <label className="field-label">
+                    <span>Own weight (kg)</span>
+                    <input
+                      name="emptyWeightKg"
+                      type="number"
+                      min="0"
+                      step="1"
+                      className="input min-h-10 w-28"
+                      defaultValue={trailer.emptyWeightKg ?? ""}
+                      placeholder="Not said"
+                      disabled={!canTrucks}
+                    />
+                  </label>
+                  {canTrucks ? (
+                    <button
+                      type="submit"
+                      className="btn btn-ghost min-h-10"
+                      disabled={busy != null}
+                    >
+                      {busy === `trailer:${trailer._id}` ? "Saving…" : "Save"}
+                    </button>
+                  ) : null}
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-10" aria-label="Equipment fields">
+        <div className="section-rule">
+          <span>Equipment fields</span>
+          <i />
+          <em>Your own facts for each category</em>
+        </div>
+        <p className="mt-2 max-w-[72ch] text-base text-ink-2">
+          One category on each line, then its fields: “Ovens: Fuel, Burners”.
+          Each item in that category then shows those fields on the Equipment
+          page.
+        </p>
+        <form
+          key={organization?.version ?? 0}
+          className="mt-3 grid max-w-2xl gap-3"
+          onSubmit={(formEvent) => {
+            formEvent.preventDefault();
+            if (!organization) return;
+            const data = new FormData(formEvent.currentTarget);
+            void run(
+              "fields",
+              () =>
+                saveEquipmentFields({
+                  docId: organization._id,
+                  version: organization.version,
+                  fieldsJson: fieldSetsJson(
+                    fieldSetsFromText(String(data.get("fields") ?? "")),
+                  ),
+                }),
+              "Equipment fields saved",
+            );
+          }}
+        >
+          <textarea
+            name="fields"
+            className="input w-full"
+            rows={4}
+            aria-label="Equipment fields"
+            defaultValue={fieldSetsToText(fieldSets)}
+            placeholder={"Ovens: Fuel, Burners\nTents: Size, Sidewalls"}
+            disabled={!canChecks || !organization}
+          />
+          {canChecks ? (
+            <div>
+              <button
+                type="submit"
+                className="btn btn-ghost min-h-10"
+                disabled={busy != null || !organization}
+              >
+                {busy === "fields" ? "Saving…" : "Save fields"}
+              </button>
+            </div>
+          ) : null}
+        </form>
+        {kinds.length > 0 ? (
+          <p className="mt-2 text-sm text-ink-2">
+            Categories in use: {kinds.join(", ")}.
+          </p>
+        ) : null}
       </section>
 
       <section className="mt-10" aria-label="Equipment">

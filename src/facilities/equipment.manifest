@@ -89,6 +89,9 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   property providesJson: string?
   property needsJson: string?
   property operatingFactsCheckedAt: datetime?
+  // The company's own facts about this item, by the field names set up for
+  // its category: {"Fuel": "propane", "Burners": "4"}.
+  property customFieldsJson: string?
 
   belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
   hasMany reservations: EquipmentReservation
@@ -216,6 +219,16 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     mutate needsJson = needsJson
     mutate operatingFactsCheckedAt = now()
     emit EquipmentOperatingFactsSet {
+      equipmentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setCustomFields(optional customFieldsJson: string) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    mutate customFieldsJson = customFieldsJson
+    emit EquipmentCustomFieldsSet {
       equipmentId: self.id
       tenantId: self.tenantId
     }
@@ -831,5 +844,10 @@ event EquipmentMissingWrittenOff: "equipment.missing.written.off" {
 
 event EquipmentPartAmountChanged: "equipment.part.amount.changed" {
   equipmentPartId: string
+  tenantId: string
+}
+
+event EquipmentCustomFieldsSet: "equipment.custom_fields_set" {
+  equipmentId: string
   tenantId: string
 }
