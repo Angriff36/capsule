@@ -93,6 +93,7 @@ const facts = {
   doughQuantity: 0,
   clockInId: "",
   wasteId: "",
+  invoiceTotal: 0,
 };
 const crew = {
   lead: { personId: "", subject: "" },
@@ -1807,6 +1808,144 @@ describe.sequential(
           { eventId: id.golden } as never,
         )) as { problems: unknown[] };
         expect(exceptions.problems).toHaveLength(2);
+      },
+      LONG,
+    );
+
+    it(
+      "golden event 20: Settle invoice/payment and generate the source-backed closeout projection with food, labor, rental, transport, waste, damage, and revenue actuals",
+      async () => {
+        const finance = w.proof.asRole({
+          subject: `finance-${TENANT}`,
+          role: "finance_manager",
+          tenantId: TENANT,
+        });
+        const pay = (cmd: unknown, args: Record<string, unknown>) =>
+          w.proof.executeCommand(finance, cmd as never, args as never);
+
+        // Ana clocks out; her time is the labor record.
+        await w.proof.executeCommand(
+          w.proof.asRole({
+            subject: `crew-ana-${TENANT}`,
+            role: "event_staff",
+            tenantId: TENANT,
+          }),
+          M.TimeRecord_clockOut,
+          {
+            docId: facts.clockInId,
+            version: await versionOf(w, facts.clockInId),
+            breakMinutes: 0,
+          } as never,
+        );
+
+        // Damage: the company pays the broken chargers, the client the lost one.
+        const issues = await eventRows<{
+          tenantId: string;
+          _id: string;
+          kind: string;
+        }>(w, "equipmentIssues", id.golden);
+        const damaged = issues.find((i) => i.kind === "damaged")!;
+        const missing = issues.find((i) => i.kind === "missing")!;
+        await pay(M.EquipmentIssue_settle, {
+          docId: damaged._id,
+          version: await versionOf(w, damaged._id),
+          resolution: "Two chargers paid to the rental company",
+          payer: "company",
+          cost: 30,
+        });
+        await pay(M.EquipmentIssue_settle, {
+          docId: missing._id,
+          version: await versionOf(w, missing._id),
+          resolution: "Added to the final bill",
+          payer: "client",
+          chargeAmount: 15,
+        });
+
+        // The event's one invoice is sent and paid in full.
+        const [invoice] = await eventRows<{
+          tenantId: string;
+          _id: string;
+          status: string;
+        }>(w, "invoices", id.golden);
+        expect(invoice.status).toBe("draft");
+        await pay(M.Invoice_send, {
+          docId: invoice._id,
+          version: await versionOf(w, invoice._id),
+        });
+        const sent = await readRow<{ total: number; amountDue: number }>(
+          w.owner,
+          invoice._id,
+        );
+        expect(sent.total).toBeGreaterThan(0);
+        const payment = (await pay(M.Payment_createViaRecord, {
+          invoiceId: invoice._id,
+          clientId: id.client,
+          amount: sent.amountDue,
+          method: "card",
+        })) as { docId: string };
+        await pay(M.Payment_settle, {
+          docId: payment.docId,
+          version: await versionOf(w, payment.docId),
+        });
+        expect(
+          await readRow<{ status: string; amountDue: number }>(
+            w.owner,
+            invoice._id,
+          ),
+        ).toMatchObject({ status: "paid", amountDue: 0 });
+        facts.invoiceTotal = sent.total;
+
+        // The closeout read: every line from Capsule's own records.
+        const read = (await finance.query(
+          api.closeoutSources.eventCloseoutSources,
+          { eventId: id.golden } as never,
+        )) as {
+          projection: {
+            lines: {
+              key: string;
+              actual: number | null;
+              complete: boolean;
+              sources: { table: string; id: string; amount: number }[];
+            }[];
+            collected: number;
+            outstanding: number;
+          };
+        };
+        const { lines } = read.projection;
+        const line = (key: string) => lines.find((l) => l.key === key)!;
+        const ids = (key: string) => line(key).sources.map((s) => s.id);
+        // Revenue: the paid invoice, fully collected.
+        expect(line("revenue").actual).toBe(sent.total);
+        expect(ids("revenue")).toContain(invoice._id);
+        expect(read.projection.collected).toBe(sent.total);
+        expect(read.projection.outstanding).toBe(0);
+        // Food: the flour that arrived on the shared weekly order counts for
+        // this event; the order is only partly in, so the line stays open.
+        const flourRow = await readRow<{
+          receivedQuantity: number;
+          unitCost: number;
+        }>(w.owner, facts.flourLineId);
+        expect(flourRow.receivedQuantity).toBeCloseTo(
+          facts.orderedFlour / 2,
+          4,
+        );
+        expect(
+          line("ingredient").sources.find((s) => s.id === facts.flourLineId)
+            ?.amount,
+        ).toBeCloseTo(flourRow.receivedQuantity * flourRow.unitCost, 2);
+        expect(line("ingredient").complete).toBe(false);
+        // Waste: 0.5 kg at 2.
+        expect(line("waste")).toMatchObject({ actual: 1, complete: true });
+        expect(ids("waste")).toEqual([facts.wasteId]);
+        // Labor: Ana's clocked time.
+        expect(ids("labor")).toEqual([facts.clockInId]);
+        // Rentals and damage: the company-paid damage is a cost.
+        expect(line("vendor").sources).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ id: damaged._id, amount: 30 }),
+          ]),
+        );
+        expect(line("vendor").complete).toBe(true);
       },
       LONG,
     );
