@@ -4,6 +4,7 @@ import { formatStatusLabel } from "../../../lib/statusLabels";
 import { EventAllergenBriefingBody } from "../EventAllergenBriefingBody";
 import { EventBudgetCard } from "../EventBudgetCard";
 import { EventCalendarSyncNote } from "../EventCalendarSyncNote";
+import { EventChangeHistoryCard } from "../EventChangeHistoryCard";
 import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
 import { EventInvoiceCard } from "../EventInvoiceCard";
@@ -306,6 +307,7 @@ export function EventDashSheetBody({
               onAction={onAction}
             />
             <EventReviewFlagsSection eventId={eventId} />
+            <EventChangeHistoryCard eventId={eventId} />
           </div>
         </>
       );
