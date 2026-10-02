@@ -79,8 +79,13 @@ describe("shared metric definitions", () => {
   it("each of the seven dashboards lists only declared measures to the reader", () => {
     expect(DASHBOARD_PAGES).toHaveLength(7);
     for (const page of DASHBOARD_PAGES) {
-      const source = readFileSync(join(REPORTS_DIR, page), "utf8");
-      expect(source, page).toContain("<MetricDefinitionList");
+      const pageSource = readFileSync(join(REPORTS_DIR, page), "utf8");
+      expect(pageSource, page).toContain("<MetricDefinitionList");
+      // The scorecard keeps its measures in scorecardMeasures.ts.
+      const source = pageSource.includes("SCORECARD_MEASURES")
+        ? pageSource +
+          readFileSync(join(REPORTS_DIR, "scorecardMeasures.ts"), "utf8")
+        : pageSource;
       const ids = [...source.matchAll(/"(dashboard\.[a-z_]+)"/g)].map(
         (match) => match[1],
       );
