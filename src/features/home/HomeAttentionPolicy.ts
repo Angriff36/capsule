@@ -69,8 +69,9 @@ const OPEN_INVOICE_STATUSES = new Set([
   "overdue",
   "partial",
 ]);
+// PrepTask has no "open" status; a task not yet claimed is "pending".
 const OPEN_PREP_STATUSES = new Set([
-  "open",
+  "pending",
   "claimed",
   "in_progress",
   "blocked",
@@ -167,7 +168,7 @@ export class HomeAttentionPolicy {
         label: "Open prep tasks",
         count: openPrep.length,
         href: "/kitchen/prep",
-        detail: "Prep still open, claimed, in progress, or blocked.",
+        detail: "Prep not started, claimed, in progress, or blocked.",
       },
       {
         id: "open_packs",

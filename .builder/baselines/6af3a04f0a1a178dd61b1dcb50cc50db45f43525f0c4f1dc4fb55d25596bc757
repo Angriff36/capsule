@@ -1191,7 +1191,8 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   eventDishes: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2086,7 +2087,8 @@ export default defineSchema({
     .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
     .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_eventId", ["eventId"])
-    .index("by_tenantId_and_invoiceNumber", ["tenantId", "invoiceNumber"]),
+    .index("by_tenantId_and_invoiceNumber", ["tenantId", "invoiceNumber"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   invoiceNumberSequences: defineTable({
     tenantId: v.string(),
     lastNumber: v.number(),
@@ -2461,6 +2463,7 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   packListItems: defineTable({
     tenantId: v.string(),
@@ -2960,6 +2963,7 @@ export default defineSchema({
     .index("by_ingredientDemandId", ["ingredientDemandId"])
     .index("by_componentId", ["componentId"])
     .index("by_assignedToId", ["assignedToId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   prepTaskComments: defineTable({
     tenantId: v.string(),

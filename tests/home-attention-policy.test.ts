@@ -36,7 +36,7 @@ describe("HomeAttentionPolicy", () => {
         { status: "sent", deletedAt: null },
         { status: "overdue", deletedAt: null },
       ],
-      prepTasks: [{ status: "open", deletedAt: null }],
+      prepTasks: [{ status: "pending", deletedAt: null }],
       packLists: [],
       closeouts: [{ status: "draft", deletedAt: null }],
     });
@@ -100,7 +100,7 @@ describe("HomeAttentionPolicy", () => {
         },
       ],
       invoices: [{ status: "sent", deletedAt: now - 1 }],
-      prepTasks: [{ status: "open", deletedAt: now - 1 }],
+      prepTasks: [{ status: "pending", deletedAt: now - 1 }],
       packLists: [{ status: "draft", deletedAt: now - 1 }],
       closeouts: [{ status: "draft", deletedAt: now - 1 }],
     });

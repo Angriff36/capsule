@@ -283,6 +283,7 @@ import type * as teamChatCursor from "../teamChatCursor.js";
 import type * as teamChatPush from "../teamChatPush.js";
 import type * as teamChatPushSend from "../teamChatPushSend.js";
 import type * as teamChatSend from "../teamChatSend.js";
+import type * as todayDesk from "../todayDesk.js";
 import type * as tppParser from "../tppParser.js";
 import type * as tppReportFavorites from "../tppReportFavorites.js";
 import type * as tppReports_contacts from "../tppReports/contacts.js";
@@ -580,6 +581,7 @@ declare const fullApi: ApiFromModules<{
   teamChatPush: typeof teamChatPush;
   teamChatPushSend: typeof teamChatPushSend;
   teamChatSend: typeof teamChatSend;
+  todayDesk: typeof todayDesk;
   tppParser: typeof tppParser;
   tppReportFavorites: typeof tppReportFavorites;
   "tppReports/contacts": typeof tppReports_contacts;
