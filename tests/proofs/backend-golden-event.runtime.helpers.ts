@@ -45,6 +45,8 @@ export const FACTS = {
   newHeadcount: 100,
   flourPerServing: 0.1,
   saltPerServing: 0.01,
+  herbPerServing: 0.02,
+  breadOverride: 90,
   flourStock: 5,
   breadPrice: 6,
   saltedPrice: 4,
@@ -70,12 +72,13 @@ export const QUOTE = {
 export type World = {
   proof: Proof;
   owner: Role;
-  roles: ReturnType<typeof rolesFor>;
+  roles: ReturnType<typeof rolesFor> & { logistics: Role };
   run: {
     owner: ReturnType<typeof runner>;
     sales: ReturnType<typeof runner>;
     events: ReturnType<typeof runner>;
     kitchen: ReturnType<typeof runner>;
+    logistics: ReturnType<typeof runner>;
   };
   catalog: Catalog;
   menuId: string;
@@ -91,12 +94,20 @@ export async function seedWorld(): Promise<World> {
     role: "owner",
     tenantId: TENANT,
   });
-  const roles = rolesFor(proof, TENANT);
+  const roles = {
+    ...rolesFor(proof, TENANT),
+    logistics: proof.asRole({
+      subject: `logistics-${TENANT}`,
+      role: "logistics_manager",
+      tenantId: TENANT,
+    }),
+  };
   const run = {
     owner: runner(proof, owner),
     sales: runner(proof, roles.sales),
     events: runner(proof, roles.events),
     kitchen: runner(proof, roles.kitchen),
+    logistics: runner(proof, roles.logistics),
   };
   await run.owner(M.Organization_createViaRegister, {
     name: "Golden Kitchen LLC",
@@ -109,6 +120,8 @@ export async function seedWorld(): Promise<World> {
       stock: FACTS.flourStock,
     },
     { name: "Golden salt", perServing: FACTS.saltPerServing },
+    // Only reaches the event in step 14 (the dish that replaces another).
+    { name: "Golden herb", perServing: FACTS.herbPerServing },
   ]);
   const menu = await run.owner(M.Menu_createViaDraft, { name: "Golden menu" });
   await run.owner(M.MenuDish_createViaAdd, {
@@ -190,4 +203,53 @@ export async function emitted(
     (row) =>
       row.type === type && (entityId == null || row.entityId === entityId),
   );
+}
+
+export type PackLine = {
+  _id: string;
+  tenantId: string;
+  packListId: string;
+  description: string;
+  unit: string;
+  requiredQuantity: number;
+  packedQuantity: number;
+  category?: string | null;
+  ownership?: string | null;
+  returnRequired?: boolean | null;
+  sourcesJson?: string | null;
+  retiredAt?: number | null;
+  excludedAt?: number | null;
+  coveredBy?: string | null;
+  loadAssignmentId?: string | null;
+  status: string;
+  version: number;
+};
+
+/** The golden event's one pack list and its live lines. */
+export async function goldenPack(
+  w: World,
+  eventId: string,
+): Promise<{ packListId: string; lines: PackLine[] }> {
+  const lists = await eventRows<{ tenantId: string; _id: string }>(
+    w,
+    "packLists",
+    eventId,
+  );
+  if (lists.length !== 1)
+    throw new Error(`Expected one pack list, found ${lists.length}`);
+  const packListId = lists[0]._id;
+  const lines = (
+    await liveRows<PackLine>(w.owner, "packListItems", TENANT)
+  ).filter((row) => row.packListId === packListId);
+  return { packListId, lines };
+}
+
+/** The single live line with this description. */
+export function packLine(lines: PackLine[], description: string): PackLine {
+  const found = lines.filter((row) => row.description === description);
+  if (found.length !== 1)
+    throw new Error(
+      `Expected one "${description}" line, found ${found.length}`,
+    );
+  return found[0];
 }

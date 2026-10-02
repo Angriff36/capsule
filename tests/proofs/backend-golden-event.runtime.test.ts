@@ -7,14 +7,16 @@
  * Provider boundaries are stubbed; every write goes through the governed
  * commands and seams the product screens use.
  */
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { api } from "../../convex/_generated/api";
 import {
   action,
   emitted,
   eventRows,
   FACTS,
+  goldenPack,
   liveRows,
+  packLine,
   QUOTE,
   readRow,
   seedOperatorPerson,
@@ -22,8 +24,14 @@ import {
   TENANT,
   versionOf,
   WEEK,
+  type PackLine,
   type World,
 } from "./backend-golden-event.runtime.helpers";
+import {
+  packView,
+  type PackViewKind,
+} from "../../src/features/logistics/packViews";
+import { fakeRoutes, stubRouteEnv } from "./route-facts.runtime.helpers";
 import { readReconciliationReceipts } from "./single-reconciliation.runtime.helpers";
 import {
   drafts,
@@ -33,6 +41,15 @@ import {
 
 const M = api.mutations;
 const LONG = 120_000;
+const MIN = 60_000;
+/** Kitchen-to-venue drive (the stubbed provider answer) and timing rules. */
+const ROUTE = {
+  driveSeconds: 2400,
+  setup: 120,
+  load: 45,
+  cleanup: 60,
+  unload: 30,
+} as const;
 
 beforeAll(() => {
   if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
@@ -59,6 +76,10 @@ const id = {
   revision: "",
   breadLine: "",
   saltLine: "",
+  herbLine: "",
+  friesLine: "",
+  caesarLine: "",
+  truckRun: "",
 };
 
 async function submitAndConvert(eventDate: number, eventEndTime: number) {
@@ -279,6 +300,103 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
   );
 
   it(
+    "golden event 05: Set an operational headquarters and a real test venue. Stub only the provider boundary",
+    async () => {
+      stubRouteEnv();
+      const google = fakeRoutes(() => ROUTE.driveSeconds);
+      try {
+        await w.run.owner(M.OperatingLocation_createViaAdd, {
+          name: "Golden commissary",
+          addressLine1: "100 Commissary Way",
+          city: "Denver",
+          region: "CO",
+          postalCode: "80202",
+          countryCode: "us",
+          timeZone: "America/Denver",
+        });
+        await w.run.events(M.Event_configureTiming, {
+          docId: id.golden,
+          version: await versionOf(w, id.golden),
+          serviceStartsAt: WEEK.golden.startsAt,
+          setupMinutes: ROUTE.setup,
+          loadMinutes: ROUTE.load,
+          cleanupMinutes: ROUTE.cleanup,
+          unloadMinutes: ROUTE.unload,
+        });
+        await action(w.roles.events, api.eventRoutes.refreshEventRoute, {
+          eventId: id.golden,
+        });
+
+        // The drive was asked from the kitchen to the typed venue address.
+        expect(google.requests.length).toBeGreaterThan(0);
+        expect(google.requests[0].body.origin.address).toContain(
+          "100 Commissary Way",
+        );
+        expect(google.requests[0].body.destination.address).toContain(
+          QUOTE.venueAddress,
+        );
+        // Provenance: the stored fact names provider, origin, destination,
+        // the answer and when it was fetched.
+        const stored = await w.owner.run(async (ctx) =>
+          ctx.db.query("manifestEvents").collect(),
+        );
+        const routeFacts = (
+          stored as unknown as {
+            entity: string;
+            entityId: string;
+            payload: { fact?: Record<string, unknown> };
+          }[]
+        )
+          .filter(
+            (row) =>
+              row.entity === "EventRoute" &&
+              row.entityId === id.golden &&
+              row.payload.fact,
+          )
+          .map((row) => row.payload.fact!);
+        const outbound = routeFacts.find((fact) => fact.leg === "outbound")!;
+        expect(outbound).toMatchObject({
+          provider: "google_routes",
+          durationSeconds: ROUTE.driveSeconds,
+          distanceMeters: 31_500,
+        });
+        expect((outbound.origin as { kind: string }).kind).toBe(
+          "operating_location",
+        );
+        expect(outbound.fetchedAt).toBeTruthy();
+
+        // Every milestone, worked out exactly from serve time and the route.
+        const ev = (await w.roles.events.query(api.queries.getEvent, {
+          id: id.golden,
+        } as never)) as Record<string, number | null>;
+        const drive = ROUTE.driveSeconds / 60;
+        expect(ev.timingOutboundTravelMinutes).toBe(drive);
+        expect(ev.timingReturnTravelMinutes).toBe(drive);
+        const buffer = ev.timingSafetyBufferMinutes ?? 0;
+        const briefing = ev.timingBriefingMinutes ?? 0;
+        const serve = WEEK.golden.startsAt;
+        const onsite = serve - ROUTE.setup * MIN;
+        const depart = onsite - (drive + buffer) * MIN;
+        const load = depart - ROUTE.load * MIN;
+        const leaveVenue = WEEK.golden.endsAt + ROUTE.cleanup * MIN;
+        const back = leaveVenue + drive * MIN;
+        expect(ev.serviceStartsAt).toBe(serve);
+        expect(ev.timingOnsiteAt).toBe(onsite);
+        expect(ev.timingDepartShopAt).toBe(depart);
+        expect(ev.timingLoadStartAt).toBe(load);
+        expect(ev.timingStaffOnAt).toBe(load - briefing * MIN);
+        expect(ev.timingDepartVenueAt).toBe(leaveVenue);
+        expect(ev.timingReturnShopAt).toBe(back);
+        expect(ev.timingStaffOffAt).toBe(back + ROUTE.unload * MIN);
+      } finally {
+        vi.unstubAllGlobals();
+        vi.unstubAllEnvs();
+      }
+    },
+    LONG,
+  );
+
+  it(
     "golden event 06: Verify exactly one active Event menu set, ingredient contribution per source, demand line per compatible event/ingredient/unit, invoice draft, pack list, and intended staffing/prep records",
     async () => {
       // One menu set: the two lines added before acceptance, no copies.
@@ -287,7 +405,7 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         dishId: string;
       }>(w, "eventDishes", id.golden);
       expect(dishes.map((d) => d.dishId).sort()).toEqual(
-        [...w.catalog.dishIds].sort(),
+        w.catalog.dishIds.slice(0, 2).sort(),
       );
 
       const demands = await eventRows<{
@@ -335,6 +453,361 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       );
       expect(invoices.map((i) => i.status)).toEqual(["draft"]);
       expect(await eventRows(w, "packLists", id.golden)).toHaveLength(1);
+    },
+    LONG,
+  );
+
+  it(
+    "golden event 07: Include fries-in-cones, Caesar dressing on the side, full-service buffet, outside rentals, client-provided china, bar service, a soft-surface venue, and a rain plan",
+    async () => {
+      const rule = (r: Record<string, unknown>) =>
+        w.run.logistics(M.PackRule_createViaDefine, r);
+      const noteDish = async (name: string, note: string) => {
+        const dish = await w.run.kitchen(M.Dish_createViaIntroduce, {
+          name,
+          portionSize: 1,
+          portionUnit: "portion",
+        });
+        return (
+          await w.run.events(M.EventDish_createViaAddToEvent, {
+            eventId: id.golden,
+            dishId: dish.docId,
+            quantityServings: FACTS.headcount,
+            specialInstructions: note,
+          })
+        ).docId;
+      };
+      // The company's packing rules (set up once, used by every event).
+      await rule({
+        trigger: "production_note",
+        matchText: "in cones",
+        description: "Paper cones",
+        category: "disposable",
+        scaleBy: "servings",
+        perUnits: 1,
+        baseQuantity: 0,
+        sparePercent: 10,
+        returnRequired: false,
+      });
+      for (const description of ["Souffle cup", "Souffle lid"])
+        await rule({
+          trigger: "production_note",
+          matchText: "on the side",
+          description,
+          category: "disposable",
+          scaleBy: "servings",
+          perUnits: 1,
+          baseQuantity: 0,
+          returnRequired: false,
+        });
+      await rule({
+        trigger: "production_note",
+        matchText: "on the side",
+        description: "Dressing ladle",
+        category: "utensil",
+        baseQuantity: 1,
+      });
+      await rule({
+        trigger: "event_fact",
+        matchFact: "barService",
+        matchText: "bar",
+        description: "Bar tool kit",
+        category: "bar",
+        baseQuantity: 1,
+      });
+      await rule({
+        trigger: "event_fact",
+        matchFact: "venueSurface",
+        matchText: "grass",
+        description: "Flooring panels",
+        category: "flooring",
+        baseQuantity: 8,
+        requiredCapability: true,
+      });
+      await rule({
+        trigger: "event_fact",
+        matchFact: "rainPlan",
+        description: "Tarps",
+        category: "weather",
+        baseQuantity: 4,
+      });
+      await rule({
+        trigger: "event_fact",
+        matchFact: "tentAndFlooring",
+        description: "Frame tent",
+        category: "weather",
+        baseQuantity: 1,
+      });
+      await rule({
+        trigger: "event_fact",
+        matchFact: "handwashing",
+        description: "Handwashing station",
+        category: "handwashing",
+        baseQuantity: 1,
+      });
+      const buffet = await w.run.owner(M.ServiceStyle_createViaRegister, {
+        name: "Full Service Buffet",
+        code: "FSB",
+      });
+      await w.run.logistics(M.ServiceStyleKitItem_createViaAdd, {
+        serviceStyleId: buffet.docId,
+        description: "Chafing dish",
+        guestsPerUnit: 10,
+        sparePercent: 20,
+      });
+      await w.run.logistics(M.ServiceStyleKitItem_createViaAdd, {
+        serviceStyleId: buffet.docId,
+        description: "China dinner plate",
+        guestsPerUnit: 1,
+      });
+
+      // The event's own facts.
+      id.friesLine = await noteDish("Golden fries", "Fries in cones");
+      id.caesarLine = await noteDish("Golden Caesar", "Dressing on the side");
+      await w.run.events(M.Event_changeServiceStyle, {
+        docId: id.golden,
+        serviceStyleId: buffet.docId,
+        serviceStyleName: "Full Service Buffet",
+        version: await versionOf(w, id.golden),
+      });
+      await w.run.events(M.Event_updateDaySheet, {
+        docId: id.golden,
+        barService: "Full bar - Mangia",
+        version: await versionOf(w, id.golden),
+      });
+      await w.run.events(M.Event_updateSetupNotes, {
+        docId: id.golden,
+        venueSurface: "Grass lawn",
+        rainPlan: "Tent on standby",
+        tentAndFlooring: "20x40 frame tent",
+        handwashing: "Yes, none on site",
+        version: await versionOf(w, id.golden),
+      });
+      const chargers = await w.run.logistics(M.Equipment_createViaRegister, {
+        name: "Gold charger",
+        assetTag: "GC-100",
+        category: "place_setting",
+        ownership: "rented",
+        quantity: 200,
+      });
+      await w.proof.executeCommand(
+        w.roles.logistics,
+        api.equipmentCheckout.reserve,
+        {
+          equipmentId: chargers.docId,
+          eventId: id.golden,
+          startsAt: WEEK.golden.startsAt,
+          endsAt: WEEK.golden.endsAt,
+          quantity: FACTS.headcount,
+        } as never,
+      );
+      const truck = await w.run.owner(M.Vehicle_createViaRegister, {
+        make: "Isuzu",
+        model: "NPR",
+        registration: "GOLD-1",
+        ownership: "owned",
+        payloadCapacityKg: 3000,
+        operationalStatus: "available",
+      });
+      id.truckRun = (
+        await w.run.owner(M.EventVehicleAssignment_createViaAssign, {
+          eventId: id.golden,
+          vehicleId: truck.docId,
+        })
+      ).docId;
+
+      const { lines } = await goldenPack(w, id.golden);
+      const qty = (d: string) => packLine(lines, d).requiredQuantity;
+      expect(qty("Paper cones")).toBe(88); // 80 servings + 10% spare
+      expect(qty("Souffle cup")).toBe(FACTS.headcount);
+      expect(qty("Souffle lid")).toBe(FACTS.headcount);
+      expect(qty("Dressing ladle")).toBe(1);
+      expect(qty("Chafing dish")).toBe(10); // 80 / 10 + 20%
+      expect(qty("Bar tool kit")).toBe(1);
+      expect(qty("Flooring panels")).toBe(8);
+      expect(qty("Tarps")).toBe(4);
+      expect(qty("Frame tent")).toBe(1);
+      expect(qty("Handwashing station")).toBe(1);
+      expect(packLine(lines, "Gold charger")).toMatchObject({
+        requiredQuantity: FACTS.headcount,
+        ownership: "rented",
+        returnRequired: true,
+      });
+
+      // The client brings their own china: the kit's plates stay listed but
+      // are not packed, so Mangia never sends a duplicate.
+      const plates = packLine(lines, "China dinner plate");
+      await w.run.logistics(M.PackListItem_exclude, {
+        docId: plates._id,
+        version: plates.version,
+        reason: "Client brings their own china",
+        coveredBy: "client",
+      });
+      const after = await goldenPack(w, id.golden);
+      expect(packLine(after.lines, "China dinner plate")).toMatchObject({
+        excludedAt: expect.any(Number),
+        coveredBy: "client",
+      });
+      // One truck booked for the event.
+      expect(
+        await eventRows(w, "eventVehicleAssignments", id.golden),
+      ).toHaveLength(1);
+    },
+    LONG,
+  );
+
+  it(
+    "golden event 08: Verify reference, warehouse-category, vehicle/load, and return views contain the same underlying line identities and totals",
+    async () => {
+      let { packListId, lines } = await goldenPack(w, id.golden);
+      for (const description of ["Gold charger", "Flooring panels"]) {
+        const row = packLine(lines, description);
+        await w.run.logistics(M.PackListItem_assignLoad, {
+          docId: row._id,
+          version: row.version,
+          loadAssignmentId: id.truckRun,
+        });
+      }
+      const ctx = {
+        dishName: () => "A dish",
+        rigs: [{ id: id.truckRun, label: "Isuzu NPR" }],
+      };
+      const views = (rows: PackLine[]) =>
+        Object.fromEntries(
+          (["all", "reference", "warehouse", "load", "returns"] as const).map(
+            (kind) => [kind, packView(kind, rows, ctx).flatMap((g) => g.lines)],
+          ),
+        ) as Record<PackViewKind, PackLine[]>;
+      const ids = (rows: PackLine[]) => rows.map((r) => r._id).sort();
+      const total = (rows: PackLine[]) =>
+        rows.reduce((sum, r) => sum + r.requiredQuantity, 0);
+
+      ({ lines } = await goldenPack(w, id.golden));
+      let v = views(lines);
+      expect(ids(v.reference)).toEqual(ids(v.all));
+      expect(ids(v.warehouse)).toEqual(ids(v.all));
+      expect(total(v.reference)).toBe(total(v.all));
+      expect(total(v.warehouse)).toBe(total(v.all));
+      const going = v.all.filter((r) => r.excludedAt == null);
+      expect(ids(v.load)).toEqual(ids(going));
+      expect(total(v.load)).toBe(total(going));
+      for (const row of v.returns) expect(ids(going)).toContain(row._id);
+      expect(ids(v.returns)).toContain(packLine(lines, "Gold charger")._id);
+      const truckGroup = packView("load", lines, ctx).find(
+        (g) => g.key === `rig:${id.truckRun}`,
+      )!;
+      // One truck on the event: everything going rides on it.
+      expect(ids(truckGroup.lines)).toEqual(ids(going));
+      expect(packLine(lines, "Gold charger").loadAssignmentId).toBe(
+        id.truckRun,
+      );
+
+      // Packing counted from one view shows in every view: they all read
+      // the same row.
+      await w.run.logistics(M.PackList_startPacking, {
+        docId: packListId,
+        version: await versionOf(w, packListId),
+      });
+      const tarps = packLine(lines, "Tarps");
+      await w.run.logistics(M.PackListItem_recordPackedCount, {
+        docId: tarps._id,
+        version: tarps.version,
+        packedQuantity: 2,
+        idempotencyKey: "golden-pack-tarps",
+      });
+      ({ lines } = await goldenPack(w, id.golden));
+      v = views(lines);
+      for (const kind of ["all", "reference", "warehouse", "load", "returns"])
+        expect(
+          v[kind as PackViewKind].find((r) => r._id === tarps._id)
+            ?.packedQuantity,
+          kind,
+        ).toBe(2);
+    },
+    LONG,
+  );
+
+  it(
+    "golden event 09: Evaluate every Final Lock office question",
+    async () => {
+      const report = (await w.roles.events.query(
+        api.lib.eventPacket.finalLock.getFinalLock,
+        { eventId: id.golden } as never,
+      )) as {
+        outcome: string;
+        answers: {
+          questionKey: string;
+          group: string;
+          result: string;
+          value: unknown;
+          missing: string[];
+          action: string | null;
+          sources: unknown[];
+          fieldWork: { confirmedAt: string | null } | null;
+        }[];
+      };
+      const office = report.answers.filter((a) => a.group !== "field");
+      const field = report.answers.filter((a) => a.group === "field");
+      expect(office.length).toBeGreaterThan(30);
+      // Every office question is answered, not applicable, or names exactly
+      // what is missing and the one step that settles it.
+      for (const a of office) {
+        expect(
+          ["answered", "not_applicable", "unresolved"],
+          a.questionKey,
+        ).toContain(a.result);
+        if (a.result === "unresolved") {
+          expect(a.missing.length, a.questionKey).toBeGreaterThan(0);
+          expect(a.action, a.questionKey).toBeTruthy();
+        } else if (a.result === "answered")
+          expect(a.sources.length, a.questionKey).toBeGreaterThan(0);
+      }
+      const at = (key: string) =>
+        report.answers.find((a) => a.questionKey === key)!;
+      expect(at("identity.guest_count").value).toEqual({
+        type: "count",
+        count: FACTS.headcount,
+      });
+      expect(at("identity.service_style").value).toEqual({
+        type: "choice",
+        choice: "Full Service Buffet",
+      });
+      expect(at("setup.rain_plan").result).toBe("answered");
+      expect(at("setup.venue_surface").result).toBe("answered");
+      expect(at("timeline.route").result).toBe("answered");
+      // Chargers are rented and the client brings the china: no Mangia
+      // china is promised twice.
+      const pieces = (at("servingware.source").value as { items: string[] })
+        .items;
+      expect(pieces).toEqual(
+        expect.arrayContaining(["Rented pieces", "Client-provided pieces"]),
+      );
+      expect(pieces).not.toContain("Mangia pieces");
+      // The inquiry's dietary note is not passed off as load-in notes.
+      expect(at("setup.load_in")).toMatchObject({
+        result: "unresolved",
+        missing: ["No load-in notes on the venue or the event."],
+      });
+      expect(at("rentals.return")).toMatchObject({
+        result: "unresolved",
+        missing: ["This event has rentals but nobody is named to return them."],
+      });
+      // Day-of work stays open until named people do it on the day.
+      expect(field.length).toBeGreaterThan(0);
+      for (const a of field) {
+        expect(a.result, a.questionKey).toBe("field_confirmation");
+        expect(a.fieldWork?.confirmedAt ?? null, a.questionKey).toBeNull();
+      }
+      expect(report.outcome).toBe("needs_review");
+
+      // Open office questions show on the event's readiness list.
+      const readiness = (await w.roles.events.query(
+        api.eventReadiness.getEventReadiness,
+        { eventId: id.golden } as never,
+      )) as { issues?: { code: string }[] } | null;
+      expect(JSON.stringify(readiness)).toContain(
+        "packet.final_lock_needs_review",
+      );
     },
     LONG,
   );
@@ -440,6 +913,105 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
           FACTS.flourStock,
         4,
       );
+    },
+    LONG,
+  );
+
+  it(
+    "golden event 14: Remove one dish and add another; verify removed unstarted work retires, manual overrides remain, and no duplicate demand or pack items appear",
+    async () => {
+      const [flourId, saltId, herbId] = w.catalog.ingredientIds;
+      // A manager's own count on the bread line must survive the menu change.
+      await w.run.owner(M.EventDish_setHeadcountOverride, {
+        docId: id.breadLine,
+        headcountOverride: FACTS.breadOverride,
+      });
+      const packBefore = await eventRows<{
+        tenantId: string;
+        _id: string;
+      }>(w, "packListItems", id.golden);
+
+      await w.run.owner(M.EventDish_remove, {
+        docId: id.saltLine,
+        reason: "Client swapped the salted course",
+      });
+      id.herbLine = (
+        await w.run.events(M.EventDish_createViaAddToEvent, {
+          eventId: id.golden,
+          dishId: w.catalog.dishIds[2],
+          quantityServings: FACTS.newHeadcount,
+        })
+      ).docId;
+
+      const bread = await readRow<{ headcountOverride: number | null }>(
+        w.owner,
+        id.breadLine,
+      );
+      expect(bread.headcountOverride).toBe(FACTS.breadOverride);
+      expect(
+        (
+          await eventRows<{ tenantId: string; _id: string }>(
+            w,
+            "eventDishes",
+            id.golden,
+          )
+        )
+          .map((d) => d._id)
+          .sort(),
+      ).toEqual(
+        [id.breadLine, id.herbLine, id.friesLine, id.caesarLine].sort(),
+      );
+
+      // Demand: one live line per ingredient; salt retired, herb added once.
+      const demands = await eventRows<{
+        tenantId: string;
+        ingredientId: string;
+        requiredQuantity: number;
+      }>(w, "ingredientDemands", id.golden);
+      const live = demands.filter((d) => d.requiredQuantity > 0);
+      expect(live.map((d) => d.ingredientId).sort()).toEqual(
+        [flourId, herbId].sort(),
+      );
+      expect(new Set(demands.map((d) => d.ingredientId)).size).toBe(
+        demands.length,
+      );
+      expect(
+        demands.find((d) => d.ingredientId === saltId)?.requiredQuantity ?? 0,
+      ).toBe(0);
+
+      // The weekly order follows: salt no longer bought for this event.
+      const [order] = await drafts(w.roles.procurement, TENANT);
+      const saltLine = await lineFor(
+        w.roles.procurement,
+        TENANT,
+        order._id,
+        saltId,
+      );
+      expect(saltLine?.orderedQuantity ?? 0).toBe(0);
+      const herbLine = await lineFor(
+        w.roles.procurement,
+        TENANT,
+        order._id,
+        herbId,
+      );
+      expect(herbLine!.orderedQuantity).toBeCloseTo(
+        FACTS.herbPerServing * FACTS.newHeadcount,
+        4,
+      );
+      expect(
+        await linkedEventIds(w.roles.procurement, TENANT, herbLine!._id),
+      ).toEqual([id.golden]);
+
+      // Pack items: no line appears twice.
+      const packAfter = await eventRows<{
+        tenantId: string;
+        _id: string;
+        description?: string;
+        sourceKey?: string | null;
+      }>(w, "packListItems", id.golden);
+      const keys = packAfter.map((p) => p.sourceKey ?? p.description ?? p._id);
+      expect(new Set(keys).size).toBe(keys.length);
+      expect(packAfter.length).toBeLessThanOrEqual(packBefore.length + 1);
     },
     LONG,
   );
