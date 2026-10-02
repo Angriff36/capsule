@@ -295,15 +295,25 @@ export function PrepBoardPage() {
           notes: String(data.get("notes") || "") || undefined,
         });
         const predecessorTaskIds = data.getAll("predecessorTaskId").map(String);
-        for (const predecessorTaskId of predecessorTaskIds) {
-          await createDependency({
-            dependentTaskId: created.docId,
-            predecessorTaskId,
-          });
-        }
+        // The task is saved first. Close the form either way, so a second
+        // press cannot make the task twice; say which waits were not saved.
         form.reset();
         setSelectedEventDishId("");
         setShowCreate(false);
+        let linked = 0;
+        try {
+          for (const predecessorTaskId of predecessorTaskIds) {
+            await createDependency({
+              dependentTaskId: created.docId,
+              predecessorTaskId,
+            });
+            linked += 1;
+          }
+        } catch (cause) {
+          throw new Error(
+            `The prep task was saved, but only ${linked} of ${predecessorTaskIds.length} "wait for" tasks were linked. To set the rest, cancel this task and open it again. ${cause instanceof Error ? cause.message : ""}`.trim(),
+          );
+        }
       },
       "Prep task opened and added to the production sheet.",
     );

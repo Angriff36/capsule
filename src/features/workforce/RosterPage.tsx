@@ -31,6 +31,7 @@ import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { runBulkItems } from "../../ui/bulk-select";
 import { useWorkingEventId } from "../events/workingEvent";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
@@ -390,8 +391,9 @@ export function RosterPage() {
   };
 
   const publishSelectedWeek = () => {
+    // A stop part way says how many were published; pressing again is safe.
     void run("publish-week", async () => {
-      for (const row of unpublishedPublicationRows) {
+      await runBulkItems(unpublishedPublicationRows, async (row) => {
         const recipientAuthSubjectId = row.person?.authSubjectId ?? undefined;
         if (row.notice) {
           await republishScheduleNotice({
@@ -412,7 +414,7 @@ export function RosterPage() {
             idempotencyKey: `weekly-schedule:${selectedWeekStartsAt}:${row.personId}`,
           });
         }
-      }
+      });
     });
   };
 

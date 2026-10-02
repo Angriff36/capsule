@@ -153,7 +153,7 @@ export function InventoryOverviewPage() {
     {
       label: "Open vendor orders",
       value: formatCount(openOrders.length),
-      hint: "Drafts plus orders sent to vendors",
+      hint: "Drafts plus orders marked sent",
       tone: "neutral",
       to: "/inventory/purchasing",
     },

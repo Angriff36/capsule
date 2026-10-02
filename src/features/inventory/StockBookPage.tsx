@@ -530,7 +530,14 @@ export function StockBookPage() {
       if (!values) return;
       const quantity = Number(values.quantity);
       const reason = String(values.reason ?? "").trim();
-      if (!Number.isFinite(quantity) || quantity <= 0 || !reason) return;
+      if (!Number.isFinite(quantity) || quantity <= 0 || !reason) {
+        setFailure(
+          new Error(
+            "Nothing was put back. Enter an amount above 0 and say why it came back.",
+          ),
+        );
+        return;
+      }
       void run(`${reservation._id}:return`, async () => {
         await returnUnused({
           docId: reservation._id,

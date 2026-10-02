@@ -8,10 +8,10 @@ const plural = (count: number, unit: string) =>
 /** Plain words for how far the order has gone toward the vendor. */
 export function draftCommitmentLabel(status: string): string {
   if (status === "draft")
-    return "Draft · not sent to the vendor. Event changes update it; nothing is sent until you send it.";
+    return "Draft · not sent to the vendor. Event changes update it until you mark it sent.";
   if (status === "pending_approval") return "Waiting for manager approval";
   if (status === "submitted")
-    return "Sent to the vendor · later changes show as a review item";
+    return "Marked sent · Capsule does not send it, so send it to the vendor yourself. Later changes show as a review item";
   if (status === "confirmed") return "Vendor confirmed";
   if (status === "partially_received") return "Partly received";
   if (status === "received") return "Received";

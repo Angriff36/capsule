@@ -405,8 +405,14 @@ export function PurchasingPage() {
       if (!values) return;
       const raw = String(values.amount ?? "").trim();
       const amount = raw === "" ? undefined : Number(raw);
-      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0))
+      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0)) {
+        setFailure(
+          new Error(
+            "The approval threshold must be a number of 0 or more. Leave it empty for no threshold.",
+          ),
+        );
         return;
+      }
       void run("approval-threshold", async () => {
         await setApprovalThreshold({
           docId: purchasingConfig._id,
@@ -471,8 +477,9 @@ export function PurchasingPage() {
         <strong>Automatic weekly draft</strong>
         <span>
           Add dishes, set headcount, approve the event — Capsule rolls the
-          ingredient shortages into one draft vendor order for the week. Nothing
-          is sent to a vendor until you submit it.
+          ingredient shortages into one draft vendor order for the week. Capsule
+          does not send orders to vendors: send the order yourself, then mark it
+          sent here.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
