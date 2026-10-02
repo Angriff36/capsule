@@ -229,6 +229,9 @@ const LINK_TABLE: Record<string, string> = {
   matchedExternalId: "@outside",
   matchedIngredientId: "ingredients",
   mentionedPersonIds: "people",
+  // PL-INBOX: the conversation a duplicate thread was merged into.
+  mergedIntoThreadId: "messageThreads",
+  targetThreadId: "messageThreads",
   missingByPersonId: "people",
   nativeTargetId: "events",
   observationId: "@outside",
