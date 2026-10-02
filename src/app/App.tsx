@@ -36,6 +36,7 @@ import { ErrorState, TableSkeleton } from "../ui/primitives";
 import { ActionResultHost } from "../ui/action-result";
 import { AuthGate } from "./AuthGate";
 import { AppShell } from "./shell/AppShell";
+import { RouteErrorBoundary } from "./shell/RouteErrorBoundary";
 
 const DemandLedgerPage = lazy(() =>
   import("../features/inventory/DemandLedgerPage").then((module) => ({
@@ -579,8 +580,14 @@ const EmailNotificationSettingsPage = lazy(() =>
   ),
 );
 
+// The route boundary also covers the full-screen pages outside AppShell
+// (event day, kitchen display, /my): a crash there clears on navigation.
 function SupplyRoute({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
+  return (
+    <RouteErrorBoundary>
+      <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>
+    </RouteErrorBoundary>
+  );
 }
 
 class AppErrorBoundary extends Component<

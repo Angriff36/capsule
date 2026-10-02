@@ -23,6 +23,7 @@ import {
   type PortalPayableInvoice,
 } from "./ClientPortalPayments";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import "./clientPortal.css";
 
 const PORTAL_STAGES: EventStage[] = [
@@ -108,9 +109,11 @@ export function ClientPortalPage({ token: tokenProp }: { token?: string }) {
   const portal = useLatestDefined(
     useQuery(api.clientPortal.getEvent, token ? { token, clock } : "skip"),
   ) as ClientPortalSnapshot | null | undefined;
+  const { loadingTooLong } = useSlowQuery(token ? portal : null);
 
   if (!token || portal === null) return <ClientPortalUnavailable />;
-  if (portal === undefined) return <ClientPortalLoading />;
+  if (portal === undefined)
+    return <ClientPortalLoading slow={loadingTooLong} />;
   return <ClientPortalView portal={portal} token={token} />;
 }
 
@@ -590,7 +593,7 @@ function DocumentCard({
   );
 }
 
-function ClientPortalLoading() {
+function ClientPortalLoading({ slow }: { slow: boolean }) {
   return (
     <main className="client-portal client-portal-state-page" aria-busy="true">
       <div className="client-portal-state-card">
@@ -599,7 +602,14 @@ function ClientPortalLoading() {
         </div>
         <p className="client-portal-eyebrow">Opening your event view</p>
         <h1>Gathering the latest details…</h1>
-        <div className="client-portal-loading-line" />
+        {slow ? (
+          <p role="alert">
+            This is taking longer than it should. Check your internet
+            connection, then refresh the page.
+          </p>
+        ) : (
+          <div className="client-portal-loading-line" />
+        )}
       </div>
     </main>
   );

@@ -16,6 +16,8 @@ import {
 } from "./facilitiesRoutes";
 import { StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { formatDate } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
@@ -86,12 +88,15 @@ export function VenueDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
+  const { loadingTooLong } = useSlowQuery(venue);
 
-  if (id === "skip" || venue === undefined) {
+  if (venue === undefined) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center text-ink-3">Loading...</div>
-      </div>
+      <QueryLoadState
+        title="This venue isn't loading"
+        detail="We couldn't load this venue. Check your connection, then refresh the page."
+        loadingTooLong={loadingTooLong}
+      />
     );
   }
 

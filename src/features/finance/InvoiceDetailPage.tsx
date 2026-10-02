@@ -59,6 +59,8 @@ import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { ReminderHistoryList } from "./ReminderHistoryList";
 import { useActionNotice } from "../../ui/action-result";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import "./taxWorkspace.css";
 
 const policy = new CommercialLifecyclePolicy();
@@ -123,6 +125,13 @@ export function InvoiceDetailPage() {
   );
   const [paymentLinkLoading, setPaymentLinkLoading] = useState(true);
   const { prompt, host } = useActionPrompt(busy != null);
+  const { loadingTooLong } = useSlowQuery(
+    [invoice, clients, creditMemos, events, invoices, payments].includes(
+      undefined,
+    ) || brandingLoading
+      ? undefined
+      : invoice,
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -187,7 +196,15 @@ export function InvoiceDetailPage() {
     return (
       <div className="operations-stage supply-stage">
         <FinanceWorkspaceNav />
-        <TableSkeleton rows={6} />
+        {loadingTooLong ? (
+          <QueryLoadState
+            title="This invoice isn't loading"
+            detail="We couldn't load this invoice. Check your connection, then refresh the page."
+            loadingTooLong
+          />
+        ) : (
+          <TableSkeleton rows={6} />
+        )}
       </div>
     );
   }

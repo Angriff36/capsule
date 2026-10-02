@@ -19,6 +19,7 @@ import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { classifyCommandFailure } from "../../events/CommandFailure";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -112,6 +113,12 @@ function readStopReport(
   } catch {
     return null;
   }
+}
+
+/** Server refusals in plain words: a stale run says someone else changed it. */
+function failureText(cause: unknown): string {
+  const failure = classifyCommandFailure(cause);
+  return `${failure.title}: ${failure.detail}`;
 }
 
 export function ImportRunDetailPage() {
@@ -212,7 +219,7 @@ export function ImportRunDetailPage() {
       await work();
       setNotice("Action completed successfully.");
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Operation failed");
+      setError(failureText(cause));
     } finally {
       setBusy(null);
     }
@@ -293,14 +300,16 @@ export function ImportRunDetailPage() {
       const parsed = JSON.parse(sourceRowsInput);
       rows = Array.isArray(parsed) ? parsed : [];
     } catch {
-      setError(`Invalid JSON for ${commitNoun} source rows`);
+      setError(
+        `Those ${commitNoun} rows can't be read. Paste them exactly as exported, as a list in square brackets.`,
+      );
       return;
     }
     // A report-archive run may finish on its file accounting alone.
     const archiveOnly =
       rows.length === 0 && Boolean(importRun.archiveStorageId);
     if (rows.length === 0 && !archiveOnly) {
-      setError(`Paste at least one ${commitNoun} source row (JSON array)`);
+      setError(`Paste at least one ${commitNoun} row to bring in.`);
       return;
     }
     setError(null);
@@ -333,7 +342,7 @@ export function ImportRunDetailPage() {
           ".",
       );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Commit failed");
+      setError(failureText(cause));
     } finally {
       setBusy(null);
     }
@@ -374,7 +383,7 @@ export function ImportRunDetailPage() {
         `Import finished: ${result.committed} more ${commitNoun}(s) brought in.`,
       );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Continue failed");
+      setError(failureText(cause));
     } finally {
       setBusy(null);
     }
@@ -408,7 +417,7 @@ export function ImportRunDetailPage() {
             ".",
         );
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Stop failed");
+        setError(failureText(cause));
       } finally {
         setBusy(null);
       }
@@ -434,7 +443,7 @@ export function ImportRunDetailPage() {
           `Reverted — ${result.rolledBack} match(es) marked as replaced.`,
         );
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Revert failed");
+        setError(failureText(cause));
       } finally {
         setBusy(null);
       }

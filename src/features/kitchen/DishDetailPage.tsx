@@ -17,6 +17,8 @@ import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useUndoToast } from "../../ui/useUndoToast";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
@@ -53,9 +55,19 @@ export function DishDetailPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { notifyUndo, host: undoHost } = useUndoToast();
   const { prompt, host } = useActionPrompt();
+  const { loadingTooLong } = useSlowQuery(dish);
 
   if (!id) return <ErrorState title="Dish not found" />;
   if (dish === undefined) {
+    if (loadingTooLong) {
+      return (
+        <QueryLoadState
+          title="This dish isn't loading"
+          detail="We couldn't load this dish. Check your connection, then refresh the page."
+          loadingTooLong
+        />
+      );
+    }
     return (
       <div className="culinary-document culinary-document-compact space-y-4">
         <Skeleton className="h-6 w-32" />
