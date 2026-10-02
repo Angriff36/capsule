@@ -247,6 +247,18 @@ describe("runtime proof: the Events page reads a bounded window at 10,000 events
       ),
     ).toBe(true);
 
+    // Client names follow the client read rule: plain staff see none and
+    // cannot find events by client name.
+    const crew = proof.asRole({
+      subject: "ledger-scale-crew",
+      role: "staff",
+      tenantId: TENANT,
+    });
+    const crewView = await read(crew, { search: "Zanzibar" });
+    expect(crewView!.rows.length).toBeGreaterThan(0);
+    expect(crewView!.rows.every((r) => r.clientLabel === "—")).toBe(true);
+    expect(crewView!.searchRows).toEqual([]);
+
     // Another company sees only its own event.
     const theirs = await read(outsider, { view: "all" });
     expect(theirs!.rows.map((r) => r.title)).toEqual(["Other company event"]);

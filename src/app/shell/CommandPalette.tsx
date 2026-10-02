@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "convex/react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../lib/api";
-import { useListEvent } from "../../lib/manifest-convex-react";
 import {
   BoxIcon,
   BuildingIcon,
@@ -58,7 +57,23 @@ export function CommandPalette({
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const events = useListEvent();
+  // The next upcoming events, read only while the palette is open; any other
+  // event is found by the server search below (PL-SCALE: never the whole
+  // event table on every screen).
+  const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
+  const upcoming = useQuery(
+    api.eventLedger.ledgerWindow,
+    open
+      ? {
+          view: "upcoming",
+          dir: "asc",
+          limit: 50,
+          showArchived: false,
+          now: today,
+        }
+      : "skip",
+  );
+  const events = upcoming?.rows;
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const disabledCapabilities = authStatus?.disabledCapabilities;
   const { hits: searchHits, loading: searchLoading } = useNaturalLanguageSearch(
@@ -139,9 +154,8 @@ export function CommandPalette({
       })),
       ...eventRows.map((ev) => ({
         key: ev._id,
-        label: String(ev.title ?? "Untitled event"),
+        label: ev.title || "Untitled event",
         hint: "Event",
-        status: typeof ev.status === "string" ? ev.status : undefined,
         icon: <CalendarIcon />,
         run: go(`/events/${ev._id}`),
       })),

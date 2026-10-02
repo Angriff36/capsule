@@ -282,13 +282,21 @@ export const ledgerWindow = query({
       docs = page.slice(0, limit).filter(visible);
     }
 
-    const searchDocs = await searchEvents(ctx, tenantId, args.search);
+    // Client names follow the client read rule (sales or finance), as the
+    // old page did by reading the client list.
+    const seesClients = canRead(auth, ["salesAccess", "financeAccess"]);
+    const searchDocs = await searchEvents(
+      ctx,
+      tenantId,
+      args.search,
+      seesClients,
+    );
 
     const clients = new Map<string, Doc<"clients"> | null>();
     const styles = new Map<string, Doc<"serviceStyles"> | null>();
     const toRow = async (e: Doc<"events">): Promise<LedgerRow> => {
       let client: Doc<"clients"> | null = null;
-      if (e.clientId) {
+      if (e.clientId && seesClients) {
         if (!clients.has(e.clientId)) {
           const found = await ctx.db.get(e.clientId);
           clients.set(
@@ -348,6 +356,7 @@ async function searchEvents(
   ctx: QueryCtx,
   tenantId: string,
   search: string | undefined,
+  byClientName: boolean,
 ): Promise<Doc<"events">[]> {
   const term = (search ?? "").trim();
   if (term.length < 2) return [];
@@ -357,10 +366,11 @@ async function searchEvents(
       q.search("title", term).eq("tenantId", tenantId),
     )
     .take(SEARCH_TAKE);
+  const clientIndexes = byClientName
+    ? (["search_companyName", "search_givenName", "search_familyName"] as const)
+    : [];
   const clientHits = await Promise.all(
-    (
-      ["search_companyName", "search_givenName", "search_familyName"] as const
-    ).map((index) => {
+    clientIndexes.map((index) => {
       const field =
         index === "search_companyName"
           ? "companyName"
