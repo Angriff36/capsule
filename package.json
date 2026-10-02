@@ -45,7 +45,7 @@
     "secrets": "bun scripts/check-secrets.ts",
     "seed": "bun scripts/seed-convex.ts",
     "storybook": "storybook dev -p 6007 --no-open",
-    "test": "vitest run",
+    "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run",
     "test:coverage": "vitest run --coverage",
     "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts manifest-integration-guard tests/finance-routes.test.ts",
     "toolchain": "bun scripts/check-toolchain.ts",
