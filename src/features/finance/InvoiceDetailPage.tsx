@@ -368,17 +368,22 @@ export function InvoiceDetailPage() {
               "Invoice marked sent and payment reminders scheduled. Press Email the invoice to send the client the PDF.",
             );
           } catch (error) {
-            const detail =
-              error instanceof Error ? error.message : "setup failed";
+            const detail = error instanceof Error ? ` (${error.message})` : "";
             throw new Error(
-              `Invoice marked sent, but automatic reminder setup failed: ${detail}`,
+              `Invoice marked sent, but its automatic reminders were not saved${detail}. Check the due date, then press Enable reminders below.`,
             );
           }
           return;
         }
         if (key === "markViewed") await markViewed(args);
         if (key === "markOverdue") await markOverdue(args);
-        setNotice(`Invoice updated (${key}).`);
+        setNotice(
+          key === "markViewed"
+            ? "Invoice marked as seen by the client."
+            : key === "markOverdue"
+              ? "Invoice marked overdue."
+              : "Invoice updated.",
+        );
       });
     })();
   };
@@ -389,7 +394,9 @@ export function InvoiceDetailPage() {
   const balanceReminderSent = invoice.balanceReminderSentAt != null;
   const balanceDue = Number(invoice.amountDue ?? 0) > 0;
   const balanceReminderBlock = balanceReminderSent
-    ? "This invoice already has a balance reminder on file."
+    ? `A balance reminder was already noted on ${formatDate(
+        Number(invoice.balanceReminderSentAt),
+      )}. To email the client, use Send reminder now.`
     : balanceDue
       ? undefined
       : "Nothing remains due on this invoice.";
@@ -400,7 +407,9 @@ export function InvoiceDetailPage() {
         docId: invoice._id,
         version: invoice.version,
       });
-      setNotice("Balance reminder is on file for this invoice.");
+      setNotice(
+        "Balance reminder noted on this invoice. It does not email the client; use Send reminder now for that.",
+      );
     });
   };
 
@@ -451,7 +460,9 @@ export function InvoiceDetailPage() {
       );
       if (result.status === "delivered") {
         setNotice(
-          "Payment reminder with the invoice PDF and payment link was taken by the email service.",
+          `Payment reminder with the invoice PDF and payment link emailed${
+            result.to ? ` to ${result.to}` : ""
+          } just now.`,
         );
         return;
       }
@@ -468,7 +479,9 @@ export function InvoiceDetailPage() {
         return;
       }
       if (result.reason === "stripe_payment_received") {
-        setNotice("No reminder sent — Stripe already shows this invoice paid.");
+        setNotice(
+          "No reminder sent — the client already paid through the payment link.",
+        );
         return;
       }
       setNotice(
@@ -498,7 +511,9 @@ export function InvoiceDetailPage() {
         );
         return;
       }
-      setNotice("Invoice PDF emailed to the client.");
+      setNotice(
+        `Invoice PDF emailed to ${result.to ?? "the client"} just now.`,
+      );
     });
   };
 
@@ -506,7 +521,7 @@ export function InvoiceDetailPage() {
     void run("createPaymentLink", async () => {
       const link = await createPaymentLink(String(invoice._id));
       setPaymentLink(link);
-      setNotice("Stripe payment link ready. Copy it or send it to the client.");
+      setNotice("Payment link ready. Copy it or send it to the client.");
     });
   };
 
@@ -1326,7 +1341,7 @@ export function InvoiceDetailPage() {
                 ? "Loading…"
                 : reminderSchedule
                   ? "Enabled"
-                  : "Not configured"}
+                  : "Not set up"}
             </dd>
           </div>
         </dl>

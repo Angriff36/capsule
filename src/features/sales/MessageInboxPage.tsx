@@ -48,7 +48,7 @@ function threadTitle(t: Thread): string {
   return (
     t.subject?.trim() ||
     t.senderIdentity?.trim() ||
-    (t.providerThreadId ? `Thread ${t.providerThreadId}` : "Untitled thread")
+    "Conversation with no subject"
   );
 }
 
@@ -169,7 +169,12 @@ export function MessageInboxPage() {
     setNotice(null);
     const disposition = replyDisposition(selected.provider);
     if (!disposition.canRecord) {
-      fail(new Error(disposition.notice ?? "Cannot send this message."));
+      fail(
+        new Error(
+          disposition.notice ??
+            "Capsule cannot send in this conversation. Copy the reply and send it from the app the client used.",
+        ),
+      );
       return;
     }
     setSending(true);
@@ -208,7 +213,7 @@ export function MessageInboxPage() {
       });
       replyRequestId.current = null;
       setReply("");
-      setNotice(`Reply taken by the email service for ${result.to}.`);
+      setNotice(`Reply emailed to ${result.to} just now.`);
     } catch (e) {
       // The typed reply stays; Send again reuses the same id.
       fail(e);
@@ -226,7 +231,7 @@ export function MessageInboxPage() {
     try {
       await navigator.clipboard.writeText(body);
       setNotice(
-        "Draft copied. Send it from your email, SMS, or social provider; Capsule did not create an outbound message.",
+        "Reply copied. Paste it into the app the client used and send it from there; Capsule did not send it.",
       );
     } catch (e) {
       fail(e);
@@ -507,7 +512,7 @@ export function MessageInboxPage() {
           <div className="flex min-h-100 flex-col">
             {selected == null ? (
               <div className="empty-state m-4">
-                <strong>Pick a thread</strong>
+                <strong>Pick a conversation</strong>
                 <span>Select a conversation to read and reply.</span>
               </div>
             ) : (

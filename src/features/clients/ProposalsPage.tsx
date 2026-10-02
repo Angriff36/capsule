@@ -341,9 +341,7 @@ export function ProposalsPage() {
         const revision = latestRevisionFor(row._id);
         if (!revision) {
           setFailure(
-            new Error(
-              "Send the proposal first — a share link needs a published revision.",
-            ),
+            new Error("Send the proposal first, then make its share link."),
           );
           return;
         }
@@ -405,7 +403,7 @@ export function ProposalsPage() {
         if (!proposalRevisionId) {
           setFailure(
             new Error(
-              "This proposal has no revision snapshot (sent before snapshots existed). Create a share link or accept it manually; signature requests need a snapshot.",
+              "This proposal was sent before Capsule kept a copy of each sent version, so it cannot ask for a signature. Send it again to ask for one, or mark it accepted by hand.",
             ),
           );
           return;
@@ -615,7 +613,9 @@ export function ProposalsPage() {
         );
         return;
       }
-      setNotice(`Proposal PDF emailed${result.to ? ` to ${result.to}` : ""}.`);
+      setNotice(
+        `Proposal PDF emailed to ${result.to ?? "the client"} just now.`,
+      );
     });
   };
 

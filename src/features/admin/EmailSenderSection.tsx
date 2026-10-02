@@ -53,7 +53,9 @@ export function EmailSenderSection({
       );
     } catch (cause) {
       setError(
-        cause instanceof Error ? cause.message : "Could not save the sender.",
+        cause instanceof Error
+          ? cause.message
+          : "Could not save the sender. Try again.",
       );
     } finally {
       setBusy(false);

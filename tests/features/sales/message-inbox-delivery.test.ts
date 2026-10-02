@@ -178,7 +178,7 @@ describe("MessageInboxPage delivery honesty", () => {
     expect(second.requestId).toBe(first.requestId);
     expect(input.value).toBe("");
     expect(container.textContent).toContain(
-      "Reply taken by the email service for a•••@garden.example.",
+      "Reply emailed to a•••@garden.example just now.",
     );
     expect(harness.createMessage).not.toHaveBeenCalled();
   });

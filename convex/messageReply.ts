@@ -130,7 +130,8 @@ export const sendEmailReply = action({
     const body = args.bodyText.trim();
     if (!body) throw new ConvexError("Write something in the reply.");
     const requestId = args.requestId.trim().slice(0, 100);
-    if (!requestId) throw new ConvexError("The reply is missing its id.");
+    if (!requestId)
+      throw new ConvexError("Reload the page, then send the reply again.");
     const resendApiKey = process.env.RESEND_API_KEY?.trim();
     const configuredFrom = process.env.INVOICE_REMINDER_FROM_EMAIL?.trim();
     if (!resendApiKey || !configuredFrom) {
@@ -139,7 +140,7 @@ export const sendEmailReply = action({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId) {
       throw new ConvexError(
-        "Conversation unavailable. Check your workspace access.",
+        "Capsule could not find this conversation. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
     const context = await ctx.runQuery(internal.messageReply.loadReplyContext, {
@@ -148,7 +149,7 @@ export const sendEmailReply = action({
     });
     if (!context) {
       throw new ConvexError(
-        "Conversation unavailable. Check your workspace access.",
+        "Capsule could not find this conversation. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
     if (context.provider !== "email") {

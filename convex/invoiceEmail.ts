@@ -49,7 +49,7 @@ export interface InvoiceEmailResult {
   /** "sent" = the email service took the email. */
   status: "sent" | "already_sent";
   emailId?: string;
-  /** For "already_sent": when the earlier email went and to whom. */
+  /** Who it went to (masked); for "already_sent" also when it went. */
   sentAt?: number;
   to?: string;
 }
@@ -90,7 +90,7 @@ export const send = action({
     });
     if (!invoice || !auth.tenantId || auth.tenantId !== invoice.tenantId) {
       throw new ConvexError(
-        "Invoice unavailable. Check your workspace access.",
+        "Capsule could not find this invoice. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
     if (
@@ -108,7 +108,7 @@ export const send = action({
     );
     if (!context) {
       throw new ConvexError(
-        "Invoice unavailable. Check your workspace access.",
+        "Capsule could not find this invoice. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
     const amountDue = Number(context.invoice.amountDue ?? 0);
@@ -274,7 +274,7 @@ export const send = action({
           `Invoice email ${emailId} sent but not added to the conversation: ${safeProviderMessage(cause)}`,
         );
       }
-      return { status: "sent", emailId };
+      return { status: "sent", emailId, to: maskEmail(recipient.email) };
     } catch (cause) {
       const { kind, remedy } = classifyReminderFailure(cause);
       await record(INVOICE_EMAIL_EVENT.failed, {

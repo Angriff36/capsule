@@ -1016,7 +1016,11 @@ async function deliverReminder(
       `Reminder ${sent.emailId} sent but not added to the conversation: ${safeProviderMessage(cause)}`,
     );
   }
-  return { status: "delivered", emailId: sent.emailId };
+  return {
+    status: "delivered",
+    emailId: sent.emailId,
+    to: maskEmail(context.recipient.email),
+  };
 }
 
 export const deliverScheduled = internalAction({

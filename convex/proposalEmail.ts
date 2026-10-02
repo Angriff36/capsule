@@ -160,7 +160,7 @@ export const send = action({
     });
     if (!visible || !auth.tenantId || auth.tenantId !== visible.tenantId) {
       throw new ConvexError(
-        "Proposal unavailable. Check your workspace access.",
+        "Capsule could not find this proposal. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
     const tenantId = visible.tenantId;
@@ -170,7 +170,7 @@ export const send = action({
     });
     if (!context) {
       throw new ConvexError(
-        "Proposal unavailable. Check your workspace access.",
+        "Capsule could not find this proposal. It may have been removed, or your role cannot open it. Ask a manager.",
       );
     }
     const { proposal } = context;
