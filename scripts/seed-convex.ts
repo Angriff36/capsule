@@ -123,6 +123,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ComponentStep_createViaAdd, { "componentId": "componentId-component-step-1", "instruction": "demo-instruction-1", "sortOrder": 1, "durationMinutes": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentStep_createViaAdd, { "componentId": "componentId-component-step-2", "instruction": "demo-instruction-2", "sortOrder": 2, "durationMinutes": 2 } as any);
+  // Contract has multiple initialization commands (draft, followEventClient); using the selected initialization command: draft.
   // Contract → api.mutations.Contract_createViaDraft
   rowsAttempted += 1;
   await client.mutation(api.mutations.Contract_createViaDraft, { "eventId": "eventId-contract-1", "clientId": "clientId-contract-1", "contractNumber": "demo-contractNumber-1", "title": "Contract 1", "documentUrl": "demo-documentUrl-1", "expiresAt": 1767268800000, "notes": "demo-notes-1" } as any);
@@ -597,6 +598,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ProductionBatchAllocation_createViaAllocate, { "productionBatchId": "productionBatchId-production-batch-allocation-1", "eventId": "eventId-production-batch-allocation-1", "eventDishId": "eventDishId-production-batch-allocation-1", "allocatedQuantity": 1, "unit": "demo-unit-1", "formulaShare": 1, "isSurplus": false } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ProductionBatchAllocation_createViaAllocate, { "productionBatchId": "productionBatchId-production-batch-allocation-2", "eventId": "eventId-production-batch-allocation-2", "eventDishId": "eventDishId-production-batch-allocation-2", "allocatedQuantity": 2, "unit": "demo-unit-2", "formulaShare": 2, "isSurplus": false } as any);
+  // Proposal has multiple initialization commands (draft, followEventClient); using the selected initialization command: draft.
   // Proposal → api.mutations.Proposal_createViaDraft
   rowsAttempted += 1;
   await client.mutation(api.mutations.Proposal_createViaDraft, { "clientId": "clientId-proposal-1", "eventId": "eventId-proposal-1", "proposalNumber": "demo-proposalNumber-1", "title": "Proposal 1", "eventDate": 1767268800000, "eventEndDate": 1767268800000, "eventType": "demo-eventType-1", "guestCount": 1, "venueName": "Proposal 1", "venueAddress": "demo-venueAddress-1", "subtotal": 1, "taxAmount": 1, "discountAmount": 1, "total": 1, "expiresAt": 1767268800000, "notes": "demo-notes-1", "terms": "demo-terms-1", "visibleSections": "demo-visibleSections-1", "sectionOrder": "demo-sectionOrder-1", "replacesProposalId": "replacesProposalId-proposal-1" } as any);

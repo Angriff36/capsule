@@ -469,8 +469,19 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Reaction-only: the proposal follows its event to a new client (#378).
+  // Only the role check, so an archived proposal cannot block the event move.
+  command followEventClient(clientId: uuid) {
+    guard roleAllows(user.role, "salesAccess")
+    mutate clientId = clientId
+  }
+
   store Proposal in durable
 }
+
+on EventClientChanged fanOut Proposal where eventId = payload.eventId
+  run followEventClient
+  params { clientId: payload.clientId }
 
 event ProposalClientMergeStaged: "proposal.client_merge_staged" {
   proposalId: string

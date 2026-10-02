@@ -317,12 +317,14 @@ export function EventDashSheetBody({
           <EventDashSheetHead
             kicker="Edit event basics"
             title={title}
-            lede="Update schedule, headcount, venue, pricing, contact, and planning notes for this event."
+            lede="Update schedule, headcount, venue, pricing, client, contact, and planning notes for this event."
           />
           <div id="event-setup-basics">
             <EventDetailRevisePanels
               {...reviseProps}
               eventId={eventId}
+              clientId={clientId}
+              clients={clients}
               startsAt={startsAt}
               endsAt={endsAt}
               expectedHeadcount={expectedHeadcount}

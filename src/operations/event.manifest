@@ -1510,6 +1510,35 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Move the event to a different client (#378): booked under the wrong
+  // client, or a planner company replaced by the end client. Allowed in every
+  // stage so a wrong booking stays correctable. Sales access, because the
+  // proposals and contracts that follow the event are sales records. They follow
+  // the event (reactions in proposal.manifest / contract.manifest). Invoices
+  // and payments stay with the client they were billed to.
+  command moveToClient(
+    clientId: uuid,
+    optional primaryContactName: string,
+    optional primaryContactEmail: string,
+    optional primaryContactPhone: string
+  ) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesAccess")
+    constraint moveDistinctClient: clientId != self.clientId "This event already belongs to that client."
+    constraint moveClientActive: count(Client where id == clientId, status == "active") > 0 "Pick a client that is still active."
+    compute previousClientId = self.clientId
+    mutate clientId = clientId
+    mutate primaryContactName = primaryContactName != null and length(trim(primaryContactName)) > 0 ? primaryContactName : self.primaryContactName
+    mutate primaryContactEmail = primaryContactName != null and length(trim(primaryContactName)) > 0 ? primaryContactEmail : self.primaryContactEmail
+    mutate primaryContactPhone = primaryContactName != null and length(trim(primaryContactName)) > 0 ? primaryContactPhone : self.primaryContactPhone
+    emit EventClientChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: clientId
+    }
+  }
+
   command changeRequirements(
     optional accessibilityNeeds: list<string>,
     optional serviceRequirements: string,
@@ -2600,6 +2629,13 @@ event EventClientReassigned: "event.client_reassigned" {
   eventId: string
   tenantId: string
   previousClientId: string
+  clientId: string
+}
+
+event EventClientChanged: "event.client_changed" {
+  eventId: string
+  tenantId: string
+  previousClientId: string?
   clientId: string
 }
 

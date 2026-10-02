@@ -5858,6 +5858,13 @@ export const ContractExpireParamsSchema = z.object({});
 
 export type ContractExpireParams = z.infer<typeof ContractExpireParamsSchema>;
 
+// Command: followEventClient on Contract
+export const ContractFollowEventClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+});
+
+export type ContractFollowEventClientParams = z.infer<typeof ContractFollowEventClientParamsSchema>;
+
 // Command: markViewed on Contract
 export const ContractMarkViewedParamsSchema = z.object({});
 
@@ -6818,6 +6825,16 @@ export type EventLockForSalesParams = z.infer<typeof EventLockForSalesParamsSche
 export const EventMarkBinderBuiltParamsSchema = z.object({});
 
 export type EventMarkBinderBuiltParams = z.infer<typeof EventMarkBinderBuiltParamsSchema>;
+
+// Command: moveToClient on Event
+export const EventMoveToClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+  primaryContactName: z.string().optional(),
+  primaryContactEmail: z.string().optional(),
+  primaryContactPhone: z.string().optional(),
+});
+
+export type EventMoveToClientParams = z.infer<typeof EventMoveToClientParamsSchema>;
 
 // Command: normalizePurchasingWeek on Event
 export const EventNormalizePurchasingWeekParamsSchema = z.object({});
@@ -10640,6 +10657,13 @@ export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
 export const ProposalExpireParamsSchema = z.object({});
 
 export type ProposalExpireParams = z.infer<typeof ProposalExpireParamsSchema>;
+
+// Command: followEventClient on Proposal
+export const ProposalFollowEventClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+});
+
+export type ProposalFollowEventClientParams = z.infer<typeof ProposalFollowEventClientParamsSchema>;
 
 // Command: followEventHeadcount on Proposal
 export const ProposalFollowEventHeadcountParamsSchema = z.object({
