@@ -70045,7 +70045,7 @@ async function __runVenueActivate(ctx: MutationCtx, { docId, version }: any, __c
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -70110,7 +70110,7 @@ async function __runVenueChangeCapacity(ctx: MutationCtx, { docId, capacity, ver
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -70163,7 +70163,7 @@ async function __runVenueDeactivate(ctx: MutationCtx, { docId, reason, version }
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -70230,7 +70230,7 @@ async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, ca
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -70412,7 +70412,7 @@ export const Venue_createViaRegister = mutation({
       wasteRules: args.wasteRules,
       waterAccess: args.waterAccess
     };
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -70475,7 +70475,7 @@ async function __runVenueSetSiteFacts(ctx: MutationCtx, { docId, seatedCapacity,
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -70537,7 +70537,7 @@ async function __runVenueSetTimeZone(ctx: MutationCtx, { docId, timeZone, versio
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -70587,7 +70587,7 @@ async function __runVenueUpdateDetails(ctx: MutationCtx, { docId, name, venueTyp
     if (!__storedDoc) throw new Error("Venue not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venues");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");

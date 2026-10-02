@@ -433,7 +433,10 @@ entity Venue mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may see venues"
+  // Venues are shared operational context like the event plan itself (read
+  // by every staff role): finance reports group revenue by venue, sales quote
+  // for a venue, drivers need the address (#124).
+  default policy venueRead read: roleAllows(user.role, "staffAccess") "Staff may see venues"
   default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venues"
   default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venues"
 
