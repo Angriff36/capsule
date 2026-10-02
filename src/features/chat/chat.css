@@ -555,8 +555,8 @@
 }
 
 .chat-walkie-mic[data-recording="true"] {
-  background: var(--color-danger, #d64545);
-  border-color: var(--color-danger, #d64545);
+  background: var(--color-danger);
+  border-color: var(--color-danger);
   color: #fff;
   animation: chat-walkie-pulse 1.2s ease-in-out infinite;
 }
@@ -582,23 +582,23 @@
 }
 
 .chat-walkie-cancel {
-  color: var(--color-danger, #d64545);
+  color: var(--color-danger);
 }
 
 .chat-walkie-error {
   width: 100%;
   margin-top: 0.25rem;
   font-size: var(--text-sm);
-  color: var(--color-danger, #d64545);
+  color: var(--color-danger);
 }
 
 @keyframes chat-walkie-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(214 69 69 / 0.45);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-danger) 45%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 0.4rem rgb(214 69 69 / 0);
+    box-shadow: 0 0 0 0.4rem color-mix(in srgb, var(--color-danger) 0%, transparent);
   }
 }
 
@@ -616,13 +616,13 @@
   gap: 0.65rem;
   max-width: 22rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--line-2, #e3e3e3);
+  border: 1px solid var(--color-line-2);
   border-radius: var(--radius-pill);
-  background: var(--surface-2, #f7f7f7);
+  background: var(--color-chat-other);
 }
 
 .chat-voice[data-playing="true"] {
-  border-color: var(--color-brand, #2f6f4f);
+  border-color: var(--color-brand);
 }
 
 .chat-voice-toggle {
@@ -634,8 +634,8 @@
   flex-shrink: 0;
   border-radius: 9999px;
   border: none;
-  background: var(--color-brand, #2f6f4f);
-  color: #fff;
+  background: var(--color-brand);
+  color: var(--color-chat-on-accent);
   cursor: pointer;
 }
 
@@ -646,12 +646,23 @@
 .chat-voice-title {
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--ink, #1c1c1c);
+  color: var(--color-ink);
   line-height: 1.2;
 }
 
 .chat-voice-meta {
   font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
-  color: var(--ink-3, #8a8a8a);
+  color: var(--color-ink-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-walkie-mic[data-recording="true"] {
+    animation: none;
+  }
+
+  .chat-walkie-dot {
+    animation: none;
+    opacity: 1;
+  }
 }

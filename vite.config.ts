@@ -253,6 +253,15 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: "node",
+    // Node >=25 ships an experimental webstorage whose `localStorage` is
+    // undefined unless --localstorage-file is set; that broken global
+    // shadows jsdom's inside worker threads and killed every DOM test with
+    // "Cannot read properties of undefined (reading 'clear')". Turning it
+    // off here (not via NODE_OPTIONS in the test script — Builder owns that
+    // script) lets jsdom provide the real implementation.
+    poolOptions: {
+      forks: { execArgv: ["--no-experimental-webstorage"] },
+    },
     // Runtime proofs nominally take 3-5s; on this shared multi-session box
     // they blow past vitest's 5s default and the gate flakes (#398).
     testTimeout: 30_000,
