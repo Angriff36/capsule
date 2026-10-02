@@ -18,6 +18,24 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
+function mountSheet(onClose: () => void) {
+  const host = document.createElement("div");
+  document.body.appendChild(host);
+  root = createRoot(host);
+  act(() =>
+    root!.render(
+      createElement(RecordPreviewSheet, {
+        open: true,
+        title: "Dana Reyes",
+        onClose,
+        children: createElement(ActionMenu, {
+          children: createElement("button", { type: "button" }, "Archive"),
+        }),
+      }),
+    ),
+  );
+}
+
 function escape(target: EventTarget = document.activeElement ?? document) {
   const event = new KeyboardEvent("keydown", {
     key: "Escape",
@@ -32,22 +50,7 @@ function escape(target: EventTarget = document.activeElement ?? document) {
 
 it("an open menu inside a sheet takes the first Escape and keeps the sheet open", () => {
   const onClose = vi.fn();
-  const host = document.createElement("div");
-  document.body.appendChild(host);
-  root = createRoot(host);
-  act(() =>
-    root!.render(
-      createElement(
-        RecordPreviewSheet,
-        { open: true, title: "Dana Reyes", onClose },
-        createElement(
-          ActionMenu,
-          null,
-          createElement("button", { type: "button" }, "Archive"),
-        ),
-      ),
-    ),
-  );
+  mountSheet(onClose);
   const menu = document.querySelector<HTMLDetailsElement>("details")!;
   menu.open = true;
 
@@ -66,22 +69,7 @@ it("an open menu inside a sheet takes the first Escape and keeps the sheet open"
 
 it("a closed menu leaves Escape to the sheet", () => {
   const onClose = vi.fn();
-  const host = document.createElement("div");
-  document.body.appendChild(host);
-  root = createRoot(host);
-  act(() =>
-    root!.render(
-      createElement(
-        RecordPreviewSheet,
-        { open: true, title: "Dana Reyes", onClose },
-        createElement(
-          ActionMenu,
-          null,
-          createElement("button", { type: "button" }, "Archive"),
-        ),
-      ),
-    ),
-  );
+  mountSheet(onClose);
   escape();
   expect(onClose).toHaveBeenCalledTimes(1);
 });
