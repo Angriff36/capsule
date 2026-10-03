@@ -103,6 +103,16 @@ vi.mock("convex/react", async (importOriginal) => {
           capped: false,
         };
       }
+      // The picker's events: every live row the test gives (a small list).
+      if (name === "eventLookup:picker" && !backend.values.has(name)) {
+        const rows = (backend.values.get("useListEvent") ?? []) as {
+          deletedAt?: number | null;
+        }[];
+        return {
+          rows: rows.filter((row) => row.deletedAt == null),
+          capped: false,
+        };
+      }
       // Whole event records for a window: the same rows, as they are.
       if (name === "eventLookup:rangeDocs" && !backend.values.has(name)) {
         const { from, to, withUndated } = args as {

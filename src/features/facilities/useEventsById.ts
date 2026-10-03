@@ -138,15 +138,14 @@ export function useAllEventReportRows(): EventLookupRow[] | undefined {
 const DAY = 86_400_000;
 
 /**
- * Events a picker offers: from half a year back to two years ahead, plus
- * events with no date yet. Older events stay reachable from their own page.
- * The window moves once a day, not on every render.
+ * Events a picker offers (convex/eventLookup.ts `picker`): the next 400 from
+ * yesterday on, the last 200 of the past 90 days, and events with no date
+ * yet. Other events stay reachable from their own page. The read moves once
+ * a day, not on every render.
  */
 export function usePickerEvents(): EventLookupRow[] | undefined {
   const today = Math.floor(Date.now() / DAY) * DAY;
-  return useEventsInRange({
-    from: today - 183 * DAY,
-    to: today + 731 * DAY,
-    withUndated: true,
-  });
+  const result = useQuery(api.eventLookup.picker, { today });
+  if (result === undefined) return undefined;
+  return result?.rows ?? [];
 }

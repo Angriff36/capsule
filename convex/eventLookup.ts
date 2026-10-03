@@ -149,6 +149,65 @@ export const rangeDocs = query({
   },
 });
 
+/** What an event picker offers (see `picker`). */
+export const PICKER_AHEAD = 400;
+export const PICKER_BACK = 200;
+const PICKER_BACK_DAYS = 90;
+const PICKER_UNDATED = 150;
+const DAY = 86_400_000;
+
+/**
+ * Events a picker offers: the next PICKER_AHEAD events from yesterday on
+ * (soonest first), the last PICKER_BACK events of the past 90 days, and up to
+ * PICKER_UNDATED undated ones. Timed on a running backend with 10,000 events
+ * (scripts/scale-backend-timings.ts), the old half-year-back to two-years-ahead
+ * window read up to 3,600 records and took about 3 seconds; this reads at
+ * most 900. Older or later events are still found through the screen's own
+ * rows and the tab's working event (usePickerAndNamedEvents).
+ */
+export const picker = query({
+  args: { today: v.number() },
+  handler: async (
+    ctx,
+    { today },
+  ): Promise<{ rows: EventLookupRow[]; capped: boolean } | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, ["staffAccess"])) return null;
+    const tenantId = auth.tenantId;
+    const undated = (startsAt: null | undefined) =>
+      ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q) =>
+          q.eq("tenantId", tenantId).eq("startsAt", startsAt),
+        )
+        .take(PICKER_UNDATED);
+    const [ahead, back, none, missing] = await Promise.all([
+      ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q) =>
+          q.eq("tenantId", tenantId).gte("startsAt", today - DAY),
+        )
+        .take(PICKER_AHEAD),
+      ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .gte("startsAt", today - PICKER_BACK_DAYS * DAY)
+            .lt("startsAt", today - DAY),
+        )
+        .order("desc")
+        .take(PICKER_BACK),
+      undated(null),
+      undated(undefined),
+    ]);
+    const docs = [...back.reverse(), ...ahead, ...none, ...missing].filter(
+      (e) => e.deletedAt == null,
+    );
+    return { rows: docs.map(lookupRow), capped: ahead.length >= PICKER_AHEAD };
+  },
+});
+
 export const CLIENT_CAP = 2000;
 
 /** One client's live events (light rows), at most CLIENT_CAP. */
