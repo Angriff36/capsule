@@ -111,6 +111,14 @@ at 25,000 lines. The tab now reads only its dishes' rows
 (`convex/menuRecipeLookup.ts`). The event page, kitchen board, prep board,
 My day, allergen matrix, pack list and recipe page read their dishes by id.
 
+Month tracker sheet (run of 2026-10-03, same company): the sheet now reads
+only the shown month's pack lists, questions, trucks and numbers
+(`convex/eventMonthRows.ts`).
+
+| Read                                                  | Cold ms | p50 ms | p95 ms |
+| ----------------------------------------------------- | ------- | ------ | ------ |
+| Month tracker rows, 267 events (`eventMonthRows.forEvents`) | 354 | 347 | 360 |
+
 ## Still open for AC-172
 
 - The dish list's first read after a change (2.5 s at 5,000 dishes); left on
@@ -120,5 +128,5 @@ My day, allergen matrix, pack list and recipe page read their dishes by id.
   needs, equipment holds, rental lines, pack lists and proposals. Still
   whole on purpose: catalogs, stock holds, vendor orders, and the lists a
   screen compares across events (shift overlaps, a person's week, role
-  suggestions). The month tracker sheet still reads whole lists.
+  suggestions). The two-year tracker board still reads whole lists.
 - Screen response under 200 ms at this size (browser leg).

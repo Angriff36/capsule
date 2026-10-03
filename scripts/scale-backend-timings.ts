@@ -404,6 +404,21 @@ try {
           ),
         }),
     ),
+    await (async () => {
+      const month = (await client.query(api.eventLookup.range, {
+        from: today,
+        to: today + 30 * DAY,
+      })) as { rows: Array<{ _id: string }> };
+      const ids = month.rows.map((r) => r._id);
+      return time(
+        `Month tracker rows (eventMonthRows.forEvents, ${ids.length} events)`,
+        (i) =>
+          client.query(api.eventMonthRows.forEvents, {
+            // One id left out per call, so the cache cannot answer.
+            eventIds: ids.filter((_, k) => k !== i % ids.length),
+          }),
+      );
+    })(),
     await time(
       "One event's menu lines with recipes (queries.listEventDishByEventId)",
       (i) =>
