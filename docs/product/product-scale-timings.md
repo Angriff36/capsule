@@ -48,8 +48,50 @@ Separate legs:
   whole-database walk per index read. Its real p95 must come from the running
   backend.
 
+## Running backend, 2026-10-03
+
+Script: `bun run --cwd <checkout> scripts/scale-backend-timings.ts`. It
+starts a throwaway local Convex backend inside the checkout (ports 3310/3311,
+state in `.convex/local`, never the shared dev database), pushes the
+functions, imports the same company (10,000 events, 5,000 dishes, 200
+clients, 20,000 menu lines) and times each read over HTTP. Each read gets one
+cold call, then 120 calls whose arguments change every call so the backend's
+query cache cannot answer. Results go to `.artifacts/product-scale-backend.json`.
+
+Hardware: same machine as above; bun 1.3.4. Network: HTTP to the backend on
+the same machine. Import of the whole company: 22 s.
+
+First run found two reads over one second:
+
+| Read                                   | p95 before | Fix                                                     | p95 after |
+| -------------------------------------- | ---------- | ------------------------------------------------------- | --------- |
+| Events page window, 200 rows           | 1,246 ms   | tab counts read at most 200 per lane (was 500): "200+"  | 703 ms    |
+| Event picker (18 screens)              | 2,957 ms   | new `eventLookup.picker`: next 400, last 90 days, undated | 419 ms    |
+
+All reads after the fixes (120 samples each):
+
+| Read                                   | Cold ms | p50 ms | p95 ms |
+| -------------------------------------- | ------- | ------ | ------ |
+| Events page window, 200 rows           | 689     | 686    | 703    |
+| Event detail, with menu                | 27      | 21     | 25     |
+| Calendar home, six weeks               | 411     | 409    | 432    |
+| Today page                             | 116     | 101    | 108    |
+| Event picker                           | 400     | 400    | 419    |
+| Dispatch week (seven days)             | 16      | 12     | 15     |
+| Dish detail                            | 16      | 16     | 19     |
+| Dish list, all 5,000 (same call)       | 2,469   | 18     | 37     |
+
+Separate legs:
+
+- Dish list: the warm figures are the backend's query cache. The first read
+  after any dish change reads all 5,000 dishes again: about 2.5 s at this
+  size.
+- All-time event export walk (20 pages of 500): first walk 3.1 s; repeat
+  walks are cached (83 ms).
+- This backend reads roughly 0.3 to 0.9 ms per record, so a read's time
+  follows how many records it touches.
+
 ## Still open for AC-172
 
-- p95 against a running backend with 100+ samples. This needs a backend that
-  is not the shared dev database, because the seed adds about 35,000 rows.
+- The dish list's first read after a change (2.5 s at 5,000 dishes).
 - Screen response under 200 ms at this size (browser leg).
