@@ -91,7 +91,15 @@ Separate legs:
 - This backend reads roughly 0.3 to 0.9 ms per record, so a read's time
   follows how many records it touches.
 
+Menu lines: the generated every-event menu list (every line of every event,
+each with its dish and whole recipe) ran 15.8 s and then failed with a server
+error at 20,000 lines. The event page and nine other screens read it. They now
+read one event's lines (p95 22 ms) or the lines of the events / dish they show
+(`convex/eventMenuLookup.ts`).
+
 ## Still open for AC-172
 
 - The dish list's first read after a change (2.5 s at 5,000 dishes).
+- Other whole-company lists the event tabs still read (recipe lines,
+  ingredients, prep tasks, guests).
 - Screen response under 200 ms at this size (browser leg).
