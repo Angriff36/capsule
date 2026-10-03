@@ -148,7 +148,7 @@ export function PackRulesPage() {
         </div>
       ) : (
         <div className="supply-table-wrap mt-4">
-          <table className="supply-table">
+          <table className="supply-table phone-cards">
             <thead>
               <tr>
                 <th>Item</th>
@@ -166,10 +166,10 @@ export function PackRulesPage() {
                     <strong>{rule.description}</strong>
                     <small className="block">Version {rule.ruleVersion}</small>
                   </td>
-                  <td>{describeRuleWhen(rule, names)}</td>
-                  <td>{describeRuleAmount(rule)}</td>
-                  <td>{describeRuleOwner(rule)}</td>
-                  <td>
+                  <td data-label="When">{describeRuleWhen(rule, names)}</td>
+                  <td data-label="How many">{describeRuleAmount(rule)}</td>
+                  <td data-label="Kind and owner">{describeRuleOwner(rule)}</td>
+                  <td data-label="State">
                     <StatusChip status={String(rule.status)} />
                   </td>
                   <td>

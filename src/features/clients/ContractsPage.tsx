@@ -297,7 +297,7 @@ export function ContractsPage() {
             <p>No open contracts.</p>
           </div>
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Title</th>
@@ -310,8 +310,10 @@ export function ContractsPage() {
               {visibleRows.map((row) => (
                 <tr key={row._id}>
                   <td>{row.title}</td>
-                  <td>{clientDisplayName(row.clientId, clients)}</td>
-                  <td>
+                  <td data-label="Client">
+                    {clientDisplayName(row.clientId, clients)}
+                  </td>
+                  <td data-label="Status">
                     <StatusChip status={String(row.status)} />
                   </td>
                   <td className="supply-row-actions">

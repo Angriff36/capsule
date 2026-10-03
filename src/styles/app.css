@@ -2251,9 +2251,11 @@
     border-top: 0;
   }
   table.phone-cards td {
+    max-width: none;
     padding: 0.1rem 0;
     border-top: 0;
     text-align: left;
+    white-space: normal;
   }
   table.phone-cards td[data-label]::before {
     content: attr(data-label) ": ";
