@@ -26,12 +26,12 @@ import {
   useGetEvent,
   useListClient,
   useListOrganization,
-  useListDish,
   useListEventTimelineActivity,
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import {
   useEventAssignmentRows,
   useEventShiftRows,
@@ -157,7 +157,6 @@ function EventDetailContent({
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
-  const dishes = useHeldQueryRows("dishes", useListDish());
   const eventId = event?._id ?? "skip";
   const eventAssignments = useEventAssignmentRows(eventId);
   const staffNeeds = useEventStaffNeedRows(eventId);
@@ -165,6 +164,10 @@ function EventDetailContent({
   const eventDishes = useHeldQueryRows(
     `eventDishes:${event._id}`,
     useEventMenuLines(event._id),
+  );
+  const dishes = useHeldQueryRows(
+    `dishes:${event._id}`,
+    useDishesByIds(eventDishes?.map((row) => row.dishId)),
   );
   const timelineActivities = useHeldQueryRows(
     "eventTimelineActivities",

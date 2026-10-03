@@ -35,6 +35,7 @@ import type * as cutover from "../cutover.js";
 import type * as deckShareLinks from "../deckShareLinks.js";
 import type * as deliveryHealth from "../deliveryHealth.js";
 import type * as deploymentProbe from "../deploymentProbe.js";
+import type * as dishLookup from "../dishLookup.js";
 import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
@@ -340,6 +341,7 @@ declare const fullApi: ApiFromModules<{
   deckShareLinks: typeof deckShareLinks;
   deliveryHealth: typeof deliveryHealth;
   deploymentProbe: typeof deploymentProbe;
+  dishLookup: typeof dishLookup;
   driverAssignment: typeof driverAssignment;
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;

@@ -1,9 +1,7 @@
 import { useMemo } from "react";
-import {
-  useListDish,
-  useListEventGuest,
-} from "../../lib/manifest-convex-react";
+import { useListEventGuest } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
 import { displayEventMenuNotes } from "./eventMenuLineFields";
 import {
@@ -38,7 +36,7 @@ export function EventAllergenBriefingBody({
     () => allEventGuests?.filter((g) => g.eventId === eventId),
     [allEventGuests, eventId],
   );
-  const dishes = useListDish();
+  const dishes = useDishesByIds(eventDishes?.map((row) => row.dishId));
 
   const menu = useMemo(() => {
     const dishById = new Map((dishes ?? []).map((dish) => [dish._id, dish]));

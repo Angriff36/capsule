@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import {
   useListComponent,
   useListPerson,
-  useListDish,
   useListDishIngredient,
   useListIngredient,
   useListPrepTask,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
@@ -27,7 +27,6 @@ type Props = {
 
 export function EventPrepTab({ eventId, eventStage }: Props) {
   const eventDishes = useEventMenuLines(eventId);
-  const dishes = useListDish();
   const components = useListComponent();
   const people = useListPerson();
   const dishIngredients = useListDishIngredient();
@@ -54,6 +53,15 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           row.status !== "cancelled",
       ),
     [eventId, prepTasks],
+  );
+  // Only the dishes this event's menu lines and prep tasks name.
+  const dishes = useDishesByIds(
+    eventDishes === undefined || prepTasks === undefined
+      ? undefined
+      : [
+          ...eventDishes.map((row) => row.dishId),
+          ...tasks.map((row) => row.dishId),
+        ],
   );
 
   const recipeFlags = useMemo(() => {

@@ -140,6 +140,18 @@ vi.mock("convex/react", async (importOriginal) => {
               : row.dishId === dishId),
         );
       }
+      // Dishes by id: the test's dish rows with those ids.
+      if (name === "dishLookup:byIds" && !backend.values.has(name)) {
+        const ids = new Set((args as { ids: string[] }).ids);
+        const rows = (backend.values.get("useListDish") ?? []) as {
+          _id: string;
+          deletedAt?: number | null;
+        }[];
+        return rows.filter((row) => ids.has(row._id) && row.deletedAt == null);
+      }
+      // The whole dish list read straight (an open dish picker).
+      if (name === "queries:listDish" && !backend.values.has(name))
+        return backend.values.get("useListDish");
       // The picker's events: every live row the test gives (a small list).
       if (name === "eventLookup:picker" && !backend.values.has(name)) {
         const rows = (backend.values.get("useListEvent") ?? []) as {
