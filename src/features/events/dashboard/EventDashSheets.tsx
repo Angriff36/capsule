@@ -20,7 +20,7 @@ import { eventDetailPath } from "../eventRoutes";
 import { STAGE_LABEL, type EventStage } from "../eventStatus";
 import { EventPacketPanel } from "../packet/EventPacketPanel";
 import { EventReviewFlagsSection } from "../review-flags/EventReviewFlagsSection";
-import { allergyLine, noteSections } from "./eventDashFacts";
+import { allergyText, noteSections } from "./eventDashFacts";
 import { EventDashSheetHead } from "./EventDashSheet";
 import "../EventOverview.css";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
@@ -173,7 +173,7 @@ export function EventDashSheetBody({
         </>
       );
     case "service": {
-      const allergy = allergyLine(
+      const allergy = allergyText(
         reviseProps.serviceRequirements,
         reviseProps.operationalRequirements,
       );

@@ -183,6 +183,12 @@
 .evd-allergy b {
   font-weight: 600;
 }
+.evd-allergy .evd-allergy-more {
+  color: var(--evd-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
 .evd .evd-edit-link {
   color: var(--evd-muted);
   font-size: 13px;
