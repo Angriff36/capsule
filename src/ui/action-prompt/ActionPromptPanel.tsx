@@ -90,7 +90,10 @@ export function ActionPromptPanel({
     // pending prompt: dismiss it, or reopen while a submit is in flight.
     let unmounting = false;
     const onNativeClose = () => {
-      if (unmounting) return;
+      // `close` is queued as a task: a dialog closed and reopened at once
+      // (StrictMode remounts the effect in dev) gets the old close event while
+      // it is open again. That event is not a close of this dialog.
+      if (unmounting || dialog.open) return;
       if (latest.current.busy) openModal(dialog);
       else latest.current.onDismiss();
     };
