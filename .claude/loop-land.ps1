@@ -55,6 +55,8 @@ function Release($h, $reviewer) {
   # Eight test workers ran this box out of memory and crashed the release check
   # three times on 2026-10-02/03 (worker "Channel closed" in the access matrix).
   $env:CAPSULE_TEST_WORKERS = '4'
+  # One release at a time: a second one would reset the shared release copy under the first.
+  if (Get-CimInstance Win32_Process -Filter "Name='bash.exe'" | Where-Object { $_.CommandLine -match 'release-clean\.sh' }) { Say "$($h.runId): a release is already running - this one waits for the next run"; return }
   $rel = (& 'C:\Program Files\Git\bin\bash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $reviewer" 2>&1) -join "`n"
   $rel | Add-Content $log
   $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
