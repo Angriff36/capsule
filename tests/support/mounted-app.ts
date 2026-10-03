@@ -184,6 +184,25 @@ vi.mock("convex/react", async (importOriginal) => {
         }[];
         return rows.filter((row) => ids.has(row._id) && row.deletedAt == null);
       }
+      // Month tracker rows of some events: the test's rows for those events.
+      if (name === "eventMonthRows:forEvents" && !backend.values.has(name)) {
+        const ids = new Set((args as { eventIds: string[] }).eventIds);
+        const rows = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as {
+              eventId?: string;
+              deletedAt?: number | null;
+            }[]
+          ).filter(
+            (row) => ids.has(String(row.eventId)) && row.deletedAt == null,
+          );
+        return {
+          packLists: rows("useListPackList"),
+          reviewFlags: rows("useListReviewFlag"),
+          vehicleAssignments: rows("useListEventVehicleAssignment"),
+          numberAssignments: rows("useListEventNumberAssignment"),
+        };
+      }
       // A menu's recipe, price and stock rows: the test's lists, as given.
       if (name === "menuRecipeLookup:forDishes" && !backend.values.has(name)) {
         const list = (hook: string) =>

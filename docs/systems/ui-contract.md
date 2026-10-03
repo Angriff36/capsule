@@ -597,7 +597,6 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listQualification` - live read
 - `queries.listReferralSource` - live read
 - `queries.listRentalOrderLineByEventId` - live read
-- `queries.listReviewFlag` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShiftByEventId` - live read
@@ -1232,6 +1231,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMonthRows.forEvents` - query; live read, updates by itself
 - `eventReadiness.getEventReadiness` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves

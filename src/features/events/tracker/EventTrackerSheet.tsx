@@ -4,16 +4,13 @@ import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import {
   useListClient,
-  useListEventNumberAssignment,
-  useListEventVehicleAssignment,
   useListInvoice,
-  useListPackList,
   useListPerson,
-  useListReviewFlag,
   useListServiceStyle,
   useListTrailer,
   useListVehicle,
 } from "../../../lib/manifest-convex-react";
+import { useEventMonthRows } from "../../../lib/useEventMonthRows";
 import { useEventRecordsInRange } from "../../facilities/useEventsById";
 import { QueryLoadState } from "../../../ui/QueryLoadState";
 import { useSlowQuery } from "../../../ui/useSlowQuery";
@@ -61,10 +58,12 @@ export function EventTrackerSheet() {
   const events = useEventRecordsInRange(monthWindow);
   const clients = useListClient();
   const invoices = useListInvoice();
-  const packLists = useListPackList();
-  const reviewFlags = useListReviewFlag();
-  const assignments = useListEventVehicleAssignment();
-  const numberAssignments = useListEventNumberAssignment();
+  // Pack lists, questions, trucks and numbers of the shown month's events.
+  const monthRows = useEventMonthRows(events?.map((event) => event._id));
+  const packLists = monthRows?.packLists;
+  const reviewFlags = monthRows?.reviewFlags;
+  const assignments = monthRows?.vehicleAssignments;
+  const numberAssignments = monthRows?.numberAssignments;
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
