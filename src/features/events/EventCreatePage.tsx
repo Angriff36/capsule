@@ -32,6 +32,7 @@ import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
 import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { EventCreateStandardList } from "./EventCreateStandardList";
 import { SERVICE_STYLE_CATALOG } from "./serviceStyleCatalog";
 import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
@@ -667,6 +668,12 @@ export function EventCreatePage() {
                     fills in here right away.
                   </p>
                 ) : null}
+                {occasionsEmpty ? (
+                  <EventCreateStandardList
+                    singular="occasion"
+                    existing={occasions}
+                  />
+                ) : null}
               </div>
               <label className="field-label">
                 Expected headcount *
@@ -906,6 +913,13 @@ export function EventCreatePage() {
                   </span>
                 ) : null}
               </label>
+              {referralSources !== undefined &&
+              activeReferralSources.length === 0 ? (
+                <EventCreateStandardList
+                  singular="referral source"
+                  existing={referralSources}
+                />
+              ) : null}
             </div>
           </FormSection>
         </form>

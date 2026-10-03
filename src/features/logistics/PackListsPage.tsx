@@ -27,7 +27,7 @@ import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 const policy = new LogisticsLifecyclePolicy();
 
 export function PackListsPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("pack-lists");
   const workingId = useWorkingEventId();
   const packLists = useListPackList();
   const packListItems = useListPackListItem();

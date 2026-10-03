@@ -326,6 +326,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -509,6 +510,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -539,7 +541,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ## 3. Event overview
 
-Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventStageActionsCard.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
+Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventStageActionsCard.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
 
 ### Generated reads
 
@@ -958,6 +960,13 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
   - effects: EventBinderBuilt
   - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 126 more
+- `mutations.Event_moveToClient` (Event.moveToClient)
+  - inputs from the screen: clientId, primaryContactName, primaryContactEmail, primaryContactPhone; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "This event already belongs to that client."; and 3 more
+  - effects: EventClientChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 126 more
 - `mutations.Event_planEngagement` (Event.planEngagement)
   - inputs from the screen: clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, clientName, serviceStyleId, serviceStyleName, occasionId, occasionName, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, ownerName, referralSourceId; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -1042,6 +1051,13 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Event and kitchen staff may see incidents"; "Event and kitchen staff may update incidents"; "Event and kitchen staff may change incidents"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: IncidentResolved
   - refresh: live reads update by themselves; reads affected: Incident.list, Incident.get, CorrectiveAction.list, CorrectiveAction.get, Delivery.list, Delivery.get, Event.list, Event.get and 4 more
+- `mutations.Occasion_createViaRegister` (Occasion.register)
+  - inputs from the screen: name, code, sortOrder, description; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event and sales staff may see occasions"; "Event managers may update occasions"; "Event managers may change occasions"; "Guard 0 failed"; "Guard 1 failed"; "Give this occasion a name."; and 2 more
+  - effects: OccasionRegistered
+  - refresh: live reads update by themselves; reads affected: Occasion.list, Occasion.get, Event.list, Event.get, QuoteSubmission.list, QuoteSubmission.get
 - `mutations.Organization_configureEquipmentFields` (Organization.configureEquipmentFields)
   - inputs from the screen: fieldsJson; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -1119,6 +1135,13 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Staff may see planning rules"; "Event managers, logistics staff and managers may update planning rules"; "Event managers, logistics staff and managers may change planning rules"; "Guard 0 failed"; "Guard 1 failed"; "Give this rule a name."; and 2 more
   - effects: PlanningRuleRevised
   - refresh: live reads update by themselves; reads affected: PlanningRule.list, PlanningRule.get, Equipment.list, Equipment.get
+- `mutations.ReferralSource_createViaRegister` (ReferralSource.register)
+  - inputs from the screen: name, code, sortOrder, description; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event and sales staff may see referral sources"; "Sales managers may update referral sources"; "Sales managers may change referral sources"; "Guard 0 failed"; "Guard 1 failed"; "Give this referral source a name"; and 2 more
+  - effects: ReferralSourceRegistered
+  - refresh: live reads update by themselves; reads affected: ReferralSource.list, ReferralSource.get, Event.list, Event.get, Lead.list, Lead.get, QuoteSubmission.list, QuoteSubmission.get and 2 more
 - `mutations.ReviewFlag_createViaRaise` (ReviewFlag.raise)
   - inputs from the screen: eventId, targetKind, question, targetId, targetLabel; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -1175,25 +1198,11 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Cargo space can't be negative. Use zero or more, or leave it empty."; and 3 more
   - effects: TrailerCargoFactsSet
   - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
-- `mutations.Vehicle_setCargoFacts` (Vehicle.setCargoFacts)
-  - inputs from the screen: cargoVolumeM3, hitchType; filled by the server: none
-  - version: required (`version`); retry key: accepted (same key = same result)
-  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Cargo space can't be negative. Use zero or more, or leave it empty."; and 2 more
-  - effects: VehicleCargoFactsSet
-  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
-- `mutations.Vehicle_setCrewFacts` (Vehicle.setCrewFacts)
-  - inputs from the screen: seatCount, driverQualificationName; filled by the server: none
-  - version: required (`version`); retry key: accepted (same key = same result)
-  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "A truck has at least one seat. Enter 1 or more, or leave it empty."; and 2 more
-  - effects: VehicleCrewFactsSet
-  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
 - `mutations.Venue_createViaRegister` (Venue.register)
   - inputs from the screen: name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Event staff may see venues"; "Event staff may update venues"; "Event staff may change venues"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - refusals (role, stage and rules): "Staff may see venues"; "Event staff may update venues"; "Event staff may change venues"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: VenueRegistered
   - refresh: live reads update by themselves; reads affected: Venue.list, Venue.get, Event.list, Event.get, RevenueAttribution.list, RevenueAttribution.get, VenueCommissionTerm.list, VenueCommissionTerm.get and 8 more
 
@@ -1212,6 +1221,7 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventLedger.ledgerWindow` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -1238,6 +1248,7 @@ Screens (63): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `reasonedChanges.holdEquipmentWithReason` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.sendOutWithReason` - mutation; authored step; live reads update by themselves
 - `rigTrailer.hitchTrailer` - mutation; authored step; live reads update by themselves
+- `rigTrailer.saveTruckFacts` - mutation; authored step; live reads update by themselves
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
 - `teamChat.channelSummary` - query; live read, updates by itself
@@ -1314,7 +1325,7 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see attached files; chat files show up with their message"; "Staff may update attachments"; "Staff may change attachments"; "Guard 0 failed"; "Chat files are attached through their message"; "This file needs something to attach to"; and 3 more
   - effects: AttachmentAdded
-  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get
+  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get, DeckShareLink.list, DeckShareLink.get
 - `mutations.ComponentComponent_adjustQuantity` (ComponentComponent.adjustQuantity)
   - inputs from the screen: quantity, unit; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -2195,6 +2206,7 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -2368,6 +2380,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3063,6 +3076,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3555,6 +3569,7 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3608,7 +3623,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see attached files; chat files show up with their message"; "Staff may update attachments"; "Staff may change attachments"; "Guard 0 failed"; "Chat files are attached through their message"; "This file needs something to attach to"; and 3 more
   - effects: AttachmentAdded
-  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get
+  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get, DeckShareLink.list, DeckShareLink.get
 - `mutations.EquipmentIssue_createViaRaise` (EquipmentIssue.raise)
   - inputs from the screen: kind, description, equipmentId, eventId, equipmentReservationId, rentalOrderLineId, quantity, severity, holdsUnits, dueAt, ownerName, vendorId, cost, payer, chargeAmount, notes; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -3822,6 +3837,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -4325,6 +4341,7 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself

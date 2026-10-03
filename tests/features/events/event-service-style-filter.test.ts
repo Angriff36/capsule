@@ -83,4 +83,43 @@ describe("event service style for lists and reports", () => {
     expect(container.textContent).not.toContain("Full e1");
     expect(container.textContent).toContain("Vending e2");
   });
+
+  it("asks the read for the style, and offers styles outside the loaded window (#428)", async () => {
+    backend.values.set("eventLedger:ledgerWindow", {
+      rows: [full("e1")].map((row) => ({
+        ...row,
+        clientLabel: "—",
+        venueName: null,
+      })),
+      styles: [
+        { key: "style-buffet", label: "Buffet" },
+        { key: "style-full", label: "Full Service" },
+      ],
+      more: true,
+      searchRows: [],
+      upcomingCount: 1,
+      attentionCount: 0,
+      upcomingCapped: false,
+      attentionCapped: false,
+    });
+    await mount(createElement(EventsListPage));
+    const select = container.querySelector<HTMLSelectElement>(
+      'select[aria-label="Filter by service style"]',
+    )!;
+    // More events exist past the window, so no counts that could lie.
+    expect([...select.options].map((option) => option.text)).toEqual([
+      "Any style",
+      "Buffet",
+      "Full Service",
+      "No service style",
+    ]);
+    change(select, "style-buffet");
+    const ledgerReads = backend.reads.mock.calls.filter(
+      ([name]) => name === "eventLedger:ledgerWindow",
+    );
+    expect(ledgerReads.at(-1)?.[1]).toMatchObject({
+      style: "style-buffet",
+      limit: 200,
+    });
+  });
 });

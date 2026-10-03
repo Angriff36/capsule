@@ -591,6 +591,13 @@ export function HomeCalendarPage() {
                 {unscheduled.length}
               </span>
             ) : null}
+            {monthRead?.capped ? (
+              <span className="fact" role="status">
+                <b>Too many to show:</b>
+                some events on these weeks are missing here. Open All events to
+                see every one.
+              </span>
+            ) : null}
             {selected ? (
               <span className="fact">
                 <b>Selected:</b>

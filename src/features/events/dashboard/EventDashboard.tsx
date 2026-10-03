@@ -66,6 +66,35 @@ export function EventDashboard(props: Props) {
     );
   }, [location.hash]);
 
+  // A link straight to a tab (?tab=staffing from "Fill this spot", the phone
+  // brief's "Open") lands at the top; on a phone the heading and stage list
+  // fill about two screens, so bring the tab's own work into view. Parts of
+  // the heading load a moment later and push the tabs down, so keep them in
+  // view for two seconds, until the person scrolls or taps.
+  useEffect(() => {
+    if (props.activeTab === "overview") return;
+    if (!window.matchMedia?.("(max-width: 767px)").matches) return;
+    const toTabs = () =>
+      document
+        .getElementById("event-sections")
+        ?.scrollIntoView?.({ block: "start" });
+    toTabs();
+    const wrap = document.querySelector(".evd-wrap");
+    if (!wrap || typeof ResizeObserver === "undefined") return;
+    const watch = new ResizeObserver(toTabs);
+    watch.observe(wrap);
+    const stop = () => {
+      watch.disconnect();
+      window.clearTimeout(timer);
+      for (const name of ["wheel", "touchstart", "keydown", "pointerdown"])
+        window.removeEventListener(name, stop);
+    };
+    const timer = window.setTimeout(stop, 2000);
+    for (const name of ["wheel", "touchstart", "keydown", "pointerdown"])
+      window.addEventListener(name, stop, { passive: true });
+    return stop;
+  }, [props.activeTab]);
+
   const onTab = (tab: EventDetailTab) => {
     setSheet(null);
     props.onTab(tab);

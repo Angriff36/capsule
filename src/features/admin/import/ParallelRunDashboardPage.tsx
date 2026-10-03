@@ -8,7 +8,6 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/lib/api";
 import {
-  useListEvent,
   useListDish,
   useListImportRun,
 } from "../../../lib/manifest-convex-react";
@@ -27,6 +26,7 @@ import { ParallelRunPeriodCheck } from "./ParallelRunPeriodCheck";
 import { useActionFailure } from "../../../ui/action-result";
 import { classifyCommandFailure } from "../../events/CommandFailure";
 import { FailureBanner } from "../../events/FailureBanner";
+import { useEventsInRange } from "../../facilities/useEventsById";
 
 /** One row of a "by ..." table: both sides' counts under one name. */
 function breakdownRows(
@@ -122,7 +122,13 @@ interface ComparisonMetric {
 }
 
 export function ParallelRunDashboardPage() {
-  const capsuleEvents = useListEvent();
+  // Only the comparison window's events (PL-SCALE), not every event. The
+  // window is fixed when the page opens, like selectedDateRange below.
+  const [windowEnd] = useState(() => Date.now());
+  const capsuleEvents = useEventsInRange({
+    from: windowEnd - COMPARISON_WINDOW_MS,
+    to: windowEnd + 1,
+  });
   const capsuleDishes = useListDish();
   const importRuns = useListImportRun();
   // The full link list is too long for one read: the menu check is counted

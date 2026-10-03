@@ -40,13 +40,13 @@ export interface CapsuleEventBundleDirectory {
      */
     lineDescriptions?: string[];
   }>;
-  vendorOrderNumbers: string[];
   /**
    * Vendor orders with the ingredient each line orders, so a run that opened
-   * an order but never finished its lines adds only the missing ones.
-   * Undefined means the loader did not read them.
+   * an order but never finished its lines adds only the missing ones. An
+   * order is always read with its lines (#241): there is no separate list of
+   * bare order numbers that could know an order but not its lines.
    */
-  vendorOrders?: Array<{
+  vendorOrders: Array<{
     id: string;
     orderNumber: string;
     status: string;

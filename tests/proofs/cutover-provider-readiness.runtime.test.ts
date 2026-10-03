@@ -317,18 +317,21 @@ describe("runtime proof: cutover provider readiness (#386)", () => {
       financialMode: "reference_history",
       backupEvidence: "Nightly backup on the Linux box, restored last Friday",
     });
+    // Clients and events are both needed before the switch (#425).
     await ownerA.run(async (ctx) => {
-      await ctx.db.insert("importRuns", {
-        tenantId: S.tenantA,
-        sourceSystem: "tpp_legacy" as const,
-        datasetType: "events" as const,
-        status: "completed" as const,
-        recordCounts: "{}",
-        actorId: "cutover-owner-a",
-        startTime: Date.now(),
-        completionTime: Date.now(),
-        version: 1,
-      });
+      for (const datasetType of ["events", "contacts"] as const) {
+        await ctx.db.insert("importRuns", {
+          tenantId: S.tenantA,
+          sourceSystem: "tpp_legacy" as const,
+          datasetType,
+          status: "completed" as const,
+          recordCounts: "{}",
+          actorId: "cutover-owner-a",
+          startTime: Date.now(),
+          completionTime: Date.now(),
+          version: 1,
+        });
+      }
     });
     await expect(
       ownerA.mutation(api.cutover.executeCutoverDecision, {

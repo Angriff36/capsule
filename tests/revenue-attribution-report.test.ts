@@ -29,6 +29,9 @@ const EVENTS: SplitEvent[] = [
     quotedPrice: 9999,
   },
   { _id: "june", stage: "approved", startsAt: JUNE + 1, quotedPrice: 7777 },
+  // #424: a quote or an event still in planning is not booked yet.
+  { _id: "quote", stage: "quote", startsAt: day(12), quotedPrice: 4444 },
+  { _id: "planning", stage: "planning", startsAt: day(14), quotedPrice: 3333 },
 ];
 
 const SPLITS: SplitRow[] = [

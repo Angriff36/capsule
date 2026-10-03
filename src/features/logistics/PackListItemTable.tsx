@@ -9,6 +9,7 @@ import { PackLineWhy } from "./PackLineWhy";
 import type { PackLineFacts } from "./packLineExplanation";
 import { packReturnSummary } from "./packReturn";
 import { packRowFacts } from "./packRowFacts";
+import { ReviewFlagInline } from "../events/review-flags/ReviewFlagInline";
 
 export interface PackListItemRow extends PackLineFacts {
   _id: string;
@@ -68,6 +69,8 @@ export interface PackListItemTableProps {
   extraActions?: (
     item: PackListItemRow,
   ) => Array<{ key: string; label: string }>;
+  /** The list's event: each line gets "Flag for review" (#368 item 13). */
+  reviewEventId?: string;
 }
 
 export function PackListItemTable({
@@ -89,6 +92,7 @@ export function PackListItemTable({
   selectableCount,
   failedItem,
   extraActions,
+  reviewEventId,
 }: PackListItemTableProps) {
   if (loading) return <TableSkeleton rows={5} />;
   if (items.length === 0) {
@@ -256,6 +260,15 @@ export function PackListItemTable({
               </td>
               <td>
                 <div className="supply-row-actions">
+                  {reviewEventId ? (
+                    <ReviewFlagInline
+                      eventId={reviewEventId}
+                      targetKind="pack_list_item"
+                      targetId={item._id}
+                      targetLabel={`${item.description} ×${item.requiredQuantity}`}
+                      disabled={busy != null}
+                    />
+                  ) : null}
                   {String(item.status) === "listed" ? (
                     <button
                       className="btn btn-ghost btn-sm"

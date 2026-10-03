@@ -79,12 +79,12 @@ export function countdownLabel(
 }
 
 /**
- * The allergy warning from the event notes: the line that names an allergy,
- * from its "ALLERGY:" label on, cut to one readable phrase. The notes are free
- * BEO text; the allergy can sit in the service or the operations notes, and
- * nothing else in the event records allergies at event level.
+ * The whole allergy warning from the event notes: the line that names an
+ * allergy, from its "ALLERGY:" label on. The notes are free BEO text; the
+ * allergy can sit in the service or the operations notes, and nothing else in
+ * the event records allergies at event level.
  */
-export function allergyLine(
+export function allergyText(
   ...notes: readonly (string | null | undefined)[]
 ): string | null {
   for (const note of notes) {
@@ -98,12 +98,19 @@ export function allergyLine(
       ? line.slice((label.index ?? 0) + label[0].length)
       : line;
     const text = from.trim();
-    if (!text) continue;
-    if (text.length <= 110) return text;
-    const cut = text.slice(0, 110);
-    return `${cut.slice(0, cut.lastIndexOf(" ")).trimEnd()}…`;
+    if (text) return text;
   }
   return null;
+}
+
+/** The allergy warning cut to one readable phrase (see `allergyText`). */
+export function allergyLine(
+  ...notes: readonly (string | null | undefined)[]
+): string | null {
+  const text = allergyText(...notes);
+  if (!text || text.length <= 110) return text;
+  const cut = text.slice(0, 110);
+  return `${cut.slice(0, cut.lastIndexOf(" ")).trimEnd()}…`;
 }
 
 /** The first line of a note, cut to `max` characters. */

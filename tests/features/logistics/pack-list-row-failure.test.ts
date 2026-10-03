@@ -51,6 +51,13 @@ it("a failed row action shows its own plain error and a Try again that reruns it
   markMissing.mockRejectedValueOnce(new Error("Network connection lost"));
   await mount(page(), `/logistics/packs/${LIST}`);
 
+  // Each line can be flagged for review, like menu lines (#368 item 13).
+  const flag = container.querySelector<HTMLElement>(
+    'tr [data-testid="review-flag-button"]',
+  );
+  expect(flag?.closest("tr")?.textContent).toContain("Cake cutter");
+  expect(flag?.textContent).toContain("Flag for review");
+
   // Marking an item on a draft list starts packing first (#142): no raw
   // server error about the list state.
   await click(button("Mark missing"));

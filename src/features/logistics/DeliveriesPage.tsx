@@ -45,7 +45,7 @@ const toEpoch = (value: FormDataEntryValue | null) => {
 };
 
 export function DeliveriesPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("deliveries");
   const deliveries = useListDelivery();
   const packLists = useListPackList();
   const eventIds = useMemo(

@@ -2,7 +2,9 @@
  * Revenue and splits for a period (PL-ATTRIBUTION, spec §7.3 / §8.5,
  * AC-302 / AC-322). Pure: the page passes the live lists in.
  *
- * - gross: booked (quoted) revenue of the period's events, cancelled ones out;
+ * - gross: booked (quoted) revenue of the period's events - approved or
+ *   later, the same booked set every dashboard uses (#424); quotes, planning
+ *   and cancelled events count nowhere;
  * - venueProduced: gross of the events that carry a venue commission split;
  * - splits: what agreed splits hand out - an applied split's booked amount,
  *   an approved one's amount worked out the same way apply works it out;
@@ -13,6 +15,8 @@
  *   apart so they never inflate splits.
  * A rejected or removed split counts nowhere.
  */
+
+import { BOOKED_STAGES } from "../reports/dashboardRecordSets";
 
 export type SplitEvent = {
   readonly _id: string;
@@ -62,7 +66,7 @@ export function revenueSplitMeasures(
   const inPeriod = events.filter(
     (event) =>
       event.deletedAt == null &&
-      event.stage !== "cancelled" &&
+      BOOKED_STAGES.includes(event.stage) &&
       event.startsAt != null &&
       event.startsAt >= periodStart &&
       event.startsAt < periodEnd,

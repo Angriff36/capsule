@@ -198,8 +198,26 @@ entity Contract mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Reaction-only: the contract follows its event to a new client (#378).
+  // Only the role check, so a voided contract cannot block the event move.
+  command followEventClient(clientId: uuid) {
+    guard roleAllows(user.role, "salesAccess")
+    compute previousClientId = self.clientId
+    mutate clientId = clientId
+    emit ContractClientReassigned {
+      contractId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: clientId
+    }
+  }
+
   store Contract in durable
 }
+
+on EventClientChanged fanOut Contract where eventId = payload.eventId
+  run followEventClient
+  params { clientId: payload.clientId }
 
 event ContractClientMergeStaged: "contract.client_merge_staged" {
   contractId: string

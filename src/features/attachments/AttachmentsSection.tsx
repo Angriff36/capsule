@@ -8,6 +8,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
 import { useActionFailure } from "../../ui/action-result";
+import { DeckShareActions } from "./DeckShareActions";
 
 export type AttachmentParentType =
   | "eventRecord"
@@ -157,7 +158,11 @@ export function AttachmentsSection({
                   {row.uploadedAt
                     ? ` · ${formatDate(row.uploadedAt)} ${formatTime(row.uploadedAt)}`
                     : ""}
+                  {row.uploadedByName ? ` · by ${row.uploadedByName}` : ""}
                 </p>
+                {parentType === "client" || parentType === "venue" ? (
+                  <DeckShareActions attachmentId={row._id} />
+                ) : null}
               </div>
               <button
                 type="button"

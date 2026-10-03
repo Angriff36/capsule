@@ -59,7 +59,7 @@ const clientLabel = (row: {
 };
 
 export function InvoicesPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("invoices");
   const [searchParams, setSearchParams] = useSearchParams();
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const prefillEventId =

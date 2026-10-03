@@ -35,6 +35,9 @@ export type EventLookupRow = Pick<
   | "assignedToId"
   | "referralSourceId"
   | "serviceStyleName"
+  | "budgetAmount"
+  | "createdAt"
+  | "updatedAt"
 >;
 
 export const byIds = query({
@@ -52,6 +55,36 @@ export const byIds = query({
       const e = await ctx.db.get(id);
       if (!e || e.tenantId !== tenantId) continue;
       rows.push(lookupRow(e));
+    }
+    return rows;
+  },
+});
+
+/**
+ * Whole event records by id (less the import draft and the encrypted contact
+ * fields, as `rangeDocs`), for a screen that already reads a window of whole
+ * records and must add the older events its own rows point at (#430:
+ * proposals linked to an event outside the window). Same caps as `byIds`.
+ */
+export const docsByIds = query({
+  args: { ids: v.array(v.string()) },
+  handler: async (ctx, { ids }): Promise<Doc<"events">[] | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, ["staffAccess"])) return null;
+    const tenantId = auth.tenantId;
+    const rows: Doc<"events">[] = [];
+    for (const raw of [...new Set(ids)].slice(0, LOOKUP_CAP)) {
+      const id = ctx.db.normalizeId("events", raw);
+      if (!id) continue;
+      const e = await ctx.db.get(id);
+      if (!e || e.tenantId !== tenantId) continue;
+      rows.push({
+        ...e,
+        importDraftJson: null,
+        primaryContactName: null,
+        primaryContactEmail: null,
+        primaryContactPhone: null,
+      });
     }
     return rows;
   },
@@ -220,5 +253,8 @@ function lookupRow(e: Doc<"events">): EventLookupRow {
     assignedToId: e.assignedToId ?? null,
     referralSourceId: e.referralSourceId ?? null,
     serviceStyleName: e.serviceStyleName ?? null,
+    budgetAmount: e.budgetAmount ?? null,
+    createdAt: e.createdAt,
+    updatedAt: e.updatedAt,
   };
 }

@@ -4,6 +4,7 @@ import { formatStatusLabel } from "../../../lib/statusLabels";
 import { EventAllergenBriefingBody } from "../EventAllergenBriefingBody";
 import { EventBudgetCard } from "../EventBudgetCard";
 import { EventCalendarSyncNote } from "../EventCalendarSyncNote";
+import { EventChangeHistoryCard } from "../EventChangeHistoryCard";
 import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
 import { EventInvoiceCard } from "../EventInvoiceCard";
@@ -19,7 +20,7 @@ import { eventDetailPath } from "../eventRoutes";
 import { STAGE_LABEL, type EventStage } from "../eventStatus";
 import { EventPacketPanel } from "../packet/EventPacketPanel";
 import { EventReviewFlagsSection } from "../review-flags/EventReviewFlagsSection";
-import { allergyLine, noteSections } from "./eventDashFacts";
+import { allergyText, noteSections } from "./eventDashFacts";
 import { EventDashSheetHead } from "./EventDashSheet";
 import "../EventOverview.css";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
@@ -172,7 +173,7 @@ export function EventDashSheetBody({
         </>
       );
     case "service": {
-      const allergy = allergyLine(
+      const allergy = allergyText(
         reviseProps.serviceRequirements,
         reviseProps.operationalRequirements,
       );
@@ -306,6 +307,7 @@ export function EventDashSheetBody({
               onAction={onAction}
             />
             <EventReviewFlagsSection eventId={eventId} />
+            <EventChangeHistoryCard eventId={eventId} />
           </div>
         </>
       );
@@ -315,12 +317,14 @@ export function EventDashSheetBody({
           <EventDashSheetHead
             kicker="Edit event basics"
             title={title}
-            lede="Update schedule, headcount, venue, pricing, contact, and planning notes for this event."
+            lede="Update schedule, headcount, venue, pricing, client, contact, and planning notes for this event."
           />
           <div id="event-setup-basics">
             <EventDetailRevisePanels
               {...reviseProps}
               eventId={eventId}
+              clientId={clientId}
+              clients={clients}
               startsAt={startsAt}
               endsAt={endsAt}
               expectedHeadcount={expectedHeadcount}

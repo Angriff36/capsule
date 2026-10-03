@@ -50,8 +50,13 @@ function Discard($h, $file) {
 
 function Release($h, $reviewer) {
   # Approved -> production, from a private clean copy so the running loop cannot disturb it.
-  # A failed release leaves _release-pending; a landed control-plane repair retries it.
+  # A failed release leaves _release-pending; the next lander run (every round) retries it.
   $pending = Join-Path $root '.loop-worktrees\_release-pending'
+  # Eight test workers ran this box out of memory and crashed the release check
+  # three times on 2026-10-02/03 (worker "Channel closed" in the access matrix).
+  $env:CAPSULE_TEST_WORKERS = '4'
+  # One release at a time: a second one would reset the shared release copy under the first.
+  if (Get-CimInstance Win32_Process -Filter "Name='bash.exe'" | Where-Object { $_.CommandLine -match 'release-clean\.sh' }) { Say "$($h.runId): a release is already running - this one waits for the next run"; return }
   $rel = (& 'C:\Program Files\Git\bin\bash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $reviewer" 2>&1) -join "`n"
   $rel | Add-Content $log
   $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
@@ -109,8 +114,12 @@ If your shell or sandbox fails so you cannot run git diff and read the change, d
   return @{ reviewer = $reviewer; verdict = $r.verdict; reason = $r.reason; full = $text }
 }
 
-if (-not (Test-Path $handoffDir)) { exit 0 }
 if (-not $IgnorePause -and (Select-String -Path (Join-Path $root 'STATE.md') -Pattern 'loop-pause-all' -Quiet)) { Say 'paused - nothing landed'; exit 0 }
+# An approved batch that failed to go live is retried on EVERY run, with the newest dev
+# (which carries any fix), not held until the next daily review (Ryan 2026-10-03).
+$pendingRelease = Join-Path $root '.loop-worktrees\_release-pending'
+if (Test-Path $pendingRelease) { Release @{ runId = 'release-retry'; item = 'production release' } ((Get-Content $pendingRelease -Raw).Trim()) }
+if (-not (Test-Path $handoffDir)) { exit 0 }
 
 foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   $h = Get-Content $file.FullName -Raw | ConvertFrom-Json

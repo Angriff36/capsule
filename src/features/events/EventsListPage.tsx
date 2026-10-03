@@ -18,6 +18,7 @@ import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
 import {
   eventServiceStyleChoices,
   eventServiceStyleKey,
+  NO_SERVICE_STYLE,
 } from "./eventServiceStyle";
 
 /** Question tabs first (what is upcoming / needs action), then the stages. */
@@ -107,6 +108,8 @@ export function EventsListPage() {
     showArchived,
     now: today,
     search: search.trim().length >= 2 ? search.trim() : undefined,
+    // The style filter runs in the read, so it reaches past this window.
+    style: style || undefined,
   });
   const events = ledger?.rows;
 
@@ -114,7 +117,7 @@ export function EventsListPage() {
     if (chosenTab == null && ledger && ledger.upcomingCount === 0)
       setTab("all");
   }, [chosenTab, ledger]);
-  useEffect(() => setLimit(WINDOW), [tab, dir, showArchived]);
+  useEffect(() => setLimit(WINDOW), [tab, dir, showArchived, style]);
 
   const live = useMemo(() => events ?? [], [events]);
   const counts = {
@@ -158,7 +161,33 @@ export function EventsListPage() {
       return dir === "asc" ? aDate - bDate : bDate - aDate;
     });
   }, [live, ledger, tab, style, search, dir, now]);
-  const styleChoices = useMemo(() => eventServiceStyleChoices(live), [live]);
+  // Every style the company has, plus the ones the loaded events use. A count
+  // shows only when the whole list is loaded; past "Show more" it would lie.
+  const styleChoices = useMemo(() => {
+    const loaded = eventServiceStyleChoices(live);
+    const known = new Set(loaded.map((choice) => choice.key));
+    const extra = (ledger?.styles ?? [])
+      .filter((choice) => !known.has(choice.key))
+      .map((choice) => ({ ...choice, count: 0 }));
+    const exact = !style && !ledger?.more;
+    return [
+      ...loaded.filter((choice) => choice.key !== NO_SERVICE_STYLE),
+      ...extra,
+    ]
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .concat(
+        loaded.find((choice) => choice.key === NO_SERVICE_STYLE) ?? {
+          key: NO_SERVICE_STYLE,
+          label: "No service style",
+          count: 0,
+        },
+      )
+      .filter((choice) => !exact || choice.count > 0 || choice.key === style)
+      .map((choice) => ({
+        key: choice.key,
+        label: exact ? `${choice.label} (${choice.count})` : choice.label,
+      }));
+  }, [live, ledger, style]);
 
   const questionTabs: Tab[] = ["upcoming", "attention", "all"];
   const stageFilter: EventStage | "" = questionTabs.includes(tab)
@@ -266,7 +295,7 @@ export function EventsListPage() {
           <option value="">Any style</option>
           {styleChoices.map((choice) => (
             <option key={choice.key} value={choice.key}>
-              {choice.label} ({choice.count})
+              {choice.label}
             </option>
           ))}
         </select>

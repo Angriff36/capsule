@@ -620,6 +620,28 @@ export const CutoverDecisionSchema = z.object({
 
 export type CutoverDecision = z.infer<typeof CutoverDecisionSchema>;
 
+// Entity: DeckShareLink
+export const DeckShareLinkSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  attachmentId: z.string().uuid(),
+  audience: z.enum(["anyone", "staff"]).default("anyone"),
+  status: z.enum(["active", "revoked"]).default("active"),
+  expiresAt: z.coerce.date().nullable().optional(),
+  revokedAt: z.coerce.date().nullable().optional(),
+  revokedByPersonId: z.string().uuid().nullable().optional(),
+  createdByPersonId: z.string().uuid().nullable().optional(),
+  viewCount: z.number().int().default(0),
+  firstViewedAt: z.coerce.date().nullable().optional(),
+  lastViewedAt: z.coerce.date().nullable().optional(),
+  lastViewerIdentity: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DeckShareLink = z.infer<typeof DeckShareLinkSchema>;
+
 // Entity: Delivery
 export const DeliverySchema = z.object({
   id: z.string().uuid(),
@@ -5836,6 +5858,13 @@ export const ContractExpireParamsSchema = z.object({});
 
 export type ContractExpireParams = z.infer<typeof ContractExpireParamsSchema>;
 
+// Command: followEventClient on Contract
+export const ContractFollowEventClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+});
+
+export type ContractFollowEventClientParams = z.infer<typeof ContractFollowEventClientParamsSchema>;
+
 // Command: markViewed on Contract
 export const ContractMarkViewedParamsSchema = z.object({});
 
@@ -5955,6 +5984,20 @@ export const CutoverDecisionSetTppReadOnlyParamsSchema = z.object({
 });
 
 export type CutoverDecisionSetTppReadOnlyParams = z.infer<typeof CutoverDecisionSetTppReadOnlyParamsSchema>;
+
+// Command: create on DeckShareLink
+export const DeckShareLinkCreateParamsSchema = z.object({
+  attachmentId: z.string().min(1),
+  audience: z.enum(["anyone", "staff"]),
+  expiresAt: z.coerce.date().optional(),
+});
+
+export type DeckShareLinkCreateParams = z.infer<typeof DeckShareLinkCreateParamsSchema>;
+
+// Command: revoke on DeckShareLink
+export const DeckShareLinkRevokeParamsSchema = z.object({});
+
+export type DeckShareLinkRevokeParams = z.infer<typeof DeckShareLinkRevokeParamsSchema>;
 
 // Command: cancel on Delivery
 export const DeliveryCancelParamsSchema = z.object({
@@ -6782,6 +6825,16 @@ export type EventLockForSalesParams = z.infer<typeof EventLockForSalesParamsSche
 export const EventMarkBinderBuiltParamsSchema = z.object({});
 
 export type EventMarkBinderBuiltParams = z.infer<typeof EventMarkBinderBuiltParamsSchema>;
+
+// Command: moveToClient on Event
+export const EventMoveToClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+  primaryContactName: z.string().optional(),
+  primaryContactEmail: z.string().optional(),
+  primaryContactPhone: z.string().optional(),
+});
+
+export type EventMoveToClientParams = z.infer<typeof EventMoveToClientParamsSchema>;
 
 // Command: normalizePurchasingWeek on Event
 export const EventNormalizePurchasingWeekParamsSchema = z.object({});
@@ -10604,6 +10657,13 @@ export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
 export const ProposalExpireParamsSchema = z.object({});
 
 export type ProposalExpireParams = z.infer<typeof ProposalExpireParamsSchema>;
+
+// Command: followEventClient on Proposal
+export const ProposalFollowEventClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+});
+
+export type ProposalFollowEventClientParams = z.infer<typeof ProposalFollowEventClientParamsSchema>;
 
 // Command: followEventHeadcount on Proposal
 export const ProposalFollowEventHeadcountParamsSchema = z.object({

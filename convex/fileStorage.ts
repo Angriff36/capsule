@@ -79,9 +79,28 @@ export const listForParent = query({
         r.parentId === args.parentId &&
         r.deletedAt == null,
     );
+    // Who uploaded each file, by name (#125): the row keeps the sign-in id;
+    // the team profile of this company linked to it gives the name.
+    const uploaderNames = new Map<string, string | null>();
+    for (const subject of new Set(live.map((r) => r.uploadedById))) {
+      if (!subject) continue;
+      const person = (
+        await ctx.db
+          .query("people")
+          .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
+          .take(10)
+      ).find((p) => p.tenantId === auth.tenantId && p.deletedAt == null);
+      const name = person
+        ? [person.givenName, person.familyName].filter(Boolean).join(" ")
+        : "";
+      uploaderNames.set(subject, name || null);
+    }
     return Promise.all(
       live.map(async (r) => ({
         ...r,
+        uploadedByName: r.uploadedById
+          ? (uploaderNames.get(r.uploadedById) ?? null)
+          : null,
         // A row that names a file another company (or a private chat
         // message) uploaded shows its name, never the file.
         url: (await storageReferencedByTenant(ctx, auth.tenantId, r.storageId))

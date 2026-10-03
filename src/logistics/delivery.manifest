@@ -301,14 +301,7 @@ event DeliveryVehicleUnassigned: "delivery.vehicle_unassigned" {
 // The transactional operational callback selects unfinished records before
 // invoking Delivery.standDownWithEvent. Settled history is not mutated.
 
-// Vision cascade: packed pack list ensures one Delivery schedule (match else create).
-on PackListPacked run Delivery.schedule
-  match packListId = payload.packListId
-  else create
-  params {
-    packListId: payload.packListId
-    eventId: payload.eventId
-    destination: payload.destination
-    windowStartsAt: payload.windowStartsAt
-    windowEndsAt: payload.windowEndsAt
-  }
+// A packed pack list books one Delivery (schedule, match by pack list, else
+// create) only for a Drop Off event or an event with no style yet (#377).
+// A reaction cannot read the event's style, so the authored seam
+// convex/lib/dropOffDelivery.ts runs it on PackListPacked.

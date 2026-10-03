@@ -2,6 +2,7 @@ import { Component, lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
+import { SharedDeckPage } from "../features/clients/SharedDeckPage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
 import { PublicMenuPage } from "../features/sales/PublicMenuPage";
@@ -624,6 +625,7 @@ export function App() {
   const clientPortalMatch = useMatch("/portal/events/:token");
   const acceptanceMatch = useMatch("/accept/:callbackToken");
   const shareMatch = useMatch("/share/:token");
+  const deckMatch = useMatch("/deck/:token");
   const quoteMatch = useMatch("/quote");
   const publicMenuMatch = useMatch("/menu");
 
@@ -652,6 +654,14 @@ export function App() {
       <AppErrorBoundary>
         <ActionResultHost />
         <SharedProposalPage token={shareMatch.params.token} />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (deckMatch?.params.token) {
+    return (
+      <AppErrorBoundary>
+        <SharedDeckPage token={deckMatch.params.token} />
       </AppErrorBoundary>
     );
   }

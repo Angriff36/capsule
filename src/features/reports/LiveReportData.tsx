@@ -1,7 +1,6 @@
 import { useMemo, type ReactNode } from "react";
 import {
   useListDelivery,
-  useListEvent,
   useListIngredientDemand,
   useListInvoice,
   useListPayment,
@@ -70,7 +69,7 @@ export function LiveReportData(props: LiveReportDataProps) {
 }
 
 function EventsData(props: LiveReportDataProps) {
-  return <ResolvedData {...props} rows={useListEvent()} />;
+  return <ResolvedData {...props} rows={useAllEventReportRows()} />;
 }
 
 function SalesData(props: LiveReportDataProps) {

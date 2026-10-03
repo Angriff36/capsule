@@ -20,9 +20,8 @@ import {
   usePlanningRuleRetire,
   usePlanningRuleRevise,
   useTrailerSetCargoFacts,
-  useVehicleSetCargoFacts,
-  useVehicleSetCrewFacts,
 } from "../../../lib/manifest-convex-react";
+import { useSaveTruckFacts } from "../../../lib/useSaveTruckFacts";
 import {
   needsFromText,
   needsJson,
@@ -126,8 +125,7 @@ export function PlanningSetupPage() {
   const reviseRule = usePlanningRuleRevise();
   const retireRule = usePlanningRuleRetire();
   const reinstateRule = usePlanningRuleReinstate();
-  const setCrewFacts = useVehicleSetCrewFacts();
-  const setTruckCargo = useVehicleSetCargoFacts();
+  const saveTruckFacts = useSaveTruckFacts();
   const setTrailerCargo = useTrailerSetCargoFacts();
   const saveEquipmentFields = useOrganizationConfigureEquipmentFields();
   const setOperatingFacts = useEquipmentSetOperatingFacts();
@@ -786,8 +784,10 @@ export function PlanningSetupPage() {
                     void run(
                       `truck:${truck._id}`,
                       async () => {
-                        await setCrewFacts({
-                          docId: truck._id,
+                        // One save: seats and cargo are kept together or
+                        // not at all.
+                        await saveTruckFacts({
+                          vehicleId: truck._id,
                           version: truck.version,
                           seatCount:
                             seats === ""
@@ -797,9 +797,6 @@ export function PlanningSetupPage() {
                             String(
                               data.get("driverQualificationName") ?? "",
                             ).trim() || undefined,
-                        });
-                        await setTruckCargo({
-                          docId: truck._id,
                           cargoVolumeM3: optionalNumber(
                             data.get("cargoVolumeM3"),
                           ),

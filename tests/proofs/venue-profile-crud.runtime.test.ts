@@ -179,5 +179,35 @@ describe("runtime proof: venue profile carries every §8.1 fact", () => {
     })) as Array<{ fileName: string; url: string | null }>;
     expect(files.map((file) => file.fileName)).toEqual(["floor-plan.pdf"]);
     expect(files[0].url).not.toBeNull();
+
+    // A file from a person on the team shows who uploaded it (#125).
+    const photoId = await writer.run(async (ctx) =>
+      (
+        ctx as unknown as {
+          storage: { store: (blob: Blob) => Promise<string> };
+        }
+      ).storage.store(new Blob(["loading dock"])),
+    );
+    await proof.executeCommand(writer, M.Attachment_createViaAttach, {
+      parentType: "venue",
+      parentId: venue.docId,
+      fileName: "loading-dock.jpg",
+      contentType: "image/jpeg",
+      fileSize: 12,
+      storageId: photoId,
+    });
+    const withNames = (await manager.query(api.fileStorage.listForParent, {
+      parentType: "venue",
+      parentId: venue.docId,
+    })) as Array<{ fileName: string; uploadedByName: string | null }>;
+    expect(
+      withNames.find((file) => file.fileName === "loading-dock.jpg")
+        ?.uploadedByName,
+    ).toBe("Riley author");
+    // No team profile behind the sign-in: no name, never a raw id.
+    expect(
+      withNames.find((file) => file.fileName === "floor-plan.pdf")
+        ?.uploadedByName,
+    ).toBeNull();
   });
 });

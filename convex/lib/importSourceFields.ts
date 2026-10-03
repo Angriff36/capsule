@@ -24,6 +24,12 @@ export interface SourceFieldMap {
   fields: readonly string[];
   /** Fields the import may write back into Capsule. Others only raise a review item. */
   writable: readonly string[];
+  /**
+   * Fields Capsule never leaves blank. A source row that blanks one leaves
+   * Capsule as it is, and the import does not count the blank as applied
+   * (#409), so a later real value is not a false review item.
+   */
+  required?: readonly string[];
   /** Plain words for the review list. */
   labels: Record<string, string>;
   fromSource(row: Row): Values;
@@ -71,6 +77,7 @@ const VENUE_TEXT = [
 const VENUE_FIELDS: SourceFieldMap = {
   fields: [...VENUE_TEXT, "capacity"],
   writable: [...VENUE_TEXT, "capacity"],
+  required: ["name"],
   labels: {
     name: "Venue name",
     addressLine1: "Street address",
@@ -130,6 +137,7 @@ const EVENT_FIELDS: SourceFieldMap = {
     "venueAddress",
     "operationalRequirements",
   ],
+  required: ["startsAt", "endsAt"],
   labels: {
     title: "Event name",
     startsAt: "Start time",
@@ -172,6 +180,7 @@ const EVENT_FIELDS: SourceFieldMap = {
 const LEAD_FIELDS: SourceFieldMap = {
   fields: ["companyName", "source", "estimatedValue", "probability"],
   writable: ["companyName", "source"],
+  required: ["source"],
   labels: {
     companyName: "Lead name",
     source: "Where the lead came from",
@@ -220,6 +229,7 @@ const DISH_FIELDS: SourceFieldMap = {
     "dietaryTags",
     "portionSize",
   ],
+  required: ["name", "portionSize"],
   labels: {
     name: "Dish name",
     description: "Description",

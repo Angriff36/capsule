@@ -1,4 +1,4 @@
-import type { Id } from "../../lib/api";
+import type { Doc, Id } from "../../lib/api";
 import { formatMoney } from "../../lib/format";
 import { EventDetailReviseContactPanels } from "./EventDetailReviseContactPanels";
 import { localDateTime } from "./eventDetailFormHelpers";
@@ -34,6 +34,8 @@ export type EventDetailRevisePanelsProps = {
   readonly serviceStyleId?: Id<"serviceStyles"> | null;
   readonly budgetAmount?: number | null;
   readonly quotedPrice?: number | null;
+  readonly clientId?: string | null;
+  readonly clients: Doc<"clients">[] | undefined;
   readonly primaryContactName?: string | null;
   readonly primaryContactEmail?: string | null;
   readonly primaryContactPhone?: string | null;
@@ -105,6 +107,8 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
     serviceStyleId,
     budgetAmount,
     quotedPrice,
+    clientId,
+    clients,
     primaryContactName,
     primaryContactEmail,
     primaryContactPhone,
@@ -123,7 +127,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
     <EventTabPanel
       eyebrow="Planning"
       title="Edit event basics"
-      description="Update schedule, headcount, venue, pricing, contact, and planning notes for this event."
+      description="Update schedule, headcount, venue, pricing, client, contact, and planning notes for this event."
       testId="event-setup-basics-panel"
     >
       <div className="grid gap-4 lg:grid-cols-3">
@@ -358,6 +362,8 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
         busy={busy}
         canRevise={canRevise}
         reviseBlockedReason={reviseBlockedReason}
+        clientId={clientId}
+        clients={clients}
         primaryContactName={primaryContactName}
         primaryContactEmail={primaryContactEmail}
         primaryContactPhone={primaryContactPhone}

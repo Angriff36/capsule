@@ -345,6 +345,54 @@ describe("runtime proof: import field ownership conflict (AC-272, AC-273)", () =
     expect((await readEvent(link1.capsuleId)).expectedHeadcount).toBe(55);
   });
 
+  it("a source row that blanks a time Capsule needs leaves the event as it is and raises nothing later (#409)", async () => {
+    const tenantId = "tenant-import-field-ownership-blank";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-ownership-blank-owner",
+      role: "owner",
+      tenantId,
+    });
+    await importRows(owner, "contacts", [
+      { ContactID: "C-651", FirstName: "Ana", LastName: "Ruiz" },
+    ]);
+    const eventRow = (over: Record<string, unknown> = {}) => ({
+      EventID: "E-651",
+      EventName: "Gala E-651",
+      ClientID: "C-651",
+      EventDate: "2026-11-14",
+      StartTime: "18:00",
+      ExpectedCount: 40,
+      EventStatus: "Proposal",
+      ...over,
+    });
+    expect((await importRows(owner, "events", [eventRow()])).committed).toBe(1);
+    const link = await linkFor(owner, tenantId, "E-651");
+    const readEvent = async () =>
+      (await owner.query(api.queries.getEvent, {
+        id: link.capsuleId as never,
+      })) as Row;
+    const before = await readEvent();
+
+    // The old system loses the date: Capsule keeps its time, no review item.
+    const blank = await importRows(owner, "events", [
+      eventRow({ EventDate: "", StartTime: "" }),
+    ]);
+    expect(blank.conflicted ?? 0).toBe(0);
+    expect((await readEvent()).startsAt).toBe(before.startsAt);
+
+    // Then a real new date arrives: it is taken, not a false review item.
+    const moved = await importRows(owner, "events", [
+      eventRow({ EventDate: "2026-11-21" }),
+    ]);
+    expect(moved.conflicted ?? 0).toBe(0);
+    expect(moved.updated).toBe(1);
+    expect((await readEvent()).startsAt).toBe(
+      Number(before.startsAt) + 7 * 86_400_000,
+    );
+    expect(await tableRows(owner, "importConflicts", tenantId)).toEqual([]);
+  });
+
   it("dishes and leads take untouched changes; allergens and a chef's edit wait for a person", async () => {
     const tenantId = "tenant-import-field-ownership-dishes";
     const proof = harness();

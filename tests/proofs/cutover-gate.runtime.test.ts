@@ -47,6 +47,7 @@ interface Gate {
     { passed: boolean; message: string; details?: string }
   >;
   blockers: string[];
+  warnings: string[];
   openItems: Array<{ kind: string; externalId: string }>;
 }
 
@@ -260,6 +261,23 @@ describe("runtime proof: the switch from TPP (PL-CUTOVER)", () => {
       "completed",
       frozenAt + 180_000,
     );
+    // #425: clients were never imported, so the switch still waits.
+    blocked = await gate(owner);
+    expect(blocked.checks.finalDeltaImport.passed).toBe(false);
+    expect(blocked.blockers.join(" ")).toContain(
+      "TPP contacts were never imported",
+    );
+    // Lists a caterer may never have kept in TPP only warn.
+    expect(blocked.warnings.join(" ")).toContain(
+      "TPP venues were never imported",
+    );
+    const contactsRun = await insertRun(
+      owner,
+      tenantId,
+      "contacts",
+      "completed",
+      frozenAt + 150_000,
+    );
     blocked = await gate(owner);
     expect(blocked.checks.finalDeltaImport.passed).toBe(true);
     expect(blocked.checks.zeroCriticalMappings.passed).toBe(false);
@@ -293,6 +311,7 @@ describe("runtime proof: the switch from TPP (PL-CUTOVER)", () => {
     expect(JSON.parse(String(saved.finalImportRuns))).toEqual({
       events: eventsRun,
       menus: menusRun,
+      contacts: contactsRun,
     });
     expect(typeof saved.scheduledImportsDisabledAt).toBe("number");
     expect(String(saved.scheduledImportsNote)).toContain(

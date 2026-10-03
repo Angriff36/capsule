@@ -48,9 +48,14 @@ if errorlevel 1 (
     if errorlevel 1 set MAKEROK=0
   )
 )
+REM Every round goes to dev at once so Ryan can test it (Ryan 2026-09-28). This runs BEFORE
+REM the stop checks: a last round that commits work and then writes _nothing-left (or whose
+REM model fails after it commits) must still reach dev. The publisher skips by itself when the
+REM batch has uncommitted changes, no new commits, or a failed typecheck.
+pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-publish.ps1" >> ".claude\loop-tick.log" 2>&1
+REM A failed production release is retried every round (Ryan 2026-10-03).
+if exist ".loop-worktrees\_release-pending" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1
 if exist ".loop-worktrees\_nothing-left" exit /b 0
 if "%MAKEROK%"=="0" exit /b 0
-REM Every round goes to dev at once so Ryan can test it (Ryan 2026-09-28).
-pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-publish.ps1" >> ".claude\loop-tick.log" 2>&1
 if exist ".loop-worktrees\_handoff\*.json" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1
 exit /b 10

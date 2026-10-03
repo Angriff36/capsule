@@ -58,7 +58,7 @@ import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 const policy = new SupplyLifecyclePolicy();
 
 export function PurchasingPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("purchasing");
   const needs = useListPurchaseNeed();
   const vendors = useListVendor();
   const orders = useListVendorOrder();

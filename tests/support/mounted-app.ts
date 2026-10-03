@@ -75,7 +75,10 @@ vi.mock("convex/react", async (importOriginal) => {
       if (args === "skip") return undefined;
       // Events by id (convex/eventLookup.ts) answer from the same event
       // rows a test gives the generated list, unless the test sets its own.
-      if (name === "eventLookup:byIds" && !backend.values.has(name)) {
+      if (
+        (name === "eventLookup:byIds" || name === "eventLookup:docsByIds") &&
+        !backend.values.has(name)
+      ) {
         const ids = new Set((args as { ids: string[] }).ids);
         const rows = (backend.values.get("useListEvent") ?? []) as {
           _id: string;

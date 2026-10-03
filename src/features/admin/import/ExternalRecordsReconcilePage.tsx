@@ -398,6 +398,7 @@ export function ExternalRecordsReconcilePage() {
                     }
                     onChange={toggleAll}
                     className="w-4 h-4"
+                    aria-label="Select all items in this list"
                   />
                 </th>
                 <th className="text-left py-3 px-4 font-medium">Old system</th>
@@ -439,6 +440,11 @@ export function ExternalRecordsReconcilePage() {
                         checked={selectedIds.has(record._id)}
                         onChange={() => toggleSelection(record._id)}
                         className="w-4 h-4"
+                        aria-label={
+                          isDerivedSourceId(record.externalId)
+                            ? "Select this old-system item"
+                            : `Select old-system item ${record.externalId}`
+                        }
                       />
                     </td>
                     <td className="py-3 px-4">

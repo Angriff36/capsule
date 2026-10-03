@@ -372,6 +372,11 @@ export async function reconcileExistingLink(
   const newApplied: Values = { ...result.newApplied };
   const writes: Values = {};
   for (const [field, value] of Object.entries(result.writes)) {
+    if (value == null && map.required?.includes(field)) {
+      // A blank where Capsule needs a value: nothing to apply (#409).
+      newApplied[field] = baseline?.[field] ?? null;
+      continue;
+    }
     if (map.writable.includes(field)) {
       writes[field] = value;
       continue;

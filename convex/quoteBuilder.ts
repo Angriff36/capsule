@@ -428,12 +428,20 @@ export const getQuoteFormOptions = query({
     serviceStyles: { _id: Id<"serviceStyles">; name: string }[];
     occasions: { _id: Id<"occasions">; name: string }[];
     referralSources: { _id: Id<"referralSources">; name: string }[];
+    /** The caterer's public name and address from Admin → Branding (#125). */
+    company: { name: string; address: string | null } | null;
   }> => {
     const org = await ctx.db
       .query("organizations")
       .filter((q) => q.eq(q.field("status"), "active"))
       .first();
-    if (!org) return { serviceStyles: [], occasions: [], referralSources: [] };
+    if (!org)
+      return {
+        serviceStyles: [],
+        occasions: [],
+        referralSources: [],
+        company: null,
+      };
     const tenantId = org.tenantId;
     const [serviceStyles, occasions, referralSources] = await Promise.all([
       ctx.db
@@ -465,6 +473,10 @@ export const getQuoteFormOptions = query({
         .filter((r) => r.deletedAt == null)
         .map((r) => ({ _id: r._id, name: r.name, sortOrder: r.sortOrder }))
         .sort(bySort),
+      company: {
+        name: org.brandDisplayName?.trim() || org.name,
+        address: org.brandAddress?.trim() || null,
+      },
     };
   },
 });

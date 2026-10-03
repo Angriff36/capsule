@@ -8,7 +8,12 @@ import {
 } from "../../../lib/format";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { STAGE_LABEL, type EventStage } from "../eventStatus";
-import { allergyLine, countdownLabel, splitTitle } from "./eventDashFacts";
+import {
+  allergyLine,
+  allergyText,
+  countdownLabel,
+  splitTitle,
+} from "./eventDashFacts";
 
 type Props = {
   readonly title: string;
@@ -36,6 +41,10 @@ export function EventDashHero(props: Props) {
     props.serviceRequirements,
     props.operationalRequirements,
   );
+  const allergyCut =
+    allergy !== null &&
+    allergy !==
+      allergyText(props.serviceRequirements, props.operationalRequirements);
   const when =
     props.startsAt != null
       ? `${formatDate(props.startsAt)} · ${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}`
@@ -109,6 +118,9 @@ export function EventDashHero(props: Props) {
             </svg>
             <span>
               <b>Allergy</b> · {allergy}
+              {allergyCut ? (
+                <b className="evd-allergy-more"> Read all</b>
+              ) : null}
             </span>
           </button>
         </div>

@@ -27,7 +27,10 @@ import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
 import { clientDisplayName } from "../events/clientName";
-import { useEventRecordsInRange } from "../facilities/useEventsById";
+import {
+  useEventRecordsById,
+  useEventRecordsInRange,
+} from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -55,6 +58,7 @@ import {
   useGenerateProposalDraft,
 } from "./ProposalDraftCheck";
 import { generateAcceptanceUrl } from "./proposalSignatureRequest";
+import "./ProposalsPage.css";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
@@ -101,7 +105,27 @@ export function ProposalsPage() {
     }),
     [today],
   );
-  const events = useEventRecordsInRange(eventWindow);
+  const windowEvents = useEventRecordsInRange(eventWindow);
+  // A proposal linked to an event outside that window keeps its event too.
+  const olderEventIds = useMemo(() => {
+    if (!proposals || !windowEvents) return undefined;
+    const inWindow = new Set(windowEvents.map((e) => String(e._id)));
+    return [
+      ...new Set(
+        proposals
+          .map((p) => (p.eventId ? String(p.eventId) : ""))
+          .filter((id) => id && !inWindow.has(id)),
+      ),
+    ];
+  }, [proposals, windowEvents]);
+  const olderEvents = useEventRecordsById(olderEventIds);
+  const events = useMemo(
+    () =>
+      windowEvents && olderEvents
+        ? [...windowEvents, ...olderEvents]
+        : windowEvents,
+    [windowEvents, olderEvents],
+  );
   const timelineActivities = useListEventTimelineActivity();
   const venues = useListVenue();
   // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
@@ -747,7 +771,7 @@ export function ProposalsPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table proposal-table">
               <thead>
                 <tr>
                   <th>Title</th>
@@ -999,9 +1023,15 @@ export function ProposalsPage() {
                           eventId={row.eventId ? String(row.eventId) : null}
                           status={String(row.status)}
                           total={Number(row.total ?? 0)}
-                          hasVenue={Boolean(
-                            events?.find((e) => e._id === row.eventId)?.venueId,
-                          )}
+                          hasVenue={(() => {
+                            // A typed venue (quote form, import) counts too.
+                            const linked = events?.find(
+                              (e) => e._id === row.eventId,
+                            );
+                            return Boolean(
+                              linked?.venueId || linked?.venueName?.trim(),
+                            );
+                          })()}
                           hasMenuSelections={(
                             proposalDishSelections ?? []
                           ).some(

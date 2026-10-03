@@ -206,6 +206,7 @@ export function RosterPage() {
     .sort((a, b) => (a.startsAt ?? Infinity) - (b.startsAt ?? Infinity))
     .map((need) => ({
       id: need._id,
+      eventId: need.eventId,
       eventTitle: eventName(need.eventId),
       role: need.role,
       startsAt: need.startsAt ?? null,

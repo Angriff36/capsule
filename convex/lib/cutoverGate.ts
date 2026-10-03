@@ -61,6 +61,20 @@ const DATASET_WORDS: Record<string, string> = {
   history: "messages and tasks",
 };
 
+/**
+ * #425: every caterer has clients and events in TPP, so the switch waits
+ * until both were imported. The other TPP lists may be unused by a
+ * caterer, so a missing one is a warning, not a stop.
+ */
+const REQUIRED_DATASETS = ["contacts", "events"] as const;
+const EXPECTED_DATASETS = [
+  "menus",
+  "venues",
+  "leads",
+  "payments",
+  "pack_list",
+] as const;
+
 const OPEN_ITEM_SAMPLE = 25;
 
 /** The workspace's one switch decision (oldest row wins, as before). */
@@ -100,6 +114,7 @@ async function finalImportCheck(
   tenantId: string,
   sourceFrozenAt: number | null,
   blockers: string[],
+  warnings: string[],
 ): Promise<{ check: CutoverCheck; runIds: Record<string, string> }> {
   const runs = await db
     .query("importRuns")
@@ -127,6 +142,20 @@ async function finalImportCheck(
   }
 
   const problems: string[] = [];
+  for (const dataset of REQUIRED_DATASETS) {
+    if (!newest.has(dataset)) {
+      problems.push(
+        `TPP ${DATASET_WORDS[dataset]} were never imported. Import them before the switch.`,
+      );
+    }
+  }
+  for (const dataset of EXPECTED_DATASETS) {
+    if (!newest.has(dataset)) {
+      warnings.push(
+        `TPP ${DATASET_WORDS[dataset]} were never imported. Fine if you never kept them in TPP.`,
+      );
+    }
+  }
   let firstUnfinished: Doc<"importRuns"> | null = null;
   for (const [dataset, run] of newest) {
     const words = DATASET_WORDS[dataset] ?? dataset;
@@ -325,6 +354,7 @@ export async function evaluateCutoverGate(
     tenantId,
     decision?.sourceFrozenAt ?? null,
     blockers,
+    warnings,
   );
   const open = await openItemsCheck(db, tenantId, blockers, warnings);
 

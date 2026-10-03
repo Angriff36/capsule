@@ -44,6 +44,8 @@ const FREE_OR_COMMAND_GUARDED: Record<string, string> = {
   "ClientPortalLink.status":
     "revoke is guarded to active links; nothing reopens",
   "ShareLink.status": "revoke is guarded to active links; nothing reopens",
+  "DeckShareLink.status":
+    "revoke is guarded to active links; nothing reopens (same as ShareLink)",
   "QuoteSubmission.status":
     "every command guards its starting status (pending, processing, failed)",
   "SyncError.status": "a person marks it fixed or opens it again",

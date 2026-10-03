@@ -596,13 +596,20 @@ function variants(entry: Entry): (string | null)[] {
  * The website quote form is open to anyone by design: it lists the names of
  * the published company's active service styles, occasions and "how did you
  * hear about us" choices (PL-QUOTE). It must give nothing else — only _id,
- * name and sortOrder on each option.
+ * name and sortOrder on each option, and the caterer's public name and
+ * address (#125).
  */
 const PUBLIC_QUOTE_FORM = "quoteBuilder:getQuoteFormOptions";
 function publicQuoteFormExtras(value: unknown): string[] {
   const extra: string[] = [];
   const form = (value ?? {}) as Record<string, unknown>;
   for (const [key, list] of Object.entries(form)) {
+    if (key === "company") {
+      for (const field of Object.keys((list ?? {}) as Doc))
+        if (field !== "name" && field !== "address")
+          extra.push(`company.${field}`);
+      continue;
+    }
     if (
       key !== "serviceStyles" &&
       key !== "occasions" &&
@@ -858,6 +865,14 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
       const queries = entries.filter((e) => e.kind === "query");
       const mutations = entries.filter((e) => e.kind === "mutation");
       const ledger: Ledger = { reads: {}, writes: {} };
+      // This proof runs for half an hour or more. Print each step so a full
+      // `bun run check` does not look stopped while it runs (#406).
+      // Date is faked above, so time the steps with the real clock.
+      const started = performance.now();
+      const progress = (step: string) =>
+        console.log(
+          `matrix progress (${Math.round((performance.now() - started) / 1000)}s): ${step}`,
+        );
 
       // Reads: same answer with and without workspace A's records.
       const readLeaks: string[] = [];
@@ -885,6 +900,7 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
               );
           }
         }
+        progress(`reads checked for ${caller.label}`);
       }
 
       // Ledger: does each read find workspace A's records for A's own owner?
@@ -907,6 +923,7 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
         }
         ledger.reads[entry.path] = reason;
       }
+      progress("owner read ledger done");
 
       // Writes: no outside call changes, removes or adds a workspace A record,
       // checked right after each accepted call and again after each function
@@ -952,6 +969,7 @@ describe("PL-AUTH workspace and role matrix (AC-151 / PR12-10)", () => {
           }
           await noteChanges(`${caller.label} -> ${entry.path}`);
         }
+        progress(`writes checked for ${caller.label}`);
       }
 
       // Ledger: does each write change workspace A records for A's own owner?

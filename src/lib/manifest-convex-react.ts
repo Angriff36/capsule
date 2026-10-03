@@ -94,6 +94,7 @@ import {
   ComponentStepReviseParamsSchema,
   ContractDraftParamsSchema,
   ContractExpireParamsSchema,
+  ContractFollowEventClientParamsSchema,
   ContractMarkViewedParamsSchema,
   ContractMarkVoidedParamsSchema,
   ContractReassignClientParamsSchema,
@@ -110,6 +111,8 @@ import {
   CutoverDecisionRecordApprovalsParamsSchema,
   CutoverDecisionRollbackParamsSchema,
   CutoverDecisionSetTppReadOnlyParamsSchema,
+  DeckShareLinkCreateParamsSchema,
+  DeckShareLinkRevokeParamsSchema,
   DeliveryCancelParamsSchema,
   DeliveryConfirmDeliveryParamsSchema,
   DeliveryMarkFailedParamsSchema,
@@ -253,6 +256,7 @@ import {
   EventLinkExternalChannelParamsSchema,
   EventLockForSalesParamsSchema,
   EventMarkBinderBuiltParamsSchema,
+  EventMoveToClientParamsSchema,
   EventNormalizePurchasingWeekParamsSchema,
   EventPlanEngagementParamsSchema,
   EventPlanNeedsNoteParamsSchema,
@@ -650,6 +654,7 @@ import {
   ProposalEnhancementReviseParamsSchema,
   ProposalEnhancementWithdrawParamsSchema,
   ProposalExpireParamsSchema,
+  ProposalFollowEventClientParamsSchema,
   ProposalFollowEventHeadcountParamsSchema,
   ProposalLineItemAddLineParamsSchema,
   ProposalLineItemRemoveLineParamsSchema,
@@ -2298,6 +2303,16 @@ export function useContractExpire() {
   };
 }
 
+/** Mutation hook for Contract.followEventClient. */
+export function useContractFollowEventClient() {
+  const mutate = useMutation(api.mutations.Contract_followEventClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ContractFollowEventClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Contract.markViewed. */
 export function useContractMarkViewed() {
   const mutate = useMutation(api.mutations.Contract_markViewed);
@@ -2517,6 +2532,36 @@ export function useCutoverDecisionSetTppReadOnly() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = CutoverDecisionSetTppReadOnlyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Reactive list for DeckShareLink. */
+export function useListDeckShareLink() {
+  return useQuery(api.queries.listDeckShareLink);
+}
+
+/** Reactive get-by-id for DeckShareLink. Pass "skip" to suspend. */
+export function useGetDeckShareLink(id: string | "skip") {
+  return useQuery(api.queries.getDeckShareLink, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DeckShareLink.create. */
+export function useDeckShareLinkCreate() {
+  const mutate = useMutation(api.mutations.DeckShareLink_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeckShareLinkCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DeckShareLink.revoke. */
+export function useDeckShareLinkRevoke() {
+  const mutate = useMutation(api.mutations.DeckShareLink_revoke);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DeckShareLinkRevokeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3741,6 +3786,16 @@ export function useEventMarkBinderBuilt() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventMarkBinderBuiltParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.moveToClient. */
+export function useEventMoveToClient() {
+  const mutate = useMutation(api.mutations.Event_moveToClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventMoveToClientParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9701,6 +9756,16 @@ export function useProposalExpire() {
   };
 }
 
+/** Mutation hook for Proposal.followEventClient. */
+export function useProposalFollowEventClient() {
+  const mutate = useMutation(api.mutations.Proposal_followEventClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalFollowEventClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.followEventHeadcount. */
 export function useProposalFollowEventHeadcount() {
   const mutate = useMutation(api.mutations.Proposal_followEventHeadcount);
@@ -13803,4 +13868,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1461 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1468 as const;

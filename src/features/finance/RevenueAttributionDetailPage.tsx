@@ -17,7 +17,7 @@ import {
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
 import { useRouteRecord } from "../../lib/routeRecord";
-import { usePickerEvents } from "../facilities/useEventsById";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { StatusChip, FormSkeleton } from "../../ui/primitives";
 import {
   formatDate as formatDateShared,
@@ -73,9 +73,10 @@ export function RevenueAttributionDetailPage() {
   const event = useGetEvent(
     isNew || !attribution?.eventId ? "skip" : attribution.eventId,
   );
-  const events = usePickerEvents();
   const [searchParams] = useSearchParams();
   const [eventId, setEventId] = useState(searchParams.get("eventId") ?? "");
+  // The chosen event stays a choice even when it is older than the window.
+  const events = usePickerAndNamedEvents([eventId]);
   const eventChoices = (events ?? [])
     .filter((e) => e.deletedAt == null && e.stage !== "cancelled")
     .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));

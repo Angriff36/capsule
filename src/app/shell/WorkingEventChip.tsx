@@ -13,7 +13,9 @@ import {
 
 /**
  * Top-bar marker for the working event. Screens that show event data start
- * on this event; clear it to see every event again.
+ * on this event; clear it to see every event again. Hidden on a phone: the
+ * top bar has no room for a name there, and each screen already says which
+ * event it shows, with "Show all events".
  */
 export function WorkingEventChip() {
   const id = useWorkingEventId();
@@ -24,7 +26,7 @@ export function WorkingEventChip() {
   }, [gone]);
   if (!id || !event || event.deletedAt != null) return null;
   return (
-    <div className="flex h-9 min-w-0 items-center gap-1 rounded-full border border-brand/40 bg-brand/10 pr-1 pl-3 text-sm">
+    <div className="flex h-9 min-w-0 items-center max-sm:hidden gap-1 rounded-full border border-brand/40 bg-brand/10 pr-1 pl-3 text-sm">
       <Link
         to={eventDetailPath(event._id)}
         className="flex min-w-0 items-center gap-2 text-ink hover:underline"
