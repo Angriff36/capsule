@@ -52,6 +52,9 @@ function Release($h, $reviewer) {
   # Approved -> production, from a private clean copy so the running loop cannot disturb it.
   # A failed release leaves _release-pending; the next lander run (every round) retries it.
   $pending = Join-Path $root '.loop-worktrees\_release-pending'
+  # Eight test workers ran this box out of memory and crashed the release check
+  # three times on 2026-10-02/03 (worker "Channel closed" in the access matrix).
+  $env:CAPSULE_TEST_WORKERS = '4'
   $rel = (& 'C:\Program Files\Git\bin\bash.exe' -lc "cd /c/Projects/capsule && bash scripts/release-clean.sh --reviewer $reviewer" 2>&1) -join "`n"
   $rel | Add-Content $log
   $result = ([regex]::Matches($rel, '(?m)^RESULT: .*$') | Select-Object -Last 1).Value
