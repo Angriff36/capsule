@@ -14,6 +14,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
+import { cookEdition } from "../../src/features/kitchen/PublishedMethodPanel";
 import {
   harness,
   liveRows,
@@ -327,6 +328,81 @@ describe("runtime proof: publishing a recipe edition (PL-DEMAND)", () => {
     expect((await t.prep(next.lineId)).map((p) => p._id).sort()).toEqual(
       prepBefore.map((p) => p._id).sort(),
     );
+  });
+
+  it("a published edition keeps its method steps, so a cook follows them while the chef changes a draft", async () => {
+    const t = await setup("tenant-recipe-edition-method");
+    await t.kitchen(M.Component_retract, { docId: t.recipeId });
+    await t.kitchen(M.ComponentStep_createViaAdd, {
+      componentId: t.recipeId,
+      instruction: "Reduce shallots in wine",
+      sortOrder: 0,
+      durationMinutes: 10,
+    });
+    await t.kitchen(M.ComponentStep_createViaAdd, {
+      componentId: t.recipeId,
+      instruction: "Whisk in cold butter",
+      sortOrder: 1,
+    });
+    await t.publish();
+    await t.kitchen(M.Component_retract, { docId: t.recipeId });
+    // The chef tries a new step in the draft.
+    await t.kitchen(M.ComponentStep_createViaAdd, {
+      componentId: t.recipeId,
+      instruction: "Add saffron",
+      sortOrder: 2,
+    });
+
+    const recipe = await readRow<{
+      _id: string;
+      status: string;
+      versionNumber: number;
+    }>(t.roles.kitchen, t.recipeId);
+    expect(recipe.status).toBe("draft");
+    const saved = await liveRows<{
+      _id: string;
+      tenantId: string;
+      componentId: string;
+      versionNumber: number;
+      snapshot: string;
+    }>(t.roles.kitchen, "componentSnapshots", "tenant-recipe-edition-method");
+    const edition = cookEdition(
+      {
+        _id: String(t.recipeId),
+        status: recipe.status,
+        versionNumber: Number(recipe.versionNumber),
+      },
+      saved,
+    );
+    expect(edition?.steps).toEqual([
+      {
+        instruction: "Reduce shallots in wine",
+        sortOrder: 0,
+        durationMinutes: 10,
+      },
+      {
+        instruction: "Whisk in cold butter",
+        sortOrder: 1,
+        durationMinutes: null,
+      },
+    ]);
+
+    // Once published again, the recipe as it stands is the method.
+    await t.publish();
+    const after = await readRow<{ status: string; versionNumber: number }>(
+      t.roles.kitchen,
+      t.recipeId,
+    );
+    expect(
+      cookEdition(
+        {
+          _id: String(t.recipeId),
+          status: after.status,
+          versionNumber: Number(after.versionNumber),
+        },
+        saved,
+      ),
+    ).toBeNull();
   });
 
   it("AC-448: finished prep keeps the step as it was made; a recipe change adds only the remaining work", async () => {

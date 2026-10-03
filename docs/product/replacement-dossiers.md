@@ -121,8 +121,8 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Stock, holds, transfers, waste | `/inventory/stock`, `/inventory/counts`, `/inventory/waste` | `proofs/stock-movement-reconcile-replay`, `proofs/waste-void-trace` | Built |
 | Choosing the vendor | `/inventory/purchasing`, ingredient page | `proofs/event-weekly-purchasing`, `proofs/preferred-vendor-routing` | Built (preferred vendor, else the default; not chosen by price) |
 | Orders, receipts, bill matching | `/inventory/purchasing`, `/inventory/orders/:id` | `proofs/receipt-invoice-match`, `proofs/partial-receipt-correction` | Built |
-| Cook sees the current method | `/kitchen/display` | `proofs/prep-work-baselines` | Built (no proof that a draft stays hidden) |
-| Actual yield and waste back to closeout | `/kitchen/yield`, event closeout | `proofs/batch-actual-ledger`, `proofs/event-food-cost-closeout` | Built (variance shown, recipe yield not suggested) |
+| Cook sees the current method | `/kitchen/display`, recipe page from a prep task | `proofs/prep-work-baselines`, `proofs/recipe-edition-publish`, `features/kitchen/published-method-panel` | Built: a published edition keeps its steps; a cook sent from a prep task reads them while the chef changes a draft |
+| Actual yield and waste back to closeout | `/kitchen/yield`, event closeout | `proofs/batch-actual-ledger`, `proofs/event-food-cost-closeout`, `features/production/yield-recipe-suggestion` | Built (3 or more batches more than 5% off plan suggest a recipe yield, with a link to the recipe) |
 | Recipe publishing | recipe page | `proofs/recipe-edition-publish` | Built for recipes; dishes and menus have no published-edition rule |
 
 No retyping: event dishes come from the accepted proposal; servings follow the

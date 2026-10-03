@@ -65,6 +65,7 @@ import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
 import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
 import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
+import { cookEdition, PublishedMethodPanel } from "./PublishedMethodPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
 import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
@@ -190,6 +191,18 @@ export function ComponentDetailPage() {
     component.deletedAt,
   );
   const prepYield = prepRecipeYield(component, prepTask);
+  // A cook sent here from a prep task follows the published edition while the
+  // chef changes a draft; the chef (no prep task) still edits the draft.
+  const cookMethodEdition = prepTaskId
+    ? cookEdition(
+        {
+          _id: String(component._id),
+          status: String(component.status),
+          versionNumber: Number(component.versionNumber),
+        },
+        snapshots,
+      )
+    : null;
   const hasYieldPreview = yieldPreview?.key === previewKey;
   const targetYield = hasYieldPreview
     ? yieldPreview.value
@@ -722,10 +735,14 @@ export function ComponentDetailPage() {
           ) : null}
         </section>
 
-        <ComponentMethodStepsPanel
-          componentId={component._id}
-          instructions={component.instructions}
-        />
+        {cookMethodEdition ? (
+          <PublishedMethodPanel edition={cookMethodEdition} />
+        ) : (
+          <ComponentMethodStepsPanel
+            componentId={component._id}
+            instructions={component.instructions}
+          />
+        )}
       </div>
 
       <ComponentKitchenStandardsPanel
