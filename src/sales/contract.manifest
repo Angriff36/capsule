@@ -202,7 +202,14 @@ entity Contract mixin TenantScoped, SoftDeletable {
   // Only the role check, so a voided contract cannot block the event move.
   command followEventClient(clientId: uuid) {
     guard roleAllows(user.role, "salesAccess")
+    compute previousClientId = self.clientId
     mutate clientId = clientId
+    emit ContractClientReassigned {
+      contractId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: clientId
+    }
   }
 
   store Contract in durable
