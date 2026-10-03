@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDish,
-  useListEventDish,
   useListPerson,
   useListInvoice,
   useListPrepTask,
@@ -21,6 +20,7 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { useEventsInRange } from "../facilities/useEventsById";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
@@ -75,7 +75,6 @@ import { prepTimeLabel } from "./prepTiming";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
-  const eventDishes = useListEventDish();
   const dishes = useListDish();
   const components = useListComponent();
   const tasks = useListPrepTask();
@@ -122,6 +121,10 @@ export function KitchenDashboardPage() {
     from: horizon.start().getTime(),
     to: horizon.end().getTime(),
   });
+  // Menu lines of those events only, never every event's (PL-SCALE).
+  const eventDishes = useMenuLinesForEvents(
+    useMemo(() => events?.map((event) => event._id), [events]),
+  );
 
   const model = useMemo(
     () =>

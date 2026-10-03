@@ -2223,6 +2223,8 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMenuLookup.forDish` - query; live read, updates by itself
+- `eventMenuLookup.forEvents` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
 - `ingredientLookup.applyCostToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
@@ -2442,7 +2444,6 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
 - `queries.listEventCloseout` - live read
-- `queries.listEventDish` - live read
 - `queries.listEventStaffNeed` - live read
 - `queries.listEventTimelineActivity` - live read
 - `queries.listInterview` - live read
@@ -3103,6 +3104,8 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMenuLookup.forDish` - query; live read, updates by itself
+- `eventMenuLookup.forEvents` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves

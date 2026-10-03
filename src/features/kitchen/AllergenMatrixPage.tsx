@@ -4,7 +4,6 @@ import {
   useListDish,
   useListDishComponent,
   useListDishIngredient,
-  useListEventDish,
   useListIngredient,
   useListMenu,
   useListMenuDish,
@@ -19,6 +18,7 @@ import {
 import { deriveDishAllergens } from "./dishAllergens";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 
 const ALLERGENS = CULINARY_ALLERGENS;
 
@@ -61,7 +61,6 @@ export function AllergenMatrixPage() {
   const [params, setParams] = useSearchParams();
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const eventDishes = useListEventDish();
   const dishes = useListDish();
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
@@ -70,6 +69,7 @@ export function AllergenMatrixPage() {
 
   const menuId = params.get("menu") ?? "";
   const eventId = params.get("event") ?? "";
+  const eventDishes = useMenuLinesForEvents([eventId]);
   const events = usePickerAndNamedEvents([eventId]);
   const scopeValue = menuId
     ? `menu:${menuId}`

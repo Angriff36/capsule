@@ -9,9 +9,9 @@ import {
   useDishReinstate,
   useGetDish,
   useListDish,
-  useListEventDish,
 } from "../../lib/manifest-convex-react";
 import { useEventsById } from "../facilities/useEventsById";
+import { useMenuLinesForDish } from "../facilities/useMenuLinesFor";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
@@ -44,7 +44,7 @@ export function DishDetailPage() {
   const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
   const allDishes = useListDish();
-  const eventDishes = useListEventDish();
+  const eventDishes = useMenuLinesForDish(dish?._id);
   const events = useEventsById(
     dish === undefined || eventDishes === undefined
       ? undefined

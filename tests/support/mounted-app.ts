@@ -117,6 +117,29 @@ vi.mock("convex/react", async (importOriginal) => {
           (row) => row.eventId === eventId && row.deletedAt == null,
         );
       }
+      // Menu lines of some events, or of one dish: the test's menu rows.
+      if (
+        (name === "eventMenuLookup:forEvents" ||
+          name === "eventMenuLookup:forDish") &&
+        !backend.values.has(name)
+      ) {
+        const { eventIds, dishId } = args as {
+          eventIds?: string[];
+          dishId?: string;
+        };
+        const rows = (backend.values.get("useListEventDish") ?? []) as {
+          eventId?: string;
+          dishId?: string;
+          deletedAt?: number | null;
+        }[];
+        return rows.filter(
+          (row) =>
+            row.deletedAt == null &&
+            (eventIds
+              ? eventIds.includes(String(row.eventId))
+              : row.dishId === dishId),
+        );
+      }
       // The picker's events: every live row the test gives (a small list).
       if (name === "eventLookup:picker" && !backend.values.has(name)) {
         const rows = (backend.values.get("useListEvent") ?? []) as {
