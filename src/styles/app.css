@@ -1254,7 +1254,7 @@
     height: 78px;
     border-top: 1px solid var(--color-accent);
     border-bottom: 1px solid var(--color-line);
-    content: "HOUSE\A COMPONENTS";
+    content: attr(data-label);
     color: var(--color-brand);
     font-family: var(--font-display);
     font-size: 18px;
