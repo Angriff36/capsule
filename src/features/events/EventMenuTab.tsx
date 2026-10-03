@@ -9,8 +9,8 @@ import {
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
-  useListEventGuest,
 } from "../../lib/manifest-convex-react";
+import { useEventGuests } from "../../lib/useEventRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
@@ -115,7 +115,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     `dishes:${eventId}`,
     useDishesByIds(eventDishes?.map((row) => row.dishId)),
   );
-  const eventGuests = useListEventGuest();
+  const eventGuests = useEventGuests(eventId);
   const reviewFlags = useEventReviewFlags(eventId);
   // Recipe, price and stock rows of the menu's dishes only.
   const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));

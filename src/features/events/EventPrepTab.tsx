@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import {
   useListComponent,
   useListPerson,
-  useListDishIngredient,
-  useListIngredient,
-  useListPrepTask,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useEventPrepTasks } from "../../lib/useEventRows";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
@@ -29,9 +28,12 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
   const eventDishes = useEventMenuLines(eventId);
   const components = useListComponent();
   const people = useListPerson();
-  const dishIngredients = useListDishIngredient();
-  const ingredients = useListIngredient();
-  const prepTasks = useListPrepTask();
+  // The menu's dish lines and ingredients only. Recipes stay the whole list:
+  // a prep step can name a sub-recipe that is not on a dish directly.
+  const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));
+  const dishIngredients = recipe?.dishIngredients;
+  const ingredients = recipe?.ingredients;
+  const prepTasks = useEventPrepTasks(eventId);
   const { ready, syncPrepForDish } = useEventMenuSync();
   const [busy, setBusy] = useState(false);
   const { notice, setNotice } = useActionNotice();

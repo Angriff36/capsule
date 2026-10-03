@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../../lib/format";
 import {
   useListPackList,
-  useListPrepTask,
   useListProposal,
 } from "../../../lib/manifest-convex-react";
+import { useEventPrepTasks } from "../../../lib/useEventRows";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { eventDetailPath } from "../eventRoutes";
 import { PACK_STATE_LABEL, packStateOf } from "../tracker/trackerSheet";
@@ -57,7 +57,7 @@ export function EventPhoneBrief({
 }) {
   const { event, eventId } = props;
   const proposals = useListProposal();
-  const prepTasks = useListPrepTask();
+  const prepTasks = useEventPrepTasks(eventId);
   const packLists = useListPackList();
 
   const next = props.lifecycleActions.find(

@@ -588,7 +588,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listPlanningOverride` - live read
 - `queries.listPlanningReceipt` - live read
 - `queries.listPlanningRule` - live read
-- `queries.listPrepTask` - live read
+- `queries.listPrepTaskByEventId` - live read
 - `queries.listProposal` - live read
 - `queries.listProposalDishSelection` - live read
 - `queries.listProposalEnhancement` - live read
@@ -1295,7 +1295,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listEventDish` - live read
 - `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverride` - live read
-- `queries.listEventGuest` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
 - `queries.listIngredientPriceObservation` - live read
@@ -1309,6 +1309,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listOrganization` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTask` - live read
+- `queries.listPrepTaskByEventId` - live read
 - `queries.listPrepTaskComment` - live read
 - `queries.listPrepTaskDependency` - live read
 - `queries.listProductionBatch` - live read

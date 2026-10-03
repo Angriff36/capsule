@@ -117,6 +117,21 @@ vi.mock("convex/react", async (importOriginal) => {
           (row) => row.eventId === eventId && row.deletedAt == null,
         );
       }
+      // One event's guests or prep tasks: the test's rows for that event.
+      for (const [query, hook] of [
+        ["queries:listEventGuestByEventId", "useListEventGuest"],
+        ["queries:listPrepTaskByEventId", "useListPrepTask"],
+      ] as const)
+        if (name === query && !backend.values.has(name)) {
+          const { eventId } = args as { eventId: string };
+          const rows = (backend.values.get(hook) ?? []) as {
+            eventId?: string;
+            deletedAt?: number | null;
+          }[];
+          return rows.filter(
+            (row) => row.eventId === eventId && row.deletedAt == null,
+          );
+        }
       // Menu lines of some events, or of one dish: the test's menu rows.
       if (
         (name === "eventMenuLookup:forEvents" ||
