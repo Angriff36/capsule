@@ -189,7 +189,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border px-5 text-base font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border px-5 py-1 text-center text-base leading-tight font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
   }
   .btn-primary {
     @apply border-brand bg-brand text-white hover:-translate-y-px hover:bg-ink;
@@ -205,7 +205,7 @@
     @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
   }
   .btn-sm {
-    @apply h-8 px-3.5 text-sm;
+    @apply min-h-8 px-3.5 text-sm;
   }
   .input {
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink shadow-[inset_0_1px_1px_rgb(36_50_45/0.06)] placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-inset disabled:text-ink-3 disabled:shadow-none;
