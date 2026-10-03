@@ -121,6 +121,15 @@ vi.mock("convex/react", async (importOriginal) => {
       for (const [query, hook] of [
         ["queries:listEventGuestByEventId", "useListEventGuest"],
         ["queries:listPrepTaskByEventId", "useListPrepTask"],
+        ["queries:listReviewFlagByEventId", "useListReviewFlag"],
+        [
+          "queries:listEventTimelineCommentByEventId",
+          "useListEventTimelineComment",
+        ],
+        [
+          "queries:listEventTimelineActivityByEventId",
+          "useListEventTimelineActivity",
+        ],
       ] as const)
         if (name === query && !backend.values.has(name)) {
           const { eventId } = args as { eventId: string };

@@ -5,9 +5,9 @@ import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEventTimelineComment,
   useEventTimelineCommentRemove,
-  useListEventTimelineComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { useEventTimelineComments } from "../../lib/useEventRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
@@ -29,7 +29,7 @@ type Props = {
  */
 export function EventTimelineCommentsPanel({ eventId }: Props) {
   const authStatus = useAuthStatus();
-  const comments = useListEventTimelineComment();
+  const comments = useEventTimelineComments(eventId);
   const people = useListPerson();
   const postComment = useCreateEventTimelineComment();
   const removeComment = useEventTimelineCommentRemove();

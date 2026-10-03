@@ -26,12 +26,12 @@ import {
   useGetEvent,
   useListClient,
   useListOrganization,
-  useListEventTimelineActivity,
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import { useEventTimelineActivities } from "../../lib/useEventRows";
 import {
   useEventAssignmentRows,
   useEventShiftRows,
@@ -170,8 +170,8 @@ function EventDetailContent({
     useDishesByIds(eventDishes?.map((row) => row.dishId)),
   );
   const timelineActivities = useHeldQueryRows(
-    "eventTimelineActivities",
-    useListEventTimelineActivity(),
+    `eventTimelineActivities:${event._id}`,
+    useEventTimelineActivities(event._id),
   );
   const people = useHeldQueryRows("people", useListPerson());
   const venues = useHeldQueryRows("venues", useListVenue());

@@ -572,8 +572,8 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTask` - live read
 - `queries.listEventTaskByEventId` - live read
-- `queries.listEventTimelineActivity` - live read
-- `queries.listEventTimelineComment` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listEventVehicleAssignment` - live read
 - `queries.listIncident` - live read
 - `queries.listIngredient` - live read
@@ -596,6 +596,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listReferralSource` - live read
 - `queries.listRentalOrderLine` - live read
 - `queries.listReviewFlag` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShiftByEventId` - live read
 - `queries.listTimeOffRequest` - live read
@@ -1296,6 +1297,8 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverride` - live read
 - `queries.listEventGuestByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
 - `queries.listIngredientPriceObservation` - live read
@@ -1315,7 +1318,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listProductionBatch` - live read
 - `queries.listProductionBatchAllocation` - live read
 - `queries.listQualityCheck` - live read
-- `queries.listReviewFlag` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listStation` - live read
 - `queries.listVendor` - live read
 - `queries.listVendorItem` - live read
@@ -2265,11 +2268,16 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `queries.getEvent` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listEventStaffNeed` - live read
 - `queries.listEventTimelineActivity` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineComment` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listOperatingLocation` - live read
 - `queries.listPerson` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listShift` - live read
 
 ### Generated actions
@@ -3890,7 +3898,11 @@ Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 ### Generated reads
 
 - `queries.getEvent` - live read
-- `queries.listReviewFlag` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 
 ### Generated actions
 

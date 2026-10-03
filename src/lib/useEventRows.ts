@@ -13,6 +13,27 @@ export function useEventGuests(eventId: string) {
   });
 }
 
+/** One event's review flags, never the whole company's (PL-SCALE). */
+export function useEventReviewFlagRows(eventId: string) {
+  return useQuery(api.queries.listReviewFlagByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's timeline comments, never the whole company's (PL-SCALE). */
+export function useEventTimelineComments(eventId: string) {
+  return useQuery(api.queries.listEventTimelineCommentByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's timeline blocks, never the whole company's (PL-SCALE). */
+export function useEventTimelineActivities(eventId: string) {
+  return useQuery(api.queries.listEventTimelineActivityByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
 /** One event's prep tasks, never the whole company's (PL-SCALE). */
 export function useEventPrepTasks(eventId: string) {
   return useQuery(api.queries.listPrepTaskByEventId, {
