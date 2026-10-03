@@ -61,7 +61,10 @@ Open:
 - Old invoices are not created as invoices; finance gets a rebuild preview
   (`/admin/imports`, old invoice rebuild).
 - Old payments wait on `/admin/reconcile` to be matched by hand.
-- Imported menus are one dish per TPP row, with no menu grouping.
+- Imported menus are one dish per TPP row. This matches the old system: its
+  menu catalog export (Name, Description, Category, Portion, Price, Tags,
+  Stations) has no menu column, because TPP builds menus per event. Each dish
+  keeps its TPP category; a BEO read in fills the event's own dish list.
 - Recipes come in through the recipe import screen, not the main import run,
   so the run's counts do not include them.
 
