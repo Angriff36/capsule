@@ -25,6 +25,10 @@ const DAY = 86_400_000;
 const EVENTS = 10_000;
 const DISHES = 5_000;
 const CLIENTS = 200;
+// A long seed or sampling loop that only awaits in-memory work never lets the
+// test worker answer vitest, which then fails the run with "Timeout calling
+// onTaskUpdate" after 60s even though every test passed. Yield now and then.
+const breathe = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 const STAGES = [
   "quote",
   "planning",
@@ -115,6 +119,7 @@ describe("runtime proof: the Events page reads a bounded window at 10,000 events
         );
       }
       for (let i = 0; i < EVENTS; i++) {
+        if (i % 250 === 0) await breathe();
         const s = seeds[i]!;
         const eventId = await ctx.db.insert("events", {
           tenantId: TENANT,
@@ -195,6 +200,7 @@ describe("runtime proof: the Events page reads a bounded window at 10,000 events
     const timings: number[] = [];
     let first: LedgerWindow | null = null;
     for (let sample = 0; sample < 100; sample++) {
+      await breathe();
       const started = performance.now();
       first = await read(owner);
       timings.push(performance.now() - started);
