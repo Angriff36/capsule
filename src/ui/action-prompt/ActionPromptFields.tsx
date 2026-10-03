@@ -126,9 +126,17 @@ function PromptField({
           }
           className="input"
           placeholder={field.placeholder}
+          list={field.suggestions ? `${fieldId}-suggestions` : undefined}
           onChange={(event) => onChange(event.target.value)}
         />
       )}
+      {field.suggestions && !field.options && !field.multiline ? (
+        <datalist id={`${fieldId}-suggestions`}>
+          {field.suggestions.map((suggestion) => (
+            <option key={suggestion} value={suggestion} />
+          ))}
+        </datalist>
+      ) : null}
     </div>
   );
 }

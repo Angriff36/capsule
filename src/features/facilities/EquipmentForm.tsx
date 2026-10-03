@@ -55,8 +55,54 @@ function money(data: FormData, name: string): number | undefined {
   return value === undefined ? undefined : Number(value);
 }
 
+function placeKey(place: string): string {
+  return place.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/**
+ * Places already in use: the catalog's own storage and current places, then
+ * the kitchen's storage places. One entry per spelling-insensitive name.
+ */
+export function equipmentPlaceChoices(
+  catalog: ReadonlyArray<{
+    homeLocation?: string | null;
+    currentLocation?: string | null;
+  }>,
+  storagePlaces: ReadonlyArray<string>,
+): string[] {
+  const byKey = new Map<string, string>();
+  const add = (place: string | null | undefined) => {
+    const trimmed = place?.trim().replace(/\s+/g, " ");
+    if (trimmed && !byKey.has(placeKey(trimmed))) {
+      byKey.set(placeKey(trimmed), trimmed);
+    }
+  };
+  for (const item of catalog) {
+    add(item.homeLocation);
+    add(item.currentLocation);
+  }
+  storagePlaces.forEach(add);
+  return [...byKey.values()].sort((a, b) => a.localeCompare(b));
+}
+
+/** A typed place in another spelling saves as the place's own name. */
+export function matchEquipmentPlace(
+  typed: string,
+  places: ReadonlyArray<string>,
+): string {
+  const trimmed = typed.trim();
+  if (!trimmed) return trimmed;
+  return (
+    places.find((place) => placeKey(place) === placeKey(trimmed)) ?? trimmed
+  );
+}
+
 /** The catalog facts both register and edit send (blank = leave unset). */
-export function equipmentCatalogFields(data: FormData) {
+export function equipmentCatalogFields(
+  data: FormData,
+  places: ReadonlyArray<string>,
+) {
+  const homeLocation = text(data, "homeLocation");
   return {
     trackingMode: String(data.get("trackingMode") ?? "bulk") as
       "serialized" | "bulk",
@@ -66,7 +112,10 @@ export function equipmentCatalogFields(data: FormData) {
     replacementCost: money(data, "replacementCost"),
     customerPrice: money(data, "customerPrice"),
     vendorId: text(data, "vendorId"),
-    homeLocation: text(data, "homeLocation"),
+    homeLocation:
+      homeLocation === undefined
+        ? undefined
+        : matchEquipmentPlace(homeLocation, places),
   };
 }
 
@@ -77,12 +126,14 @@ export function EquipmentForm({
   onClose,
   editItem,
   vendors,
+  places,
 }: {
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose: () => void;
   editItem?: EquipmentDetailRow | null;
   vendors: VendorChoice[];
+  places: string[];
 }) {
   const editing = editItem != null;
   return (
@@ -265,7 +316,11 @@ export function EquipmentForm({
             className="input"
             defaultValue={editItem?.homeLocation ?? ""}
             placeholder="Where it lives"
+            list="equipment-places"
           />
+          <span className="field-hint">
+            Pick a place already in use, or type a new one.
+          </span>
         </label>
         {editing ? (
           <label className="field-label">
@@ -275,9 +330,15 @@ export function EquipmentForm({
               className="input"
               defaultValue={editItem?.currentLocation ?? ""}
               placeholder="Where it is now"
+              list="equipment-places"
             />
           </label>
         ) : null}
+        <datalist id="equipment-places">
+          {places.map((place) => (
+            <option key={place} value={place} />
+          ))}
+        </datalist>
         <label className="field-label">
           Description
           <input

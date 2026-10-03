@@ -3628,6 +3628,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `queries.listPackListItem` - live read
 - `queries.listPerson` - live read
 - `queries.listRentalOrderLine` - live read
+- `queries.listStorageLocation` - live read
 - `queries.listVenueLayoutTemplate` - live read
 
 ### Generated actions

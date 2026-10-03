@@ -141,7 +141,7 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 
 | Job | Where in Capsule | Proof | State |
 | --- | --- | --- | --- |
-| Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount` | Built (one photo; place is text) |
+| Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount`, `features/facilities/equipment-place-choices` | Built (one photo). Storage place and Move offer the places already in use (catalog places and kitchen storage places); another spelling saves as the known place's name |
 | Availability across events, repairs, late returns | event Equipment panel | `proofs/availability-realtime`, `proofs/equipment-reservation-conflict` | Built |
 | Rental lines on proposals, approval, changes | `/clients/proposals` Pricing | `proofs/rental-proposal-lines`, `proofs/post-acceptance-change-order` | Built |
 | Approved rentals held for the event | automatic on approval | `proofs/accepted-rental-holds` | Built 2026-10-03 |
