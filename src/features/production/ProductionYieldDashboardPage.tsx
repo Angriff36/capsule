@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   useListProductionBatch,
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
+import { componentPath } from "../kitchen/kitchenRoutes";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   buildProductionYieldReport,
@@ -258,6 +260,19 @@ export function ProductionYieldDashboard({
                         <span className="production-yield-component">
                           <strong>{row.componentName}</strong>
                           <small>{varianceSignal(row)}</small>
+                          {row.suggestion ? (
+                            <Link
+                              to={componentPath(row.componentId)}
+                              className="production-yield-suggestion"
+                              data-testid="yield-suggestion"
+                            >
+                              Recipe says{" "}
+                              {quantity.format(row.suggestion.currentYield)}{" "}
+                              {row.suggestion.yieldUnit}; these batches suggest{" "}
+                              {quantity.format(row.suggestion.suggestedYield)}.
+                              Check the recipe
+                            </Link>
+                          ) : null}
                         </span>
                       </td>
                       <td>
