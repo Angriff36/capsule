@@ -7717,6 +7717,7 @@ async function __runContractFollowEventClient(ctx: MutationCtx, { docId, clientI
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Guard 0 failed");
+    const previousClientId = doc.clientId;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -7725,6 +7726,11 @@ async function __runContractFollowEventClient(ctx: MutationCtx, { docId, clientI
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, contractId: docId, tenantId: __after.tenantId, previousClientId: previousClientId, clientId: clientId, _subject: { entity: "Contract", command: "followEventClient", id: docId } };
+    const __manifestEvent0 = { type: "ContractClientReassigned", entity: "Contract", entityId: docId, payload: { contractId: docId, tenantId: __after.tenantId, previousClientId: previousClientId, clientId: clientId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "followEventClient", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -50224,6 +50230,7 @@ async function __runProposalFollowEventClient(ctx: MutationCtx, { docId, clientI
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Guard 0 failed");
+    const previousClientId = doc.clientId;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -50232,6 +50239,11 @@ async function __runProposalFollowEventClient(ctx: MutationCtx, { docId, clientI
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, proposalId: docId, tenantId: __after.tenantId, previousClientId: previousClientId, clientId: clientId, _subject: { entity: "Proposal", command: "followEventClient", id: docId } };
+    const __manifestEvent0 = { type: "ProposalClientReassigned", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: __after.tenantId, previousClientId: previousClientId, clientId: clientId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "followEventClient", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 

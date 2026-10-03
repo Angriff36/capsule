@@ -473,7 +473,14 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // Only the role check, so an archived proposal cannot block the event move.
   command followEventClient(clientId: uuid) {
     guard roleAllows(user.role, "salesAccess")
+    compute previousClientId = self.clientId
     mutate clientId = clientId
+    emit ProposalClientReassigned {
+      proposalId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: clientId
+    }
   }
 
   store Proposal in durable
