@@ -13,6 +13,12 @@ $wt = Get-ChildItem (Join-Path $root '.loop-worktrees') -Directory -Filter 'batc
 if (-not $wt) { exit 0 }
 $wt = $wt.FullName
 if ((git -C $wt rev-parse --abbrev-ref HEAD 2>$null) -notlike 'loop/batch-*') { Say "$wt is not on a loop/batch-* branch - skipped"; exit 0 }
+# Proof files the pre-push check refreshed on an earlier refused push: commit them.
+$left = @(git -C $wt status --porcelain | ForEach-Object { $_.Substring(3) })
+if ($left.Count -gt 0 -and -not ($left | Where-Object { $_ -notlike 'generated/proof/*' })) {
+  git -C $wt add -- generated/proof
+  git -C $wt commit --quiet -m '[loop] Refresh the proof catalog so the round can go to dev'
+}
 if (git -C $wt status --porcelain) { Say "uncommitted changes in $wt - skipped until the builder commits them"; exit 0 }
 
 git -C $wt fetch origin dev --quiet
@@ -33,6 +39,15 @@ Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force
 $env:LOOP_LANDER = '1'
 git -C $wt push --quiet origin HEAD:dev *>> $log
 $pushed = $LASTEXITCODE -eq 0
+# The pre-push check refreshes stale proof files itself and asks for them to be committed;
+# do that once and push again, so one forgotten refresh does not hold the round off dev.
+$dirty = @(git -C $wt status --porcelain | ForEach-Object { $_.Substring(3) })
+if (-not $pushed -and $dirty.Count -gt 0 -and -not ($dirty | Where-Object { $_ -notlike 'generated/proof/*' })) {
+  git -C $wt add -- generated/proof
+  git -C $wt commit --quiet -m '[loop] Refresh the proof catalog so the round can go to dev'
+  git -C $wt push --quiet origin HEAD:dev *>> $log
+  $pushed = $LASTEXITCODE -eq 0
+}
 $env:LOOP_LANDER = $null
 if (-not $pushed) { Say "push to dev refused (see above) - retried next round"; exit 0 }
 Say "on dev as $(git -C $wt rev-parse --short HEAD)"
