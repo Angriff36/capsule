@@ -38,6 +38,8 @@ const EVENTS = 10_000;
 const DISHES = 5_000;
 const CLIENTS = 200;
 const LINES_PER_EVENT = 2;
+const INGREDIENTS = 2_000;
+const LINES_PER_DISH = 5;
 const SAMPLES = 120;
 const OUT = join(ROOT, ".artifacts", "scale-backend");
 mkdirSync(OUT, { recursive: true });
@@ -237,6 +239,42 @@ try {
       ),
     );
     dishes = (await client.query(api.queries.listDish, {})) as typeof dishes;
+    importTable(
+      "ingredients",
+      writeLines(
+        "ingredients",
+        Array.from({ length: INGREDIENTS }, (_, n) => ({
+          tenantId: TENANT,
+          name: `Ingredient ${n}`,
+          unit: "pound",
+          costPerUnit: 1 + (n % 20),
+          status: "active",
+          version: 1,
+        })),
+      ),
+    );
+    const ingredients = (await client.query(
+      api.queries.listIngredient,
+      {},
+    )) as Array<{ _id: Id<"ingredients"> }>;
+    importTable(
+      "dishIngredients",
+      writeLines(
+        "dishIngredients",
+        dishes.flatMap((dish, d) =>
+          Array.from({ length: LINES_PER_DISH }, (_, l) => ({
+            tenantId: TENANT,
+            dishId: dish._id,
+            ingredientId:
+              ingredients[(d * LINES_PER_DISH + l) % ingredients.length]!._id,
+            quantity: 0.5,
+            unit: "pound",
+            sortOrder: l,
+            version: 1,
+          })),
+        ),
+      ),
+    );
     const eventIds = await allEventIds();
     importTable(
       "eventDishes",
@@ -357,6 +395,16 @@ try {
       }),
     ),
     await time(
+      "Menu tab recipe, price and stock rows (menuRecipeLookup.forDishes, 12 dishes)",
+      (i) =>
+        client.query(api.menuRecipeLookup.forDishes, {
+          dishIds: Array.from(
+            { length: 12 },
+            (_, d) => dishes[(i * 41 + d * 7) % DISHES]!._id,
+          ),
+        }),
+    ),
+    await time(
       "One event's menu lines with recipes (queries.listEventDishByEventId)",
       (i) =>
         client.query(api.queries.listEventDishByEventId, {
@@ -385,6 +433,30 @@ try {
       `every event's menu lines (old event page read): ${everyMenuLine.ms} ms, ${everyMenuLine.result}`,
     );
   }
+  // The read the Menu tab used before: every dish ingredient line of the
+  // company, each with its ingredient. One call; it may fail too.
+  let everyDishIngredient: { ms: number; result: string };
+  {
+    const start = performance.now();
+    try {
+      const rows = (await client.query(
+        api.queries.listDishIngredient,
+        {},
+      )) as [];
+      everyDishIngredient = {
+        ms: Math.round(performance.now() - start),
+        result: `${rows.length} lines`,
+      };
+    } catch (error) {
+      everyDishIngredient = {
+        ms: Math.round(performance.now() - start),
+        result: `failed: ${String(error).split("\n")[0]}`,
+      };
+    }
+    say(
+      `every dish ingredient line (old Menu tab read): ${everyDishIngredient.ms} ms, ${everyDishIngredient.result}`,
+    );
+  }
   const exportWalk = await time(
     "All-time event export walk (eventLookup.reportPage, 500 a page)",
     () => allEventIds(),
@@ -407,11 +479,14 @@ try {
       dishes: dishes.length,
       clients: CLIENTS,
       menuLines: EVENTS * LINES_PER_EVENT,
+      ingredients: INGREDIENTS,
+      dishIngredientLines: DISHES * LINES_PER_DISH,
     },
     seedImportMs: seedMs || "already filled",
     timings,
     exportWalk,
     everyMenuLine,
+    everyDishIngredient,
   };
   mkdirSync(join(ROOT, ".artifacts"), { recursive: true });
   writeFileSync(

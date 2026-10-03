@@ -97,9 +97,23 @@ error at 20,000 lines. The event page and nine other screens read it. They now
 read one event's lines (p95 22 ms) or the lines of the events / dish they show
 (`convex/eventMenuLookup.ts`).
 
+Dishes and recipe rows (run of 2026-10-03, same company plus 2,000
+ingredients and 25,000 dish ingredient lines, 5 per dish):
+
+| Read                                                  | Cold ms | p50 ms | p95 ms |
+| ----------------------------------------------------- | ------- | ------ | ------ |
+| Dishes on one menu, 12 (`dishLookup.byIds`)           | 12      | 10     | 12     |
+| Menu tab recipe, price, stock rows, 12 dishes         | 117     | 105    | 113    |
+
+The event Menu tab read every dish ingredient line of the company (and nine
+more whole lists). That read ran 16.0 s and then failed with a server error
+at 25,000 lines. The tab now reads only its dishes' rows
+(`convex/menuRecipeLookup.ts`). The event page, kitchen board, prep board,
+My day, allergen matrix, pack list and recipe page read their dishes by id.
+
 ## Still open for AC-172
 
-- The dish list's first read after a change (2.5 s at 5,000 dishes).
-- Other whole-company lists the event tabs still read (recipe lines,
-  ingredients, prep tasks, guests).
+- The dish list's first read after a change (2.5 s at 5,000 dishes); left on
+  catalog screens and pickers on purpose.
+- Other whole-company lists the event tabs still read (prep tasks, guests).
 - Screen response under 200 ms at this size (browser leg).
