@@ -408,7 +408,7 @@ export function VenueLayoutTemplatesPage() {
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="phone-cards w-full text-xs">
             <thead className="text-left text-sm uppercase text-ink-3">
               <tr>
                 <th className="py-2 pr-3">Name</th>
@@ -433,7 +433,7 @@ export function VenueLayoutTemplatesPage() {
                         </div>
                       ) : null}
                     </td>
-                    <td className="py-2 pr-3 text-ink-2">
+                    <td className="py-2 pr-3 text-ink-2" data-label="Venue">
                       <Link
                         className="link"
                         to={venueDetailPath(template.venueId)}
@@ -441,8 +441,10 @@ export function VenueLayoutTemplatesPage() {
                         {venueName(template.venueId)}
                       </Link>
                     </td>
-                    <td className="py-2 pr-3 text-ink-2">{count}</td>
-                    <td className="py-2 pr-3">
+                    <td className="py-2 pr-3 text-ink-2" data-label="Sections">
+                      {count}
+                    </td>
+                    <td className="py-2 pr-3" data-label="Status">
                       <StatusChip
                         status={template.status}
                         color={

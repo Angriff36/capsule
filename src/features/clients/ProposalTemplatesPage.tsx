@@ -454,7 +454,7 @@ export function ProposalTemplatesPage() {
             }
           />
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Name</th>
@@ -471,11 +471,13 @@ export function ProposalTemplatesPage() {
                   <td>
                     <strong>{row.name}</strong>
                   </td>
-                  <td className="text-ink-2">{row.description || "—"}</td>
-                  <td className="text-ink-2">
+                  <td className="text-ink-2" data-label="Description">
+                    {row.description || "—"}
+                  </td>
+                  <td className="text-ink-2" data-label="Visible sections">
                     {formatVisibleSections(row.visibleSections)}
                   </td>
-                  <td className="text-ink-2">
+                  <td className="text-ink-2" data-label="Defaults">
                     <div className="text-2xs">
                       {row.defaultTaxRate != null
                         ? `Tax: ${formatPercentage(row.defaultTaxRate)}`
@@ -488,7 +490,7 @@ export function ProposalTemplatesPage() {
                         : null}
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     <StatusChip status={row.status} />
                   </td>
                   <td className="text-right">

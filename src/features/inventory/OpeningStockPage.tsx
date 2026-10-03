@@ -204,7 +204,7 @@ export function OpeningStockPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Item</th>
@@ -237,25 +237,27 @@ export function OpeningStockPage() {
                             {row.sourceFile}
                           </small>
                         </td>
-                        <td>
+                        <td data-label="What it is">
                           {
                             OPENING_STOCK_KIND_TEXT[
                               row.kind as OpeningStockKind
                             ]
                           }
                         </td>
-                        <td>
+                        <td data-label="On the sheet">
                           {row.quantity == null
                             ? "No amount"
                             : `${amount(row.quantity)} ${row.sourceUnit || "(no unit)"}`}
                         </td>
-                        <td>
+                        <td data-label="In catalog unit">
                           {row.catalogQuantity == null
                             ? "—"
                             : `${amount(row.catalogQuantity)} ${unitOf.get(String(row.ingredientId)) ?? ""}`}
                         </td>
-                        <td>{row.locationName || "Not given"}</td>
-                        <td>
+                        <td data-label="Kept in">
+                          {row.locationName || "Not given"}
+                        </td>
+                        <td data-label="Counted">
                           {day(row.asOfAt)}
                           <small className="block text-ink-3">
                             {
@@ -265,7 +267,7 @@ export function OpeningStockPage() {
                             }
                           </small>
                         </td>
-                        <td>
+                        <td data-label="To do">
                           {row.status === "applied" ? (
                             "Used as opening stock."
                           ) : row.status === "set_aside" ? (
