@@ -709,6 +709,8 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .evd *,
+  .evd *::before,
+  .evd *::after,
   .evd-dialog {
     animation: none !important;
     transition: none !important;
