@@ -101,14 +101,14 @@ export function OpeningStockImport() {
             disabled={busy}
           />
         </label>
-        <label className="field-label">
+        <label className="field-label max-w-full min-w-0">
           Count sheet
           <input
             type="file"
             accept=".csv,text/csv"
             onChange={handleFile}
             disabled={busy}
-            className="text-xs"
+            className="max-w-full text-xs"
           />
         </label>
       </div>

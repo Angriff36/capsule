@@ -244,7 +244,7 @@ export function BrandingPage() {
         </p>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)]">
         <Section title="Document identity">
           <form
             key={`${record?._id ?? "new"}:${record?.version ?? 0}`}

@@ -178,7 +178,7 @@ export function OpeningStockPage() {
             <p className="eyebrow">Inventory · Opening stock</p>
             <h2>Count sheet rows</h2>
           </div>
-          <div className="flex gap-2" role="tablist">
+          <div className="flex flex-wrap gap-2" role="tablist">
             {TABS.map(([value, label]) => (
               <button
                 key={value}
