@@ -348,6 +348,14 @@ try {
     await time("Dish detail (queries.getDish)", (i) =>
       client.query(api.queries.getDish, { id: dishes[(i * 37) % DISHES]!._id }),
     ),
+    await time("Dishes on one menu (dishLookup.byIds, 12 dishes)", (i) =>
+      client.query(api.dishLookup.byIds, {
+        ids: Array.from(
+          { length: 12 },
+          (_, d) => dishes[(i * 41 + d * 7) % DISHES]!._id,
+        ),
+      }),
+    ),
     await time(
       "One event's menu lines with recipes (queries.listEventDishByEventId)",
       (i) =>

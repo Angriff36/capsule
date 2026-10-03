@@ -6,7 +6,6 @@ import {
   useCreateTimeRecord,
   useListAvailabilityWindow,
   useListDelivery,
-  useListDish,
   useListEventCloseout,
   useListPackList,
   useListPackListItem,
@@ -32,6 +31,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useEventsById } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { MyShiftWorkDetails, shiftWorkDetails } from "./MyShiftWorkDetails";
 import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -122,7 +122,6 @@ export function MyDayPage() {
     useListPrepTaskDependency(),
     offlineScope,
   );
-  const dishes = useCachedRead("prepDishes", useListDish(), offlineScope);
   // Menu lines of the events with open prep tasks only, never every
   // event's (PL-SCALE).
   const openTaskEventIds = useMemo(
@@ -140,6 +139,30 @@ export function MyDayPage() {
   const eventDishes = useCachedRead(
     "prepEventDishes",
     useMenuLinesForEvents(openTaskEventIds),
+    offlineScope,
+  );
+  // Dishes of those open tasks and menu lines only, never the whole list.
+  const dishes = useCachedRead(
+    "prepDishes",
+    useDishesByIds(
+      useMemo(
+        () =>
+          tasks === undefined || eventDishes === undefined
+            ? undefined
+            : [
+                ...tasks
+                  .filter(
+                    (task) =>
+                      task.deletedAt == null &&
+                      task.status !== "completed" &&
+                      task.status !== "cancelled",
+                  )
+                  .map((task) => task.dishId),
+                ...eventDishes.map((row) => row.dishId),
+              ],
+        [tasks, eventDishes],
+      ),
+    ),
     offlineScope,
   );
   const deliveries = useCachedRead(

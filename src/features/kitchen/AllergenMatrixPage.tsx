@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  useListDish,
   useListDishComponent,
   useListDishIngredient,
   useListIngredient,
@@ -19,6 +18,7 @@ import { deriveDishAllergens } from "./dishAllergens";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 
 const ALLERGENS = CULINARY_ALLERGENS;
 
@@ -61,7 +61,6 @@ export function AllergenMatrixPage() {
   const [params, setParams] = useSearchParams();
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useListDish();
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const componentIngredients = useListComponentIngredient();
@@ -70,6 +69,14 @@ export function AllergenMatrixPage() {
   const menuId = params.get("menu") ?? "";
   const eventId = params.get("event") ?? "";
   const eventDishes = useMenuLinesForEvents([eventId]);
+  // Only the chosen menu's or event's dishes, never the whole dish list.
+  const dishes = useDishesByIds(
+    menuId
+      ? menuDishes
+          ?.filter((line) => line.deletedAt == null && line.menuId === menuId)
+          .map((line) => line.dishId)
+      : eventDishes?.map((line) => line.dishId),
+  );
   const events = usePickerAndNamedEvents([eventId]);
   const scopeValue = menuId
     ? `menu:${menuId}`

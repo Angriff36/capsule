@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
-  useListDish,
   useListPerson,
   useListInvoice,
   useListPrepTask,
@@ -21,6 +20,7 @@ import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { useEventsInRange } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
@@ -75,7 +75,6 @@ import { prepTimeLabel } from "./prepTiming";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
-  const dishes = useListDish();
   const components = useListComponent();
   const tasks = useListPrepTask();
   const invoices = useListInvoice();
@@ -124,6 +123,20 @@ export function KitchenDashboardPage() {
   // Menu lines of those events only, never every event's (PL-SCALE).
   const eventDishes = useMenuLinesForEvents(
     useMemo(() => events?.map((event) => event._id), [events]),
+  );
+  // Only the dishes those events' menu lines and prep tasks name.
+  const dishes = useDishesByIds(
+    useMemo(() => {
+      if (events === undefined || eventDishes === undefined || !tasks)
+        return undefined;
+      const inWindow = new Set(events.map((event) => String(event._id)));
+      return [
+        ...eventDishes.map((row) => row.dishId),
+        ...tasks
+          .filter((task) => inWindow.has(String(task.eventId)))
+          .map((task) => task.dishId),
+      ];
+    }, [eventDishes, events, tasks]),
   );
 
   const model = useMemo(

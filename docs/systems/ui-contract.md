@@ -1212,6 +1212,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
 - `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
 - `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
@@ -2216,6 +2217,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.publishRecipeEdition` - mutation; authored step; live reads update by themselves
 - `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -3097,6 +3099,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `candidateHireRevocation.revokeHire` - mutation; authored step; live reads update by themselves
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself

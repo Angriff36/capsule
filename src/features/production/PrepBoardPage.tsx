@@ -4,7 +4,6 @@ import {
   useCreatePrepTask,
   useCreatePrepTaskDependency,
   useCreateQualityCheck,
-  useListDish,
   useListIngredient,
   useListPrepTask,
   useListPrepTaskComment,
@@ -31,6 +30,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 
 const DAY = 86_400_000;
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
@@ -120,7 +120,23 @@ export function PrepBoardPage() {
     [tasks, eventDishes],
   );
   const events = useEventsById(eventIds);
-  const dishes = useListDish();
+  // Only the dishes these tasks and menu lines name (open tasks first, as
+  // one read takes at most 500 dishes), never the whole dish list.
+  const dishes = useDishesByIds(
+    useMemo(
+      () =>
+        tasks === undefined || eventDishes === undefined
+          ? undefined
+          : [
+              ...tasks
+                .filter((task) => String(task.status) !== "completed")
+                .map((task) => task.dishId),
+              ...eventDishes.map((row) => row.dishId),
+              ...tasks.map((task) => task.dishId),
+            ],
+      [tasks, eventDishes],
+    ),
+  );
   const ingredients = useListIngredient();
   const comments = useListPrepTaskComment();
   const createTask = useCreatePrepTask();
