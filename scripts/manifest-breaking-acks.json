@@ -2622,6 +2622,42 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-03",
       "reason": "PL-NATIVE-JOURNEY AC-672: new optional trip cost on a truck run for the closeout transport line; existing runs read as no cost."
+    },
+    {
+      "path": "clockOut.parameters.latitude",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-03",
+      "reason": "Clock-out keeps the phone location like the clock-in (Nowsta parity); optional, old callers send nothing."
+    },
+    {
+      "path": "clockOut.parameters.longitude",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-03",
+      "reason": "Clock-out keeps the phone location like the clock-in (Nowsta parity); optional, old callers send nothing."
+    },
+    {
+      "path": "clockOut.parameters.accuracyMeters",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-03",
+      "reason": "Clock-out keeps the phone location like the clock-in (Nowsta parity); optional, old callers send nothing."
+    },
+    {
+      "path": "TimeRecord.clockOutLatitude",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-03",
+      "reason": "New optional clock-out location; existing time entries read as no location."
+    },
+    {
+      "path": "TimeRecord.clockOutLongitude",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-03",
+      "reason": "New optional clock-out location; existing time entries read as no location."
+    },
+    {
+      "path": "TimeRecord.clockOutAccuracyMeters",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-03",
+      "reason": "New optional clock-out location; existing time entries read as no location."
     }
   ]
 }

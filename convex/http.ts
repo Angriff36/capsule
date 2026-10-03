@@ -4076,8 +4076,8 @@ const COMMAND_DISPATCH = {
   },
   "TimeRecord.clockOut": {
     ref: api.mutations.TimeRecord_clockOut,
-    params: ["docId","breakMinutes","notes","paidBreakMinutes","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"breakMinutes","type":"number","required":false},{"name":"notes","type":"string","required":false},{"name":"paidBreakMinutes","type":"number","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","breakMinutes","notes","paidBreakMinutes","latitude","longitude","accuracyMeters","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"breakMinutes","type":"number","required":false},{"name":"notes","type":"string","required":false},{"name":"paidBreakMinutes","type":"number","required":false},{"name":"latitude","type":"number","required":false},{"name":"longitude","type":"number","required":false},{"name":"accuracyMeters","type":"number","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "TimeRecord.correct": {
     ref: api.mutations.TimeRecord_correct,

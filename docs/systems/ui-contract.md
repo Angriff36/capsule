@@ -3011,10 +3011,10 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - effects: TimeRecordApproved
   - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.TimeRecord_clockOut` (TimeRecord.clockOut)
-  - inputs from the screen: breakMinutes, notes, paidBreakMinutes; filled by the server: none
+  - inputs from the screen: breakMinutes, notes, paidBreakMinutes, latitude, longitude, accuracyMeters; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
   - effects: TimeRecordClockedOut
   - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.TimeRecord_correct` (TimeRecord.correct)

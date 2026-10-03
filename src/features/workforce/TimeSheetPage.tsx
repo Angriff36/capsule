@@ -241,6 +241,42 @@ export function punchEvidenceLabel(row: {
   return parts.length ? parts.join(" · ") : null;
 }
 
+/**
+ * Where the clock-out came from, and how far it was from the clock-in when
+ * both phones gave a location (a long way off is worth a look, not a block).
+ */
+export function clockOutEvidenceLabel(row: {
+  clockInLatitude?: number | null;
+  clockInLongitude?: number | null;
+  clockOutLatitude?: number | null;
+  clockOutLongitude?: number | null;
+  clockOutAccuracyMeters?: number | null;
+}): string | null {
+  if (row.clockOutLatitude == null || row.clockOutLongitude == null)
+    return null;
+  const label = `Phone location ${row.clockOutLatitude.toFixed(4)}, ${row.clockOutLongitude.toFixed(4)}${row.clockOutAccuracyMeters != null ? ` (±${Math.round(row.clockOutAccuracyMeters)} m)` : ""}`;
+  if (row.clockInLatitude == null || row.clockInLongitude == null) return label;
+  const km = distanceKm(
+    row.clockInLatitude,
+    row.clockInLongitude,
+    row.clockOutLatitude,
+    row.clockOutLongitude,
+  );
+  return km < 0.5
+    ? `${label} · same place as the clock-in`
+    : `${label} · ${km.toFixed(1)} km from the clock-in`;
+}
+
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const rad = Math.PI / 180;
+  const a =
+    Math.sin(((lat2 - lat1) * rad) / 2) ** 2 +
+    Math.cos(lat1 * rad) *
+      Math.cos(lat2 * rad) *
+      Math.sin(((lon2 - lon1) * rad) / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(a));
+}
+
 /** Under the hours: the planned shift and how the recorded time compares. */
 export function PlannedVsRecorded({
   row,
@@ -699,6 +735,14 @@ export function TimeSheetPage() {
                       {row.clockOutAt
                         ? `${formatDate(row.clockOutAt)} ${formatTime(row.clockOutAt)}`
                         : "—"}
+                      {clockOutEvidenceLabel(row) ? (
+                        <small
+                          className="block text-ink-3"
+                          data-testid="clock-out-evidence"
+                        >
+                          {clockOutEvidenceLabel(row)}
+                        </small>
+                      ) : null}
                     </td>
                     <TimeSheetBreakCell
                       breakMinutes={row.breakMinutes}

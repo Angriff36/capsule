@@ -81,7 +81,7 @@ delivery is not being built now (owner, 2026-09-29).
 | Event instructions for crew | `/my` | `proofs/field-staff-booking-read` | Built |
 | Reminders | text and push alerts | `proofs/sms-reminder-dedupe`, `proofs/push-outbox-dedupe` | Built |
 | Announcements | `/admin/announcements`, banner | `proofs/announcement-board` | Built ("read and closed by" count for managers) |
-| Clock in and out, location at clock-in | `/my` | `proofs/time-correction-audit`, `proofs/offline-clock-reconcile` | Built (no location at clock-out) |
+| Clock in and out, location at clock-in and clock-out | `/my`, `/staff/time` | `proofs/time-correction-audit`, `proofs/offline-clock-reconcile`, `features/workforce/clock-out-location` | Built: both taps keep the phone location when the person allows it; the time sheet says how far the clock-out was from the clock-in |
 | Late and no-show alerts | `/staff/time` | `proofs/clock-alerts` | Built |
 | Manager edits and time sheet approval | `/staff/time` | `proofs/time-correction-audit` | Built |
 | Breaks and overtime warnings | `/staff/time`, `/finance/payroll` | `features/finance/break-classification` | Built |

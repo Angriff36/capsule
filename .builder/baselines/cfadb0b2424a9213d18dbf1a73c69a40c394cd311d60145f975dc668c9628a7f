@@ -4357,6 +4357,9 @@ export const TimeRecordSchema = z.object({
   clockInLatitude: z.number().nullable().optional(),
   clockInLongitude: z.number().nullable().optional(),
   clockInAccuracyMeters: z.number().nullable().optional(),
+  clockOutLatitude: z.number().nullable().optional(),
+  clockOutLongitude: z.number().nullable().optional(),
+  clockOutAccuracyMeters: z.number().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["open", "closed", "corrected"]).default("open"),
   correctedAt: z.coerce.date().nullable().optional(),
@@ -12055,6 +12058,9 @@ export const TimeRecordClockOutParamsSchema = z.object({
   breakMinutes: z.number().optional(),
   notes: z.string().optional(),
   paidBreakMinutes: z.number().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  accuracyMeters: z.number().optional(),
 });
 
 export type TimeRecordClockOutParams = z.infer<typeof TimeRecordClockOutParamsSchema>;

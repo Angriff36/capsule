@@ -63614,7 +63614,7 @@ export const TimeRecord_createViaClockIn = mutation({
   },
 });
 
-async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, notes, paidBreakMinutes, version }: any, __creation = false) {
+async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, notes, paidBreakMinutes, latitude, longitude, accuracyMeters, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -63632,6 +63632,7 @@ async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, 
     if (!((((user.personId != null) && (doc.personId === user.personId)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
     if (!(((breakMinutes == null) || (breakMinutes >= 0)))) throw new Error("Break minutes can't be negative. Use zero or more.");
     if (!(((paidBreakMinutes == null) || (paidBreakMinutes >= 0)))) throw new Error("Paid break minutes can't be negative. Use zero or more.");
+    if (!((((latitude == null) && (longitude == null)) || ((((((latitude != null) && (longitude != null)) && (latitude >= (-90))) && (latitude <= 90)) && (longitude >= (-180))) && (longitude <= 180))))) throw new Error("The clock-out location is incomplete. Send both latitude and longitude, or neither.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -63648,6 +63649,9 @@ async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, 
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
+      clockOutLatitude: latitude,
+      clockOutLongitude: longitude,
+      clockOutAccuracyMeters: accuracyMeters,
       clockOutAt: Date.now(),
       breakMinutes: ((breakMinutes != null) ? breakMinutes : doc.breakMinutes),
       paidBreakMinutes: ((paidBreakMinutes != null) ? paidBreakMinutes : doc.paidBreakMinutes),
@@ -63671,6 +63675,9 @@ export const TimeRecord_clockOut = mutation({
     breakMinutes: v.optional(v.any()),
     notes: v.optional(v.string()),
     paidBreakMinutes: v.optional(v.any()),
+    latitude: v.optional(v.any()),
+    longitude: v.optional(v.any()),
+    accuracyMeters: v.optional(v.any()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

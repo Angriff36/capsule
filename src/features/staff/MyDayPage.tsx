@@ -722,19 +722,28 @@ export function MyDayPage() {
                         onClick={() => {
                           const lunch = breakMinutesInput(lunchMinutes);
                           const paid = breakMinutesInput(paidBreakMinutes);
-                          perform(
-                            "clock-out",
-                            "clock-out",
-                            "Clock out",
-                            {
-                              docId: openRecord._id,
-                              version: openRecord.version,
-                              ...(lunch ? { breakMinutes: lunch } : {}),
-                              ...(paid ? { paidBreakMinutes: paid } : {}),
-                            },
-                            () => {
-                              setLunchMinutes("");
-                              setPaidBreakMinutes("");
+                          setBusy("clock-out");
+                          void readClockEvidence().then(
+                            ({ latitude, longitude, accuracyMeters }) => {
+                              setBusy(null);
+                              perform(
+                                "clock-out",
+                                "clock-out",
+                                "Clock out",
+                                {
+                                  docId: openRecord._id,
+                                  version: openRecord.version,
+                                  ...(lunch ? { breakMinutes: lunch } : {}),
+                                  ...(paid ? { paidBreakMinutes: paid } : {}),
+                                  ...(latitude != null && longitude != null
+                                    ? { latitude, longitude, accuracyMeters }
+                                    : {}),
+                                },
+                                () => {
+                                  setLunchMinutes("");
+                                  setPaidBreakMinutes("");
+                                },
+                              );
                             },
                           );
                         }}
