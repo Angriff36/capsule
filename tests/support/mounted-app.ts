@@ -149,6 +149,25 @@ vi.mock("convex/react", async (importOriginal) => {
         }[];
         return rows.filter((row) => ids.has(row._id) && row.deletedAt == null);
       }
+      // A menu's recipe, price and stock rows: the test's lists, as given.
+      if (name === "menuRecipeLookup:forDishes" && !backend.values.has(name)) {
+        const list = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as { deletedAt?: number | null }[]
+          ).filter((row) => row.deletedAt == null);
+        return {
+          dishIngredients: list("useListDishIngredient"),
+          dishComponents: list("useListDishComponent"),
+          components: list("useListComponent"),
+          componentIngredients: list("useListComponentIngredient"),
+          ingredients: list("useListIngredient"),
+          priceObservations: list("useListIngredientPriceObservation"),
+          unitMappings: list("useListItemUnitMapping"),
+          containers: list("useListDishContainer"),
+          inventoryItems: list("useListInventoryItem"),
+          inventoryReservations: list("useListInventoryReservation"),
+        };
+      }
       // The whole dish list read straight (an open dish picker).
       if (name === "queries:listDish" && !backend.values.has(name))
         return backend.values.get("useListDish");

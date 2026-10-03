@@ -241,6 +241,7 @@ import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAva
 import type * as lib_venueFactsSnapshot from "../lib/venueFactsSnapshot.js";
 import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
+import type * as menuRecipeLookup from "../menuRecipeLookup.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as messageInboxPages from "../messageInboxPages.js";
 import type * as messageReply from "../messageReply.js";
@@ -547,6 +548,7 @@ declare const fullApi: ApiFromModules<{
   "lib/venueFactsSnapshot": typeof lib_venueFactsSnapshot;
   "lib/venueReconciliation": typeof lib_venueReconciliation;
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
+  menuRecipeLookup: typeof menuRecipeLookup;
   messageInbox: typeof messageInbox;
   messageInboxPages: typeof messageInboxPages;
   messageReply: typeof messageReply;

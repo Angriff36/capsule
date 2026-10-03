@@ -9,22 +9,13 @@ import {
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
-  useListComponent,
-  useListComponentIngredient,
-  useListDishComponent,
-  useListDishContainer,
-  useListDishIngredient,
   useListEventGuest,
-  useListIngredient,
-  useListIngredientPriceObservation,
-  useListItemUnitMapping,
-  useListInventoryItem,
-  useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
@@ -126,16 +117,18 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   );
   const eventGuests = useListEventGuest();
   const reviewFlags = useEventReviewFlags(eventId);
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  const itemUnitMappings = useListItemUnitMapping();
-  const priceObservations = useListIngredientPriceObservation();
-  const containers = useListDishContainer();
-  const inventoryItems = useListInventoryItem();
-  const inventoryReservations = useListInventoryReservation();
+  // Recipe, price and stock rows of the menu's dishes only.
+  const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));
+  const dishIngredients = recipe?.dishIngredients;
+  const dishComponents = recipe?.dishComponents;
+  const components = recipe?.components;
+  const componentIngredients = recipe?.componentIngredients;
+  const ingredients = recipe?.ingredients;
+  const itemUnitMappings = recipe?.unitMappings;
+  const priceObservations = recipe?.priceObservations;
+  const containers = recipe?.containers;
+  const inventoryItems = recipe?.inventoryItems;
+  const inventoryReservations = recipe?.inventoryReservations;
   const materializeTemplate = useMaterializeEventMenuTemplate();
   const applyPackage = useApplyCateringPackage();
   const createEventDish = useCreateEventDish();
@@ -186,7 +179,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   );
   const existingDishIds = selections.map((row) => row.dishId);
 
-  const nutrition = useEventMenuNutrition(existingDishIds);
+  const nutrition = useEventMenuNutrition(existingDishIds, recipe);
 
   const refreshStock = async () => {
     if (!prepSyncReady) return;

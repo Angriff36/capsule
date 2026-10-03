@@ -2253,6 +2253,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `menuRecipeLookup.forDishes` - query; live read, updates by itself
 
 ## 5. Timeline and route
 
