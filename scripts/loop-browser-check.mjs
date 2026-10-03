@@ -147,14 +147,35 @@ if (await answers(`${convexUrl}/version`)) {
   const logDir = join(main, ".artifacts", "loop-browser");
   mkdirSync(logDir, { recursive: true });
   const devLog = join(logDir, "convex-dev.log");
-  const fd = openSync(devLog, "w");
-  const child = spawn(
-    process.execPath,
-    [join(main, "node_modules", "convex", "bin", "main.js"), "dev"],
-    { cwd: main, detached: true, stdio: ["ignore", fd, fd], windowsHide: true },
-  );
-  child.unref();
-  closeSync(fd);
+  if (process.platform === "win32") {
+    // Started by Windows itself (Win32_Process.Create), not as a child of this
+    // run: a child inherits every open handle of the builder round, including
+    // .claude/loop-tick.log, and kept it locked so every later round failed on
+    // its first log line (2026-10-02 19:02 to 21:43).
+    const command = `cmd.exe /c ""${process.execPath}" "${join(main, "node_modules", "convex", "bin", "main.js")}" dev > "${devLog}" 2>&1"`;
+    const created = spawnSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-Command",
+        `$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = '${command.replace(/'/g, "''")}'; CurrentDirectory = '${main.replace(/'/g, "''")}' }; exit $r.ReturnValue`,
+      ],
+      { stdio: "ignore", windowsHide: true },
+    );
+    if (created.status !== 0)
+      throw new Error(
+        "could not start the local backend (Win32_Process.Create)",
+      );
+  } else {
+    const fd = openSync(devLog, "w");
+    const child = spawn(
+      process.execPath,
+      [join(main, "node_modules", "convex", "bin", "main.js"), "dev"],
+      { cwd: main, detached: true, stdio: ["ignore", fd, fd] },
+    );
+    child.unref();
+    closeSync(fd);
+  }
   await waitFor(`${convexUrl}/version`, 180, "local Convex backend");
   // Its first push of the main checkout's functions must finish first, or it
   // would land after (and replace) this worktree's push below.
