@@ -147,9 +147,10 @@ function render(view: PackViewKind, items: typeof lines) {
 const ids = (html: string) =>
   [...html.matchAll(/data-line-id="([^"]+)"/g)].map((m) => m[1]).sort();
 const packedOf = (html: string, id: string) =>
-  new RegExp(`data-line-id="${id}".*?<td>[^<]*</td><td>(\\d+) each`, "s").exec(
-    html,
-  )?.[1];
+  new RegExp(
+    `data-line-id="${id}".*?<td data-label="Packed">(\\d+) each`,
+    "s",
+  ).exec(html)?.[1];
 
 describe("four pack views of one line set (AC-540, AC-381)", () => {
   it("the four views render the same line ids and a pack in one view shows in all four", () => {
