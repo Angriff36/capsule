@@ -14,6 +14,7 @@ import {
   buildEventRequirements,
   type RequirementKind,
 } from "../logistics/eventRequirements";
+import "./EventRequirementsPanel.css";
 
 function fromHold(sourcesJson: unknown): boolean {
   if (typeof sourcesJson !== "string" || !sourcesJson) return false;
@@ -146,7 +147,7 @@ export function EventRequirementsPanel({ eventId }: { eventId: Id<"events"> }) {
               {REQUIREMENT_KIND_LABEL[group.kind]} ({group.rows.length})
             </h3>
             <div className="supply-table-wrap">
-              <table className="supply-table">
+              <table className="supply-table needs-table">
                 <thead>
                   <tr>
                     <th>Item</th>
@@ -163,9 +164,9 @@ export function EventRequirementsPanel({ eventId }: { eventId: Id<"events"> }) {
                       <td className="supply-number">
                         {Number(line.quantity.toFixed(2))} {line.unit}
                       </td>
-                      <td>{line.source}</td>
-                      <td>{line.availability}</td>
-                      <td>{line.responsible}</td>
+                      <td data-label="From">{line.source}</td>
+                      <td data-label="Where it stands">{line.availability}</td>
+                      <td data-label="Who is on it">{line.responsible}</td>
                     </tr>
                   ))}
                 </tbody>
