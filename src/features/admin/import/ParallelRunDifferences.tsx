@@ -177,7 +177,7 @@ export function ParallelRunDifferences({
         </div>
       )}
       <div className="supply-table-wrap">
-        <table className="supply-table">
+        <table className="supply-table phone-cards">
           <thead>
             <tr>
               <th>TPP event</th>
@@ -215,9 +215,9 @@ export function ParallelRunDifferences({
                       <div className="text-2xs text-ink-3">{row.tppTitle}</div>
                     )}
                   </td>
-                  <td>{fieldWords(row.field)}</td>
-                  <td>{row.sourceValue ?? "—"}</td>
-                  <td>
+                  <td data-label="What differs">{fieldWords(row.field)}</td>
+                  <td data-label="In TPP">{row.sourceValue ?? "—"}</td>
+                  <td data-label="In Capsule">
                     {row.eventId ? (
                       <Link
                         to={eventDetailPath(
@@ -232,7 +232,7 @@ export function ParallelRunDifferences({
                       (row.capsuleValue ?? "—")
                     )}
                   </td>
-                  <td>
+                  <td data-label="Given to">
                     <select
                       aria-label={`Give TPP event ${row.externalId} ${fieldWords(row.field)} to`}
                       className="input input-sm"
@@ -260,7 +260,7 @@ export function ParallelRunDifferences({
                       ))}
                     </select>
                   </td>
-                  <td>
+                  <td data-label="Status">
                     <StatusChip status={row.status} />
                     <span className="sr-only">{STATUS_WORDS[row.status]}</span>
                     {row.resolutionNote && (

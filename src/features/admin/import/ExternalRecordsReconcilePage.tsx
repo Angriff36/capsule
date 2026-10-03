@@ -387,8 +387,8 @@ export function ExternalRecordsReconcilePage() {
         ) : null}
 
         {/* Records table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div className="overflow-x-auto max-md:px-3">
+          <table className="phone-cards w-full text-xs">
             <thead>
               <tr className="border-b border-line bg-inset">
                 <th className="text-left py-3 px-4 font-medium">
@@ -449,26 +449,29 @@ export function ExternalRecordsReconcilePage() {
                         }
                       />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4" data-label="Old system">
                       {SOURCE_SYSTEM_LABELS[record.sourceSystem] ||
                         record.sourceSystem}
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4" data-label="Type">
                       {RECORD_TYPE_LABELS[record.capsuleEntity] ||
                         record.capsuleEntity}
                     </td>
-                    <td className="py-3 px-4 font-mono text-2xs">
+                    <td
+                      className="py-3 px-4 font-mono text-2xs"
+                      data-label="ID in the old system"
+                    >
                       {isDerivedSourceId(record.externalId)
                         ? "None — known by its name and details"
                         : record.externalId}
                       {/* PL-SOURCE-RESOLUTION: the old row beside the result. */}
                       <SourceRowSummary raw={record.rawSourceData} />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4" data-label="In Capsule as">
                       {RECORD_TYPE_LABELS[record.capsuleEntity] ||
                         record.capsuleEntity}
                     </td>
-                    <td className="py-3 px-4 text-xs">
+                    <td className="py-3 px-4 text-xs" data-label="In Capsule">
                       {record.capsuleId ? (
                         (recordLabels?.[record._id] ?? (
                           <span className="font-mono text-2xs">
@@ -481,7 +484,7 @@ export function ExternalRecordsReconcilePage() {
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4" data-label="Status">
                       {record.conflictStatus !== "resolved" ? (
                         <StatusChip
                           status={
@@ -500,7 +503,7 @@ export function ExternalRecordsReconcilePage() {
                         </p>
                       ) : null}
                     </td>
-                    <td className="py-3 px-4 text-ink-2">
+                    <td className="py-3 px-4 text-ink-2" data-label="Created">
                       {record.createdAt
                         ? new Date(record.createdAt).toLocaleDateString()
                         : "—"}
