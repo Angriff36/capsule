@@ -904,6 +904,11 @@ export const commitImportRun = action({
           if (outcome === "committed") committed += 1;
           else if (outcome === "skipped") skipped += 1;
           else if (outcome === "pending") pending += 1;
+          else if (outcome !== "resumed") {
+            // PL-SOURCE-DELTA: an earlier run's company, compared again.
+            countDelta(delta, outcome);
+            skipped += 1;
+          }
           continue;
         }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
@@ -1906,6 +1911,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, packList] of (
         parsed.records as ParsedCapsulePackList[]
@@ -1936,11 +1942,22 @@ export const commitImportRun = action({
           continue;
         }
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized — own-run links skip silently so resume
+          // counts stay exact (R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA: an earlier run's pack list takes changed lines
+          // as a reviewed delta (never over a packer's change).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "pack_lists",
+            link: existing,
+            record: packList,
+            rawSourceData: JSON.stringify(packList),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -1995,6 +2012,7 @@ export const commitImportRun = action({
           // errors") and the PackList already exists.
           const itemImportErrors: string[] = [];
           let itemsAdded = 0;
+          const addedItems: typeof packList.items = [];
           for (const [itemIndex, item] of packList.items.entries()) {
             try {
               await ctx.runMutation(
@@ -2014,6 +2032,7 @@ export const commitImportRun = action({
                 },
               );
               itemsAdded += 1;
+              addedItems.push(item);
             } catch (itemCause) {
               itemImportErrors.push(
                 `${item.description}: ${itemCause instanceof Error ? itemCause.message : "add item failed"}`,
@@ -2035,6 +2054,9 @@ export const commitImportRun = action({
               itemImportErrors,
             }),
             conflictStatus: "resolved",
+            // Only lines that saved count as applied, so a line that failed
+            // is added by a later import of the same list.
+            ...sourceBaseline("pack_lists", { ...packList, items: addedItems }),
           });
           committed += 1;
         } catch (cause) {
@@ -2074,7 +2096,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {

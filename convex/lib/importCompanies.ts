@@ -8,12 +8,18 @@ import type { Id } from "../_generated/dataModel";
 import type { ParsedCapsuleContact } from "../tppParser";
 import type { LookAlikeClient } from "./importIdentity";
 import { skippedByPerson } from "./importResolution";
+import { SOURCE_FIELD_MAPS, sourceVersionOf } from "./importSourceFields";
+import { reconcileExistingLink, type DeltaOutcome } from "../importSourceDelta";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 
 export const COMPANY_RECORD_TYPE = "company";
 
-/** Create the company client and its link; a company already linked is skipped. */
+/**
+ * Create the company client and its link. A company an earlier run made takes
+ * a changed source row as a reviewed delta (PL-SOURCE-DELTA); one a person
+ * skipped stays skipped.
+ */
 export async function commitImportedCompany(
   ctx: ActionCtx,
   args: {
@@ -25,7 +31,7 @@ export async function commitImportedCompany(
     /** PL-SOURCE-IDENTITY: why the new company may be one Capsule has. */
     lookAlike?: (made: LookAlikeClient) => Promise<string | null>;
   },
-): Promise<"committed" | "skipped" | "pending" | "resumed"> {
+): Promise<"committed" | "skipped" | "pending" | DeltaOutcome> {
   const { company } = args;
   const details = company.company!;
   const existing = await ctx.runQuery(internal.importCommit.findLink, {
@@ -35,10 +41,19 @@ export async function commitImportedCompany(
     externalId: company.externalId,
   });
   if (existing && (existing.capsuleId || skippedByPerson(existing))) {
-    return existing.sourceImportRunId === args.importRunId
-      ? "resumed"
-      : "skipped";
+    if (existing.sourceImportRunId === args.importRunId) return "resumed";
+    if (!existing.capsuleId) return "skipped";
+    return await reconcileExistingLink(ctx, {
+      dataset: "companies",
+      link: existing,
+      record: company,
+      rawSourceData: args.rawSourceData,
+      importRunId: args.importRunId,
+    });
   }
+  const values = SOURCE_FIELD_MAPS.companies.fromSource(
+    company as unknown as Record<string, unknown>,
+  );
   const link = {
     tenantId: args.tenantId,
     sourceSystem: args.sourceSystem,
@@ -75,6 +90,8 @@ export async function commitImportedCompany(
     await ctx.runMutation(internal.importCommit.upsertLink, {
       ...link,
       capsuleId,
+      appliedValues: JSON.stringify(values),
+      sourceVersion: sourceVersionOf(values),
       ...(lookAlikeNote
         ? {
             conflictStatus: "pending_conflict" as const,

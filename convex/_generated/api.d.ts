@@ -145,6 +145,7 @@ import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_importCompanies from "../lib/importCompanies.js";
 import type * as lib_importEventFiles from "../lib/importEventFiles.js";
 import type * as lib_importIdentity from "../lib/importIdentity.js";
+import type * as lib_importPackListLines from "../lib/importPackListLines.js";
 import type * as lib_importRecordHomes from "../lib/importRecordHomes.js";
 import type * as lib_importResolution from "../lib/importResolution.js";
 import type * as lib_importSourceFields from "../lib/importSourceFields.js";
@@ -447,6 +448,7 @@ declare const fullApi: ApiFromModules<{
   "lib/importCompanies": typeof lib_importCompanies;
   "lib/importEventFiles": typeof lib_importEventFiles;
   "lib/importIdentity": typeof lib_importIdentity;
+  "lib/importPackListLines": typeof lib_importPackListLines;
   "lib/importRecordHomes": typeof lib_importRecordHomes;
   "lib/importResolution": typeof lib_importResolution;
   "lib/importSourceFields": typeof lib_importSourceFields;

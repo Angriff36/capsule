@@ -9,6 +9,8 @@ import {
   DATASET_BY_RECORD_TYPE,
   SOURCE_FIELD_MAPS,
   describeValue,
+  fieldLabel,
+  fieldWritable,
   parseValues,
   readStoredValue,
 } from "../../../../convex/lib/importSourceFields";
@@ -25,6 +27,15 @@ function recordName(link: Link | undefined): string {
   const kept = parseValues(link.rawSourceData) ?? {};
   if (typeof kept.name === "string") return kept.name;
   if (typeof kept.title === "string") return kept.title;
+  const company = kept.company;
+  if (
+    company &&
+    typeof company === "object" &&
+    !Array.isArray(company) &&
+    typeof company.name === "string"
+  ) {
+    return company.name;
+  }
   const person = [kept.givenName, kept.familyName]
     .filter((part) => typeof part === "string" && part)
     .join(" ");
@@ -90,8 +101,10 @@ export function SourceChangeReview({
             ? DATASET_BY_RECORD_TYPE[link.recordType]
             : undefined;
           const map = dataset ? SOURCE_FIELD_MAPS[dataset] : undefined;
-          const label = map?.labels[row.field] ?? row.field;
-          const canTake = map?.writable.includes(row.field) ?? false;
+          const label = map ? fieldLabel(map, row.field) : row.field;
+          const canTake = map
+            ? fieldWritable(map, row.field, readStoredValue(row.sourceValue))
+            : false;
           const busy = busyId === row._id;
           return (
             <li

@@ -3,13 +3,16 @@
 // The three-way rule itself lives in culinaryModel/importMapping.ts
 // (threeWayReconcile); this file only names the fields and how to read them.
 import type { FieldValue } from "./culinaryModel/importMapping";
+import { PACK_LIST_FIELDS } from "./importPackListLines";
 
 export type SourceDeltaDataset =
   | "contacts"
+  | "companies"
   | "venues"
   | "events"
   | "leads"
-  | "menus";
+  | "menus"
+  | "pack_lists";
 
 type Values = Record<string, FieldValue>;
 type Row = Record<string, unknown>;
@@ -34,7 +37,28 @@ export interface SourceFieldMap {
   labels: Record<string, string>;
   fromSource(row: Row): Values;
   fromCapsule(doc: Row): Values;
+  /**
+   * For a record whose compared fields depend on the row (one per pack list
+   * line): the fields to compare, given the last import and the new source.
+   */
+  fieldsFor?(applied: Values | null, source: Values): string[];
+  /** Per-field write rule, when `writable` cannot name the fields up front. */
+  canWrite?(field: string, value: FieldValue): boolean;
+  /** Per-field label, when `labels` cannot name the fields up front. */
+  labelFor?(field: string): string;
 }
+
+/** Plain words for one compared field. */
+export const fieldLabel = (map: SourceFieldMap, field: string): string =>
+  map.labels[field] ?? map.labelFor?.(field) ?? field;
+
+/** May the import (or "Use the new value") write this value into Capsule? */
+export const fieldWritable = (
+  map: SourceFieldMap,
+  field: string,
+  value: FieldValue,
+): boolean =>
+  map.canWrite ? map.canWrite(field, value) : map.writable.includes(field);
 
 const CONTACT_FIELDS: SourceFieldMap = {
   fields: ["givenName", "familyName", "email", "phone"],
@@ -56,6 +80,45 @@ const CONTACT_FIELDS: SourceFieldMap = {
     familyName: text(doc.familyName),
     email: text(doc.email),
     phone: text(doc.phone),
+  }),
+};
+
+// Company rows of the contacts import (TPP_COMPANY_MAPPINGS). The billing
+// address follows the old system; the name, tax id and payment terms are
+// billing facts a person checks, so a change there waits on the review list.
+const COMPANY_ADDRESS = [
+  "addressLine1",
+  "city",
+  "region",
+  "postalCode",
+] as const;
+
+const COMPANY_FIELDS: SourceFieldMap = {
+  fields: ["companyName", ...COMPANY_ADDRESS, "taxId", "paymentTermsDays"],
+  writable: [...COMPANY_ADDRESS],
+  labels: {
+    companyName: "Company name",
+    addressLine1: "Street address",
+    city: "City",
+    region: "State",
+    postalCode: "ZIP code",
+    taxId: "Tax ID",
+    paymentTermsDays: "Payment terms (days)",
+  },
+  fromSource: (row) => {
+    const company = (row.company ?? {}) as Row;
+    return {
+      companyName: text(company.name),
+      ...Object.fromEntries(COMPANY_ADDRESS.map((f) => [f, text(row[f])])),
+      taxId: text(company.taxId),
+      paymentTermsDays: num(company.paymentTermsDays),
+    };
+  },
+  fromCapsule: (doc) => ({
+    companyName: text(doc.companyName),
+    ...Object.fromEntries(COMPANY_ADDRESS.map((f) => [f, text(doc[f])])),
+    taxId: text(doc.taxId),
+    paymentTermsDays: num(doc.paymentTermsDays),
   }),
 };
 
@@ -261,19 +324,23 @@ const DISH_FIELDS: SourceFieldMap = {
 
 export const SOURCE_FIELD_MAPS: Record<SourceDeltaDataset, SourceFieldMap> = {
   contacts: CONTACT_FIELDS,
+  companies: COMPANY_FIELDS,
   venues: VENUE_FIELDS,
   events: EVENT_FIELDS,
   leads: LEAD_FIELDS,
   menus: DISH_FIELDS,
+  pack_lists: PACK_LIST_FIELDS,
 };
 
 /** Recordtype on the link → dataset, for screens that start from a link. */
 export const DATASET_BY_RECORD_TYPE: Record<string, SourceDeltaDataset> = {
   contact: "contacts",
+  company: "companies",
   venue: "venues",
   event: "events",
   lead: "leads",
   menu: "menus",
+  pack_list: "pack_lists",
 };
 
 /** Plain words for a stored value on the review list. */
