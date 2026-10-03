@@ -15,7 +15,6 @@ import {
   useListDishComponent,
   useListDishContainer,
   useListDishIngredient,
-  useListEventDish,
   useListEventGuest,
   useListIngredient,
   useListIngredientPriceObservation,
@@ -25,6 +24,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
@@ -116,7 +116,10 @@ const MENU_ROW_COLUMNS =
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
   const dishes = useHeldQueryRows("dishes", useListDish());
-  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
+  const eventDishes = useHeldQueryRows(
+    `eventDishes:${eventId}`,
+    useEventMenuLines(eventId),
+  );
   const eventGuests = useListEventGuest();
   const reviewFlags = useEventReviewFlags(eventId);
   const dishIngredients = useListDishIngredient();

@@ -564,7 +564,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEventAssignment` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventChecklist` - live read
-- `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventNumberAssignment` - live read
 - `queries.listEventPlanNeeds` - live read
@@ -1292,6 +1292,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listEquipment` - live read
 - `queries.listEvent` - live read
 - `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverride` - live read
 - `queries.listEventGuest` - live read
 - `queries.listIngredient` - live read
@@ -3989,7 +3990,7 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
 - `queries.listEventCloseout` - live read
-- `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
 - `queries.listIngredientPriceObservation` - live read

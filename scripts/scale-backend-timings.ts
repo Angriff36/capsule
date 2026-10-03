@@ -348,7 +348,35 @@ try {
     await time("Dish detail (queries.getDish)", (i) =>
       client.query(api.queries.getDish, { id: dishes[(i * 37) % DISHES]!._id }),
     ),
+    await time(
+      "One event's menu lines with recipes (queries.listEventDishByEventId)",
+      (i) =>
+        client.query(api.queries.listEventDishByEventId, {
+          eventId: eventIds[(i * 53) % EVENTS]!,
+        }),
+    ),
   ];
+  // The read the event page used before: every event's menu lines with
+  // their recipe trees. One call; it may fail on the backend's read limits.
+  let everyMenuLine: { ms: number; result: string };
+  {
+    const start = performance.now();
+    try {
+      const rows = (await client.query(api.queries.listEventDish, {})) as [];
+      everyMenuLine = {
+        ms: Math.round(performance.now() - start),
+        result: `${rows.length} lines`,
+      };
+    } catch (error) {
+      everyMenuLine = {
+        ms: Math.round(performance.now() - start),
+        result: `failed: ${String(error).split("\n")[0]}`,
+      };
+    }
+    say(
+      `every event's menu lines (old event page read): ${everyMenuLine.ms} ms, ${everyMenuLine.result}`,
+    );
+  }
   const exportWalk = await time(
     "All-time event export walk (eventLookup.reportPage, 500 a page)",
     () => allEventIds(),
@@ -375,6 +403,7 @@ try {
     seedImportMs: seedMs || "already filled",
     timings,
     exportWalk,
+    everyMenuLine,
   };
   mkdirSync(join(ROOT, ".artifacts"), { recursive: true });
   writeFileSync(

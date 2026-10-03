@@ -5,10 +5,10 @@ import {
   useListPerson,
   useListDish,
   useListDishIngredient,
-  useListEventDish,
   useListIngredient,
   useListPrepTask,
 } from "../../lib/manifest-convex-react";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
@@ -26,7 +26,7 @@ type Props = {
 };
 
 export function EventPrepTab({ eventId, eventStage }: Props) {
-  const eventDishes = useListEventDish();
+  const eventDishes = useEventMenuLines(eventId);
   const dishes = useListDish();
   const components = useListComponent();
   const people = useListPerson();
