@@ -2461,6 +2461,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listTimeRecord` - live read
 - `queries.listTrainingCompletion` - live read
 - `queries.listTrainingModule` - live read
+- `queries.listVendor` - live read
 - `queries.listWeeklyScheduleNotice` - live read
 
 ### Generated actions

@@ -87,7 +87,7 @@ delivery is not being built now (owner, 2026-09-29).
 | Breaks and overtime warnings | `/staff/time`, `/finance/payroll` | `features/finance/break-classification` | Built |
 | Planned against actual labor | event Margin tab | `features/finance/planned-vs-actual-labor` | Built |
 | Approved time export | `/finance/payroll` | `proofs/payroll-approved-time` | Built (file only) |
-| Agency workers without duplicate people | `/staff/roster` | `proofs/eligible-suggestions` | Built (agency is a name, not a vendor record) |
+| Agency workers without duplicate people | `/staff/roster` | `proofs/eligible-suggestions`, `features/workforce/staffing-agency-choices` | Built: the agency box offers the company's vendors and agencies already in use; another spelling saves as the known name |
 | Past shifts for each worker | `/my` | `features/workforce/recorded-vs-planned` | Built (Capsule shifts only) |
 
 No retyping: approval posts the staffing needs from the event's own style and

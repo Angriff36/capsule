@@ -4,6 +4,7 @@ import {
   usePersonSetSchedulingHold,
   usePersonSetStaffingVendor,
   usePersonSetWorkPreferences,
+  useListVendor,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
@@ -37,6 +38,42 @@ export function schedulingSummary(person: {
     .join(" · ");
 }
 
+function nameKey(name: string): string {
+  return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/**
+ * Agencies to offer: the company's active vendors, then the agency names
+ * already on people. One entry per spelling-insensitive name.
+ */
+export function agencyChoices(
+  vendorNames: ReadonlyArray<string>,
+  people: ReadonlyArray<{ staffingVendor?: string | null }>,
+): string[] {
+  const byKey = new Map<string, string>();
+  const add = (name: string | null | undefined) => {
+    const trimmed = name?.trim().replace(/\s+/g, " ");
+    if (trimmed && !byKey.has(nameKey(trimmed))) {
+      byKey.set(nameKey(trimmed), trimmed);
+    }
+  };
+  vendorNames.forEach(add);
+  people.forEach((person) => add(person.staffingVendor));
+  return [...byKey.values()].sort((a, b) => a.localeCompare(b));
+}
+
+/** A typed agency in another spelling saves as the known agency's name. */
+export function matchAgency(
+  typed: string,
+  agencies: ReadonlyArray<string>,
+): string | undefined {
+  const trimmed = typed.trim();
+  if (!trimmed) return undefined;
+  return (
+    agencies.find((agency) => nameKey(agency) === nameKey(trimmed)) ?? trimmed
+  );
+}
+
 /**
  * Who prefers which roles, where each person is approved to work, agency
  * workers, and a "do not schedule" note (AC-505/511). These shape staffing
@@ -50,6 +87,15 @@ export function StaffSchedulingSection({
   const setPreferences = usePersonSetWorkPreferences();
   const setHold = usePersonSetSchedulingHold();
   const setVendor = usePersonSetStaffingVendor();
+  const vendors = useListVendor();
+  const agencies = agencyChoices(
+    (vendors ?? [])
+      .filter(
+        (vendor) => vendor.deletedAt == null && vendor.status === "active",
+      )
+      .map((vendor) => vendor.name),
+    people,
+  );
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -86,6 +132,8 @@ export function StaffSchedulingSection({
           required: false,
           placeholder: "Empty = our own staff",
           defaultValue: person.staffingVendor ?? "",
+          suggestions: agencies,
+          helper: "Pick one of your vendors, or type the agency's name.",
         },
         {
           name: "schedulingHoldReason",
@@ -111,7 +159,7 @@ export function StaffSchedulingSection({
       await setVendor({
         docId: person._id,
         version: version++,
-        vendorName: values.staffingVendor?.trim() || undefined,
+        vendorName: matchAgency(values.staffingVendor ?? "", agencies),
       });
       await setHold({
         docId: person._id,
