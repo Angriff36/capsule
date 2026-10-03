@@ -3,6 +3,7 @@
 // old one in the item's history. Reading the same file again changes nothing.
 import { useState, type ChangeEvent } from "react";
 import { useImportVendorPriceRows } from "../facilities/vendorPriceList";
+import { formatCountNoun } from "../../lib/format";
 import { parseCsv } from "../../lib/tppMenuCsv";
 
 const CHUNK_SIZE = 200;
@@ -57,11 +58,15 @@ export function VendorPriceListImport() {
         rows.length === 0
           ? "No rows found in the file."
           : [
-              `${total.added} items added`,
+              `${formatCountNoun(total.added, "item")} added`,
               `${total.updated} updated`,
               `${total.unchanged} already up to date`,
-              total.vendorsAdded > 0 ? `${total.vendorsAdded} new vendors` : "",
-              found.length > 0 ? `${found.length} rows not read` : "",
+              total.vendorsAdded > 0
+                ? formatCountNoun(total.vendorsAdded, "new vendor")
+                : "",
+              found.length > 0
+                ? `${formatCountNoun(found.length, "row")} not read`
+                : "",
             ]
               .filter(Boolean)
               .join(", ") + ".",
