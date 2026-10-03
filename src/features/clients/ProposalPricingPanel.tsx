@@ -224,7 +224,7 @@ export function ProposalPricingPanel({
           No pricing lines on this proposal.
         </p>
       ) : (
-        <table className="data-table mt-2">
+        <table className="data-table phone-cards mt-2">
           <thead>
             <tr>
               <th>Description</th>
@@ -239,7 +239,7 @@ export function ProposalPricingPanel({
             {rows.map((row, index) => (
               <tr key={row._id}>
                 <td>
-                  {row.description}
+                  <strong>{row.description}</strong>
                   {row.equipmentId ? (
                     <span className="ml-2 text-2xs text-ink-3">
                       Rental
@@ -249,20 +249,20 @@ export function ProposalPricingPanel({
                     </span>
                   ) : null}
                 </td>
-                <td>
+                <td data-label="Basis">
                   {PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="Price / %">
                   {Number(row.unitPrice).toFixed(2)}
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="Qty">
                   {row.pricingBasis === "per_unit"
                     ? Number(row.quantity)
                     : row.pricingBasis === "per_person"
                       ? `${guestCount} guests`
                       : "—"}
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="Amount">
                   {(recomputed.lines[index]?.amount ?? 0).toFixed(2)}
                 </td>
                 {editable ? (

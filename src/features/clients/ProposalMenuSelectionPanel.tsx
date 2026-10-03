@@ -125,7 +125,7 @@ export function ProposalMenuSelectionPanel({
       {activeSelections.length === 0 ? (
         <p className="mt-3 text-base text-ink-2">No dishes selected yet.</p>
       ) : (
-        <table className="data-table mt-3">
+        <table className="data-table phone-cards mt-3">
           <thead>
             <tr>
               <th>Dish</th>
@@ -137,9 +137,11 @@ export function ProposalMenuSelectionPanel({
           <tbody>
             {activeSelections.map((row) => (
               <tr key={row._id}>
-                <td>{dishName(row.dishId)}</td>
-                <td>{menuName(row.menuId)}</td>
                 <td>
+                  <strong>{dishName(row.dishId)}</strong>
+                </td>
+                <td data-label="Menu">{menuName(row.menuId)}</td>
+                <td data-label="Servings">
                   {editable ? (
                     <input
                       key={`${row._id}:${row.quantityServings}`}
