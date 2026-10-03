@@ -1143,7 +1143,7 @@ export function KitchenDashboardPage() {
           </label>
           <select
             id="kcd-m-service"
-            className="input h-11 min-w-0 flex-1"
+            className="input order-last h-11 min-w-0 basis-full"
             value={selectedEventId}
             onChange={(e) => pickEvent(e.target.value)}
           >
