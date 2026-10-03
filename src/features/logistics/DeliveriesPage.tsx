@@ -430,7 +430,7 @@ export function DeliveriesPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Destination</th>
@@ -449,11 +449,11 @@ export function DeliveriesPage() {
                       <td>
                         <strong>{row.destination}</strong>
                       </td>
-                      <td>
+                      <td data-label="Pack / event">
                         {packName(row.packListId)}
                         <small>{eventName(row.eventId)}</small>
                       </td>
-                      <td>
+                      <td data-label="Driver">
                         {String(row.status) === "scheduled" ||
                         String(row.status) === "in_transit" ? (
                           <select
@@ -476,7 +476,7 @@ export function DeliveriesPage() {
                           personName(row.driverId)
                         )}
                       </td>
-                      <td>
+                      <td data-label="Vehicle">
                         {String(row.status) === "scheduled" ||
                         String(row.status) === "in_transit" ? (
                           <select
@@ -501,7 +501,7 @@ export function DeliveriesPage() {
                           )?.registration ?? "—")
                         )}
                       </td>
-                      <td>
+                      <td data-label="Window">
                         {row.windowStartsAt
                           ? new Date(row.windowStartsAt).toLocaleString()
                           : "—"}{" "}
@@ -510,7 +510,7 @@ export function DeliveriesPage() {
                           ? new Date(row.windowEndsAt).toLocaleString()
                           : "—"}
                       </td>
-                      <td>
+                      <td data-label="State">
                         <StatusChip status={String(row.status)} />
                         {row.failureReason ? (
                           <small>{row.failureReason}</small>

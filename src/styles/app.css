@@ -207,6 +207,30 @@
   .btn-sm {
     @apply min-h-8 px-3.5 text-sm;
   }
+  /* Every file picker gets the small ghost button look. The browser's own
+     grey "Choose File" box read as plain text on a phone, on every import. */
+  input[type="file"] {
+    max-width: 100%;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+  }
+  input[type="file"]::file-selector-button {
+    margin-right: 0.75rem;
+    min-height: 2rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--color-line-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-panel);
+    color: var(--color-ink);
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  input[type="file"]:hover::file-selector-button {
+    border-color: var(--color-brand);
+  }
   .input {
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink shadow-[inset_0_1px_1px_rgb(36_50_45/0.06)] placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-inset disabled:text-ink-3 disabled:shadow-none;
   }

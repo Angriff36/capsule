@@ -175,14 +175,17 @@ describe("plain words on the kitchen recipe book", () => {
     expect(all).not.toContain("saved component import");
     expect(all).not.toContain("Save component again");
 
-    expect(page).toContain("then save the review and open the recipe.");
+    expect(page).toContain("then save and");
+    expect(page).toContain("open the recipe.");
+    expect(page).not.toContain("`.txt`");
+    expect(panes).not.toContain("`.txt`");
     expect(page).toContain("Open saved recipe");
     expect(page).toContain("The corrected formula lives on its recipe.");
     expect(panes).toContain("Recipe text");
     expect(panes).toContain("Recipe sheet CSV");
     expect(panes).toContain("Recipe lines CSV");
     expect(panes).toContain("Plain text recipe (.txt)");
-    expect(panes).toContain("Paste recipe text or choose");
+    expect(panes).toContain("Paste the recipe or choose");
     expect(panes).toContain("Recipe name");
     expect(panes).toContain("<h3>Ingredients and sub-recipes</h3>");
     expect(panes).toContain("Save and edit recipe");

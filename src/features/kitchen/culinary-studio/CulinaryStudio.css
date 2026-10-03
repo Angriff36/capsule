@@ -17,8 +17,10 @@
   background: var(--color-inset);
 }
 
-/* Record pages have a taller head than the band; it stopped mid-title. */
-.culinary-document.culinary-studio::before {
+/* Record pages and the import page have a taller head than the band; it
+   stopped mid-title. */
+.culinary-document.culinary-studio::before,
+.component-import-page.culinary-studio::before {
   content: none;
 }
 
