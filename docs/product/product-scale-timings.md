@@ -115,5 +115,10 @@ My day, allergen matrix, pack list and recipe page read their dishes by id.
 
 - The dish list's first read after a change (2.5 s at 5,000 dishes); left on
   catalog screens and pickers on purpose.
-- Other whole-company lists the event tabs still read (prep tasks, guests).
+- Event tabs now read one event's guests, prep tasks, review flags,
+  timeline blocks / comments, crew (assignments, needs, shifts), ingredient
+  needs, equipment holds, rental lines, pack lists and proposals. Still
+  whole on purpose: catalogs, stock holds, vendor orders, and the lists a
+  screen compares across events (shift overlaps, a person's week, role
+  suggestions). The month tracker sheet still reads whole lists.
 - Screen response under 200 ms at this size (browser leg).
