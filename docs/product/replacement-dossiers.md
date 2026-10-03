@@ -177,7 +177,7 @@ assigned as field work (§20.6).
 | Binder color and event number on the cover | packet cover and brief | `event-packet-workbook`, `proofs/event-packet-native-parts` | Built (cover says "Event" since 2026-10-03) |
 | Packet versions, out of date after a change | Workbook history | `proofs/packet-out-of-date-readiness` | Built |
 | Keep BEOs, worksheets, drawings with the event | Workbook sources, Photos tab | `proofs/event-packet-evidence`, `proofs/record-source-provenance` | Built (kept and linked) |
-| Route, map, load-in, setup drawings in the packet | packet venue part, pages at the back | `proofs/backend-golden-event` step 10, `proofs/packet-print-files`, `event-packet-attached-files` | Built (drawings, maps and uploaded BEOs print at the back as PDF pages or pictures; the venue map itself is still a link) |
+| Route, map, load-in, setup drawings in the packet | packet venue part, pages at the back | `proofs/backend-golden-event` step 10, `proofs/packet-print-files`, `event-packet-attached-files` | Built (drawings, maps and uploaded BEOs print at the back as PDF pages or pictures; since 2026-10-03 a venue map picture from OpenStreetMap prints there too, `venue-map-picture`) |
 | Tracker board | `/events/tracker` | `proofs/packet-out-of-date-readiness` (binder mark) | Built; the binder mark is set by hand and clears itself when a changed packet is printed |
 | Event chat (replaces Slack) | event Chat tab | `proofs/event-communication`, `proofs/event-chat-channel` | Built |
 
