@@ -82,7 +82,7 @@ delivery is not being built now (owner, 2026-09-29).
 | Offer, claim, assign, decline, waitlist, swap | `/my`, `/staff/swaps` | `proofs/coverage-flows`, `proofs/staff-coverage-flows` | Built |
 | Schedule and change acknowledgement | `/my` | `proofs/schedule-change-ack` | Built |
 | Event instructions for crew | `/my` | `proofs/field-staff-booking-read` | Built |
-| Reminders | text and push alerts | `proofs/sms-reminder-dedupe`, `proofs/push-outbox-dedupe` | Built |
+| Reminders | sent on their own before each shift; staff get them on their phone and see their shifts on `/my`; managers check sending on `/admin/integrations` "Outside messages" | `proofs/sms-reminder-dedupe`, `proofs/push-outbox-dedupe`, `proofs/backend-delivery-states` | Built: "Outside messages" shows text alerts waiting, stopped after failed tries, and not sure; a phone (push) alert that fails is only written to the server log, so managers do not see it yet (open) |
 | Announcements | `/admin/announcements`, banner | `proofs/announcement-board` | Built ("read and closed by" count for managers) |
 | Clock in and out, location at clock-in and clock-out | `/my`, `/staff/time` | `proofs/time-correction-audit`, `proofs/offline-clock-reconcile`, `features/workforce/clock-out-location` | Built: both taps keep the phone location when the person allows it; the time sheet says how far the clock-out was from the clock-in |
 | Late and no-show alerts | `/staff/time` | `proofs/clock-alerts` | Built |
@@ -147,12 +147,21 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 | Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount`, `features/facilities/equipment-place-choices` | Built (one photo). Storage place and Move offer the places already in use (catalog places and kitchen storage places); another spelling saves as the known place's name |
 | Availability across events, repairs, late returns | event Equipment panel | `proofs/availability-realtime`, `proofs/equipment-reservation-conflict` | Built |
 | Rental lines on proposals, approval, changes | `/clients/proposals` Pricing | `proofs/rental-proposal-lines`, `proofs/post-acceptance-change-order` | Built |
-| Approved rentals held for the event | automatic on approval | `proofs/accepted-rental-holds` | Built 2026-10-03 |
+| Approved rentals held for the event | event Equipment panel (held there on their own when the proposal is approved) | `proofs/accepted-rental-holds` | Built 2026-10-03 |
 | Vendor rentals and client-owned items | event Rental orders panel, pack list | `proofs/sub-rental-orders`, `proofs/accepted-rental-holds` | Built (a short approved item opens the vendor rental form filled in) |
 | Pull, scan, pack, load, deliver, pick up, return, inspect | `/logistics/packs/:id`, `/logistics/dispatch`, `/logistics/returns` | `proofs/pull-inspect-flow`, `proofs/pack-scan-load-truck`, `proofs/custody-trail` | Built |
 | Routes, trucks and trailers, crew, windows | `/logistics/route`, `/logistics/fleet` | `proofs/route-capacity`, `proofs/vehicle-assignment-conflict` | Built |
 | Broken, missing, dirty, late, short to vendor; billing | `/logistics/returns`, event Equipment problems, invoice | `proofs/damage-to-billing`, `proofs/closeout-source-projection` | Built (late returns are read from the return times) |
 | Rental money, vendor cost, losses, use | `/facilities` rentals card | `features/logistics/rental-reporting`, `proofs/accepted-rental-sales` | Built: revenue is the accepted price where the event has one, else held amount x list price; Download gives the month as a spreadsheet file (totals + each owned item's use) |
+
+Deliveries: the proposal and the invoice (where damage and loss charges go)
+are emailed from Capsule, and each try shows on the proposal's "Emails" list
+and the invoice page with the fix when one did not go. Vendor rental orders
+are not sent by Capsule: staff ask the rental company themselves, then mark
+the line confirmed with the vendor's reference, then delivered and returned,
+so the Rental orders panel shows which orders the vendor has not confirmed.
+Routes, trucks and maps stay inside Capsule; nothing is sent to an outside
+route service.
 
 No retyping: since 2026-10-03 an item on the accepted proposal is held for the
 event on approval (and on an accepted change), as many as are free; the rest
@@ -177,9 +186,15 @@ assigned as field work (§20.6).
 | Binder color and event number on the cover | packet cover and brief | `event-packet-workbook`, `proofs/event-packet-native-parts` | Built (cover says "Event" since 2026-10-03) |
 | Packet versions, out of date after a change | Workbook history | `proofs/packet-out-of-date-readiness` | Built |
 | Keep BEOs, worksheets, drawings with the event | Workbook sources, Photos tab | `proofs/event-packet-evidence`, `proofs/record-source-provenance` | Built (kept and linked) |
-| Route, map, load-in, setup drawings in the packet | packet venue part, pages at the back | `proofs/backend-golden-event` step 10, `proofs/packet-print-files`, `event-packet-attached-files` | Built (drawings, maps and uploaded BEOs print at the back as PDF pages or pictures; since 2026-10-03 a venue map picture from OpenStreetMap prints there too, `venue-map-picture`) |
+| Route, map, load-in, setup drawings in the packet | packet venue part, pages at the back | `proofs/backend-golden-event` step 10, `proofs/packet-print-files`, `event-packet-attached-files` | Built (drawings, maps and uploaded BEOs print at the back as PDF pages or pictures; since 2026-10-03 a venue map picture from OpenStreetMap prints there too, `venue-map-picture`; when the address is missing, not found, or the map service does not answer, the packet prints without the picture and keeps the map link, so staff see at once that it did not come) |
 | Tracker board | `/events/tracker` | `proofs/packet-out-of-date-readiness` (binder mark) | Built; the binder mark is set by hand and clears itself when a changed packet is printed |
 | Event chat (replaces Slack) | event Chat tab | `proofs/event-communication`, `proofs/event-chat-channel` | Built |
+
+No retyping: the packet parts are built from the event itself (menu, guest
+count, staff, timeline, venue, rentals), and each Final Lock question the
+event already answers is filled in from the event with its source shown
+(`proofs/event-packet-native-parts`, `proofs/event-packet-final-lock-sources`).
+Only what the event does not hold is asked in the Workbook.
 
 History: BEO paste and TPP files on `/events/import`; original PDFs are kept
 on the event and, since 2026-10-03, print at the back of the packet.
