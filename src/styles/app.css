@@ -2259,6 +2259,10 @@
     content: attr(data-label) ": ";
     color: var(--color-ink-3);
   }
+  /* A cell that only repeats the group heading above the cards. */
+  table.phone-cards td.phone-hide {
+    display: none;
+  }
 }
 
 .supply-table {
