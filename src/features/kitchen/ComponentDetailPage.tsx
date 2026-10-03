@@ -7,7 +7,6 @@ import {
   useGetPrepTask,
   useGetEvent,
   useListComponentImport,
-  useListDish,
   useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
@@ -49,6 +48,7 @@ import {
 } from "./IngredientPriceHistory";
 import { calculateComponentCost } from "./ComponentCostCalculator";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -100,8 +100,18 @@ export function ComponentDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const itemUnitMappings = useListItemUnitMapping();
   const lines = useListComponentIngredient();
-  const dishes = useListDish();
   const dishComponents = useListDishComponent();
+  // Only the dishes that use this recipe, never the whole dish list.
+  const dishes = useDishesByIds(
+    component == null || dishComponents === undefined
+      ? undefined
+      : dishComponents
+          .filter(
+            (line) =>
+              line.deletedAt == null && line.componentId === component._id,
+          )
+          .map((line) => line.dishId),
+  );
   const revise = useComponentReviseDraft();
   const publish = usePublishRecipeEdition();
   const retract = useComponentRetract();
