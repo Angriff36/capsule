@@ -274,7 +274,7 @@ export function PackListsPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -295,8 +295,8 @@ export function PackListsPage() {
                       </Link>
                       {row.purpose ? <small>{row.purpose}</small> : null}
                     </td>
-                    <td>{eventName(row.eventId)}</td>
-                    <td>
+                    <td data-label="Event">{eventName(row.eventId)}</td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                     </td>
                     <td>
