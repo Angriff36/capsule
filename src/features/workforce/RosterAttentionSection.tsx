@@ -1,8 +1,11 @@
+import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
+import { eventDetailPath } from "../events/eventRoutes";
 import { formatWindow, type RosterConflict } from "./rosterConflicts";
 
 export type OpenStaffNeed = {
   id: string;
+  eventId: string;
   eventTitle: string;
   role: string;
   startsAt: number | null;
@@ -45,7 +48,13 @@ export function RosterAttentionSection({
                   : " · time not set yet"}
                 {need.claimedBy
                   ? ` · ${need.claimedBy} offered to take it`
-                  : ""}
+                  : ""}{" "}
+                <Link
+                  className="text-accent underline"
+                  to={eventDetailPath(need.eventId, "staffing")}
+                >
+                  Fill this spot
+                </Link>
               </li>
             ))}
           </ul>
