@@ -147,7 +147,7 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 | Pull, scan, pack, load, deliver, pick up, return, inspect | `/logistics/packs/:id`, `/logistics/dispatch`, `/logistics/returns` | `proofs/pull-inspect-flow`, `proofs/pack-scan-load-truck`, `proofs/custody-trail` | Built |
 | Routes, trucks and trailers, crew, windows | `/logistics/route`, `/logistics/fleet` | `proofs/route-capacity`, `proofs/vehicle-assignment-conflict` | Built |
 | Broken, missing, dirty, late, short to vendor; billing | `/logistics/returns`, event Equipment problems, invoice | `proofs/damage-to-billing`, `proofs/closeout-source-projection` | Built (late returns are read from the return times) |
-| Rental money, vendor cost, losses, use | `/facilities` rentals card | `features/logistics/rental-reporting`, `proofs/accepted-rental-sales` | Partly: revenue is the accepted price where the event has one, else held amount x list price; no export |
+| Rental money, vendor cost, losses, use | `/facilities` rentals card | `features/logistics/rental-reporting`, `proofs/accepted-rental-sales` | Built: revenue is the accepted price where the event has one, else held amount x list price; Download gives the month as a spreadsheet file (totals + each owned item's use) |
 
 No retyping: since 2026-10-03 an item on the accepted proposal is held for the
 event on approval (and on an accepted change), as many as are free; the rest

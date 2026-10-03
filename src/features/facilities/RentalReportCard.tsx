@@ -73,6 +73,80 @@ export function rentalReportRows(
   ];
 }
 
+function csvCell(value: string | number): string {
+  if (typeof value === "number") return String(value);
+  const safe = /^[=+\-@]/u.test(value) ? `'${value}` : value;
+  return `"${safe.replaceAll('"', '""')}"`;
+}
+
+/**
+ * The month's roll-up as a spreadsheet file: the totals with their notes,
+ * then every owned item with the share of the month it was out on events.
+ * Money and shares are plain numbers so a spreadsheet can add them up.
+ */
+export function rentalReportCsv(report: RentalReport, month: string): string {
+  const notes = new Map(
+    rentalReportRows(report).map(([label, , hint]) => [label, hint]),
+  );
+  const rows: Array<Array<string | number>> = [
+    ["Month", "Measure", "Amount", "Note"],
+    [
+      month,
+      "Equipment charged to clients",
+      report.equipmentCharged,
+      notes.get("Equipment charged to clients") ?? "",
+    ],
+    [
+      month,
+      "Vendor rental cost",
+      report.vendorCost,
+      notes.get("Vendor rental cost") ?? "",
+    ],
+    [
+      month,
+      "Lost or damaged units",
+      report.lostOrDamagedUnits,
+      notes.get("Lost or damaged") ?? "",
+    ],
+    [month, "Lost or damaged cost", report.lossCost, ""],
+    [
+      month,
+      "Charged back to client or vendor",
+      report.recovered,
+      notes.get("Charged back to client or vendor") ?? "",
+    ],
+    [
+      month,
+      "Our equipment in use (%)",
+      report.averageUse == null ? "" : Math.round(report.averageUse * 100),
+      report.averageUse == null ? "No owned items" : "",
+    ],
+    [],
+    ["Month", "Item", "Out on events (%)", ""],
+    ...report.itemUse.map((row) => [
+      month,
+      row.name,
+      Math.round(row.share * 1000) / 10,
+      "",
+    ]),
+  ];
+  return rows.map((row) => row.map(csvCell).join(",")).join("\r\n") + "\r\n";
+}
+
+function downloadRentalReport(report: RentalReport, month: string) {
+  const blob = new Blob(["﻿", rentalReportCsv(report, month)], {
+    type: "text/csv;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `rentals-and-equipment-${month}.csv`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 /** Rental revenue, vendor cost, loss and damage, and equipment use by month. */
 export function RentalReportCard() {
   const equipment = useListEquipment();
@@ -147,17 +221,27 @@ export function RentalReportCard() {
         <h2 className="text-lg font-semibold text-ink">
           Rentals and equipment
         </h2>
-        <label className="field-label">
-          Month
-          <input
-            type="month"
-            className="input"
-            value={month}
-            onChange={(event) =>
-              event.target.value && setMonth(event.target.value)
-            }
-          />
-        </label>
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="field-label">
+            Month
+            <input
+              type="month"
+              className="input"
+              value={month}
+              onChange={(event) =>
+                event.target.value && setMonth(event.target.value)
+              }
+            />
+          </label>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={report == null}
+            onClick={() => report && downloadRentalReport(report, month)}
+          >
+            Download
+          </button>
+        </div>
       </div>
       {report == null ? (
         <p className="mt-3 text-sm text-ink-3">Loading...</p>

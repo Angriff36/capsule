@@ -5,7 +5,10 @@
  */
 import { describe, expect, it } from "vitest";
 import { rentalReport } from "../../../src/features/logistics/rentalReporting";
-import { rentalReportRows } from "../../../src/features/facilities/RentalReportCard";
+import {
+  rentalReportCsv,
+  rentalReportRows,
+} from "../../../src/features/facilities/RentalReportCard";
 
 const HOUR = 3_600_000;
 const MAY = Date.UTC(2026, 4, 1);
@@ -180,5 +183,21 @@ describe("rental and equipment roll-up for a month", () => {
     expect(text).toContain(
       "1 event(s) at the price the client accepted; others at list price.",
     );
+  });
+
+  it("downloads the month as a spreadsheet file with plain numbers and every owned item", () => {
+    const csv = rentalReportCsv(rentalReport(input, MAY, JUNE), "2026-05");
+    const lines = csv.trimEnd().split("\r\n");
+    expect(lines[0]).toBe('"Month","Measure","Amount","Note"');
+    expect(lines).toContain(
+      '"2026-05","Equipment charged to clients",1100,"At list price for what is held. 1 hold(s) on items with no client price - not counted."',
+    );
+    expect(lines).toContain(
+      '"2026-05","Vendor rental cost",775.5,"2 rental line(s) from vendors."',
+    );
+    expect(lines).toContain('"2026-05","Lost or damaged cost",56,""');
+    expect(lines).toContain('"2026-05","Chairs",25,""');
+    expect(lines).toContain('"2026-05","Coffee urns",1.6,""');
+    expect(csv).not.toContain("Tent"); // rented, not ours
   });
 });
