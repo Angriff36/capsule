@@ -166,7 +166,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
 
   return (
     <Section title="Outbound webhooks">
-      <div className="grid gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.8fr)]">
+      <div className="grid grid-cols-1 gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.8fr)]">
         <div>
           <p className="max-w-2xl text-base leading-relaxed text-ink-2">
             Automatically notify another system — Zapier, Make, or something
@@ -291,7 +291,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                     className="rounded-sm border border-line bg-panel p-3 text-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="font-semibold text-ink">
                           {endpoint.label}
                         </p>
@@ -299,7 +299,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                           {endpoint.url}
                         </p>
                       </div>
-                      <div className="flex shrink-0 flex-wrap gap-1">
+                      <div className="flex shrink-0 flex-col gap-1 sm:flex-row">
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"
