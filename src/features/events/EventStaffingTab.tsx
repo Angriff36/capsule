@@ -17,7 +17,6 @@ import {
   useListAvailabilityWindow,
   useListEventAssignment,
   useListEventStaffNeed,
-  useListEventTimelineActivity,
   useListPerson,
   useListShift,
   useListShiftType,
@@ -26,6 +25,7 @@ import {
   useCreateStaffNeedWaitlistEntry,
   useStaffNeedWaitlistEntryLeave,
 } from "../../lib/manifest-convex-react";
+import { useEventTimelineActivities } from "../../lib/useEventRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
@@ -72,7 +72,7 @@ export function EventStaffingTab({ eventId }: Props) {
   const people = useListPerson();
   const shifts = useListShift();
   const shiftTypes = useListShiftType();
-  const activities = useListEventTimelineActivity();
+  const activities = useEventTimelineActivities(eventId);
   const timeOff = useListTimeOffRequest();
   const availability = useListAvailabilityWindow();
   const createAssignment = useCreateEventAssignment();

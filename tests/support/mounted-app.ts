@@ -123,6 +123,9 @@ vi.mock("convex/react", async (importOriginal) => {
         ["queries:listPrepTaskByEventId", "useListPrepTask"],
         ["queries:listReviewFlagByEventId", "useListReviewFlag"],
         ["queries:listProposalByEventId", "useListProposal"],
+        ["queries:listEventAssignmentByEventId", "useListEventAssignment"],
+        ["queries:listEventStaffNeedByEventId", "useListEventStaffNeed"],
+        ["queries:listShiftByEventId", "useListShift"],
         ["queries:listPackListByEventId", "useListPackList"],
         ["queries:listIngredientDemandByEventId", "useListIngredientDemand"],
         [

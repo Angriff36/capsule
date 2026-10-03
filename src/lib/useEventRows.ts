@@ -69,6 +69,27 @@ export function useEventRentalOrderLines(eventId: string) {
   });
 }
 
+/** One event's staff assignments, never the whole company's (PL-SCALE). */
+export function useEventAssignments(eventId: string) {
+  return useQuery(api.queries.listEventAssignmentByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's staff needs, never the whole company's (PL-SCALE). */
+export function useEventStaffNeeds(eventId: string) {
+  return useQuery(api.queries.listEventStaffNeedByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's shifts, never the whole company's (PL-SCALE). */
+export function useEventShifts(eventId: string) {
+  return useQuery(api.queries.listShiftByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
 /** One event's prep tasks, never the whole company's (PL-SCALE). */
 export function useEventPrepTasks(eventId: string) {
   return useQuery(api.queries.listPrepTaskByEventId, {
