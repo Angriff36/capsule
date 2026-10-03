@@ -42,7 +42,7 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
 }) {
   return (
     <div className="supply-table-wrap">
-      <table className="supply-table">
+      <table className="supply-table phone-cards">
         <thead>
           <tr>
             <th>Equipment</th>
@@ -75,8 +75,8 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
                   </small>
                 ) : null}
               </td>
-              <td>{item.category}</td>
-              <td>
+              <td data-label="Category">{item.category}</td>
+              <td data-label="Location">
                 {item.homeLocation ? (
                   <div>
                     <div>{item.homeLocation}</div>
@@ -94,13 +94,13 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
               <td>
                 <StatusChip status={String(item.ownership)} />
               </td>
-              <td className="supply-number">
+              <td className="supply-number" data-label="Qty">
                 {item.quantity}
                 {item.countUnit && item.countUnit !== "each" ? (
                   <small>{item.countUnit}</small>
                 ) : null}
               </td>
-              <td className="supply-number">
+              <td className="supply-number" data-label="Value">
                 {formatMoney(item.purchaseValue)}
                 {item.replacementCost != null ? (
                   <small>replace {formatMoney(item.replacementCost)}</small>

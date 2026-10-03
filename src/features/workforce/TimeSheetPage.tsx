@@ -173,7 +173,7 @@ export function TimeSheetBreakCell({
 }) {
   const paid = Number(paidBreakMinutes);
   return (
-    <td className="supply-number">
+    <td className="supply-number" data-label="Lunch (unpaid)">
       {timeRecordBreakLabel(breakMinutes)}
       {Number.isFinite(paid) && paid > 0 ? (
         <small className="block text-ink-3">{paid} min paid breaks</small>
@@ -662,7 +662,7 @@ export function TimeSheetPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Person</th>
@@ -681,8 +681,8 @@ export function TimeSheetPage() {
                     <td>
                       <strong>{personName(row.personId)}</strong>
                     </td>
-                    <td>{eventTitle(row.eventId)}</td>
-                    <td>
+                    <td data-label="Event">{eventTitle(row.eventId)}</td>
+                    <td data-label="Clock in">
                       {row.clockInAt
                         ? `${formatDate(row.clockInAt)} ${formatTime(row.clockInAt)}`
                         : "—"}
@@ -695,7 +695,7 @@ export function TimeSheetPage() {
                         </small>
                       ) : null}
                     </td>
-                    <td>
+                    <td data-label="Clock out">
                       {row.clockOutAt
                         ? `${formatDate(row.clockOutAt)} ${formatTime(row.clockOutAt)}`
                         : "—"}
@@ -704,7 +704,7 @@ export function TimeSheetPage() {
                       breakMinutes={row.breakMinutes}
                       paidBreakMinutes={row.paidBreakMinutes}
                     />
-                    <td>
+                    <td data-label="Hours">
                       {row.clockInAt != null &&
                       row.clockOutAt != null &&
                       row.clockOutAt >= row.clockInAt

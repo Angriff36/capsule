@@ -2201,6 +2201,40 @@
     overscroll-behavior-x: contain;
     white-space: nowrap;
   }
+  /* Opt-in for tables people work in on a phone: one card per row, each
+     value led by its data-label. Rows with actions in a hidden column grew
+     very tall and the first column was cut at the screen edge. */
+  .workspace-sheet table.phone-cards {
+    display: block;
+    min-width: 0;
+    overflow-x: visible;
+    white-space: normal;
+  }
+  table.phone-cards thead {
+    display: none;
+  }
+  table.phone-cards tbody,
+  table.phone-cards tr,
+  table.phone-cards td {
+    display: block;
+    width: 100%;
+  }
+  table.phone-cards tr {
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-line);
+  }
+  table.phone-cards tbody tr:first-child {
+    border-top: 0;
+  }
+  .supply-table.phone-cards td {
+    padding: 0.1rem 0;
+    border-top: 0;
+    text-align: left;
+  }
+  table.phone-cards td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: var(--color-ink-3);
+  }
 }
 
 .supply-table {
