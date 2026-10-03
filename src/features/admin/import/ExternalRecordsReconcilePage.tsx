@@ -339,7 +339,9 @@ export function ExternalRecordsReconcilePage() {
 
           <div className="ml-auto">
             <p className="text-xs text-ink-2">
-              {filteredRecords.length} waiting to be matched
+              {allRecords === undefined
+                ? "Counting what is waiting…"
+                : `${filteredRecords.length} waiting to be matched`}
             </p>
           </div>
         </div>
