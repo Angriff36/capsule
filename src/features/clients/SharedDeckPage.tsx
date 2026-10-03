@@ -79,13 +79,13 @@ export function SharedDeckPage({ token }: { token: string }) {
           <iframe
             title={deck.fileName}
             src={deck.url}
-            className="h-[80vh] w-full rounded border border-line bg-surface"
+            className="h-[80vh] w-full rounded-sm border border-line bg-panel"
           />
         ) : deck.url && deck.contentType.startsWith("image/") ? (
           <img
             src={deck.url}
             alt={deck.fileName}
-            className="w-full rounded border border-line"
+            className="w-full rounded-sm border border-line"
           />
         ) : (
           <p className="text-base text-ink-2">
