@@ -55,6 +55,10 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   // Staff profile that said the load is in the vehicle. Missing when that
   // account is not linked to a profile.
   property preloadedByPersonId: uuid?
+  // What this run cost the company: a hired truck's bill, a vendor's
+  // delivery fee, or fuel and tolls for our own truck. Empty = not known.
+  // The event closeout adds it up as the transport line.
+  property tripCost: money(12, 2)?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
@@ -64,6 +68,7 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   computed isPreloaded: boolean = self.preloadedAt != null
   computed isReleased: boolean = self.releasedAt != null
 
+  constraint tripCostNotNegative: self.tripCost == null or self.tripCost >= 0 "Trip cost can't be negative. Use zero or more."
   constraint assignmentHasRig: self.assignedAt == null or self.vehicleId != null or self.trailerId != null or (self.vendorName != null and length(trim(self.vendorName)) > 0) "An assignment needs a vehicle, a trailer or a vendor name"
 
   // The crew needs to know which truck they are on; the people who run events
@@ -186,6 +191,20 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // What this run cost. Stays changeable after the event, when the bill comes
+  // in. Empty clears it.
+  command setTripCost(optional tripCost: money(12, 2)) {
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    constraint setTripCostNotNegative: tripCost == null or tripCost >= 0 "Trip cost can't be negative. Use zero or more."
+    mutate tripCost = tripCost
+    emit EventVehicleTripCostSet {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
   // Hitch a trailer to this truck's run. The same checks as a new rig run
   // again (trailer in service, fits the truck, not on another run at the same
   // time unless a reason is given), and the crew's times are planned again.
@@ -255,6 +274,12 @@ event EventVehicleLegPlanned: "event_vehicle.leg_planned" {
 }
 
 event EventVehicleLoadingZoneSet: "event_vehicle.loading_zone_set" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleTripCostSet: "event_vehicle.trip_cost_set" {
   eventVehicleAssignmentId: string
   tenantId: string
   eventId: string

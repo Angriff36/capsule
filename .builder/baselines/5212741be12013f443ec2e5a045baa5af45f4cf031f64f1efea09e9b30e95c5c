@@ -315,6 +315,7 @@ import {
   EventVehicleAssignmentPlanLegParamsSchema,
   EventVehicleAssignmentReleaseParamsSchema,
   EventVehicleAssignmentSetLoadingZoneParamsSchema,
+  EventVehicleAssignmentSetTripCostParamsSchema,
   ExternalRecordLinkDecideParamsSchema,
   ExternalRecordLinkDiscardParamsSchema,
   ExternalRecordLinkLinkParamsSchema,
@@ -5313,6 +5314,16 @@ export function useEventVehicleAssignmentSetLoadingZone() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventVehicleAssignmentSetLoadingZoneParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventVehicleAssignment.setTripCost. */
+export function useEventVehicleAssignmentSetTripCost() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_setTripCost);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentSetTripCostParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13868,4 +13879,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1468 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1469 as const;

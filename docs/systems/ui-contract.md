@@ -2325,6 +2325,13 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
   - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: EventVehicleLoadingZoneSet
   - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_setTripCost` (EventVehicleAssignment.setTripCost)
+  - inputs from the screen: tripCost; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Trip cost can't be negative. Use zero or more."; and 2 more
+  - effects: EventVehicleTripCostSet
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
 - `mutations.Event_chooseOperatingLocation` (Event.chooseOperatingLocation)
   - inputs from the screen: operatingLocationId; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

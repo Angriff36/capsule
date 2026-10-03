@@ -1623,6 +1623,7 @@ export default defineSchema({
     loadingZone: v.optional(v.union(v.string(), v.null())),
     bookedTwiceReason: v.optional(v.union(v.string(), v.null())),
     preloadedByPersonId: v.optional(v.union(v.string(), v.null())),
+    tripCost: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

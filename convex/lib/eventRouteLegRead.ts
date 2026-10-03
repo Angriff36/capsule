@@ -35,6 +35,7 @@ export type RunSettings = {
   loadMinutes: number | null;
   leaveAfterMinutes: number | null;
   loadingZone: string | null;
+  tripCost: number | null;
 };
 
 async function activeRigs(ctx: QueryCtx, event: Doc<"events">) {
@@ -305,6 +306,7 @@ export async function readEventRouteLegsWithConflicts(
     loadMinutes: row.loadMinutes ?? null,
     leaveAfterMinutes: row.leaveAfterMinutes ?? null,
     loadingZone: row.loadingZone ?? null,
+    tripCost: row.tripCost ?? null,
   }));
   const vehicleIds = new Set(legs.flatMap((leg) => leg.vehicleId ? [leg.vehicleId] : []));
   const trailerIds = new Set(legs.flatMap((leg) => leg.trailerId ? [leg.trailerId] : []));

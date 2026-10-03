@@ -4,7 +4,9 @@ import {
   useCreateEventVehicleAssignment,
   useEventVehicleAssignmentPlanLeg,
   useEventVehicleAssignmentSetLoadingZone,
+  useEventVehicleAssignmentSetTripCost,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import {
   useEventRouteLegs,
   useEventTransport,
@@ -22,6 +24,7 @@ type RunDraft = {
   load: string;
   leaveAfter: string;
   zone: string;
+  tripCost: string;
 };
 
 const text = (value: number | null) => (value == null ? "" : String(value));
@@ -64,6 +67,7 @@ export function EventRouteLegsPanel({
   const transport = useEventTransport(eventId);
   const planLeg = useEventVehicleAssignmentPlanLeg();
   const setLoadingZone = useEventVehicleAssignmentSetLoadingZone();
+  const setTripCost = useEventVehicleAssignmentSetTripCost();
   const addRun = useCreateEventVehicleAssignment();
   const [editing, setEditing] = useState<{ run: Run; draft: RunDraft } | null>(
     null,
@@ -91,8 +95,10 @@ export function EventRouteLegsPanel({
     if (!editing) return;
     const { run: row, draft } = editing;
     const zone = draft.zone.trim();
+    const tripCost = minutes(draft.tripCost);
     if (
       await run(async () => {
+        let version = row.version;
         await planLeg({
           docId: row.id,
           version: row.version,
@@ -100,12 +106,17 @@ export function EventRouteLegsPanel({
           loadMinutes: minutes(draft.load),
           leaveAfterMinutes: minutes(draft.leaveAfter),
         });
-        if (zone !== (row.loadingZone ?? ""))
+        version += 1;
+        if (zone !== (row.loadingZone ?? "")) {
           await setLoadingZone({
             docId: row.id,
-            version: row.version + 1,
+            version,
             loadingZone: zone || undefined,
           });
+          version += 1;
+        }
+        if ((tripCost ?? null) !== row.tripCost)
+          await setTripCost({ docId: row.id, version, tripCost });
       })
     )
       setEditing(null);
@@ -151,6 +162,11 @@ export function EventRouteLegsPanel({
                     {leg.kind === "vendor" && " (outside vendor)"}
                   </p>
                   <p className="text-base">{legTimes(leg).join(" · ")}</p>
+                  {own?.tripCost != null && (
+                    <p className="text-sm text-ink-2">
+                      Trip cost {formatMoneyExact(own.tripCost)}
+                    </p>
+                  )}
                   <ul className="text-sm text-ink-2">
                     {leg.explanation.map((line) => (
                       <li key={line}>{line}</li>
@@ -175,11 +191,12 @@ export function EventRouteLegsPanel({
                           load: text(own.loadMinutes),
                           leaveAfter: text(own.leaveAfterMinutes),
                           zone: own.loadingZone ?? "",
+                          tripCost: text(own.tripCost),
                         },
                       })
                     }
                   >
-                    Change times
+                    Change run
                   </button>
                 )}
               </div>
@@ -231,10 +248,29 @@ export function EventRouteLegsPanel({
                       />
                     </label>
                   )}
+                  <label className="field-label">
+                    <span>Trip cost ($)</span>
+                    <input
+                      className="input min-h-10 w-full"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={editing.draft.tripCost}
+                      placeholder="Not known yet"
+                      onChange={(e) =>
+                        setEditing({
+                          ...editing,
+                          draft: { ...editing.draft, tripCost: e.target.value },
+                        })
+                      }
+                    />
+                  </label>
                   <p className="text-sm text-ink-2 sm:col-span-3">
-                    Leave a box empty to use the main crew’s time. Fill in
-                    “Leaves after arriving” for a drop run, so the truck can
-                    come back for another trip.
+                    Trip cost is what this run cost the company: a hired truck’s
+                    bill, a delivery fee, or fuel and tolls. The event’s
+                    closeout adds it up. Leave a time box empty to use the main
+                    crew’s time. Fill in “Leaves after arriving” for a drop run,
+                    so the truck can come back for another trip.
                   </p>
                   <div className="flex flex-wrap gap-3 sm:col-span-3">
                     <button
@@ -242,7 +278,7 @@ export function EventRouteLegsPanel({
                       className="btn btn-primary"
                       disabled={busy}
                     >
-                      {busy ? "Saving…" : "Save run times"}
+                      {busy ? "Saving…" : "Save run"}
                     </button>
                     <button
                       type="button"

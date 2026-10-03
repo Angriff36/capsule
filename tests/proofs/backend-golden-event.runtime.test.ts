@@ -1952,6 +1952,13 @@ describe.sequential(
           chargeAmount: 15,
         });
 
+        // Transport: the truck run's fuel and tolls, typed when the bill came.
+        await w.run.owner(M.EventVehicleAssignment_setTripCost, {
+          docId: id.truckRun,
+          version: await versionOf(w, id.truckRun),
+          tripCost: 42.5,
+        });
+
         // The event's one invoice is sent and paid in full.
         const [invoice] = await eventRows<{
           tenantId: string;
@@ -2037,6 +2044,15 @@ describe.sequential(
           ]),
         );
         expect(line("vendor").complete).toBe(true);
+        // Transport: the truck run's trip cost, from the run itself.
+        expect(line("transport")).toMatchObject({
+          actual: 42.5,
+          complete: true,
+          note: null,
+        });
+        expect(line("transport").sources).toEqual([
+          expect.objectContaining({ id: id.truckRun, amount: 42.5 }),
+        ]);
       },
       LONG,
     );
@@ -2094,6 +2110,7 @@ describe.sequential(
         const frozen = await closeout();
         expect(frozen.status).toBe("finalized");
         expect(frozen.sourceSnapshot).toContain(facts.wasteId);
+        expect(frozen.sourceSnapshot).toContain(id.truckRun);
 
         const report = async () =>
           (await w.owner.query(api.culinaryDemand.eventFoodCostReport, {

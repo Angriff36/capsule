@@ -1750,6 +1750,7 @@ export const EventVehicleAssignmentSchema = z.object({
   loadingZone: z.string().nullable().optional(),
   bookedTwiceReason: z.string().nullable().optional(),
   preloadedByPersonId: z.string().uuid().nullable().optional(),
+  tripCost: z.number().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -7846,6 +7847,13 @@ export const EventVehicleAssignmentSetLoadingZoneParamsSchema = z.object({
 });
 
 export type EventVehicleAssignmentSetLoadingZoneParams = z.infer<typeof EventVehicleAssignmentSetLoadingZoneParamsSchema>;
+
+// Command: setTripCost on EventVehicleAssignment
+export const EventVehicleAssignmentSetTripCostParamsSchema = z.object({
+  tripCost: z.number().optional(),
+});
+
+export type EventVehicleAssignmentSetTripCostParams = z.infer<typeof EventVehicleAssignmentSetTripCostParamsSchema>;
 
 // Command: decide on ExternalRecordLink
 export const ExternalRecordLinkDecideParamsSchema = z.object({
