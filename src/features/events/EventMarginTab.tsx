@@ -181,6 +181,12 @@ export function EventMarginTab({ eventId }: Props) {
     ],
   );
 
+  // Some food has no price: costs shown are only the known part.
+  const costsIncomplete = foodCostReport
+    ? !foodCostReport.estimated.complete
+    : recipeRollup.dishes.some(
+        (dish) => dish.incompleteLineCount > 0 || dish.pricedLineCount === 0,
+      );
   const laborCost = live.laborCost;
   const equipmentCost = live.equipmentCost;
   const revenue = live.invoiceCount > 0 ? live.confirmedRevenue : quoted;
@@ -263,6 +269,7 @@ export function EventMarginTab({ eventId }: Props) {
             totalCost={totalCost}
             grossProfit={grossProfit}
             marginPct={marginPct}
+            costsIncomplete={costsIncomplete}
           />
           <EventMarginRevenueBreakdown lines={revenueLines} total={revenue} />
           <EventMarginCostBreakdown buckets={costBuckets} total={totalCost} />
@@ -308,6 +315,7 @@ export function EventMarginTab({ eventId }: Props) {
           totalCost={totalCost}
           grossProfit={grossProfit}
           marginPct={marginPct}
+          costsIncomplete={costsIncomplete}
           headcount={headcount}
           buckets={costBuckets}
           budget={budget}
