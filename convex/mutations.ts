@@ -12389,7 +12389,7 @@ async function __runEquipmentClearPrimaryImage(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -12439,7 +12439,7 @@ async function __runEquipmentReactivate(ctx: MutationCtx, { docId, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
@@ -12503,7 +12503,7 @@ async function __runEquipmentRecount(ctx: MutationCtx, { docId, actualQuantity, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -12558,7 +12558,7 @@ async function __runEquipmentRegister(ctx: MutationCtx, { docId, name, assetTag,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendor = __rel_vendor;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -12691,7 +12691,7 @@ export const Equipment_createViaRegister = mutation({
       vendorId: args.vendorId
     };
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -12743,7 +12743,7 @@ async function __runEquipmentRetire(ctx: MutationCtx, { docId, reason, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -12810,7 +12810,7 @@ async function __runEquipmentReviseDetails(ctx: MutationCtx, { docId, name, cate
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -12890,7 +12890,7 @@ async function __runEquipmentSetCustomFields(ctx: MutationCtx, { docId, customFi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -12940,7 +12940,7 @@ async function __runEquipmentSetOperatingFacts(ctx: MutationCtx, { docId, provid
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -12993,7 +12993,7 @@ async function __runEquipmentSetPrimaryImage(ctx: MutationCtx, { docId, storageI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -13046,7 +13046,7 @@ async function __runEquipmentTransfer(ctx: MutationCtx, { docId, toLocation, not
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -13099,7 +13099,7 @@ async function __runEquipmentUpdateCondition(ctx: MutationCtx, { docId, conditio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -13152,7 +13152,7 @@ async function __runEquipmentWriteOffMissing(ctx: MutationCtx, { docId, missingQ
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may see equipment");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Inventory, logistics or kitchen staff may see equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

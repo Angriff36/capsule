@@ -1,7 +1,17 @@
-import { useState, type FormEvent } from "react";
-import { useComponentSetKitchenStandards } from "../../lib/manifest-convex-react";
+import { Fragment, useRef, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
+import {
+  useComponentSetKitchenStandards,
+  useListEquipment,
+} from "../../lib/manifest-convex-react";
 import { ComponentPrimaryImageUploader } from "../attachments/ComponentPrimaryImageUploader";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
+import {
+  activeRecipeEquipment,
+  addRecipeEquipment,
+  recipeEquipmentPieces,
+  type RecipeEquipmentOption,
+} from "./recipeEquipment";
 
 export type KitchenStandardsRow = {
   _id: string;
@@ -87,6 +97,9 @@ export function ComponentKitchenStandardsPanel({
   onFailure: (error: unknown) => void;
 }) {
   const setStandards = useComponentSetKitchenStandards();
+  const equipment = useListEquipment() as RecipeEquipmentOption[] | undefined;
+  const equipmentChoices = activeRecipeEquipment(equipment);
+  const equipmentBox = useRef<HTMLTextAreaElement>(null);
   const [busy, setBusy] = useState(false);
   const rows = kitchenStandards(component);
   const onFile = rows.filter((row) => row.value != null).length;
@@ -143,6 +156,29 @@ export function ComponentKitchenStandardsPanel({
                 <a href={row.value} target="_blank" rel="noreferrer">
                   Watch the video
                 </a>
+              ) : row.key === "equipmentNotes" ? (
+                <ul className="m-0 list-none p-0">
+                  {recipeEquipmentPieces(row.value, equipment).map(
+                    (piece, index) => (
+                      <li key={`${piece.text}:${index}`}>
+                        {piece.item ? (
+                          <>
+                            <Link to="/facilities/equipment">
+                              {piece.item.name}
+                            </Link>
+                            <span className="text-ink-3">
+                              {" "}
+                              · {piece.item.quantity ?? 0}{" "}
+                              {piece.item.countUnit?.trim() || "each"} on hand
+                            </span>
+                          </>
+                        ) : (
+                          piece.text
+                        )}
+                      </li>
+                    ),
+                  )}
+                </ul>
               ) : (
                 row.value
               )}
@@ -158,25 +194,53 @@ export function ComponentKitchenStandardsPanel({
           onSubmit={submit}
         >
           {STANDARDS.map(({ key, label, hint }) => (
-            <label key={key} className="field-label sm:col-span-2">
-              {label}
-              {key === "videoUrl" ? (
-                <input
-                  name={key}
-                  type="url"
-                  className="input"
-                  placeholder={hint}
-                  defaultValue={component[key] ?? ""}
-                />
-              ) : (
-                <textarea
-                  name={key}
-                  className="input min-h-16 py-2"
-                  placeholder={hint}
-                  defaultValue={component[key] ?? ""}
-                />
-              )}
-            </label>
+            <Fragment key={key}>
+              <label className="field-label sm:col-span-2">
+                {label}
+                {key === "videoUrl" ? (
+                  <input
+                    name={key}
+                    type="url"
+                    className="input"
+                    placeholder={hint}
+                    defaultValue={component[key] ?? ""}
+                  />
+                ) : (
+                  <textarea
+                    name={key}
+                    ref={key === "equipmentNotes" ? equipmentBox : undefined}
+                    className="input min-h-16 py-2"
+                    placeholder={hint}
+                    defaultValue={component[key] ?? ""}
+                  />
+                )}
+              </label>
+              {key === "equipmentNotes" && equipmentChoices.length > 0 ? (
+                <label className="field-label sm:col-span-2">
+                  Add from the equipment list
+                  <select
+                    className="input"
+                    value=""
+                    onChange={(event) => {
+                      const box = equipmentBox.current;
+                      if (box && event.target.value) {
+                        box.value = addRecipeEquipment(
+                          box.value,
+                          event.target.value,
+                        );
+                      }
+                    }}
+                  >
+                    <option value="">Pick a piece of equipment</option>
+                    {equipmentChoices.map((item) => (
+                      <option key={item._id} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </Fragment>
           ))}
           <button className="btn btn-primary self-end" disabled={busy}>
             {busy ? "Saving…" : "Save standards"}

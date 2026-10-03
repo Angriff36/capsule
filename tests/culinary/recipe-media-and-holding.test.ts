@@ -9,13 +9,16 @@
 import { convexTest } from "convex-test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { MemoryRouter } from "react-router-dom";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { modules } from "../proofs/convex-test-modules";
 
+let equipmentList: unknown[] | undefined;
 vi.mock("../../src/lib/manifest-convex-react", () => ({
+  useListEquipment: () => equipmentList,
   useComponentSetKitchenStandards: () => async () => null,
   useComponentSetPrimaryImage: () => async () => null,
   useComponentClearPrimaryImage: () => async () => null,
@@ -47,10 +50,14 @@ type Row = Record<string, unknown> & {
 
 const render = (row: Row) =>
   renderToStaticMarkup(
-    createElement(ComponentKitchenStandardsPanel, {
-      component: row,
-      onFailure: () => {},
-    }),
+    createElement(
+      MemoryRouter,
+      null,
+      createElement(ComponentKitchenStandardsPanel, {
+        component: row,
+        onFailure: () => {},
+      }),
+    ),
   );
 
 describe("AC-453 recipe media and holding standards", () => {
@@ -161,5 +168,57 @@ describe("AC-453 recipe media and holding standards", () => {
     row = await read(docId);
     expect(kitchenStandards(row).every((s) => s.value == null)).toBe(true);
     expect(row.primaryImageStorageId ?? null).toBeNull();
+  });
+
+  it("a chef reads the company equipment list, and recipe equipment on that list says how many the kitchen has", async () => {
+    const proof = createManifestTestContext({
+      convexTest: convexTest as never,
+      schema,
+      modules,
+    });
+    const inventory = proof.asRole({
+      subject: "stock-lead",
+      role: "inventory_manager",
+      tenantId: TENANT,
+    });
+    await proof.executeCommand(
+      inventory,
+      api.mutations.Equipment_createViaRegister,
+      {
+        name: "Rondeau",
+        assetTag: "RND-1",
+        category: "Cookware",
+        ownership: "owned",
+        quantity: 6,
+      },
+    );
+    const kitchen = proof.asRole({
+      subject: "chef-standards",
+      role: "kitchen_manager",
+      tenantId: TENANT,
+    });
+    const seen = (await kitchen.query(api.queries.listEquipment, {})) as {
+      name: string;
+    }[];
+    expect(seen.map((item) => item.name)).toEqual(["Rondeau"]);
+    const other = proof.asRole({
+      subject: "chef-elsewhere",
+      role: "kitchen_manager",
+      tenantId: "tenant-other-kitchen",
+    });
+    expect(await other.query(api.queries.listEquipment, {})).toEqual([]);
+
+    equipmentList = seen;
+    const page = render({
+      _id: "c1",
+      version: 1,
+      name: "Braised short rib",
+      equipmentNotes: "rondeau, hotel pans",
+    });
+    expect(page).toContain('href="/facilities/equipment"');
+    expect(page).toContain("6 each on hand");
+    expect(page).toContain("hotel pans");
+    expect(page).toContain("Add from the equipment list");
+    equipmentList = undefined;
   });
 });
