@@ -1022,9 +1022,15 @@ export function ProposalsPage() {
                           eventId={row.eventId ? String(row.eventId) : null}
                           status={String(row.status)}
                           total={Number(row.total ?? 0)}
-                          hasVenue={Boolean(
-                            events?.find((e) => e._id === row.eventId)?.venueId,
-                          )}
+                          hasVenue={(() => {
+                            // A typed venue (quote form, import) counts too.
+                            const linked = events?.find(
+                              (e) => e._id === row.eventId,
+                            );
+                            return Boolean(
+                              linked?.venueId || linked?.venueName?.trim(),
+                            );
+                          })()}
                           hasMenuSelections={(
                             proposalDishSelections ?? []
                           ).some(

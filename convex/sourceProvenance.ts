@@ -46,20 +46,26 @@ export const listByCapsuleId = query({
     if (!auth.tenantId || !IMPORT_ACCESS_ROLES.has(auth.role)) return [];
     if (!capsuleId) return [];
 
-    // ponytail: no by_capsuleId index exists (only by_tenantId /
-    // by_sourceImportRunId), so collect the tenant's links and filter in JS —
-    // the same shape as the generated listExternalRecordLinkByTenantId the
-    // reconcile page already uses. Upgrade to a by_capsuleId index only if a
-    // tenant's link volume makes the scan measurable.
-    const rows = await ctx.db
-      .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
-      .collect();
-
     // AC-181: a client keeps the old-system links of every client merged
     // into it, each marked with the name it was imported under.
     const merged = await mergedClients(ctx, auth.tenantId, capsuleId);
     const mergedName = new Map(merged.map((m) => [m.clientId, m.name]));
+
+    // Read only this record's links (and its merged clients'). A whole-tenant
+    // scan timed out the proposals page once an import left thousands of
+    // links, because every proposal row runs this query.
+    const tenantId = auth.tenantId;
+    const rows = [];
+    for (const id of [capsuleId, ...mergedName.keys()]) {
+      rows.push(
+        ...(await ctx.db
+          .query("externalRecordLinks")
+          .withIndex("by_tenantId_and_capsuleId", (q) =>
+            q.eq("tenantId", tenantId).eq("capsuleId", id),
+          )
+          .collect()),
+      );
+    }
     const links = rows
       .filter(
         (row) =>
