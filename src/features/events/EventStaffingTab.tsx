@@ -390,7 +390,7 @@ export function EventStaffingTab({ eventId }: Props) {
                 })
               }
             >
-              Fill open shifts from suggestions
+              Auto-fill open shifts
             </button>
           ) : null}
         </div>
