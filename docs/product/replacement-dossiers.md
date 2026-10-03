@@ -123,7 +123,7 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Orders, receipts, bill matching | `/inventory/purchasing`, `/inventory/orders/:id` | `proofs/receipt-invoice-match`, `proofs/partial-receipt-correction` | Built |
 | Cook sees the current method | `/kitchen/display`, recipe page from a prep task | `proofs/prep-work-baselines`, `proofs/recipe-edition-publish`, `features/kitchen/published-method-panel` | Built: a published edition keeps its steps; a cook sent from a prep task reads them while the chef changes a draft |
 | Actual yield and waste back to closeout | `/kitchen/yield`, event closeout | `proofs/batch-actual-ledger`, `proofs/event-food-cost-closeout`, `features/production/yield-recipe-suggestion` | Built (3 or more batches more than 5% off plan suggest a recipe yield, with a link to the recipe) |
-| Recipe publishing | recipe page | `proofs/recipe-edition-publish` | Built for recipes; dishes and menus have no published-edition rule |
+| Recipe publishing | recipe page | `proofs/recipe-edition-publish` | Built: recipes publish editions; a dish can be linked as an edition of another; menus go draft -> published (details change only in draft, unpublish needs a reason); an accepted proposal keeps its own copy of the menu, so a later dish change never rewrites what the client agreed |
 
 No retyping: event dishes come from the accepted proposal; servings follow the
 guest count.
