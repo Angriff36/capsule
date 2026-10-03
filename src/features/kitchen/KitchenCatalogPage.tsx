@@ -601,7 +601,11 @@ function KitchenCatalogPageContent({
             </div>
           ) : (
             <div className="component-empty-state">
-              <div className="component-book-mark" aria-hidden="true">
+              <div
+                className="component-book-mark"
+                aria-hidden="true"
+                data-label={`HOUSE\n${sectionLabel.toUpperCase()}`}
+              >
                 <span />
               </div>
               <div>

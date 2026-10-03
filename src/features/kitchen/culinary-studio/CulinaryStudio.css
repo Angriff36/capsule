@@ -17,6 +17,11 @@
   background: var(--color-inset);
 }
 
+/* Record pages have a taller head than the band; it stopped mid-title. */
+.culinary-document.culinary-studio::before {
+  content: none;
+}
+
 .culinary-studio > * {
   position: relative;
   z-index: 1;

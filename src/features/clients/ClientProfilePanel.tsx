@@ -171,7 +171,7 @@ export function ClientProfilePanel({
             Leave it empty to keep the saved ID. Type a new ID to replace it.
           </span>
         </label>
-        <label>
+        <label className="supply-check mt-3">
           <input name="clearTaxId" type="checkbox" /> Clear the saved tax ID
         </label>
         <button

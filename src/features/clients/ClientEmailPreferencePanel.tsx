@@ -83,7 +83,7 @@ export function ClientEmailPreferencePanel({
       <fieldset className="space-y-2">
         <legend className="sr-only">What we email this client</legend>
         {CHOICES.map((row) => (
-          <label key={row.value} className="supply-check">
+          <label key={row.value} className="supply-check items-start">
             <input
               type="radio"
               name="emailPreference"
@@ -91,8 +91,10 @@ export function ClientEmailPreferencePanel({
               checked={choice === row.value}
               onChange={() => setChoice(row.value)}
             />{" "}
-            {row.label}
-            <span className="field-hint">{row.hint}</span>
+            <span>
+              {row.label}
+              <span className="field-hint block">{row.hint}</span>
+            </span>
           </label>
         ))}
       </fieldset>
