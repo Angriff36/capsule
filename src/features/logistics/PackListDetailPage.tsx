@@ -4,7 +4,6 @@ import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
   useGetPackList,
-  useListDish,
   useListPerson,
   useListPackListItem,
   useListPackListTemplate,
@@ -50,6 +49,7 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { useEventsById } from "../facilities/useEventsById";
+import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -106,7 +106,14 @@ export function PackListDetailPage() {
   const events = useEventsById(
     packList === undefined ? undefined : [packList?.eventId],
   );
-  const dishes = useListDish();
+  // Only the dishes this list's items name, never the whole dish list.
+  const dishes = useDishesByIds(
+    packList == null || items === undefined
+      ? undefined
+      : items
+          .filter((item) => item.packListId === packList._id)
+          .map((item) => item.dishId),
+  );
   const people = useListPerson();
   const createItem = useCreatePackListItem();
   const applyPackTemplate = useApplyPackTemplate();
@@ -142,6 +149,8 @@ export function PackListDetailPage() {
   const dispatch = usePackListDispatch();
   const cancel = usePackListCancel();
   const [showAdd, setShowAdd] = useState(false);
+  // The whole dish list only while the add-item form is open.
+  const formDishes = useWholeDishList(showAdd);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showScan, setShowScan] = useState(false);
   const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(
@@ -1125,7 +1134,7 @@ export function PackListDetailPage() {
 
       {showAdd && canAddItems ? (
         <PackListItemForm
-          dishes={dishes ?? []}
+          dishes={formDishes ?? []}
           busy={busy === "add-item"}
           onSubmit={submitItem}
         />

@@ -3594,6 +3594,7 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 ### Authored reads and steps
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
 - `driverAssignment.assign` - mutation; authored step; live reads update by themselves
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
