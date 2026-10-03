@@ -58,6 +58,7 @@ import {
   useGenerateProposalDraft,
 } from "./ProposalDraftCheck";
 import { generateAcceptanceUrl } from "./proposalSignatureRequest";
+import "./ProposalsPage.css";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
@@ -770,7 +771,7 @@ export function ProposalsPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table proposal-table">
               <thead>
                 <tr>
                   <th>Title</th>
