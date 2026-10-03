@@ -142,7 +142,7 @@ export function PersonalDataExportView({
       ) : null}
 
       {canExport ? (
-        <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.2fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.2fr)]">
           <Section title="Find an individual" count={filteredSubjects.length}>
             <div className="border-b border-line p-3">
               <label className="field-label" htmlFor="personal-data-search">
@@ -170,7 +170,7 @@ export function PersonalDataExportView({
                 hint="Try another name, email, role, or status."
               />
             ) : (
-              <fieldset className="max-h-[32rem] divide-y divide-line overflow-y-auto">
+              <fieldset className="max-h-[32rem] min-w-0 divide-y divide-line overflow-y-auto">
                 <legend className="sr-only">Choose a person to export</legend>
                 {filteredSubjects.map((subject) => {
                   const key = subjectKey(subject);
@@ -193,7 +193,7 @@ export function PersonalDataExportView({
                         }}
                         className="mt-1"
                       />
-                      <span className="min-w-0 flex-1">
+                      <span className="min-w-0 flex-1 wrap-anywhere">
                         <span className="flex flex-wrap items-center gap-2">
                           <strong className="text-ink">
                             {subject.displayName}
