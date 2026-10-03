@@ -116,7 +116,10 @@ export function WasteRecentEntries({
         </div>
       ) : (
         <div className="supply-table-wrap">
-          <table className="supply-table" data-testid="waste-recent-entries">
+          <table
+            className="supply-table phone-cards"
+            data-testid="waste-recent-entries"
+          >
             <thead>
               <tr>
                 <th>When</th>
@@ -137,16 +140,18 @@ export function WasteRecentEntries({
                       <small>by {recorderName(record.recordedById)}</small>
                     ) : null}
                   </td>
-                  <td>
+                  <td data-label="Ingredient">
                     <strong>{ingredientName(record.ingredientId)}</strong>
                     {record.notes ? <small>{record.notes}</small> : null}
                   </td>
-                  <td className="supply-number">
+                  <td className="supply-number" data-label="Quantity">
                     {record.quantity} {record.unit}
                   </td>
-                  <td>{WASTE_REASON_LABELS[record.reason] ?? record.reason}</td>
-                  <td>{eventName(record.eventId)}</td>
-                  <td className="supply-number">
+                  <td data-label="Reason">
+                    {WASTE_REASON_LABELS[record.reason] ?? record.reason}
+                  </td>
+                  <td data-label="Event">{eventName(record.eventId)}</td>
+                  <td className="supply-number" data-label="Waste value">
                     {formatMoney(record.quantity * record.unitCost)}
                   </td>
                   <td>
