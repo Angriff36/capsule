@@ -34,6 +34,41 @@ export function useEventTimelineActivities(eventId: string) {
   });
 }
 
+/** One event's proposals, never the whole company's (PL-SCALE). */
+export function useEventProposals(eventId: string) {
+  return useQuery(api.queries.listProposalByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's pack lists, never the whole company's (PL-SCALE). */
+export function useEventPackLists(eventId: string) {
+  return useQuery(api.queries.listPackListByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's ingredient needs, never the whole company's (PL-SCALE). */
+export function useEventIngredientDemands(eventId: string) {
+  return useQuery(api.queries.listIngredientDemandByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's equipment holds, never the whole company's (PL-SCALE). */
+export function useEventEquipmentReservations(eventId: string) {
+  return useQuery(api.queries.listEquipmentReservationByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
+/** One event's rental order lines, never the whole company's (PL-SCALE). */
+export function useEventRentalOrderLines(eventId: string) {
+  return useQuery(api.queries.listRentalOrderLineByEventId, {
+    eventId: eventId as Id<"events">,
+  });
+}
+
 /** One event's prep tasks, never the whole company's (PL-SCALE). */
 export function useEventPrepTasks(eventId: string) {
   return useQuery(api.queries.listPrepTaskByEventId, {

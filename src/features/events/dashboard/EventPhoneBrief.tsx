@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../../lib/format";
 import {
-  useListPackList,
-  useListProposal,
-} from "../../../lib/manifest-convex-react";
-import { useEventPrepTasks } from "../../../lib/useEventRows";
+  useEventPackLists,
+  useEventPrepTasks,
+  useEventProposals,
+} from "../../../lib/useEventRows";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { eventDetailPath } from "../eventRoutes";
 import { PACK_STATE_LABEL, packStateOf } from "../tracker/trackerSheet";
@@ -56,9 +56,9 @@ export function EventPhoneBrief({
   readonly onOpen: (id: DashSheetId) => void;
 }) {
   const { event, eventId } = props;
-  const proposals = useListProposal();
+  const proposals = useEventProposals(eventId);
   const prepTasks = useEventPrepTasks(eventId);
-  const packLists = useListPackList();
+  const packLists = useEventPackLists(eventId);
 
   const next = props.lifecycleActions.find(
     (action) => action.kind === "primary",

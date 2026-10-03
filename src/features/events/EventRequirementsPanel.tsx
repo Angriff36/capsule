@@ -1,13 +1,15 @@
 import type { Id } from "../../lib/api";
 import {
   useListEquipment,
-  useListEquipmentReservation,
   useListIngredient,
-  useListIngredientDemand,
-  useListPackList,
   useListPackListItem,
-  useListRentalOrderLine,
 } from "../../lib/manifest-convex-react";
+import {
+  useEventEquipmentReservations,
+  useEventIngredientDemands,
+  useEventPackLists,
+  useEventRentalOrderLines,
+} from "../../lib/useEventRows";
 import { useRentalVendorChoices } from "../facilities/equipmentCheckout";
 import {
   REQUIREMENT_KIND_LABEL,
@@ -31,12 +33,12 @@ function fromHold(sourcesJson: unknown): boolean {
 
 /** Everything this event needs, kept apart by kind, with who is on it. */
 export function EventRequirementsPanel({ eventId }: { eventId: Id<"events"> }) {
-  const demands = useListIngredientDemand() ?? [];
+  const demands = useEventIngredientDemands(eventId) ?? [];
   const ingredients = useListIngredient() ?? [];
-  const holds = useListEquipmentReservation() ?? [];
+  const holds = useEventEquipmentReservations(eventId) ?? [];
   const equipment = useListEquipment() ?? [];
-  const rentals = useListRentalOrderLine() ?? [];
-  const packLists = useListPackList() ?? [];
+  const rentals = useEventRentalOrderLines(eventId) ?? [];
+  const packLists = useEventPackLists(eventId) ?? [];
   const packItems = useListPackListItem() ?? [];
   const vendors = useRentalVendorChoices() ?? [];
 

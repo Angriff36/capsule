@@ -560,6 +560,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEquipmentIssue` - live read
 - `queries.listEquipmentPart` - live read
 - `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
 - `queries.listEventAssignmentByEventId` - live read
@@ -577,24 +578,25 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEventVehicleAssignment` - live read
 - `queries.listIncident` - live read
 - `queries.listIngredient` - live read
-- `queries.listIngredientDemand` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listInvoice` - live read
 - `queries.listMenu` - live read
 - `queries.listOccasion` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPackListItem` - live read
 - `queries.listPerson` - live read
 - `queries.listPlanningOverride` - live read
 - `queries.listPlanningReceipt` - live read
 - `queries.listPlanningRule` - live read
 - `queries.listPrepTaskByEventId` - live read
-- `queries.listProposal` - live read
+- `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelection` - live read
 - `queries.listProposalEnhancement` - live read
 - `queries.listQualification` - live read
 - `queries.listReferralSource` - live read
-- `queries.listRentalOrderLine` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlag` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listServiceStyle` - live read
@@ -1292,6 +1294,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listDishTask` - live read
 - `queries.listDishTaskMaterial` - live read
 - `queries.listEquipment` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventDish` - live read
 - `queries.listEventDishByEventId` - live read
@@ -1301,6 +1304,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listIngredientPriceObservation` - live read
 - `queries.listInventoryItem` - live read
 - `queries.listInventoryLot` - live read
@@ -1310,6 +1314,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listMenu` - live read
 - `queries.listMenuDish` - live read
 - `queries.listOrganization` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTask` - live read
 - `queries.listPrepTaskByEventId` - live read
@@ -1317,7 +1322,9 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listPrepTaskDependency` - live read
 - `queries.listProductionBatch` - live read
 - `queries.listProductionBatchAllocation` - live read
+- `queries.listProposalByEventId` - live read
 - `queries.listQualityCheck` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listStation` - live read
 - `queries.listVendor` - live read
@@ -2266,6 +2273,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 ### Generated reads
 
 - `queries.getEvent` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
 - `queries.listEventGuestByEventId` - live read
@@ -2274,9 +2282,13 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineComment` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listOperatingLocation` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listShift` - live read
 
@@ -3646,14 +3658,23 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `queries.listEquipmentMaintenanceTask` - live read
 - `queries.listEquipmentPart` - live read
 - `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEquipmentServiceEntry` - live read
 - `queries.listEvent` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSection` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPackListItem` - live read
 - `queries.listPerson` - live read
-- `queries.listRentalOrderLine` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listStorageLocation` - live read
 - `queries.listVenueLayoutTemplate` - live read
 
@@ -3898,10 +3919,15 @@ Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 ### Generated reads
 
 - `queries.getEvent` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 
 ### Generated actions

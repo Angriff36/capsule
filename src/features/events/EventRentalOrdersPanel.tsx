@@ -5,12 +5,12 @@ import {
   useCreateRentalOrderLine,
   useCreateVendor,
   useListEquipment,
-  useListRentalOrderLine,
   useRentalOrderLineCancel,
   useRentalOrderLineConfirm,
   useRentalOrderLineMarkDelivered,
   useRentalOrderLineMarkReturned,
 } from "../../lib/manifest-convex-react";
+import { useEventRentalOrderLines } from "../../lib/useEventRows";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice } from "../../ui/action-result";
 import { Link } from "react-router-dom";
@@ -62,7 +62,7 @@ function shortTime(value?: number | null): string {
 
 /** Items rented from outside vendors for this event - never our own stock. */
 export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
-  const lines = useListRentalOrderLine() as RentalRow[] | undefined;
+  const lines = useEventRentalOrderLines(eventId) as RentalRow[] | undefined;
   const equipment = useListEquipment();
   const vendorChoices = useRentalVendorChoices();
   const venueRuleRows = useVenueVendorRules(eventId);
