@@ -1618,6 +1618,9 @@
 
 .supply-stage {
   display: grid;
+  /* One column no wider than the screen: a wide table scrolls in its own
+     box instead of pushing every heading and paragraph past the edge. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
