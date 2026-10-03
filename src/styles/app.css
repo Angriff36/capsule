@@ -2226,7 +2226,7 @@
   table.phone-cards tbody tr:first-child {
     border-top: 0;
   }
-  .supply-table.phone-cards td {
+  table.phone-cards td {
     padding: 0.1rem 0;
     border-top: 0;
     text-align: left;
