@@ -775,6 +775,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             status: String(dish.status),
             mergedIntoDishId: dish.mergedIntoDishId,
             canonicalDishId: dish.canonicalDishId,
+            versionOfDishId: dish.versionOfDishId,
+            versionLabel: dish.versionLabel,
           }))}
           excludeIds={existingDishIds}
           onSelect={(dishId) =>
