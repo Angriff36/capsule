@@ -447,12 +447,12 @@ try {
   const tabs = page.locator('[role="tablist"][aria-label="Show"] [role="tab"]');
   const tabCount = await tabs.count();
   const tabTimes = [];
-  for (let i = 0; i < 45; i++)
+  for (let i = 0; i < 120; i++)
     tabTimes.push(await interaction(() => tabs.nth(i % tabCount).click()));
   results.interactions.push(summary("Events page tab click", tabTimes));
   const search = page.getByPlaceholder("Search title, client, venue…");
   const keyTimes = [];
-  for (let round = 0; round < 5; round++) {
+  for (let round = 0; round < 13; round++) {
     await search.click();
     for (const ch of `Event ${round + 1}`)
       keyTimes.push(await interaction(() => page.keyboard.press(ch === " " ? "Space" : ch)));
@@ -461,17 +461,17 @@ try {
   results.interactions.push(summary("Events search key press", keyTimes));
   await page.screenshot({ path: join(OUT, "events-search.png") });
 
-  // Event page section tabs, on ten events.
+  // Event page section tabs, on twenty events.
   const eventOpens = [];
   const sectionTimes = [];
-  for (const [e, id] of eventIds.slice(0, 10).entries()) {
+  for (const [e, id] of eventIds.slice(0, 20).entries()) {
     eventOpens.push(
       await open(
         `/events/${id}`,
         () =>
           document.querySelectorAll('nav[aria-label="Event sections"] [role="tab"]')
             .length > 0,
-        e === 9,
+        e === 19,
       ),
     );
     const sections = page.locator('nav[aria-label="Event sections"] [role="tab"]');
@@ -482,6 +482,30 @@ try {
   results.opens.push(summary("Event page opens to its sections", eventOpens));
   results.interactions.push(summary("Event page section tab click", sectionTimes));
   await page.screenshot({ path: join(OUT, "event.png"), fullPage: true });
+
+  // Kitchen dish catalog: every dish, read in pages; search runs in the page.
+  const catalogOpens = [];
+  for (let i = 0; i < 3; i++)
+    catalogOpens.push(
+      await open(
+        "/kitchen/dishes",
+        () => /All dishes\s*5,000/.test(document.body.innerText),
+        i === 2,
+      ),
+    );
+  results.opens.push(summary("Dish catalog opens to all dishes", catalogOpens));
+  const dishSearch = page.getByPlaceholder("Search dishes by name or category…");
+  const dishKeyTimes = [];
+  for (let round = 0; round < 13; round++) {
+    await dishSearch.click();
+    for (const ch of `Dish ${round + 10}`)
+      dishKeyTimes.push(
+        await interaction(() => page.keyboard.press(ch === " " ? "Space" : ch)),
+      );
+    dishKeyTimes.push(await interaction(() => dishSearch.fill("")));
+  }
+  results.interactions.push(summary("Dish catalog search key press", dishKeyTimes));
+  await page.screenshot({ path: join(OUT, "dishes.png") });
   const browserVersion = browser.version();
   await browser.close();
 

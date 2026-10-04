@@ -136,6 +136,25 @@ paint; 16 means under the browser's 16 ms floor.
 
 Every interaction p95 is under 200 ms.
 
+Rerun 2026-10-04 with at least 100 samples per interaction and the dish
+catalog added (5,000 dishes, read in pages, searched in the page):
+
+| Interaction                     | Samples | p50 ms | p95 ms |
+| ------------------------------- | ------- | ------ | ------ |
+| Events page tab click           | 120     | 16     | 16     |
+| Events search key press         | 108     | 16     | 80     |
+| Event page section tab click    | 120     | 32     | 48     |
+| Dish catalog search key press   | 104     | 16     | 16     |
+
+| Screen opens (full page load, dev server, sign-in check) | Samples | p50 ms | p95 ms |
+| -------------------------------------------------------- | ------- | ------ | ------ |
+| Events page to its list                                   | 5       | 2,152  | 3,003  |
+| Event page to its sections                                | 20      | 2,012  | 3,233  |
+| Dish catalog to all 5,000 dishes                          | 3       | 2,091  | 2,907  |
+
+Screen opens are a full page load of the development build (a cold start
+each time); they are reported apart from the list/detail reads above.
+
 The first run found every screen took 15 to 18 s to open: the notification
 bell (on every screen) read every event, 13.1 s, and the socket answers a
 screen's reads together, so every other read waited for it. The bell now
@@ -162,7 +181,11 @@ The one-call list took 2.5 s uncached; the same 5,000 dishes in ten pages
 take 0.6 s in all. Browser check `dish-pages.mjs` PASS at 360 and 1280
 (catalog shows all 2,329 local dishes, dish page, pack rules, proposals).
 
-## Still open for AC-172
+## AC-172 result (2026-10-04)
+
+Every list/detail read p95 is under one second, every interaction p95 is
+under 200 ms over at least 100 samples, and cold start, export and import
+are reported apart. Notes kept for later work:
 
 - Event tabs now read one event's guests, prep tasks, review flags,
   timeline blocks / comments, crew (assignments, needs, shifts), ingredient
