@@ -344,7 +344,7 @@ export function NewDishPanel({ onClose }: { onClose: () => void }) {
                     key={dish._id}
                     className="flex flex-wrap items-center gap-2 rounded-xs bg-panel px-2 py-1.5"
                   >
-                    <span className="min-w-0 flex-1">
+                    <span className="min-w-40 flex-1">
                       <span className="block truncate text-sm font-medium text-ink">
                         {dish.name}
                       </span>
