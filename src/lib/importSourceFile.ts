@@ -31,6 +31,23 @@ const CONTACT_ALIASES: Record<string, string> = {
   company: "CompanyName",
 };
 
+/**
+ * Events only: TPP's event list report prints the event number as "Invoice
+ * No" (TPP's invoice number is the event number), has no event name, and
+ * names the client instead of giving its id.
+ */
+const EVENT_ALIASES: Record<string, string> = {
+  invoiceno: "EventID",
+  invoicenumber: "EventID",
+  eventtitle: "EventName",
+  guestcount: "ExpectedCount",
+  eventtotal: "TotalRevenue",
+  contactcompanyname: "ClientCompanyName",
+  contactfirstname: "ClientFirstName",
+  contactlastname: "ClientLastName",
+  occasion: "Occasion",
+};
+
 const key = (heading: string) =>
   heading.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -46,6 +63,7 @@ function fieldFor(datasetType: string): (heading: string) => string | null {
   const aliases = {
     ...ALIASES,
     ...(datasetType === "contacts" ? CONTACT_ALIASES : {}),
+    ...(datasetType === "events" ? EVENT_ALIASES : {}),
   };
   return (heading) => {
     const plain = key(heading);

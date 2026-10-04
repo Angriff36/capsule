@@ -5,7 +5,7 @@ import {
   useEventRecordPastCompletion,
 } from "../../lib/manifest-convex-react";
 import {
-  OLD_SYSTEM_CANCEL_REASON,
+  oldSystemCancelReason,
   oldSystemFinishedStage,
 } from "../../../convex/lib/oldSystemEventStage";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
@@ -13,7 +13,8 @@ import { FailureBanner } from "./FailureBanner";
 
 /**
  * An event read in before imports copied the old status sits in Planning.
- * When the old system says it is over (Complete / Closed Out) or Cancelled,
+ * When the old system says it is over (Complete / Final / Closed Out),
+ * Cancelled or a lost quote,
  * one tap gives it that status here, with no approval work drafted.
  */
 export function OldSystemStatusAction({
@@ -41,7 +42,10 @@ export function OldSystemStatusAction({
       if (finished === "completed") {
         await recordPastCompletion({ docId: eventId });
       } else {
-        await cancel({ docId: eventId, reason: OLD_SYSTEM_CANCEL_REASON });
+        await cancel({
+          docId: eventId,
+          reason: oldSystemCancelReason(oldStatus),
+        });
       }
     } catch (error) {
       setFailure(classifyCommandFailure(error));

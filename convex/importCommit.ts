@@ -108,6 +108,7 @@ import {
   parseTppPackLists,
   parseTppPayments,
   parseTppVenues,
+  type ImportedClientName,
   type ParsedCapsuleEvent,
   type ParsedCapsuleLead,
   type ParsedCapsuleMenu,
@@ -131,6 +132,11 @@ import {
   type LookAlikeVenue,
 } from "./lib/importIdentity";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
+import {
+  matchClientByName,
+  type ClientName,
+  type ClientNameMatch,
+} from "./importClientByName";
 import { commitStockRows } from "./openingStock";
 import { commitHistoryRows } from "./importHistory";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
@@ -322,6 +328,34 @@ export const countRunLinks = internalQuery({
  * e.g. events → contact name) AND the input row exactly as received, under
  * its own `sourceRow` key, so raw source stays apart from the interpretation.
  */
+async function loadClientNames(
+  ctx: ActionCtx,
+  tenantId: string,
+): Promise<ClientName[]> {
+  const names: ClientName[] = [];
+  let cursor: string | null = null;
+  for (;;) {
+    const page: {
+      names: ClientName[];
+      isDone: boolean;
+      continueCursor: string;
+    } = await ctx.runQuery(internal.importClientByName.clientNamesPage, {
+      tenantId,
+      cursor,
+    });
+    names.push(...page.names);
+    if (page.isDone) return names;
+    cursor = page.continueCursor;
+  }
+}
+
+/** "Rebecca Griffith (Spokane Inc)" — a client named on an event list row. */
+function clientNameText(name: ImportedClientName | undefined): string {
+  const person = [name?.givenName, name?.familyName].filter(Boolean).join(" ");
+  if (person && name?.companyName) return `${person} (${name.companyName})`;
+  return person || name?.companyName || "Imported Contact";
+}
+
 function withSourceRow(normalized: object, sourceRow: unknown): string {
   return JSON.stringify({ ...normalized, sourceRow: sourceRow ?? null });
 }
@@ -1083,6 +1117,8 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
       const delta: DeltaTally = { updated: 0, conflicted: 0 };
+      // Read once per batch, only when a row names its client by name.
+      let clientNames: ClientName[] | null = null;
 
       for (const [index, event] of (
         parsed.records as ParsedCapsuleEvent[]
@@ -1143,20 +1179,50 @@ export const commitImportRun = action({
         // pending_conflict link rather than fabricating a client — the
         // documented next slice (company→Client).
         // A ClientID may name a person contact or a company row (AC-275).
-        const clientLink =
-          (await ctx.runQuery(internal.importCommit.findLink, {
+        // TPP's event list report has no ClientID, only the client's name.
+        let byName: ClientNameMatch | null = null;
+        if (!event.clientId && event.clientName) {
+          clientNames ??= await loadClientNames(ctx, tenantId);
+          byName = matchClientByName(clientNames, event.clientName);
+        }
+        const clientLink = byName
+          ? null
+          : ((await ctx.runQuery(internal.importCommit.findLink, {
+              tenantId,
+              sourceSystem,
+              recordType: "contact",
+              externalId: event.clientId,
+            })) ??
+            (await ctx.runQuery(internal.importCommit.findLink, {
+              tenantId,
+              sourceSystem,
+              recordType: COMPANY_RECORD_TYPE,
+              externalId: event.clientId,
+            })));
+        if (byName && byName.status !== "found") {
+          const who = clientNameText(event.clientName);
+          await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
-            recordType: "contact",
-            externalId: event.clientId,
-          })) ??
-          (await ctx.runQuery(internal.importCommit.findLink, {
-            tenantId,
-            sourceSystem,
-            recordType: COMPANY_RECORD_TYPE,
-            externalId: event.clientId,
-          }));
-        if (!clientLink || !clientLink.capsuleId) {
+            recordType: "event",
+            externalId: event.externalId,
+            capsuleEntity: "event_record",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            conflictStatus: "pending_conflict",
+            resolutionNote:
+              byName.status === "several"
+                ? `${byName.count} clients are named ${who}; merge them or read the file again after one is renamed.`
+                : `No client named ${who}; import the contact list first, then read this file again.`,
+          });
+          pending += 1;
+          continue;
+        }
+        if (!byName && (!clientLink || !clientLink.capsuleId)) {
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -1179,7 +1245,13 @@ export const commitImportRun = action({
         // client it was merged into.
         const clientId: string = await ctx.runQuery(
           internal.importCommit.survivingClientId,
-          { tenantId, clientId: clientLink.capsuleId },
+          {
+            tenantId,
+            clientId:
+              byName?.status === "found"
+                ? byName.clientId
+                : (clientLink?.capsuleId ?? ""),
+          },
         );
 
         // Venue is optional on Event; resolve if the TPP VenueID was imported.
@@ -1205,9 +1277,11 @@ export const commitImportRun = action({
         // Headcount is guarded >= 1; dates require endsAt > startsAt (default a
         // 1h window when EndTime is absent).
         const eventType = event.occasionId || "Imported Event";
-        let primaryContactName = "Imported Contact";
+        let primaryContactName = event.clientName
+          ? clientNameText(event.clientName)
+          : "Imported Contact";
         try {
-          const contact = JSON.parse(clientLink.rawSourceData || "{}") as {
+          const contact = JSON.parse(clientLink?.rawSourceData || "{}") as {
             givenName?: string;
             familyName?: string;
             company?: { name?: string };

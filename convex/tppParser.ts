@@ -55,6 +55,15 @@ export interface TppEventRecord {
   CreatedDate?: string;
   ModifiedDate?: string;
   /**
+   * TPP's event list report prints the client by name, with no ClientID
+   * ("Contact Company Name", "Contact First Name", "Contact Last Name"), and
+   * the occasion; src/lib/importSourceFile.ts reads those headings into these.
+   */
+  ClientCompanyName?: string;
+  ClientFirstName?: string;
+  ClientLastName?: string;
+  Occasion?: string;
+  /**
    * PL-IMPORT-RESUME (AC-024): files that belong to the event (contract, BEO,
    * floor plan). The bytes are uploaded first; the row carries the stored id.
    */
@@ -195,6 +204,12 @@ export interface TppMenuRecord {
 /**
  * Parsed Capsule entity format
  */
+export interface ImportedClientName {
+  companyName?: string;
+  givenName?: string;
+  familyName?: string;
+}
+
 export interface ParsedCapsuleEvent {
   externalId: string;
   title: string;
@@ -209,6 +224,8 @@ export interface ParsedCapsuleEvent {
   venueName?: string;
   venueAddress?: string;
   clientId: string;
+  /** Set when the row names its client only by name (no ClientID). */
+  clientName?: ImportedClientName;
   primaryContactId?: string;
   assignedToId?: string;
   quotedRevenue?: number;
@@ -587,10 +604,19 @@ export function mapTppAllergens(value?: string): string[] {
 export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
   const startsAt = parseTppDateTime(record.EventDate, record.StartTime);
   const endsAt = parseTppDateTime(record.EventDate, record.EndTime);
+  const clientName = importedClientName(record);
+  const named = clientName
+    ? clientName.companyName ||
+      [clientName.givenName, clientName.familyName].filter(Boolean).join(" ")
+    : "";
 
   return {
     externalId: record.EventID,
-    title: record.EventName,
+    // The event list report has no event name: "<client> <occasion>".
+    title:
+      record.EventName ||
+      [named, record.Occasion || record.EventType].filter(Boolean).join(" "),
+    ...(clientName && !record.ClientID ? { clientName } : {}),
     occasionId: record.EventType
       ? record.EventType.toLowerCase().replace(/\s+/g, "_")
       : undefined,
@@ -629,6 +655,17 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
       ? { files: parseTppEventFiles(record.Files) }
       : {}),
   };
+}
+
+function importedClientName(
+  record: TppEventRecord,
+): ImportedClientName | undefined {
+  const companyName = record.ClientCompanyName?.trim() || undefined;
+  const givenName = record.ClientFirstName?.trim() || undefined;
+  const familyName = record.ClientLastName?.trim() || undefined;
+  return companyName || givenName || familyName
+    ? { companyName, givenName, familyName }
+    : undefined;
 }
 
 /** Event files (contracts, BEOs) whose bytes were uploaded before the import. */
@@ -1109,11 +1146,11 @@ export function parseTppEvents(
         });
         return;
       }
-      if (!parsed.clientId) {
+      if (!parsed.clientId && !parsed.clientName) {
         errors.push({
           recordIndex: index,
           field: "ClientID",
-          message: "ClientID is required",
+          message: "ClientID or the client's name is required",
         });
         return;
       }

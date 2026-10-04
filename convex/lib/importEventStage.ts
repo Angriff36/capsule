@@ -6,7 +6,7 @@ import type { ActionCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import {
-  OLD_SYSTEM_CANCEL_REASON,
+  oldSystemCancelReason,
   oldSystemFinishedStage,
 } from "./oldSystemEventStage";
 
@@ -39,7 +39,7 @@ export async function applyImportedEventStage(
     if (stage === "cancelled") {
       await ctx.runMutation(api.mutations.Event_cancel, {
         docId,
-        reason: OLD_SYSTEM_CANCEL_REASON,
+        reason: oldSystemCancelReason(args.rawStatus),
         idempotencyKey,
       });
     } else {

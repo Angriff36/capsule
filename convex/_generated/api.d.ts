@@ -62,6 +62,7 @@ import type * as googleCalendarHealth from "../googleCalendarHealth.js";
 import type * as hiringPipeline from "../hiringPipeline.js";
 import type * as http from "../http.js";
 import type * as importCancel from "../importCancel.js";
+import type * as importClientByName from "../importClientByName.js";
 import type * as importCommit from "../importCommit.js";
 import type * as importCoordinator from "../importCoordinator.js";
 import type * as importHistory from "../importHistory.js";
@@ -380,6 +381,7 @@ declare const fullApi: ApiFromModules<{
   hiringPipeline: typeof hiringPipeline;
   http: typeof http;
   importCancel: typeof importCancel;
+  importClientByName: typeof importClientByName;
   importCommit: typeof importCommit;
   importCoordinator: typeof importCoordinator;
   importHistory: typeof importHistory;
