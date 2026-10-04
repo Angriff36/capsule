@@ -8,8 +8,8 @@ import {
   useDishPurge,
   useDishReinstate,
   useGetDish,
-  useListDish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { useEventsById } from "../facilities/useEventsById";
 import { useMenuLinesForDish } from "../facilities/useMenuLinesFor";
 import { useTrackRecent } from "../../lib/recents";
@@ -43,7 +43,7 @@ export function DishDetailPage() {
   const { id } = useParams();
   const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
-  const allDishes = useListDish();
+  const allDishes = useWholeDishList();
   const eventDishes = useMenuLinesForDish(dish?._id);
   const events = useEventsById(
     dish === undefined || eventDishes === undefined

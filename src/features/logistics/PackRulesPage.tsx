@@ -2,13 +2,13 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePackRule,
-  useListDish,
   useListPackRule,
   useListServiceStyle,
   usePackRuleReinstate,
   usePackRuleRetire,
   usePackRuleRevise,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
@@ -33,7 +33,7 @@ import {
  */
 export function PackRulesPage() {
   const rules = useListPackRule() as PackRuleRow[] | undefined;
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   const styles = useListServiceStyle();
   const define = useCreatePackRule();
   const revise = usePackRuleRevise();

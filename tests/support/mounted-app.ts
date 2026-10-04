@@ -256,18 +256,23 @@ vi.mock("convex/react", async (importOriginal) => {
       }
       return backend.values.get(name);
     },
-    // All-time event pages (eventLookup:reportPage) answer in one page from
-    // the generated list's rows, unless the test sets its own.
+    // All-time event pages (eventLookup:reportPage) and dish pages
+    // (dishLookup:page) answer in one page from the generated list's rows,
+    // unless the test sets its own.
     usePaginatedQuery: (
       reference: Parameters<typeof getFunctionName>[0],
       args?: unknown,
     ) => {
       const name = getFunctionName(reference);
       backend.reads(name, args);
+      if (args === "skip")
+        return { results: [], status: "LoadingFirstPage", loadMore: () => {} };
       const rows =
         name === "eventLookup:reportPage" && !backend.values.has(name)
           ? backend.values.get("useListEvent")
-          : backend.values.get(name);
+          : name === "dishLookup:page" && !backend.values.has(name)
+            ? backend.values.get("useListDish")
+            : backend.values.get(name);
       return rows === undefined
         ? { results: [], status: "LoadingFirstPage", loadMore: () => {} }
         : { results: rows, status: "Exhausted", loadMore: () => {} };

@@ -22,7 +22,6 @@ import {
   useDishReinstate,
   useIngredientPurge,
   useIngredientReinstate,
-  useListDish,
   useListIngredient,
   useListMenu,
   useListComponent,
@@ -32,6 +31,7 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useSuccessToast } from "../../ui/useSuccessToast";
@@ -104,7 +104,7 @@ function ComponentCatalogPage() {
 }
 
 function DishCatalogPage() {
-  const data = useListDish();
+  const data = useWholeDishList();
   return (
     <KitchenCatalogPageContent
       section="dishes"

@@ -92,5 +92,25 @@ describe("runtime proof: dishes by id stay in the company (AC-172)", () => {
       await driver.query(api.dishLookup.byIds, { ids: [ids.salmon] }),
     ).toBeNull();
     expect(await driver.query(api.queries.listDish, {})).toEqual([]);
+
+    // Dish pages walked to the end give the generated list's rows, in its
+    // order, and nothing to other companies or roles it hides.
+    const walk = async (who: typeof owner) => {
+      const names: string[] = [];
+      let cursor: string | null = null;
+      for (;;) {
+        const result = (await who.query(api.dishLookup.page, {
+          paginationOpts: { numItems: 2, cursor },
+        })) as { page: Row[]; isDone: boolean; continueCursor: string };
+        names.push(...result.page.map((r) => r.name));
+        if (result.isDone) return names;
+        cursor = result.continueCursor;
+      }
+    };
+    const listed = (await owner.query(api.queries.listDish, {})) as Row[];
+    expect(await walk(owner)).toEqual(listed.map((r) => r.name));
+    expect(await walk(owner)).toEqual(["Salmon", "Old soup", "Not asked for"]);
+    expect(await walk(outsider)).toEqual(["Their dish"]);
+    expect(await walk(driver)).toEqual([]);
   });
 });

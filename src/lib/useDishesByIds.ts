@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { useQuery } from "convex/react";
+import { useEffect, useMemo } from "react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import type { DishRow } from "../../convex/dishLookup";
 import { api } from "./api";
 
@@ -32,11 +32,26 @@ export function useDishesByIds(
   return rows ?? [];
 }
 
+const DISH_PAGE = 500;
+
 /**
- * The company's whole dish list, read only while `enabled` (for example
- * while an "add a dish" picker is open), so a screen does not hold a
- * subscription to every dish the rest of the time.
+ * The company's whole dish list (same rows and order as the generated list),
+ * read 500 at a time (convex/dishLookup.ts `page`), so a dish change re-reads
+ * one page, not every dish (PL-SCALE). `undefined` until the last page has
+ * arrived, so counts and duplicate warnings never see a part-list. Read only
+ * while `enabled` (for example while an "add a dish" picker is open).
  */
-export function useWholeDishList(enabled: boolean) {
-  return useQuery(api.queries.listDish, enabled ? {} : "skip");
+export function useWholeDishList(enabled = true): DishRow[] | undefined {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.dishLookup.page,
+    enabled ? {} : "skip",
+    { initialNumItems: DISH_PAGE },
+  );
+  useEffect(() => {
+    if (status === "CanLoadMore") loadMore(DISH_PAGE);
+  }, [status, loadMore]);
+  return useMemo(
+    () => (enabled && status === "Exhausted" ? results : undefined),
+    [enabled, results, status],
+  );
 }

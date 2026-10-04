@@ -42,6 +42,11 @@ vi.mock("../src/lib/manifest-convex-react", () => {
 
 vi.mock("convex/react", () => ({
   useQuery: () => harness.convexQuery,
+  usePaginatedQuery: () => ({
+    results: [],
+    status: "Exhausted",
+    loadMore: () => {},
+  }),
   useMutation: () => async () => undefined,
   useAction: () => async () => undefined,
   useConvex: () => ({}),

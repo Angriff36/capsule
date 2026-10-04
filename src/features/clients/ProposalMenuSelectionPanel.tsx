@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {
   useCreateProposalDishSelection,
-  useListDish,
   useListMenu,
   useListMenuDish,
   useListProposalDishSelection,
   useProposalDishSelectionAdjustServings,
   useProposalDishSelectionRemove,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
 
 interface ProposalMenuSelectionPanelProps {
@@ -32,7 +32,7 @@ export function ProposalMenuSelectionPanel({
 }: ProposalMenuSelectionPanelProps) {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   const selections = useListProposalDishSelection();
   const createSelection = useCreateProposalDishSelection();
   const adjustServings = useProposalDishSelectionAdjustServings();

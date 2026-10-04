@@ -10,7 +10,6 @@ import {
   useListProposalEnhancement,
   useListProposalDishSelection,
   useListProposalRevision,
-  useListDish,
   useProposalAccept,
   useProposalDecline,
   useProposalExpire,
@@ -20,6 +19,7 @@ import {
   useShareLinkCreate,
   useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -134,7 +134,7 @@ export function ProposalsPage() {
   const proposalEnhancements = useListProposalEnhancement();
   const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.

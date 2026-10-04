@@ -353,7 +353,6 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `queries.getEvent` - live read
 - `queries.listClient` - live read
-- `queries.listDish` - live read
 - `queries.listEvent` - live read
 - `queries.listEventTimelineActivity` - live read
 - `queries.listMenu` - live read
@@ -509,6 +508,8 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 ### Authored reads and steps
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -555,7 +556,6 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listClientContact` - live read
 - `queries.listCorrectiveAction` - live read
 - `queries.listDelivery` - live read
-- `queries.listDish` - live read
 - `queries.listEquipment` - live read
 - `queries.listEquipmentIssue` - live read
 - `queries.listEquipmentPart` - live read
@@ -1215,6 +1215,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
 - `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
@@ -2232,6 +2233,7 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -2466,7 +2468,6 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listAvailabilityWindow` - live read
 - `queries.listCandidate` - live read
 - `queries.listDelivery` - live read
-- `queries.listDish` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
@@ -3136,6 +3137,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `candidateHireRevocation.revokeHire` - mutation; authored step; live reads update by themselves
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -3181,7 +3183,6 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `queries.getPackList` - live read
 - `queries.listDelivery` - live read
 - `queries.listDepartureOverride` - live read
-- `queries.listDish` - live read
 - `queries.listEquipment` - live read
 - `queries.listEquipmentReservation` - live read
 - `queries.listEvent` - live read
@@ -3631,6 +3632,7 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `driverAssignment.assign` - mutation; authored step; live reads update by themselves
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
