@@ -60,7 +60,7 @@ This page does not claim Capsule is production ready. It claims only what each l
 - Verdict: PASS
 - Rows: AC-653, AC-655, AC-660, AC-664, AC-667, AC-670, AC-674, AC-426
 - Scenario: `tests/proofs/backend-golden-event.runtime.test.ts` steps 01 to 22; `tests/proofs/route-fact.runtime.test.ts` (the timeline's drive time is a stored route fact).
-- Not covered here: the proposal's picture section and payment schedule (AC-654, open).
+- The proposal's picture section is done (AC-654 picture leg, 2026-10-04: client page, proposal file, office check; golden event 02). Not covered here: the proposal's payment schedule (AC-654 stays open for it, paused under the no-money rule).
 
 ## 09 · AC-721 · TPP, Nowsta, Galley, Goodshuffle, Event Tracker, Drive/Dropbox hunting, and the hand-built office binder are no longer required for new standard operations after their individual replacement qualification passes.
 

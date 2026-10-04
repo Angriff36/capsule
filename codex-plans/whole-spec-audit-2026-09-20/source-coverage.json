@@ -9484,7 +9484,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
-      "sha": "7fcda6e3"
+      "sha": "0487dfcd"
     },
     {
       "id": "AC-392",
@@ -15154,9 +15154,9 @@
       "status": "PENDING",
       "codeState": "partial",
       "tasks": ["PL-NATIVE-JOURNEY"],
-      "gap": "The proposal has no picture section yet (dish photos exist and could be shown). The payment schedule part is deposit terms, paused under the no-money rule.",
+      "gap": "Picture section done (2026-10-04: dish pictures on the client page, the proposal file and the office check; golden event 02). Open only for the payment schedule part (deposit terms), paused under the no-money rule.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/backend-golden-event.runtime.test.ts — golden event 02: From the inquiry/Event facts, generate a branded Proposal containing the selected menu, rental/"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/backend-golden-event.runtime.test.ts — golden event 02: From the inquiry/Event facts, generate a branded Proposal containing the selected menu, rental/ 2026-10-04 picture leg PASS: convex/lib/proposalPictures.ts picks the priced dishes' pictures, send freezes them in the revision, the client link page, the proposal file (download + email) and the office draft check \"Dish pictures\" show them; proof tests/proofs/backend-golden-event.runtime.test.ts golden event 02, tests/proposal-pdf-projection.test.ts, tests/proposal-public-renderers.test.ts; browser check at 360 + 1280. Still open: payment schedule part (deposit terms), paused under the no-money rule."
       ],
       "waitsOn": null,
       "owners": [
@@ -15165,7 +15165,7 @@
         "qualification scripts and docs"
       ],
       "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "sha": "0487dfcd"
     },
     {
       "id": "AC-655",
@@ -16499,6 +16499,7 @@
       "tasks": ["PL-COMPLETION-DOSSIER"],
       "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 08 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - dossier definition 08 rests on AC-653, 655, 660, 664, 667, 670, 674, 426 (all PASS; backend-golden-event steps 01-22, route-fact), checked by tests/backend-completion-dossier.test.ts; proposal payment schedule named as open (AC-654; its picture leg is done, 2026-10-04). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json (artifact: dossier section 08)",
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 08 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - dossier definition 08 rests on AC-653, 655, 660, 664, 667, 670, 674, 426 (all PASS; backend-golden-event steps 01-22, route-fact), checked by tests/backend-completion-dossier.test.ts; proposal picture section named as open (AC-654). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json (artifact: dossier section 08)"
       ],
       "waitsOn": null,
@@ -16509,7 +16510,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
-      "sha": "d1ca0b8f"
+      "sha": "0487dfcd"
     },
     {
       "id": "AC-721",

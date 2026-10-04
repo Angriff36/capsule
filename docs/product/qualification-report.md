@@ -124,4 +124,4 @@ Affected plan items: PL-GIT-MAINTENANCE, PL-LOOP-COMPLETION, PL-COMPLETION-DOSSI
 
 | Row | Plan item | What is missing |
 | --- | --- | --- |
-| AC-654 | PL-NATIVE-JOURNEY | The proposal has no picture section yet (dish photos exist and could be shown). The payment schedule part is deposit terms, paused under the no-money rule. |
+| AC-654 | PL-NATIVE-JOURNEY | Picture section done (2026-10-04: dish pictures on the client page, the proposal file and the office check; golden event 02). Open only for the payment schedule part (deposit terms), paused under the no-money rule. |
