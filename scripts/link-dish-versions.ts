@@ -29,6 +29,8 @@ const { values } = parseArgs({
     // Dev only: run each call through `convex run --identity <json>` as a real
     // workspace user, for local backends where the agent session cannot read dishes.
     "cli-identity": { type: "string" },
+    // Second step: set "use the main dish's recipe" on every version.
+    "recipe-sharing": { type: "boolean", default: false },
   },
 });
 const url = values.url ?? process.env.VITE_CONVEX_URL;
@@ -167,6 +169,7 @@ async function main() {
     if (page.isDone) break;
     cursor = page.continueCursor;
   }
+  if (values["recipe-sharing"]) return shareRecipes(client, dishes);
   const plan = planVersions(dishes);
   const text = JSON.stringify(plan, null, 2);
   const planHash = createHash("sha256").update(text).digest("hex");
@@ -198,6 +201,131 @@ async function main() {
     }
   }
   console.log(`Linked ${done} versions to ${plan.length} main dishes.`);
+}
+
+type Line = {
+  dishId: string;
+  deletedAt?: number | null;
+  removedAt?: number | null;
+  status?: string;
+  componentId?: string;
+  ingredientId?: string;
+  name?: string;
+};
+
+/**
+ * A version shares the main recipe when it has no recipe of its own, or when
+ * everything on it is already on the main dish (a stale copy). A version with
+ * its own different recipe keeps it (the Passed tray kit, for example).
+ */
+export function recipeSharingPlan(
+  dishes: readonly Dish[],
+  lines: readonly Line[],
+) {
+  const live = (l: Line) =>
+    l.deletedAt == null && l.removedAt == null && l.status !== "retired";
+  const keysOf = (dishId: string) =>
+    new Set(
+      lines
+        .filter((l) => l.dishId === dishId && live(l))
+        .map(
+          (l) =>
+            l.componentId ??
+            l.ingredientId ??
+            `task:${(l.name ?? "").trim().toLowerCase()}`,
+        ),
+    );
+  return dishes
+    .filter((d) => d.versionOfDishId && d.deletedAt == null)
+    .map((d) => {
+      const own = keysOf(d._id);
+      const main = keysOf(d.versionOfDishId!);
+      const shared = [...own].every((key) => main.has(key));
+      return {
+        id: d._id,
+        name: d.name,
+        mainId: d.versionOfDishId!,
+        shared,
+        ownLines: own.size,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+async function shareRecipes(client: Caller, dishes: Dish[]) {
+  const lines: Line[] = [
+    ...((await client.query("queries:listDishComponent", {})) ?? []),
+    ...((await client.query("queries:listDishIngredient", {})) ?? []),
+    ...((await client.query("queries:listDishTask", {})) ?? []),
+  ];
+  // The main dish should hold the recipe: when a version has a fuller recipe
+  // than its main, that version becomes the main and the others follow it.
+  const count = (id: string) =>
+    lines.filter(
+      (l) =>
+        l.dishId === id &&
+        l.deletedAt == null &&
+        l.removedAt == null &&
+        l.status !== "retired",
+    ).length;
+  const families = new Map<string, Dish[]>();
+  for (const d of dishes) {
+    if (d.deletedAt != null || d.mergedIntoDishId != null) continue;
+    const mainId = d.versionOfDishId ?? d._id;
+    families.set(mainId, [...(families.get(mainId) ?? []), d]);
+  }
+  for (const [mainId, members] of families) {
+    if (members.length < 2) continue;
+    const best = [...members].sort(
+      (a, b) => count(b._id) - count(a._id) || (a._id === mainId ? -1 : 1),
+    )[0]!;
+    if (best._id === mainId || count(best._id) <= count(mainId)) continue;
+    const oldMain = members.find((m) => m._id === mainId)!;
+    console.log(
+      `Main of "${oldMain.name}" moves to "${best.name}" (${count(best._id)} recipe lines vs ${count(mainId)}).`,
+    );
+    if (!values.apply) {
+      // Preview the result as if moved.
+      for (const m of members)
+        m.versionOfDishId = m._id === best._id ? null : best._id;
+      continue;
+    }
+    await client.mutation("mutations:Dish_detachVersion", {
+      docId: best._id,
+      idempotencyKey: `dish-version-promote:${best._id}`,
+    });
+    for (const m of members) {
+      if (m._id === best._id) continue;
+      await client.mutation("mutations:Dish_makeVersionOf", {
+        docId: m._id,
+        mainDishId: best._id,
+        label: m.versionLabel ?? versionLabel(m),
+        idempotencyKey: `dish-version-relink:${m._id}:${best._id}`,
+      });
+      m.versionOfDishId = best._id;
+    }
+    best.versionOfDishId = null;
+  }
+  const plan = recipeSharingPlan(dishes, lines);
+  const text = JSON.stringify(plan, null, 2);
+  const planHash = createHash("sha256").update(text).digest("hex");
+  mkdirSync(values.out!, { recursive: true });
+  writeFileSync(`${values.out}/recipe-sharing.json`, text);
+  const sharing = plan.filter((p) => p.shared).length;
+  console.log(
+    `${plan.length} versions: ${sharing} use the main recipe, ${plan.length - sharing} keep their own. Plan: ${values.out}/recipe-sharing.json sha256 ${planHash}`,
+  );
+  if (!values.apply) return;
+  if (values["expected-plan-sha256"] !== planHash)
+    throw new Error("The plan changed since the preview; preview again");
+  for (const p of plan) {
+    await client.mutation("mutations:Dish_useMainRecipe", {
+      docId: p.id,
+      shared: p.shared,
+      idempotencyKey: `dish-version-recipe:${p.id}:${p.shared}`,
+    });
+  }
+  console.log(`Set the recipe source on ${plan.length} versions.`);
 }
 
 if (import.meta.main) await main();
