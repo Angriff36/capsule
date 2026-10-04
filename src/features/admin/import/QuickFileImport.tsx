@@ -3,14 +3,14 @@
 // validate → review → commit) server-side via convex/quickImport.ts, so the
 // operator never touches the five-stage ceremony. Chunked per ~500 rows: each
 // chunk is its own run, so Revert and the reconcile queue stay per-chunk
-// precise. Menu items read the TPP menu CSV; the other kinds read any .xlsx or
-// .csv report with a heading row (src/lib/importSourceFile.ts).
+// precise. Menu items read the TPP Menu Items Export; the other kinds read any
+// .xlsx or .csv report with a heading row (src/lib/importSourceFile.ts).
 
 import { useAction } from "convex/react";
 import { useRef, useState, type ChangeEvent } from "react";
 import { api } from "../../../lib/api";
 import { sourceRowsFromGrid } from "../../../lib/importSourceFile";
-import { tppMenuCsvToRows } from "../../../lib/tppMenuCsv";
+import { tppMenuTableToRows } from "../../../lib/tppMenuCsv";
 import { importRunDetailPath } from "./importRoutes";
 import { sourceFileGrid } from "./sourceFileGrid";
 import { Link } from "react-router-dom";
@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 const CHUNK_SIZE = 500;
 
 const KINDS = [
-  { value: "menus", label: "Menu items (TPP menu export, .csv)" },
+  { value: "menus", label: "Menu items (TPP Menu Items Export)" },
   { value: "contacts", label: "Contacts and companies (Address / Phone List)" },
   { value: "venues", label: "Venues" },
   { value: "events", label: "Events" },
@@ -66,20 +66,20 @@ export function QuickFileImport() {
     setBusy(true);
     try {
       const checksum = await fileChecksum(await file.arrayBuffer());
+      let grid: string[][];
+      try {
+        grid = await sourceFileGrid(file);
+      } catch {
+        throw new Error(
+          `${file.name} could not be read. Use the old system's export as .xlsx or .csv.`,
+        );
+      }
       let rows: unknown[];
       if (kind === "menus") {
-        const read = tppMenuCsvToRows(await file.text());
+        const read = tppMenuTableToRows(grid);
         rows = read.rows;
         setSkippedRows(read.skipped);
       } else {
-        let grid: string[][];
-        try {
-          grid = await sourceFileGrid(file);
-        } catch {
-          throw new Error(
-            `${file.name} could not be read. Use the old system's export as .xlsx or .csv.`,
-          );
-        }
         const read = sourceRowsFromGrid(grid, kind);
         if (read.rows.length === 0)
           throw new Error(
@@ -136,13 +136,13 @@ export function QuickFileImport() {
         <div>
           <h2>Import a file from the old system</h2>
           <p className="text-xs text-ink-2">
-            Pick what the file holds, then the file. Menu items read the TPP
-            menu export (or any CSV with a Name column). The other kinds read
-            the old system&apos;s report as .xlsx or .csv: its headings (First
-            Name, Zip, Venue Name…) are matched for you, and columns Capsule has
-            no place for are kept with each row. Records are made right away —
-            no extra steps. Importing the same file again is safe; records
-            already brought in are skipped.
+            Pick what the file holds, then the file, as .xlsx or .csv. Menu
+            items read the TPP Menu Items Export (or any sheet with a Name
+            column). The other kinds read the old system&apos;s report: its
+            headings (First Name, Zip, Venue Name…) are matched for you, and
+            columns Capsule has no place for are kept with each row. Records are
+            made right away — no extra steps. Importing the same file again is
+            safe; records already brought in are skipped.
           </p>
         </div>
       </div>
@@ -168,11 +168,7 @@ export function QuickFileImport() {
         <input
           ref={fileInput}
           type="file"
-          accept={
-            kind === "menus"
-              ? ".csv,text/csv"
-              : ".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          }
+          accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={handleFile}
           disabled={busy}
           className="max-w-full text-xs"

@@ -9,7 +9,11 @@ import {
   datasetReadsFile,
   sourceRowsFromGrid,
 } from "../src/lib/importSourceFile";
-import { parseCsv } from "../src/lib/tppMenuCsv";
+import {
+  parseCsv,
+  tppMenuCsvToRows,
+  tppMenuTableToRows,
+} from "../src/lib/tppMenuCsv";
 
 const grid = parseCsv(
   readFileSync(
@@ -67,6 +71,45 @@ describe("old system report file -> import rows", () => {
         "contacts",
       ).rows,
     ).toEqual([]);
+  });
+
+  it("reads the TPP Menu Items Export sheet the same as its CSV", () => {
+    // Headings and a row as in work/finishatkitchen.xlsx (TPP export).
+    const sheet = [
+      [
+        "Name",
+        "Description",
+        "Category",
+        "Portion Size",
+        "Portion Unit",
+        "Portion Price",
+        "Tags",
+        "Stations",
+        "Item Status",
+      ],
+      [
+        "5 Layer Lasagna",
+        "Lasagna with meat ragu",
+        " Finish at Kitchen",
+        "1",
+        "Serving",
+        "12",
+        "",
+        "Finish Kitchen",
+        "Active",
+      ],
+    ];
+    const fromSheet = tppMenuTableToRows(sheet);
+    const fromCsv = tppMenuCsvToRows(
+      sheet.map((cells) => cells.join(",")).join("\n"),
+    );
+    expect(fromSheet).toEqual(fromCsv);
+    expect(fromSheet.rows[0]).toMatchObject({
+      menu_item_id: "5_layer_lasagna",
+      category: "Finish at Kitchen",
+      portion_size_description: "1 Serving",
+      price_per_person: 12,
+    });
   });
 
   it("reads files only for the datasets with a documented field map", () => {
