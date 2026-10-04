@@ -63,6 +63,25 @@ const items: AutomaticExplanation[] = [
       action: "Rent 2 more or swap the style.",
     },
   },
+  {
+    kind: "staffing_need",
+    id: "k1spot",
+    version: 1,
+    label: "Bartender",
+    value: "no time set",
+    status: "open",
+    origin: "manual",
+    sources: [],
+    ruleVersion: null,
+    why: "A person posted this crew spot by hand.",
+    stale: false,
+    staleReason: null,
+    lastReconciledAt: null,
+    blocking: {
+      reason: "Nobody has this spot yet.",
+      action: "EventStaffNeed.fill",
+    },
+  },
 ];
 
 vi.mock("../../../src/lib/useEventAutomaticExplanations", () => ({
@@ -95,7 +114,7 @@ describe("event 'Why is this here?' card", () => {
     for (const details of host.querySelectorAll("details")) details.open = true;
     const text = host.textContent ?? "";
     expect(text).toContain("Why is this here?");
-    expect(text).toContain("2 need a look");
+    expect(text).toContain("3 need a look");
     expect(text).toContain("Proposal lines");
     expect(text).toContain("Made from the chicken dish on the event menu");
     expect(text).toContain("Changed by a person");
@@ -112,6 +131,11 @@ describe("event 'Why is this here?' card", () => {
       "Capsule did not keep what this came from; not made from a saved rule.",
     );
     expect(text).not.toMatch(/k1[a-z]+|eventDishes/);
+    // A command name never reaches the screen; its next step does.
+    expect(text).toContain(
+      "Nobody has this spot yet. Next: put a person in this spot.",
+    );
+    expect(text).not.toContain("EventStaffNeed.fill");
     if (existsSync(".artifacts/llm-review")) {
       writeFileSync(
         ".artifacts/llm-review/AC-642-rendered.html",

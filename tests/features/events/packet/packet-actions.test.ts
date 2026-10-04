@@ -128,9 +128,9 @@ describe("event packet actions", () => {
         html.indexOf(`data-question="${key}"`),
         html.indexOf("</li>", html.indexOf(`data-question="${key}"`)),
       );
-    expect(row("identity.venue")).toContain(
-      "Why: Lakeside Lawn, 1 Shore Road.",
-    );
+    // The answer shows once; a "Why" that only repeats it is left out.
+    expect(row("identity.venue")).toContain("Lakeside Lawn, 1 Shore Road.");
+    expect(row("identity.venue")).not.toContain("Why: Lakeside Lawn");
     expect(row("identity.venue")).toContain("Decide this for this event");
     expect(row("identity.venue")).toContain("Why this event is different");
     expect(row("field.arrival")).toContain("Lena Crew is down to do it");

@@ -221,9 +221,12 @@ function QuestionRow({
         </span>
       </div>
       <p className="mt-1 text-ink">{lineText(answer)}</p>
-      {!answer.override && answer.result !== "unresolved" && (
-        <p className="mt-1 text-ink-3">Why: {answer.explanation}</p>
-      )}
+      {/* A "Why" that only repeats the answer adds nothing to read. */}
+      {!answer.override &&
+        answer.result !== "unresolved" &&
+        answer.explanation.trim() !== lineText(answer).trim() && (
+          <p className="mt-1 text-ink-3">Why: {answer.explanation}</p>
+        )}
       {answer.missing.length > 0 && (
         <ul className="mt-1 list-disc pl-5 text-ink-2">
           {answer.missing.map((fact) => (
@@ -258,6 +261,13 @@ function QuestionRow({
           {answer.sources.map((source, index) => {
             const to = sourceLink(eventId, source);
             const label = sourceLabel(source);
+            // Two fields of the same record read as one source.
+            const seen = answer.sources.findIndex(
+              (other) =>
+                sourceLabel(other) === label &&
+                sourceLink(eventId, other) === to,
+            );
+            if (seen !== index) return null;
             return to ? (
               <Link key={index} className="btn-link" to={to}>
                 {label}

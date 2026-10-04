@@ -81,6 +81,27 @@ function WhyGroup({ group }: { readonly group: AutomaticWhyGroup }) {
   );
 }
 
+/** The decision a person must make, in words; the command name stays off screen. */
+const NEXT_STEP: Record<string, string> = {
+  "PrepTask.unblock": "Next: clear what is holding up the task.",
+  "PrepTask.resolveChoice":
+    "Next: pick one of the recipe's choices for this event.",
+  "PrepTask.revise": "Next: fix the task so a cook can follow it.",
+  "EventTimelineActivity.useCalculatedTiming":
+    "Next: use the worked-out time, or set the time by hand.",
+  "Ingredient.updateDetails": "Next: set the ingredient's unit.",
+  "EventStaffNeed.planTiming": "Next: set when this spot starts and ends.",
+  "EventStaffNeed.fill": "Next: put a person in this spot.",
+  "PackListItem.recordSentInstead":
+    "Next: record what was sent in its place, or mark it missing.",
+  "PackListItem.exclude":
+    "Next: take it off the pack list if it is not needed.",
+};
+
+/** A plain-words action shows as it is; a command name shows its next step. */
+const nextStep = (action: string) =>
+  /^[A-Z]\w*\.[a-z]\w*$/.test(action) ? (NEXT_STEP[action] ?? "") : action;
+
 function WhyItem({ item }: { readonly item: AutomaticExplanation }) {
   return (
     <li>
@@ -103,14 +124,16 @@ function WhyItem({ item }: { readonly item: AutomaticExplanation }) {
               {ORIGIN_LABEL[item.origin]}
             </span>
             {item.status ? (
-              <span className="ml-2">Status: {item.status}</span>
+              <span className="ml-2">
+                Status: {item.status.replace(/_/g, " ")}
+              </span>
             ) : null}
           </p>
           {item.stale && item.staleReason ? <p>{item.staleReason}</p> : null}
           {item.blocking ? (
             <p>
               <span className="font-semibold text-ink">Held up:</span>{" "}
-              {item.blocking.reason} {item.blocking.action}
+              {item.blocking.reason} {nextStep(item.blocking.action)}
             </p>
           ) : null}
           <p>{sourceLine(item)}</p>
