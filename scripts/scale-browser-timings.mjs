@@ -171,7 +171,13 @@ let vite;
 function stop() {
   kill(vite);
   kill(dev);
-  if (!hadEnvFile && existsSync(envFile)) rmSync(envFile);
+  // The throwaway backend's own settings file breaks later pushes to the
+  // shared dev backend, so it goes even when an earlier run left it.
+  if (
+    existsSync(envFile) &&
+    (!hadEnvFile || readFileSync(envFile, "utf8").includes("anonymous-agent"))
+  )
+    rmSync(envFile);
 }
 
 let failed = false;
