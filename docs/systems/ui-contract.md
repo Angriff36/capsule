@@ -525,6 +525,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
 - `lib.proposalGenerate.generateProposalDraft` - mutation; authored step; live reads update by themselves
 - `lib.proposalHistoricalAcceptance.recordImportedAcceptance` - mutation; authored step; live reads update by themselves
+- `lib.proposalPictures.forProposal` - query; live read, updates by itself
 - `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `lib.proposalPricing.listRentalItems` - query; live read, updates by itself
 - `lib.proposalPricing.removeProposalLineAndRecompute` - mutation; authored step; live reads update by themselves

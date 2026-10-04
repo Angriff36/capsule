@@ -20,6 +20,7 @@ import {
 } from "../../src/lib/proposalGeneration";
 import { readEventSources, readProposalLines } from "./proposalGenerateSources";
 import { resolveTenantBrandName } from "./proposalRevision";
+import { proposalPictureRefs } from "./proposalPictures";
 
 export type ProposalDraftReport = {
   generated: boolean;
@@ -138,10 +139,15 @@ export const getProposalDraftReport = query({
     for (const line of liveLines)
       if (line.equipmentId)
         rentalSources.push({ table: "proposalLineItems", id: String(line._id) });
+    // AC-654: each dish picture the proposal shows names its dish.
+    const pictureSources: SourceRef[] = (await proposalPictureRefs(ctx, proposal)).map(
+      (ref) => ({ table: "dishes", id: ref.dishId }),
+    );
     for (const [key, sources] of [
       ["venue", venueSources],
       ["service", serviceSources],
       ["rentals", rentalSources],
+      ["pictures", pictureSources],
     ] as const)
       if (sources.length > 0)
         sections.push({ key, sources: [...sources], stale: false, staleReasons: [] });

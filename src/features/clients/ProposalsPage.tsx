@@ -20,6 +20,7 @@ import {
   useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useProposalPictureUrls } from "../../lib/useProposalPictureUrls";
 import { type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -91,6 +92,7 @@ const policy = new CrmLifecyclePolicy();
 
 export function ProposalsPage() {
   const { branding } = useTenantBranding();
+  const withPictureUrls = useProposalPictureUrls();
   const proposals = useListProposal();
   const clients = useListClient();
   // Events from two years back to two years ahead, plus undated ones: the
@@ -641,7 +643,7 @@ export function ProposalsPage() {
     }
     void run(`${row._id}:email`, async () => {
       const pdf = await proposalPdfBase64({
-        proposal: projection.proposal,
+        proposal: await withPictureUrls(projection.proposal),
         clientName: projection.clientName,
         branding,
       });
@@ -857,26 +859,31 @@ export function ProposalsPage() {
                                 dishes === undefined))
                           }
                           onClick={() => {
-                            const pdfProjection = pdfProjectionFor(row);
-                            if (!pdfProjection) return;
-                            if (pdfProjection.source) {
-                              void downloadProjectedProposalPdf({
-                                projection: pdfProjection,
-                                branding,
-                                download: downloadProposalPdf,
-                                onNotice: setNotice,
-                              }).catch((error) => setFailure(error));
-                            } else {
-                              void downloadProposalPdf({
-                                proposal: pdfProjection.proposal,
-                                clientName: pdfProjection.clientName,
-                                branding,
-                              })
-                                .then(() =>
+                            const projected = pdfProjectionFor(row);
+                            if (!projected) return;
+                            void withPictureUrls(projected.proposal)
+                              .then((proposal) => {
+                                const pdfProjection = {
+                                  ...projected,
+                                  proposal,
+                                };
+                                if (pdfProjection.source) {
+                                  return downloadProjectedProposalPdf({
+                                    projection: pdfProjection,
+                                    branding,
+                                    download: downloadProposalPdf,
+                                    onNotice: setNotice,
+                                  });
+                                }
+                                return downloadProposalPdf({
+                                  proposal: pdfProjection.proposal,
+                                  clientName: pdfProjection.clientName,
+                                  branding,
+                                }).then(() =>
                                   setNotice("Proposal PDF downloaded."),
-                                )
-                                .catch((error) => setFailure(error));
-                            }
+                                );
+                              })
+                              .catch((error) => setFailure(error));
                           }}
                         >
                           Download PDF

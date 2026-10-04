@@ -274,5 +274,63 @@ describe("published proposal PDF projection", () => {
       }),
     });
     expect(result.proposal.sectionOrder).toEqual(["terms", "menu_sections"]);
+    // Older sends froze no pictures, so their file shows none.
+    expect(result.proposal.menuPictures).toEqual([]);
+  });
+
+  // AC-654: the sent proposal's frozen dish pictures print under the menu,
+  // each named under it; a picture that could not load is left out.
+  it("prints the frozen dish pictures with their dish names", () => {
+    const result = projectProposalPdf(live, "Client", {
+      snapshot: JSON.stringify({
+        proposal: {
+          title: "Frozen title",
+          guestCount: 10,
+          subtotal: 100,
+          taxAmount: 0,
+          discountAmount: 0,
+          total: 100,
+          visibleSections: ["menu_sections"],
+        },
+        client: { name: "Frozen client" },
+        venue: null,
+        dishSelections: [{ dishName: "Roasted carrots" }],
+        lineItems: [],
+        enhancements: [],
+        timeline: [],
+        pictures: [
+          { dishId: "d1", dishName: "Roasted carrots", storageId: "s1" },
+          { dishId: "d2", dishName: "Cedar salmon", storageId: "s2" },
+        ],
+      }),
+    });
+    expect(result.proposal.menuPictures).toEqual([
+      { dishName: "Roasted carrots", storageId: "s1" },
+      { dishName: "Cedar salmon", storageId: "s2" },
+    ]);
+    // 1x1 PNG.
+    const png =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+    const doc = buildProposalPdf({
+      clientName: "Client",
+      branding: {
+        displayName: "Capsule Catering",
+        address: "",
+        primaryColor: "#243B31",
+        accentColor: "#B7791F",
+      },
+      proposal: {
+        ...result.proposal,
+        menuPictures: [
+          { dishName: "Roasted carrots", imageDataUrl: png },
+          { dishName: "Cedar salmon", imageDataUrl: null },
+        ],
+      },
+    });
+    const rendered = JSON.stringify((doc as any).internal.pages);
+    // Menu line + picture name; the salmon picture did not load.
+    expect(rendered.split("Roasted carrots")).toHaveLength(3);
+    expect(rendered).not.toContain("Cedar salmon");
+    expect(rendered).toMatch(/\/I\d+ Do/);
   });
 });
