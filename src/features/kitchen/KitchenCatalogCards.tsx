@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { Link } from "react-router-dom";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { ChevronRightIcon } from "../../ui/icons";
 import { RecordPreviewSheet } from "../../ui/RecordPreviewSheet";
@@ -46,6 +46,10 @@ export type CatalogItem = {
   canonicalIngredientId?: string | null;
   mergedIntoDishId?: string | null;
   mergedIntoIngredientId?: string | null;
+  /** Dishes: how many versions (tabs) this main dish has. */
+  versionCount?: number;
+  /** Dishes: the versions' names, so search finds the main dish. */
+  versionNames?: string;
 };
 
 type LifecycleCommands = {
@@ -295,7 +299,14 @@ export function KitchenCatalogCards({
                         role="gridcell"
                         aria-colindex={1}
                       >
-                        <strong>{item.name}</strong>
+                        <strong>
+                          {item.name}
+                          {item.versionCount ? (
+                            <span className="ml-2 text-sm font-normal text-ink-3">
+                              {formatCountNoun(item.versionCount, "version")}
+                            </span>
+                          ) : null}
+                        </strong>
                         <small>{ledgerDescription(section, item)}</small>
                       </span>
                       <span

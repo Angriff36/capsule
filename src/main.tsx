@@ -22,8 +22,17 @@ import {
 } from "./app/shell/OfflineShell";
 import { checkDeploymentConfig } from "./lib/deploymentConfigCheck";
 import { reloadKeepingDrafts } from "./ui/unsavedDrafts";
+import { api } from "../convex/_generated/api";
+import { setGoogleGeocoder } from "./features/logistics/routePlanner";
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
+const convexClient = convexUrl ? new ConvexReactClient(convexUrl) : undefined;
+// Venue maps, weather and routes ask Google for an address first.
+if (convexClient) {
+  setGoogleGeocoder((query) =>
+    convexClient.action(api.geocode.lookup, { query }),
+  );
+}
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as
   string | undefined;
 
@@ -94,10 +103,7 @@ createRoot(root).render(
           <ClerkFailed>
             <SignInUnreachable />
           </ClerkFailed>
-          <ConvexProviderWithClerk
-            client={new ConvexReactClient(convexUrl)}
-            useAuth={useAuth}
-          >
+          <ConvexProviderWithClerk client={convexClient!} useAuth={useAuth}>
             <BrowserRouter>
               <App />
             </BrowserRouter>

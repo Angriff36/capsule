@@ -330,6 +330,8 @@ export const ComponentSchema = z.object({
   storageWindowDays: z.number().int().nullable().optional(),
   storageWindowSource: z.string().nullable().optional(),
   equipmentNotes: z.string().nullable().optional(),
+  activePrepMinutes: z.number().int().nullable().optional(),
+  passiveCookMinutes: z.number().int().nullable().optional(),
   platingInstructions: z.string().nullable().optional(),
   coolingInstructions: z.string().nullable().optional(),
   holdingInstructions: z.string().nullable().optional(),
@@ -372,6 +374,21 @@ export const ComponentComponentSchema = z.object({
 });
 
 export type ComponentComponent = z.infer<typeof ComponentComponentSchema>;
+
+// Entity: ComponentEquipment
+export const ComponentEquipmentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  componentId: z.string().uuid(),
+  name: z.string().default(""),
+  sortOrder: z.number().int().optional().default(0),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ComponentEquipment = z.infer<typeof ComponentEquipmentSchema>;
 
 // Entity: ComponentImport
 export const ComponentImportSchema = z.object({
@@ -720,6 +737,11 @@ export const DishSchema = z.object({
   editionNumber: z.number().int().nullable().optional().default(1),
   mergedIntoDishId: z.string().uuid().nullable().optional(),
   kind: z.enum(["food", "supply", "service", "package"]).nullable().optional(),
+  versionOfDishId: z.string().uuid().nullable().optional(),
+  versionLabel: z.string().nullable().optional(),
+  usesMainRecipe: z.boolean().nullable().optional(),
+  finishTiming: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]).nullable().optional(),
+  recipeDishId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1310,6 +1332,7 @@ export const EventDishSchema = z.object({
   dishId: z.string().uuid(),
   dishName: z.string().nullable().optional(),
   recipeSyncDishId: z.string().uuid().nullable().optional(),
+  recipeDishId: z.string().uuid().nullable().optional(),
   quantityServings: z.number().int().default(1),
   followsEventHeadcount: z.boolean().nullable().optional(),
   headcountOverride: z.number().int().nullable().optional().default(0),
@@ -4268,6 +4291,24 @@ export const StorageLocationComputedSchema = StorageLocationSchema.extend({
 export type StorageLocation = z.infer<typeof StorageLocationSchema>;
 export type StorageLocationWithComputed = z.infer<typeof StorageLocationComputedSchema>;
 
+// Entity: StylePackaging
+export const StylePackagingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  componentId: z.string().uuid().nullable().optional(),
+  dishId: z.string().uuid().nullable().optional(),
+  serviceStyleId: z.string().uuid(),
+  instructions: z.string().default(""),
+  container: z.string().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  removedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StylePackaging = z.infer<typeof StylePackagingSchema>;
+
 // Entity: SyncError
 export const SyncErrorSchema = z.object({
   id: z.string().uuid(),
@@ -5525,6 +5566,14 @@ export const ComponentSetStorageWindowParamsSchema = z.object({
 
 export type ComponentSetStorageWindowParams = z.infer<typeof ComponentSetStorageWindowParamsSchema>;
 
+// Command: setTimes on Component
+export const ComponentSetTimesParamsSchema = z.object({
+  activePrepMinutes: z.number().int(),
+  passiveCookMinutes: z.number().int(),
+});
+
+export type ComponentSetTimesParams = z.infer<typeof ComponentSetTimesParamsSchema>;
+
 // Command: add on ComponentComponent
 export const ComponentComponentAddParamsSchema = z.object({
   componentId: z.string().min(1),
@@ -5553,6 +5602,20 @@ export const ComponentComponentRemoveParamsSchema = z.object({
 });
 
 export type ComponentComponentRemoveParams = z.infer<typeof ComponentComponentRemoveParamsSchema>;
+
+// Command: add on ComponentEquipment
+export const ComponentEquipmentAddParamsSchema = z.object({
+  componentId: z.string().min(1),
+  name: z.string(),
+  sortOrder: z.number().int().optional(),
+});
+
+export type ComponentEquipmentAddParams = z.infer<typeof ComponentEquipmentAddParamsSchema>;
+
+// Command: remove on ComponentEquipment
+export const ComponentEquipmentRemoveParamsSchema = z.object({});
+
+export type ComponentEquipmentRemoveParams = z.infer<typeof ComponentEquipmentRemoveParamsSchema>;
 
 // Command: approveReview on ComponentImport
 export const ComponentImportApproveReviewParamsSchema = z.object({});
@@ -6072,10 +6135,20 @@ export const DishClassifyKindParamsSchema = z.object({
 
 export type DishClassifyKindParams = z.infer<typeof DishClassifyKindParamsSchema>;
 
+// Command: clearFinishTiming on Dish
+export const DishClearFinishTimingParamsSchema = z.object({});
+
+export type DishClearFinishTimingParams = z.infer<typeof DishClearFinishTimingParamsSchema>;
+
 // Command: clearPrimaryImage on Dish
 export const DishClearPrimaryImageParamsSchema = z.object({});
 
 export type DishClearPrimaryImageParams = z.infer<typeof DishClearPrimaryImageParamsSchema>;
+
+// Command: detachVersion on Dish
+export const DishDetachVersionParamsSchema = z.object({});
+
+export type DishDetachVersionParams = z.infer<typeof DishDetachVersionParamsSchema>;
 
 // Command: introduce on Dish
 export const DishIntroduceParamsSchema = z.object({
@@ -6092,6 +6165,13 @@ export const DishIntroduceParamsSchema = z.object({
 
 export type DishIntroduceParams = z.infer<typeof DishIntroduceParamsSchema>;
 
+// Command: labelVersion on Dish
+export const DishLabelVersionParamsSchema = z.object({
+  label: z.string(),
+});
+
+export type DishLabelVersionParams = z.infer<typeof DishLabelVersionParamsSchema>;
+
 // Command: linkAsEdition on Dish
 export const DishLinkAsEditionParamsSchema = z.object({
   sourceDishId: z.string().uuid(),
@@ -6099,6 +6179,14 @@ export const DishLinkAsEditionParamsSchema = z.object({
 });
 
 export type DishLinkAsEditionParams = z.infer<typeof DishLinkAsEditionParamsSchema>;
+
+// Command: makeVersionOf on Dish
+export const DishMakeVersionOfParamsSchema = z.object({
+  mainDishId: z.string().uuid(),
+  label: z.string(),
+});
+
+export type DishMakeVersionOfParams = z.infer<typeof DishMakeVersionOfParamsSchema>;
 
 // Command: mergeInto on Dish
 export const DishMergeIntoParamsSchema = z.object({
@@ -6155,6 +6243,13 @@ export const DishSaveServiceInstructionsParamsSchema = z.object({
 
 export type DishSaveServiceInstructionsParams = z.infer<typeof DishSaveServiceInstructionsParamsSchema>;
 
+// Command: setFinishTiming on Dish
+export const DishSetFinishTimingParamsSchema = z.object({
+  timing: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]),
+});
+
+export type DishSetFinishTimingParams = z.infer<typeof DishSetFinishTimingParamsSchema>;
+
 // Command: setPrimaryImage on Dish
 export const DishSetPrimaryImageParamsSchema = z.object({
   storageId: z.string(),
@@ -6170,6 +6265,13 @@ export const DishUpdatePortioningParamsSchema = z.object({
 });
 
 export type DishUpdatePortioningParams = z.infer<typeof DishUpdatePortioningParamsSchema>;
+
+// Command: useMainRecipe on Dish
+export const DishUseMainRecipeParamsSchema = z.object({
+  shared: z.boolean(),
+});
+
+export type DishUseMainRecipeParams = z.infer<typeof DishUseMainRecipeParamsSchema>;
 
 // Command: attach on DishComponent
 export const DishComponentAttachParamsSchema = z.object({
@@ -7240,6 +7342,11 @@ export const EventDishConfirmFromProposalParamsSchema = z.object({
 });
 
 export type EventDishConfirmFromProposalParams = z.infer<typeof EventDishConfirmFromProposalParamsSchema>;
+
+// Command: followRecipeSource on EventDish
+export const EventDishFollowRecipeSourceParamsSchema = z.object({});
+
+export type EventDishFollowRecipeSourceParams = z.infer<typeof EventDishFollowRecipeSourceParamsSchema>;
 
 // Command: refreshRecipeSync on EventDish
 export const EventDishRefreshRecipeSyncParamsSchema = z.object({});
@@ -10326,6 +10433,13 @@ export const PrepTaskCompleteParamsSchema = z.object({
 
 export type PrepTaskCompleteParams = z.infer<typeof PrepTaskCompleteParamsSchema>;
 
+// Command: leaveOldRecipe on PrepTask
+export const PrepTaskLeaveOldRecipeParamsSchema = z.object({
+  recipeDishId: z.string().min(1),
+});
+
+export type PrepTaskLeaveOldRecipeParams = z.infer<typeof PrepTaskLeaveOldRecipeParamsSchema>;
+
 // Command: linkRecipe on PrepTask
 export const PrepTaskLinkRecipeParamsSchema = z.object({
   dishTaskId: z.string().min(1),
@@ -11953,6 +12067,30 @@ export const StorageLocationReviseDetailsParamsSchema = z.object({
 });
 
 export type StorageLocationReviseDetailsParams = z.infer<typeof StorageLocationReviseDetailsParamsSchema>;
+
+// Command: add on StylePackaging
+export const StylePackagingAddParamsSchema = z.object({
+  serviceStyleId: z.string().min(1),
+  instructions: z.string(),
+  componentId: z.string().min(1).optional(),
+  dishId: z.string().min(1).optional(),
+  container: z.string().optional(),
+});
+
+export type StylePackagingAddParams = z.infer<typeof StylePackagingAddParamsSchema>;
+
+// Command: remove on StylePackaging
+export const StylePackagingRemoveParamsSchema = z.object({});
+
+export type StylePackagingRemoveParams = z.infer<typeof StylePackagingRemoveParamsSchema>;
+
+// Command: revise on StylePackaging
+export const StylePackagingReviseParamsSchema = z.object({
+  instructions: z.string(),
+  container: z.string().optional(),
+});
+
+export type StylePackagingReviseParams = z.infer<typeof StylePackagingReviseParamsSchema>;
 
 // Command: markResolved on SyncError
 export const SyncErrorMarkResolvedParamsSchema = z.object({});

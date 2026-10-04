@@ -60,6 +60,8 @@ export function deriveDishAllergens(
   dish: AllergenSourceRecord,
   input: DishAllergenInput,
 ): DishAllergenReport {
+  // A version may cook from its main dish's recipe (recipeDishId).
+  const recipeId = String(dish.recipeDishId ?? dish._id);
   const sources = new Map<CulinaryAllergenCode, string[]>();
   const flag = (code: CulinaryAllergenCode, source: string) => {
     const list = sources.get(code) ?? [];
@@ -100,13 +102,15 @@ export function deriveDishAllergens(
   };
 
   for (const line of input.dishIngredients) {
-    if (line.deletedAt != null || line.dishId !== dish._id) continue;
+    if (line.deletedAt != null || String(line.dishId) !== recipeId) continue;
     takeLine(line);
   }
 
   const componentIds = new Set(
     input.dishComponents
-      .filter((line) => line.deletedAt == null && line.dishId === dish._id)
+      .filter(
+        (line) => line.deletedAt == null && String(line.dishId) === recipeId,
+      )
       .map((line) => String(line.componentId)),
   );
   for (const line of input.componentIngredients) {

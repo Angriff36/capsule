@@ -2676,6 +2676,60 @@
       "category": "event-payload-changed",
       "acknowledgedAt": "2026-10-04",
       "reason": "The event also carries the optional price date; older events without it read as dated when they happened."
+    },
+    {
+      "path": "Dish.versionOfDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Dish.versionLabel",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Dish.recipeDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "Dish.usesMainRecipe",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "EventDish.recipeDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "EventDishAdded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "EventDishAdded carries recipeDishId (the dish whose recipe the line cooks from); dishId unchanged."
+    },
+    {
+      "path": "Dish.finishTiming",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "When a dish is finished (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Component.activePrepMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Recipe sheet times (Ryan 2026-10-04): new optional field; existing recipes stay valid with no value."
+    },
+    {
+      "path": "Component.passiveCookMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Recipe sheet times (Ryan 2026-10-04): new optional field; existing recipes stay valid with no value."
     }
   ]
 }

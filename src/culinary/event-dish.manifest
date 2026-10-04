@@ -24,6 +24,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   property dishName: string?
   // Catalog edits follow active event work, never completed history.
   property indexed recipeSyncDishId: uuid?
+  // The dish whose recipe this line cooks from: the version itself, or its
+  // main dish when the version uses the main recipe. Null on older lines = dishId.
+  property recipeDishId: uuid?
   // One serving quantity for prep, purchasing, containers and food cost.
   property required quantityServings: int = 1
   // Remember explicit counts so a later coincidentally matching headcount
@@ -45,13 +48,14 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo recipeDish: Dish fields [tenantId, recipeDishId] references [tenantId, id]
   hasMany prepTasks: PrepTask
 
   computed targetHeadcount: int = self.quantityServings
   // Display helper: largest batch count across attached components (lemonade = one component).
   // Headcount uses self.targetHeadcount (sibling computed; Convex helpers assign in order).
-  computed requiredBatches: int = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0)
-  computed requiredYieldQuantity: decimal(10, 2) = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0) * line.yieldQuantity / line.batchMultiplier)
+  computed requiredBatches: int = self.recipeDish != null ? max_of(filter(self.recipeDish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0) : max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0)
+  computed requiredYieldQuantity: decimal(10, 2) = self.recipeDish != null ? max_of(filter(self.recipeDish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0) * line.yieldQuantity / line.batchMultiplier) : max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0) * line.yieldQuantity / line.batchMultiplier)
   // Sum of (servings / attachment yieldQuantity) × batchMultiplier × same-unit
   // ingredient batch cost per attached component (matches the demand engine and
   // menu board: cost/serving = batch cost × batchMultiplier ÷ attachment yield),
@@ -61,7 +65,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // reported $0 estimated food cost on every event.
   // Batch cost is inlined (not line.component.liveBatchCost) so Convex hydrate can load
   // component.ingredientLines → ingredient without a nested compute pass.
-  computed estimatedCost: money(12, 2) = sum(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? self.targetHeadcount / line.yieldQuantity : 0) * line.batchMultiplier * sum(filter(line.component.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0)) + self.targetHeadcount * sum(filter(self.dish.ingredientLines, (dl) => dl.deletedAt == null and dl.addedAt != null), (dl) => dl.unit == dl.ingredient.unit ? dl.quantity * (dl.wasteFactor != null ? dl.wasteFactor : 1) * dl.ingredient.costPerUnit : 0)
+  // Lines on this dish, or on its recipe dish when the version uses the main
+  // recipe (recipeDishId set). Prices and the formula are unchanged.
+  computed estimatedCost: money(12, 2) = (sum(filter(self.dish.componentLines, (line) => self.recipeDishId == null and line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? self.targetHeadcount / line.yieldQuantity : 0) * line.batchMultiplier * sum(filter(line.component.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0)) + self.targetHeadcount * sum(filter(self.dish.ingredientLines, (dl) => self.recipeDishId == null and dl.deletedAt == null and dl.addedAt != null), (dl) => dl.unit == dl.ingredient.unit ? dl.quantity * (dl.wasteFactor != null ? dl.wasteFactor : 1) * dl.ingredient.costPerUnit : 0)) + (self.recipeDish != null ? sum(filter(self.recipeDish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? self.targetHeadcount / line.yieldQuantity : 0) * line.batchMultiplier * sum(filter(line.component.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0)) + self.targetHeadcount * sum(filter(self.recipeDish.ingredientLines, (dl) => dl.deletedAt == null and dl.addedAt != null), (dl) => dl.unit == dl.ingredient.unit ? dl.quantity * (dl.wasteFactor != null ? dl.wasteFactor : 1) * dl.ingredient.costPerUnit : 0) : 0)
 
   // Zero servings = 86'd / not serving; remove() is the other path.
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "This dish's servings can't be negative. Use zero or more."
@@ -106,7 +112,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     mutate eventId = eventId
     mutate dishId = dishId
     mutate dishName = dishName
-    mutate recipeSyncDishId = dishId
+    mutate recipeSyncDishId = (self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : dishId)
+    mutate recipeDishId = (self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : dishId)
     mutate quantityServings = quantityServings
     mutate followsEventHeadcount = quantityServings == self.event.expectedHeadcount and (headcountOverride == null or headcountOverride == 0)
     mutate headcountOverride = headcountOverride != null ? headcountOverride : 0
@@ -120,6 +127,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       eventId: eventId
       dishId: dishId
+      recipeDishId: (self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : dishId)
       quantityServings: quantityServings
       headcountOverride: headcountOverride != null ? headcountOverride : 0
       purchasingWeekStart: self.event.purchasingWeekStart
@@ -128,8 +136,29 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Follows the dish's current recipe source (Ryan 2026-10-04: planned events
+  // must not keep an old, often empty, version recipe). Only lines on live
+  // events move (recipeSyncDishId is null once an event is done). No guards:
+  // this runs inside a Dish fan-out and must never roll that change back.
+  // A line that does not move emits a key that matches no recipe rows.
+  command followRecipeSource() {
+    compute live = self.addedAt != null and self.deletedAt == null and self.recipeSyncDishId != null
+    compute source = self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : self.dishId
+    mutate recipeDishId = live ? source : self.recipeDishId
+    mutate recipeSyncDishId = live ? source : self.recipeSyncDishId
+    emit EventDishRecipeFollowed {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      recipeDishId: live ? source : "no-recipe-change"
+      quantityServings: self.quantityServings
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
   command refreshRecipeSync() {
-    mutate recipeSyncDishId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.dishId : null
+    mutate recipeSyncDishId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? (self.recipeDishId != null ? self.recipeDishId : self.dishId) : null
     emit EventDishRecipeSyncRefreshed {
       eventDishId: self.id
       tenantId: self.tenantId
@@ -280,7 +309,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     mutate eventId = eventId
     mutate dishId = dishId
     mutate dishName = dishName != null ? dishName : self.dishName
-    mutate recipeSyncDishId = dishId
+    mutate recipeSyncDishId = (self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : dishId)
+    mutate recipeDishId = (self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : dishId)
     mutate quantityServings = self.addedAt != null ? self.quantityServings : quantityServings
     mutate followsEventHeadcount = wasExistingLine ? self.followsEventHeadcount : quantityServings == self.event.expectedHeadcount
     mutate purchasingWeekStart = self.event.purchasingWeekStart
@@ -293,7 +323,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       eventId: eventId
       dishId: dishId
-      seedDishId: wasExistingLine ? null : dishId
+      seedDishId: wasExistingLine ? null : (self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : dishId)
       quantityServings: self.quantityServings
       purchasingWeekStart: self.event.purchasingWeekStart
       course: self.course
@@ -375,11 +405,31 @@ event EventDishContainerPackRequested: "event_dish.container_pack_requested" {
   quantityServings: number
 }
 
+event EventDishRecipeFollowed: "event_dish.recipe_followed" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  recipeDishId: string
+  quantityServings: number
+  purchasingWeekStart: datetime?
+}
+
+on DishRecipeSourceChanged fanOut EventDish where dishId = payload.dishId
+  run followRecipeSource
+
+on DishVersionLinked fanOut EventDish where dishId = payload.dishId
+  run followRecipeSource
+
+on DishVersionUnlinked fanOut EventDish where dishId = payload.dishId
+  run followRecipeSource
+
 event EventDishAdded: "event_dish.added" {
   eventDishId: string
   tenantId: string
   eventId: string
   dishId: string
+  recipeDishId: string?
   quantityServings: number
   headcountOverride: int
   purchasingWeekStart: datetime?

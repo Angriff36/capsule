@@ -44,6 +44,9 @@ entity Component mixin TenantScoped, SoftDeletable {
   // Kitchen standards a cook reads at the station (PL-CULINARY-CATALOG,
   // AC-453). Plain words a person wrote; null = not on file, never guessed.
   property equipmentNotes: string?
+  // Recipe sheet times (Ryan 2026-10-04): hands-on minutes and unattended minutes.
+  property activePrepMinutes: int?
+  property passiveCookMinutes: int?
   property platingInstructions: string?
   property coolingInstructions: string?
   property holdingInstructions: string?
@@ -201,6 +204,17 @@ entity Component mixin TenantScoped, SoftDeletable {
     mutate reheatInstructions = reheatInstructions
     mutate substitutionNotes = substitutionNotes
     mutate videoUrl = videoUrl
+    emit ComponentKitchenStandardsSet {
+      componentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setTimes(activePrepMinutes: int, passiveCookMinutes: int) {
+    guard self.deletedAt == null
+    constraint componentTimesNonnegative: activePrepMinutes >= 0 and passiveCookMinutes >= 0 "Times can't be negative. Use zero or more."
+    mutate activePrepMinutes = activePrepMinutes
+    mutate passiveCookMinutes = passiveCookMinutes
     emit ComponentKitchenStandardsSet {
       componentId: self.id
       tenantId: self.tenantId

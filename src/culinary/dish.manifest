@@ -51,11 +51,25 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property mergedIntoDishId: uuid?
   // Revision-2: food | supply | service | package. Null reads as food.
   property kind: DishKind?
+  // Versions (Ryan 2026-10-04): the same food made another way, e.g. "Finish
+  // at Kitchen", "Finish at Event", "Drop Off". A version is a full dish with
+  // its own recipes, prep steps and portion, linked to its main dish and shown
+  // as a tab there. versionLabel names the tab (the main dish may have one too).
+  property indexed versionOfDishId: uuid?
+  property versionLabel: string?
+  // A version uses the main dish's recipe (ingredients, recipes, prep steps)
+  // unless switched off. recipeDishId is that dish; null = this dish's own.
+  property usesMainRecipe: boolean?
+  // When this dish (or version) is finished (Ryan 2026-10-04): part of the dish,
+  // separate from the event-wide service style. Null = not set.
+  property finishTiming: FinishTiming?
+  property recipeDishId: uuid?
 
   hasMany ingredientLines: DishIngredient
   hasMany componentLines: DishComponent
   hasMany prepTasks: DishTask
   belongsTo canonicalDish: Dish fields [tenantId, canonicalDishId] references [tenantId, id]
+  belongsTo versionOf: Dish fields [tenantId, versionOfDishId] references [tenantId, id]
   belongsTo mergedIntoDish: Dish fields [tenantId, mergedIntoDishId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
@@ -288,6 +302,77 @@ entity Dish mixin TenantScoped, SoftDeletable {
       sourceDishId: sourceDishId
       name: self.name
       editionNumber: editionNumber != null ? editionNumber : self.editionNumber
+    }
+  }
+
+  // Make this dish a version (tab) of a main dish. Its recipes, prep steps and
+  // portion stay its own; nothing is copied or removed.
+  command makeVersionOf(mainDishId: uuid, label: string) {
+    guard self.deletedAt == null
+    guard self.mergedIntoDishId == null
+    constraint versionNotSelf: mainDishId != self.id "A dish cannot be a version of itself."
+    constraint versionLabelGiven: length(trim(label)) > 0 "Name this version, for example Finish at Kitchen."
+    mutate versionOfDishId = mainDishId
+    mutate versionLabel = trim(label)
+    mutate recipeDishId = self.usesMainRecipe == false ? null : mainDishId
+    emit DishVersionLinked {
+      dishId: self.id
+      tenantId: self.tenantId
+      mainDishId: mainDishId
+      label: trim(label)
+    }
+  }
+
+  // Name this dish's tab ("Finish at Kitchen"); empty clears the name.
+  command labelVersion(label: string) {
+    guard self.deletedAt == null
+    mutate versionLabel = length(trim(label)) > 0 ? trim(label) : null
+    emit DishVersionLabeled {
+      dishId: self.id
+      tenantId: self.tenantId
+      label: trim(label)
+    }
+  }
+
+  // Shared: this version cooks from the main dish's recipe. Not shared: its own.
+  command useMainRecipe(shared: boolean) {
+    guard self.deletedAt == null
+    guard self.versionOfDishId != null
+    mutate usesMainRecipe = shared
+    mutate recipeDishId = shared ? self.versionOfDishId : null
+    emit DishRecipeSourceChanged {
+      dishId: self.id
+      tenantId: self.tenantId
+      usesMainRecipe: shared
+    }
+  }
+
+  command setFinishTiming(timing: FinishTiming) {
+    guard self.deletedAt == null
+    mutate finishTiming = timing
+    emit DishFinishTimingSet {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command clearFinishTiming() {
+    guard self.deletedAt == null
+    mutate finishTiming = null
+    emit DishFinishTimingSet {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Turn a version back into a dish of its own.
+  command detachVersion() {
+    guard self.versionOfDishId != null
+    mutate versionOfDishId = null
+    mutate recipeDishId = null
+    emit DishVersionUnlinked {
+      dishId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -549,6 +634,13 @@ enum TaskResolution {
 
 // What a Dish row IS. Supplies (plasticware, place settings) and packages
 // print as dish headings on the sheet but must never enter food purchasing.
+// When a dish is finished. Display names: Finish at Kitchen, Finish at Event, Day Of.
+enum FinishTiming {
+  finish_at_kitchen
+  finish_at_event
+  day_of
+}
+
 enum DishKind {
   food
   supply
@@ -764,6 +856,35 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   }
 
   store DishTask in durable
+}
+
+event DishVersionLinked: "dish.version_linked" {
+  dishId: string
+  tenantId: string
+  mainDishId: string
+  label: string
+}
+
+event DishVersionLabeled: "dish.version_labeled" {
+  dishId: string
+  tenantId: string
+  label: string
+}
+
+event DishRecipeSourceChanged: "dish.recipe_source_changed" {
+  dishId: string
+  tenantId: string
+  usesMainRecipe: boolean
+}
+
+event DishFinishTimingSet: "dish.finish_timing_set" {
+  dishId: string
+  tenantId: string
+}
+
+event DishVersionUnlinked: "dish.version_unlinked" {
+  dishId: string
+  tenantId: string
 }
 
 event DishIntroduced: "dish.introduced" {

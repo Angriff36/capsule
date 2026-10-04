@@ -2,6 +2,11 @@ import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import type { MenuRecipeRows } from "../../convex/menuRecipeLookup";
 import { api } from "./api";
+import {
+  shareRecipeLines,
+  withRecipeDishIds,
+  type RecipeLink,
+} from "../features/kitchen/dishVersions";
 
 const EMPTY: MenuRecipeRows = {
   dishIngredients: [],
@@ -42,4 +47,28 @@ export function useMenuRecipeRows(
   if (ids.length === 0) return EMPTY;
   if (rows === undefined) return undefined;
   return rows ?? EMPTY;
+}
+
+/**
+ * The recipe rows behind these dishes, as each one cooks it: a dish (or event
+ * menu line) that shares another dish's recipe shows that recipe's
+ * ingredient and recipe lines under its own id. Containers stay its own.
+ */
+export function useSharedRecipeRows(
+  links: readonly RecipeLink[] | undefined,
+): MenuRecipeRows | undefined {
+  const rows = useMenuRecipeRows(
+    links === undefined ? undefined : withRecipeDishIds(links),
+  );
+  return useMemo(
+    () =>
+      rows === undefined || links === undefined
+        ? rows
+        : {
+            ...rows,
+            dishIngredients: shareRecipeLines(rows.dishIngredients, links),
+            dishComponents: shareRecipeLines(rows.dishComponents, links),
+          },
+    [rows, links],
+  );
 }

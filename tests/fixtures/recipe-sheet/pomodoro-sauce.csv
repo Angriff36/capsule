@@ -1,0 +1,45 @@
+﻿section,key,value
+recipe_info,recipe_name,POMODORO SAUCE
+recipe_info,yield_total,10 GALLONS
+recipe_info,portion_size,SEE PREP BOARD
+recipe_info,servings,SEE PREP BOARD
+recipe_info,active_prep_time,20 MINUTES
+recipe_info,passive_cook_time,1 HOUR
+recipe_info,total_time,1 HOUR 20 MINUTES
+recipe_info,version,2026.01
+allergen,dairy,
+allergen,eggs,
+allergen,wheat_gluten,x
+allergen,soy,
+allergen,peanuts,
+allergen,tree_nuts,
+allergen,fish,
+allergen,shellfish,
+allergen,sesame,
+equipment,,TILT SKILLET
+equipment,,IMMERSION BLENDER
+equipment,,200 PANS
+equipment,,TILT SKILLET SPATULA
+equipment,,MEASURING CUPS
+ingredient,DICED ONION,5 POUNDS
+ingredient,DICED CELERY,2.5 POUNDS
+ingredient,DICED CARROT,2.5 POUNDS
+ingredient,MINCED GARLIC,2 CUPS
+ingredient,DRIED BASIL,1/2 CUP
+ingredient,DRIED OREGANO,1/2 CUP
+ingredient,DRIED THYME,1/2 CUP
+ingredient,SALT,1/4 CUP
+ingredient,DICED TOMATO (IN JUICE),6 #10 CANS
+ingredient,TOMATO PASTE (SUPER HEAVY PIZZA SAUCE),3 #10 CANS
+instruction,1,IN TILT SKILLET HEAT 1/2 CUPS OF OLIVE OIL UNTIL HOT
+instruction,2,"ADD ONIONS, CELERY AND CARROTS AND COOK UNTIL CARROTS ARE SOFT"
+instruction,3,ADD GARLIC AND SWEAT FOR ABOUT 30 SECONDS (UNTIL AROMATIC)
+instruction,4,ADD DRIED HERBS AND SPICES AND MIX THOROUGHLY
+instruction,5,ADD TOMATO PASTE TO TILT SKILLET AND LET COOK UNTIL BUBBLING
+instruction,6,PUREE DICED TOMATO CANS WITH IMMERSION BLENDER AND ADD TO TILT SKILLET
+instruction,7,FULL MIX ALL INGREDIENTS AND LOWER HEAT SO SAUCE COMES TO A SIMMER
+instruction,8,SIMMER SAUCE ON LOW FOR 1 HOUR STIRRING OCCASIONALLY
+instruction,9,REMOVE SAUCE FROM TILT SKILLET INTO 200 PANS TO COOL COMPLETELY
+packaging,drop_off,"ONCE COOLED COMPLETELY, PACKAGE IN PROPER SIZED BAIN MARIE CATER WRAP AND LABEL FOR EVENT"
+packaging,bring_hot,"ONCE COOLED COMPLETELY, PACKAGE IN PROPER SIZED BAIN MARIE CATER WRAP AND LABEL FOR EVENT"
+packaging,cook_on_site,"ONCE COOLED COMPLETELY, PACKAGE IN PROPER SIZED BAIN MARIE CATER WRAP AND LABEL FOR EVENT"

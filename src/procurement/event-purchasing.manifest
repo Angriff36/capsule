@@ -451,7 +451,7 @@ event PurchaseNeedReadyForWeeklyDraft: "purchase_need.ready_for_weekly_draft" {
   vendorId: string
 }
 
-on EventDishAdded fanOut DishComponent where dishId = payload.dishId
+on EventDishAdded fanOut DishComponent where dishId = payload.recipeDishId
   run EventDishComponentSeed.seed
   match eventDishId = payload.eventDishId, componentId = self.componentId
   else create
@@ -487,7 +487,7 @@ on EventDishConfirmedFromProposal fanOut DishComponent where dishId = payload.se
 // The dish's OWN ingredient lines contribute directly — no Component needed.
 // Their quantity is per serving, so it scales straight off headcount rather
 // than through a component's yield.
-on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
+on EventDishAdded fanOut DishIngredient where dishId = payload.recipeDishId
   run EventIngredientContribution.record
   match eventDishId = payload.eventDishId, componentId = null, ingredientId = self.ingredientId, unit = self.unit
   else create
@@ -503,6 +503,41 @@ on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
     servings: payload.quantityServings
     purchasingWeekStart: payload.purchasingWeekStart
   }
+
+// A planned event line re-pointed at its dish's recipe source (a version
+// switched to the main dish's recipe) re-seeds from it the same way.
+on EventDishRecipeFollowed fanOut DishComponent where dishId = payload.recipeDishId
+  run EventDishComponentSeed.seed
+  match eventDishId = payload.eventDishId, componentId = self.componentId
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    componentId: self.componentId
+    servings: payload.quantityServings
+    yieldQuantity: self.yieldQuantity
+    batchMultiplier: self.batchMultiplier
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
+on EventDishRecipeFollowed fanOut DishIngredient where dishId = payload.recipeDishId
+  run EventIngredientContribution.record
+  match eventDishId = payload.eventDishId, componentId = null, ingredientId = self.ingredientId, unit = self.unit
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    componentId: null
+    ingredientId: self.ingredientId
+    quantity: self.quantity * payload.quantityServings
+    quantityPerServing: self.quantity
+    unit: self.unit
+    servings: payload.quantityServings
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
 
 on EventDishComponentSeeded fanOut ComponentIngredient where componentId = payload.componentId
   run EventIngredientContribution.record
