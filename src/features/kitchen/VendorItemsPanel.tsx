@@ -203,22 +203,22 @@ export function VendorItemsPanel({
                       ]
                         .filter(Boolean)
                         .join(" · ")}
+                  {earlier.length > 0 ? (
+                    <span className="block">
+                      Earlier prices:{" "}
+                      {earlier
+                        .slice(0, EARLIER_SHOWN)
+                        .map(
+                          (point) =>
+                            `${formatMoneyExact(point.packPrice)} from ${PRICE_DATE.format(point.pricedAt)}`,
+                        )
+                        .join(" · ")}
+                      {earlier.length > EARLIER_SHOWN
+                        ? ` · and ${earlier.length - EARLIER_SHOWN} older`
+                        : ""}
+                    </span>
+                  ) : null}
                 </span>
-                {earlier.length > 0 ? (
-                  <span className="text-sm text-ink-2">
-                    Earlier prices:{" "}
-                    {earlier
-                      .slice(0, EARLIER_SHOWN)
-                      .map(
-                        (point) =>
-                          `${formatMoneyExact(point.packPrice)} from ${PRICE_DATE.format(point.pricedAt)}`,
-                      )
-                      .join(" · ")}
-                    {earlier.length > EARLIER_SHOWN
-                      ? ` · and ${earlier.length - EARLIER_SHOWN} older`
-                      : ""}
-                  </span>
-                ) : null}
                 <div className="culinary-line-actions">
                   <button
                     type="button"

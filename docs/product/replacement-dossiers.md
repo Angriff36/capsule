@@ -112,7 +112,7 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Allergen roll-up for a menu or event | `/kitchen/allergen-matrix` | `proofs/incident-allergen-corrective-action` | Built |
 | Units and conversions | ingredient page | `culinary-unit-meaning`, `proofs/incompatible-unit-review` | Built (never guesses) |
 | Pack sizes and vendor items | ingredient page, `/inventory/contracts` | `proofs/menu-profitability-direct-ingredient`, `proofs/vendor-item-record`, `proofs/vendor-item-order-price` | Built: vendor items per ingredient (item number, pack, pack price with history); weekly order lines take the vendor's pack price |
-| Prices and price history | ingredient page, `/inventory/purchasing` (price list file) | `culinary-model-cost-dated`, `proofs/receipt-exact-once`, `proofs/vendor-price-list-import` | Built: history grows from receipts and from each vendor price list read in (a new price keeps the old one) |
+| Prices and price history | ingredient page, `/inventory/purchasing` (price list file) | `culinary-model-cost-dated`, `proofs/receipt-exact-once`, `proofs/vendor-price-list-import` | Built: history grows from receipts and from each vendor price list read in (a new price keeps the old one); a Price date column brings old prices in with their dates; each vendor item on the ingredient page shows its earlier prices and dates |
 | Recipes, sub-recipes, yields, versions | `/kitchen/components/:id`, `/kitchen/dishes/:id` | `proofs/safe-culinary-operations` | Built |
 | Method, station, equipment | recipe page, `/kitchen/stations` | `proofs/prep-work-baselines`, `dish-editing-behavior` | Built: each recipe step offers the kitchen station list and saves another spelling as the station's own name; a station change moves unstarted event prep. Recipe equipment is picked from the company equipment list (other words still allowed); each listed piece shows how many the company has |
 | Photos, video, plating, holding and reheating | recipe page | `culinary/recipe-media-and-holding` | Built (one photo) |
@@ -135,8 +135,10 @@ History: recipes through the recipe import screen (`/kitchen/components/import`)
 and the TPP recipe repair scripts; ingredients are filled from the USDA
 library; opening stock through `/inventory/opening-stock`; vendors and their
 item prices through the vendor price list card on `/inventory/purchasing`
-(`proofs/vendor-price-list-import`). Older price history before that file
-still has no way in.
+(`proofs/vendor-price-list-import`). Older prices come in through the same
+card: one row per price with its Price date; the newest becomes the item's
+price and older ones go into its history, also when an older file is read
+after a newer one.
 
 ## Goodshuffle Pro (rentals and decor)
 
