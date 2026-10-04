@@ -78,3 +78,26 @@ export function valuesByUse(values: Iterable<string | null | undefined>) {
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
     .map((entry) => entry.label);
 }
+
+// Timing and serving words in old catalog categories ("Apps - Passed -
+// Finish at Event"). They have their own sections on the new dish form.
+const NOT_A_MENU_CATEGORY =
+  /^(?:finish at (?:event|kitchen)|day of|passed|drop ?off|vending|action station|buffet.*|plated|family style|individual|sel\s*\d*|ready to heat|air catering)$/i;
+
+/** Real menu categories (Apps, Entree, Pizza...) from catalog categories. */
+export function menuCategory(category: string | null | undefined) {
+  const part = (category ?? "")
+    .split(/\s+-\s+/)
+    .map((piece) => piece.trim())
+    .find((piece) => piece && !NOT_A_MENU_CATEGORY.test(piece));
+  return part || undefined;
+}
+
+/** The common diet tags, written one way ("gluten free" -> "gluten-free"). */
+export function dietTag(tag: string): string {
+  return tag
+    .trim()
+    .toLowerCase()
+    .replace(/\s*-?\s*free$/, "-free")
+    .replace(/\s+/g, " ");
+}

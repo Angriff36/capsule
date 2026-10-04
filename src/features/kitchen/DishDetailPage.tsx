@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDish,
+  useDishClearFinishTiming,
   useDishDetachVersion,
   useDishLabelVersion,
   useDishLinkAsEdition,
@@ -10,6 +11,7 @@ import {
   useDishMergeInto,
   useDishPurge,
   useDishReinstate,
+  useDishSetFinishTiming,
   useGetDish,
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
@@ -27,6 +29,7 @@ import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { CulinaryRecordPicker } from "./CulinaryRecordPicker";
 import {
+  FINISH_TIMINGS,
   VERSION_NAME_SUGGESTIONS,
   mainDishIdOf,
   mainDishRows,
@@ -73,6 +76,8 @@ export function DishDetailPage() {
   const makeVersionOf = useDishMakeVersionOf();
   const labelVersion = useDishLabelVersion();
   const detachVersion = useDishDetachVersion();
+  const setFinishTiming = useDishSetFinishTiming();
+  const clearFinishTiming = useDishClearFinishTiming();
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -154,11 +159,11 @@ export function DishDetailPage() {
       await prompt.askFields({
         title,
         description:
-          "Name the way this dish is served, for example Finish at Kitchen or Drop Off.",
+          "A version is a tab on the dish: the same food made another way. Name the tab, for example Mini, Vegan or Finish at Event.",
         fields: [
           {
             name: "label",
-            label: "Version name",
+            label: "Tab name",
             defaultValue,
             suggestions: VERSION_NAME_SUGGESTIONS,
             required: true,
@@ -336,6 +341,37 @@ export function DishDetailPage() {
             ))}
           </nav>
         ) : null}
+        <label className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-2">
+          {hasVersions ? "This tab is finished" : "Finished"}
+          <select
+            className="input w-auto"
+            value={dish.finishTiming ?? ""}
+            disabled={busy != null}
+            onChange={(event) => {
+              const timing = event.target.value;
+              void run("finishTiming", async () => {
+                if (timing)
+                  await setFinishTiming({
+                    docId: dish._id,
+                    version: dish.version,
+                    timing,
+                  });
+                else
+                  await clearFinishTiming({
+                    docId: dish._id,
+                    version: dish.version,
+                  });
+              });
+            }}
+          >
+            <option value="">Not set</option>
+            {FINISH_TIMINGS.map((entry) => (
+              <option key={entry.value} value={entry.value}>
+                {entry.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <details className="recipe-management">
           <summary>Versions</summary>
           <div className="flex flex-wrap gap-2">

@@ -11,16 +11,24 @@ export type VersionedDish = {
   mergedIntoDishId?: string | null;
 };
 
-/** Names offered when a cook adds a version; any other name is allowed. */
+/**
+ * Tab names offered when a cook adds a version. Versions are custom tabs
+ * (Ryan 2026-10-04); any name is allowed and is the norm.
+ */
 export const VERSION_NAME_SUGGESTIONS = [
   "Finish at Kitchen",
   "Finish at Event",
-  "Passed",
-  "Drop Off",
-  "Vending",
-  "Action Station",
   "Day Of",
 ];
+
+/** When a dish is finished (Dish.finishTiming), with its plain name. */
+export const FINISH_TIMINGS = [
+  { value: "finish_at_kitchen", label: "Finish at Kitchen" },
+  { value: "finish_at_event", label: "Finish at Event" },
+  { value: "day_of", label: "Day Of" },
+] as const;
+
+export type FinishTiming = (typeof FINISH_TIMINGS)[number]["value"];
 
 function isLive(row: VersionedDish) {
   return row.deletedAt == null && row.mergedIntoDishId == null;
