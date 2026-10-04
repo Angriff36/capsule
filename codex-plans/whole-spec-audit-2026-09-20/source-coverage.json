@@ -4709,7 +4709,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92"
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-168",
@@ -4877,7 +4877,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92"
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-176",
@@ -5111,7 +5111,7 @@
         "owning authored read and command seams"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92",
+      "sha": "fbfc4786",
       "waitsOn": null
     },
     {
@@ -5415,7 +5415,7 @@
         "owning authored read and command seams"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92",
+      "sha": "fbfc4786",
       "waitsOn": null
     },
     {
@@ -6462,7 +6462,7 @@
         "authored email/social ingress seams"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92",
+      "sha": "fbfc4786",
       "waitsOn": null
     },
     {
@@ -8880,7 +8880,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92"
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-364",
@@ -8934,7 +8934,7 @@
       "status": "PENDING",
       "codeState": "implemented-unverified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Needs a recorded full repository gate run for the dossier.",
+      "gap": "Needs the full repository gate run recorded in dossier definition 13.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): bun run check (existing)"
       ],
@@ -9011,7 +9011,7 @@
         "owning authored read and command seams"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92",
+      "sha": "fbfc4786",
       "waitsOn": null
     },
     {
@@ -9727,7 +9727,7 @@
         "owning authored read and command seams"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92",
+      "sha": "fbfc4786",
       "waitsOn": null
     },
     {
@@ -12971,7 +12971,7 @@
         "owning authored read and command seams"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "b3a9ef92",
+      "sha": "fbfc4786",
       "waitsOn": null
     },
     {
@@ -16341,9 +16341,9 @@
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-01",
       "status": "PENDING",
-      "codeState": "partial",
+      "codeState": "implemented-unverified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 01 not written yet.",
+      "gap": "Dossier definition 01 rests on PASS rows; the J review of it is still to run.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 01 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
       ],
@@ -16362,12 +16362,12 @@
       "key": "BE-21-02",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-02",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 02 not written yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 02 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 02 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): docs/product/backend-completion-dossier.md definition 02 rests on AC-418, 432, 386, 625, 628, 094 (all PASS): tests/proofs/proposal-projection-agreement.runtime.test.ts, price-agreement-surfaces, closeout-source-projection; tests/backend-completion-dossier.test.ts checks every named row is PASS and every proof file exists"
       ],
       "waitsOn": null,
       "owners": [
@@ -16376,20 +16376,20 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-715",
       "key": "BE-21-03",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-03",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 03 not written yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 03 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 03 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): docs/product/backend-completion-dossier.md definition 03 rests on AC-422, 423, 404, 405, 479, 471 (all PASS): canonical-change-events, reconciliation-receipts, reaction-replay-identity, week-move-reconcile; tests/backend-completion-dossier.test.ts"
       ],
       "waitsOn": null,
       "owners": [
@@ -16398,20 +16398,20 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-716",
       "key": "BE-21-04",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-04",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 04 not written yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 04 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 04 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): docs/product/backend-completion-dossier.md definition 04 rests on AC-480, 481, 482, 675, 683, 446, 635, 636, 061, 509 (all PASS): event-cancellation-matrix, recipe-edition-publish, backend-audit-attribution, client-merge-history, time-correction-audit; tests/backend-completion-dossier.test.ts"
       ],
       "waitsOn": null,
       "owners": [
@@ -16420,20 +16420,20 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-717",
       "key": "BE-21-05",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-05",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 05 not written yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 05 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 05 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): docs/product/backend-completion-dossier.md definition 05 rests on AC-042, 074, 144, 419, 450, 489 (all PASS): tests/culinary-model-acceptance.test.ts, component-nutrition-unknown, prep-unknown-time, report-total-reconciliation, publish-availability; tests/backend-completion-dossier.test.ts"
       ],
       "waitsOn": null,
       "owners": [
@@ -16442,20 +16442,20 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-718",
       "key": "BE-21-06",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-06",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 06 not written yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 06 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 06 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): docs/product/backend-completion-dossier.md definition 06 rests on AC-156, 684, 690, 694, 695, 696, 637 (all PASS): tenant-access-matrix (2/2 on 2026-10-04 in this batch), backend-role-matrix, backend-canonical-read-contract; tests/backend-completion-dossier.test.ts"
       ],
       "waitsOn": null,
       "owners": [
@@ -16464,8 +16464,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-719",
@@ -16475,11 +16475,11 @@
       "status": "PENDING",
       "codeState": "partial",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 07 not written yet.",
+      "gap": "Proven for calendar, email, text, webhook and phone alerts (dossier definition 07); QuickBooks and Stripe effects are paused money work, and signed inbound provider messages wait on the generator (issue #52).",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 07 verified against scenario, gate, review and Git receipts"
       ],
-      "waitsOn": null,
+      "waitsOn": "no-money-rule",
       "owners": [
         "ACCEPTANCE_TESTS.md",
         "IMPLEMENTATION_PLAN.md",
@@ -16495,9 +16495,9 @@
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-08",
       "status": "PENDING",
-      "codeState": "partial",
+      "codeState": "implemented-unverified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 08 not written yet.",
+      "gap": "Dossier definition 08 rests on PASS rows; the J review is still to run. The proposal picture section (AC-654) is open.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 08 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
       ],
@@ -16539,9 +16539,9 @@
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-10",
       "status": "PENDING",
-      "codeState": "partial",
+      "codeState": "implemented-unverified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 10 not written yet.",
+      "gap": "Dossier definition 10 rests on PASS rows; the J review of the rendered Final Lock questions is still to run.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 10 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
       ],
@@ -16561,9 +16561,9 @@
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-11",
       "status": "PENDING",
-      "codeState": "partial",
+      "codeState": "implemented-unverified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 11 not written yet.",
+      "gap": "Dossier definition 11 rests on PASS rows; the J review of the rendered explanation card is still to run.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 11 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
       ],
@@ -16582,12 +16582,12 @@
       "key": "BE-21-12",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-12",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Completion dossier definition 12 not written yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 12 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 12 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): docs/product/backend-completion-dossier.md definition 12 rests on AC-643..652 and AC-705 (all PASS): docs/systems/ui-contract.md built from the code + tests/backend-ui-contract.test.ts; tests/backend-completion-dossier.test.ts"
       ],
       "waitsOn": null,
       "owners": [
@@ -16596,8 +16596,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fbfc4786"
     },
     {
       "id": "AC-725",
@@ -16605,9 +16605,9 @@
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-13",
       "status": "PENDING",
-      "codeState": "partial",
+      "codeState": "implemented-unverified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Needs a recorded full repository gate run for the dossier.",
+      "gap": "Needs the full repository gate run recorded in dossier definition 13.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 13 verified against scenario, gate, review and Git receipts"
       ],
