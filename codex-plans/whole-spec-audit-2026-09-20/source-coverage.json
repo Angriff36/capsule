@@ -4491,17 +4491,17 @@
       "key": "PR13-01",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-01",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-GIT-MAINTENANCE"],
-      "gap": "Owned by the loop tools (ralph-sync.sh, loop.sh).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/ralph-sync-acceptance.test.ts — fresh refs and actual ancestry govern resume. 2026-10-04: 3 legs PASS in tests/ralph-sync-acceptance.test.ts (work added to dev after the last look is found only by the fetch and merged; \"current\" only after a fetch and names the dev commit; dev unreachable = non-zero, no claim). Open: the \"integrating\" line names the branch but not its own commit or the missing dev commits - needs a change to ralph-sync.sh (loop tool; control-plane repair)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/ralph-sync-acceptance.test.ts — fresh refs and actual ancestry govern resume. 2026-10-04: 3 legs PASS in tests/ralph-sync-acceptance.test.ts (work added to dev after the last look is found only by the fetch and merged; \"current\" only after a fetch and names the dev commit; dev unreachable = non-zero, no claim). Open: the \"integrating\" line names the branch but not its own commit or the missing dev commits - needs a change to ralph-sync.sh (loop tool; control-plane repair). 2026-10-04 PASS after repair 70a0ec3d: tests/ralph-sync-acceptance.test.ts 6/6 - prints \"this copy is <branch> at <full commit>\", then \"missing N commit(s) from origin/dev\" with each missing commit, before \"integrating\"; default base branch is dev"
       ],
-      "waitsOn": "loop-tools",
+      "waitsOn": null,
       "owners": ["ralph-sync.sh", "ralph-preview.ps1", ".ralph.env", "loop.sh"],
-      "environment": "Not verified yet",
-      "sha": "c8a4996c"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "6ca7d9a8"
     },
     {
       "id": "AC-158",
@@ -4518,24 +4518,24 @@
       "waitsOn": null,
       "owners": ["ralph-sync.sh", "ralph-preview.ps1", ".ralph.env", "loop.sh"],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "c8a4996c"
+      "sha": "6b10dbb8"
     },
     {
       "id": "AC-159",
       "key": "PR13-03",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-03",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-GIT-MAINTENANCE"],
-      "gap": "Owned by the loop tools (ralph-preview.ps1).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/ralph-preview-identity.test.ts — reject wrong checkout and report both serving processes. 2026-10-04: 3 legs PASS in tests/ralph-preview-identity.test.ts (accepts only a server whose source map names this checkout and prints address + folder; refuses a server that answers 200 for another checkout; will not start over an occupied port and leaves that server running). Open: no commit or process id in the output, and an occupied port does not name the process holding it - needs a change to ralph-preview.ps1 (loop tool; control-plane repair)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/ralph-preview-identity.test.ts — reject wrong checkout and report both serving processes. 2026-10-04: 3 legs PASS in tests/ralph-preview-identity.test.ts (accepts only a server whose source map names this checkout and prints address + folder; refuses a server that answers 200 for another checkout; will not start over an occupied port and leaves that server running). Open: no commit or process id in the output, and an occupied port does not name the process holding it - needs a change to ralph-preview.ps1 (loop tool; control-plane repair). 2026-10-04 PASS after repair 70a0ec3d: tests/ralph-preview-identity.test.ts 3/3 - a verified preview prints address, folder, \"at commit <full commit>\" and the serving process (\"PID n (node)\"); an occupied port names the process holding it and leaves it running; a fresh start prints both the started process and the port's server"
       ],
-      "waitsOn": "loop-tools",
+      "waitsOn": null,
       "owners": ["ralph-sync.sh", "ralph-preview.ps1", ".ralph.env", "loop.sh"],
-      "environment": "Not verified yet",
-      "sha": "c8a4996c"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "6ca7d9a8"
     },
     {
       "id": "AC-160",
