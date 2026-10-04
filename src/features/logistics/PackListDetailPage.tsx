@@ -60,6 +60,7 @@ import { usePackRigs } from "./usePackRigs";
 import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PackScanPanel } from "./PackScanPanel";
+import { PackFoodPackaging } from "./PackFoodPackaging";
 import { PackListSourcePanel } from "./PackListSourcePanel";
 import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
@@ -1266,6 +1267,12 @@ export function PackListDetailPage() {
           reviewEventId={String(packList.eventId)}
         />
       </section>
+
+      <PackFoodPackaging
+        eventId={packList.eventId}
+        serviceStyleId={event?.serviceStyleId ?? null}
+        serviceStyleName={serviceStyle?.name}
+      />
 
       <PackListSourcePanel packListId={packList._id} />
 

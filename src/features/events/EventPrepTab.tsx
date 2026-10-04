@@ -3,7 +3,13 @@ import { Link } from "react-router-dom";
 import {
   useListComponent,
   useListPerson,
+  useListServiceStyle,
+  useListStylePackaging,
 } from "../../lib/manifest-convex-react";
+import type {
+  ServiceStyleOption,
+  StylePackagingRow,
+} from "../kitchen/stylePackaging";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useEventPrepTasks } from "../../lib/useEventRows";
 import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
@@ -22,11 +28,16 @@ import { EventUnresolvedMaterialsNotice } from "./EventUnresolvedMaterialsNotice
 type Props = {
   eventId: string;
   eventStage: string;
+  /** The event's service style picks which packaging line each dish shows. */
+  serviceStyleId?: string | null;
 };
 
-export function EventPrepTab({ eventId, eventStage }: Props) {
+export function EventPrepTab({ eventId, eventStage, serviceStyleId }: Props) {
   const eventDishes = useEventMenuLines(eventId);
   const components = useListComponent();
+  const packaging = useListStylePackaging() as StylePackagingRow[] | undefined;
+  const styles = useListServiceStyle() as ServiceStyleOption[] | undefined;
+  const styleName = styles?.find((style) => style._id === serviceStyleId)?.name;
   const people = useListPerson();
   // The menu's dish lines and ingredients only. Recipes stay the whole list:
   // a prep step can name a sub-recipe that is not on a dish directly.
@@ -197,6 +208,9 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           components={components ?? []}
           people={people ?? []}
           recipeFlags={recipeFlags}
+          serviceStyleId={serviceStyleId}
+          serviceStyleName={styleName}
+          packaging={packaging}
           renderQuantityFlags={(flags) =>
             flags.map((flag) => (
               <p
