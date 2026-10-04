@@ -6,6 +6,7 @@
   "permissions": {
     "allow": [
       "Bash(git fetch *)",
+      "Bash(git worktree add .loop-worktrees/batch-* -b loop/batch-* origin/dev)",
       "Bash(bash scripts/loop-worktree-sweep.sh)",
       "Edit(//c/Projects/capsule/.loop-worktrees/**)",
       "Edit(//c/Projects/capsule/STATE.md)",
