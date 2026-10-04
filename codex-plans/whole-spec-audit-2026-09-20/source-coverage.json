@@ -8902,7 +8902,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "a28a7296"
+      "sha": "ae6f9235"
     },
     {
       "id": "AC-365",
@@ -8946,7 +8946,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "a28a7296"
+      "sha": "ae6f9235"
     },
     {
       "id": "AC-367",
@@ -16619,7 +16619,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "a28a7296"
+      "sha": "ae6f9235"
     },
     {
       "id": "AC-726",
