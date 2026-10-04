@@ -1967,7 +1967,7 @@
 .ledger-heading > span {
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 
@@ -2061,7 +2061,7 @@
 .schedule-publish-note {
   grid-column: 1;
   color: var(--color-ink-2);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .schedule-publish-action {
@@ -2120,7 +2120,7 @@
 .schedule-notice-item-heading small {
   margin-top: 0.15rem;
   color: var(--color-ink-3);
-  font-size: 10px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 
@@ -2265,7 +2265,7 @@
 .supply-muted {
   margin-top: 2px;
   color: var(--color-ink-3);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .supply-number {
@@ -3837,7 +3837,7 @@
   gap: 0.4rem;
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -4142,6 +4142,120 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Demand calculation trace: a full-width ledger detail, intentionally flat. */
+.demand-provenance-row > td {
+  padding: 0 !important;
+  background: var(--color-inset);
+}
+.demand-provenance {
+  border-block: 1px solid var(--color-line-2);
+  padding: 1.1rem 1.4rem;
+}
+.demand-provenance > header,
+.demand-provenance-line-head,
+.demand-provenance-reconcile,
+.demand-provenance-links {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.demand-provenance > header strong {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+.demand-provenance > header > span,
+.demand-provenance-reconcile,
+.demand-provenance-empty,
+.demand-provenance-loading {
+  color: var(--color-ink-3);
+  font-size: 13px;
+}
+.demand-provenance-reconcile {
+  margin-top: 1rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.demand-provenance-reconcile a,
+.demand-provenance-links a {
+  color: var(--color-brand);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.demand-provenance-line {
+  border-top: 1px solid var(--color-line);
+  padding: 1rem 0;
+}
+.demand-provenance-line-head strong {
+  font-size: 11px;
+}
+.demand-provenance-line-head span,
+.demand-provenance-line code,
+.demand-provenance-line dd {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.demand-provenance-line code {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--color-ink-2);
+  white-space: normal;
+}
+.demand-provenance-line dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0.65rem;
+  border-block: 1px solid var(--color-line);
+}
+.demand-provenance-line dl > div {
+  padding: 0.45rem 0.65rem;
+  border-left: 1px solid var(--color-line);
+}
+.demand-provenance-line dl > div:nth-child(3n + 1) {
+  border-left: 0;
+}
+.demand-provenance-line dt {
+  color: var(--color-ink-3);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.demand-provenance-line dd {
+  margin-top: 0.2rem;
+}
+.demand-provenance-links {
+  justify-content: flex-start;
+  margin-top: 0.65rem;
+  font-size: 13px;
+}
+.demand-provenance-history {
+  border-top: 1px solid var(--color-line);
+  padding-top: 0.8rem;
+}
+.demand-provenance-history > p:not(.eyebrow) {
+  margin-top: 0.35rem;
+  color: var(--color-ink-2);
+  font-size: 10px;
+}
+@media (max-width: 560px) {
+  .demand-provenance {
+    padding: 1rem;
+  }
+  .demand-provenance-line dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .demand-provenance-line dl > div:nth-child(3n + 1) {
+    border-left: 1px solid var(--color-line);
+  }
+  .demand-provenance-line dl > div:nth-child(2n + 1) {
+    border-left: 0;
+  }
 }
 
 @media (min-width: 960px) {

@@ -1228,7 +1228,6 @@ export const EventIngredientContributionSchema = z.object({
   calculationSnapshot: z.unknown().nullable().optional(),
   supersededAt: z.coerce.date().nullable().optional(),
   supersededBySourceKey: z.string().nullable().optional(),
-  supersedeReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

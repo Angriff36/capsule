@@ -137,7 +137,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["discontinued"]
   transition status from "discontinued" to ["active"]
 
-  default policy ingredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see ingredients"
+  default policy ingredientRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") "Kitchen and inventory staff may see ingredients"
   default policy ingredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update ingredients"
   default policy ingredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change ingredients"
 

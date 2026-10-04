@@ -1113,7 +1113,6 @@ export default defineSchema({
     calculationSnapshot: v.optional(v.union(v.any(), v.null())),
     supersededAt: v.optional(v.union(v.number(), v.null())),
     supersededBySourceKey: v.optional(v.union(v.string(), v.null())),
-    supersedeReason: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
@@ -1124,8 +1123,7 @@ export default defineSchema({
     .index("by_sourceKey", ["sourceKey"])
     .index("by_eventId", ["eventId"])
     .index("by_eventDishId", ["eventDishId"])
-    .index("by_ingredientId", ["ingredientId"])
-    .index("by_eventId_and_ingredientId", ["eventId", "ingredientId"]),
+    .index("by_ingredientId", ["ingredientId"]),
   eventLayoutSections: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

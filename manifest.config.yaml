@@ -77,3 +77,6 @@ projections:
         Invoice:
           - fields: [tenantId, invoiceNumber]
             name: by_tenantId_and_invoiceNumber
+        EventIngredientContribution:
+          - fields: [eventId, ingredientId]
+            name: by_eventId_and_ingredientId

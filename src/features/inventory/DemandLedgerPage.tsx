@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -24,6 +24,7 @@ import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { useWorkingEventId } from "../events/workingEvent";
+import { IngredientDemandProvenancePanel } from "./IngredientDemandProvenancePanel";
 
 const UNITS = [
   "each",
@@ -59,6 +60,7 @@ export function DemandLedgerPage() {
   );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [expandedDemandId, setExpandedDemandId] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeDemands = (demands ?? []).filter(
@@ -309,90 +311,120 @@ export function DemandLedgerPage() {
                 {activeDemands.map((demand) => {
                   const need = existingNeed(demand._id);
                   const actions = policy.demandActions(String(demand.status));
+                  const expanded = expandedDemandId === demand._id;
                   return (
-                    <tr key={demand._id}>
-                      <td>
-                        <strong>{eventName(demand.eventId)}</strong>
-                        <small>{demand.eventId.slice(-8)}</small>
-                      </td>
-                      <td>
-                        {(() => {
-                          const ingredient = ingredients?.find(
-                            (i) => i._id === demand.ingredientId,
-                          );
-                          if (!ingredient)
-                            return ingredientName(demand.ingredientId);
-                          return (
-                            <HoverPreview
-                              card={
-                                <IngredientPreviewCard
-                                  ingredient={ingredient}
+                    <Fragment key={demand._id}>
+                      <tr>
+                        <td>
+                          <strong>{eventName(demand.eventId)}</strong>
+                          <small>{demand.eventId.slice(-8)}</small>
+                        </td>
+                        <td>
+                          {(() => {
+                            const ingredient = ingredients?.find(
+                              (i) => i._id === demand.ingredientId,
+                            );
+                            if (!ingredient)
+                              return ingredientName(demand.ingredientId);
+                            return (
+                              <HoverPreview
+                                card={
+                                  <IngredientPreviewCard
+                                    ingredient={ingredient}
+                                  />
+                                }
+                              >
+                                <IngredientCatalogLabel
+                                  ingredientId={ingredient._id}
+                                  ingredients={ingredients}
+                                  link
                                 />
-                              }
-                            >
-                              <IngredientCatalogLabel
-                                ingredientId={ingredient._id}
-                                ingredients={ingredients}
-                                link
-                              />
-                            </HoverPreview>
-                          );
-                        })()}
-                      </td>
-                      <td className="supply-number">
-                        {demand.requiredQuantity} {demand.unit}
-                        {(() => {
-                          const anomaly = anomalies.get(demand._id);
-                          if (!anomaly) return null;
-                          return (
-                            <span
-                              className="chip ml-2 border-warn/40 bg-warn-soft text-warn"
-                              data-testid="demand-anomaly-flag"
-                              title={`Historical avg ${anomaly.expectedQuantity.toFixed(
-                                2,
-                              )} ${demand.unit} across ${anomaly.sampleSize} past ${
-                                anomaly.tier
-                              } events — this is ${Math.round(
-                                anomaly.deviation * 100,
-                              )}% ${anomaly.direction}`}
-                            >
-                              ⚠ {Math.round(anomaly.deviation * 100)}%{" "}
-                              {anomaly.direction}
+                              </HoverPreview>
+                            );
+                          })()}
+                        </td>
+                        <td className="supply-number">
+                          {demand.requiredQuantity} {demand.unit}
+                          {(() => {
+                            const anomaly = anomalies.get(demand._id);
+                            if (!anomaly) return null;
+                            return (
+                              <span
+                                className="chip ml-2 border-warn/40 bg-warn-soft text-warn"
+                                data-testid="demand-anomaly-flag"
+                                title={`Historical avg ${anomaly.expectedQuantity.toFixed(
+                                  2,
+                                )} ${demand.unit} across ${anomaly.sampleSize} past ${
+                                  anomaly.tier
+                                } events — this is ${Math.round(
+                                  anomaly.deviation * 100,
+                                )}% ${anomaly.direction}`}
+                              >
+                                ⚠ {Math.round(anomaly.deviation * 100)}%{" "}
+                                {anomaly.direction}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td>
+                          <StatusChip status={String(demand.status)} />
+                        </td>
+                        <td>
+                          {need ? (
+                            <StatusChip status={String(need.status)} />
+                          ) : (
+                            <span className="supply-muted">
+                              Opens on Event approve
                             </span>
-                          );
-                        })()}
-                      </td>
-                      <td>
-                        <StatusChip status={String(demand.status)} />
-                      </td>
-                      <td>
-                        {need ? (
-                          <StatusChip status={String(need.status)} />
-                        ) : (
-                          <span className="supply-muted">
-                            Opens on Event approve
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <div className="supply-row-actions">
-                          {actions.map((action) => (
+                          )}
+                        </td>
+                        <td>
+                          <div className="supply-row-actions">
                             <button
-                              key={action.key}
+                              type="button"
                               className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
+                              aria-expanded={expanded}
+                              aria-controls={`demand-provenance-${demand._id}`}
                               onClick={() =>
-                                invokeDemandAction(demand, action.key)
+                                setExpandedDemandId(
+                                  expanded ? null : demand._id,
+                                )
                               }
                             >
-                              {busy === `${demand._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
+                              {expanded
+                                ? "Hide calculation"
+                                : "How was this computed?"}
                             </button>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
+                            {actions.map((action) => (
+                              <button
+                                key={action.key}
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() =>
+                                  invokeDemandAction(demand, action.key)
+                                }
+                              >
+                                {busy === `${demand._id}:${action.key}`
+                                  ? "Working…"
+                                  : action.label}
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                      {expanded ? (
+                        <tr
+                          id={`demand-provenance-${demand._id}`}
+                          className="demand-provenance-row"
+                        >
+                          <td colSpan={6}>
+                            <IngredientDemandProvenancePanel
+                              demandId={demand._id}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                    </Fragment>
                   );
                 })}
               </tbody>

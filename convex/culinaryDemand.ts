@@ -655,6 +655,7 @@ const contributionArgs = (
   sourceDishIngredientId: c.sourceDishIngredientId ?? undefined,
   sourceDishComponentId: c.sourceDishComponentId ?? undefined,
   componentPath: c.componentPath,
+  calculationSnapshot: c.calculationSnapshot,
 });
 
 export interface ReconcileEventDemandResult {

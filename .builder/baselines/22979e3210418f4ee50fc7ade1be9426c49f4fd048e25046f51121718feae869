@@ -3507,7 +3507,7 @@ async function __runComponentDraft(ctx: MutationCtx, { docId, name, yieldQuantit
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -3612,7 +3612,7 @@ export const Component_createViaDraft = mutation({
       yieldQuantity: args.yieldQuantity,
       yieldUnit: args.yieldUnit
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -3657,7 +3657,7 @@ async function __runComponentPublishVersion(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -3718,7 +3718,7 @@ async function __runComponentPurge(ctx: MutationCtx, { docId, version }: any, __
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -3779,7 +3779,7 @@ async function __runComponentRetire(ctx: MutationCtx, { docId, reason, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!(((doc.status === "draft") || (doc.status === "published")))) throw new Error("Guard 0 failed");
@@ -3842,7 +3842,7 @@ async function __runComponentRetract(ctx: MutationCtx, { docId, version }: any, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "published"))) throw new Error("Guard 0 failed");
@@ -3904,7 +3904,7 @@ async function __runComponentReviseDraft(ctx: MutationCtx, { docId, name, yieldQ
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -3971,7 +3971,7 @@ async function __runComponentSetServesPerYield(ctx: MutationCtx, { docId, serves
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -4018,7 +4018,7 @@ async function __runComponentSetStorageWindow(ctx: MutationCtx, { docId, storage
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see recipes");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8323,7 +8323,7 @@ async function __runDishClassifyAllergens(ctx: MutationCtx, { docId, allergenSum
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8370,7 +8370,7 @@ async function __runDishClassifyKind(ctx: MutationCtx, { docId, kind, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8416,7 +8416,7 @@ async function __runDishClearPrimaryImage(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8463,7 +8463,7 @@ async function __runDishIntroduce(ctx: MutationCtx, { docId, name, portionSize, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -8560,7 +8560,7 @@ export const Dish_createViaIntroduce = mutation({
       portionUnit: args.portionUnit,
       serviceStyle: args.serviceStyle
     };
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -8600,7 +8600,7 @@ async function __runDishLinkAsEdition(ctx: MutationCtx, { docId, sourceDishId, e
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -8652,7 +8652,7 @@ async function __runDishMergeInto(ctx: MutationCtx, { docId, targetDishId, reaso
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8719,7 +8719,7 @@ async function __runDishPurge(ctx: MutationCtx, { docId, version }: any, __creat
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8780,7 +8780,7 @@ async function __runDishReinstate(ctx: MutationCtx, { docId, version }: any, __c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
@@ -8841,7 +8841,7 @@ async function __runDishRetire(ctx: MutationCtx, { docId, reason, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8904,7 +8904,7 @@ async function __runDishReviseDetails(ctx: MutationCtx, { docId, name, descripti
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -8962,7 +8962,7 @@ async function __runDishSaveRecipe(ctx: MutationCtx, { docId, instructions, sour
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9015,7 +9015,7 @@ async function __runDishSaveServiceInstructions(ctx: MutationCtx, { docId, instr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9065,7 +9065,7 @@ async function __runDishSetPrimaryImage(ctx: MutationCtx, { docId, storageId, fi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9115,7 +9115,7 @@ async function __runDishUpdatePortioning(ctx: MutationCtx, { docId, portionSize,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Dish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Dish not found");
-    if (!((((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, inventory, sales and managers may see dishes");
+    if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, sales and managers may see dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update dishes");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dishes");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -9220,7 +9220,7 @@ async function __runDishComponentAttach(ctx: MutationCtx, { docId, dishId, compo
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "attach", emitIndex: 0 });
@@ -9330,7 +9330,7 @@ export const DishComponent_createViaAttach = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "attach", emitIndex: 0 });
@@ -9913,11 +9913,11 @@ async function __runDishIngredientAdd(ctx: MutationCtx, { docId, dishId, ingredi
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
@@ -10024,11 +10024,11 @@ export const DishIngredient_createViaAdd = mutation({
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "add", emitIndex: 0 });
@@ -10086,11 +10086,11 @@ async function __runDishIngredientAdjustQuantity(ctx: MutationCtx, { docId, quan
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "adjustQuantity", emitIndex: 0 });
@@ -11906,7 +11906,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("invoices", __elseDoc as any);
-      await __runInvoiceIssue(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInvoiceIssue(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const __match2_raw = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match2_rows = __match2_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).activeEventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -11927,7 +11927,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("packLists", __elseDoc as any);
-      await __runPackListOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runPackListOpen(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const fanRows3 = (await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows3) {
@@ -11952,7 +11952,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("productionBatches", __elseDoc as any);
-        await __runProductionBatchPlan(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runProductionBatchPlan(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows4 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -12571,17 +12571,6 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
@@ -12812,7 +12801,7 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("eventCloseouts", __elseDoc as any);
-      await __runEventCloseoutCapture(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runEventCloseoutCapture(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "closeOut", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -15493,7 +15482,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows2 = (await ctx.db.query("dishIngredients").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15515,11 +15504,11 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows3 = (await ctx.db.query("packLists").filter((q) => q.eq(q.field("activeEventId"), payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15554,7 +15543,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("prepTasks", __elseDoc as any);
-        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addToEvent", emitIndex: 0 });
@@ -15681,7 +15670,7 @@ export const EventDish_createViaAddToEvent = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows2 = (await ctx.db.query("dishIngredients").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15703,11 +15692,11 @@ export const EventDish_createViaAddToEvent = mutation({
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows3 = (await ctx.db.query("packLists").filter((q) => q.eq(q.field("activeEventId"), payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15742,7 +15731,7 @@ export const EventDish_createViaAddToEvent = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("prepTasks", __elseDoc as any);
-        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPrepTaskOpen(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "addToEvent", emitIndex: 0 });
@@ -15937,7 +15926,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows1 = (await ctx.db.query("dishIngredients").withIndex("by_dishId", (q) => q.eq("dishId", payload.seedDishId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -15959,11 +15948,11 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "confirmFromProposal", emitIndex: 0 });
@@ -16255,7 +16244,7 @@ async function __runEventDishRequestContainerPack(ctx: MutationCtx, { docId, pac
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "requestContainerPack", emitIndex: 0 });
@@ -16509,11 +16498,11 @@ async function __runEventDishComponentSeedRefresh(ctx: MutationCtx, { docId, ver
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "refresh", emitIndex: 0 });
@@ -16660,11 +16649,11 @@ async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventI
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "seed", emitIndex: 0 });
@@ -16771,11 +16760,11 @@ export const EventDishComponentSeed_createViaSeed = mutation({
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","supersedeReason","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeSyncComponentId","recipeSyncIngredientId","ingredientId","quantity","quantityPerServing","unit","servings","purchasingWeekStart","recordedAt","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId","calculationSnapshot","supersededAt","supersededBySourceKey","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
-        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "seed", emitIndex: 0 });
@@ -17530,7 +17519,7 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -17742,7 +17731,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
@@ -17882,7 +17871,7 @@ async function __runEventIngredientContributionRetire(ctx: MutationCtx, { docId,
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "retire", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -17995,7 +17984,7 @@ async function __runEventIngredientContributionRetirePreviousUnit(ctx: MutationC
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "retirePreviousUnit", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -18111,7 +18100,7 @@ async function __runEventIngredientContributionRevise(ctx: MutationCtx, { docId,
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "revise", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -18157,7 +18146,6 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
     const updates = {
       supersededAt: Date.now(),
       supersededBySourceKey: supersededBySourceKey,
-      supersedeReason: reason,
       deletedAt: Date.now(),
       quantity: 0,
       purchasingWeekStart: (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : doc.purchasingWeekStart),
@@ -18231,7 +18219,7 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientDemands", __elseDoc as any);
-      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientDemandSyncFromContributions(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "supersede", emitIndex: 0 });
     await __handleManifestEvent(ctx, { ...__manifestEvent1, eventId: __manifestEventId1, command: "supersede", emitIndex: 1 });
@@ -22810,7 +22798,7 @@ async function __runIngredientClassifyAllergens(ctx: MutationCtx, { docId, aller
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -22859,7 +22847,7 @@ async function __runIngredientClearPrimaryImage(ctx: MutationCtx, { docId, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -22906,7 +22894,7 @@ async function __runIngredientConfigureSubstitutes(ctx: MutationCtx, { docId, su
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -22948,7 +22936,7 @@ async function __runIngredientDiscontinue(ctx: MutationCtx, { docId, reason, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23011,7 +22999,7 @@ async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -23102,7 +23090,7 @@ export const Ingredient_createViaIntroduce = mutation({
       preferredVendorId: args.preferredVendorId,
       unit: args.unit
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
@@ -23140,7 +23128,7 @@ async function __runIngredientLinkAsEdition(ctx: MutationCtx, { docId, sourceIng
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -23192,7 +23180,7 @@ async function __runIngredientMergeInto(ctx: MutationCtx, { docId, targetIngredi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23259,7 +23247,7 @@ async function __runIngredientPurge(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -23320,7 +23308,7 @@ async function __runIngredientReinstate(ctx: MutationCtx, { docId, version }: an
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "discontinued"))) throw new Error("Guard 0 failed");
@@ -23381,7 +23369,7 @@ async function __runIngredientSetNutrition(ctx: MutationCtx, { docId, caloriesPe
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23453,7 +23441,7 @@ async function __runIngredientSetPreferredVendor(ctx: MutationCtx, { docId, pref
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -23495,7 +23483,7 @@ async function __runIngredientSetPreferredVendors(ctx: MutationCtx, { docId, pre
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.introducedAt != null))) throw new Error("Guard 0 failed");
@@ -23539,7 +23527,7 @@ async function __runIngredientSetPrimaryImage(ctx: MutationCtx, { docId, storage
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23589,7 +23577,7 @@ async function __runIngredientUpdateCosting(ctx: MutationCtx, { docId, costPerUn
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -23639,7 +23627,7 @@ async function __runIngredientUpdateDetails(ctx: MutationCtx, { docId, name, uni
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Ingredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Ingredient not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "inventoryAccess")))) throw new Error("Kitchen and inventory staff may see ingredients");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update ingredients");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change ingredients");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -25870,7 +25858,7 @@ async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNum
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryItems", __elseDoc as any);
-      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -26002,7 +25990,7 @@ export const InventoryLot_createViaRecord = mutation({
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryItems", __elseDoc as any);
-      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInventoryItemReceiveDelivery(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "record", emitIndex: 0 });
     const __result = { docId };
@@ -30540,7 +30528,7 @@ async function __runPackListApplyServiceStyleKit(ctx: MutationCtx, { docId, serv
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "applyServiceStyleKit", emitIndex: 0 });
@@ -30822,7 +30810,7 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("deliveries", __elseDoc as any);
-      await __runDeliverySchedule(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runDeliverySchedule(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "markPacked", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -30914,7 +30902,7 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows1 = (await ctx.db.query("eventDishes").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -31031,7 +31019,7 @@ export const PackList_createViaOpen = mutation({
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureKitItem(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     const fanRows1 = (await ctx.db.query("eventDishes").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -31152,7 +31140,7 @@ async function __runPackListRequestDishContainers(ctx: MutationCtx, { docId, eve
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("packListItems", __elseDoc as any);
-        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runPackListItemEnsureContainer(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "requestDishContainers", emitIndex: 0 });
@@ -37847,7 +37835,7 @@ async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, acceptedR
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishes", __elseDoc as any);
-        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "accept", emitIndex: 0 });
@@ -38296,7 +38284,7 @@ async function __runProposalLinkEvent(ctx: MutationCtx, { docId, version }: any,
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishes", __elseDoc as any);
-        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any);
+        await __runEventDishConfirmFromProposal(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "linkEvent", emitIndex: 0 });
@@ -52274,7 +52262,7 @@ async function __runVendorOrderEnsureWeeklyDraft(ctx: MutationCtx, { docId, vend
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrderLines", __elseDoc as any);
-      await __runVendorOrderLineEnsureWeeklyLine(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runVendorOrderLineEnsureWeeklyLine(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "ensureWeeklyDraft", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -53384,7 +53372,7 @@ async function __runVendorOrderLineCorrectReceipt(ctx: MutationCtx, { docId, cor
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("receiptCorrections", __elseDoc as any);
-      await __runReceiptCorrectionRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runReceiptCorrectionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const reactionTarget1 = payload.vendorOrderId;
     if (reactionTarget1) await __runVendorOrderNoteReceiptCorrection(ctx, { docId: reactionTarget1, lineStillShort: payload.lineStillShort } as any);
@@ -53502,7 +53490,7 @@ async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, v
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrderLineDemands", __elseDoc as any);
-      await __runVendorOrderLineDemandLink(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runVendorOrderLineDemandLink(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "ensureWeeklyLine", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -53686,7 +53674,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("ingredientPriceObservations", __elseDoc as any);
-      await __runIngredientPriceObservationRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runIngredientPriceObservationRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     const __match1_raw = await ctx.db.query("inventoryLots").withIndex("by_vendorOrderLineId", (q) => q.eq("vendorOrderLineId", payload.vendorOrderLineId)).collect();
     const __match1_rows = __match1_raw.filter((d) => (d as any).vendorOrderLineId === payload.vendorOrderLineId && (d as any).cumulativeReceivedQuantity === payload.receivedQuantity && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
@@ -53710,7 +53698,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("inventoryLots", __elseDoc as any);
-      await __runInventoryLotRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runInventoryLotRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "recordReceipt", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -56439,7 +56427,7 @@ async function __runWeeklyPurchasingConfigRouteNeed(ctx: MutationCtx, { docId, p
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrders", __elseDoc as any);
-      await __runVendorOrderEnsureWeeklyDraft(ctx, { docId: __elseId, ...__elseArgs } as any);
+      await __runVendorOrderEnsureWeeklyDraft(ctx, { docId: __elseId, ...__elseArgs } as any, true);
     }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "routeNeed", emitIndex: 0 });
     return { ...doc, ...updates };

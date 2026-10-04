@@ -71,7 +71,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // salesAccess: sales browses the published catalog for proposal menu
   // selection (sales/proposal-dish-selection.manifest).
   // Event managers compose package recipes as well as their event menu lines.
-  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may see dishes"
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory, sales and managers may see dishes"
   default policy dishWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update dishes"
   default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change dishes"
 
