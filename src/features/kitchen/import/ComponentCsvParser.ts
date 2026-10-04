@@ -165,7 +165,7 @@ export class ComponentCsvParser {
     );
   }
 
-  private parseRows(csv: string): string[][] {
+  parseRows(csv: string): string[][] {
     const rows: string[][] = [];
     let row: string[] = [];
     let cell = "";

@@ -209,6 +209,7 @@ import type * as lib_purchasingReschedule from "../lib/purchasingReschedule.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
 import type * as lib_quoteSelections from "../lib/quoteSelections.js";
 import type * as lib_recipeReconciliation from "../lib/recipeReconciliation.js";
+import type * as lib_recipeSheetApply from "../lib/recipeSheetApply.js";
 import type * as lib_reconciliationFlags from "../lib/reconciliationFlags.js";
 import type * as lib_reconciliationIsolation from "../lib/reconciliationIsolation.js";
 import type * as lib_reconciliationReceipt from "../lib/reconciliationReceipt.js";
@@ -523,6 +524,7 @@ declare const fullApi: ApiFromModules<{
   "lib/qboSync": typeof lib_qboSync;
   "lib/quoteSelections": typeof lib_quoteSelections;
   "lib/recipeReconciliation": typeof lib_recipeReconciliation;
+  "lib/recipeSheetApply": typeof lib_recipeSheetApply;
   "lib/reconciliationFlags": typeof lib_reconciliationFlags;
   "lib/reconciliationIsolation": typeof lib_reconciliationIsolation;
   "lib/reconciliationReceipt": typeof lib_reconciliationReceipt;

@@ -58161,7 +58161,7 @@ async function __runServiceStyleActivate(ctx: MutationCtx, { docId, version }: a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
+    if (!(((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "staffAccess")))) throw new Error("Staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -58224,7 +58224,7 @@ async function __runServiceStyleDeactivate(ctx: MutationCtx, { docId, reason, ve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
+    if (!(((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "staffAccess")))) throw new Error("Staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -58289,7 +58289,7 @@ async function __runServiceStyleRegister(ctx: MutationCtx, { docId, name, code, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
+    if (!(((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "staffAccess")))) throw new Error("Staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -58383,7 +58383,7 @@ export const ServiceStyle_createViaRegister = mutation({
       description: args.description,
       name: args.name
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
+    if (!(((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "staffAccess")))) throw new Error("Staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -58420,7 +58420,7 @@ async function __runServiceStyleReviseDetails(ctx: MutationCtx, { docId, name, d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
+    if (!(((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "staffAccess")))) throw new Error("Staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");

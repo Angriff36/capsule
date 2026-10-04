@@ -221,6 +221,8 @@ const LINK_TABLE: Record<string, string> = {
   loadRuleId: "@outside",
   locationId: "storageLocations",
   locationIds: "storageLocations",
+  // Dish versions (2026-10-04): the main dish a version belongs to.
+  mainDishId: "dishes",
   maintenanceScheduleId: "vehicleMaintenanceSchedules",
   manifestEventId: "@outside",
   maintenanceTaskId: "equipmentMaintenanceTasks",
@@ -286,6 +288,8 @@ const LINK_TABLE: Record<string, string> = {
   raisedById: "@sign-in",
   reactivatedById: "@sign-in",
   realmId: "@outside",
+  // Dish versions (2026-10-04): the dish whose recipe a version cooks from.
+  recipeDishId: "dishes",
   recipeSyncComponentId: "components",
   recipeSyncDishId: "dishes",
   recipeSyncIngredientId: "ingredients",

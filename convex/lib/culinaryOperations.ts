@@ -11,6 +11,7 @@ import {
   writeMaterializationReceipt,
 } from "./materializationReceipt";
 import { recipeIdentityFingerprint } from "../../src/lib/recipeIdentity";
+import { applyRecipeSheet, recipeSheetArgs, type RecipeSheetInput } from "./recipeSheetApply";
 
 export const reconcileImportedEventRecipeSync = mutation({
   args: { eventId: v.id("events"), expectedEventVersion: v.number() },
@@ -351,6 +352,7 @@ export const importComponent = mutation({
       batchMultiplier: v.optional(v.number()), category: v.optional(v.string()),
       cuisine: v.optional(v.string()), description: v.optional(v.string()),
       instructions: v.optional(v.string()), lines: v.array(importLine),
+      sheet: recipeSheetArgs,
     }),
     review: v.optional(v.object({
       importId: v.id("componentImports"),
@@ -386,9 +388,10 @@ export const importComponent = mutation({
       }
     }
     const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
-      ...args.projection, lines: undefined, yieldUnit: args.projection.yieldUnit as never,
+      ...args.projection, lines: undefined, sheet: undefined, yieldUnit: args.projection.yieldUnit as never,
     });
     const lineIds = await addRecipeLines(ctx, component.docId, args.projection.lines, ingredientIds);
+    await applyRecipeSheet(ctx, tenantId, component.docId, args.projection.sheet);
     const output = { componentId: String(component.docId), createdIngredientIds, lineIds };
     await writeMaterializationReceipt(ctx, tenantId, "componentImport", args.operationKey, args.projection, output);
     return { ...output, recovered: false };
@@ -404,6 +407,7 @@ type ImportProjection = {
   cuisine?: string;
   description?: string;
   instructions?: string;
+  sheet?: RecipeSheetInput;
   lines: {
     name: string;
     ingredientId?: Id<"ingredients">;
@@ -682,7 +686,7 @@ async function finalizeReviewedImport(
     }
   }
   const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
-    ...projection, lines: undefined, yieldUnit: projection.yieldUnit as never,
+    ...projection, lines: undefined, sheet: undefined, yieldUnit: projection.yieldUnit as never,
     recipeIdentityFingerprint: decision.identity,
     // Provenance the duplicate check reads back: which export this recipe
     // came from and the normalized formula identity computed above.
@@ -690,6 +694,7 @@ async function finalizeReviewedImport(
     sourceText: row.rawSourceText,
   });
   const lineIds = await addRecipeLines(ctx, component.docId, projection.lines, ingredientIds);
+  await applyRecipeSheet(ctx, tenantId, component.docId, projection.sheet);
   if (decision.note) {
     // Same formula under a new name, or the same name with a different
     // formula: the new recipe stands on its own and the pairing is stored so
