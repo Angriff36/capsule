@@ -4646,27 +4646,27 @@
         "approved backup/deploy scripts and self-hosted backend owners"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "bf318de3"
+      "sha": "8e04b7b6"
     },
     {
       "id": "AC-165",
       "key": "PR13-10",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-10",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-MONITORING"],
-      "gap": "Alerts show on Integrations and in managers' bells; the recovery drill needs a production-like backend. Expiring connections: neither provider stores a token end date.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/operational-health-classification.test.ts plus authorized alert/recovery drill receipt"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/operational-health-classification.test.ts plus authorized alert/recovery drill receipt. 2026-10-04: tests/operational-health-classification.test.ts 7/7, tests/proofs/system-health-notices.runtime.test.ts 3/3; scripts/qualify-recovery-drill.ts 14/14 on a throwaway backend (receipt docs/quality/recovery-drill.json): receiver switched off -> Capsule stops after one 404 and every manager bell says \"Capsule stopped trying 1 webhook\" in 61 s, other company sees nothing, no address in any alert; fix + Try again -> same delivery id delivered in 61 s, bell clear; backend killed -> not answering, restart on the same data answers in 2 s, ready in 8 s, data kept, webhook schedule resumed by itself (new event out in 51 s, no repeat send); backend outside a release shows the set-up-by-hand check"
       ],
-      "waitsOn": "production-box",
+      "waitsOn": null,
       "owners": [
         "approved production health/deploy scripts",
         "provider/import/reconciliation owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "8e04b7b6"
     },
     {
       "id": "AC-166",

@@ -54,10 +54,20 @@ take them back; fix them in the other system or by hand:
 - invoices, customers and payments written to QuickBooks
 - payment links already opened or paid
 
-## Not built yet
+## Who gets told
 
-- A paging alert (text or email to a named person) when an "act" item appears.
-  Who receives it is an open question in
-  specs/ralph/production-13-release-recovery.md.
-- The recovery drill (break a disposable backend, see the alert, recover,
-  record the times) needs a disposable production-like backend.
+Every manager, in the notification bell, while Capsule is open. There is no
+text or email page to one named on-call person (nobody has an on-call
+setting); see the 2026-10-04 PL-MONITORING plan note for why.
+
+## Drill
+
+`bun run scripts/qualify-recovery-drill.ts` breaks a throwaway local backend
+(never the dev or production data) and follows this page to recover. Receipt
+`docs/quality/recovery-drill.json`. Run on 2026-10-04, 14/14 checks passed:
+
+| Break | Alert seen | Recovery step | Time to recover |
+| --- | --- | --- | --- |
+| Webhook receiver switched off (404) | "Capsule stopped trying 1 webhook" in every manager's bell after 61 s (one try, then stop); another company sees nothing | Fix the receiver, then Try again | Delivered 61 s later with the same delivery id; bell clear |
+| Backend process killed | Server does not answer (screens show "server is not answering") | Restart the server on the same data | Answers in 2 s, ready in 8 s; data kept; webhook schedule resumed by itself (next event out in 51 s, nothing sent twice) |
+| Backend set up outside a release | "The server was set up by hand" check | Run the normal production release | — |
