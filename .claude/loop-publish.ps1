@@ -19,7 +19,11 @@ if ($left.Count -gt 0 -and -not ($left | Where-Object { $_ -notlike 'generated/p
   git -C $wt add -- generated/proof
   git -C $wt commit --quiet -m '[loop] Refresh the proof catalog so the round can go to dev'
 }
-if (git -C $wt status --porcelain) { Say "uncommitted changes in $wt - skipped until the builder commits them"; exit 0 }
+# Unsaved notes (*.md) cannot change the app or its checks; only commits are pushed, so they
+# do not hold the round's finished work off dev. Any other unsaved file still does.
+$left = @(git -C $wt status --porcelain | ForEach-Object { $_.Substring(3) })
+if ($left.Count -gt 0 -and -not ($left | Where-Object { $_ -notlike '*.md' })) { $left = @() }
+if ($left.Count -gt 0) { Say "uncommitted changes in $wt - skipped until the builder commits them"; exit 0 }
 
 git -C $wt fetch origin dev --quiet
 if ((git -C $wt rev-list --count origin/dev..HEAD) -eq '0') { exit 0 }
