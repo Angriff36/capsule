@@ -4,8 +4,8 @@ import {
   usePersonSetSchedulingHold,
   usePersonSetStaffingVendor,
   usePersonSetWorkPreferences,
-  useListVendor,
 } from "../../lib/manifest-convex-react";
+import { useActiveVendorNames } from "../../lib/useActiveVendorNames";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 
@@ -87,15 +87,8 @@ export function StaffSchedulingSection({
   const setPreferences = usePersonSetWorkPreferences();
   const setHold = usePersonSetSchedulingHold();
   const setVendor = usePersonSetStaffingVendor();
-  const vendors = useListVendor();
-  const agencies = agencyChoices(
-    (vendors ?? [])
-      .filter(
-        (vendor) => vendor.deletedAt == null && vendor.status === "active",
-      )
-      .map((vendor) => vendor.name),
-    people,
-  );
+  const vendorNames = useActiveVendorNames();
+  const agencies = agencyChoices(vendorNames ?? [], people);
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);

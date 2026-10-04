@@ -2508,7 +2508,6 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listTimeRecord` - live read
 - `queries.listTrainingCompletion` - live read
 - `queries.listTrainingModule` - live read
-- `queries.listVendor` - live read
 - `queries.listWeeklyScheduleNotice` - live read
 
 ### Generated actions
@@ -3171,6 +3170,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `teamChat.searchLinkTargets` - query; live read, updates by itself
 - `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
 - `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
+- `vendorNames.active` - query; live read, updates by itself
 - `workforceScheduling.autoFillEventStaffNeeds` - mutation; authored step; live reads update by themselves
 - `workforceScheduling.scheduleShift` - mutation; authored step; live reads update by themselves
 - `workforceScheduling.suggestStaffForNeed` - query; live read, updates by itself

@@ -304,6 +304,7 @@ import type * as tppReports_general from "../tppReports/general.js";
 import type * as tppReports_options from "../tppReports/options.js";
 import type * as tppReports_shared from "../tppReports/shared.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
+import type * as vendorNames from "../vendorNames.js";
 import type * as vendorOrderEmail from "../vendorOrderEmail.js";
 import type * as vendorPriceList from "../vendorPriceList.js";
 import type * as venueVendorPolicy from "../venueVendorPolicy.js";
@@ -614,6 +615,7 @@ declare const fullApi: ApiFromModules<{
   "tppReports/options": typeof tppReports_options;
   "tppReports/shared": typeof tppReports_shared;
   vehicleAssignment: typeof vehicleAssignment;
+  vendorNames: typeof vendorNames;
   vendorOrderEmail: typeof vendorOrderEmail;
   vendorPriceList: typeof vendorPriceList;
   venueVendorPolicy: typeof venueVendorPolicy;
