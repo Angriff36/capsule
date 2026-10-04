@@ -31,6 +31,7 @@ import {
   confirmPendingOperation,
 } from "../../lib/pendingOperationKey";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
+import { deriveDishAllergens } from "../kitchen/dishAllergens";
 import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { eventLineRecipeDishId } from "../kitchen/dishVersions";
@@ -383,14 +384,36 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     ],
   );
 
-  const menuAllergenCodes = useMemo(() => {
-    const codes = new Set<string>();
+  // Allergens from the recipe (ingredients and recipe marks) plus the dish's own.
+  const allergenCodesByDish = useMemo(() => {
+    const recipe = {
+      dishIngredients: dishIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
+      ingredients: ingredients ?? [],
+      components: components ?? [],
+    };
+    const byDish = new Map<string, string[]>();
     for (const selection of selections) {
       const dish = dishes?.find((row) => row._id === selection.dishId);
-      for (const code of dish?.allergenSummary ?? []) codes.add(String(code));
+      if (!dish || byDish.has(dish._id)) continue;
+      byDish.set(dish._id, deriveDishAllergens(dish, recipe).codes);
     }
-    return [...codes];
-  }, [dishes, selections]);
+    return byDish;
+  }, [
+    componentIngredients,
+    components,
+    dishComponents,
+    dishIngredients,
+    dishes,
+    ingredients,
+    selections,
+  ]);
+
+  const menuAllergenCodes = useMemo(
+    () => [...new Set([...allergenCodesByDish.values()].flat())],
+    [allergenCodesByDish],
+  );
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -1051,7 +1074,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                   Catalog dish ↗
                                 </Link>
                               ) : null}
-                              <AllergenIconRow codes={dish?.allergenSummary} />
+                              <AllergenIconRow
+                                codes={
+                                  dish
+                                    ? allergenCodesByDish.get(dish._id)
+                                    : undefined
+                                }
+                              />
                               <span
                                 className={`rounded-sm px-2 py-0.5 text-xs font-semibold ${
                                   estimateKind === "priced"

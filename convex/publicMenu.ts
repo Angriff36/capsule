@@ -1,6 +1,7 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
-import type { Doc } from "./_generated/dataModel";
+import { query, type QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import { deriveDishAllergens } from "../src/features/kitchen/dishAllergens";
 import {
   effectiveSellingPrice,
   menuIneligibleReasons,
@@ -88,6 +89,19 @@ export const getPublicMenu = query({
         .map((d) => [d._id as string, d]),
     );
 
+    // Allergens from each listed dish's recipe (ingredients and recipe marks)
+    // plus the ones typed on the dish: a guest must never see fewer.
+    const allergensByDish = new Map<string, string[]>();
+    for (const menu of menus)
+      for (const md of lines) {
+        const dish = md.menuId === menu._id && dishes.get(md.dishId as string);
+        if (dish && !allergensByDish.has(dish._id))
+          allergensByDish.set(
+            dish._id,
+            await recipeAllergens(ctx, tenantId, dish),
+          );
+      }
+
     return menus
       .map((menu): PublicMenu => {
         const menuDishes = lines
@@ -104,7 +118,7 @@ export const getPublicMenu = query({
                 course: md.course ?? dish.course ?? null,
                 serviceStyle: md.serviceStyle ?? dish.serviceStyle ?? null,
                 dietaryTags: dish.dietaryTags ?? [],
-                allergens: (dish.allergenSummary ?? []).map(String),
+                allergens: allergensByDish.get(dish._id) ?? [],
                 price: effectiveSellingPrice(md, now),
               },
             ];
@@ -133,3 +147,71 @@ export const getPublicMenu = query({
       );
   },
 });
+
+/** One dish's allergen codes from its recipe, read through indexes. */
+async function recipeAllergens(
+  ctx: QueryCtx,
+  tenantId: string,
+  dish: Doc<"dishes">,
+): Promise<string[]> {
+  const recipeId = ctx.db.normalizeId(
+    "dishes",
+    String(dish.recipeDishId ?? dish._id),
+  );
+  if (!recipeId) return (dish.allergenSummary ?? []).map(String);
+  const mine = <T extends { tenantId: string; deletedAt?: number | null }>(
+    rows: T[],
+  ) => rows.filter((row) => row.tenantId === tenantId && row.deletedAt == null);
+  const withIngredient = async <T extends { ingredientId: Id<"ingredients"> }>(
+    rows: T[],
+  ) => {
+    const out: (T & { ingredient: Doc<"ingredients"> | null })[] = [];
+    for (const row of rows) {
+      const ingredient = await ctx.db.get(row.ingredientId);
+      out.push({
+        ...row,
+        ingredient: ingredient?.tenantId === tenantId ? ingredient : null,
+      });
+    }
+    return out;
+  };
+  const dishIngredients = await withIngredient(
+    mine(
+      await ctx.db
+        .query("dishIngredients")
+        .withIndex("by_dishId", (q) => q.eq("dishId", recipeId))
+        .collect(),
+    ),
+  );
+  const dishComponents = mine(
+    await ctx.db
+      .query("dishComponents")
+      .withIndex("by_dishId", (q) => q.eq("dishId", recipeId))
+      .collect(),
+  );
+  const components: Doc<"components">[] = [];
+  const componentIngredients: Doc<"componentIngredients">[] = [];
+  for (const link of dishComponents) {
+    const component = await ctx.db.get(link.componentId);
+    if (component?.tenantId === tenantId) components.push(component);
+    componentIngredients.push(
+      ...(await withIngredient(
+        mine(
+          await ctx.db
+            .query("componentIngredients")
+            .withIndex("by_componentId", (q) =>
+              q.eq("componentId", link.componentId),
+            )
+            .collect(),
+        ),
+      )),
+    );
+  }
+  return deriveDishAllergens(dish, {
+    dishIngredients,
+    dishComponents,
+    componentIngredients,
+    ingredients: [],
+    components,
+  }).codes;
+}

@@ -15,6 +15,8 @@ import {
   useGetDish,
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
+import { deriveDishAllergens } from "./dishAllergens";
 import { useEventsById } from "../facilities/useEventsById";
 import { useMenuLinesForDish } from "../facilities/useMenuLinesFor";
 import { useTrackRecent } from "../../lib/recents";
@@ -85,6 +87,10 @@ export function DishDetailPage() {
   const { notifyUndo, host: undoHost } = useUndoToast();
   const { prompt, host } = useActionPrompt();
   const { loadingTooLong } = useSlowQuery(dish);
+  // The recipe behind the dish, for allergens from its ingredients and recipes.
+  const recipeRows = useMenuRecipeRows(
+    dish ? [recipeDishIdOf(dish)] : undefined,
+  );
 
   if (!id) return <ErrorState title="Dish not found" />;
   if (dish === undefined) {
@@ -312,7 +318,13 @@ export function DishDetailPage() {
           <div>
             <dt>Allergens</dt>
             <dd>
-              <AllergenIconRow codes={dish.allergenSummary} />
+              <AllergenIconRow
+                codes={
+                  recipeRows
+                    ? deriveDishAllergens(dish, recipeRows).codes
+                    : dish.allergenSummary
+                }
+              />
             </dd>
           </div>
           <div>

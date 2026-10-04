@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { useEventGuests } from "../../lib/useEventRows";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import { useEventDayBriefing } from "../../lib/eventDayBriefing";
+import { deriveDishAllergens } from "../kitchen/dishAllergens";
 import { TableSkeleton } from "../../ui/primitives";
 import { displayEventMenuNotes } from "./eventMenuLineFields";
 import {
@@ -33,6 +35,26 @@ export function EventAllergenBriefingBody({
   );
   const eventGuests = useEventGuests(eventId);
   const dishes = useDishesByIds(eventDishes?.map((row) => row.dishId));
+  // Every staff member may read the Event Day briefing, so the whole crew
+  // sees allergens from the recipe (ingredients and recipe marks), not only
+  // the ones typed on the dish.
+  const briefing = useEventDayBriefing(eventId);
+  const allergensByDish = useMemo(() => {
+    const byDish = new Map<string, readonly string[]>();
+    if (!briefing) return byDish;
+    const recipe = {
+      dishIngredients: briefing.dishIngredients,
+      dishComponents: briefing.dishComponents,
+      componentIngredients: briefing.componentIngredients,
+      ingredients: [],
+      components: briefing.components ?? [],
+    };
+    for (const dish of briefing.dishes)
+      byDish.set(String(dish._id), deriveDishAllergens(dish, recipe).codes);
+    return byDish;
+  }, [briefing]);
+  const dishAllergens = (dish: { _id: string; allergenSummary?: string[] }) =>
+    allergensByDish.get(String(dish._id)) ?? dish.allergenSummary ?? [];
 
   const menu = useMemo(() => {
     const dishById = new Map((dishes ?? []).map((dish) => [dish._id, dish]));
@@ -82,7 +104,7 @@ export function EventAllergenBriefingBody({
         if (!wanted) continue;
         const hits = menu
           .filter((item) =>
-            (item.dish?.allergenSummary ?? []).some((allergen: string) => {
+            (item.dish ? dishAllergens(item.dish) : []).some((allergen) => {
               const present = normalize(allergen);
               return present === wanted || wanted.includes(present);
             }),
@@ -98,7 +120,9 @@ export function EventAllergenBriefingBody({
       }
     }
     return results;
-  }, [flaggedGuests, menu]);
+    // dishAllergens reads only allergensByDish.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flaggedGuests, menu, allergensByDish]);
 
   if (
     eventDishes === undefined ||
@@ -167,8 +191,8 @@ export function EventAllergenBriefingBody({
                     ) : null}
                   </td>
                   <td className="py-1.5 pr-3 capitalize">
-                    {dish?.allergenSummary?.length
-                      ? dish.allergenSummary.map(allergenLabel).join(", ")
+                    {dish && dishAllergens(dish).length
+                      ? dishAllergens(dish).map(allergenLabel).join(", ")
                       : "None declared"}
                   </td>
                   <td className="py-1.5 capitalize text-ink-2">

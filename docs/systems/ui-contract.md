@@ -2336,6 +2336,8 @@ Screens (170): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
 - `dishLookup.byIds` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
+- `eventDayBriefing.getBriefing` - query; live read, updates by itself
+- `eventDayBriefing.listEvents` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself

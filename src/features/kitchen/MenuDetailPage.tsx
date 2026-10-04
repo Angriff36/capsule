@@ -114,6 +114,7 @@ export function MenuDetailPage() {
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
+      components: components ?? [],
     });
     const map = new Map<string, string[]>();
     for (const { dish, sources } of rows) {
@@ -127,6 +128,7 @@ export function MenuDetailPage() {
     dishComponents,
     componentIngredients,
     ingredients,
+    components,
   ]);
   const profitability = useMemo(
     () =>
@@ -539,7 +541,8 @@ export function MenuDetailPage() {
           _id: dish._id,
           name: dish.name,
           description: dish.description,
-          allergenSummary: dish.allergenSummary,
+          allergenSummary:
+            allergensByDish.get(String(dish._id)) ?? dish.allergenSummary,
           primaryImageStorageId: dish.primaryImageStorageId,
           editionNumber: dish.editionNumber,
           deletedAt: dish.deletedAt,

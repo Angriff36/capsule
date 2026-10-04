@@ -238,6 +238,49 @@ describe("public menu shows effective sell prices and nothing private (AC-240)",
     });
   });
 
+  it("lists allergens from the dish's recipe, not only the ones typed on the dish", async () => {
+    const proof = harness();
+    const { owner } = await seedCatalog(proof, "tenant-menu-e");
+    const ribId = ((await owner.query(api.queries.listDish, {})) as any[]).find(
+      (row) => row.name === "Braised short rib",
+    )._id;
+    const egg = (await proof.executeCommand(
+      owner,
+      M.Ingredient_createViaIntroduce,
+      { name: "Egg yolk", unit: "cup", costPerUnit: 1, allergens: ["eggs"] },
+    )) as { docId: string };
+    const sauce = (await proof.executeCommand(
+      owner,
+      M.Component_createViaDraft,
+      { name: "Gravy", yieldQuantity: 1, yieldUnit: "gallon" },
+    )) as { docId: string };
+    await proof.executeCommand(owner, M.Component_setDeclaredAllergens, {
+      docId: sauce.docId,
+      declaredAllergens: ["wheat"],
+    });
+    await proof.executeCommand(owner, M.ComponentIngredient_createViaAdd, {
+      componentId: sauce.docId,
+      ingredientId: egg.docId,
+      quantity: 1,
+      unit: "cup",
+    });
+    await proof.executeCommand(owner, M.DishComponent_createViaAttach, {
+      dishId: ribId,
+      componentId: sauce.docId,
+      yieldQuantity: 1,
+    });
+    const [menu] = (await proof.anonymous.query(
+      api.publicMenu.getPublicMenu,
+      {},
+    )) as any[];
+    const rib = menu.dishes.find(
+      (row: any) => row.name === "Braised short rib",
+    );
+    expect(rib.allergens).toEqual(["milk", "eggs", "tree_nuts", "wheat"]);
+    const tart = menu.dishes.find((row: any) => row.name === "Pear tart");
+    expect(tart.allergens).toEqual(["milk", "tree_nuts"]);
+  });
+
   it("shows another company nothing", async () => {
     const proof = harness();
     await seedCatalog(proof, "tenant-menu-d");

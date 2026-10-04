@@ -4,6 +4,8 @@ import {
   dishAllergenClaim,
 } from "../../../src/features/kitchen/dishAllergens";
 import { deriveAllergenRows } from "../../../src/features/kitchen/AllergenMatrixPage";
+import { menuDishTextSources } from "../../../src/features/events/EventMenuDietaryConflictsCard";
+import { crossCheckMenu } from "../../../src/features/events/eventDietaryCrossCheck";
 
 const input = {
   dishIngredients: [],
@@ -40,6 +42,42 @@ describe("allergens marked on a recipe reach its dishes (PL-RECIPE-SHEET)", () =
       ...input,
     });
     expect([...rows[0]!.sources.keys()]).toEqual(["wheat"]);
+  });
+
+  it("the event menu's guest-allergy check reads recipe marks and ingredient allergens", () => {
+    const sources = menuDishTextSources({
+      eventId: "e",
+      event: null,
+      guests: [],
+      selections: [{ _id: "line", dishId: "pasta" }],
+      dishes: [{ _id: "pasta", name: "Pasta" }],
+      dishIngredients: [],
+      dishComponents: [{ dishId: "pasta", componentId: "sauce" }],
+      componentIngredients: [{ componentId: "sauce", ingredientId: "parm" }],
+      ingredients: [{ _id: "parm", name: "Parmesan", allergens: ["milk"] }],
+      components: [
+        { _id: "sauce", name: "Pomodoro Sauce", declaredAllergens: ["wheat"] },
+      ],
+    });
+    const conflicts = crossCheckMenu(
+      [
+        {
+          term: "gluten",
+          family: "gluten",
+          origin: { kind: "guest", guestName: "Ann" },
+        },
+        {
+          term: "dairy",
+          family: "dairy",
+          origin: { kind: "guest", guestName: "Bo" },
+        },
+      ],
+      sources,
+    );
+    expect(conflicts.map((row) => row.evidence)).toEqual([
+      "Pomodoro Sauce ingredient: “parmesan”",
+      "Pomodoro Sauce marked on recipe: “wheat”",
+    ]);
   });
 
   it("without the recipe list nothing changes for older callers", () => {
