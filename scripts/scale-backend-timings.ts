@@ -397,6 +397,28 @@ try {
       "Dish list, all 5,000 (queries.listDish; same call, cache may answer)",
       () => client.query(api.queries.listDish, {}),
     ),
+    // What a dish change re-reads now: one page. The page size moves by one
+    // each call (380-500), so the cache cannot answer.
+    await time("Dish list page (dishLookup.page, 380-500 dishes)", (i) =>
+      client.query(api.dishLookup.page, {
+        paginationOpts: { numItems: 380 + i, cursor: null },
+      }),
+    ),
+    // A screen's first open: every page in turn, as useWholeDishList does.
+    await time(
+      "Dish list, all pages in turn (dishLookup.page, about 500 a page)",
+      async (i) => {
+        let cursor: string | null = null;
+        for (;;) {
+          const result = (await client.query(api.dishLookup.page, {
+            paginationOpts: { numItems: 480 + i, cursor },
+          })) as { isDone: boolean; continueCursor: string };
+          if (result.isDone) return;
+          cursor = result.continueCursor;
+        }
+      },
+      10,
+    ),
     await time("Dish detail (queries.getDish)", (i) =>
       client.query(api.queries.getDish, { id: dishes[(i * 37) % DISHES]!._id }),
     ),

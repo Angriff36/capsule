@@ -148,10 +148,22 @@ fix (full page load in the dev server, sign-in check included):
 | Events page to its list         | 5       | 1,873  | 2,861  |
 | Event page to its sections      | 10      | 2,006  | 2,555  |
 
+Dish list in pages (run of 2026-10-04, same company): the kitchen catalog,
+dish page, menu page, pack rules, proposals, imports and the "add a dish"
+pickers now read the dish list 500 at a time (`dishLookup.page`), every
+page loaded. Each page is its own read, so a dish change re-reads one page.
+
+| Read                                                       | Samples | Cold ms | p50 ms | p95 ms |
+| ---------------------------------------------------------- | ------- | ------- | ------ | ------ |
+| One page, 380-500 dishes (what a dish change re-reads)     | 120     | 104     | 103    | 111    |
+| All pages in turn, 5,000 dishes (a screen's first open)    | 10      | 614     | 604    | 614    |
+
+The one-call list took 2.5 s uncached; the same 5,000 dishes in ten pages
+take 0.6 s in all. Browser check `dish-pages.mjs` PASS at 360 and 1280
+(catalog shows all 2,329 local dishes, dish page, pack rules, proposals).
+
 ## Still open for AC-172
 
-- The dish list's first read after a change (2.5 s at 5,000 dishes); left on
-  catalog screens and pickers on purpose.
 - Event tabs now read one event's guests, prep tasks, review flags,
   timeline blocks / comments, crew (assignments, needs, shifts), ingredient
   needs, equipment holds, rental lines, pack lists and proposals. Still
