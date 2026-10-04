@@ -91,9 +91,16 @@ describe("ralph-sync.sh brings a work copy up to date with dev", () => {
       const upstream = addUpstream(other, "drinks.txt", "lemonade\n");
       // The checkout's own remote ref is old; only a fetch can see `upstream`.
       expect(git(work, "rev-parse", "origin/dev")).not.toBe(upstream);
+      const before = git(work, "rev-parse", "HEAD");
 
       const run = sync(work);
       expect(run.status).toBe(0);
+      expect(run.out).toContain(`this copy is loop/work at ${before}`);
+      expect(run.out).toContain("missing 1 commit(s) from origin/dev");
+      expect(run.out).toContain(`${upstream.slice(0, 7)} upstream drinks.txt`);
+      expect(run.out.indexOf(before)).toBeLessThan(
+        run.out.indexOf("integrating newer origin/dev"),
+      );
       expect(run.out).toContain("integrating newer origin/dev");
       expect(run.out).toContain("loop/work");
       expect(git(work, "rev-parse", "origin/dev")).toBe(upstream);
@@ -114,6 +121,8 @@ describe("ralph-sync.sh brings a work copy up to date with dev", () => {
       const tip = git(work, "rev-parse", "dev");
       const run = sync(work);
       expect(run.status).toBe(0);
+      expect(run.out).toContain(`this copy is loop/work at ${tip}`);
+      expect(run.out).not.toContain("missing");
       expect(run.out).toContain(`current with origin/dev (${tip.slice(0, 8)})`);
     },
     TIMEOUT,

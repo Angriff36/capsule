@@ -228,7 +228,7 @@ if [ "$DRY_RUN" -eq 1 ]; then
 fi
 
 . "$(dirname "${BASH_SOURCE[0]}")/ralph-sync.sh" || exit 1
-if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "${RALPH_BASE_BRANCH:-main}" ]; then
+if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "${RALPH_BASE_BRANCH:-dev}" ]; then
     echo "Error: Ralph needs a work branch. Use --branch ralph/work."
     exit 1
 fi

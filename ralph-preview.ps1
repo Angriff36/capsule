@@ -10,13 +10,25 @@ function Test-PreviewCheckout {
         return $map.file.Replace('\', '/') -eq "$previewRoot/src/main.tsx"
     } catch { return $false }
 }
+function Get-CheckoutCommit {
+    try { $commit = & git -C $PSScriptRoot rev-parse HEAD 2>$null } catch { $commit = $null }
+    if ($LASTEXITCODE -eq 0 -and $commit) { return "$commit".Trim() }
+    return 'unknown (not a git checkout)'
+}
+function Get-PortOwner {
+    $owner = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $owner) { return $null }
+    $process = Get-Process -Id $owner.OwningProcess -ErrorAction SilentlyContinue
+    $name = if ($process) { $process.ProcessName } else { 'unknown' }
+    return "PID $($owner.OwningProcess) ($name)"
+}
 if (Test-PreviewCheckout) {
-    Write-Output "Preview verified: $previewUrl serves $previewRoot"
+    Write-Output "Preview verified: $previewUrl serves $previewRoot at commit $(Get-CheckoutCommit) ($(Get-PortOwner))"
     exit 0
 }
 if (-not $Ensure) { throw "Preview missing or wrong checkout at $previewUrl. Run this script with -Ensure to start it." }
-$listener = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue
-if ($listener) { throw "Port $Port is occupied by another server. Choose a free port and update RALPH_PREVIEW_CHECK_CMD." }
+$portOwner = Get-PortOwner
+if ($portOwner) { throw "Port $Port is occupied by another server, $portOwner; it was left running. Choose a free port and update RALPH_PREVIEW_CHECK_CMD." }
 $viteEntry = Join-Path $PSScriptRoot 'node_modules/vite/bin/vite.js'
 if (-not (Test-Path $viteEntry)) { throw 'Install project dependencies before starting preview.' }
 $logDir = Join-Path $PSScriptRoot '.artifacts'
@@ -28,7 +40,7 @@ $previewProcess = Start-Process -FilePath (Get-Command node).Source -ArgumentLis
   -RedirectStandardError (Join-Path $logDir 'ralph-preview.err.log')
 for ($attempt = 0; $attempt -lt 30; $attempt++) {
     if (Test-PreviewCheckout) {
-        Write-Output "Preview verified: $previewUrl serves $previewRoot (PID $($previewProcess.Id))"
+        Write-Output "Preview verified: $previewUrl serves $previewRoot at commit $(Get-CheckoutCommit) (started PID $($previewProcess.Id); port served by $(Get-PortOwner))"
         exit 0
     }
     if ($previewProcess.HasExited) { throw 'Preview exited; inspect .artifacts/ralph-preview.err.log.' }

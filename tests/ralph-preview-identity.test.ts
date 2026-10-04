@@ -18,10 +18,23 @@ afterEach(() => {
   for (const server of servers.splice(0)) server.kill();
 });
 
-/** A copy of the script in its own folder: the folder it must find served. */
+function git(cwd: string, ...args: string[]): string {
+  const result = spawnSync("git", args, { cwd, encoding: "utf8" });
+  if (result.status !== 0)
+    throw new Error(`git ${args.join(" ")}: ${result.stderr}`);
+  return result.stdout.trim();
+}
+
+/** A copy of the script in its own git folder: the folder it must find served. */
 function checkout() {
   const root = mkdtempSync(join(tmpdir(), "capsule-ralph-preview-"));
   copyFileSync(SCRIPT, join(root, "ralph-preview.ps1"));
+  git(root, "init", "-b", "dev");
+  git(root, "config", "user.email", "test@example.invalid");
+  git(root, "config", "user.name", "Preview Test");
+  git(root, "config", "core.hooksPath", join(root, "no-hooks"));
+  git(root, "add", "ralph-preview.ps1");
+  git(root, "commit", "-m", "start");
   return root;
 }
 
@@ -75,6 +88,10 @@ describe.skipIf(process.platform !== "win32")(
         expect(run.status).toBe(0);
         expect(run.out).toContain(`http://127.0.0.1:${port}`);
         expect(run.out).toContain(root.replace(/\\/g, "/"));
+        expect(run.out).toContain(
+          `at commit ${git(root, "rev-parse", "HEAD")}`,
+        );
+        expect(run.out).toContain(`PID ${servers[0]!.pid} (node)`);
       },
       TIMEOUT,
     );
@@ -99,6 +116,7 @@ describe.skipIf(process.platform !== "win32")(
         const run = preview(root, port, true);
         expect(run.status).not.toBe(0);
         expect(run.out).toContain(`Port ${port} is occupied`);
+        expect(run.out).toContain(`PID ${servers[0]!.pid} (node)`);
         expect(servers[0]!.exitCode).toBeNull();
         expect(servers[0]!.killed).toBe(false);
       },
