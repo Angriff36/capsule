@@ -116,7 +116,9 @@ export function RecordPictures({
       </div>
       {rows === undefined ? null : items.length === 0 ? (
         <p className="text-sm text-ink-3">
-          None yet. Add plating shots, method steps or a short clip.
+          {parentType === "equipment"
+            ? "None yet. Add photos of the item, its parts, or a short how-to clip."
+            : "None yet. Add plating shots, method steps or a short clip."}
         </p>
       ) : (
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-3">
