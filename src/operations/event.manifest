@@ -938,7 +938,7 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // Quote → Planning → Pending Approval → Approved → Sales Lock → Executing → Final → Complete → Close Out lifecycle
   transition stage from "quote" to ["planning", "cancelled"]
-  transition stage from "planning" to ["pending_approval", "cancelled"]
+  transition stage from "planning" to ["pending_approval", "completed", "cancelled"]
   transition stage from "pending_approval" to ["planning", "approved", "cancelled"]
   transition stage from "approved" to ["sales_lock", "cancelled"]
   transition stage from "sales_lock" to ["executing", "cancelled"]
@@ -1839,6 +1839,23 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "eventManageAccess")
     mutate stage = "completed"
     mutate completedAt = now()
+    emit EventCompleted {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // An event that already happened (the old system says Complete or Closed
+  // Out) is recorded as completed straight from planning. It never goes
+  // through approval here, so no invoice, staffing, pack list or purchasing
+  // work is drafted for an event that is over.
+  command recordPastCompletion() {
+    guard self.stage == "planning"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint pastEventOnly: self.endsAt < now() "Only an event that has already happened can be marked finished from planning."
+    mutate stage = "completed"
+    mutate completedAt = self.endsAt
     emit EventCompleted {
       eventId: self.id
       tenantId: self.tenantId

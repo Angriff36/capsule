@@ -7004,6 +7004,11 @@ export const EventRecordFinalVenueFactsParamsSchema = z.object({
 
 export type EventRecordFinalVenueFactsParams = z.infer<typeof EventRecordFinalVenueFactsParamsSchema>;
 
+// Command: recordPastCompletion on Event
+export const EventRecordPastCompletionParamsSchema = z.object({});
+
+export type EventRecordPastCompletionParams = z.infer<typeof EventRecordPastCompletionParamsSchema>;
+
 // Command: reschedule on Event
 export const EventRescheduleParamsSchema = z.object({
   startsAt: z.coerce.date(),

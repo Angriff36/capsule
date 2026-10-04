@@ -275,6 +275,7 @@ import {
   EventReactivateParamsSchema,
   EventReassignClientParamsSchema,
   EventRecordFinalVenueFactsParamsSchema,
+  EventRecordPastCompletionParamsSchema,
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
@@ -3984,6 +3985,16 @@ export function useEventRecordFinalVenueFacts() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventRecordFinalVenueFactsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.recordPastCompletion. */
+export function useEventRecordPastCompletion() {
+  const mutate = useMutation(api.mutations.Event_recordPastCompletion);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventRecordPastCompletionParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14097,4 +14108,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1491 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1492 as const;
