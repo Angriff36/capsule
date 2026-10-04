@@ -82,7 +82,12 @@ export function EventImportPage() {
         id: venue._id,
         name: venue.name,
       })),
-      dishes: activeDishes.map((dish) => ({ id: dish._id, name: dish.name })),
+      dishes: activeDishes.map((dish) => ({
+        id: dish._id,
+        name: dish.name,
+        versionLabel: dish.versionLabel,
+        versionOfId: dish.versionOfDishId,
+      })),
     });
   }, [bundle, activeClients, activeVenues, activeDishes]);
   const seedKey = suggestion

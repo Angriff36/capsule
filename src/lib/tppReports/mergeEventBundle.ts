@@ -41,13 +41,18 @@ function addPrepDishesToMenu(
 ): void {
   const baseName = (value: string) =>
     normalizeName(value.replace(/\([^)]*\)/g, ""));
-  const onMenu = new Set(menu.map((item) => baseName(item.name)));
+  const onMenu = new Map(menu.map((item) => [baseName(item.name), item]));
   const added: string[] = [];
   for (const task of prepTasks) {
     const key = baseName(task.dishName);
-    if (key.length === 0 || onMenu.has(key)) continue;
-    onMenu.add(key);
-    const item: BundleMenuItem = { name: task.dishName };
+    const listed = onMenu.get(key);
+    if (listed) {
+      listed.finish ??= task.category;
+      continue;
+    }
+    if (key.length === 0) continue;
+    const item: BundleMenuItem = { name: task.dishName, finish: task.category };
+    onMenu.set(key, item);
     if (task.parentServings !== undefined) {
       item.quantityServings = task.parentServings;
     }
