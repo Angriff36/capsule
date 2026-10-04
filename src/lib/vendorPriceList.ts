@@ -14,6 +14,9 @@ export type VendorPriceRow = {
   packUnit: UnitCode | null;
   packPrice: number | null;
   priceText: string;
+  priceDateText: string;
+  /** Noon UTC on the row's price date, or null when there is none. */
+  priceDate: number | null;
 };
 
 const pick = (row: Record<string, unknown>, ...names: string[]): string => {
@@ -32,6 +35,31 @@ export function priceFromText(priceText: string): number | null {
   return quantityFromText(priceText.replace(/^\$/, "").replace(/\$/g, ""));
 }
 
+/**
+ * "2025-03-14", "3/14/2025" or "3/14/25" -> noon UTC that day (the same
+ * calendar day in every US time zone); anything else -> null.
+ */
+export function priceDateFromText(text: string): number | null {
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text);
+  const us = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/.exec(text);
+  const [year, month, day] = iso
+    ? [Number(iso[1]), Number(iso[2]), Number(iso[3])]
+    : us
+      ? [
+          us[3]!.length === 2 ? 2000 + Number(us[3]) : Number(us[3]),
+          Number(us[1]),
+          Number(us[2]),
+        ]
+      : [NaN, NaN, NaN];
+  const at = Date.UTC(year, month - 1, day, 12);
+  const back = new Date(at);
+  return Number.isFinite(at) &&
+    back.getUTCMonth() === month - 1 &&
+    back.getUTCDate() === day
+    ? at
+    : null;
+}
+
 /** One sheet row → the fields a vendor item needs. Headers are matched loosely. */
 export function readVendorPriceRow(
   row: Record<string, unknown>,
@@ -39,6 +67,14 @@ export function readVendorPriceRow(
   const packUnitText = pick(row, "Pack unit", "Unit", "UOM", "Pack UOM");
   const priceText = pick(row, "Pack price", "Price", "Case price", "Cost");
   const itemName = pick(row, "Item name", "Item", "Description", "Product");
+  const priceDateText = pick(
+    row,
+    "Price date",
+    "Date",
+    "Effective date",
+    "As of",
+    "Price as of",
+  );
   return {
     vendorName: pick(row, "Vendor", "Vendor name", "Supplier"),
     itemCode: pick(row, "Item number", "Item code", "Item no", "SKU", "Code"),
@@ -51,6 +87,8 @@ export function readVendorPriceRow(
     packUnit: unitFromText(packUnitText),
     packPrice: priceFromText(priceText),
     priceText,
+    priceDateText,
+    priceDate: priceDateText ? priceDateFromText(priceDateText) : null,
   };
 }
 
@@ -66,6 +104,10 @@ export function vendorPriceRowProblem(row: VendorPriceRow): string | null {
       : "No pack unit.";
   if (row.priceText && row.packPrice == null)
     return `"${row.priceText}" is not a price.`;
+  if (row.priceDateText && row.priceDate == null)
+    return `"${row.priceDateText}" is not a date. Write it like 2025-03-14 or 3/14/2025.`;
+  if (row.priceDate != null && row.packPrice == null)
+    return "A price date needs a pack price on the same row.";
   return null;
 }
 

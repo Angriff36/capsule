@@ -2658,6 +2658,24 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-03",
       "reason": "New optional clock-out location; existing time entries read as no location."
+    },
+    {
+      "path": "update.parameters.priceDate",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "VendorItem.update takes an optional price date (an old price list read in); callers that leave it out keep today's date."
+    },
+    {
+      "path": "VendorItemAdded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "The event now carries the pack price, pack and price date so the price history can be read from it; no reaction listens to it."
+    },
+    {
+      "path": "VendorItemUpdated.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "The event also carries the optional price date; older events without it read as dated when they happened."
     }
   ]
 }

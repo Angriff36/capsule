@@ -2182,10 +2182,10 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - effects: StationRetired
   - refresh: live reads update by themselves; reads affected: Station.list, Station.get
 - `mutations.VendorItem_createViaAdd` (VendorItem.add)
-  - inputs from the screen: vendorId, ingredientId, description, packQuantity, packUnit, itemCode, packPrice; filled by the server: none
+  - inputs from the screen: vendorId, ingredientId, description, packQuantity, packUnit, itemCode, packPrice, priceDate; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 6 more
+  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
   - effects: VendorItemAdded
   - refresh: live reads update by themselves; reads affected: VendorItem.list, VendorItem.get, Ingredient.list, Ingredient.get, Vendor.list, Vendor.get
 - `mutations.VendorItem_remove` (VendorItem.remove)
@@ -2196,10 +2196,10 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - effects: VendorItemRemoved
   - refresh: live reads update by themselves; reads affected: VendorItem.list, VendorItem.get, Ingredient.list, Ingredient.get, Vendor.list, Vendor.get
 - `mutations.VendorItem_update` (VendorItem.update)
-  - inputs from the screen: description, packQuantity, packUnit, itemCode, packPrice; filled by the server: none
+  - inputs from the screen: description, packQuantity, packUnit, itemCode, packPrice, priceDate; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "Say what the vendor calls this item."; and 4 more
+  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "Say what the vendor calls this item."; and 5 more
   - effects: VendorItemUpdated
   - refresh: live reads update by themselves; reads affected: VendorItem.list, VendorItem.get, Ingredient.list, Ingredient.get, Vendor.list, Vendor.get
 - `mutations.VendorOrderLine_createViaAddLine` (VendorOrderLine.addLine)
@@ -2271,6 +2271,8 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
 - `menuRecipeLookup.forDishes` - query; live read, updates by itself
+- `vendorPriceList.importVendorPriceRows` - mutation; authored step; live reads update by themselves
+- `vendorPriceList.priceHistory` - query; live read, updates by itself
 
 ## 5. Timeline and route
 

@@ -37,7 +37,13 @@ export function VendorPriceListImport() {
     setMessage("");
     setProblems([]);
     setBusy(true);
-    const total = { vendorsAdded: 0, added: 0, updated: 0, unchanged: 0 };
+    const total = {
+      vendorsAdded: 0,
+      added: 0,
+      updated: 0,
+      unchanged: 0,
+      pastPrices: 0,
+    };
     const found: Problem[] = [];
     try {
       const rows = sheetRows(await file.text());
@@ -51,6 +57,7 @@ export function VendorPriceListImport() {
         total.added += result.added;
         total.updated += result.updated;
         total.unchanged += result.unchanged;
+        total.pastPrices += result.pastPrices;
         found.push(...result.problems);
       }
       setProblems(found);
@@ -61,6 +68,9 @@ export function VendorPriceListImport() {
               `${formatCountNoun(total.added, "item")} added`,
               `${total.updated} updated`,
               `${total.unchanged} already up to date`,
+              total.pastPrices > 0
+                ? `${formatCountNoun(total.pastPrices, "older price")} kept in price history`
+                : "",
               total.vendorsAdded > 0
                 ? formatCountNoun(total.vendorsAdded, "new vendor")
                 : "",
@@ -94,10 +104,12 @@ export function VendorPriceListImport() {
           <h2>Bring in a vendor price list</h2>
           <p className="text-xs text-ink-2">
             A CSV with Vendor, Item name, Pack amount and Pack unit columns,
-            plus any of: Item number, Ingredient, Pack price. Each row is one
-            item a vendor sells for one ingredient. New vendors are added. A new
-            price keeps the old one in the item&apos;s history. Reading the same
-            file again changes nothing.
+            plus any of: Item number, Ingredient, Pack price, Price date. Each
+            row is one item a vendor sells for one ingredient. New vendors are
+            added. A new price keeps the old one in the item&apos;s history. To
+            bring in old prices, put one row per price with its Price date: the
+            newest becomes the price, older ones go into the history. Reading
+            the same file again changes nothing.
           </p>
         </div>
       </div>

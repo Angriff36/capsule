@@ -12495,9 +12495,18 @@ export const VendorItemAddParamsSchema = z.object({
   packUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   itemCode: z.string().optional(),
   packPrice: z.number().optional(),
+  priceDate: z.coerce.date().optional(),
 });
 
 export type VendorItemAddParams = z.infer<typeof VendorItemAddParamsSchema>;
+
+// Command: recordPastPrice on VendorItem
+export const VendorItemRecordPastPriceParamsSchema = z.object({
+  packPrice: z.number(),
+  priceDate: z.coerce.date(),
+});
+
+export type VendorItemRecordPastPriceParams = z.infer<typeof VendorItemRecordPastPriceParamsSchema>;
 
 // Command: remove on VendorItem
 export const VendorItemRemoveParamsSchema = z.object({});
@@ -12511,6 +12520,7 @@ export const VendorItemUpdateParamsSchema = z.object({
   packUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   itemCode: z.string().optional(),
   packPrice: z.number().optional(),
+  priceDate: z.coerce.date().optional(),
 });
 
 export type VendorItemUpdateParams = z.infer<typeof VendorItemUpdateParamsSchema>;
