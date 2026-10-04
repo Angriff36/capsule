@@ -81,8 +81,9 @@ export function SourceLinkList({
             </dl>
             {oldStatus ? (
               <p className="mt-2 text-ink-3">
-                Imported events start in Planning here. Move this event on when
-                you are ready.
+                Imported events that are over or cancelled take that status
+                here; the others start in Planning. Move this event on when you
+                are ready.
               </p>
             ) : null}
             {link.mergedFromName ? (
@@ -151,7 +152,7 @@ function StatusChip({ status }: { readonly status: string }) {
  * The event status the old system had (TPP EventStatus, kept on the import
  * row because the import does not apply it as the Capsule stage).
  */
-function oldSystemStatus(raw: string | null): string | null {
+export function oldSystemStatus(raw: string | null): string | null {
   if (!raw) return null;
   try {
     const parsed: unknown = JSON.parse(raw);

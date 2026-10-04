@@ -148,6 +148,7 @@ import type * as lib_headcountStaffingReconciliation from "../lib/headcountStaff
 import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_importCompanies from "../lib/importCompanies.js";
 import type * as lib_importEventFiles from "../lib/importEventFiles.js";
+import type * as lib_importEventStage from "../lib/importEventStage.js";
 import type * as lib_importIdentity from "../lib/importIdentity.js";
 import type * as lib_importPackListLines from "../lib/importPackListLines.js";
 import type * as lib_importRecordHomes from "../lib/importRecordHomes.js";
@@ -174,6 +175,7 @@ import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallb
 import type * as lib_materializationReceipt from "../lib/materializationReceipt.js";
 import type * as lib_messageMedia from "../lib/messageMedia.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
+import type * as lib_oldSystemEventStage from "../lib/oldSystemEventStage.js";
 import type * as lib_oneOnlyRules from "../lib/oneOnlyRules.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_operationalEvents from "../lib/operationalEvents.js";
@@ -463,6 +465,7 @@ declare const fullApi: ApiFromModules<{
   "lib/householdVolumeParse": typeof lib_householdVolumeParse;
   "lib/importCompanies": typeof lib_importCompanies;
   "lib/importEventFiles": typeof lib_importEventFiles;
+  "lib/importEventStage": typeof lib_importEventStage;
   "lib/importIdentity": typeof lib_importIdentity;
   "lib/importPackListLines": typeof lib_importPackListLines;
   "lib/importRecordHomes": typeof lib_importRecordHomes;
@@ -489,6 +492,7 @@ declare const fullApi: ApiFromModules<{
   "lib/materializationReceipt": typeof lib_materializationReceipt;
   "lib/messageMedia": typeof lib_messageMedia;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
+  "lib/oldSystemEventStage": typeof lib_oldSystemEventStage;
   "lib/oneOnlyRules": typeof lib_oneOnlyRules;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/operationalEvents": typeof lib_operationalEvents;

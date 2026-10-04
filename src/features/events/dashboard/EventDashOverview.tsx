@@ -338,7 +338,11 @@ export function EventDashOverview({
         <EventImportDraftPanel eventId={eventId} />
         <EventProposalSourceCard eventId={eventId} />
         <EventProposalEnhancementsCard eventId={eventId} />
-        <EventSourceProvenancePanel capsuleId={eventId} />
+        <EventSourceProvenancePanel
+          capsuleId={eventId}
+          stage={props.stage}
+          endsAt={props.endsAt}
+        />
       </div>
     </section>
   );

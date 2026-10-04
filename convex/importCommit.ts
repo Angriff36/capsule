@@ -34,10 +34,11 @@
  * looked up against prior contacts/venues imports (recordType "contact"/"venue"
  * → Capsule id) before the Event is created; an event whose client was not
  * imported becomes a `pending_conflict` link (reconcile queue) rather than
- * fabricating a client. The TPP-mapped stage is NOT applied (the create command
- * hardcodes `stage: "planning"` and exposes no stage arg); the raw TPP
- * EventStatus is preserved on the link's rawSourceData for parallel-run
- * reconciliation (§6.1).
+ * fabricating a client. The create command makes the event in Planning; an old
+ * event that is over (Complete / Closed Out) or Cancelled then takes that
+ * status (`lib/importEventStage.ts`), and live old statuses stay in Planning.
+ * The raw TPP EventStatus is preserved on the link's rawSourceData for
+ * parallel-run reconciliation (§6.1).
  *
  * Leads need NO cross-dataset resolution: a Lead is the PRE-client inquiry
  * (`clientId` is optional, set only on conversion), so a TPP opportunity/
@@ -134,6 +135,7 @@ import { commitStockRows } from "./openingStock";
 import { commitHistoryRows } from "./importHistory";
 import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
 import { attachImportedEventFiles } from "./lib/importEventFiles";
+import { applyImportedEventStage } from "./lib/importEventStage";
 import {
   COMPANY_RECORD_TYPE,
   commitImportedCompany,
@@ -1294,6 +1296,21 @@ export const commitImportRun = action({
             eventId,
             files: event.files ?? [],
           });
+          // An old event that is over or was cancelled takes that status;
+          // live old statuses stay in Planning.
+          const stageError = await applyImportedEventStage(ctx, {
+            importRunId: args.importRunId,
+            externalId: event.externalId,
+            eventId,
+            rawStatus: event.rawEventStatus,
+            endsAt,
+          });
+          const notes = [
+            ...(fileErrors.length > 0
+              ? [`Some files were not added: ${fileErrors.join("; ")}`]
+              : []),
+            ...(stageError ? [stageError] : []),
+          ];
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -1307,11 +1324,7 @@ export const commitImportRun = action({
               rawRows[parsed.sourceIndexes[index]!],
             ),
             conflictStatus: "resolved",
-            ...(fileErrors.length > 0
-              ? {
-                  resolutionNote: `Some files were not added: ${fileErrors.join("; ")}`,
-                }
-              : {}),
+            ...(notes.length > 0 ? { resolutionNote: notes.join(" ") } : {}),
             ...sourceBaseline("events", event),
           });
           committed += 1;

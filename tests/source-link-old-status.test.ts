@@ -11,6 +11,7 @@ import {
   SourceLinkList,
   type SourceLink,
 } from "../src/features/events/SourceLinkList";
+import { oldSystemFinishedStage } from "../convex/lib/oldSystemEventStage";
 
 function link(rawSourceData: string | null): SourceLink {
   return {
@@ -41,7 +42,22 @@ describe("old-system status on an imported event", () => {
     ]);
     expect(html).toContain("Status in the old system");
     expect(html).toContain("Confirmed");
-    expect(html).toContain("Imported events start in Planning here.");
+    expect(html).toContain("the others start in Planning");
+  });
+
+  it("copies only a finished old event that is over, or a cancelled one", () => {
+    const now = Date.UTC(2026, 9, 4);
+    const past = now - 86_400_000;
+    const future = now + 86_400_000;
+    expect(oldSystemFinishedStage("Complete", past, now)).toBe("completed");
+    expect(oldSystemFinishedStage("Closed Out", past, now)).toBe("completed");
+    expect(oldSystemFinishedStage("Complete", future, now)).toBeNull();
+    expect(oldSystemFinishedStage(" cancelled ", future, now)).toBe(
+      "cancelled",
+    );
+    for (const live of ["Quote", "Planning", "Approved", "Executing", ""]) {
+      expect(oldSystemFinishedStage(live, past, now)).toBeNull();
+    }
   });
 
   it("shows nothing extra when the import kept no status", () => {
