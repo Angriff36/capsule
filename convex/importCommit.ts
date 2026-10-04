@@ -954,13 +954,14 @@ export const commitImportRun = action({
           [contact.title, contact.notes].filter(Boolean).join(" — ") ||
           undefined;
         // AC-275: the person's company, when the company row was imported.
-        const companyName = contact.companyId
-          ? await importedCompanyName(ctx, {
-              tenantId,
-              sourceSystem,
-              companyId: contact.companyId,
-            })
-          : undefined;
+        const companyName =
+          (contact.companyId
+            ? await importedCompanyName(ctx, {
+                tenantId,
+                sourceSystem,
+                companyId: contact.companyId,
+              })
+            : undefined) ?? contact.companyName;
         try {
           const created = await ctx.runMutation(
             api.mutations.Client_createViaRegister,

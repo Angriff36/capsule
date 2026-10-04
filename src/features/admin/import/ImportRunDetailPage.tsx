@@ -15,6 +15,7 @@ import { useRouteRecord } from "../../../lib/routeRecord";
 import { importRunsListPath } from "./importRoutes";
 import { ImportProvenancePanel } from "./ImportProvenancePanel";
 import { ArchiveIntakePanel } from "./ArchiveIntakePanel";
+import { SourceRowsFilePicker } from "./SourceRowsFilePicker";
 import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
@@ -733,11 +734,19 @@ export function ImportRunDetailPage() {
             </h2>
           </div>
           <div className="p-4">
+            <SourceRowsFilePicker
+              datasetType={importRun.datasetType}
+              noun={commitNoun}
+              onRows={(rows) =>
+                setSourceRowsInput(JSON.stringify(rows, null, 1))
+              }
+            />
             <label
               htmlFor="sourceRows"
               className="block text-xs font-medium text-ink mb-2"
             >
-              {commitNounLabel} source rows (JSON array)
+              {commitNounLabel} source rows (filled from the file, or pasted as
+              a JSON array)
             </label>
             <textarea
               id="sourceRows"

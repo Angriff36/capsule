@@ -85,6 +85,8 @@ export interface TppContactRecord {
   Mobile?: string;
   Title?: string;
   CompanyID?: string;
+  // The Address / Phone List prints a person's company by name ("Company").
+  CompanyName?: string;
   IsPrimary?: boolean;
   IsBilling?: boolean;
   Notes?: string;
@@ -98,10 +100,15 @@ export interface TppContactRecord {
 }
 
 export interface TppCompanyRecord {
-  CompanyID: string;
+  // The Address / Phone List prints company rows with no id.
+  CompanyID?: string;
   CompanyName: string;
   ClientType?: string;
   BillingAddress?: string;
+  // Address / Phone List columns of a company row.
+  Address?: string;
+  Email?: string;
+  Phone?: string;
   City?: string;
   State?: string;
   ZipCode?: string;
@@ -231,6 +238,8 @@ export interface ParsedCapsuleContact {
   mobile?: string;
   title?: string;
   companyId?: string;
+  /** The person's company as printed, used when no company row is linked. */
+  companyName?: string;
   isPrimary?: boolean;
   isBillingContact?: boolean;
   notes?: string;
@@ -676,6 +685,7 @@ export function parseTppContact(
     mobile: record.Mobile,
     title: record.Title,
     companyId: record.CompanyID,
+    companyName: record.CompanyName?.trim() || undefined,
     isPrimary: parseTppBoolean(record.IsPrimary),
     isBillingContact: parseTppBoolean(record.IsBilling),
     notes: record.Notes,
@@ -723,13 +733,27 @@ export function parseTppCompany(
 ): ParsedCapsuleContact {
   const terms = /(\d{1,3})/.exec(record.PaymentTerms ?? "");
   const days = terms ? Number(terms[1]) : undefined;
+  const sourceId = record.CompanyID?.trim() ?? "";
+  const address = record.BillingAddress ?? record.Address;
   return {
-    externalId: record.CompanyID,
+    // AC-179: a company row with no CompanyID gets a stable id from its details.
+    externalId:
+      sourceId ||
+      derivedSourceId([
+        record.CompanyName,
+        address,
+        record.ZipCode,
+        record.Email,
+        record.Phone,
+      ]),
+    ...(sourceId ? {} : { identitySource: "derived" as const }),
     givenName: "",
     familyName: "",
+    email: record.Email,
+    phone: record.Phone,
     notes: record.Notes,
     createdAt: parseTppDateTime(record.CreatedDate),
-    addressLine1: record.BillingAddress,
+    addressLine1: address,
     city: record.City,
     region: record.State,
     postalCode: record.ZipCode,
