@@ -260,6 +260,7 @@ import type * as personalDataErasure from "../personalDataErasure.js";
 import type * as personalDataExport from "../personalDataExport.js";
 import type * as proposalEmail from "../proposalEmail.js";
 import type * as publicMenu from "../publicMenu.js";
+import type * as pushDeviceHealth from "../pushDeviceHealth.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as qboSync from "../qboSync.js";
 import type * as queries from "../queries.js";
@@ -571,6 +572,7 @@ declare const fullApi: ApiFromModules<{
   personalDataExport: typeof personalDataExport;
   proposalEmail: typeof proposalEmail;
   publicMenu: typeof publicMenu;
+  pushDeviceHealth: typeof pushDeviceHealth;
   pushSubscriptions: typeof pushSubscriptions;
   qboSync: typeof qboSync;
   queries: typeof queries;

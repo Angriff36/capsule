@@ -29,6 +29,7 @@ import {
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { RunAlertLoopLedger } from "./lib/runOfShowAlertLoop";
 import { live, tenantPerson } from "./lib/teamChatRead";
+import { recordPushFailures } from "./pushDeviceHealth";
 import type { PushPayload, PushTarget } from "./teamChatPush";
 import { insertStepEvent } from "./lib/commandAudit";
 
@@ -341,6 +342,8 @@ export const recordRunPushResults = internalMutation({
     gone: v.array(
       v.object({ id: v.id("pushSubscriptions"), version: v.number() }),
     ),
+    // Devices the push service refused for another reason; kept for managers.
+    failed: v.optional(v.array(v.id("pushSubscriptions"))),
     now: v.number(),
   },
   handler: async (ctx, args) => {
@@ -348,6 +351,7 @@ export const recordRunPushResults = internalMutation({
       const row = await ctx.db.get(id);
       if (row && live(row)) await ctx.db.patch(id, { lastUsedAt: args.now });
     }
+    await recordPushFailures(ctx, args.failed ?? [], args.now);
     // 404/410 from the push service: the browser dropped the subscription.
     // Prune only the exact row version the delivery held.
     for (const { id, version } of args.gone) {

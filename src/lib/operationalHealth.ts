@@ -36,6 +36,8 @@ export interface MessageChannelSnapshot {
   oldestWaitingSince: number | null;
   stopped: number;
   notSure: number;
+  /** Phone alerts only: who owns the phones that missed the last alert. */
+  missedBy?: string[];
 }
 
 export interface HealthSnapshot {
@@ -139,6 +141,25 @@ function messageAlerts(snapshot: HealthSnapshot): HealthAlert[] {
         )} minutes.`,
         action: `Check the connection for ${channel.label.toLowerCase()} below. Capsule keeps trying by itself; nothing is lost while it waits. ${RUNBOOK}`,
       });
+    }
+    if (channel.channel === "phoneAlerts") {
+      // Counted per phone. A "check", not a bell item: one lost or switched-off
+      // phone must not ring every manager's bell until someone deals with it.
+      if (channel.stopped > 0) {
+        const who = channel.missedBy?.length
+          ? ` Phones of: ${channel.missedBy.join(", ")}.`
+          : "";
+        alerts.push({
+          key: "phoneAlerts-missed",
+          level: "check",
+          title: `${plural(channel.stopped, "phone", "phones")} did not get the last alert`,
+          detail: `Shift, chat and run-of-show alerts are not reaching ${channel.stopped === 1 ? "this phone" : "these phones"}. Everything still shows when the person opens Capsule.${who}`,
+          action:
+            "Ask the person to open Capsule on that phone and turn phone alerts off and on again. If every phone misses alerts, check the phone alert keys on the server. " +
+            RUNBOOK,
+        });
+      }
+      continue;
     }
     if (channel.stopped > 0) {
       alerts.push({

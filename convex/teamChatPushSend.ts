@@ -51,6 +51,7 @@ export const deliver = internalAction({
 
     const used: Id<"pushSubscriptions">[] = [];
     const gone: { id: Id<"pushSubscriptions">; version: number }[] = [];
+    const failed: Id<"pushSubscriptions">[] = [];
     results.forEach((result, index) => {
       const target = job.targets[index];
       if (!target) return;
@@ -63,15 +64,17 @@ export const deliver = internalAction({
       if (statusCode === 404 || statusCode === 410) {
         gone.push({ id: target.id, version: target.version });
       } else {
+        failed.push(target.id);
         console.warn(
           `push: delivery failed (${statusCode ?? "no status"}) for one device`,
         );
       }
     });
-    if (used.length > 0 || gone.length > 0) {
+    if (used.length > 0 || gone.length > 0 || failed.length > 0) {
       await ctx.runMutation(internal.teamChatPush.recordPushResults, {
         used,
         gone,
+        failed,
         now,
       });
     }

@@ -1,5 +1,5 @@
 // AUTHOR-OWNED — one look at every kind of outside message Capsule sends
-// (webhooks, text alerts, sign-in emails): how many wait for a try, how long
+// (webhooks, text alerts, sign-in emails, phone alerts): how many wait for a try, how long
 // the oldest has waited, how many Capsule stopped trying, and how many it is
 // not sure about. Counts only one workspace, for its managers.
 import type { Doc } from "./_generated/dataModel";
@@ -11,6 +11,7 @@ import {
   type DeliveryPolicy,
   type DeliverySummary,
 } from "./lib/deliveryState";
+import { phoneAlertHealthFor } from "./pushDeviceHealth";
 import { SMS_POLICY, smsAlertHistories } from "./smsAlertClaims";
 import { signInEmailStates } from "./staffSignInEmail";
 import {
@@ -21,13 +22,15 @@ import {
 } from "./webhookIntegrations";
 
 export interface ChannelHealth {
-  channel: "webhooks" | "texts" | "signInEmails";
+  channel: "webhooks" | "texts" | "signInEmails" | "phoneAlerts";
   label: string;
   waiting: number;
   oldestWaitingSince: number | null;
   stopped: number;
   notSure: number;
   delivered: number;
+  /** Phone alerts only: who owns the phones that missed the last alert. */
+  missedBy?: string[];
 }
 
 function tally(
@@ -87,7 +90,7 @@ export async function outsideMessageHealthFor(
   tenantLedger: Doc<"manifestEvents">[],
   now: number,
 ): Promise<ChannelHealth[]> {
-  const [webhookRows, claimRows, signInRows] = await Promise.all([
+  const [webhookRows, claimRows, signInRows, phones] = await Promise.all([
     ctx.db
       .query("manifestEvents")
       .withIndex("by_entity", (q) => q.eq("entity", "WebhookDelivery"))
@@ -100,6 +103,7 @@ export async function outsideMessageHealthFor(
       .query("manifestEvents")
       .withIndex("by_entity", (q) => q.eq("entity", "StaffSignInEmail"))
       .collect(),
+    phoneAlertHealthFor(ctx, tenantId),
   ]);
 
   const webhooks = deliveryHistoryFor(
@@ -119,6 +123,17 @@ export async function outsideMessageHealthFor(
     ),
     tally("texts", "Text alerts", summarized(texts, now, SMS_POLICY)),
     tally("signInEmails", "Sign-in emails", signIns),
+    // Counted per phone, not per alert: did the phone's last alert arrive?
+    {
+      channel: "phoneAlerts",
+      label: "Phone alerts",
+      waiting: 0,
+      oldestWaitingSince: null,
+      stopped: phones.missed,
+      notSure: 0,
+      delivered: phones.reached,
+      missedBy: phones.missedBy,
+    },
   ];
 }
 
