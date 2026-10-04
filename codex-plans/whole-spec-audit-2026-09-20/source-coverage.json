@@ -4542,21 +4542,21 @@
       "key": "PR13-04",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-04",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-LOOP-COMPLETION"],
-      "gap": "Owned by the loop tools (ralph-worker.ps1, loop.sh).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/ralph-completion-contract.test.ts — provider error or changed spec cannot count as success. 2026-10-04: provider-error leg PASS, tests/ralph-completion-contract.test.ts 4/4 (stand-in launcher exits 0: a 429 answer -> worker exit 3, provider message kept, log exit=3; empty answer -> exit 3; real answer -> exit 0 and relayed; missing task file -> exit 2, nothing logged). Open: loop.sh reports one exit code per round (no separate tests / push / integration / frontend deploy / backend deploy / signed-in check states), a codex \"turn.completed\" counts as success even when the answer is a provider error, nothing invalidates a done claim when specs/ changes, and repeated rounds with no plan progress give no diagnosis - loop tool; control-plane repair requested"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/ralph-completion-contract.test.ts — provider error or changed spec cannot count as success. 2026-10-04: provider-error leg PASS, tests/ralph-completion-contract.test.ts 4/4 (stand-in launcher exits 0: a 429 answer -> worker exit 3, provider message kept, log exit=3; empty answer -> exit 3; real answer -> exit 0 and relayed; missing task file -> exit 2, nothing logged). 2026-10-04: loop.sh legs PASS after control-plane repair 861d8884: tests/ralph-loop-rounds.test.ts 6/6 (tests, push, integration, frontend deploy, backend deploy and signed-in check recorded as separate states, a dev push is never a deployment; a failing test run is recorded as fail; a codex answer that is a 429 provider error is a failed round; an all-complete claim carries the specs/ hash and dies when specs/ change; rounds with no change get a diagnosis and the loop goes on, a commit resets the count) + tests/ralph-completion-contract.test.ts 4/4"
       ],
-      "waitsOn": "loop-tools",
+      "waitsOn": null,
       "owners": [
         "ralph-worker.ps1",
         "loop.sh",
         "acceptance/coverage consumers"
       ],
-      "environment": "Not verified yet",
-      "sha": "ba635498"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "861d8884"
     },
     {
       "id": "AC-161",
