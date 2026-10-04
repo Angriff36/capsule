@@ -119,6 +119,35 @@ only the shown month's pack lists, questions, trucks and numbers
 | ----------------------------------------------------- | ------- | ------ | ------ |
 | Month tracker rows, 267 events (`eventMonthRows.forEvents`) | 354 | 347 | 360 |
 
+## Browser leg (local interaction)
+
+`scripts/scale-browser-timings.mjs` (run of 2026-10-03): the same throwaway
+backend, the same 10,000-event / 5,000-dish company filled under the testing
+sign-in's own company, signed in as its owner in headless Chromium at
+1280x800 against the Vite dev server (development React build). The figure
+is the browser's own event timing: from the click or key press to the next
+paint; 16 means under the browser's 16 ms floor.
+
+| Interaction                     | Samples | p50 ms | p95 ms |
+| ------------------------------- | ------- | ------ | ------ |
+| Events page tab click           | 45      | 16     | 24     |
+| Events search key press         | 40      | 16     | 72     |
+| Event page section tab click    | 60      | 32     | 48     |
+
+Every interaction p95 is under 200 ms.
+
+The first run found every screen took 15 to 18 s to open: the notification
+bell (on every screen) read every event, 13.1 s, and the socket answers a
+screen's reads together, so every other read waited for it. The bell now
+reads only events waiting for approval and those whose stage changed in its
+seven-day window (five new event indexes): 282 ms. Screen opens after the
+fix (full page load in the dev server, sign-in check included):
+
+| Screen opens                    | Samples | p50 ms | p95 ms |
+| ------------------------------- | ------- | ------ | ------ |
+| Events page to its list         | 5       | 1,873  | 2,861  |
+| Event page to its sections      | 10      | 2,006  | 2,555  |
+
 ## Still open for AC-172
 
 - The dish list's first read after a change (2.5 s at 5,000 dishes); left on
@@ -129,4 +158,5 @@ only the shown month's pack lists, questions, trucks and numbers
   whole on purpose: catalogs, stock holds, vendor orders, and the lists a
   screen compares across events (shift overlaps, a person's week, role
   suggestions). The two-year tracker board still reads whole lists.
-- Screen response under 200 ms at this size (browser leg).
+- Nothing else measured over target. Screen opens are a full page load in the
+  dev server; the production build is not timed here.
