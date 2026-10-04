@@ -9469,12 +9469,12 @@
       "key": "BE-1.6-decision-order",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "§1.6 lines 99-110 sources and decision order",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Decision order to be recorded in the completion dossier, then a J review.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed docs review 'decision-order application recorded in each spec-conflict resolution'; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed docs review 'decision-order application recorded in each spec-conflict resolution'; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - docs/product/decision-order-log.md records 23 disagreements, each with the source followed and its BE-1.6 rule number, and the 11 manual procedures with how each is handled (worked out / does not apply / missing fact / field check); tests/decision-order-log.test.ts checks every line names a rule 1-6 and files that exist (25/25). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-391-decision-order-2026-10-04.json"
       ],
       "waitsOn": null,
       "owners": [
@@ -9483,8 +9483,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
+      "sha": "7fcda6e3"
     },
     {
       "id": "AC-392",
