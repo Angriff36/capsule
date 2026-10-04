@@ -79,6 +79,7 @@ export type EventDayDetailData = EventDayInputs &
     | "dishIngredients"
     | "dishComponents"
     | "componentIngredients"
+    | "components"
     | "people"
     | "vehicles"
     | "equipments"
@@ -354,6 +355,7 @@ export function MenuSheet({ data }: { data: EventDayDetailData }) {
     dishComponents: data.dishComponents,
     componentIngredients: data.componentIngredients,
     ingredients: [],
+    components: data.components ?? [],
   };
   const reportByDish = new Map<string, DishAllergenReport>();
   for (const row of rows) {

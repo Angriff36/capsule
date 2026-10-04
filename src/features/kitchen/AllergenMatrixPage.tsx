@@ -6,6 +6,7 @@ import {
   useListIngredient,
   useListMenu,
   useListMenuDish,
+  useListComponent,
   useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
@@ -45,6 +46,7 @@ export function deriveAllergenRows(input: {
   dishComponents: MatrixRecord[];
   componentIngredients: MatrixRecord[];
   ingredients: MatrixRecord[];
+  components?: MatrixRecord[];
 }) {
   return [...new Set(input.dishIds)]
     .map((dishId) => {
@@ -65,6 +67,8 @@ export function AllergenMatrixPage() {
   const dishComponents = useListDishComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
+  // Recipes, for allergens marked on the recipe itself.
+  const components = useListComponent();
 
   const menuId = params.get("menu") ?? "";
   const eventId = params.get("event") ?? "";
@@ -122,8 +126,10 @@ export function AllergenMatrixPage() {
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
+      components: components ?? [],
     });
   }, [
+    components,
     loading,
     scopeValue,
     menuId,

@@ -68,6 +68,7 @@ export function EventDayPage() {
       dishIngredients: briefing.dishIngredients,
       dishComponents: briefing.dishComponents,
       componentIngredients: briefing.componentIngredients,
+      components: briefing.components ?? [],
       people: briefing.people,
       vehicles: briefing.vehicles,
       equipments: briefing.equipments,

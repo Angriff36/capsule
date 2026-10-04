@@ -27,6 +27,8 @@ export type DishAllergenInput = {
   dishComponents: readonly AllergenSourceRecord[];
   componentIngredients: readonly AllergenSourceRecord[];
   ingredients: readonly AllergenSourceRecord[];
+  /** Recipes, for the allergens marked on the recipe itself (declaredAllergens). */
+  components?: readonly AllergenSourceRecord[];
 };
 
 export type DishAllergenReport = {
@@ -117,6 +119,15 @@ export function deriveDishAllergens(
     if (line.deletedAt != null || !componentIds.has(String(line.componentId)))
       continue;
     takeLine(line);
+  }
+  // Allergens marked on a recipe's own sheet count like the dish's own marks.
+  for (const component of input.components ?? []) {
+    if (component.deletedAt != null || !componentIds.has(String(component._id)))
+      continue;
+    for (const code of (component.declaredAllergens ??
+      []) as CulinaryAllergenCode[]) {
+      flag(code, `${String(component.name)} (marked on recipe)`);
+    }
   }
 
   for (const code of (dish.allergenSummary ?? []) as CulinaryAllergenCode[]) {

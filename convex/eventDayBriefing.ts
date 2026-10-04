@@ -360,6 +360,23 @@ export const getBriefing = query({
       .flat()
       .filter((row: any) => row.tenantId === tenantId && live(row));
 
+    // Allergens marked on a recipe itself (recipe sheet) count for its dishes,
+    // even when the recipe was removed but a live dish line still uses it.
+    const componentRows = (
+      await Promise.all(
+        componentIds.map((componentId) =>
+          tenantDocAllowDeleted(ctx, tenantId, componentId),
+        ),
+      )
+    )
+      .filter((row: any) => row != null)
+      .map((row: any) => ({
+        _id: row._id,
+        deletedAt: null,
+        name: row.name,
+        declaredAllergens: row.declaredAllergens ?? [],
+      }));
+
     const dishIngredients = await Promise.all(
       dishLineRows.map((line: any) => hydrateLine(ctx, tenantId, line)),
     );
@@ -595,6 +612,7 @@ export const getBriefing = query({
         componentId: row.componentId,
       })),
       componentIngredients,
+      components: componentRows,
       deliveries: (deliveries as any[]).map((row) => ({
         _id: row._id,
         eventId: row.eventId,

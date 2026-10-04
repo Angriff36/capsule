@@ -267,6 +267,13 @@ export type EventDayMe = {
   role: string;
 };
 
+export type EventDayComponent = {
+  _id: string;
+  deletedAt: number | null;
+  name: string;
+  declaredAllergens: string[];
+};
+
 export type EventDayBriefing = {
   packetReadiness: EventDayPacketReadiness;
   event: EventDayEvent;
@@ -279,6 +286,8 @@ export type EventDayBriefing = {
   dishIngredients: EventDayRecipeLine[];
   dishComponents: EventDayDishComponent[];
   componentIngredients: EventDayRecipeLine[];
+  /** Recipes on the menu with the allergens marked on the recipe itself. */
+  components?: EventDayComponent[];
   deliveries: EventDayDelivery[];
   vehicles: EventDayVehicle[];
   layoutSections: EventDayLayoutSection[];

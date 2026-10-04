@@ -68,6 +68,7 @@ import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
 import { cookEdition, PublishedMethodPanel } from "./PublishedMethodPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
 import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
+import { RecipeAllergenMarks } from "./RecipeAllergenMarks";
 import { RecipeTimesEquipmentPanel } from "./RecipeTimesEquipmentPanel";
 import { StylePackagingPanel } from "./StylePackagingPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
@@ -504,6 +505,8 @@ export function ComponentDetailPage() {
       />
 
       <RecipeTimesEquipmentPanel component={component} onFailure={setFailure} />
+
+      <RecipeAllergenMarks component={component} onFailure={setFailure} />
 
       <div className="culinary-work-grid">
         <section className="culinary-section">
