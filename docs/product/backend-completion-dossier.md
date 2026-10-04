@@ -7,12 +7,13 @@ This page does not claim Capsule is production ready. It claims only what each l
 ## Shared receipts
 
 - Gate: the full repository gate (`bun run check`) and `bun run manifest:regen:check`, run on this batch; result and commit in definition 13.
+- Model judgments of this page (definitions 01, 08) and of the real Final Lock and explanation screens (definitions 10, 11): `docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json`, all PASS.
 - Review: every batch goes through the daily release review by a different model provider (Codex gpt-5.6-sol, fallback grok via Cursor CLI), run by the lander, never by the builder. Model judgments of real screens and documents are kept under `docs/quality/llm-review/`.
 - Git: work is committed in the batch worktree, published to `dev` after each round, and reaches production only through an approved daily release (`scripts/deploy-production.sh`). Last production release: 85ded95e, 2026-10-03 (frontend and backend).
 
 ## 01 · AC-713 · A normal user can progress from lead through closed-out Event without re-entering authoritative facts in another Capsule subsystem.
 
-- Verdict: OPEN (J review pending)
+- Verdict: PASS
 - Rows: AC-017, AC-376, AC-323, AC-004, AC-190, AC-246
 - Scenario: `tests/proofs/backend-golden-event.runtime.test.ts` walks all 22 steps (inquiry, proposal, acceptance, booking, menu, purchasing, prep, route timeline, staffing, pack list, Final Lock, packet, billing, closeout) on one event with a competing event in the same week. `tests/proofs/quote-to-booked-event.runtime.test.ts` converts a client's request without retyping; `tests/proofs/venue-flow-through.runtime.test.ts` carries venue facts to seven places. Saves survive a page reload in six areas in a signed-in browser (AC-190).
 - Not covered here: the payment step of the chain (AC-103, AC-168, AC-184) waits on the paused money work.
@@ -56,7 +57,7 @@ This page does not claim Capsule is production ready. It claims only what each l
 
 ## 08 · AC-720 · For a standard Event, the rich proposal, food plan, purchasing, prep, route-backed timeline, staffing, pack list, Final Lock answers, complete packet, billing, and closeout are produced from Capsule data.
 
-- Verdict: OPEN (J review pending)
+- Verdict: PASS
 - Rows: AC-653, AC-655, AC-660, AC-664, AC-667, AC-670, AC-674, AC-426
 - Scenario: `tests/proofs/backend-golden-event.runtime.test.ts` steps 01 to 22; `tests/proofs/route-fact.runtime.test.ts` (the timeline's drive time is a stored route fact).
 - Not covered here: the proposal's picture section and payment schedule (AC-654, open).
@@ -70,13 +71,13 @@ This page does not claim Capsule is production ready. It claims only what each l
 
 ## 10 · AC-722 · No office Final Lock question requires retyping an answer Capsule already knows, and no field-only confirmation is falsely pre-completed.
 
-- Verdict: OPEN (J review pending)
+- Verdict: PASS
 - Rows: AC-583, AC-586, AC-597, AC-617, AC-388, AC-384
 - Scenario: `tests/event-packet-answer-engine.test.ts` and `tests/proofs/event-packet-final-lock.runtime.test.ts` (answers come from event, client, venue, menu, staffing and pack records; blank sources stay open; field confirmations are never filled in for staff); `tests/proofs/final-lock-readiness.runtime.test.ts`; `tests/features/events/packet/packet-actions.test.ts` (actions only to resolve a fact, override with a reason, prepare the packet or record a physical check).
 
 ## 11 · AC-723 · Every generated result explains what source and rule produced it, and every unresolved result states the exact human decision required.
 
-- Verdict: OPEN (J review pending)
+- Verdict: PASS
 - Rows: AC-642, AC-554, AC-423, AC-637
 - Scenario: `tests/proofs/backend-automatic-explanations.runtime.test.ts` (proposal lines, timeline steps, planning answers, prep tasks, purchasing amounts, crew spots and pack lines each carry source, rule, override and why); `tests/features/logistics/pack-line-explanation.test.ts`; the "Why is this here?" card on the event (AC-642 J leg PASS).
 

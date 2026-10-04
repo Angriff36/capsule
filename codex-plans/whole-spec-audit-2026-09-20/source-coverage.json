@@ -16340,12 +16340,12 @@
       "key": "BE-21-01",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-01",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Dossier definition 01 rests on PASS rows; the J review of it is still to run.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 01 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 01 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - docs/product/backend-completion-dossier.md definition 01 rests on AC-017, 376, 323, 004, 190, 246 (all PASS; backend-golden-event 22/22, quote-to-booked-event, venue-flow-through), checked by tests/backend-completion-dossier.test.ts; payment step named as open (AC-103/168/184). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json (artifact: dossier section 01)"
       ],
       "waitsOn": null,
       "owners": [
@@ -16354,8 +16354,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
+      "sha": "c2ce45e0"
     },
     {
       "id": "AC-714",
@@ -16377,7 +16377,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "fbfc4786"
+      "sha": "22eb97a7"
     },
     {
       "id": "AC-715",
@@ -16399,7 +16399,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "fbfc4786"
+      "sha": "22eb97a7"
     },
     {
       "id": "AC-716",
@@ -16421,7 +16421,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "fbfc4786"
+      "sha": "22eb97a7"
     },
     {
       "id": "AC-717",
@@ -16443,7 +16443,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "fbfc4786"
+      "sha": "22eb97a7"
     },
     {
       "id": "AC-718",
@@ -16465,7 +16465,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "fbfc4786"
+      "sha": "22eb97a7"
     },
     {
       "id": "AC-719",
@@ -16494,12 +16494,12 @@
       "key": "BE-21-08",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-08",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Dossier definition 08 rests on PASS rows; the J review is still to run. The proposal picture section (AC-654) is open.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 08 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 08 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - dossier definition 08 rests on AC-653, 655, 660, 664, 667, 670, 674, 426 (all PASS; backend-golden-event steps 01-22, route-fact), checked by tests/backend-completion-dossier.test.ts; proposal picture section named as open (AC-654). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json (artifact: dossier section 08)"
       ],
       "waitsOn": null,
       "owners": [
@@ -16508,8 +16508,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
+      "sha": "c2ce45e0"
     },
     {
       "id": "AC-721",
@@ -16538,12 +16538,12 @@
       "key": "BE-21-10",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-10",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Dossier definition 10 rests on PASS rows; the J review of the rendered Final Lock questions is still to run.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 10 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 10 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - dossier definition 10 rests on AC-583, 586, 597, 617, 388, 384 (all PASS; event-packet-answer-engine, event-packet-final-lock, final-lock-readiness, packet-actions). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json (artifact: the rendered Final Lock question list of a real event, signed-in browser 1280x800, after c2ce45e0 fixed 'pays the quoted 0' and repeated Why / source lines)"
       ],
       "waitsOn": null,
       "owners": [
@@ -16552,20 +16552,20 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "signed-in browser on the local dev stack; model or human judgment of the real screen or document",
+      "sha": "c2ce45e0"
     },
     {
       "id": "AC-723",
       "key": "BE-21-11",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-11",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Dossier definition 11 rests on PASS rows; the J review of the rendered explanation card is still to run.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 11 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 11 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit.; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): P - dossier definition 11 rests on AC-642, 554, 423, 637 (all PASS; backend-automatic-explanations, pack-line-explanation). J PASS glm-5.3-flash via src/lib/llm-review.ts, receipt docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json (artifact: the rendered 'Why is this here?' card and readiness lines of a real event, signed-in browser 1280x800, after c2ce45e0 replaced command names with plain next steps)"
       ],
       "waitsOn": null,
       "owners": [
@@ -16574,8 +16574,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "signed-in browser on the local dev stack; model or human judgment of the real screen or document",
+      "sha": "c2ce45e0"
     },
     {
       "id": "AC-724",
@@ -16597,7 +16597,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "fbfc4786"
+      "sha": "22eb97a7"
     },
     {
       "id": "AC-725",
