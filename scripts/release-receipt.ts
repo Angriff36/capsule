@@ -42,6 +42,13 @@ import { inspectVercelDeployment } from "./vercelInspectDeployment";
  *  box pop-os (https://pop-os.<tailnet>.ts.net); impartial-mule-193 is only
  *  the Cloud fallback. */
 const DEFAULT_EXPECTED_DEPLOYMENT = "pop-os";
+/** The production address (same default as scripts/verify-vercel-release.ts
+ *  and scripts/deploy-backend.sh); --url or CAPSULE_RELEASE_URL overrides it. */
+const DEFAULT_CANONICAL_URL = "https://capsule-tau-eight.vercel.app";
+/** The Vercel project `capsule` (same ids as .vercel/project.json), so
+ *  `vercel env pull` works from a fresh clone or worktree with no link. */
+const VERCEL_ORG_ID = "team_YxFzuz829x7VAb5w5Yx2lycJ";
+const VERCEL_PROJECT_ID = "prj_vA7SAjDhyGT3Yb6RZYkTB2FRT6eq";
 const IDENTITY_QUERY = "deploymentProbe:health";
 interface Options {
   sha?: string;
@@ -103,7 +110,8 @@ function parseArgs(argv: readonly string[]): Options {
     throw new Error("release-receipt: --wait needs a non-negative number");
   }
   options.url =
-    options.url ?? (process.env.CAPSULE_RELEASE_URL?.trim() || undefined);
+    options.url ??
+    (process.env.CAPSULE_RELEASE_URL?.trim() || DEFAULT_CANONICAL_URL);
   return options;
 }
 
@@ -112,6 +120,7 @@ function run(
   command: string,
   args: readonly string[],
   timeoutMs: number,
+  extraEnv: Record<string, string> = {},
 ): { stdout: string; status: number | null } | null {
   const localVercel = command === "vercel";
   const executable = localVercel ? "node" : command;
@@ -122,6 +131,7 @@ function run(
     encoding: "utf8",
     timeout: timeoutMs,
     shell: false,
+    env: { ...process.env, ...extraEnv },
   });
   if (result.error || result.stdout == null) return null;
   return { stdout: result.stdout, status: result.status };
@@ -272,6 +282,39 @@ function backendChangesSince(
     .map((line) => line.slice("reason=".length));
 }
 
+/** The backend the shipped frontend calls, as the build itself publishes it
+ *  in <site>/version.json (vite.config.ts); used when the production env
+ *  cannot be pulled. Only a value for the integrated sha counts. */
+async function servedConvexUrl(
+  canonicalUrl: string | undefined,
+  integratedSha: string | null,
+): Promise<string | null> {
+  if (!canonicalUrl) return null;
+  try {
+    const response = await fetch(
+      `${canonicalUrl.replace(/\/+$/, "")}/version.json`,
+      { cache: "no-store" },
+    );
+    if (!response.ok) return null;
+    const body = (await response.json()) as {
+      commit?: unknown;
+      convexUrl?: unknown;
+    };
+    if (
+      typeof body.commit !== "string" ||
+      !integratedSha ||
+      body.commit.toLowerCase() !== integratedSha.toLowerCase()
+    ) {
+      return null;
+    }
+    return typeof body.convexUrl === "string" && body.convexUrl
+      ? body.convexUrl
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 /** KEY=VALUE subset reader (same contract as check-deployment-config.ts). */
 function readEnvValue(path: string, name: string): string | null {
   let content: string;
@@ -310,6 +353,11 @@ function gatherConfig(
     };
   }
   const envPath = `${outDir}/prod.env`;
+  mkdirSync(outDir, { recursive: true });
+  const project =
+    process.env.VERCEL_ORG_ID && process.env.VERCEL_PROJECT_ID
+      ? {}
+      : { VERCEL_ORG_ID, VERCEL_PROJECT_ID };
   const tokenArgs = process.env.VERCEL_TOKEN
     ? ["-t", process.env.VERCEL_TOKEN]
     : [];
@@ -317,6 +365,7 @@ function gatherConfig(
     "vercel",
     ["env", "pull", envPath, "--environment", "production", "-y", ...tokenArgs],
     120_000,
+    project,
   );
   if (!pulled || pulled.status !== 0) {
     return {
@@ -405,11 +454,14 @@ async function main(argv: readonly string[]): Promise<number> {
         commandCount: null,
         productStep: null,
       };
-  const { config, convexUrl } = gatherConfig(
+  const gathered = gatherConfig(
     options.url,
     options.expectedDeployment,
     options.outDir,
   );
+  const { config } = gathered;
+  const convexUrl =
+    gathered.convexUrl ?? (await servedConvexUrl(options.url, integratedSha));
   const backendReleaseSha = await probeBackendRelease(convexUrl);
 
   const input: ReleaseReceiptInput = {
