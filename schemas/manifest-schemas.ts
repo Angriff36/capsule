@@ -720,6 +720,8 @@ export const DishSchema = z.object({
   editionNumber: z.number().int().nullable().optional().default(1),
   mergedIntoDishId: z.string().uuid().nullable().optional(),
   kind: z.enum(["food", "supply", "service", "package"]).nullable().optional(),
+  versionOfDishId: z.string().uuid().nullable().optional(),
+  versionLabel: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6077,6 +6079,11 @@ export const DishClearPrimaryImageParamsSchema = z.object({});
 
 export type DishClearPrimaryImageParams = z.infer<typeof DishClearPrimaryImageParamsSchema>;
 
+// Command: detachVersion on Dish
+export const DishDetachVersionParamsSchema = z.object({});
+
+export type DishDetachVersionParams = z.infer<typeof DishDetachVersionParamsSchema>;
+
 // Command: introduce on Dish
 export const DishIntroduceParamsSchema = z.object({
   name: z.string(),
@@ -6092,6 +6099,13 @@ export const DishIntroduceParamsSchema = z.object({
 
 export type DishIntroduceParams = z.infer<typeof DishIntroduceParamsSchema>;
 
+// Command: labelVersion on Dish
+export const DishLabelVersionParamsSchema = z.object({
+  label: z.string(),
+});
+
+export type DishLabelVersionParams = z.infer<typeof DishLabelVersionParamsSchema>;
+
 // Command: linkAsEdition on Dish
 export const DishLinkAsEditionParamsSchema = z.object({
   sourceDishId: z.string().uuid(),
@@ -6099,6 +6113,14 @@ export const DishLinkAsEditionParamsSchema = z.object({
 });
 
 export type DishLinkAsEditionParams = z.infer<typeof DishLinkAsEditionParamsSchema>;
+
+// Command: makeVersionOf on Dish
+export const DishMakeVersionOfParamsSchema = z.object({
+  mainDishId: z.string().uuid(),
+  label: z.string(),
+});
+
+export type DishMakeVersionOfParams = z.infer<typeof DishMakeVersionOfParamsSchema>;
 
 // Command: mergeInto on Dish
 export const DishMergeIntoParamsSchema = z.object({

@@ -2676,6 +2676,18 @@
       "category": "event-payload-changed",
       "acknowledgedAt": "2026-10-04",
       "reason": "The event also carries the optional price date; older events without it read as dated when they happened."
+    },
+    {
+      "path": "Dish.versionOfDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Dish.versionLabel",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
     }
   ]
 }

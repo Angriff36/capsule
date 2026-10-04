@@ -675,11 +675,14 @@ export default defineSchema({
     editionNumber: v.optional(v.union(v.number(), v.null())),
     mergedIntoDishId: v.optional(v.union(v.id("dishes"), v.null())),
     kind: v.optional(v.union(v.literal("food"), v.literal("supply"), v.literal("service"), v.literal("package"), v.null())),
+    versionOfDishId: v.optional(v.union(v.id("dishes"), v.null())),
+    versionLabel: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_versionOfDishId", ["versionOfDishId"])
     .index("by_canonicalDishId", ["canonicalDishId"])
     .index("by_mergedIntoDishId", ["mergedIntoDishId"])
     .index("by_primaryImageStorageId", ["primaryImageStorageId"])

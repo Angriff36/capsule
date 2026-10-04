@@ -131,11 +131,14 @@ import {
   DishContainerReinstateParamsSchema,
   DishContainerRetireParamsSchema,
   DishContainerReviseParamsSchema,
+  DishDetachVersionParamsSchema,
   DishIngredientAddParamsSchema,
   DishIngredientAdjustQuantityParamsSchema,
   DishIngredientRemoveParamsSchema,
   DishIntroduceParamsSchema,
+  DishLabelVersionParamsSchema,
   DishLinkAsEditionParamsSchema,
+  DishMakeVersionOfParamsSchema,
   DishMergeIntoParamsSchema,
   DishPurgeParamsSchema,
   DishReinstateParamsSchema,
@@ -2720,6 +2723,16 @@ export function useDishClearPrimaryImage() {
   };
 }
 
+/** Mutation hook for Dish.detachVersion. */
+export function useDishDetachVersion() {
+  const mutate = useMutation(api.mutations.Dish_detachVersion);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishDetachVersionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Dish.introduce. */
 export function useDishIntroduce() {
   const mutate = useMutation(api.mutations.Dish_introduce);
@@ -2730,12 +2743,32 @@ export function useDishIntroduce() {
   };
 }
 
+/** Mutation hook for Dish.labelVersion. */
+export function useDishLabelVersion() {
+  const mutate = useMutation(api.mutations.Dish_labelVersion);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishLabelVersionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Dish.linkAsEdition. */
 export function useDishLinkAsEdition() {
   const mutate = useMutation(api.mutations.Dish_linkAsEdition);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishLinkAsEditionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.makeVersionOf. */
+export function useDishMakeVersionOf() {
+  const mutate = useMutation(api.mutations.Dish_makeVersionOf);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishMakeVersionOfParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13890,4 +13923,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1470 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1473 as const;
