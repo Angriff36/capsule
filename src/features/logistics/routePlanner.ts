@@ -101,6 +101,14 @@ export function geocodeQueries(destination: string): string[] {
   return queries;
 }
 
+type Geocoder = (query: string) => Promise<GeoPoint | null>;
+let googleGeocoder: Geocoder | undefined;
+
+/** Set once at start-up: Google is asked first, OpenStreetMap after it. */
+export function setGoogleGeocoder(geocoder: Geocoder): void {
+  googleGeocoder = geocoder;
+}
+
 async function searchOnce(query: string): Promise<GeoPoint | null> {
   const response = await fetch(
     `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
@@ -128,7 +136,12 @@ export async function geocodeDestination(
   }
   let point: GeoPoint | null = null;
   try {
-    for (const query of geocodeQueries(destination)) {
+    if (googleGeocoder) point = await googleGeocoder(destination.trim());
+  } catch {
+    // Google unreachable — OpenStreetMap below
+  }
+  try {
+    for (const query of point ? [] : geocodeQueries(destination)) {
       point = await searchOnce(query);
       if (point) break;
     }
