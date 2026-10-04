@@ -31,6 +31,8 @@ const { values } = parseArgs({
     "cli-identity": { type: "string" },
     // Second step: set "use the main dish's recipe" on every version.
     "recipe-sharing": { type: "boolean", default: false },
+    // Re-send the recipe switch (new idempotency keys) so planned events follow it.
+    "rerun-tag": { type: "string" },
   },
 });
 const url = values.url ?? process.env.VITE_CONVEX_URL;
@@ -322,7 +324,7 @@ async function shareRecipes(client: Caller, dishes: Dish[]) {
     await client.mutation("mutations:Dish_useMainRecipe", {
       docId: p.id,
       shared: p.shared,
-      idempotencyKey: `dish-version-recipe:${p.id}:${p.shared}`,
+      idempotencyKey: `dish-version-recipe:${p.id}:${p.shared}${values["rerun-tag"] ? `:${values["rerun-tag"]}` : ""}`,
     });
   }
   console.log(`Set the recipe source on ${plan.length} versions.`);
