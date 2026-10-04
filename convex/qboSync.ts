@@ -29,7 +29,7 @@ import {
   type QboOAuthConfig,
 } from "./lib/qboSync";
 
-const CONNECTION_ENTITY = "QuickBooksConnection";
+export const CONNECTION_ENTITY = "QuickBooksConnection";
 const CUSTOMER_ENTITY = "QuickBooksCustomerLink";
 const INVOICE_ENTITY = "QuickBooksInvoiceLink";
 const PAYMENT_ENTITY = "QuickBooksPaymentLink";
@@ -215,7 +215,7 @@ function parseSyncState(payload: unknown): EntitySyncState | null {
   };
 }
 
-function latestActiveConnection(
+export function latestActiveConnection(
   rows: Array<{
     type: string;
     entity: string;

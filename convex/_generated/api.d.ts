@@ -287,6 +287,7 @@ import type * as staffShiftSwaps from "../staffShiftSwaps.js";
 import type * as staffSignInEmail from "../staffSignInEmail.js";
 import type * as staffSummaries from "../staffSummaries.js";
 import type * as stripeConnect from "../stripeConnect.js";
+import type * as systemHealthNotices from "../systemHealthNotices.js";
 import type * as teamChat from "../teamChat.js";
 import type * as teamChatCursor from "../teamChatCursor.js";
 import type * as teamChatPush from "../teamChatPush.js";
@@ -595,6 +596,7 @@ declare const fullApi: ApiFromModules<{
   staffSignInEmail: typeof staffSignInEmail;
   staffSummaries: typeof staffSummaries;
   stripeConnect: typeof stripeConnect;
+  systemHealthNotices: typeof systemHealthNotices;
   teamChat: typeof teamChat;
   teamChatCursor: typeof teamChatCursor;
   teamChatPush: typeof teamChatPush;

@@ -23,7 +23,8 @@ export interface AppNotification {
     | "allergen_incident"
     | "staff_message"
     | "mention"
-    | "prep_task_comment";
+    | "prep_task_comment"
+    | "system_health";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -44,6 +45,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     staff_message: "Message",
     mention: "Mention",
     prep_task_comment: "Prep note",
+    system_health: "System health",
   };
 
 /** Stage changes older than this are history, not notifications. */

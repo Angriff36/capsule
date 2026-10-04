@@ -165,7 +165,12 @@ const dev = spawn(
     "--tail-logs",
     "disable",
   ],
-  { cwd: ROOT, env: childEnv, stdio: ["ignore", logFd, logFd], windowsHide: true },
+  {
+    cwd: ROOT,
+    env: childEnv,
+    stdio: ["ignore", logFd, logFd],
+    windowsHide: true,
+  },
 );
 let vite;
 function stop() {
@@ -211,7 +216,10 @@ try {
   say("functions pushed");
 
   const adminKey = JSON.parse(
-    readFileSync(join(ROOT, ".convex", "local", "default", "config.json"), "utf8"),
+    readFileSync(
+      join(ROOT, ".convex", "local", "default", "config.json"),
+      "utf8",
+    ),
   ).adminKey;
   const client = new ConvexHttpClient(URL_);
   client.setAdminAuth(adminKey, {
@@ -248,7 +256,12 @@ try {
   say(`starting Vite at ${base}`);
   vite = spawn(
     process.execPath,
-    [join(ROOT, "node_modules", "vite", "bin", "vite.js"), "--port", String(port), "--strictPort"],
+    [
+      join(ROOT, "node_modules", "vite", "bin", "vite.js"),
+      "--port",
+      String(port),
+      "--strictPort",
+    ],
     {
       cwd: ROOT,
       env: {
@@ -309,16 +322,24 @@ try {
   let signedIn = false;
   for (let i = 0; i < 90 && !signedIn; i++) {
     await page.waitForTimeout(1000);
-    const body = await page.evaluate(() => document.body.innerText).catch(() => "");
+    const body = await page
+      .evaluate(() => document.body.innerText)
+      .catch(() => "");
     signedIn =
-      (await page.evaluate(() => Boolean(window.Clerk?.user?.id)).catch(() => false)) &&
+      (await page
+        .evaluate(() => Boolean(window.Clerk?.user?.id))
+        .catch(() => false)) &&
       !body.includes("Sign in to Capsule") &&
       !body.includes("Checking your sign-in") &&
       !body.includes("Checking your session");
   }
   await page.screenshot({ path: join(OUT, "signed-in.png") });
   if (!signedIn) throw new Error("the sign-in ticket did not sign in");
-  if ((await page.evaluate(() => document.body.innerText)).includes("open your profile")) {
+  if (
+    (await page.evaluate(() => document.body.innerText)).includes(
+      "open your profile",
+    )
+  ) {
     const net = await page.evaluate(async () => {
       const r = await fetch(
         "https://golden-koi-11.clerk.accounts.dev/v1/environment",
@@ -332,7 +353,9 @@ try {
     const jwt = await page.evaluate(() => window.Clerk.session.getToken());
     const probe = new ConvexHttpClient(URL_);
     probe.setAuth(jwt);
-    const claims = JSON.parse(Buffer.from(jwt.split(".")[1], "base64url").toString());
+    const claims = JSON.parse(
+      Buffer.from(jwt.split(".")[1], "base64url").toString(),
+    );
     const outcome = await probe
       .action(anyApi.authLink.ensureAccountProfile, {})
       .catch((e) => String(e));
@@ -437,8 +460,8 @@ try {
       await open(
         "/events",
         () =>
-          document.querySelectorAll('[role="tab"][aria-selected]').length >= 3 &&
-          /Event \d/.test(document.body.innerText),
+          document.querySelectorAll('[role="tab"][aria-selected]').length >=
+            3 && /Event \d/.test(document.body.innerText),
         i === 4,
       ),
     );
@@ -455,7 +478,9 @@ try {
   for (let round = 0; round < 13; round++) {
     await search.click();
     for (const ch of `Event ${round + 1}`)
-      keyTimes.push(await interaction(() => page.keyboard.press(ch === " " ? "Space" : ch)));
+      keyTimes.push(
+        await interaction(() => page.keyboard.press(ch === " " ? "Space" : ch)),
+      );
     keyTimes.push(await interaction(() => search.fill("")));
   }
   results.interactions.push(summary("Events search key press", keyTimes));
@@ -469,18 +494,23 @@ try {
       await open(
         `/events/${id}`,
         () =>
-          document.querySelectorAll('nav[aria-label="Event sections"] [role="tab"]')
-            .length > 0,
+          document.querySelectorAll(
+            'nav[aria-label="Event sections"] [role="tab"]',
+          ).length > 0,
         e === 19,
       ),
     );
-    const sections = page.locator('nav[aria-label="Event sections"] [role="tab"]');
+    const sections = page.locator(
+      'nav[aria-label="Event sections"] [role="tab"]',
+    );
     const n = await sections.count();
     for (let k = 1; k <= n; k++)
       sectionTimes.push(await interaction(() => sections.nth(k % n).click()));
   }
   results.opens.push(summary("Event page opens to its sections", eventOpens));
-  results.interactions.push(summary("Event page section tab click", sectionTimes));
+  results.interactions.push(
+    summary("Event page section tab click", sectionTimes),
+  );
   await page.screenshot({ path: join(OUT, "event.png"), fullPage: true });
 
   // Kitchen dish catalog: every dish, read in pages; search runs in the page.
@@ -494,7 +524,9 @@ try {
       ),
     );
   results.opens.push(summary("Dish catalog opens to all dishes", catalogOpens));
-  const dishSearch = page.getByPlaceholder("Search dishes by name or category…");
+  const dishSearch = page.getByPlaceholder(
+    "Search dishes by name or category…",
+  );
   const dishKeyTimes = [];
   for (let round = 0; round < 13; round++) {
     await dishSearch.click();
@@ -504,7 +536,9 @@ try {
       );
     dishKeyTimes.push(await interaction(() => dishSearch.fill("")));
   }
-  results.interactions.push(summary("Dish catalog search key press", dishKeyTimes));
+  results.interactions.push(
+    summary("Dish catalog search key press", dishKeyTimes),
+  );
   await page.screenshot({ path: join(OUT, "dishes.png") });
   const browserVersion = browser.version();
   await browser.close();
@@ -542,7 +576,9 @@ try {
 } catch (error) {
   failed = true;
   await failShot().catch(() => undefined);
-  console.error(`[scale-browser] ${error instanceof Error ? error.stack : error}`);
+  console.error(
+    `[scale-browser] ${error instanceof Error ? error.stack : error}`,
+  );
 } finally {
   stop();
 }

@@ -2,7 +2,8 @@
 // (webhooks, text alerts, sign-in emails): how many wait for a try, how long
 // the oldest has waited, how many Capsule stopped trying, and how many it is
 // not sure about. Counts only one workspace, for its managers.
-import { query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import {
   summarizeDelivery,
@@ -75,6 +76,52 @@ function summarized(
   }));
 }
 
+/**
+ * The three channel tallies for one company. `tenantLedger` is the company's
+ * own ledger rows (by_entityId = tenantId); the caller reads it once and can
+ * share it with other checks (the notification bell does).
+ */
+export async function outsideMessageHealthFor(
+  ctx: QueryCtx,
+  tenantId: string,
+  tenantLedger: Doc<"manifestEvents">[],
+  now: number,
+): Promise<ChannelHealth[]> {
+  const [webhookRows, claimRows, signInRows] = await Promise.all([
+    ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entity", (q) => q.eq("entity", "WebhookDelivery"))
+      .collect(),
+    ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entity", (q) => q.eq("entity", CLAIM_ENTITY))
+      .collect(),
+    ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entity", (q) => q.eq("entity", "StaffSignInEmail"))
+      .collect(),
+  ]);
+
+  const webhooks = deliveryHistoryFor(
+    [...webhookRows, ...claimRows],
+    tenantId,
+  ).map((entry) => entry.rows);
+  const texts = smsAlertHistories(tenantLedger, tenantId).values();
+  const signIns = signInEmailStates(signInRows, tenantId, now).map((entry) => ({
+    state: entry.state,
+    firstAt: entry.lastAttemptAt,
+  }));
+  return [
+    tally(
+      "webhooks",
+      "Webhooks",
+      summarized(webhooks, now, WEBHOOK_DELIVERY_POLICY),
+    ),
+    tally("texts", "Text alerts", summarized(texts, now, SMS_POLICY)),
+    tally("signInEmails", "Sign-in emails", signIns),
+  ];
+}
+
 export const outsideMessageHealth = query({
   args: {},
   handler: async (ctx): Promise<ChannelHealth[] | null> => {
@@ -86,46 +133,10 @@ export const outsideMessageHealth = query({
       return null;
     }
     const tenantId = auth.tenantId;
-    const now = Date.now();
-    const [webhookRows, claimRows, tenantLedger, signInRows] =
-      await Promise.all([
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entity", (q) => q.eq("entity", "WebhookDelivery"))
-          .collect(),
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entity", (q) => q.eq("entity", CLAIM_ENTITY))
-          .collect(),
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
-          .collect(),
-        ctx.db
-          .query("manifestEvents")
-          .withIndex("by_entity", (q) => q.eq("entity", "StaffSignInEmail"))
-          .collect(),
-      ]);
-
-    const webhooks = deliveryHistoryFor(
-      [...webhookRows, ...claimRows],
-      tenantId,
-    ).map((entry) => entry.rows);
-    const texts = smsAlertHistories(tenantLedger, tenantId).values();
-    const signIns = signInEmailStates(signInRows, tenantId, now).map(
-      (entry) => ({
-        state: entry.state,
-        firstAt: entry.lastAttemptAt,
-      }),
-    );
-    return [
-      tally(
-        "webhooks",
-        "Webhooks",
-        summarized(webhooks, now, WEBHOOK_DELIVERY_POLICY),
-      ),
-      tally("texts", "Text alerts", summarized(texts, now, SMS_POLICY)),
-      tally("signInEmails", "Sign-in emails", signIns),
-    ];
+    const tenantLedger = await ctx.db
+      .query("manifestEvents")
+      .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
+      .collect();
+    return outsideMessageHealthFor(ctx, tenantId, tenantLedger, Date.now());
   },
 });
