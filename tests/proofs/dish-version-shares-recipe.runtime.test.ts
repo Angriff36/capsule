@@ -144,4 +144,93 @@ describe("runtime proof: dish versions share the main recipe", () => {
       [],
     );
   });
+
+  it("switching a version to the main recipe updates events already planned", async () => {
+    const proof = createManifestTestContext({
+      convexTest: convexTest as never,
+      schema,
+      modules,
+    });
+    const owner = proof.asRole({
+      subject: "owner-follow",
+      role: "owner",
+      tenantId: TENANT,
+    });
+    const run = (fn: unknown, args: Record<string, unknown>) =>
+      proof.executeCommand(
+        owner,
+        fn as never,
+        args as never,
+      ) as Promise<Created>;
+
+    await run(api.mutations.Organization_createViaRegister, {
+      name: "Follow kitchen",
+    });
+    const main = await run(api.mutations.Dish_createViaIntroduce, {
+      name: "Carne Asada",
+      portionSize: 1,
+      portionUnit: "portion",
+      category: "Drop Off",
+    });
+    const mainStep = await run(api.mutations.DishTask_createViaAdd, {
+      dishId: main.docId,
+      name: "Make carne asada",
+      category: "Finish at Kitchen",
+    });
+    const version = await run(api.mutations.Dish_createViaIntroduce, {
+      name: "Carne Asada - Finish at Event",
+      portionSize: 1,
+      portionUnit: "portion",
+      category: "Finish at Event",
+    });
+    // An old copy of one step, as the duplicate dishes had.
+    await run(api.mutations.DishTask_createViaAdd, {
+      dishId: version.docId,
+      name: "Make carne asada",
+      category: "Finish at Kitchen",
+    });
+    const client = await run(api.mutations.Client_createViaRegister, {
+      clientType: "company",
+      companyName: "Follow client",
+    });
+    const event = await run(api.mutations.Event_createViaPlanEngagement, {
+      clientId: client.docId,
+      title: "Follow lunch",
+      eventType: "catering",
+      startsAt: Date.UTC(2026, 11, 3, 18, 0),
+      endsAt: Date.UTC(2026, 11, 3, 22, 0),
+      expectedHeadcount: 30,
+      primaryContactName: "Sky Follow",
+      budgetAmount: 1000,
+      quotedPrice: 1500,
+    });
+    const line = await run(api.mutations.EventDish_createViaAddToEvent, {
+      eventId: event.docId,
+      dishId: version.docId,
+      quantityServings: 30,
+    });
+    // Joined afterwards, and switched to the main recipe.
+    await run(api.mutations.Dish_makeVersionOf, {
+      docId: version.docId,
+      mainDishId: main.docId,
+      label: "Finish at Event",
+    });
+    await run(api.mutations.Dish_useMainRecipe, {
+      docId: version.docId,
+      shared: true,
+    });
+
+    const after = (await owner.run(async (ctx) => ({
+      line: await ctx.db.get(line.docId as never),
+      prep: await ctx.db.query("prepTasks").collect(),
+    }))) as {
+      line: { recipeDishId?: string | null };
+      prep: Array<{ eventDishId: string; dishTaskId?: string; status: string }>;
+    };
+    expect(after.line.recipeDishId).toBe(main.docId);
+    const open = after.prep.filter(
+      (p) => p.eventDishId === line.docId && p.status !== "cancelled",
+    );
+    expect(open.map((p) => p.dishTaskId)).toEqual([mainStep.docId]);
+  });
 });

@@ -231,6 +231,7 @@ import {
   EventDishComponentSeedRetireParamsSchema,
   EventDishComponentSeedSeedParamsSchema,
   EventDishConfirmFromProposalParamsSchema,
+  EventDishFollowRecipeSourceParamsSchema,
   EventDishLineOverrideApplyParamsSchema,
   EventDishLineOverrideRevokeParamsSchema,
   EventDishRefreshRecipeSyncParamsSchema,
@@ -619,6 +620,7 @@ import {
   PrepTaskDependencyDropLinkParamsSchema,
   PrepTaskDependencyReleaseRetiredRequirementParamsSchema,
   PrepTaskDependencySatisfyParamsSchema,
+  PrepTaskLeaveOldRecipeParamsSchema,
   PrepTaskLinkRecipeParamsSchema,
   PrepTaskMarkBlockedParamsSchema,
   PrepTaskMarkOverrideParamsSchema,
@@ -4347,6 +4349,16 @@ export function useEventDishConfirmFromProposal() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventDishConfirmFromProposalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventDish.followRecipeSource. */
+export function useEventDishFollowRecipeSource() {
+  const mutate = useMutation(api.mutations.EventDish_followRecipeSource);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishFollowRecipeSourceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9286,6 +9298,16 @@ export function usePrepTaskComplete() {
   };
 }
 
+/** Mutation hook for PrepTask.leaveOldRecipe. */
+export function usePrepTaskLeaveOldRecipe() {
+  const mutate = useMutation(api.mutations.PrepTask_leaveOldRecipe);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskLeaveOldRecipeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PrepTask.linkRecipe. */
 export function usePrepTaskLinkRecipe() {
   const mutate = useMutation(api.mutations.PrepTask_linkRecipe);
@@ -13934,4 +13956,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1474 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1476 as const;

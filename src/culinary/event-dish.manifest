@@ -136,6 +136,27 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Follows the dish's current recipe source (Ryan 2026-10-04: planned events
+  // must not keep an old, often empty, version recipe). Only lines on live
+  // events move (recipeSyncDishId is null once an event is done). No guards:
+  // this runs inside a Dish fan-out and must never roll that change back.
+  // A line that does not move emits a key that matches no recipe rows.
+  command followRecipeSource() {
+    compute live = self.addedAt != null and self.deletedAt == null and self.recipeSyncDishId != null
+    compute source = self.dish != null and self.dish.recipeDishId != null ? self.dish.recipeDishId : self.dishId
+    mutate recipeDishId = live ? source : self.recipeDishId
+    mutate recipeSyncDishId = live ? source : self.recipeSyncDishId
+    emit EventDishRecipeFollowed {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      recipeDishId: live ? source : "no-recipe-change"
+      quantityServings: self.quantityServings
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
   command refreshRecipeSync() {
     mutate recipeSyncDishId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? (self.recipeDishId != null ? self.recipeDishId : self.dishId) : null
     emit EventDishRecipeSyncRefreshed {
@@ -383,6 +404,25 @@ event EventDishContainerPackRequested: "event_dish.container_pack_requested" {
   packListId: string
   quantityServings: number
 }
+
+event EventDishRecipeFollowed: "event_dish.recipe_followed" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  recipeDishId: string
+  quantityServings: number
+  purchasingWeekStart: datetime?
+}
+
+on DishRecipeSourceChanged fanOut EventDish where dishId = payload.dishId
+  run followRecipeSource
+
+on DishVersionLinked fanOut EventDish where dishId = payload.dishId
+  run followRecipeSource
+
+on DishVersionUnlinked fanOut EventDish where dishId = payload.dishId
+  run followRecipeSource
 
 event EventDishAdded: "event_dish.added" {
   eventDishId: string

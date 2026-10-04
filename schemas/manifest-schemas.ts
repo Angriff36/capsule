@@ -7273,6 +7273,11 @@ export const EventDishConfirmFromProposalParamsSchema = z.object({
 
 export type EventDishConfirmFromProposalParams = z.infer<typeof EventDishConfirmFromProposalParamsSchema>;
 
+// Command: followRecipeSource on EventDish
+export const EventDishFollowRecipeSourceParamsSchema = z.object({});
+
+export type EventDishFollowRecipeSourceParams = z.infer<typeof EventDishFollowRecipeSourceParamsSchema>;
+
 // Command: refreshRecipeSync on EventDish
 export const EventDishRefreshRecipeSyncParamsSchema = z.object({});
 
@@ -10357,6 +10362,13 @@ export const PrepTaskCompleteParamsSchema = z.object({
 });
 
 export type PrepTaskCompleteParams = z.infer<typeof PrepTaskCompleteParamsSchema>;
+
+// Command: leaveOldRecipe on PrepTask
+export const PrepTaskLeaveOldRecipeParamsSchema = z.object({
+  recipeDishId: z.string().min(1),
+});
+
+export type PrepTaskLeaveOldRecipeParams = z.infer<typeof PrepTaskLeaveOldRecipeParamsSchema>;
 
 // Command: linkRecipe on PrepTask
 export const PrepTaskLinkRecipeParamsSchema = z.object({
