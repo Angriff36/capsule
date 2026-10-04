@@ -12,6 +12,8 @@
  * every call so the backend's query cache cannot answer them. Writes
  * .artifacts/product-scale-backend.json and prints it. The backend is stopped
  * at the end; a .env.local this run wrote is removed again.
+ * SCALE_TENANT names the company to fill and time; SCALE_FILL_ONLY=1 stops
+ * after the fill.
  */
 import { spawn, spawnSync } from "node:child_process";
 import {
@@ -32,7 +34,8 @@ import type { Id } from "../convex/_generated/dataModel";
 const ROOT = process.cwd();
 const CLOUD_PORT = 3310;
 const URL = `http://127.0.0.1:${CLOUD_PORT}`;
-const TENANT = "tenant-product-scale";
+// scale-browser-timings.mjs fills the testing sign-in's own company.
+const TENANT = process.env.SCALE_TENANT ?? "tenant-product-scale";
 const DAY = 86_400_000;
 const EVENTS = 10_000;
 const DISHES = 5_000;
@@ -293,6 +296,11 @@ try {
     );
     seedMs = Math.round(performance.now() - seedStart);
     say(`filled in ${seedMs} ms`);
+  }
+  if (process.env.SCALE_FILL_ONLY) {
+    say("filled; timings skipped (SCALE_FILL_ONLY)");
+    stop();
+    process.exit(0);
   }
 
   async function allEventIds() {
