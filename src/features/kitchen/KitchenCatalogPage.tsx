@@ -38,6 +38,7 @@ import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
+import { mainDishRows } from "./dishVersions";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards, type CatalogItem } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
@@ -105,10 +106,12 @@ function ComponentCatalogPage() {
 
 function DishCatalogPage() {
   const data = useWholeDishList();
+  // Versions show as tabs on their main dish, not as rows of their own.
+  const mains = useMemo(() => (data ? mainDishRows(data) : undefined), [data]);
   return (
     <KitchenCatalogPageContent
       section="dishes"
-      data={data as CatalogItem[] | undefined}
+      data={mains as CatalogItem[] | undefined}
     />
   );
 }
@@ -222,6 +225,7 @@ function KitchenCatalogPageContent({
           item.description,
           item.cuisine,
           item.course,
+          item.versionNames,
         ].some((value) =>
           String(value ?? "")
             .toLowerCase()
