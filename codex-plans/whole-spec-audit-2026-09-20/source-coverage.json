@@ -4501,7 +4501,7 @@
       "waitsOn": null,
       "owners": ["ralph-sync.sh", "ralph-preview.ps1", ".ralph.env", "loop.sh"],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "6ca7d9a8"
+      "sha": "ba635498"
     },
     {
       "id": "AC-158",
@@ -4535,7 +4535,7 @@
       "waitsOn": null,
       "owners": ["ralph-sync.sh", "ralph-preview.ps1", ".ralph.env", "loop.sh"],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "6ca7d9a8"
+      "sha": "ba635498"
     },
     {
       "id": "AC-160",
@@ -4547,7 +4547,7 @@
       "tasks": ["PL-LOOP-COMPLETION"],
       "gap": "Owned by the loop tools (ralph-worker.ps1, loop.sh).",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/ralph-completion-contract.test.ts — provider error or changed spec cannot count as success"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/ralph-completion-contract.test.ts — provider error or changed spec cannot count as success. 2026-10-04: provider-error leg PASS, tests/ralph-completion-contract.test.ts 4/4 (stand-in launcher exits 0: a 429 answer -> worker exit 3, provider message kept, log exit=3; empty answer -> exit 3; real answer -> exit 0 and relayed; missing task file -> exit 2, nothing logged). Open: loop.sh reports one exit code per round (no separate tests / push / integration / frontend deploy / backend deploy / signed-in check states), a codex \"turn.completed\" counts as success even when the answer is a provider error, nothing invalidates a done claim when specs/ changes, and repeated rounds with no plan progress give no diagnosis - loop tool; control-plane repair requested"
       ],
       "waitsOn": "loop-tools",
       "owners": [
@@ -4556,7 +4556,7 @@
         "acceptance/coverage consumers"
       ],
       "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "sha": "ba635498"
     },
     {
       "id": "AC-161",
