@@ -722,6 +722,8 @@ export const DishSchema = z.object({
   kind: z.enum(["food", "supply", "service", "package"]).nullable().optional(),
   versionOfDishId: z.string().uuid().nullable().optional(),
   versionLabel: z.string().nullable().optional(),
+  usesMainRecipe: z.boolean().nullable().optional(),
+  recipeDishId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1312,6 +1314,7 @@ export const EventDishSchema = z.object({
   dishId: z.string().uuid(),
   dishName: z.string().nullable().optional(),
   recipeSyncDishId: z.string().uuid().nullable().optional(),
+  recipeDishId: z.string().uuid().nullable().optional(),
   quantityServings: z.number().int().default(1),
   followsEventHeadcount: z.boolean().nullable().optional(),
   headcountOverride: z.number().int().nullable().optional().default(0),
@@ -6192,6 +6195,13 @@ export const DishUpdatePortioningParamsSchema = z.object({
 });
 
 export type DishUpdatePortioningParams = z.infer<typeof DishUpdatePortioningParamsSchema>;
+
+// Command: useMainRecipe on Dish
+export const DishUseMainRecipeParamsSchema = z.object({
+  shared: z.boolean(),
+});
+
+export type DishUseMainRecipeParams = z.infer<typeof DishUseMainRecipeParamsSchema>;
 
 // Command: attach on DishComponent
 export const DishComponentAttachParamsSchema = z.object({

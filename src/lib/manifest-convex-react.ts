@@ -155,6 +155,7 @@ import {
   DishTaskReviseParamsSchema,
   DishTaskSpecifyWorkParamsSchema,
   DishUpdatePortioningParamsSchema,
+  DishUseMainRecipeParamsSchema,
   EmailNotificationSubscriptionConfigureParamsSchema,
   EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema,
   EquipmentClearPrimaryImageParamsSchema,
@@ -2859,6 +2860,16 @@ export function useDishUpdatePortioning() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishUpdatePortioningParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.useMainRecipe. */
+export function useDishUseMainRecipe() {
+  const mutate = useMutation(api.mutations.Dish_useMainRecipe);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishUseMainRecipeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13923,4 +13934,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1473 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1474 as const;

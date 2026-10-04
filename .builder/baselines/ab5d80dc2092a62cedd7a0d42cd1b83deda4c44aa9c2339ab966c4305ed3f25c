@@ -677,6 +677,8 @@ export default defineSchema({
     kind: v.optional(v.union(v.literal("food"), v.literal("supply"), v.literal("service"), v.literal("package"), v.null())),
     versionOfDishId: v.optional(v.union(v.id("dishes"), v.null())),
     versionLabel: v.optional(v.union(v.string(), v.null())),
+    usesMainRecipe: v.optional(v.union(v.boolean(), v.null())),
+    recipeDishId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
@@ -1228,6 +1230,7 @@ export default defineSchema({
     dishId: v.id("dishes"),
     dishName: v.optional(v.union(v.string(), v.null())),
     recipeSyncDishId: v.optional(v.union(v.string(), v.null())),
+    recipeDishId: v.optional(v.union(v.id("dishes"), v.null())),
     quantityServings: v.number(),
     followsEventHeadcount: v.optional(v.union(v.boolean(), v.null())),
     headcountOverride: v.optional(v.union(v.number(), v.null())),
@@ -1245,7 +1248,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_recipeSyncDishId", ["recipeSyncDishId"])
     .index("by_eventId", ["eventId"])
-    .index("by_dishId", ["dishId"]),
+    .index("by_dishId", ["dishId"])
+    .index("by_recipeDishId", ["recipeDishId"]),
   eventDishComponentSeeds: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

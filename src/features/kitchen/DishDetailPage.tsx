@@ -482,7 +482,7 @@ export function DishDetailPage() {
               disabled={busy != null}
               onClick={() =>
                 void run("createEdition", async () => {
-                  const createdId = await createDish({
+                  const created = (await createDish({
                     name: dish.name,
                     portionSize: dish.portionSize,
                     portionUnit: dish.portionUnit,
@@ -492,8 +492,12 @@ export function DishDetailPage() {
                     serviceStyle: dish.serviceStyle ?? undefined,
                     dietaryTags: dish.dietaryTags,
                     allergenSummary: dish.allergenSummary,
-                  });
-                  if (typeof createdId !== "string") return;
+                  })) as string | { docId: string } | undefined;
+                  // The save step answers { docId }; it never was a plain id,
+                  // so the new edition was made but never linked.
+                  const createdId =
+                    typeof created === "string" ? created : created?.docId;
+                  if (!createdId) return;
                   await linkAsEdition({
                     docId: createdId,
                     sourceDishId:

@@ -2688,6 +2688,30 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-04",
       "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Dish.recipeDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "Dish.usesMainRecipe",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "EventDish.recipeDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "EventDishAdded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "EventDishAdded carries recipeDishId (the dish whose recipe the line cooks from); dishId unchanged."
     }
   ]
 }

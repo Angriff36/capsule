@@ -57,6 +57,10 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // as a tab there. versionLabel names the tab (the main dish may have one too).
   property indexed versionOfDishId: uuid?
   property versionLabel: string?
+  // A version uses the main dish's recipe (ingredients, recipes, prep steps)
+  // unless switched off. recipeDishId is that dish; null = this dish's own.
+  property usesMainRecipe: boolean?
+  property recipeDishId: uuid?
 
   hasMany ingredientLines: DishIngredient
   hasMany componentLines: DishComponent
@@ -307,6 +311,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
     constraint versionLabelGiven: length(trim(label)) > 0 "Name this version, for example Finish at Kitchen."
     mutate versionOfDishId = mainDishId
     mutate versionLabel = trim(label)
+    mutate recipeDishId = self.usesMainRecipe == false ? null : mainDishId
     emit DishVersionLinked {
       dishId: self.id
       tenantId: self.tenantId
@@ -326,10 +331,24 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Shared: this version cooks from the main dish's recipe. Not shared: its own.
+  command useMainRecipe(shared: boolean) {
+    guard self.deletedAt == null
+    guard self.versionOfDishId != null
+    mutate usesMainRecipe = shared
+    mutate recipeDishId = shared ? self.versionOfDishId : null
+    emit DishRecipeSourceChanged {
+      dishId: self.id
+      tenantId: self.tenantId
+      usesMainRecipe: shared
+    }
+  }
+
   // Turn a version back into a dish of its own.
   command detachVersion() {
     guard self.versionOfDishId != null
     mutate versionOfDishId = null
+    mutate recipeDishId = null
     emit DishVersionUnlinked {
       dishId: self.id
       tenantId: self.tenantId
@@ -822,6 +841,12 @@ event DishVersionLabeled: "dish.version_labeled" {
   dishId: string
   tenantId: string
   label: string
+}
+
+event DishRecipeSourceChanged: "dish.recipe_source_changed" {
+  dishId: string
+  tenantId: string
+  usesMainRecipe: boolean
 }
 
 event DishVersionUnlinked: "dish.version_unlinked" {

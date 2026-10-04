@@ -908,12 +908,12 @@ on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload
 
 // Compat first — repair activeDishId on templates that predate the field, in
 // the same transaction, so legacy dishes still generate.
-on EventDishAdded fanOut DishTask where dishId = payload.dishId
+on EventDishAdded fanOut DishTask where dishId = payload.recipeDishId
   run DishTask.backfillActiveKey
 
 // One PrepTask per active template. match on (eventDishId, dishTaskId) makes a
 // replayed EventDishAdded update the existing line instead of duplicating it.
-on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
+on EventDishAdded fanOut DishTask where activeDishId = payload.recipeDishId
   run PrepTask.open
   match eventDishId = payload.eventDishId, dishTaskId = self.id
   else create
