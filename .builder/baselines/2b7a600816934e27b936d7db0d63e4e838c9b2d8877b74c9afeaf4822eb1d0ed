@@ -86,6 +86,7 @@ import {
   ComponentRetireParamsSchema,
   ComponentRetractParamsSchema,
   ComponentReviseDraftParamsSchema,
+  ComponentSetDeclaredAllergensParamsSchema,
   ComponentSetKitchenStandardsParamsSchema,
   ComponentSetPrimaryImageParamsSchema,
   ComponentSetServesPerYieldParamsSchema,
@@ -1707,6 +1708,16 @@ export function useComponentReviseDraft() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ComponentReviseDraftParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Component.setDeclaredAllergens. */
+export function useComponentSetDeclaredAllergens() {
+  const mutate = useMutation(api.mutations.Component_setDeclaredAllergens);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentSetDeclaredAllergensParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14086,4 +14097,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1490 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1491 as const;

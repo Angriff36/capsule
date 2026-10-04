@@ -314,6 +314,7 @@ export default defineSchema({
     equipmentNotes: v.optional(v.union(v.string(), v.null())),
     activePrepMinutes: v.optional(v.union(v.number(), v.null())),
     passiveCookMinutes: v.optional(v.union(v.number(), v.null())),
+    declaredAllergens: v.optional(v.array(v.union(v.literal("milk"), v.literal("eggs"), v.literal("fish"), v.literal("crustacean_shellfish"), v.literal("tree_nuts"), v.literal("peanuts"), v.literal("wheat"), v.literal("soybeans"), v.literal("sesame")))),
     platingInstructions: v.optional(v.union(v.string(), v.null())),
     coolingInstructions: v.optional(v.union(v.string(), v.null())),
     holdingInstructions: v.optional(v.union(v.string(), v.null())),

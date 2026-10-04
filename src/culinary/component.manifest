@@ -47,6 +47,9 @@ entity Component mixin TenantScoped, SoftDeletable {
   // Recipe sheet times (Ryan 2026-10-04): hands-on minutes and unattended minutes.
   property activePrepMinutes: int?
   property passiveCookMinutes: int?
+  // Allergens marked on the recipe sheet itself (Ryan 2026-10-04,
+  // recipe_sheet.csv "allergen" rows). Adds to what the ingredients carry.
+  property declaredAllergens: list<AllergenCode> = []
   property platingInstructions: string?
   property coolingInstructions: string?
   property holdingInstructions: string?
@@ -215,6 +218,15 @@ entity Component mixin TenantScoped, SoftDeletable {
     constraint componentTimesNonnegative: activePrepMinutes >= 0 and passiveCookMinutes >= 0 "Times can't be negative. Use zero or more."
     mutate activePrepMinutes = activePrepMinutes
     mutate passiveCookMinutes = passiveCookMinutes
+    emit ComponentKitchenStandardsSet {
+      componentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setDeclaredAllergens(declaredAllergens: list<AllergenCode>) {
+    guard self.deletedAt == null
+    mutate declaredAllergens = declaredAllergens
     emit ComponentKitchenStandardsSet {
       componentId: self.id
       tenantId: self.tenantId

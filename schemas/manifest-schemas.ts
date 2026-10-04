@@ -332,6 +332,7 @@ export const ComponentSchema = z.object({
   equipmentNotes: z.string().nullable().optional(),
   activePrepMinutes: z.number().int().nullable().optional(),
   passiveCookMinutes: z.number().int().nullable().optional(),
+  declaredAllergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   platingInstructions: z.string().nullable().optional(),
   coolingInstructions: z.string().nullable().optional(),
   holdingInstructions: z.string().nullable().optional(),
@@ -5529,6 +5530,13 @@ export const ComponentReviseDraftParamsSchema = z.object({
 });
 
 export type ComponentReviseDraftParams = z.infer<typeof ComponentReviseDraftParamsSchema>;
+
+// Command: setDeclaredAllergens on Component
+export const ComponentSetDeclaredAllergensParamsSchema = z.object({
+  declaredAllergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
+});
+
+export type ComponentSetDeclaredAllergensParams = z.infer<typeof ComponentSetDeclaredAllergensParamsSchema>;
 
 // Command: setKitchenStandards on Component
 export const ComponentSetKitchenStandardsParamsSchema = z.object({
