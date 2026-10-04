@@ -27,6 +27,40 @@ const FACT_ORDER: EventBundleSource[] = [
   "battleBoard",
 ];
 
+/**
+ * The production worksheet names every dish the kitchen makes, with its
+ * servings. A dish it names that no menu report listed still belongs on the
+ * event, so it joins the menu (and is matched to a saved dish, or offered for
+ * a pick) instead of its prep tasks being dropped. "(Sel)" and other bracket
+ * tags do not make a different dish.
+ */
+function addPrepDishesToMenu(
+  menu: BundleMenuItem[],
+  prepTasks: readonly EventBundle["prepTasks"][number][],
+  warnings: string[],
+): void {
+  const baseName = (value: string) =>
+    normalizeName(value.replace(/\([^)]*\)/g, ""));
+  const onMenu = new Set(menu.map((item) => baseName(item.name)));
+  const added: string[] = [];
+  for (const task of prepTasks) {
+    const key = baseName(task.dishName);
+    if (key.length === 0 || onMenu.has(key)) continue;
+    onMenu.add(key);
+    const item: BundleMenuItem = { name: task.dishName };
+    if (task.parentServings !== undefined) {
+      item.quantityServings = task.parentServings;
+    }
+    menu.push(item);
+    added.push(task.dishName);
+  }
+  if (added.length > 0) {
+    warnings.push(
+      `Added to the menu from the production worksheet: ${added.join(", ")}.`,
+    );
+  }
+}
+
 /** Keep only the listed sources, in the listed order. */
 function orderParts(
   parts: readonly EventBundlePart[],
@@ -203,6 +237,7 @@ export function mergeEventBundle(
   bundle.menu = mergeMenu(parts, warnings);
   bundle.timeline = mergeTimeline(parts);
   bundle.prepTasks = parts.flatMap((part) => part.prepTasks ?? []);
+  addPrepDishesToMenu(bundle.menu, bundle.prepTasks, warnings);
   bundle.packList = parts.flatMap((part) => part.packList ?? []);
   bundle.orderLines = parts.flatMap((part) => part.orderLines ?? []);
   bundle.payments = parts.flatMap((part) => part.payments ?? []);
