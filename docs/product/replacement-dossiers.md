@@ -56,11 +56,16 @@ did not go (invoice page and the proposal's "Emails" list). Capsule knows
 callbacks wait on issue #52).
 
 Open:
-- Imported events that are over (TPP Complete / Closed Out) come in
-  Completed, and Cancelled ones come in Cancelled, with no invoice, staff or
-  pack list made for them (`proofs/import-old-event-status`, since
-  2026-10-04). Live TPP statuses start in Planning, so approval still makes
-  their work. The TPP status shows on the event's "Imported from" panel as
+- Imported events that are over and were booked in TPP (Confirmed, Sales
+  Lock, Final, Complete, Closed ...) come in Completed, and Cancelled ones,
+  lost quotes and quotes past their date come in Cancelled, with no invoice,
+  staff or pack list made for them (`proofs/import-old-event-status`, since
+  2026-10-04). Events still to come start in Planning, so approval still
+  makes their work. TPP's event list report (the 2,505-event history file,
+  "Invoice No", client by name) comes in through "Import a file from the old
+  system" > Events; each event finds its client by name among the clients
+  read from the contact list (`proofs/import-event-list-report`). Two
+  clients with one name, or none, leave the event waiting with a note. The TPP status shows on the event's "Imported from" panel as
   "Status in the old system"; an event read in before 2026-10-04 has a
   "Mark finished" / "Mark cancelled" button there.
 - Old invoices are not created as invoices; finance gets a rebuild preview
