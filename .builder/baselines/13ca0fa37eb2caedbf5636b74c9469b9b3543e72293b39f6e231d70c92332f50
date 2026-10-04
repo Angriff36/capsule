@@ -48,6 +48,8 @@ import {
   ComponentComponentAdjustQuantityParamsSchema,
   ComponentComponentRemoveParamsSchema,
   ComponentDraftParamsSchema,
+  ComponentEquipmentAddParamsSchema,
+  ComponentEquipmentRemoveParamsSchema,
   ComponentImportApproveReviewParamsSchema,
   ComponentImportBeginFinalizationParamsSchema,
   ComponentImportBeginReviewParamsSchema,
@@ -88,6 +90,7 @@ import {
   ComponentSetPrimaryImageParamsSchema,
   ComponentSetServesPerYieldParamsSchema,
   ComponentSetStorageWindowParamsSchema,
+  ComponentSetTimesParamsSchema,
   ComponentSnapshotCaptureParamsSchema,
   ComponentStepAddParamsSchema,
   ComponentStepRemoveParamsSchema,
@@ -812,6 +815,9 @@ import {
   StorageLocationDeactivateParamsSchema,
   StorageLocationRegisterParamsSchema,
   StorageLocationReviseDetailsParamsSchema,
+  StylePackagingAddParamsSchema,
+  StylePackagingRemoveParamsSchema,
+  StylePackagingReviseParamsSchema,
   SyncErrorMarkResolvedParamsSchema,
   SyncErrorRecordParamsSchema,
   SyncErrorReopenParamsSchema,
@@ -1745,6 +1751,16 @@ export function useComponentSetStorageWindow() {
   };
 }
 
+/** Mutation hook for Component.setTimes. */
+export function useComponentSetTimes() {
+  const mutate = useMutation(api.mutations.Component_setTimes);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentSetTimesParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for Component.draft. */
 export function useCreateComponent() {
   const mutate = useMutation(api.mutations.Component_createViaDraft);
@@ -1802,6 +1818,47 @@ export function useCreateComponentComponent() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = ComponentComponentAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for ComponentEquipment. */
+export function useListComponentEquipment() {
+  return useQuery(api.queries.listComponentEquipment);
+}
+
+/** Reactive get-by-id for ComponentEquipment. Pass "skip" to suspend. */
+export function useGetComponentEquipment(id: string | "skip") {
+  return useQuery(api.queries.getComponentEquipment, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ComponentEquipment.add. */
+export function useComponentEquipmentAdd() {
+  const mutate = useMutation(api.mutations.ComponentEquipment_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentEquipmentAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ComponentEquipment.remove. */
+export function useComponentEquipmentRemove() {
+  const mutate = useMutation(api.mutations.ComponentEquipment_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentEquipmentRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ComponentEquipment.add. */
+export function useCreateComponentEquipment() {
+  const mutate = useMutation(api.mutations.ComponentEquipment_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ComponentEquipmentAddParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -12129,6 +12186,57 @@ export function useCreateStorageLocation() {
   };
 }
 
+/** Reactive list for StylePackaging. */
+export function useListStylePackaging() {
+  return useQuery(api.queries.listStylePackaging);
+}
+
+/** Reactive get-by-id for StylePackaging. Pass "skip" to suspend. */
+export function useGetStylePackaging(id: string | "skip") {
+  return useQuery(api.queries.getStylePackaging, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for StylePackaging.add. */
+export function useStylePackagingAdd() {
+  const mutate = useMutation(api.mutations.StylePackaging_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StylePackagingAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StylePackaging.remove. */
+export function useStylePackagingRemove() {
+  const mutate = useMutation(api.mutations.StylePackaging_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StylePackagingRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StylePackaging.revise. */
+export function useStylePackagingRevise() {
+  const mutate = useMutation(api.mutations.StylePackaging_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StylePackagingReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for StylePackaging.add. */
+export function useCreateStylePackaging() {
+  const mutate = useMutation(api.mutations.StylePackaging_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = StylePackagingAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for SyncError. */
 export function useListSyncError() {
   return useQuery(api.queries.listSyncError);
@@ -13978,4 +14086,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1478 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1490 as const;

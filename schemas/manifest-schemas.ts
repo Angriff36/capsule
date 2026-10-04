@@ -330,6 +330,8 @@ export const ComponentSchema = z.object({
   storageWindowDays: z.number().int().nullable().optional(),
   storageWindowSource: z.string().nullable().optional(),
   equipmentNotes: z.string().nullable().optional(),
+  activePrepMinutes: z.number().int().nullable().optional(),
+  passiveCookMinutes: z.number().int().nullable().optional(),
   platingInstructions: z.string().nullable().optional(),
   coolingInstructions: z.string().nullable().optional(),
   holdingInstructions: z.string().nullable().optional(),
@@ -372,6 +374,21 @@ export const ComponentComponentSchema = z.object({
 });
 
 export type ComponentComponent = z.infer<typeof ComponentComponentSchema>;
+
+// Entity: ComponentEquipment
+export const ComponentEquipmentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  componentId: z.string().uuid(),
+  name: z.string().default(""),
+  sortOrder: z.number().int().optional().default(0),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ComponentEquipment = z.infer<typeof ComponentEquipmentSchema>;
 
 // Entity: ComponentImport
 export const ComponentImportSchema = z.object({
@@ -4274,6 +4291,24 @@ export const StorageLocationComputedSchema = StorageLocationSchema.extend({
 export type StorageLocation = z.infer<typeof StorageLocationSchema>;
 export type StorageLocationWithComputed = z.infer<typeof StorageLocationComputedSchema>;
 
+// Entity: StylePackaging
+export const StylePackagingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  componentId: z.string().uuid().nullable().optional(),
+  dishId: z.string().uuid().nullable().optional(),
+  serviceStyleId: z.string().uuid(),
+  instructions: z.string().default(""),
+  container: z.string().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  removedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StylePackaging = z.infer<typeof StylePackagingSchema>;
+
 // Entity: SyncError
 export const SyncErrorSchema = z.object({
   id: z.string().uuid(),
@@ -5531,6 +5566,14 @@ export const ComponentSetStorageWindowParamsSchema = z.object({
 
 export type ComponentSetStorageWindowParams = z.infer<typeof ComponentSetStorageWindowParamsSchema>;
 
+// Command: setTimes on Component
+export const ComponentSetTimesParamsSchema = z.object({
+  activePrepMinutes: z.number().int(),
+  passiveCookMinutes: z.number().int(),
+});
+
+export type ComponentSetTimesParams = z.infer<typeof ComponentSetTimesParamsSchema>;
+
 // Command: add on ComponentComponent
 export const ComponentComponentAddParamsSchema = z.object({
   componentId: z.string().min(1),
@@ -5559,6 +5602,20 @@ export const ComponentComponentRemoveParamsSchema = z.object({
 });
 
 export type ComponentComponentRemoveParams = z.infer<typeof ComponentComponentRemoveParamsSchema>;
+
+// Command: add on ComponentEquipment
+export const ComponentEquipmentAddParamsSchema = z.object({
+  componentId: z.string().min(1),
+  name: z.string(),
+  sortOrder: z.number().int().optional(),
+});
+
+export type ComponentEquipmentAddParams = z.infer<typeof ComponentEquipmentAddParamsSchema>;
+
+// Command: remove on ComponentEquipment
+export const ComponentEquipmentRemoveParamsSchema = z.object({});
+
+export type ComponentEquipmentRemoveParams = z.infer<typeof ComponentEquipmentRemoveParamsSchema>;
 
 // Command: approveReview on ComponentImport
 export const ComponentImportApproveReviewParamsSchema = z.object({});
@@ -12010,6 +12067,30 @@ export const StorageLocationReviseDetailsParamsSchema = z.object({
 });
 
 export type StorageLocationReviseDetailsParams = z.infer<typeof StorageLocationReviseDetailsParamsSchema>;
+
+// Command: add on StylePackaging
+export const StylePackagingAddParamsSchema = z.object({
+  serviceStyleId: z.string().min(1),
+  instructions: z.string(),
+  componentId: z.string().min(1).optional(),
+  dishId: z.string().min(1).optional(),
+  container: z.string().optional(),
+});
+
+export type StylePackagingAddParams = z.infer<typeof StylePackagingAddParamsSchema>;
+
+// Command: remove on StylePackaging
+export const StylePackagingRemoveParamsSchema = z.object({});
+
+export type StylePackagingRemoveParams = z.infer<typeof StylePackagingRemoveParamsSchema>;
+
+// Command: revise on StylePackaging
+export const StylePackagingReviseParamsSchema = z.object({
+  instructions: z.string(),
+  container: z.string().optional(),
+});
+
+export type StylePackagingReviseParams = z.infer<typeof StylePackagingReviseParamsSchema>;
 
 // Command: markResolved on SyncError
 export const SyncErrorMarkResolvedParamsSchema = z.object({});
