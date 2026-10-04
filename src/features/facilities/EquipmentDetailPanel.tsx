@@ -20,6 +20,7 @@ import {
 } from "../../lib/equipmentFields";
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
+import { RecordPictures } from "../attachments/RecordPictures";
 import { BarcodeLabel } from "../../ui/BarcodeLabel";
 import { scanLabelFor } from "../logistics/packScan";
 import type { VendorChoice } from "./EquipmentForm";
@@ -243,6 +244,21 @@ export function EquipmentDetailPanel({
               </button>
             ) : null}
           </div>
+          <RecordPictures
+            parentType="equipment"
+            parentId={item._id}
+            name={item.name}
+            mainStorageId={item.primaryImageStorageId}
+            onMakeMain={(storageId, fileName) =>
+              setPrimaryImage({
+                docId: item._id,
+                version: item.version,
+                storageId,
+                fileName,
+              })
+            }
+            onError={onError}
+          />
           <BarcodeLabel
             code={
               item.assetTag?.trim()

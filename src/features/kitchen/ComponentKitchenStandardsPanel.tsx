@@ -2,10 +2,12 @@ import { Fragment, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useComponentSetKitchenStandards,
+  useComponentSetPrimaryImage,
   useListEquipment,
 } from "../../lib/manifest-convex-react";
 import { ComponentPrimaryImageUploader } from "../attachments/ComponentPrimaryImageUploader";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
+import { RecordPictures } from "../attachments/RecordPictures";
 import {
   activeRecipeEquipment,
   addRecipeEquipment,
@@ -97,6 +99,7 @@ export function ComponentKitchenStandardsPanel({
   onFailure: (error: unknown) => void;
 }) {
   const setStandards = useComponentSetKitchenStandards();
+  const setPrimaryImage = useComponentSetPrimaryImage();
   const equipment = useListEquipment() as RecipeEquipmentOption[] | undefined;
   const equipmentChoices = activeRecipeEquipment(equipment);
   const equipmentBox = useRef<HTMLTextAreaElement>(null);
@@ -145,6 +148,21 @@ export function ComponentKitchenStandardsPanel({
       ) : (
         <p className="text-base text-ink-3">Photo: {NOT_ON_FILE}</p>
       )}
+      <RecordPictures
+        parentType="component"
+        parentId={component._id}
+        name={component.name}
+        mainStorageId={component.primaryImageStorageId}
+        onMakeMain={(storageId, fileName) =>
+          setPrimaryImage({
+            docId: component._id,
+            version: component.version,
+            storageId,
+            fileName,
+          })
+        }
+        onError={onFailure}
+      />
       <dl className="culinary-facts">
         {rows.map((row) => (
           <div key={row.key} data-testid={`standard-${row.key}`}>

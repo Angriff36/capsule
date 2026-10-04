@@ -1474,6 +1474,13 @@ Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - refusals (role, stage and rules): "Kitchen staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Component not found"
   - effects: ComponentKitchenStandardsSet
   - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentImport.list, ComponentImport.get, ComponentImportLine.list, ComponentImportLine.get and 18 more
+- `mutations.Component_setPrimaryImage` (Component.setPrimaryImage)
+  - inputs from the screen: storageId, fileName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Add a photo before you set it as the main picture."; "ConcurrencyConflict:"; and 1 more
+  - effects: ComponentPrimaryImageSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentImport.list, ComponentImport.get, ComponentImportLine.list, ComponentImportLine.get and 18 more
 - `mutations.Component_setServesPerYield` (Component.setServesPerYield)
   - inputs from the screen: servesPerYield; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
