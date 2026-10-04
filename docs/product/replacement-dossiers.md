@@ -120,7 +120,7 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Prices and price history | ingredient page, `/inventory/purchasing` (price list file) | `culinary-model-cost-dated`, `proofs/receipt-exact-once`, `proofs/vendor-price-list-import` | Built: history grows from receipts and from each vendor price list read in (a new price keeps the old one); a Price date column brings old prices in with their dates; each vendor item on the ingredient page shows its earlier prices and dates |
 | Recipes, sub-recipes, yields, versions | `/kitchen/components/:id`, `/kitchen/dishes/:id` | `proofs/safe-culinary-operations` | Built |
 | Method, station, equipment | recipe page, `/kitchen/stations` | `proofs/prep-work-baselines`, `dish-editing-behavior` | Built: each recipe step offers the kitchen station list and saves another spelling as the station's own name; a station change moves unstarted event prep. Recipe equipment is picked from the company equipment list (other words still allowed); each listed piece shows how many the company has |
-| Photos, video, plating, holding and reheating | recipe page | `culinary/recipe-media-and-holding` | Built (one photo) |
+| Photos, video, plating, holding and reheating | recipe page | `culinary/recipe-media-and-holding` | Built (a main photo plus more pictures and short videos) |
 | Substitutions | ingredient and recipe pages | `proofs/live-substitution-at-executing`, `features/kitchen/ingredient-substitution-ranking` | Built: saved swaps per ingredient (ingredient page), ranked on a stock shortage by free stock, new allergens and cost; recipe-level notes too |
 | Menus and event servings | `/kitchen/menus/:id`, event Menu tab | `proofs/event-dish-demand-lifecycle` | Built |
 | Live cost, known against missing | dish, menu and event pages | `proofs/menu-profitability-direct-ingredient`, `proofs/event-estimated-food-cost` | Built |
@@ -151,7 +151,7 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 
 | Job | Where in Capsule | Proof | State |
 | --- | --- | --- | --- |
-| Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount`, `features/facilities/equipment-place-choices` | Built (one photo). Storage place and Move offer the places already in use (catalog places and kitchen storage places); another spelling saves as the known place's name |
+| Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount`, `features/facilities/equipment-place-choices` | Built (a main photo plus more pictures and short videos). Storage place and Move offer the places already in use (catalog places and kitchen storage places); another spelling saves as the known place's name |
 | Availability across events, repairs, late returns | event Equipment panel | `proofs/availability-realtime`, `proofs/equipment-reservation-conflict` | Built |
 | Rental lines on proposals, approval, changes | `/clients/proposals` Pricing | `proofs/rental-proposal-lines`, `proofs/post-acceptance-change-order` | Built |
 | Approved rentals held for the event | event Equipment panel (held there on their own when the proposal is approved) | `proofs/accepted-rental-holds` | Built 2026-10-03 |
@@ -174,9 +174,16 @@ No retyping: since 2026-10-03 an item on the accepted proposal is held for the
 event on approval (and on an accepted change), as many as are free; the rest
 shows on the event as "approved by the client but not held".
 
-History: no way in yet for Goodshuffle items, holds or orders. Needs a
-Goodshuffle export file to build against (blocked). The event packet still has
-a "check current Goodshuffle rentals" item for imported events.
+History: Goodshuffle items come in from the Goodshuffle inventory export
+(.xlsx or .csv) on `/facilities/equipment`, "Bring in Goodshuffle items"
+(`proofs/goodshuffle-items-import`, since 2026-10-04). Each product becomes an
+equipment item tagged GS-<Product ID> with its count, client price, storage
+place, description, details and first picture; services and delivery fees are
+charges and are named, not added. Reading the file again updates the same
+items; counts changed in Capsule stay and are listed to recount. The export
+has no holds or orders, so old Goodshuffle bookings stay in Goodshuffle until
+their events pass. The event packet still has a "check current Goodshuffle
+rentals" item for imported events.
 
 ## Final Lock binder, tracker, shared drives, event chat
 
@@ -187,7 +194,7 @@ assigned as field work (§20.6).
 | --- | --- | --- | --- |
 | Prove the event is ready | event page Workbook, `/workbooks` | `proofs/final-lock-readiness`, `proofs/readiness-projections` | Built |
 | Ops Final Lock questions | Workbook, Final Lock questions | `proofs/event-packet-final-lock`, `proofs/event-packet-final-lock-sources` | Built |
-| Sales Lock | event stage actions | `proofs/lifecycle-sales-lock-completeness` | Built as a completeness check (spec §3.3 asks for gate checks) |
+| Sales Lock | event stage actions | `proofs/lifecycle-sales-lock-completeness` | Built: locking checks client, dates, guest count, name, venue and service style, and says what is missing |
 | The eight packet parts in binder order | Workbook, prepare | `proofs/event-packet-native-parts` | Built |
 | Office answers and blank field forms | Workbook field forms, `/my` | `proofs/event-packet-field-confirmation` | Built (field forms never pre-filled) |
 | Binder color and event number on the cover | packet cover and brief | `event-packet-workbook`, `proofs/event-packet-native-parts` | Built (cover says "Event" since 2026-10-03) |
