@@ -1,6 +1,4 @@
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { geocodeDestination } from "../logistics/routePlanner";
 import {
   coordinatesMapUrl,
   venueCoordinates,
@@ -8,26 +6,19 @@ import {
 import { EventOverviewCard } from "./EventOverviewCard";
 
 /**
- * Venue map on the overview. Tiles come from OpenStreetMap's keyless embed,
- * pinned by the venue's stored coordinates when it has them; an address-only
- * venue is geocoded once through the same cached Nominatim helper the weather
- * and route planner use. "Open in Google Maps" hands the driver a turn-by-turn
- * link either way — the embed is orientation, not navigation. `children` rides
+ * Venue map on the overview: Google Maps' keyless embed, pinned by the
+ * venue's stored coordinates or else its address. "Open in Google Maps" hands
+ * the driver a turn-by-turn link — the embed is orientation, not navigation. `children` rides
  * in the card header (the event-day weather chip); `startsAt` feeds it.
  */
 export function EventMapPanel({
   venue,
-  startsAt,
   children,
 }: {
   readonly venue: EventMapVenue | undefined | null;
   readonly startsAt?: number | null;
   readonly children?: ReactNode;
 }) {
-  const [point, setPoint] = useState<
-    { lat: number; lon: number } | null | undefined
-  >(undefined);
-
   const coords = venue ? venueCoordinates(venue) : null;
   const addressQuery = venue
     ? [
@@ -42,59 +33,31 @@ export function EventMapPanel({
         .join(", ")
     : "";
 
-  useEffect(() => {
-    if (coords) {
-      setPoint({ lat: coords.latitude, lon: coords.longitude });
-      return;
-    }
-    if (!addressQuery) {
-      setPoint(null);
-      return;
-    }
-    let active = true;
-    setPoint(undefined);
-    void geocodeDestination(addressQuery).then((hit) => {
-      if (active) setPoint(hit);
-    });
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coords?.latitude, coords?.longitude, addressQuery]);
-
-  const googleMapsHref = point
-    ? coordinatesMapUrl({ latitude: point.lat, longitude: point.lon })
+  // Google finds the address itself (Ryan 2026-10-04: the free OpenStreetMap
+  // search missed "2440 BUILDING 2440 NE Hopkins Ct."), and its plain embed
+  // needs no key. Stored coordinates win over the address.
+  const mapQuery = coords
+    ? `${coords.latitude},${coords.longitude}`
+    : addressQuery;
+  const googleMapsHref = coords
+    ? coordinatesMapUrl(coords)
     : addressQuery
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressQuery)}`
       : null;
 
-  const body =
-    !venue || (!coords && !addressQuery) ? (
-      <p className="text-base text-ink-2">
-        No venue location on file yet — add an address or coordinates to the
-        venue to see the map.
-      </p>
-    ) : point === undefined ? (
-      <p className="text-base text-ink-2" role="status">
-        Locating the venue…
-      </p>
-    ) : point === null ? (
-      <p className="text-base text-ink-2">
-        The venue could not be located on the map.{" "}
-        {googleMapsHref ? (
-          <a className="text-link hover:underline" href={googleMapsHref}>
-            Try the address in Google Maps
-          </a>
-        ) : null}
-      </p>
-    ) : (
-      <iframe
-        title={`Map of ${venue?.name ?? "the venue"}`}
-        className="event-map-frame"
-        loading="lazy"
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${point.lon - 0.012}%2C${point.lat - 0.007}%2C${point.lon + 0.012}%2C${point.lat + 0.007}&layer=mapnik&marker=${point.lat}%2C${point.lon}`}
-      />
-    );
+  const body = !mapQuery ? (
+    <p className="text-base text-ink-2">
+      No venue location on file yet — add an address or coordinates to the venue
+      to see the map.
+    </p>
+  ) : (
+    <iframe
+      title={`Map of ${venue?.name ?? "the venue"}`}
+      className="event-map-frame"
+      loading="lazy"
+      src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=15&output=embed`}
+    />
+  );
 
   return (
     <EventOverviewCard

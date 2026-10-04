@@ -79,9 +79,9 @@ it("shows the venue map and event-day weather chip for a coordinates-only venue"
   const frame = map?.querySelector("iframe.event-map-frame");
   expect(frame).not.toBeNull();
   const src = frame?.getAttribute("src") ?? "";
-  expect(src).toContain("openstreetmap.org/export/embed.html");
-  expect(src).toContain("marker=47.01359");
+  expect(src).toContain("maps.google.com/maps?q=47.01359");
   expect(src).toContain("-116.52979");
+  expect(src).toContain("output=embed");
   expect(map?.textContent).toContain("Open in Google Maps");
 
   const chip = container.querySelector('[data-testid="event-weather-chip"]');
