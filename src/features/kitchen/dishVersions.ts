@@ -96,3 +96,74 @@ export function mainDishRows<T extends VersionedDish>(
       };
     });
 }
+
+// Shared recipe (Ryan 2026-10-04): a version cooks from its main dish's
+// recipe unless switched to its own. The recipe of a dish is the lines
+// (ingredients, recipes, prep steps) whose dishId is dish.recipeDishId, else
+// its own id. An event line keeps the recipe it was added with.
+
+/** The dish whose recipe lines this dish cooks from. */
+export function recipeDishIdOf(dish: {
+  _id: string;
+  recipeDishId?: string | null;
+}): string {
+  return dish.recipeDishId ?? dish._id;
+}
+
+/** The dish whose recipe lines this event menu line cooks from. */
+export function eventLineRecipeDishId(line: {
+  dishId: string;
+  recipeDishId?: string | null;
+}): string {
+  return line.recipeDishId ?? line.dishId;
+}
+
+/** A dish and the dish whose recipe it cooks from. */
+export type RecipeLink = { dishId: string; recipeDishId?: string | null };
+
+/** Recipe links of dish rows (for menus and dish lists). */
+export function dishRecipeLinks(
+  dishes: readonly { _id: string; recipeDishId?: string | null }[],
+): RecipeLink[] {
+  return dishes.map((dish) => ({
+    dishId: dish._id,
+    recipeDishId: dish.recipeDishId,
+  }));
+}
+
+/** The dish ids plus the dishes whose recipes they cook from. */
+export function withRecipeDishIds(links: readonly RecipeLink[]): string[] {
+  return [
+    ...new Set(
+      links.flatMap((link) =>
+        link.recipeDishId ? [link.dishId, link.recipeDishId] : [link.dishId],
+      ),
+    ),
+  ];
+}
+
+/**
+ * Recipe lines as each dish cooks them: a dish that shares another dish's
+ * recipe gets a copy of those lines under its own id (its own lines, if any,
+ * are left out). Screens that group lines by dishId then show the shared
+ * recipe without other changes.
+ */
+export function shareRecipeLines<T extends { dishId: string }>(
+  lines: readonly T[],
+  links: readonly RecipeLink[],
+): T[] {
+  const sourceOf = new Map<string, string>();
+  for (const link of links) {
+    if (link.recipeDishId && link.recipeDishId !== link.dishId)
+      sourceOf.set(String(link.dishId), String(link.recipeDishId));
+  }
+  if (sourceOf.size === 0) return lines as T[];
+  const shared = lines.filter((line) => !sourceOf.has(String(line.dishId)));
+  for (const [dishId, recipeId] of sourceOf) {
+    for (const line of lines) {
+      if (String(line.dishId) === recipeId)
+        shared.push({ ...line, dishId } as T);
+    }
+  }
+  return shared;
+}

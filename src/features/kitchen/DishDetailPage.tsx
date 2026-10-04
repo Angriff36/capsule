@@ -30,6 +30,7 @@ import {
   VERSION_NAME_SUGGESTIONS,
   mainDishIdOf,
   mainDishRows,
+  recipeDishIdOf,
   versionTabLabel,
   versionTabs,
 } from "./dishVersions";
@@ -37,6 +38,7 @@ import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishContainersPanel } from "./DishContainersPanel";
 import { DishDetailsEditor } from "./DishDetailsEditor";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
+import { DishVersionRecipeSwitch } from "./DishVersionRecipeSwitch";
 import { DishComponentsPanel } from "./DishComponentsPanel";
 import { DishComponentPortionSpecPanel } from "./DishComponentPortionSpecPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
@@ -136,10 +138,16 @@ export function DishDetailPage() {
 
   // Versions: the main dish and its versions show as tabs on every one of them.
   const tabs = allDishes ? versionTabs(allDishes, dish) : [];
-  const mainId = allDishes ? mainDishIdOf(allDishes, dish) : dish._id;
+  const mainId = allDishes
+    ? mainDishIdOf(allDishes, dish)
+    : (dish.versionOfDishId ?? dish._id);
   const main = tabs[0] ?? dish;
   const isVersion = mainId !== dish._id;
   const hasVersions = tabs.length > 1;
+  // A version may cook from the main dish's recipe; its panels then show
+  // the main dish's lines, read only. Portion, containers and notes stay its own.
+  const recipeId = recipeDishIdOf(dish);
+  const sharingRecipe = recipeId !== dish._id;
 
   const askVersionName = async (title: string, defaultValue = "") =>
     (
@@ -282,7 +290,7 @@ export function DishDetailPage() {
               {dish.portionSize} {String(dish.portionUnit)}
             </dd>
           </div>
-          <DishPlateCostFact dishId={dish._id} />
+          <DishPlateCostFact dishId={recipeId} />
           <div>
             <dt>Category</dt>
             <dd>{dish.category || "—"}</dd>
@@ -458,13 +466,30 @@ export function DishDetailPage() {
         </section>
       ) : null}
 
-      <DishIngredientsPanel dishId={dish._id} />
+      {isVersion ? (
+        <DishVersionRecipeSwitch
+          dishId={dish._id}
+          dishVersion={dish.version}
+          mainDishId={mainId}
+          mainName={main.name}
+          sharing={sharingRecipe}
+          onFailure={setFailure}
+        />
+      ) : null}
 
-      <DishPrepTasksPanel dishId={dish._id} />
+      <fieldset
+        disabled={sharingRecipe}
+        className="contents"
+        aria-label={sharingRecipe ? "The main dish's recipe" : undefined}
+      >
+        <DishIngredientsPanel dishId={recipeId} />
 
-      <DishComponentsPanel dishId={dish._id} />
+        <DishPrepTasksPanel dishId={recipeId} />
 
-      <DishComponentPortionSpecPanel dishId={dish._id} />
+        <DishComponentsPanel dishId={recipeId} />
+
+        <DishComponentPortionSpecPanel dishId={recipeId} />
+      </fieldset>
 
       <DishContainersPanel dishId={dish._id} />
 
