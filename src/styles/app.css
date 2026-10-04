@@ -4447,13 +4447,21 @@
   .print-sheet * {
     visibility: visible;
   }
+  /* !important: screen rules (.card, the report drawer's slide-in shift) are
+     stronger and kept the sheet in place on the paper - it printed half way
+     down, or two fifths across. The frames around a sheet are unpinned so it
+     starts at the top-left of the paper. */
   .print-sheet {
-    position: absolute;
+    position: absolute !important;
     top: 0;
     left: 0;
     width: 100%;
     border: none;
     box-shadow: none;
+  }
+  *:has(.print-sheet) {
+    position: static !important;
+    transform: none !important;
   }
   .print-sheet .supply-table-wrap {
     overflow: visible;

@@ -244,6 +244,8 @@
     border: none;
     box-shadow: none;
     transform: none;
+    /* No slide on paper: mid-slide, the sheet printed far to the right. */
+    transition: none;
     overflow: visible;
   }
   .home-report-view > .tpp-print-area {
@@ -255,6 +257,11 @@
      .home-report-printing — so a page's own print never drags the rail's
      sheet onto its paper. */
   html:not(.home-report-printing) .home-report-rail {
+    display: none;
+  }
+  /* And the other way: a rail print on a screen with its own sheet (allergen
+     matrix, contract) leaves that sheet off the paper. */
+  html.home-report-printing .print-sheet:not(.home-report-rail .print-sheet) {
     display: none;
   }
 }
