@@ -8887,12 +8887,12 @@
       "key": "CF-14-slice4-operations",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§14 Slice 4 (ship event staffing/HR basics, kitchen menu/recipe/cost/waste/inventory, equipment reservation/packing/maintenance on the same Event spine)",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Slice 4 operations proofs to be gathered into the completion dossier.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): Focused set: tests/proofs/shift-lifecycle.runtime.test.ts + prep-task-override-survives-regeneration.runtime.test.ts + proposed equipment/staffing proofs in this audit"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): Focused set: tests/proofs/shift-lifecycle.runtime.test.ts + prep-task-override-survives-regeneration.runtime.test.ts + proposed equipment/staffing proofs in this audit; PASS 2026-10-04 (PL-COMPLETION-DOSSIER): slice 4 on the event spine rests on PASS rows AC-324, 331 (shift-lifecycle, event-staffing-full-lifecycle), AC-337 (prep-task-override-survives-regeneration), AC-335, 466 (waste-void), AC-336 (inventory-command-api-lifecycle), AC-451, 478 (menu cost), AC-541 (equipment-reservation-conflict), AC-136 (equipment-return-availability), AC-343 (pack-list-delivery-lifecycle), AC-339, 546 (maintenance-out-of-service); all ran green in the full `bun run check` PASS 2026-10-04 on loop/batch-20261003y..."
       ],
       "waitsOn": null,
       "owners": [
@@ -8901,8 +8901,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "a28a7296"
     },
     {
       "id": "AC-365",
@@ -8931,12 +8931,12 @@
       "key": "CF-14-slice-gate",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§14 closing paragraph (each slice ends after focused tests, the required gate, and wiring proof; no unrelated cleanup while a slice blocker is known)",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Needs the full repository gate run recorded in dossier definition 13.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): bun run check (existing)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): bun run check (existing); PASS 2026-10-04: full `bun run check` PASS 2026-10-04 on loop/batch-20261003y at a28a7296 (toolchain, regen guard, proof kit, manifest registry / breaking / fmt / scan / completeness, wiring drift, manifest integration, design vocab, typecheck, format, secrets, test:coverage 781/781 files, 2558 tests + 1 skipped, coverage thresholds, vite build, storybook build, baseline-decay ok; exit 0) and `bun run manifest:regen:check` 'generated output is current'. The first run of the day found 2 outdated tests (fixed in a28a7296), then the whole gate was run again; wiring proof = check:wiring-drift + check:manifest-integration inside the gate"
       ],
       "waitsOn": null,
       "owners": [
@@ -8945,8 +8945,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "a28a7296"
     },
     {
       "id": "AC-367",
@@ -16355,7 +16355,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
-      "sha": "c2ce45e0"
+      "sha": "d1ca0b8f"
     },
     {
       "id": "AC-714",
@@ -16509,7 +16509,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
-      "sha": "c2ce45e0"
+      "sha": "d1ca0b8f"
     },
     {
       "id": "AC-721",
@@ -16553,7 +16553,7 @@
         "repository review/release policy"
       ],
       "environment": "signed-in browser on the local dev stack; model or human judgment of the real screen or document",
-      "sha": "c2ce45e0"
+      "sha": "d1ca0b8f"
     },
     {
       "id": "AC-723",
@@ -16575,7 +16575,7 @@
         "repository review/release policy"
       ],
       "environment": "signed-in browser on the local dev stack; model or human judgment of the real screen or document",
-      "sha": "c2ce45e0"
+      "sha": "d1ca0b8f"
     },
     {
       "id": "AC-724",
@@ -16604,12 +16604,12 @@
       "key": "BE-21-13",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-13",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Needs the full repository gate run recorded in dossier definition 13.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 13 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 13 verified against scenario, gate, review and Git receipts; PASS 2026-10-04 (PL-COMPLETION-DOSSIER, dossier definition 13): full `bun run check` PASS 2026-10-04 on loop/batch-20261003y at a28a7296 (toolchain, regen guard, proof kit, manifest registry / breaking / fmt / scan / completeness, wiring drift, manifest integration, design vocab, typecheck, format, secrets, test:coverage 781/781 files, 2558 tests + 1 skipped, coverage thresholds, vite build, storybook build, baseline-decay ok; exit 0) and `bun run manifest:regen:check` 'generated output is current'. The first run of the day found 2 outdated tests (fixed in a28a7296), then the whole gate was run again"
       ],
       "waitsOn": null,
       "owners": [
@@ -16618,8 +16618,8 @@
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "a28a7296"
     },
     {
       "id": "AC-726",

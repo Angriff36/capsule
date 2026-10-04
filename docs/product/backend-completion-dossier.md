@@ -89,9 +89,9 @@ This page does not claim Capsule is production ready. It claims only what each l
 
 ## 13 · AC-725 · Focused proofs, deterministic regeneration, and `bun run check` pass.
 
-- Verdict: OPEN (gate run pending)
+- Verdict: PASS
 - Rows: AC-704, AC-162
-- Scenario: `bun run manifest:regen:check` twice with no change (AC-704); the full gate result for this batch is recorded here when it has run.
+- Scenario: `bun run manifest:regen:check` twice with no change (AC-704). 2026-10-04 at a28a7296: the full `bun run check` passed end to end (781/781 test files, 2558 tests, coverage thresholds, build, component catalog, baseline) and `bun run manifest:regen:check` reported generated output current.
 
 ## 14 · AC-726 · An eligible different model reviews and approves the complete diff under the repository's review rule.
 
