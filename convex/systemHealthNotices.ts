@@ -70,6 +70,7 @@ export const attention = query({
       QUICKBOOKS_CONNECTION_ENTITY,
       "QuickBooksReconciled",
     );
+    const quickBooksConnection = latestQuickBooksConnection(tenantLedger);
 
     const alerts = classifyHealth({
       now,
@@ -83,10 +84,12 @@ export const attention = query({
                 ? "needs_reconnect"
                 : "in_step",
             failedCount: 0,
+            accessEndsAt: calendarConnection.refreshTokenExpiresAt,
           }
         : null,
       quickBooks: {
-        connected: latestQuickBooksConnection(tenantLedger) != null,
+        connected: quickBooksConnection != null,
+        accessEndsAt: quickBooksConnection?.refreshTokenExpiresAt ?? null,
         lastStatus:
           quickBooksRun == null
             ? null

@@ -29,6 +29,7 @@ never provider error text, so no key, token or address reaches the screen.
 | Some events did not reach Google Calendar | Single events were refused. | Retry each event from the Google Calendar list. | — |
 | QuickBooks needs connecting again | QuickBooks refused Capsule's access. | Disconnect and connect again. | — |
 | Last QuickBooks run did not send everything | Some items failed. | Sync now; items already in QuickBooks are skipped, not sent twice. | — |
+| Google Calendar / QuickBooks access ends in N days | The provider gave access for a fixed time (QuickBooks always; Google only for time-limited access) and the end is 14 days or less away. | Connect again before the date; nothing already sent is sent twice. | — |
 
 ## Rollback and roll forward
 

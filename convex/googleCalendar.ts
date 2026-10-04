@@ -63,6 +63,8 @@ export interface ConnectionPayload {
   /** Null on connections made before the basis was recorded. */
   basis: CalendarSyncBasis | null;
   scopes: string | null;
+  /** When Google stops accepting the stored token; null when it did not say. */
+  refreshTokenExpiresAt: number | null;
 }
 
 export interface EventSyncState {
@@ -187,6 +189,7 @@ function parseConnection(payload: unknown): ConnectionPayload | null {
     refreshToken: { ciphertext, keyId },
     basis: parseCalendarBasis(value.basis),
     scopes: stringValue(value.scopes),
+    refreshTokenExpiresAt: numberValue(value.refreshTokenExpiresAt),
   };
 }
 
@@ -388,6 +391,13 @@ export const completeConnection = action({
         refreshToken: encrypted,
         basis: newCalendarBasis(connectedAt, state.includePast === true),
         ...(tokens.scope ? { scopes: tokens.scope } : {}),
+        ...(tokens.refreshTokenExpiresIn != null &&
+        tokens.refreshTokenExpiresIn > 0
+          ? {
+              refreshTokenExpiresAt:
+                connectedAt + tokens.refreshTokenExpiresIn * 1000,
+            }
+          : {}),
       });
       await ctx.scheduler.runAfter(0, internal.googleCalendar.reconcileTenant, {
         tenantId,
@@ -519,6 +529,7 @@ export const recordConnection = internalMutation({
       }),
     ),
     scopes: v.optional(v.string()),
+    refreshTokenExpiresAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     await insertStepEvent(ctx, {

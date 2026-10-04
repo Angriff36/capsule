@@ -159,6 +159,37 @@ describe("AC-165 System health in the notification bell", () => {
     ).toEqual([]);
   });
 
+  it("a QuickBooks connection whose access ends within 14 days reaches the bell", async () => {
+    const t = setup();
+    const now = Date.now();
+    await t.run(async (ctx) => {
+      await ctx.db.insert("manifestEvents", {
+        type: "QuickBooksConnected",
+        entity: "QuickBooksConnection",
+        entityId: A,
+        payload: {
+          tenantId: A,
+          connectionId: "qbo-health",
+          realmId: "realm-1",
+          connectedAt: now - 90 * 24 * 60 * MINUTE,
+          connectedBy: "proof-manager",
+          refreshToken: { ciphertext: "x", keyId: "k" },
+          refreshTokenExpiresAt: now + 5 * 24 * 60 * MINUTE,
+        },
+        createdAt: now - 60 * MINUTE,
+      });
+    });
+    const notices = await (
+      await person(t, A, "manager")
+    ).query(api.systemHealthNotices.attention, {});
+    expect(notices.map((notice) => [notice.id, notice.message])).toEqual([
+      [
+        "system-health:quickbooks-access-ending",
+        "QuickBooks access ends in 5 days",
+      ],
+    ]);
+  });
+
   it("nothing wrong means nothing in the bell", async () => {
     const t = setup();
     expect(
