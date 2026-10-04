@@ -1113,6 +1113,11 @@ export default defineSchema({
     .index("by_recurrenceTemplateEventId", ["recurrenceTemplateEventId"])
     .index("by_tenantId_and_startsAt", ["tenantId", "startsAt"])
     .index("by_tenantId_and_stage_and_startsAt", ["tenantId", "stage", "startsAt"])
+    .index("by_tenantId_and_approvedAt", ["tenantId", "approvedAt"])
+    .index("by_tenantId_and_executionStartedAt", ["tenantId", "executionStartedAt"])
+    .index("by_tenantId_and_completedAt", ["tenantId", "completedAt"])
+    .index("by_tenantId_and_cancelledAt", ["tenantId", "cancelledAt"])
+    .index("by_tenantId_and_closedOutAt", ["tenantId", "closedOutAt"])
     .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] }),
   eventAllergenChecks: defineTable({
     tenantId: v.string(),

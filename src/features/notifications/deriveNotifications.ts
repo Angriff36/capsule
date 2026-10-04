@@ -89,6 +89,8 @@ export interface NotificationSources {
   staffChatReadCursors?: Doc<"staffChatReadCursors">[] | undefined;
   /** Titles for mention channels whose events the caller's role cannot list. */
   mentionEventTitles?: Record<string, string>;
+  /** Titles of events named by incidents / double bookings but not in `events`. */
+  eventTitles?: Record<string, string>;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
@@ -143,9 +145,10 @@ export function deriveNotifications(
     });
   }
 
-  const eventTitles = new Map(
-    (src.events ?? []).map((e) => [e._id as string, e.title]),
-  );
+  const eventTitles = new Map([
+    ...Object.entries(src.eventTitles ?? {}),
+    ...(src.events ?? []).map((e) => [e._id as string, e.title] as const),
+  ]);
   for (const incident of src.incidents ?? []) {
     if (incident.deletedAt != null || incident.reportedAt == null) continue;
     if (incident.category !== "allergen") continue;

@@ -126,3 +126,16 @@ projections:
             name: by_tenantId_and_startsAt
           - fields: [tenantId, stage, startsAt]
             name: by_tenantId_and_stage_and_startsAt
+          # The notification bell (convex/notifications.ts) reads only the
+          # events whose stage changed in the last seven days, not every
+          # event (13 s at 10,000 events held up every screen).
+          - fields: [tenantId, approvedAt]
+            name: by_tenantId_and_approvedAt
+          - fields: [tenantId, executionStartedAt]
+            name: by_tenantId_and_executionStartedAt
+          - fields: [tenantId, completedAt]
+            name: by_tenantId_and_completedAt
+          - fields: [tenantId, cancelledAt]
+            name: by_tenantId_and_cancelledAt
+          - fields: [tenantId, closedOutAt]
+            name: by_tenantId_and_closedOutAt
