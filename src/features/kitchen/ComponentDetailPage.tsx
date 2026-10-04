@@ -68,6 +68,8 @@ import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
 import { cookEdition, PublishedMethodPanel } from "./PublishedMethodPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
 import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
+import { RecipeTimesEquipmentPanel } from "./RecipeTimesEquipmentPanel";
+import { StylePackagingPanel } from "./StylePackagingPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
 import {
   beginPendingOperation,
@@ -501,6 +503,8 @@ export function ComponentDetailPage() {
         onFailure={setFailure}
       />
 
+      <RecipeTimesEquipmentPanel component={component} onFailure={setFailure} />
+
       <div className="culinary-work-grid">
         <section className="culinary-section">
           <div className="culinary-section-heading">
@@ -757,6 +761,11 @@ export function ComponentDetailPage() {
 
       <ComponentKitchenStandardsPanel
         component={component}
+        onFailure={setFailure}
+      />
+
+      <StylePackagingPanel
+        owner={{ componentId: component._id }}
         onFailure={setFailure}
       />
 

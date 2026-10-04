@@ -42,6 +42,7 @@ import { DishContainersPanel } from "./DishContainersPanel";
 import { DishDetailsEditor } from "./DishDetailsEditor";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishVersionRecipeSwitch } from "./DishVersionRecipeSwitch";
+import { StylePackagingPanel } from "./StylePackagingPanel";
 import { DishComponentsPanel } from "./DishComponentsPanel";
 import { DishComponentPortionSpecPanel } from "./DishComponentPortionSpecPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
@@ -528,6 +529,11 @@ export function DishDetailPage() {
       </fieldset>
 
       <DishContainersPanel dishId={dish._id} />
+
+      <StylePackagingPanel
+        owner={{ dishId: dish._id }}
+        onFailure={setFailure}
+      />
 
       <details className="recipe-management recipe-record-history">
         <summary>Editions &amp; duplicates ({nameMatches.length})</summary>

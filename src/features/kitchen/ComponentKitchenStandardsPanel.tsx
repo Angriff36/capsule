@@ -41,8 +41,8 @@ type StandardKey =
 const STANDARDS: { key: StandardKey; label: string; hint: string }[] = [
   {
     key: "equipmentNotes",
-    label: "Equipment",
-    hint: "Pans, tools and machines this recipe needs",
+    label: "Equipment notes",
+    hint: "Anything about the equipment the list above does not say",
   },
   {
     key: "platingInstructions",
