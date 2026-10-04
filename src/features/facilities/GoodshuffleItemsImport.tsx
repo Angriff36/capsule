@@ -13,7 +13,9 @@ import {
   useImportGoodshuffleItems,
 } from "./goodshuffleItems";
 
-const CHUNK_SIZE = 100;
+// Each new item is several saves; 100 rows in one call ran past the server's
+// limit on the real 416-row export.
+const CHUNK_SIZE = 20;
 const SHOWN = 20;
 
 type Problem = { row: number; reason: string };
