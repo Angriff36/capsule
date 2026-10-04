@@ -3,8 +3,9 @@
  * 2,505-event history file prints "Invoice No", the client by name, no event
  * name and statuses like "3- Final") imports as events. Each event finds its
  * client by name among the clients read in from the contact list, takes a
- * "<client> <occasion>" title and its guest count, and a past Final / Closed
- * event comes in completed, a Cancelled one or a lost quote cancelled. An
+ * "<client> <occasion>" title and its guest count, and a booked event that is
+ * over comes in completed, a Cancelled one, a lost quote or a quote whose
+ * date passed cancelled. An
  * unknown client or two clients with one name leave the event waiting with a
  * plain note; the same file again makes nothing new.
  */
@@ -59,7 +60,7 @@ describe("runtime proof: the TPP event list file imports as events", () => {
     });
 
     const first = await importRows(actor, "events", rows);
-    expect(first).toMatchObject({ committed: 4, pending: 2 });
+    expect(first).toMatchObject({ committed: 5, pending: 2 });
 
     const clients = await tableRows(actor, "clients", tenantId);
     const clientId = (test: (c: Record<string, unknown>) => boolean) =>
@@ -86,6 +87,11 @@ describe("runtime proof: the TPP event list file imports as events", () => {
       stage: "cancelled",
       cancellationReason: "Quote lost in the old system",
     });
+    // A quote whose date passed was never booked.
+    expect(byTitle("Lena Hartwell Graduation")).toMatchObject({
+      stage: "cancelled",
+      cancellationReason: "Quote not booked in the old system before its date",
+    });
     // A confirmed event still to come stays in Planning.
     expect(byTitle("Lena Hartwell Anniversary")).toMatchObject({
       clientId: lena,
@@ -106,6 +112,6 @@ describe("runtime proof: the TPP event list file imports as events", () => {
 
     const again = await importRows(actor, "events", rows);
     expect(again.committed).toBe(0);
-    expect(await tableRows(actor, "events", tenantId)).toHaveLength(4);
+    expect(await tableRows(actor, "events", tenantId)).toHaveLength(5);
   });
 });

@@ -11,7 +11,10 @@ import {
   SourceLinkList,
   type SourceLink,
 } from "../src/features/events/SourceLinkList";
-import { oldSystemFinishedStage } from "../convex/lib/oldSystemEventStage";
+import {
+  oldSystemCancelReason,
+  oldSystemFinishedStage,
+} from "../convex/lib/oldSystemEventStage";
 
 function link(rawSourceData: string | null): SourceLink {
   return {
@@ -45,18 +48,45 @@ describe("old-system status on an imported event", () => {
     expect(html).toContain("the others start in Planning");
   });
 
-  it("copies only a finished old event that is over, or a cancelled one", () => {
+  it("copies a booked old event that is over, and a cancelled, lost or unbooked one", () => {
     const now = Date.UTC(2026, 9, 4);
     const past = now - 86_400_000;
     const future = now + 86_400_000;
-    expect(oldSystemFinishedStage("Complete", past, now)).toBe("completed");
-    expect(oldSystemFinishedStage("Closed Out", past, now)).toBe("completed");
-    expect(oldSystemFinishedStage("Complete", future, now)).toBeNull();
+    // TPP's report words, with their sort numbers.
+    for (const booked of [
+      "Complete",
+      "Closed Out",
+      "Approved",
+      "Executing",
+      "3- Final",
+      "00- Closed",
+      "1- Confirmed",
+      "2- Sales Lock",
+      "1- Sales Lock Planning",
+    ]) {
+      expect(oldSystemFinishedStage(booked, past, now)).toBe("completed");
+      expect(oldSystemFinishedStage(booked, future, now)).toBeNull();
+    }
     expect(oldSystemFinishedStage(" cancelled ", future, now)).toBe(
       "cancelled",
     );
-    for (const live of ["Quote", "Planning", "Approved", "Executing", ""]) {
-      expect(oldSystemFinishedStage(live, past, now)).toBeNull();
+    expect(oldSystemFinishedStage("9-Cancelled", future, now)).toBe(
+      "cancelled",
+    );
+    expect(oldSystemFinishedStage("QUOTE (LOST)", future, now)).toBe(
+      "cancelled",
+    );
+    expect(oldSystemCancelReason("QUOTE (LOST)")).toBe(
+      "Quote lost in the old system",
+    );
+    // A quote whose date passed was never booked; one still to come waits.
+    expect(oldSystemFinishedStage("0- Quote", past, now)).toBe("cancelled");
+    expect(oldSystemCancelReason("0- Quote")).toBe(
+      "Quote not booked in the old system before its date",
+    );
+    expect(oldSystemFinishedStage("0- Quote", future, now)).toBeNull();
+    for (const other of ["Planning", ""]) {
+      expect(oldSystemFinishedStage(other, past, now)).toBeNull();
     }
   });
 

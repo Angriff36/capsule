@@ -13,9 +13,9 @@ import { FailureBanner } from "./FailureBanner";
 
 /**
  * An event read in before imports copied the old status sits in Planning.
- * When the old system says it is over (Complete / Final / Closed Out),
- * Cancelled or a lost quote,
- * one tap gives it that status here, with no approval work drafted.
+ * When the old system says it was booked and it is over, or it was
+ * cancelled, lost or never booked (oldSystemEventStage.ts), one tap gives
+ * it that status here, with no approval work drafted.
  */
 export function OldSystemStatusAction({
   eventId,
@@ -59,7 +59,7 @@ export function OldSystemStatusAction({
       <p className="text-ink-2">
         {finished === "completed"
           ? `The old system says this event is ${oldStatus} and it is over. Mark it finished here: no approval, invoice, staff or pack list work is made for it.`
-          : `The old system says this event was ${oldStatus}. Mark it cancelled here too.`}
+          : `The old system says: ${oldSystemCancelReason(oldStatus)} (${oldStatus}). Mark it cancelled here too.`}
       </p>
       {failure ? (
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />

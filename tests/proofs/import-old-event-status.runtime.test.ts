@@ -1,8 +1,8 @@
 /**
  * Runtime proof (PL-REPLACEMENT-PROOF, TPP dossier "Imported events all start
- * in Planning"): an old event that is over (Complete / Closed Out) comes in
- * completed and one that was Cancelled comes in cancelled; live old statuses
- * and a "Complete" event still to come stay in Planning. Nothing is drafted
+ * in Planning"): an old booked event that is over (Complete, Closed Out,
+ * Approved) comes in completed and one that was Cancelled comes in
+ * cancelled; events still to come and a past "Planning" stay in Planning. Nothing is drafted
  * for the old events (no invoice), and a resumed run replays the stage step
  * under its run-scoped key instead of failing.
  */
@@ -84,12 +84,14 @@ describe("runtime proof: imported events keep a finished old status", () => {
           row("E-1", "Complete", "2025-05-01"),
           row("E-2", "Closed Out", "2025-06-01"),
           row("E-3", "Cancelled", "2099-06-01"),
-          row("E-4", "Approved", "2025-07-01"),
+          row("E-4", "Approved", "2099-08-01"),
           row("E-5", "Complete", "2099-07-01"),
+          row("E-6", "Approved", "2025-07-01"),
+          row("E-7", "Planning", "2025-08-01"),
         ],
       },
     )) as { committed: number };
-    expect(imported.committed).toBe(5);
+    expect(imported.committed).toBe(7);
 
     const links = (await owner.run(async (ctx) =>
       (await ctx.db.query("externalRecordLinks").collect()).filter(
@@ -118,6 +120,9 @@ describe("runtime proof: imported events keep a finished old status", () => {
     expect(cancelled.cancellationReason).toBe(OLD_SYSTEM_CANCEL_REASON);
     expect(eventFor("E-4").stage).toBe("planning");
     expect(eventFor("E-5").stage).toBe("planning");
+    // A booked event that is over happened, whatever word TPP left on it.
+    expect(eventFor("E-6").stage).toBe("completed");
+    expect(eventFor("E-7").stage).toBe("planning");
 
     // No approval ran, so nothing was drafted for the old events.
     const invoices = await owner.run(async (ctx) =>
@@ -145,10 +150,10 @@ describe("runtime proof: imported events keep a finished old status", () => {
     ).rejects.toThrow("Only an event that has already happened");
     // The one-tap copy on the event's import panel uses the same command.
     await owner.mutation(api.mutations.Event_recordPastCompletion, {
-      docId: eventFor("E-4")._id,
+      docId: eventFor("E-7")._id,
     });
     const after = (await owner.run(async (ctx) =>
-      ctx.db.get(eventFor("E-4")._id as never),
+      ctx.db.get(eventFor("E-7")._id as never),
     )) as EventRow;
     expect(after.stage).toBe("completed");
   });

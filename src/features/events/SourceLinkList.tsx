@@ -81,9 +81,9 @@ export function SourceLinkList({
             </dl>
             {oldStatus ? (
               <p className="mt-2 text-ink-3">
-                Imported events that are over or cancelled take that status
-                here; the others start in Planning. Move this event on when you
-                are ready.
+                Imported events that are over come in finished, or cancelled
+                when they were cancelled or never booked; the others start in
+                Planning. Move this event on when you are ready.
               </p>
             ) : null}
             {link.mergedFromName ? (
