@@ -157,7 +157,9 @@ FAILURE_LOG_LINES=${FAILURE_LOG_LINES:-20}
 # a non-zero Claude exit — we recover the category from the stderr tail.
 categorize_failure() {
     local ec="$1" text="$2"
-    if [ "$ec" -eq 124 ] || printf '%s' "$text" | grep -qiE 'time?d? ?out'; then
+    if printf '%s' "$text" | grep -qE 'provider failure|API Error'; then
+        echo "provider-fail"
+    elif [ "$ec" -eq 124 ] || printf '%s' "$text" | grep -qiE 'time?d? ?out'; then
         echo "timeout"
     elif printf '%s' "$text" | grep -qiE 'lint'; then
         echo "lint-fail"
@@ -228,6 +230,10 @@ if [ "$DRY_RUN" -eq 1 ]; then
 fi
 
 . "$(dirname "${BASH_SOURCE[0]}")/ralph-sync.sh" || exit 1
+. "$(dirname "${BASH_SOURCE[0]}")/ralph-rounds.sh" || exit 1
+# Tests the loop itself runs after a round that committed. Defaults to TEST_CMD;
+# set it empty in .ralph.env to skip (the state is then recorded as not_run).
+ROUND_TEST_CMD=${RALPH_ROUND_TEST_CMD-${TEST_CMD:-}}
 if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "${RALPH_BASE_BRANCH:-dev}" ]; then
     echo "Error: Ralph needs a work branch. Use --branch ralph/work."
     exit 1
@@ -240,6 +246,9 @@ while true; do
     fi
 
     ralph_sync_base || { echo "Ralph: cannot fetch upstream; no completion claimed."; exit 1; }
+    ralph_claim_check
+    ROUND_HEAD=$(git rev-parse HEAD)
+    ROUND_TICKS=$(ralph_plan_count xX)
 
     # Run Ralph iteration with the selected prompt, driven by whichever CLI
     # RALPH_CLI names. build_cli_cmd maps the provider to its headless/output/model
@@ -250,7 +259,8 @@ while true; do
     ITER_START=$(date +%s)
     # Inject .ralph.env values into the prompt via envsubst before piping to Claude.
     PROMPT="$(render_prompt)
-$(ralph_integration_prompt)"
+$(ralph_integration_prompt)
+$(ralph_claim_prompt)"
     # Tee stderr to a temp file so a failed iteration can be logged with its tail,
     # while still showing it live. ponytail: the process-substitution tee may drop
     # the very last buffered line in a rare race — fine for a diagnostic tail.
@@ -280,8 +290,19 @@ $(ralph_integration_prompt)"
         done
         wait "$CLI_PID" 2>/dev/null
         EXIT_CODE=$?
-        # A completed turn is a completed iteration, however the process ended.
-        grep -q '"type":"turn.completed"' "$OUT_LOG" && EXIT_CODE=0
+        # tee may still be writing the last lines when codex exited quickly.
+        for _ in 1 2 3 4 5; do grep -q '"type":"turn.completed"' "$OUT_LOG" && break; sleep 1; done
+        # A completed turn is a completed iteration, however the process ended -
+        # unless its answer is a provider error or empty (AC-160).
+        if ralph_codex_answer_ok "$OUT_LOG"; then
+            EXIT_CODE=0
+        elif grep -q '"type":"turn.completed"' "$OUT_LOG"; then
+            EXIT_CODE=3
+            {
+                echo "Ralph: provider failure or empty answer - round NOT done"
+                grep '"type":"agent_message"' "$OUT_LOG" | tail -n 1
+            } | tee -a "$STDERR_LOG" >&2
+        fi
         rm -f "$OUT_LOG"
     elif [ "$RALPH_CLI" = "cursor" ]; then
         # Cursor's `agent -p` takes the prompt as an argument, not on stdin.
@@ -300,9 +321,11 @@ $(ralph_integration_prompt)"
     # On a non-zero exit (Claude CLI crash, or backpressure surfaced through it),
     # append a structured record to .ralph-failures.md — the running input for the
     # "sit on the loop" review practice.
+    CATEGORY=""
     if [ "$EXIT_CODE" -ne 0 ]; then
         STDERR_TAIL=$(tail -n "$FAILURE_LOG_LINES" "$STDERR_LOG" 2>/dev/null)
         CATEGORY=$(categorize_failure "$EXIT_CODE" "$STDERR_TAIL")
+        RALPH_LAST_FAILURE="$CATEGORY in round $((ITERATION + 1))"
         {
             printf '## %s — iteration %d (%s)\n' \
                 "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$((ITERATION + 1))" "$MODE"
@@ -315,13 +338,18 @@ $(ralph_integration_prompt)"
     fi
     rm -f "$STDERR_LOG"
 
+    # What the agent itself changed this round, before the loop's own commits.
+    COMMITTED=0
+    [ "$(git rev-parse HEAD)" != "$ROUND_HEAD" ] && COMMITTED=1
+    ralph_progress_note "$((ITERATION + 1))" "$EXIT_CODE" "$CATEGORY" "$ROUND_HEAD" "$ROUND_TICKS"
+
     # A failed round that ended in under a minute did no work: the provider refused
     # us (subscription empty, rate limit, logged out) or the CLI crashed at start.
     # Seen 2026-09-22: 500 such rounds at one per 11 s on an empty OpenAI plan.
     # Wait 15 minutes and try again - never stop (owner rule), never spin.
     if [ "$EXIT_CODE" -ne 0 ] && [ "$ELAPSED" -lt 60 ]; then
-        echo "Ralph: round failed in ${ELAPSED}s (provider limit or login?) - waiting 15 min before the next try"
-        sleep 900
+        echo "Ralph: round failed in ${ELAPSED}s (provider limit or login?) - waiting ${RALPH_FAIL_WAIT:-900}s before the next try"
+        sleep "${RALPH_FAIL_WAIT:-900}"
     fi
 
     # The pre-push hook regenerates Builder output and refuses the push when the
@@ -340,24 +368,43 @@ $(ralph_integration_prompt)"
     # Push changes after each iteration. Record the completed iteration count to
     # the checkpoint only on a successful push, so --resume never skips work that
     # never made it upstream.
-    PUSH_OK=0
+    # Separate states per round (AC-160): pass / fail / not_run. Each is "pass"
+    # only when the loop itself saw it pass this round.
+    TESTS_STATE=not_run
+    if [ "$EXIT_CODE" -eq 0 ] && [ "$COMMITTED" -eq 1 ] && [ -n "$ROUND_TEST_CMD" ]; then
+        if bash -c "$ROUND_TEST_CMD"; then TESTS_STATE=pass; else TESTS_STATE=fail; fi
+    fi
+    INTEGRATION_STATE=fail
+    git merge-base --is-ancestor "$RALPH_BASE_SHA" HEAD 2>/dev/null &&
+        ! git rev-parse -q --verify MERGE_HEAD >/dev/null && INTEGRATION_STATE=pass
+
+    PUSH_STATE=not_run
     if [ "$EXIT_CODE" -eq 0 ] && [ "$(git branch --show-current)" = "$CURRENT_BRANCH" ] &&
-        ! git rev-parse -q --verify MERGE_HEAD >/dev/null &&
-        git push -u "$RALPH_REMOTE" "$CURRENT_BRANCH"; then
-        PUSH_OK=1
+        ! git rev-parse -q --verify MERGE_HEAD >/dev/null; then
+        PUSH_STATE=fail
+        git push -u "$RALPH_REMOTE" "$CURRENT_BRANCH" && PUSH_STATE=pass
+    fi
+    if [ "$PUSH_STATE" = pass ]; then
         echo "$((ITERATION + 1))" > "$CHECKPOINT_FILE"
     else
         echo "Failed to push — checkpoint not advanced"
     fi
+    [ "$EXIT_CODE" -eq 0 ] && ralph_claim_record
 
     # Append one telemetry record per iteration for post-run analysis.
+    # The loop never deploys and never signs in: a branch push is not a
+    # deployment, so those three states stay not_run.
     # ponytail: hand-rolled JSON escape (backslash + quote) instead of a jq
     #           dependency — commit subjects are single-line, so no newlines to escape.
     COMMIT_SUBJECT=$(git log -1 --pretty=%s 2>/dev/null)
     COMMIT_SUBJECT=${COMMIT_SUBJECT//\\/\\\\}
     COMMIT_SUBJECT=${COMMIT_SUBJECT//\"/\\\"}
-    printf '{"timestamp":"%s","iteration":%d,"mode":"%s","seconds":%d,"exit_code":%d,"commit":"%s"}\n' \
-        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$((ITERATION + 1))" "$MODE" "$ELAPSED" "$EXIT_CODE" "$COMMIT_SUBJECT" \
+    ROUND_STATE=pass
+    [ "$EXIT_CODE" -ne 0 ] && ROUND_STATE=fail
+    printf '{"timestamp":"%s","iteration":%d,"mode":"%s","seconds":%d,"exit_code":%d,"round":"%s","failure":"%s","tests":"%s","push":"%s","integration":"%s","frontend_deploy":"not_run","backend_deploy":"not_run","signed_in_check":"not_run","specs_claim":"%s","specs":"%s","no_progress_rounds":%d,"commit":"%s"}\n' \
+        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$((ITERATION + 1))" "$MODE" "$ELAPSED" "$EXIT_CODE" \
+        "$ROUND_STATE" "$CATEGORY" "$TESTS_STATE" "$PUSH_STATE" "$INTEGRATION_STATE" \
+        "$RALPH_CLAIM_STATE" "$(ralph_specs_hash)" "${#RALPH_STALL_LOG[@]}" "$COMMIT_SUBJECT" \
         >> .ralph-telemetry.jsonl
 
     # No self-stop (owner rule 2026-09-20). An empty plan is not "done": the
