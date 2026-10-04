@@ -139,6 +139,10 @@ export function EventPrepList({
                 serviceStyleId={serviceStyleId}
                 serviceStyleName={serviceStyleName}
                 dishId={dishId}
+                mainDishId={
+                  (dish as { versionOfDishId?: string | null } | undefined)
+                    ?.versionOfDishId
+                }
                 recipes={[
                   ...new Set(
                     group.tasks

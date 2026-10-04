@@ -59,6 +59,19 @@ describe("event prep and pack lists show the event's own service style (PL-RECIP
     expect(html).not.toContain("Hot box");
   });
 
+  it("a dish version with no line of its own uses its main dish's line", () => {
+    const html = renderToStaticMarkup(
+      createElement(EventDishPackaging, {
+        packaging,
+        serviceStyleId: "hot",
+        dishId: "pasta-mini",
+        mainDishId: "pasta",
+        recipes: [],
+      }),
+    );
+    expect(html).toContain("Chafer, sterno, serve hot");
+  });
+
   it("an event without a service style shows no packaging", () => {
     expect(render(null)).toBe("");
   });

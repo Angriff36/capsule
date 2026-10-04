@@ -13,12 +13,15 @@ export function EventDishPackaging({
   serviceStyleId,
   serviceStyleName,
   dishId,
+  mainDishId,
   recipes,
 }: {
   packaging: readonly StylePackagingRow[] | undefined;
   serviceStyleId: string | null | undefined;
   serviceStyleName?: string;
   dishId: string | undefined;
+  /** For a dish version: its main dish, whose line it uses when it has none. */
+  mainDishId?: string | null;
   /** Recipes in the dish, by id, with the name to show beside their line. */
   recipes: readonly { id: string; name: string }[];
 }) {
@@ -29,6 +32,7 @@ export function EventDishPackaging({
     serviceStyleId,
     dishId,
     recipes.map((recipe) => recipe.id),
+    mainDishId,
   );
   if (rows.length === 0) return null;
   return (

@@ -42,21 +42,31 @@ export function PackFoodPackaging({
   );
   const rows = [...new Set(menu.map((line) => String(line.dishId)))].map(
     (dishId) => {
+      const dish = dishes?.find((row) => String(row._id) === dishId) as
+        | {
+            name?: string;
+            versionOfDishId?: string | null;
+            recipeDishId?: string | null;
+          }
+        | undefined;
+      // A version may cook from its main dish's recipe (recipeDishId).
+      const recipeId = dish?.recipeDishId ?? dishId;
       const recipes = (dishComponents ?? [])
-        .filter((row) => row.deletedAt == null && row.dishId === dishId)
+        .filter((row) => row.deletedAt == null && row.dishId === recipeId)
         .map((row) => ({
           id: String(row.componentId),
           name: componentName.get(String(row.componentId)) ?? "Recipe",
         }));
+      const mainDishId = dish?.versionOfDishId ?? null;
       const found = packagingForEvent(
         packaging,
         serviceStyleId,
         dishId,
         recipes.map((recipe) => recipe.id),
+        mainDishId,
       );
-      const name =
-        dishes?.find((dish) => String(dish._id) === dishId)?.name ?? "Dish";
-      return { dishId, name, recipes, written: found.length > 0 };
+      const name = dish?.name ?? "Dish";
+      return { dishId, mainDishId, name, recipes, written: found.length > 0 };
     },
   );
   const written = rows.filter((row) => row.written);
@@ -89,6 +99,7 @@ export function PackFoodPackaging({
                 packaging={packaging}
                 serviceStyleId={serviceStyleId}
                 dishId={row.dishId}
+                mainDishId={row.mainDishId}
                 recipes={row.recipes}
               />
             </li>

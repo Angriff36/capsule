@@ -74,12 +74,16 @@ export function packagingForEvent(
   serviceStyleId: string | null | undefined,
   dishId: string,
   componentIds: readonly string[] = [],
+  /** A version with no line of its own uses its main dish's line. */
+  mainDishId?: string | null,
 ) {
   if (!serviceStyleId) return [];
   const live = (rows ?? []).filter(
     (row) => row.deletedAt == null && row.serviceStyleId === serviceStyleId,
   );
-  const dish = live.find((row) => row.dishId === dishId);
+  const dish =
+    live.find((row) => row.dishId === dishId) ??
+    (mainDishId ? live.find((row) => row.dishId === mainDishId) : undefined);
   const recipes = componentIds
     .map((id) => live.find((row) => row.componentId === id))
     .filter((row): row is StylePackagingRow => row != null);
