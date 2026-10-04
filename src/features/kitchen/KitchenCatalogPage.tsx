@@ -11,7 +11,6 @@ import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
 import type { Id } from "../../lib/api";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import {
-  useCreateDish,
   useCreateIngredient,
   useCreateMenu,
   useCreateComponent,
@@ -42,13 +41,13 @@ import { mainDishRows } from "./dishVersions";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards, type CatalogItem } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
+import { NewDishPanel } from "./NewDishPanel";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   KITCHEN_SECTIONS,
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
-  dishPath,
   componentPath,
   ingredientPath,
   type KitchenSection,
@@ -67,14 +66,6 @@ const UNITS = UNIT_OF_MEASURE;
 function optional(value: FormDataEntryValue | null) {
   const result = String(value ?? "").trim();
   return result || undefined;
-}
-
-function csv(value: FormDataEntryValue | null) {
-  const result = String(value ?? "")
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return result.length ? result : undefined;
 }
 
 export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
@@ -137,7 +128,6 @@ function KitchenCatalogPageContent({
   const navigate = useNavigate();
   const createIngredient = useCreateIngredient();
   const createComponent = useCreateComponent();
-  const createDish = useCreateDish();
   const createMenu = useCreateMenu();
   const generateUploadUrl = useGenerateUploadUrl();
   const createAttachment = useCreateAttachment();
@@ -415,38 +405,6 @@ function KitchenCatalogPageContent({
         });
         navigate(componentPath(created.docId));
         return;
-      } else if (section === "dishes") {
-        const name = String(data.get("name") ?? "").trim();
-        const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
-          visibleRows,
-          name,
-        );
-        if (
-          duplicate &&
-          !(await prompt.askConfirm({
-            title: "Possible duplicate dish",
-            description: `A dish named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Use dish detail → Create new edition for a versioned edition.`,
-            confirmLabel: "Create anyway",
-          }))
-        ) {
-          return;
-        }
-        const created = await createDish({
-          name,
-          portionSize: Number(data.get("portionSize")),
-          portionUnit: String(
-            data.get("portionUnit"),
-          ) as (typeof UNITS)[number],
-          description: optional(data.get("description")),
-          category: optional(data.get("category")),
-          course: optional(data.get("course")),
-          serviceStyle: optional(data.get("serviceStyle")),
-          dietaryTags: csv(data.get("dietaryTags")),
-        });
-        // Prep templates, containers and components all live on the detail page,
-        // and adding them is always the next step. Land there like components do.
-        navigate(dishPath(created.docId));
-        return;
       } else {
         const name = String(data.get("name") ?? "").trim();
         const minGuests = Number(data.get("minGuests"));
@@ -525,7 +483,9 @@ function KitchenCatalogPageContent({
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
-      {showCreate ? (
+      {showCreate && section === "dishes" ? (
+        <NewDishPanel onClose={() => setShowCreate(false)} />
+      ) : showCreate ? (
         <KitchenCatalogCreateForm
           section={section}
           busy={busy === "create"}
