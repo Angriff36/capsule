@@ -1,9 +1,15 @@
 export type ActionResultKind = "ok" | "fail";
 
+export type ActionResultAction = {
+  label: string;
+  to: string;
+};
+
 export type ActionResult = {
   id: number;
   kind: ActionResultKind;
   message: string;
+  actions?: readonly ActionResultAction[];
 };
 
 type Listener = (result: ActionResult | null) => void;
@@ -36,8 +42,8 @@ export class ActionResultStore {
     return this.result;
   }
 
-  ok(message: string): void {
-    this.publish(message.trim(), "ok", OK_DISMISS_MS);
+  ok(message: string, actions?: readonly ActionResultAction[]): void {
+    this.publish(message.trim(), "ok", OK_DISMISS_MS, actions);
   }
 
   fail(message: string): void {
@@ -54,10 +60,11 @@ export class ActionResultStore {
     message: string,
     kind: ActionResultKind,
     dismissMs: number,
+    actions?: readonly ActionResultAction[],
   ): void {
     if (!message) return;
     this.clearTimer();
-    this.result = { id: this.nextId++, kind, message };
+    this.result = { id: this.nextId++, kind, message, actions };
     this.emit();
     const publishedId = this.result.id;
     this.dismissTimer = setTimeout(() => {
@@ -75,8 +82,11 @@ export class ActionResultStore {
   }
 }
 
-export function reportActionOk(message: string): void {
-  ActionResultStore.shared.ok(message);
+export function reportActionOk(
+  message: string,
+  actions?: readonly ActionResultAction[],
+): void {
+  ActionResultStore.shared.ok(message, actions);
 }
 
 export function reportActionFail(message: string): void {

@@ -109,6 +109,7 @@ import {
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
 import type { Doc } from "../../lib/api";
+import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
 
 function HeroFact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -246,14 +247,17 @@ function EventDetailContent({
     setSearchParams(next, { replace: true });
   };
 
-  const run = async (work: () => Promise<unknown>, okMessage = "Saved") => {
+  const run = async (
+    work: () => Promise<unknown>,
+    okMessage: string | null = "Saved",
+  ) => {
     setFailure(null);
     setBusy(true);
     try {
       await work();
       setReasonFor(null);
       setReason("");
-      notifySuccess(okMessage);
+      if (okMessage) notifySuccess(okMessage);
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -271,7 +275,13 @@ function EventDetailContent({
     const done = "Stage updated";
     if (key === "submitForApproval")
       void run(() => submitForApproval(args), done);
-    if (key === "approve") void run(() => approve(args), done);
+    if (key === "approve")
+      void run(async () => {
+        await approve(args);
+        new AutomationCascadeFeedbackManager(notifySuccess).eventApproved(
+          event._id,
+        );
+      }, null);
     if (key === "lockForSales") void run(() => lockForSales(args), done);
     if (key === "confirmSalesLock")
       void run(() => confirmSalesLock(args), done);

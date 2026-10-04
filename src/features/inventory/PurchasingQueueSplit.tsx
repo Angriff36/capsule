@@ -63,6 +63,7 @@ export type PurchasingQueueSplitProps = {
   ingredientName: (id: string) => string;
   ingredients?: readonly IngredientCatalogRow[];
   eventName: (id: string) => string;
+  scopedEventName?: string;
   onNeedAction: (need: PurchaseNeed, key: string) => void;
   onOnboardVendor: () => void;
   vendorContacts: VendorContact[];
@@ -85,6 +86,7 @@ export function PurchasingQueueSplit({
   ingredientName,
   ingredients,
   eventName,
+  scopedEventName,
   onNeedAction,
   onOnboardVendor,
   vendorContacts,
@@ -104,7 +106,11 @@ export function PurchasingQueueSplit({
           <TableSkeleton rows={6} />
         ) : activeNeeds.length === 0 ? (
           <div className="document-empty">
-            <p>No purchase needs are open.</p>
+            <p>
+              {scopedEventName
+                ? `No purchase needs are open for ${scopedEventName}.`
+                : "No purchase needs are open."}
+            </p>
             <span>
               Approve an event with calculated component demand to open needs
               here (weekly draft is maintained automatically).

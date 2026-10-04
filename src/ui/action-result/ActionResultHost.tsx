@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { XIcon } from "../icons";
 import { ActionResultStore, type ActionResult } from "./ActionResultStore";
 
@@ -30,7 +31,21 @@ export function ActionResultHost() {
           }`}
           role={ok ? "status" : "alert"}
         >
-          {result.message}
+          <span>{result.message}</span>
+          {result.actions?.length ? (
+            <span className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+              {result.actions.map((action) => (
+                <Link
+                  key={action.to}
+                  className="text-link"
+                  to={action.to}
+                  onClick={() => ActionResultStore.shared.dismiss()}
+                >
+                  {action.label}
+                </Link>
+              ))}
+            </span>
+          ) : null}
         </output>
         <button
           type="button"
