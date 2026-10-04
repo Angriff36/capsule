@@ -56,6 +56,7 @@ import type * as eventTimingRules from "../eventTimingRules.js";
 import type * as externalRecordLinkLists from "../externalRecordLinkLists.js";
 import type * as fileStorage from "../fileStorage.js";
 import type * as geocode from "../geocode.js";
+import type * as goodshuffleItems from "../goodshuffleItems.js";
 import type * as googleCalendar from "../googleCalendar.js";
 import type * as googleCalendarHealth from "../googleCalendarHealth.js";
 import type * as hiringPipeline from "../hiringPipeline.js";
@@ -373,6 +374,7 @@ declare const fullApi: ApiFromModules<{
   externalRecordLinkLists: typeof externalRecordLinkLists;
   fileStorage: typeof fileStorage;
   geocode: typeof geocode;
+  goodshuffleItems: typeof goodshuffleItems;
   googleCalendar: typeof googleCalendar;
   googleCalendarHealth: typeof googleCalendarHealth;
   hiringPipeline: typeof hiringPipeline;
