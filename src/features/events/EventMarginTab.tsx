@@ -84,6 +84,7 @@ export function EventMarginTab({ eventId }: Props) {
             id: row._id,
             eventId: row.eventId,
             dishId: row.dishId,
+            recipeDishId: row.recipeDishId,
             quantityServings: Number(row.quantityServings),
             headcountOverride: Number(
               (row as { headcountOverride?: number }).headcountOverride ?? 0,

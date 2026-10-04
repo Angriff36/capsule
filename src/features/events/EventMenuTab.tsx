@@ -15,7 +15,7 @@ import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
-import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
+import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
@@ -33,6 +33,7 @@ import {
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
+import { eventLineRecipeDishId } from "../kitchen/dishVersions";
 import { EventMenuStockShortageBanner } from "../kitchen/EventMenuStockShortageBanner";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
@@ -118,7 +119,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const eventGuests = useEventGuests(eventId);
   const reviewFlags = useEventReviewFlags(eventId);
   // Recipe, price and stock rows of the menu's dishes only.
-  const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));
+  const recipe = useSharedRecipeRows(eventDishes);
   const dishIngredients = recipe?.dishIngredients;
   const dishComponents = recipe?.dishComponents;
   const components = recipe?.components;
@@ -1078,7 +1079,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             <EventMenuLineOverrides
                               eventId={eventId}
                               eventDishId={selection._id}
-                              dishId={selection.dishId}
+                              dishId={eventLineRecipeDishId(selection)}
                               dishName={dishTitle}
                               busy={busy != null}
                               prompt={prompt}
@@ -1342,6 +1343,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                         <div className="border-t border-line bg-inset/40 px-4 py-3">
                           <EventMenuRecipeEditor
                             dishId={selection.dishId}
+                            recipeDishId={selection.recipeDishId}
                             servings={
                               dishCost?.servings ??
                               Number(selection.quantityServings)

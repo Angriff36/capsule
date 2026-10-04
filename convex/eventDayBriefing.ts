@@ -282,6 +282,14 @@ export const getBriefing = query({
     const dishIds = [
       ...new Set(eventDishes.map((row: any) => String(row.dishId))),
     ];
+    // A version may cook from its main dish's recipe (recipeDishId): read
+    // those lines and show them under the menu's dish, so allergens match.
+    const recipeOf = new Map<string, string>(
+      eventDishes.map((row: any) => [
+        String(row.dishId),
+        String(row.recipeDishId ?? row.dishId),
+      ]),
+    );
     const dishes = (
       await Promise.all(
         eventDishes
@@ -304,11 +312,15 @@ export const getBriefing = query({
 
     const dishLineRows = (
       await Promise.all(
-        dishIds.map((dishId) =>
-          ctx.db
-            .query("dishIngredients")
-            .withIndex("by_dishId", (q: any) => q.eq("dishId", dishId))
-            .collect(),
+        dishIds.map(async (dishId) =>
+          (
+            await ctx.db
+              .query("dishIngredients")
+              .withIndex("by_dishId", (q: any) =>
+                q.eq("dishId", recipeOf.get(dishId) ?? dishId),
+              )
+              .collect()
+          ).map((row: any) => ({ ...row, dishId })),
         ),
       )
     )
@@ -316,11 +328,15 @@ export const getBriefing = query({
       .filter((row: any) => row.tenantId === tenantId && live(row));
     const dishComponentRows = (
       await Promise.all(
-        dishIds.map((dishId) =>
-          ctx.db
-            .query("dishComponents")
-            .withIndex("by_dishId", (q: any) => q.eq("dishId", dishId))
-            .collect(),
+        dishIds.map(async (dishId) =>
+          (
+            await ctx.db
+              .query("dishComponents")
+              .withIndex("by_dishId", (q: any) =>
+                q.eq("dishId", recipeOf.get(dishId) ?? dishId),
+              )
+              .collect()
+          ).map((row: any) => ({ ...row, dishId })),
         ),
       )
     )
