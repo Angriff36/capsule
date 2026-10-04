@@ -678,6 +678,7 @@ export default defineSchema({
     versionOfDishId: v.optional(v.union(v.id("dishes"), v.null())),
     versionLabel: v.optional(v.union(v.string(), v.null())),
     usesMainRecipe: v.optional(v.union(v.boolean(), v.null())),
+    finishTiming: v.optional(v.union(v.literal("finish_at_kitchen"), v.literal("finish_at_event"), v.literal("day_of"), v.null())),
     recipeDishId: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),

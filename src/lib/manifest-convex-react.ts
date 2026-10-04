@@ -122,6 +122,7 @@ import {
   DepartureOverrideRecordParamsSchema,
   DishClassifyAllergensParamsSchema,
   DishClassifyKindParamsSchema,
+  DishClearFinishTimingParamsSchema,
   DishClearPrimaryImageParamsSchema,
   DishComponentAttachParamsSchema,
   DishComponentDetachParamsSchema,
@@ -146,6 +147,7 @@ import {
   DishReviseDetailsParamsSchema,
   DishSaveRecipeParamsSchema,
   DishSaveServiceInstructionsParamsSchema,
+  DishSetFinishTimingParamsSchema,
   DishSetPrimaryImageParamsSchema,
   DishTaskAddParamsSchema,
   DishTaskBackfillActiveKeyParamsSchema,
@@ -2716,6 +2718,16 @@ export function useDishClassifyKind() {
   };
 }
 
+/** Mutation hook for Dish.clearFinishTiming. */
+export function useDishClearFinishTiming() {
+  const mutate = useMutation(api.mutations.Dish_clearFinishTiming);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishClearFinishTimingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Dish.clearPrimaryImage. */
 export function useDishClearPrimaryImage() {
   const mutate = useMutation(api.mutations.Dish_clearPrimaryImage);
@@ -2842,6 +2854,16 @@ export function useDishSaveServiceInstructions() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishSaveServiceInstructionsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.setFinishTiming. */
+export function useDishSetFinishTiming() {
+  const mutate = useMutation(api.mutations.Dish_setFinishTiming);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishSetFinishTimingParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -13956,4 +13978,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1476 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1478 as const;

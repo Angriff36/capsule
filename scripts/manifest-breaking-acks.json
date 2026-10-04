@@ -2712,6 +2712,12 @@
       "category": "event-payload-changed",
       "acknowledgedAt": "2026-10-04",
       "reason": "EventDishAdded carries recipeDishId (the dish whose recipe the line cooks from); dishId unchanged."
+    },
+    {
+      "path": "Dish.finishTiming",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "When a dish is finished (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
     }
   ]
 }

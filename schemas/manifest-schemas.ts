@@ -723,6 +723,7 @@ export const DishSchema = z.object({
   versionOfDishId: z.string().uuid().nullable().optional(),
   versionLabel: z.string().nullable().optional(),
   usesMainRecipe: z.boolean().nullable().optional(),
+  finishTiming: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]).nullable().optional(),
   recipeDishId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -6077,6 +6078,11 @@ export const DishClassifyKindParamsSchema = z.object({
 
 export type DishClassifyKindParams = z.infer<typeof DishClassifyKindParamsSchema>;
 
+// Command: clearFinishTiming on Dish
+export const DishClearFinishTimingParamsSchema = z.object({});
+
+export type DishClearFinishTimingParams = z.infer<typeof DishClearFinishTimingParamsSchema>;
+
 // Command: clearPrimaryImage on Dish
 export const DishClearPrimaryImageParamsSchema = z.object({});
 
@@ -6179,6 +6185,13 @@ export const DishSaveServiceInstructionsParamsSchema = z.object({
 });
 
 export type DishSaveServiceInstructionsParams = z.infer<typeof DishSaveServiceInstructionsParamsSchema>;
+
+// Command: setFinishTiming on Dish
+export const DishSetFinishTimingParamsSchema = z.object({
+  timing: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]),
+});
+
+export type DishSetFinishTimingParams = z.infer<typeof DishSetFinishTimingParamsSchema>;
 
 // Command: setPrimaryImage on Dish
 export const DishSetPrimaryImageParamsSchema = z.object({

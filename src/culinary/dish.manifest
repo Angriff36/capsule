@@ -60,6 +60,9 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // A version uses the main dish's recipe (ingredients, recipes, prep steps)
   // unless switched off. recipeDishId is that dish; null = this dish's own.
   property usesMainRecipe: boolean?
+  // When this dish (or version) is finished (Ryan 2026-10-04): part of the dish,
+  // separate from the event-wide service style. Null = not set.
+  property finishTiming: FinishTiming?
   property recipeDishId: uuid?
 
   hasMany ingredientLines: DishIngredient
@@ -344,6 +347,24 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command setFinishTiming(timing: FinishTiming) {
+    guard self.deletedAt == null
+    mutate finishTiming = timing
+    emit DishFinishTimingSet {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command clearFinishTiming() {
+    guard self.deletedAt == null
+    mutate finishTiming = null
+    emit DishFinishTimingSet {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Turn a version back into a dish of its own.
   command detachVersion() {
     guard self.versionOfDishId != null
@@ -613,6 +634,13 @@ enum TaskResolution {
 
 // What a Dish row IS. Supplies (plasticware, place settings) and packages
 // print as dish headings on the sheet but must never enter food purchasing.
+// When a dish is finished. Display names: Finish at Kitchen, Finish at Event, Day Of.
+enum FinishTiming {
+  finish_at_kitchen
+  finish_at_event
+  day_of
+}
+
 enum DishKind {
   food
   supply
@@ -847,6 +875,11 @@ event DishRecipeSourceChanged: "dish.recipe_source_changed" {
   dishId: string
   tenantId: string
   usesMainRecipe: boolean
+}
+
+event DishFinishTimingSet: "dish.finish_timing_set" {
+  dishId: string
+  tenantId: string
 }
 
 event DishVersionUnlinked: "dish.version_unlinked" {
