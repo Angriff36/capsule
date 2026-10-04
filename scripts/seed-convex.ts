@@ -89,6 +89,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ComponentComponent_createViaAdd, { "componentId": "componentId-component-component-1", "childComponentId": "childComponentId-component-component-1", "quantity": 1, "unit": "demo-unit-1", "sortOrder": 1, "wasteFactor": 1, "quantityBasis": "demo-quantityBasis-1", "prepNotes": "demo-prepNotes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentComponent_createViaAdd, { "componentId": "componentId-component-component-2", "childComponentId": "childComponentId-component-component-2", "quantity": 2, "unit": "demo-unit-2", "sortOrder": 2, "wasteFactor": 2, "quantityBasis": "demo-quantityBasis-2", "prepNotes": "demo-prepNotes-2" } as any);
+  // ComponentEquipment has multiple initialization commands (add, remove); using the selected initialization command: add.
+  // ComponentEquipment → api.mutations.ComponentEquipment_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ComponentEquipment_createViaAdd, { "componentId": "componentId-component-equipment-1", "name": "ComponentEquipment 1", "sortOrder": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ComponentEquipment_createViaAdd, { "componentId": "componentId-component-equipment-2", "name": "ComponentEquipment 2", "sortOrder": 2 } as any);
   // ComponentImport → api.mutations.ComponentImport_createViaUpload
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentImport_createViaUpload, { "sourceKind": "demo-sourceKind-1", "sourceFilename": "ComponentImport 1", "rawSourceText": "demo-rawSourceText-1", "sourceByteCount": 1, "sourceFingerprint": "demo-sourceFingerprint-1", "csvSheetText": "demo-csvSheetText-1", "csvLinesText": "demo-csvLinesText-1" } as any);
@@ -791,6 +797,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.StorageLocation_createViaRegister, { "name": "StorageLocation 1", "locationType": "demo-locationType-1", "temperatureZone": "demo-temperatureZone-1", "minTemperature": 1, "maxTemperature": 1, "temperatureUnit": "demo-temperatureUnit-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.StorageLocation_createViaRegister, { "name": "StorageLocation 2", "locationType": "demo-locationType-2", "temperatureZone": "demo-temperatureZone-2", "minTemperature": 2, "maxTemperature": 2, "temperatureUnit": "demo-temperatureUnit-2" } as any);
+  // StylePackaging has multiple initialization commands (add, remove); using the selected initialization command: add.
+  // StylePackaging → api.mutations.StylePackaging_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.StylePackaging_createViaAdd, { "componentId": "componentId-style-packaging-1", "dishId": "dishId-style-packaging-1", "serviceStyleId": "serviceStyleId-style-packaging-1", "instructions": "demo-instructions-1", "container": "demo-container-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.StylePackaging_createViaAdd, { "componentId": "componentId-style-packaging-2", "dishId": "dishId-style-packaging-2", "serviceStyleId": "serviceStyleId-style-packaging-2", "instructions": "demo-instructions-2", "container": "demo-container-2" } as any);
   // SyncError → api.mutations.SyncError_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.SyncError_createViaRecord, { "sourceSystem": "demo-sourceSystem-1", "recordType": "demo-recordType-1", "externalId": "externalId-sync-error-1", "kind": "demo-kind-1", "errorMessage": "demo-errorMessage-1", "rawPayload": "demo-rawPayload-1" } as any);
@@ -1041,6 +1053,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ComponentComponent",
       "createMutation": "ComponentComponent_createViaAdd",
+      "rowCount": 2
+    },
+    {
+      "entity": "ComponentEquipment",
+      "createMutation": "ComponentEquipment_createViaAdd",
       "rowCount": 2
     },
     {
@@ -1761,6 +1778,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "StorageLocation",
       "createMutation": "StorageLocation_createViaRegister",
+      "rowCount": 2
+    },
+    {
+      "entity": "StylePackaging",
+      "createMutation": "StylePackaging_createViaAdd",
       "rowCount": 2
     },
     {
