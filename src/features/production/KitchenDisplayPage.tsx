@@ -92,8 +92,8 @@ export function KitchenDisplayPage() {
   const tasks = useListPrepTask();
   const dependencies = useListPrepTaskDependency();
   const batches = useListProductionBatch();
-  // The filter offers events in the picker window (half a year back, two years
-  // ahead, undated); the names on cards come from the events the board's own
+  // The filter offers the picker's events (next 400, last 90 days, undated);
+  // the names on cards come from the events the board's own
   // tasks and batches name, wherever they fall.
   const events = usePickerEvents();
   const boardEventIds = useMemo(

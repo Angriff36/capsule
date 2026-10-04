@@ -4,12 +4,12 @@ import { useIssueEventStock } from "../../lib/operational-transactions";
 import {
   useCreateInventoryReservation,
   useListIngredient,
-  useListIngredientDemand,
   useListInventoryItem,
   useListInventoryLot,
   useListInventoryReservation,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { useEventIngredientDemands } from "../../lib/useEventRows";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventInventorySummaryAside } from "./EventInventorySummaryAside";
 import {
@@ -41,7 +41,7 @@ export function EventInventoryPanel({
   onBusy,
   onError,
 }: Props) {
-  const demands = useListIngredientDemand();
+  const demands = useEventIngredientDemands(eventId);
   const items = useListInventoryItem();
   const inventoryLots = useListInventoryLot();
   const reservations = useListInventoryReservation();

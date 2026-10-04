@@ -29,7 +29,7 @@ describe("plain words on leftover facilities equipment manifests", () => {
     }
 
     for (const fresh of [
-      "Inventory or logistics staff may see equipment",
+      "Inventory, logistics or kitchen staff may see equipment",
       "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event",
       "Inventory or logistics staff may see equipment maintenance",
       "Inventory or logistics staff may see equipment service history",

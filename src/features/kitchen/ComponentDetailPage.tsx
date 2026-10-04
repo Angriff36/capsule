@@ -7,7 +7,6 @@ import {
   useGetPrepTask,
   useGetEvent,
   useListComponentImport,
-  useListDish,
   useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
@@ -49,6 +48,7 @@ import {
 } from "./IngredientPriceHistory";
 import { calculateComponentCost } from "./ComponentCostCalculator";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -65,6 +65,7 @@ import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
 import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
 import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
+import { cookEdition, PublishedMethodPanel } from "./PublishedMethodPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
 import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
@@ -99,8 +100,18 @@ export function ComponentDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const itemUnitMappings = useListItemUnitMapping();
   const lines = useListComponentIngredient();
-  const dishes = useListDish();
   const dishComponents = useListDishComponent();
+  // Only the dishes that use this recipe, never the whole dish list.
+  const dishes = useDishesByIds(
+    component == null || dishComponents === undefined
+      ? undefined
+      : dishComponents
+          .filter(
+            (line) =>
+              line.deletedAt == null && line.componentId === component._id,
+          )
+          .map((line) => line.dishId),
+  );
   const revise = useComponentReviseDraft();
   const publish = usePublishRecipeEdition();
   const retract = useComponentRetract();
@@ -190,6 +201,18 @@ export function ComponentDetailPage() {
     component.deletedAt,
   );
   const prepYield = prepRecipeYield(component, prepTask);
+  // A cook sent here from a prep task follows the published edition while the
+  // chef changes a draft; the chef (no prep task) still edits the draft.
+  const cookMethodEdition = prepTaskId
+    ? cookEdition(
+        {
+          _id: String(component._id),
+          status: String(component.status),
+          versionNumber: Number(component.versionNumber),
+        },
+        snapshots,
+      )
+    : null;
   const hasYieldPreview = yieldPreview?.key === previewKey;
   const targetYield = hasYieldPreview
     ? yieldPreview.value
@@ -722,10 +745,14 @@ export function ComponentDetailPage() {
           ) : null}
         </section>
 
-        <ComponentMethodStepsPanel
-          componentId={component._id}
-          instructions={component.instructions}
-        />
+        {cookMethodEdition ? (
+          <PublishedMethodPanel edition={cookMethodEdition} />
+        ) : (
+          <ComponentMethodStepsPanel
+            componentId={component._id}
+            instructions={component.instructions}
+          />
+        )}
       </div>
 
       <ComponentKitchenStandardsPanel

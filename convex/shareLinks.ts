@@ -84,6 +84,8 @@ type SharedProposal = {
     course: string | null;
     serviceStyle: string | null;
   }>;
+  /** AC-654: the dish pictures frozen into the shared revision. */
+  pictures: Array<{ dishName: string; imageUrl: string }>;
   timeline: Array<{ name: string; startsAt: number; endsAt: number | null }>;
   revisionNumber: number;
   capturedAt: number | null;
@@ -180,6 +182,16 @@ async function replacementOf(
     return { title: "a newer proposal", shareToken: null };
   }
   return { title: next.title, shareToken: await workingLinkFor(ctx, next._id) };
+}
+
+/** A picture the revision froze; null when it was never set or is gone. */
+async function frozenPictureUrl(
+  ctx: QueryCtx,
+  storageId: unknown,
+): Promise<string | null> {
+  if (typeof storageId !== "string" || !storageId) return null;
+  const id = ctx.db.system.normalizeId("_storage", storageId);
+  return id ? await ctx.storage.getUrl(id) : null;
 }
 
 /** Resolve a share token to the pinned revision's client-safe view, or null. */
@@ -310,6 +322,21 @@ export const getSharedProposal = query({
         course: str(dish.course),
         serviceStyle: str(dish.serviceStyle),
       })),
+      pictures: (
+        await Promise.all(
+          (Array.isArray(snapshot.pictures)
+            ? (snapshot.pictures as Array<Record<string, unknown>>)
+            : []
+          ).map(async (picture) => ({
+            dishName: str(picture.dishName) ?? "Menu item",
+            imageUrl: await frozenPictureUrl(ctx, picture.storageId),
+          })),
+        )
+      ).flatMap((picture) =>
+        picture.imageUrl
+          ? [{ dishName: picture.dishName, imageUrl: picture.imageUrl }]
+          : [],
+      ),
       timeline: (Array.isArray(snapshot.timeline)
         ? (snapshot.timeline as Array<Record<string, unknown>>)
         : []

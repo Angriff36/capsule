@@ -335,7 +335,7 @@ export function RoleScorecardsPage() {
             </div>
           ) : (
             <div className="supply-table-wrap">
-              <table className="supply-table">
+              <table className="supply-table phone-cards">
                 <thead>
                   <tr>
                     <th>Role</th>
@@ -359,22 +359,24 @@ export function RoleScorecardsPage() {
                               {PersonRoleDirectory.label(row.role)}
                             </strong>
                           </td>
-                          <td>{row.title}</td>
-                          <td className="text-ink-2">
+                          <td data-label="Title">{row.title}</td>
+                          <td className="text-ink-2" data-label="Expectations">
                             {parsed.length
                               ? parsed
                                   .map((e) => `${e.metric}: ${e.target}`)
                                   .join(" · ")
                               : "—"}
                           </td>
-                          <td className="text-ink-2">
+                          <td className="text-ink-2" data-label="Effective">
                             {formatDate(row.effectiveFrom)}
                             {row.effectiveTo
                               ? ` → ${formatDate(row.effectiveTo)}`
                               : ""}
                           </td>
-                          <td className="text-ink-2">v{row.version}</td>
-                          <td>
+                          <td className="text-ink-2" data-label="Version">
+                            v{row.version}
+                          </td>
+                          <td data-label="Status">
                             <StatusChip status={String(row.status)} />
                           </td>
                           <td className="text-right">

@@ -1,0 +1,19 @@
+{
+  "acceptance": "AC-391 (J leg)",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "results": {
+    "decision order": {
+      "artifact": "docs/product/decision-order-log.md (disagreements part)",
+      "criterion": "The reader is a catering owner who does not code. For each disagreement listed, the page says plainly which two sources disagreed, which one Capsule follows, and the rule number from the six-step order at the top, and that rule number matches the order (owner decisions and the product spec = 1, the Final Lock manual = 2, the customer's accepted scope and event facts = 3, current code = 4, provider documentation = 5, old-system records = 6). Each line names where the proof is. A line whose rule number contradicts the order fails.",
+      "pass": true,
+      "judgedAt": "2026-10-04T05:28:40.802Z"
+    },
+    "manual procedures": {
+      "artifact": "docs/product/decision-order-log.md (manual procedures part)",
+      "criterion": "The reader is a catering owner who does not code. Each Final Lock manual procedure listed (Sales Lock, Ops Final Lock, print-ready binder, pack list, equipment, timeline, setup, task breakdown, buffet, before takeoff, return) says in plain words whether Capsule works the answer out, proves it does not apply, names the exact missing fact, or leaves it as a check a named person does on site, and names the proof. None is left without a way it is handled.",
+      "pass": true,
+      "judgedAt": "2026-10-04T05:30:32.382Z"
+    }
+  }
+}

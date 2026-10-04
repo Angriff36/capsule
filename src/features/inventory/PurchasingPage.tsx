@@ -42,6 +42,7 @@ import { currentWeeklyDraft, weeklyDraftLines } from "./weeklyDraftView";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { purchasingStockContext } from "./purchasingStockContext";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
+import { VendorPriceListImport } from "./VendorPriceListImport";
 import { SentOrderSurplusPanel } from "./SentOrderSurplusPanel";
 import { sentOrderSurplus } from "./sentOrderSurplus";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
@@ -709,6 +710,8 @@ export function PurchasingPage() {
       </section>
 
       <SeasonalDemandForecast />
+
+      <VendorPriceListImport />
 
       <BulkActionBar
         count={selection.count}

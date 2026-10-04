@@ -807,7 +807,7 @@ export function StockBookPage() {
             </div>
           ) : (
             <div className="supply-table-wrap">
-              <table className="supply-table">
+              <table className="supply-table phone-cards">
                 <thead>
                   <tr>
                     <th>Ingredient</th>
@@ -838,10 +838,16 @@ export function StockBookPage() {
                         />
                         <small>{unitFor(item)}</small>
                       </td>
-                      <td>{locationName(item.locationId)}</td>
-                      <td className="supply-number">{item.quantityOnHand}</td>
-                      <td className="supply-number">{reservedFor(item._id)}</td>
-                      <td className="supply-number">
+                      <td data-label="Location">
+                        {locationName(item.locationId)}
+                      </td>
+                      <td className="supply-number" data-label="On hand">
+                        {item.quantityOnHand}
+                      </td>
+                      <td className="supply-number" data-label="Reserved">
+                        {reservedFor(item._id)}
+                      </td>
+                      <td className="supply-number" data-label="PAR / reorder">
                         {item.parLevel} / {item.reorderThreshold}
                         {isBelowReorder(item) ? (
                           <StatusChip status="reorder now" />
@@ -849,7 +855,7 @@ export function StockBookPage() {
                           <StatusChip status="below par" />
                         ) : null}
                       </td>
-                      <td>
+                      <td data-label="Best before / Use by">
                         {dateLabel(item.bestBeforeAt)} /{" "}
                         {dateLabel(item.useByAt)}
                         {isExpired(item) ? (
@@ -944,7 +950,7 @@ export function StockBookPage() {
             </div>
           ) : (
             <div className="supply-table-wrap">
-              <table className="supply-table">
+              <table className="supply-table phone-cards">
                 <thead>
                   <tr>
                     <th>Event</th>
@@ -964,25 +970,25 @@ export function StockBookPage() {
                     return (
                       <tr key={reservation._id}>
                         <td>{eventName(reservation.eventId)}</td>
-                        <td>
+                        <td data-label="Ingredient">
                           <IngredientCatalogLabel
                             ingredientId={reservation.ingredientId}
                             ingredients={ingredients}
                             link
                           />
                         </td>
-                        <td>
+                        <td data-label="Location">
                           {item
                             ? locationName(item.locationId)
                             : "Unknown location"}
                         </td>
-                        <td className="supply-number">
+                        <td className="supply-number" data-label="Quantity">
                           {reservation.quantity}
                           {Number(reservation.returnedQuantity ?? 0) > 0
                             ? ` (${reservation.returnedQuantity} sent back)`
                             : ""}
                         </td>
-                        <td>
+                        <td data-label="State">
                           <StatusChip status={String(reservation.status)} />
                         </td>
                         <td>

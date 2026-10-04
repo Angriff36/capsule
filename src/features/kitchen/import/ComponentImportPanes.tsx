@@ -263,8 +263,8 @@ export function ComponentImportReviewPane({
             Structure the house book entry.
           </h3>
           <p>
-            Paste recipe text or choose `.txt` / CSV files, then parse to review
-            ingredient matches before saving.
+            Paste the recipe or choose a text or CSV file, then read it in to
+            check the ingredient matches before you save.
           </p>
         </div>
       </section>

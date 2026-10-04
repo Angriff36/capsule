@@ -9,7 +9,6 @@ import {
   useListDishIngredient,
   useListEquipment,
   useListEquipmentReservation,
-  useListEventDish,
   useListIngredient,
   useListIngredientDemand,
   useListIngredientPriceObservation,
@@ -20,6 +19,7 @@ import {
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { buildEventMenuCost } from "./eventMenuCost";
 import {
   canReadEventFoodCost,
@@ -46,7 +46,7 @@ type Props = {
 
 export function EventMarginTab({ eventId }: Props) {
   const event = useGetEvent(eventId);
-  const eventDishes = useListEventDish();
+  const eventDishes = useEventMenuLines(eventId);
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();

@@ -19,6 +19,7 @@ const RECORD_NAMES: Record<string, string> = {
   rentalOrderLines: "Rental",
   equipmentIssues: "Equipment problem",
   revenueAttributions: "Commission",
+  eventVehicleAssignments: "Truck run",
   eventGuests: "Guest",
 };
 

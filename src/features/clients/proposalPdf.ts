@@ -16,6 +16,7 @@ import {
   type PricingBasis,
 } from "../../lib/pricing";
 import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
+import { loadMenuPictures } from "../../lib/proposalMenuPictures";
 
 export interface ProposalPdfRecord {
   _id: string;
@@ -40,6 +41,11 @@ export interface ProposalPdfRecord {
     dishName: string;
     dishDescription?: string | null;
   }>;
+  // AC-654: the dish pictures (stored file id -> address -> drawn picture).
+  // Unset on a draft: useProposalPictureUrls reads the draft's pictures live.
+  // A sent proposal carries the frozen list (empty on older sends).
+  // loadMenuPictures turns each address into imageDataUrl just before drawing.
+  menuPictures?: MenuPicture[];
   // Optional sections for timeline, logistics, enhancements
   timelineItems?: TimelineItem[];
   venueLogistics?: VenueLogistics;
@@ -51,6 +57,13 @@ export interface ProposalPdfRecord {
   pricingLines?: PricingLinePdf[];
   // Acceptance URL for CTA
   acceptanceUrl?: string;
+}
+
+export interface MenuPicture {
+  dishName: string;
+  storageId?: string | null;
+  imageUrl?: string | null;
+  imageDataUrl?: string | null;
 }
 
 export interface TimelineItem {
@@ -349,6 +362,55 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     );
   }, 0);
   const menuHeight = Math.max(58, 28 + menuLineCount * 14);
+  // AC-654: dishes with a picture show it under the menu, three to a row,
+  // each with the dish name under it.
+  const renderMenuPictures = () => {
+    const pictures = (proposal.menuPictures ?? []).filter(
+      (item) => item.imageDataUrl,
+    );
+    const columns = 3;
+    const gap = 12;
+    const cellWidth = (CONTENT_WIDTH - gap * (columns - 1)) / columns;
+    const pictureHeight = Math.round(cellWidth * 0.7);
+    const rowHeight = pictureHeight + 30;
+    for (let index = 0; index < pictures.length; index += columns) {
+      ensureSpace(rowHeight);
+      pictures.slice(index, index + columns).forEach((item, column) => {
+        const x = MARGIN + column * (cellWidth + gap);
+        try {
+          const image = doc.getImageProperties(item.imageDataUrl!);
+          // Fit inside the box, keep the picture's shape, centre it.
+          const scale = Math.min(
+            cellWidth / image.width,
+            pictureHeight / image.height,
+          );
+          const width = image.width * scale;
+          const height = image.height * scale;
+          doc.setFillColor(...PAPER);
+          doc.rect(x, y, cellWidth, pictureHeight, "F");
+          doc.addImage(
+            item.imageDataUrl!,
+            x + (cellWidth - width) / 2,
+            y + (pictureHeight - height) / 2,
+            width,
+            height,
+          );
+        } catch {
+          return;
+        }
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...MUTED);
+        const caption = doc.splitTextToSize(
+          item.dishName,
+          cellWidth,
+        ) as string[];
+        doc.text(caption.slice(0, 2), x, y + pictureHeight + 12);
+      });
+      y += rowHeight;
+    }
+    if (pictures.length > 0) y += 6;
+  };
   const renderMenu = () => {
     if (sectionVisible("menu_sections")) {
       ensureSpace(menuHeight + 38);
@@ -380,6 +442,7 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
         menuY += lines.length * 14;
       }
       y += menuHeight + 16;
+      renderMenuPictures();
     }
 
     if (proposal.notes?.trim()) {
@@ -752,7 +815,8 @@ export async function proposalPdfBase64(
   input: ProposalPdfInput,
 ): Promise<{ base64: string; fileName: string }> {
   const branding = await loadTenantBrandingForPdf(input.branding);
-  const dataUri = buildProposalPdf({ ...input, branding }).output(
+  const proposal = await loadMenuPictures(input.proposal);
+  const dataUri = buildProposalPdf({ ...input, proposal, branding }).output(
     "datauristring",
   );
   return {
@@ -765,7 +829,8 @@ export async function downloadProposalPdf(
   input: ProposalPdfInput,
 ): Promise<void> {
   const branding = await loadTenantBrandingForPdf(input.branding);
-  buildProposalPdf({ ...input, branding }).save(
+  const proposal = await loadMenuPictures(input.proposal);
+  buildProposalPdf({ ...input, proposal, branding }).save(
     proposalPdfFileName(input.proposal),
   );
 }

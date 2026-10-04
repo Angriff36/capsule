@@ -21,7 +21,7 @@ export interface PacketPreparationPorts {
     finalLockFingerprint?: string;
   }): Promise<{ storageId: string }>;
   /** Drawings, maps and uploaded papers that print at the back. */
-  files?(): Promise<AttachedPrintFile[]>;
+  files?(snapshot: EventPacketSnapshot): Promise<AttachedPrintFile[]>;
   record(input: {
     inputFingerprint: string;
     finalLockFingerprint: string;
@@ -47,7 +47,7 @@ export async function prepareNativeWorkbook(ports: PacketPreparationPorts) {
   });
   const rendered = await renderWorkbook(
     workbook,
-    ports.files ? await ports.files() : [],
+    ports.files ? await ports.files(current.snapshot) : [],
   );
   if (rendered.audit.violations.length)
     throw new Error(

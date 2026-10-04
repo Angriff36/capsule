@@ -6,6 +6,8 @@
  * - range: one window, matches a brute-force count, says when it is capped;
  * - rangeDocs: the same window as whole records, without the import draft or
  *   contact fields;
+ * - picker: the next events soonest first, the recent past and undated ones,
+ *   at a fixed most;
  * - byClient: one client's live events only;
  * - reportPage: every event in pages no larger than asked for, nothing twice.
  */
@@ -16,7 +18,12 @@ import type { Id } from "../../convex/_generated/dataModel";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
-import { RANGE_CAP, type EventLookupRow } from "../../convex/eventLookup";
+import {
+  PICKER_AHEAD,
+  PICKER_BACK,
+  RANGE_CAP,
+  type EventLookupRow,
+} from "../../convex/eventLookup";
 
 const TENANT = "tenant-event-lookup-scale";
 const OTHER = "tenant-event-lookup-scale-other";
@@ -146,6 +153,33 @@ describe("runtime proof: event reads stay bounded at 10,000 events (AC-172)", ()
     })) as { rows: EventLookupRow[]; capped: boolean };
     expect(everything.capped).toBe(true);
     expect(everything.rows.length).toBeLessThanOrEqual(RANGE_CAP);
+
+    // A picker: the next PICKER_AHEAD events soonest first, the last
+    // PICKER_BACK of the past 90 days, and every undated event.
+    const offered = (await owner.query(api.eventLookup.picker, {
+      today,
+    })) as { rows: EventLookupRow[]; capped: boolean };
+    const dated = offered.rows.filter((r) => r.startsAt != null);
+    const ahead = dated.filter((r) => r.startsAt! >= today - DAY);
+    const back = dated.filter((r) => r.startsAt! < today - DAY);
+    expect(offered.capped).toBe(true);
+    expect(ahead.length).toBeLessThanOrEqual(PICKER_AHEAD);
+    expect(ahead.length).toBeGreaterThan(PICKER_AHEAD * 0.99);
+    expect(back.length).toBeLessThanOrEqual(PICKER_BACK);
+    expect(back.length).toBeGreaterThan(PICKER_BACK * 0.99);
+    expect(back.every((r) => r.startsAt! >= today - 90 * DAY)).toBe(true);
+    // Soonest first: the next events, not the oldest of a long window.
+    const truthAhead = live
+      .filter((s) => s.startsAt != null && s.startsAt >= today - DAY)
+      .map((s) => s.startsAt!)
+      .sort((a, b) => a - b);
+    expect(Math.max(...ahead.map((r) => r.startsAt!))).toBeLessThanOrEqual(
+      truthAhead[PICKER_AHEAD]!,
+    );
+    const startsInOrder = dated.map((r) => r.startsAt!);
+    expect([...startsInOrder].sort((a, b) => a - b)).toEqual(startsInOrder);
+    expect(offered.rows.length - dated.length).toBe(undated);
+    expect(offered.rows.every((r) => r.deletedAt == null)).toBe(true);
 
     // Whole records for the same week, without the draft or contacts.
     const records = (await owner.query(api.eventLookup.rangeDocs, {

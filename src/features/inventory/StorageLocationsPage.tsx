@@ -226,7 +226,7 @@ export function StorageLocationsPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -247,10 +247,14 @@ export function StorageLocationsPage() {
                       <td>
                         <strong>{location.name}</strong>
                       </td>
-                      <td>{location.locationType || "—"}</td>
-                      <td>{location.temperatureZone || "—"}</td>
-                      <td>{temperatureLabel(location)}</td>
-                      <td>
+                      <td data-label="Type">{location.locationType || "—"}</td>
+                      <td data-label="Zone">
+                        {location.temperatureZone || "—"}
+                      </td>
+                      <td data-label="Target temp">
+                        {temperatureLabel(location)}
+                      </td>
+                      <td data-label="Stock held">
                         {stockItems === undefined ? (
                           "…"
                         ) : (
@@ -262,7 +266,7 @@ export function StorageLocationsPage() {
                           </Link>
                         )}
                       </td>
-                      <td>
+                      <td data-label="State">
                         <StatusChip status={String(location.status)} />
                         {location.deactivationReason ? (
                           <small>{location.deactivationReason}</small>

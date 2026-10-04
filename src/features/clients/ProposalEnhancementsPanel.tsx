@@ -133,7 +133,7 @@ export function ProposalEnhancementsPanel({
           No optional enhancements on this proposal.
         </p>
       ) : (
-        <table className="data-table mt-2">
+        <table className="data-table phone-cards mt-2">
           <thead>
             <tr>
               <th>Name</th>
@@ -145,9 +145,13 @@ export function ProposalEnhancementsPanel({
           <tbody>
             {rows.map((row) => (
               <tr key={row._id}>
-                <td>{row.name}</td>
-                <td className="text-ink-2">{row.description ?? "—"}</td>
-                <td className="tabular-nums">
+                <td>
+                  <strong>{row.name}</strong>
+                </td>
+                <td className="text-ink-2" data-label="Description">
+                  {row.description ?? "—"}
+                </td>
+                <td className="tabular-nums" data-label="Price">
                   {formatMoneyExact(Number(row.price) || 0)}
                 </td>
                 {editable ? (

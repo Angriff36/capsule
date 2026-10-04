@@ -77,6 +77,8 @@ export type RentalReport = {
   readonly recovered: number;
   readonly averageUse: number | null;
   readonly busiest: readonly ItemUse[];
+  /** Every owned active item, busiest first. */
+  readonly itemUse: readonly ItemUse[];
 };
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
@@ -218,5 +220,6 @@ export function rentalReport(
         ? null
         : use.reduce((sum, row) => sum + row.share, 0) / use.length,
     busiest: use.slice(0, 5),
+    itemUse: use,
   };
 }

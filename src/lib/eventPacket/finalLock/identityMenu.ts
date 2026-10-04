@@ -8,6 +8,7 @@ import {
   unresolved,
   type Draft,
 } from "./answer";
+import { formatMoneyExact } from "../../format";
 import { isDropOff } from "./policy";
 import type { FinalLockInput } from "./types";
 
@@ -184,7 +185,7 @@ export function identityAnswers(input: FinalLockInput): Record<string, Draft> {
           type: "record",
           fields: { billTo: customer, quotedPrice: price },
         },
-        `${customer} pays the quoted ${price}.`,
+        `${customer} pays the quoted ${formatMoneyExact(price)}.`,
         "identity.billing.from-event-and-client",
         [...clientSources, ...ev(input, "quotedPrice")],
       );

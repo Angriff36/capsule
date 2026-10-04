@@ -150,10 +150,18 @@ describe("time capture keeps actor, time zone and reason (AC-126)", () => {
       version: record.version,
       breakMinutes: 30,
       paidBreakMinutes: 15,
+      latitude: 40.758,
+      longitude: -73.9855,
+      accuracyMeters: 20,
     });
     record = await s.read(first.docId);
     expect(record.status).toBe("closed");
     expect(record.paidBreakMinutes).toBe(15);
+    // The clock-out keeps its own phone location next to the clock-in one.
+    expect(record.clockOutLatitude).toBe(40.758);
+    expect(record.clockOutLongitude).toBe(-73.9855);
+    expect(record.clockOutAccuracyMeters).toBe(20);
+    expect(record.clockInLatitude).toBe(40.7128);
 
     // Kit cannot correct their own time; a manager cannot correct without a
     // reason.

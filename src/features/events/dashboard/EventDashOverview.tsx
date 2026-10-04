@@ -7,10 +7,10 @@ import {
 } from "../../../lib/eventPacket/useEventPacket";
 import { formatCount, formatMoney, formatTime } from "../../../lib/format";
 import {
-  useListEventTimelineComment,
   useListInvoice,
   useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
+import { useEventTimelineComments } from "../../../lib/useEventRows";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { EventProposalEnhancementsCard } from "../../clients/EventProposalEnhancementsCard";
 import { EventProposalSourceCard } from "../../clients/EventProposalSourceCard";
@@ -123,7 +123,7 @@ export function EventDashOverview({
 }) {
   const { event, eventId } = props;
   const invoices = useListInvoice();
-  const comments = useListEventTimelineComment();
+  const comments = useEventTimelineComments(eventId);
   const canManagePacket = useEventPacketAccess(eventId);
   const forecast = useEventDayForecast(props.venue, props.startsAt);
   const serviceStyles = useListServiceStyle();

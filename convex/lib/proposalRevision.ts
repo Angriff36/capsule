@@ -11,6 +11,7 @@ import {
   type VenueFactsSnapshot,
 } from "./venueFactsSnapshot";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
+import { proposalPictureRefs, type ProposalPictureRef } from "./proposalPictures";
 
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -166,6 +167,9 @@ export interface ProposalRevisionSnapshot {
     price: number;
     sortOrder: number;
   }>;
+  // AC-654: the pictures of the dishes on the proposal when it went out.
+  // Absent on revisions made before pictures were frozen.
+  pictures?: ProposalPictureRef[];
   tenant: {
     /** Null when the company has no name on record (AC-096). */
     name: string | null;
@@ -389,6 +393,7 @@ export async function buildProposalRevisionSnapshot(
     timeline: timelineData,
     lineItems: lineItemsData,
     enhancements: enhancementsData,
+    pictures: await proposalPictureRefs(ctx, proposal),
     tenant: {
       name: tenantName,
     },

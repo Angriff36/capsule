@@ -25,8 +25,13 @@ import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
 
 const DAY = 86_400_000;
-/** Most rows a tab count or a window reads; counts show "500+" past it. */
-export const LEDGER_CAP = 500;
+/**
+ * Most rows a tab count or a window reads; counts show "200+" past it. Every
+ * view reads both tab counts (about six index reads of this size), so this
+ * cap sets the page's cost: at 500 the page took 1.2 s on a running backend
+ * with 10,000 events (scripts/scale-backend-timings.ts).
+ */
+export const LEDGER_CAP = 200;
 const SEARCH_TAKE = 100;
 const DONE_STAGES = new Set(["completed", "cancelled", "closed_out"]);
 const STAGES = [

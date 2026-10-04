@@ -87,8 +87,8 @@ export function StaffingTemplatesPage() {
   };
 
   return (
-    <div className="operations-stage">
-      <header className="training-masthead">
+    <div className="operations-stage supply-stage">
+      <header className="supply-masthead">
         <div>
           <p className="eyebrow">Staff · Crew templates</p>
           <h1 className="display-title mt-2">

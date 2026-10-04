@@ -160,7 +160,15 @@ export function planLines(
 export type DraftIssue = { code: string; message: string; recordIds: string[] };
 
 export type SectionReport = {
-  key: "event" | "menu" | "pricing" | "terms" | "venue" | "service" | "rentals";
+  key:
+    | "event"
+    | "menu"
+    | "pricing"
+    | "terms"
+    | "venue"
+    | "service"
+    | "rentals"
+    | "pictures";
   sources: SourceRef[];
   stale: boolean;
   /** Why it is out of date, in plain words. */

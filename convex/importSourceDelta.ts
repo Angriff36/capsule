@@ -33,8 +33,15 @@ import {
   type FieldValue,
 } from "./lib/culinaryModel/importMapping";
 import {
+  PACK_LINE_PREFIX,
+  isCapsuleOwnLine,
+  readPackLineValue,
+} from "./lib/importPackListLines";
+import {
   DATASET_BY_RECORD_TYPE,
   SOURCE_FIELD_MAPS,
+  fieldLabel,
+  fieldWritable,
   parseValues,
   readStoredValue,
   sourceVersionOf,
@@ -61,10 +68,22 @@ async function readCapsule(
   capsuleId: string,
 ): Promise<CapsuleDoc | null> {
   try {
-    if (dataset === "contacts") {
+    if (dataset === "contacts" || dataset === "companies") {
       return (await ctx.runQuery(api.queries.getClient, {
         id: capsuleId as Id<"clients">,
       })) as CapsuleDoc | null;
+    }
+    if (dataset === "pack_lists") {
+      const packListId = capsuleId as Id<"packLists">;
+      const packList = await ctx.runQuery(api.queries.getPackList, {
+        id: packListId,
+      });
+      if (!packList) return null;
+      const lines = await ctx.runQuery(
+        api.queries.listPackListItemByPackListId,
+        { packListId },
+      );
+      return { ...(packList as CapsuleDoc), lines };
     }
     if (dataset === "leads") {
       return (await ctx.runQuery(api.queries.getLead, {
@@ -110,20 +129,24 @@ async function writeCapsule(
   doc: CapsuleDoc,
   writes: Values,
 ): Promise<void> {
-  if (dataset === "contacts") {
+  if (dataset === "contacts" || dataset === "companies") {
     await ctx.runMutation(api.mutations.Client_changeContact, {
       docId: capsuleId as Id<"clients">,
       email: put(writes, doc, "email"),
       phone: put(writes, doc, "phone"),
       website: keep(doc.website),
-      addressLine1: keep(doc.addressLine1),
+      addressLine1: put(writes, doc, "addressLine1"),
       addressLine2: keep(doc.addressLine2),
-      city: keep(doc.city),
-      region: keep(doc.region),
-      postalCode: keep(doc.postalCode),
+      city: put(writes, doc, "city"),
+      region: put(writes, doc, "region"),
+      postalCode: put(writes, doc, "postalCode"),
       countryCode: keep(doc.countryCode),
       version: doc.version,
     });
+    return;
+  }
+  if (dataset === "pack_lists") {
+    await writePackList(ctx, capsuleId as Id<"packLists">, doc, writes);
     return;
   }
   if (dataset === "events") {
@@ -302,6 +325,52 @@ async function writeDish(
   }
 }
 
+/**
+ * Pack list lines: a line the list does not have yet is added; a line it has
+ * once, in the same unit, takes the new amount. Anything else (the line is
+ * there twice, the unit changed, the list is already loaded) is refused, so
+ * the line waits on the review list.
+ */
+async function writePackList(
+  ctx: ActionCtx,
+  packListId: Id<"packLists">,
+  doc: CapsuleDoc,
+  writes: Values,
+): Promise<void> {
+  const lines = (Array.isArray(doc.lines) ? doc.lines : []) as Array<
+    Record<string, unknown> & { _id: Id<"packListItems">; version?: number }
+  >;
+  for (const [field, value] of Object.entries(writes)) {
+    const amount = readPackLineValue(value);
+    if (!amount) throw new Error("This pack line cannot be written.");
+    const description = field.slice(PACK_LINE_PREFIX.length);
+    const matches = lines.filter(
+      (line) =>
+        !isCapsuleOwnLine(line) &&
+        typeof line.description === "string" &&
+        line.description.trim() === description,
+    );
+    if (matches.length === 0) {
+      await ctx.runMutation(api.mutations.PackListItem_createViaAddItem, {
+        packListId,
+        description,
+        requiredQuantity: amount.quantity,
+        unit: amount.unit as Doc<"packListItems">["unit"],
+      });
+      continue;
+    }
+    const line = matches[0]!;
+    if (matches.length > 1 || line.unit !== amount.unit) {
+      throw new Error("A person needs to change this pack line.");
+    }
+    await ctx.runMutation(api.mutations.PackListItem_adjustQuantity, {
+      docId: line._id,
+      requiredQuantity: amount.quantity,
+      version: line.version,
+    });
+  }
+}
+
 function toStored(conflict: FieldConflict) {
   return {
     field: conflict.field,
@@ -342,7 +411,7 @@ export async function reconcileExistingLink(
   // PL-SOURCE-MERGE (AC-061): a merged-away client's row updates the client
   // it was merged into; the link itself keeps pointing where it did.
   const capsuleId =
-    dataset === "contacts"
+    dataset === "contacts" || dataset === "companies"
       ? await ctx.runQuery(internal.importCommit.survivingClientId, {
           tenantId: link.tenantId,
           clientId: link.capsuleId,
@@ -366,7 +435,7 @@ export async function reconcileExistingLink(
     applied: baseline,
     capsule: map.fromCapsule(doc),
     source,
-    fields: map.fields,
+    fields: map.fieldsFor ? map.fieldsFor(baseline, source) : map.fields,
   });
   const conflicts = [...result.conflicts];
   const newApplied: Values = { ...result.newApplied };
@@ -377,7 +446,7 @@ export async function reconcileExistingLink(
       newApplied[field] = baseline?.[field] ?? null;
       continue;
     }
-    if (map.writable.includes(field)) {
+    if (fieldWritable(map, field, value)) {
       writes[field] = value;
       continue;
     }
@@ -596,13 +665,14 @@ export const takeSourceValue = action({
       throw new ConvexError("Capsule cannot apply this kind of change here.");
     }
     const map = SOURCE_FIELD_MAPS[dataset];
-    if (!map.writable.includes(conflict.field)) {
+    const value = readStoredValue(conflict.sourceValue);
+    if (!fieldWritable(map, conflict.field, value)) {
       throw new ConvexError(
-        `Change the ${map.labels[conflict.field] ?? conflict.field} on the record, then mark this as fixed another way.`,
+        `Change the ${fieldLabel(map, conflict.field)} on the record, then mark this as fixed another way.`,
       );
     }
     const capsuleId =
-      dataset === "contacts"
+      dataset === "contacts" || dataset === "companies"
         ? await ctx.runQuery(internal.importCommit.survivingClientId, {
             tenantId: link.tenantId,
             clientId: link.capsuleId,
@@ -610,7 +680,6 @@ export const takeSourceValue = action({
         : link.capsuleId;
     const doc = await readCapsule(ctx, dataset, capsuleId);
     if (!doc) throw new ConvexError("The record could not be opened.");
-    const value = readStoredValue(conflict.sourceValue);
     await writeCapsule(ctx, dataset, capsuleId, doc, {
       [conflict.field]: value ?? null,
     });

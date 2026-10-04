@@ -213,10 +213,10 @@ describe("runtime proof: the Events page reads a bounded window at 10,000 events
     expect(first).not.toBeNull();
     expect(first!.rows.length).toBeLessThanOrEqual(200 + 103 /* undated */);
     expect(first!.more).toBe(true);
-    // The upcoming count is capped at 500 and says so.
-    expect(upcomingTruth).toBeGreaterThan(500);
+    // The upcoming count is capped at 200 (LEDGER_CAP) and says so.
+    expect(upcomingTruth).toBeGreaterThan(200);
     expect(first!.upcomingCapped).toBe(true);
-    expect(first!.upcomingCount).toBeGreaterThanOrEqual(500);
+    expect(first!.upcomingCount).toBeGreaterThanOrEqual(200);
     for (const row of first!.rows) {
       expect(row.stage === "completed" || row.stage === "cancelled").toBe(
         false,

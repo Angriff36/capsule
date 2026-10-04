@@ -5,7 +5,8 @@
  *
  *  - `eventCloseoutSources` reads every record behind each closeout number
  *    (invoices, credits, payments, received food orders, waste, clocked
- *    time, rentals, equipment problems, commissions, guest check-ins) and
+ *    time, rentals, equipment problems, commissions, truck run costs, guest
+ *    check-ins) and
  *    returns plan vs actual per line, which lines are still incomplete, and
  *    the exact records (id + version + amount) behind each number.
  *  - `captureCloseoutFromSources` stores those numbers on the event's draft
@@ -54,6 +55,7 @@ const entered = v.optional(
     labor: v.optional(v.number()),
     vendor: v.optional(v.number()),
     commission: v.optional(v.number()),
+    transport: v.optional(v.number()),
     headcount: v.optional(v.number()),
   }),
 );
@@ -142,6 +144,42 @@ async function weeklyOrderShares(
     _id: String(order._id),
     lines: lines as never[],
   }));
+}
+
+/** The event's truck runs and vendor drops still on it, named for people. */
+async function truckRuns(ctx: QueryCtx, tenantId: string, eventId: string) {
+  const rows = (
+    await ctx.db
+      .query("eventVehicleAssignments")
+      .withIndex("by_activeEventId", (q) => q.eq("activeEventId", eventId))
+      .collect()
+  ).filter(
+    (row) =>
+      row.tenantId === tenantId &&
+      row.deletedAt == null &&
+      row.releasedAt == null,
+  );
+  return await Promise.all(
+    rows.map(async (row) => {
+      const vehicle = row.vehicleId ? await ctx.db.get(row.vehicleId) : null;
+      const trailer = row.trailerId ? await ctx.db.get(row.trailerId) : null;
+      const own = <T extends { tenantId: string }>(doc: T | null) =>
+        doc && doc.tenantId === tenantId ? doc : null;
+      const truck = own(vehicle);
+      const label =
+        row.vendorName?.trim() ||
+        (truck
+          ? `${truck.make} ${truck.model}`.trim() || truck.registration
+          : own(trailer)?.registration) ||
+        "Truck run";
+      return {
+        _id: String(row._id),
+        version: row.version,
+        label,
+        tripCost: row.tripCost ?? null,
+      };
+    }),
+  );
 }
 
 async function loadProjection(
@@ -234,6 +272,7 @@ async function loadProjection(
     equipmentIssues: ids(mine(issues as Doc<"equipmentIssues">[])),
     attributions: ids(mine(attributions as Doc<"revenueAttributions">[])),
     guests: ids(mine(guests as Doc<"eventGuests">[])),
+    truckRuns: await truckRuns(ctx, tenantId, eventId),
   });
 }
 

@@ -368,7 +368,7 @@ export function EventTemplatesPage() {
             hint="Save a fully-configured event as a template to bootstrap the next one."
           />
         ) : (
-          <table className="w-full">
+          <table className="phone-cards w-full">
             <thead>
               <tr>
                 <th className="th w-full">Template</th>
@@ -390,24 +390,29 @@ export function EventTemplatesPage() {
                       {template.eventType}
                     </span>
                   </td>
-                  <td className="td text-ink-2">{template.clientType}</td>
-                  <td className="td text-right font-mono">
+                  <td className="td text-ink-2" data-label="Client type">
+                    {template.clientType}
+                  </td>
+                  <td
+                    className="td text-right font-mono"
+                    data-label="Headcount"
+                  >
                     {formatCount(template.defaultHeadcount)}
                   </td>
-                  <td className="td text-ink-2">
+                  <td className="td text-ink-2" data-label="Menu">
                     {menuName(template.menuId) ?? "—"}
                   </td>
-                  <td className="td text-ink-2">
+                  <td className="td text-ink-2" data-label="Staff roles">
                     {template.defaultStaffRoles?.length
                       ? template.defaultStaffRoles.join(", ")
                       : "—"}
                   </td>
-                  <td className="td text-ink-2">
+                  <td className="td text-ink-2" data-label="Equipment">
                     {template.typicalEquipment?.length
                       ? template.typicalEquipment.join(", ")
                       : "—"}
                   </td>
-                  <td className="td">
+                  <td className="td" data-label="Status">
                     <StatusChip status={String(template.status)} />
                   </td>
                   <td className="td">

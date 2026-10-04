@@ -7,10 +7,8 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/lib/api";
-import {
-  useListDish,
-  useListImportRun,
-} from "../../../lib/manifest-convex-react";
+import { useListImportRun } from "../../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../../lib/useDishesByIds";
 import {
   useExternalRecordLinksFor,
   useMenuLinkStats,
@@ -129,7 +127,7 @@ export function ParallelRunDashboardPage() {
     from: windowEnd - COMPARISON_WINDOW_MS,
     to: windowEnd + 1,
   });
-  const capsuleDishes = useListDish();
+  const capsuleDishes = useWholeDishList();
   const importRuns = useListImportRun();
   // The full link list is too long for one read: the menu check is counted
   // on the server, and only links to imported events are listed.

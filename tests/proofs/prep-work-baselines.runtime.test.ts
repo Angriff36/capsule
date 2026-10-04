@@ -372,6 +372,33 @@ describe("runtime proof: prep baselines, overrides and partial work (PL-PREP)", 
     ).toEqual([]);
   });
 
+  it("a recipe step moved to another station moves its unstarted event prep with it", async () => {
+    const w = await world("tenant-prep-station");
+    const dish = await dishWithSteps(w, "Trout");
+    const line = await addDish(w, dish.dishId, 20);
+    await reconcilePrep(w, line);
+    const make = stepRows(await prep(w, line), dish.make)[0];
+    expect(make.station).toBe("Hot line");
+
+    // Same call the recipe page makes: every stored value passed back, only
+    // the station changed.
+    await w.run(w.kitchen)(M.DishTask_revise, {
+      docId: dish.make,
+      name: "Make sauce for Trout",
+      defaultQuantity: 1,
+      defaultUnit: "portion",
+      station: "Finish at Kitchen",
+      componentId: dish.sauce,
+      instructions: "Reduce by half",
+    });
+    await reconcilePrep(w, line);
+    const moved = stepRows(await prep(w, line), dish.make);
+    expect(moved).toHaveLength(1);
+    expect(moved[0]._id).toBe(make._id);
+    expect(moved[0].station).toBe("Finish at Kitchen");
+    expect(moved[0].specialInstructions).toBe("Reduce by half");
+  });
+
   it("AC-337: a recipe change after the work is finished is listed for review and the finished task is never edited", async () => {
     const w = await world("tenant-prep-review");
     const dish = await dishWithSteps(w, "Salmon");

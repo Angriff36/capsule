@@ -43,7 +43,7 @@ export function ServiceStyleKitLineTable({
 }: ServiceStyleKitLineTableProps) {
   return (
     <div className="supply-table-wrap mt-3">
-      <table className="supply-table">
+      <table className="supply-table phone-cards">
         <thead>
           <tr>
             <th>Item</th>
@@ -59,9 +59,9 @@ export function ServiceStyleKitLineTable({
               <td>
                 <strong>{line.description}</strong>
               </td>
-              <td>{quantityRule(line)}</td>
-              <td>{line.note || "—"}</td>
-              <td>
+              <td data-label="Quantity">{quantityRule(line)}</td>
+              <td data-label="Packer note">{line.note || "—"}</td>
+              <td data-label="State">
                 <StatusChip status={String(line.status)} />
               </td>
               <td>

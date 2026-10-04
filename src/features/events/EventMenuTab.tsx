@@ -9,22 +9,13 @@ import {
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
-  useListComponent,
-  useListComponentIngredient,
-  useListDish,
-  useListDishComponent,
-  useListDishContainer,
-  useListDishIngredient,
-  useListEventDish,
-  useListEventGuest,
-  useListIngredient,
-  useListIngredientPriceObservation,
-  useListItemUnitMapping,
-  useListInventoryItem,
-  useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
+import { useEventGuests } from "../../lib/useEventRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
@@ -115,20 +106,29 @@ const MENU_ROW_COLUMNS =
 
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
-  const dishes = useHeldQueryRows("dishes", useListDish());
-  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
-  const eventGuests = useListEventGuest();
+  const eventDishes = useHeldQueryRows(
+    `eventDishes:${eventId}`,
+    useEventMenuLines(eventId),
+  );
+  // The menu's own dishes; the whole dish list only while the picker is open.
+  const dishes = useHeldQueryRows(
+    `dishes:${eventId}`,
+    useDishesByIds(eventDishes?.map((row) => row.dishId)),
+  );
+  const eventGuests = useEventGuests(eventId);
   const reviewFlags = useEventReviewFlags(eventId);
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  const itemUnitMappings = useListItemUnitMapping();
-  const priceObservations = useListIngredientPriceObservation();
-  const containers = useListDishContainer();
-  const inventoryItems = useListInventoryItem();
-  const inventoryReservations = useListInventoryReservation();
+  // Recipe, price and stock rows of the menu's dishes only.
+  const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));
+  const dishIngredients = recipe?.dishIngredients;
+  const dishComponents = recipe?.dishComponents;
+  const components = recipe?.components;
+  const componentIngredients = recipe?.componentIngredients;
+  const ingredients = recipe?.ingredients;
+  const itemUnitMappings = recipe?.unitMappings;
+  const priceObservations = recipe?.priceObservations;
+  const containers = recipe?.containers;
+  const inventoryItems = recipe?.inventoryItems;
+  const inventoryReservations = recipe?.inventoryReservations;
   const materializeTemplate = useMaterializeEventMenuTemplate();
   const applyPackage = useApplyCateringPackage();
   const createEventDish = useCreateEventDish();
@@ -144,6 +144,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     demandVersionsForEvent,
   } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
+  const pickerDishes = useWholeDishList(showPicker);
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
   );
@@ -178,7 +179,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   );
   const existingDishIds = selections.map((row) => row.dishId);
 
-  const nutrition = useEventMenuNutrition(existingDishIds);
+  const nutrition = useEventMenuNutrition(existingDishIds, recipe);
 
   const refreshStock = async () => {
     if (!prepSyncReady) return;
@@ -756,10 +757,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         }))}
         onDismiss={() => setStockShortages([])}
       />
-      {showPicker ? (
+      {showPicker && pickerDishes === undefined ? (
+        <p className="text-sm text-ink-3" role="status">
+          Loading dishes…
+        </p>
+      ) : showPicker ? (
         <CulinaryRecordPicker
           kind="dish"
-          records={(dishes ?? []).map((dish) => ({
+          records={(pickerDishes ?? []).map((dish) => ({
             _id: dish._id,
             name: dish.name,
             description: dish.description,
@@ -780,7 +785,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                 eventId,
                 dishId,
                 quantityServings: servings,
-                dishName: dishes?.find((d) => d._id === dishId)?.name,
+                dishName: pickerDishes?.find((d) => d._id === dishId)?.name,
                 headcountOverride: 0,
               });
               await refreshStock();

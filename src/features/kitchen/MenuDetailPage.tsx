@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   useGetMenu,
-  useListDish,
   useListDishComponent,
   useListDishIngredient,
   useListIngredient,
@@ -17,6 +16,7 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -62,7 +62,7 @@ export function MenuDetailPage() {
   const navigate = useNavigate();
   const menu = useRouteRecord(useGetMenu, id);
   useTrackRecent("Menu", menu?.name);
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   const menuDishes = useListMenuDish();
   const dishComponents = useListDishComponent();
   const dishIngredients = useListDishIngredient();

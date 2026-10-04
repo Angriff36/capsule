@@ -26,12 +26,12 @@ import {
   useGetEvent,
   useListClient,
   useListOrganization,
-  useListDish,
-  useListEventDish,
-  useListEventTimelineActivity,
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds } from "../../lib/useDishesByIds";
+import { useEventTimelineActivities } from "../../lib/useEventRows";
 import {
   useEventAssignmentRows,
   useEventShiftRows,
@@ -157,15 +157,21 @@ function EventDetailContent({
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
-  const dishes = useHeldQueryRows("dishes", useListDish());
   const eventId = event?._id ?? "skip";
   const eventAssignments = useEventAssignmentRows(eventId);
   const staffNeeds = useEventStaffNeedRows(eventId);
   const shifts = useEventShiftRows(eventId);
-  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
+  const eventDishes = useHeldQueryRows(
+    `eventDishes:${event._id}`,
+    useEventMenuLines(event._id),
+  );
+  const dishes = useHeldQueryRows(
+    `dishes:${event._id}`,
+    useDishesByIds(eventDishes?.map((row) => row.dishId)),
+  );
   const timelineActivities = useHeldQueryRows(
-    "eventTimelineActivities",
-    useListEventTimelineActivity(),
+    `eventTimelineActivities:${event._id}`,
+    useEventTimelineActivities(event._id),
   );
   const people = useHeldQueryRows("people", useListPerson());
   const venues = useHeldQueryRows("venues", useListVenue());

@@ -587,7 +587,7 @@ export function VehicleMaintenancePage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Vehicle</th>
@@ -623,12 +623,12 @@ export function VehicleMaintenancePage() {
                           <small>{schedule.instructions}</small>
                         ) : null}
                       </td>
-                      <td>
+                      <td data-label="Interval">
                         {schedule.intervalType === "mileage"
                           ? `Every ${milesFmt.format(schedule.intervalMiles)} mi`
                           : `Every ${schedule.intervalDays} days`}
                       </td>
-                      <td>
+                      <td data-label="Next due">
                         {schedule.intervalType === "mileage" ? (
                           <>
                             <strong>
@@ -642,7 +642,7 @@ export function VehicleMaintenancePage() {
                           <strong>{formatDate(schedule.nextDueAt)}</strong>
                         )}
                       </td>
-                      <td>
+                      <td data-label="Status">
                         <StatusChip status={state} />
                         <small data-testid="maintenance-due-label">
                           {dueLabel(schedule)}
@@ -771,7 +771,7 @@ export function VehicleMaintenancePage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Date</th>
@@ -788,17 +788,19 @@ export function VehicleMaintenancePage() {
                   return (
                     <tr key={`${row.kind}:${row.id}`}>
                       <td>{formatDate(row.at)}</td>
-                      <td>{vehicle?.registration ?? "—"}</td>
-                      <td>
+                      <td data-label="Vehicle">
+                        {vehicle?.registration ?? "—"}
+                      </td>
+                      <td data-label="Type">
                         <StatusChip
                           status={row.kind === "fuel" ? "fuel" : "service"}
                         />
                       </td>
-                      <td>{row.detail}</td>
-                      <td className="supply-number">
+                      <td data-label="Detail">{row.detail}</td>
+                      <td className="supply-number" data-label="Odometer">
                         {milesFmt.format(row.odometer)} mi
                       </td>
-                      <td className="supply-number">
+                      <td className="supply-number" data-label="Cost">
                         {costFmt.format(row.cost)}
                       </td>
                     </tr>

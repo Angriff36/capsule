@@ -184,7 +184,7 @@ describe("Final Lock answers from native event records", () => {
     // No part of the staff reply carries the price, printed lines included.
     const billingLine = (r: any) =>
       r.print.lines.find((l: any) => l.questionKey === "identity.billing").text;
-    expect(billingLine(report)).toContain("5000");
+    expect(billingLine(report)).toContain("$5,000.00");
     expect(billingLine(seen)).toBe(
       "Lakeside Weddings pays. Managers see the price.",
     );

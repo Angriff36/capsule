@@ -382,8 +382,8 @@ export function ImportRunsListPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div className="overflow-x-auto max-md:px-3">
+          <table className="phone-cards w-full text-xs">
             <thead>
               <tr className="border-b border-line bg-inset">
                 <th className="text-left py-3 px-4 font-medium">Source</th>
@@ -429,22 +429,25 @@ export function ImportRunsListPage() {
                         {SOURCE_SYSTEM_LABELS[run.sourceSystem] ||
                           run.sourceSystem}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4" data-label="Dataset">
                         {DATASET_TYPE_LABELS[run.datasetType] ||
                           run.datasetType}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4" data-label="Status">
                         <StatusChip status={statusLabel} />
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4" data-label="Items">
                         {totalRecords > 0 ? totalRecords.toString() : "—"}
                       </td>
-                      <td className="py-3 px-4 text-ink-2">
+                      <td className="py-3 px-4 text-ink-2" data-label="Started">
                         {run.startTime
                           ? new Date(run.startTime).toLocaleString()
                           : "—"}
                       </td>
-                      <td className="py-3 px-4 text-ink-2">
+                      <td
+                        className="py-3 px-4 text-ink-2"
+                        data-label="Completed"
+                      >
                         {run.completionTime
                           ? new Date(run.completionTime).toLocaleString()
                           : "—"}

@@ -10,6 +10,8 @@ export interface ActionPromptField {
   multiline?: boolean;
   /** When present the field renders as a select over these options. */
   options?: Array<{ value: string; label: string }>;
+  /** Words offered while typing; other words are still allowed. */
+  suggestions?: string[];
   required?: boolean;
   helper?: string;
 }

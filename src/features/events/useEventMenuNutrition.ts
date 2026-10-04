@@ -1,10 +1,5 @@
 import { useMemo } from "react";
-import {
-  useListComponent,
-  useListComponentIngredient,
-  useListDishComponent,
-  useListIngredient,
-} from "../../lib/manifest-convex-react";
+import type { MenuRecipeRows } from "../../../convex/menuRecipeLookup";
 import {
   calculateComponentNutrition,
   sumPerGuestNutrition,
@@ -16,11 +11,14 @@ import {
  * Per-guest nutrition across an event's dishes → components. Operational
  * estimate; it does not re-scale for dish-level component yields.
  */
-export function useEventMenuNutrition(dishIds: readonly string[]) {
-  const dishComponents = useListDishComponent();
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
+export function useEventMenuNutrition(
+  dishIds: readonly string[],
+  rows: MenuRecipeRows | undefined,
+) {
+  const dishComponents = rows?.dishComponents;
+  const components = rows?.components;
+  const componentIngredients = rows?.componentIngredients;
+  const ingredients = rows?.ingredients;
 
   const totals = useMemo(() => {
     const wanted = new Set(dishIds.map(String));

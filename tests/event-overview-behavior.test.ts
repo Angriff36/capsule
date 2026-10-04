@@ -375,8 +375,9 @@ it("prints the live nine-domain readiness summary, not a frozen Event readiness 
   expect(card.textContent).toContain(
     "This event has no quoted price to seed billing.",
   );
-  expect(card.textContent).toContain("warning");
-  expect(card.textContent).toContain("Event.changePricing");
+  // Staff read the reason; severity and the command name stay off screen.
+  expect(card.textContent).not.toContain("warning");
+  expect(card.textContent).not.toContain("Event.changePricing");
   expect(card.textContent).toContain("1 open");
   expect(card.textContent).not.toContain("FROZEN READY");
   expect(card.textContent).not.toContain("readinessName");

@@ -178,6 +178,17 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
   it(
     "golden event 02: From the inquiry/Event facts, generate a branded Proposal",
     async () => {
+      // AC-654: the bread dish has a picture; the salted dish has none.
+      const breadPicture = String(
+        await w.raw.run((ctx) =>
+          ctx.storage.store(new Blob(["bread"], { type: "image/jpeg" })),
+        ),
+      );
+      await w.run.kitchen(M.Dish_setPrimaryImage, {
+        docId: w.catalog.dishIds[0],
+        storageId: breadPicture,
+        fileName: "bread.jpg",
+      });
       id.breadLine = (
         await w.run.events(M.EventDish_createViaAddToEvent, {
           eventId: id.golden,
@@ -219,6 +230,17 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         table: "eventDishes",
         id: id.breadLine,
       });
+      // The picture section names the one dish with a picture.
+      expect(
+        report.sections.find((s) => s.key === "pictures")?.sources,
+      ).toEqual([{ table: "dishes", id: w.catalog.dishIds[0] }]);
+      const draftPictures = (await w.roles.sales.query(
+        api.lib.proposalPictures.forProposal,
+        { proposalId: id.proposal } as never,
+      )) as { dishId: string; imageUrl: string | null }[];
+      expect(draftPictures).toHaveLength(1);
+      expect(draftPictures[0].dishId).toBe(w.catalog.dishIds[0]);
+      expect(draftPictures[0].imageUrl).toMatch(/^https?:\/\//);
 
       const proposal = await readRow<{
         subtotal: number;
@@ -248,6 +270,27 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         total: proposal.total,
       });
       expect(snapshot.tenant.name).toBe("Golden Kitchen Catering");
+      // The send freezes the picture; the client's web page shows it.
+      expect(snapshot.pictures).toEqual([
+        {
+          dishId: w.catalog.dishIds[0],
+          dishName: expect.any(String),
+          storageId: breadPicture,
+        },
+      ]);
+      // The operator who makes the link (and signs later steps) has a profile.
+      await seedOperatorPerson(w);
+      const link = (await w.owner.mutation(api.mutations.ShareLink_create, {
+        proposalId: id.proposal,
+        proposalRevisionId: id.revision,
+      } as never)) as { _id: string };
+      // The client opens the link signed out.
+      const shared = (await w.raw.query(api.shareLinks.getSharedProposal, {
+        token: link._id,
+      })) as { pictures: { dishName: string; imageUrl: string }[] };
+      expect(shared.pictures).toHaveLength(1);
+      expect(shared.pictures[0].dishName).toBe(snapshot.pictures[0].dishName);
+      expect(shared.pictures[0].imageUrl).toMatch(/^https?:\/\//);
     },
     LONG,
   );
@@ -258,7 +301,6 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       await w.proof.executeCommand(w.owner, M.Proposal_markViewed, {
         docId: id.proposal,
       });
-      await seedOperatorPerson(w);
       const request = (await w.proof.executeCommand(
         w.owner,
         M.SignatureRequest_createViaRequestSignature,
@@ -1952,6 +1994,13 @@ describe.sequential(
           chargeAmount: 15,
         });
 
+        // Transport: the truck run's fuel and tolls, typed when the bill came.
+        await w.run.owner(M.EventVehicleAssignment_setTripCost, {
+          docId: id.truckRun,
+          version: await versionOf(w, id.truckRun),
+          tripCost: 42.5,
+        });
+
         // The event's one invoice is sent and paid in full.
         const [invoice] = await eventRows<{
           tenantId: string;
@@ -2037,6 +2086,15 @@ describe.sequential(
           ]),
         );
         expect(line("vendor").complete).toBe(true);
+        // Transport: the truck run's trip cost, from the run itself.
+        expect(line("transport")).toMatchObject({
+          actual: 42.5,
+          complete: true,
+          note: null,
+        });
+        expect(line("transport").sources).toEqual([
+          expect.objectContaining({ id: id.truckRun, amount: 42.5 }),
+        ]);
       },
       LONG,
     );
@@ -2094,6 +2152,7 @@ describe.sequential(
         const frozen = await closeout();
         expect(frozen.status).toBe("finalized");
         expect(frozen.sourceSnapshot).toContain(facts.wasteId);
+        expect(frozen.sourceSnapshot).toContain(id.truckRun);
 
         const report = async () =>
           (await w.owner.query(api.culinaryDemand.eventFoodCostReport, {

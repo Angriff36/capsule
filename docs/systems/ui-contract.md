@@ -327,6 +327,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -352,7 +353,6 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `queries.getEvent` - live read
 - `queries.listClient` - live read
-- `queries.listDish` - live read
 - `queries.listEvent` - live read
 - `queries.listEventTimelineActivity` - live read
 - `queries.listMenu` - live read
@@ -508,9 +508,12 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 ### Authored reads and steps
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -522,6 +525,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
 - `lib.proposalGenerate.generateProposalDraft` - mutation; authored step; live reads update by themselves
 - `lib.proposalHistoricalAcceptance.recordImportedAcceptance` - mutation; authored step; live reads update by themselves
+- `lib.proposalPictures.forProposal` - query; live read, updates by itself
 - `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `lib.proposalPricing.listRentalItems` - query; live read, updates by itself
 - `lib.proposalPricing.removeProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
@@ -553,16 +557,16 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listClientContact` - live read
 - `queries.listCorrectiveAction` - live read
 - `queries.listDelivery` - live read
-- `queries.listDish` - live read
 - `queries.listEquipment` - live read
 - `queries.listEquipmentIssue` - live read
 - `queries.listEquipmentPart` - live read
 - `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventChecklist` - live read
-- `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventNumberAssignment` - live read
 - `queries.listEventPlanNeeds` - live read
@@ -570,30 +574,31 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTask` - live read
 - `queries.listEventTaskByEventId` - live read
-- `queries.listEventTimelineActivity` - live read
-- `queries.listEventTimelineComment` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listEventVehicleAssignment` - live read
 - `queries.listIncident` - live read
 - `queries.listIngredient` - live read
-- `queries.listIngredientDemand` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listInvoice` - live read
 - `queries.listMenu` - live read
 - `queries.listOccasion` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPackListItem` - live read
 - `queries.listPerson` - live read
 - `queries.listPlanningOverride` - live read
 - `queries.listPlanningReceipt` - live read
 - `queries.listPlanningRule` - live read
-- `queries.listPrepTask` - live read
-- `queries.listProposal` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelection` - live read
 - `queries.listProposalEnhancement` - live read
 - `queries.listQualification` - live read
 - `queries.listReferralSource` - live read
-- `queries.listRentalOrderLine` - live read
-- `queries.listReviewFlag` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShiftByEventId` - live read
 - `queries.listTimeOffRequest` - live read
@@ -635,7 +640,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - inputs from the screen: providesJson, needsJson; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EquipmentOperatingFactsSet
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.EventAssignment_chooseTravelLeg` (EventAssignment.chooseTravelLeg)
@@ -1210,6 +1215,8 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
 - `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
@@ -1222,9 +1229,11 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMonthRows.forEvents` - query; live read, updates by itself
 - `eventReadiness.getEventReadiness` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
@@ -1261,7 +1270,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 ## 4. Menu and kitchen
 
-Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicker.tsx`, `events/ComponentStockSuggestions.tsx`, `events/EventAllergenBriefingBody.tsx`, `events/EventAllergenBriefingPage.tsx`, `events/EventDraftPoButton.tsx`, `events/EventDraftPoCoordinator.ts`, `events/EventMenuDietaryCard.tsx`, `events/EventMenuDietaryConflictsCard.tsx`, `events/EventMenuLineKitchen.tsx`, `events/EventMenuLineNote.tsx`, `events/EventMenuLineOverrides.tsx`, `events/EventMenuNotesCard.tsx`, `events/EventMenuRecipeEditor.tsx`, `events/EventMenuSidebar.tsx`, `events/EventMenuStatsCard.tsx`, `events/EventMenuTab.tsx`, `events/EventMenuTemplateCard.tsx`, `events/EventPrepList.tsx`, `events/EventPrepTab.tsx`, `events/EventPrepWorkNotice.tsx`, `events/EventStockIssueCoordinator.ts`, `events/EventStockReservationCoordinator.ts`, `events/EventUnresolvedMaterialsNotice.tsx`, `events/useEventMenuNutrition.ts`, `kitchen/AllergenIconRow.tsx`, `kitchen/AllergenMatrixPage.tsx`, `kitchen/command-deck/KitchenCommandDeckCrewRail.tsx`, `kitchen/command-deck/KitchenCommandDeckEventRail.tsx`, `kitchen/command-deck/KitchenCommandDeckFilters.tsx`, `kitchen/command-deck/KitchenCommandDeckHorizon.ts`, `kitchen/command-deck/KitchenCommandDeckModel.ts`, `kitchen/command-deck/KitchenCommandDeckPersonLabel.ts`, `kitchen/command-deck/KitchenCommandDeckTaskPanel.tsx`, `kitchen/command-deck/KitchenCommandDeckTypes.ts`, `kitchen/command-deck/KitchenPrepAssignManager.ts`, `kitchen/ComponentCostCalculator.ts`, `kitchen/ComponentCostPanel.tsx`, `kitchen/ComponentDetailPage.tsx`, `kitchen/ComponentIngredientWasteButton.tsx`, `kitchen/ComponentKitchenStandardsPanel.tsx`, `kitchen/ComponentMethodStepsPanel.tsx`, `kitchen/ComponentNutrition.ts`, `kitchen/ComponentNutritionPanel.tsx`, `kitchen/ComponentPortionSpecsPanel.tsx`, `kitchen/ComponentPrepContext.tsx`, `kitchen/ComponentRecipeStatusPanel.tsx`, `kitchen/componentSnapshot.ts`, `kitchen/componentSnapshotCapture.ts`, `kitchen/ComponentSubRecipesPanel.tsx`, `kitchen/ComponentVersionHistoryPanel.tsx`, `kitchen/ComponentYieldStoragePanel.tsx`, `kitchen/culinary-studio/CulinaryCatalogCardCopy.ts`, `kitchen/culinary-studio/CulinaryCatalogCardTone.ts`, `kitchen/CulinaryAllergenVocabulary.ts`, `kitchen/CulinaryCanonicalMatcher.ts`, `kitchen/CulinaryCatalogVisibility.ts`, `kitchen/CulinaryEntityLink.tsx`, `kitchen/CulinaryFailureBanner.tsx`, `kitchen/CulinaryLifecyclePolicy.ts`, `kitchen/CulinaryRecordPicker.tsx`, `kitchen/culinaryRecovery.ts`, `kitchen/dishAllergens.ts`, `kitchen/DishComponentPortionSpecPanel.tsx`, `kitchen/DishComponentsPanel.tsx`, `kitchen/DishContainerEditForm.tsx`, `kitchen/DishContainersPanel.tsx`, `kitchen/DishDetailPage.tsx`, `kitchen/DishDetailsEditor.tsx`, `kitchen/dishIngredientRemoval.ts`, `kitchen/DishIngredientsPanel.tsx`, `kitchen/DishPlateCostFact.tsx`, `kitchen/DishPrepTasksPanel.tsx`, `kitchen/DishPrepTaskWorkControls.tsx`, `kitchen/EventMenuReservationSync.ts`, `kitchen/EventMenuStockShortageBanner.tsx`, `kitchen/EventMenuSyncController.ts`, `kitchen/EventPrepCoordinator.ts`, `kitchen/EventPrepTaskSynchronizer.ts`, `kitchen/import/ComponentCsvParser.ts`, `kitchen/import/ComponentImportCoordinator.ts`, `kitchen/import/ComponentImportFinalizer.ts`, `kitchen/import/ComponentImportLineKind.tsx`, `kitchen/import/ComponentImportPage.tsx`, `kitchen/import/ComponentImportPanes.tsx`, `kitchen/import/ComponentImportRepository.ts`, `kitchen/import/ComponentImportSourcePanel.tsx`, `kitchen/import/ComponentImportTypes.ts`, `kitchen/import/ComponentTextParser.ts`, `kitchen/import/ImportSourceReadiness.ts`, `kitchen/import/IngredientCatalogMatcher.ts`, `kitchen/import/SourceFingerprint.ts`, `kitchen/import/UnitOfMeasureMapper.ts`, `kitchen/IngredientAllergenFieldset.tsx`, `kitchen/IngredientCatalogLabel.tsx`, `kitchen/IngredientCostingEditor.tsx`, `kitchen/IngredientDetailPage.tsx`, `kitchen/IngredientDetailsEditor.tsx`, `kitchen/IngredientMergeControl.tsx`, `kitchen/IngredientNutritionEditor.tsx`, `kitchen/IngredientOptionPicker.tsx`, `kitchen/IngredientPreviewCard.tsx`, `kitchen/IngredientPriceHistory.ts`, `kitchen/IngredientPriceTrendPanel.tsx`, `kitchen/IngredientStorageEditor.tsx`, `kitchen/IngredientSubstitution.ts`, `kitchen/IngredientSubstitutionEditor.tsx`, `kitchen/ItemUnitMappingsPanel.tsx`, `kitchen/KitchenBookNav.tsx`, `kitchen/KitchenCatalogCards.tsx`, `kitchen/KitchenCatalogCleanupPage.tsx`, `kitchen/KitchenCatalogCreateForm.tsx`, `kitchen/KitchenCatalogDisplayCache.ts`, `kitchen/KitchenCatalogLifecycleButtons.tsx`, `kitchen/KitchenCatalogPage.tsx`, `kitchen/KitchenDashboardPage.tsx`, `kitchen/kitchenRoutes.ts`, `kitchen/KitchenStationsPage.tsx`, `kitchen/KitchenUnresolvedWorkPage.tsx`, `kitchen/lookup/ExternalIngredientProfile.ts`, `kitchen/lookup/IngredientDatabaseLookup.tsx`, `kitchen/lookup/parseIngredientNutritionFromForm.ts`, `kitchen/MenuDetailPage.tsx`, `kitchen/MenuDetailsEditor.tsx`, `kitchen/MenuDishManager.tsx`, `kitchen/menuPdf.ts`, `kitchen/MenuPriceChangePlanner.tsx`, `kitchen/MenuProfitabilityAnalysis.ts`, `kitchen/MenuProfitabilityPanel.tsx`, `kitchen/menuTemplates.ts`, `kitchen/prepQuantityLabel.ts`, `kitchen/prepTaskCheck.ts`, `kitchen/prepTaskQuantity.ts`, `kitchen/PrepTaskRow.tsx`, `kitchen/PrepTemplateQuantityCoordinator.ts`, `kitchen/prepTiming.ts`, `kitchen/RecipeEditionNotice.tsx`, `kitchen/RecipeNotes.tsx`, `kitchen/useEventMenuSync.ts`, `kitchen/VendorItemsPanel.tsx`, `kitchen/VendorPriceComparisonPanel.tsx`, `production/BatchAllocationsPanel.tsx`, `production/batchCompletion.ts`, `production/BatchCompletionFields.tsx`, `production/BatchShortfallPanel.tsx`, `production/KitchenDisplayPage.tsx`, `production/KitchenDisplayTaskFacts.tsx`, `production/PrepActionReasonForm.tsx`, `production/PrepBoardPage.tsx`, `production/PrepTaskCommentThread.tsx`, `production/PrepTaskDependencies.ts`, `production/ProductionFailureBanner.tsx`, `production/ProductionLifecyclePolicy.ts`, `production/ProductionPlanPage.tsx`, `production/productionRoutes.ts`, `production/ProductionWorkspaceNav.tsx`, `production/productionYield.ts`, `production/ProductionYieldDashboardPage.tsx`
+Screens (161): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicker.tsx`, `events/ComponentStockSuggestions.tsx`, `events/EventAllergenBriefingBody.tsx`, `events/EventAllergenBriefingPage.tsx`, `events/EventDraftPoButton.tsx`, `events/EventDraftPoCoordinator.ts`, `events/EventMenuDietaryCard.tsx`, `events/EventMenuDietaryConflictsCard.tsx`, `events/EventMenuLineKitchen.tsx`, `events/EventMenuLineNote.tsx`, `events/EventMenuLineOverrides.tsx`, `events/EventMenuNotesCard.tsx`, `events/EventMenuRecipeEditor.tsx`, `events/EventMenuSidebar.tsx`, `events/EventMenuStatsCard.tsx`, `events/EventMenuTab.tsx`, `events/EventMenuTemplateCard.tsx`, `events/EventPrepList.tsx`, `events/EventPrepTab.tsx`, `events/EventPrepWorkNotice.tsx`, `events/EventStockIssueCoordinator.ts`, `events/EventStockReservationCoordinator.ts`, `events/EventUnresolvedMaterialsNotice.tsx`, `events/useEventMenuNutrition.ts`, `kitchen/AllergenIconRow.tsx`, `kitchen/AllergenMatrixPage.tsx`, `kitchen/command-deck/KitchenCommandDeckCrewRail.tsx`, `kitchen/command-deck/KitchenCommandDeckEventRail.tsx`, `kitchen/command-deck/KitchenCommandDeckFilters.tsx`, `kitchen/command-deck/KitchenCommandDeckHorizon.ts`, `kitchen/command-deck/KitchenCommandDeckModel.ts`, `kitchen/command-deck/KitchenCommandDeckPersonLabel.ts`, `kitchen/command-deck/KitchenCommandDeckTaskPanel.tsx`, `kitchen/command-deck/KitchenCommandDeckTypes.ts`, `kitchen/command-deck/KitchenPrepAssignManager.ts`, `kitchen/ComponentCostCalculator.ts`, `kitchen/ComponentCostPanel.tsx`, `kitchen/ComponentDetailPage.tsx`, `kitchen/ComponentIngredientWasteButton.tsx`, `kitchen/ComponentKitchenStandardsPanel.tsx`, `kitchen/ComponentMethodStepsPanel.tsx`, `kitchen/ComponentNutrition.ts`, `kitchen/ComponentNutritionPanel.tsx`, `kitchen/ComponentPortionSpecsPanel.tsx`, `kitchen/ComponentPrepContext.tsx`, `kitchen/ComponentRecipeStatusPanel.tsx`, `kitchen/componentSnapshot.ts`, `kitchen/componentSnapshotCapture.ts`, `kitchen/ComponentSubRecipesPanel.tsx`, `kitchen/ComponentVersionHistoryPanel.tsx`, `kitchen/ComponentYieldStoragePanel.tsx`, `kitchen/culinary-studio/CulinaryCatalogCardCopy.ts`, `kitchen/culinary-studio/CulinaryCatalogCardTone.ts`, `kitchen/CulinaryAllergenVocabulary.ts`, `kitchen/CulinaryCanonicalMatcher.ts`, `kitchen/CulinaryCatalogVisibility.ts`, `kitchen/CulinaryEntityLink.tsx`, `kitchen/CulinaryFailureBanner.tsx`, `kitchen/CulinaryLifecyclePolicy.ts`, `kitchen/CulinaryRecordPicker.tsx`, `kitchen/culinaryRecovery.ts`, `kitchen/dishAllergens.ts`, `kitchen/DishComponentPortionSpecPanel.tsx`, `kitchen/DishComponentsPanel.tsx`, `kitchen/DishContainerEditForm.tsx`, `kitchen/DishContainersPanel.tsx`, `kitchen/DishDetailPage.tsx`, `kitchen/DishDetailsEditor.tsx`, `kitchen/dishIngredientRemoval.ts`, `kitchen/DishIngredientsPanel.tsx`, `kitchen/DishPlateCostFact.tsx`, `kitchen/DishPrepTasksPanel.tsx`, `kitchen/DishPrepTaskWorkControls.tsx`, `kitchen/EventMenuReservationSync.ts`, `kitchen/EventMenuStockShortageBanner.tsx`, `kitchen/EventMenuSyncController.ts`, `kitchen/EventPrepCoordinator.ts`, `kitchen/EventPrepTaskSynchronizer.ts`, `kitchen/import/ComponentCsvParser.ts`, `kitchen/import/ComponentImportCoordinator.ts`, `kitchen/import/ComponentImportFinalizer.ts`, `kitchen/import/ComponentImportLineKind.tsx`, `kitchen/import/ComponentImportPage.tsx`, `kitchen/import/ComponentImportPanes.tsx`, `kitchen/import/ComponentImportRepository.ts`, `kitchen/import/ComponentImportSourcePanel.tsx`, `kitchen/import/ComponentImportTypes.ts`, `kitchen/import/ComponentTextParser.ts`, `kitchen/import/ImportSourceReadiness.ts`, `kitchen/import/IngredientCatalogMatcher.ts`, `kitchen/import/SourceFingerprint.ts`, `kitchen/import/UnitOfMeasureMapper.ts`, `kitchen/IngredientAllergenFieldset.tsx`, `kitchen/IngredientCatalogLabel.tsx`, `kitchen/IngredientCostingEditor.tsx`, `kitchen/IngredientDetailPage.tsx`, `kitchen/IngredientDetailsEditor.tsx`, `kitchen/IngredientMergeControl.tsx`, `kitchen/IngredientNutritionEditor.tsx`, `kitchen/IngredientOptionPicker.tsx`, `kitchen/IngredientPreviewCard.tsx`, `kitchen/IngredientPriceHistory.ts`, `kitchen/IngredientPriceTrendPanel.tsx`, `kitchen/IngredientStorageEditor.tsx`, `kitchen/IngredientSubstitution.ts`, `kitchen/IngredientSubstitutionEditor.tsx`, `kitchen/ItemUnitMappingsPanel.tsx`, `kitchen/KitchenBookNav.tsx`, `kitchen/KitchenCatalogCards.tsx`, `kitchen/KitchenCatalogCleanupPage.tsx`, `kitchen/KitchenCatalogCreateForm.tsx`, `kitchen/KitchenCatalogDisplayCache.ts`, `kitchen/KitchenCatalogLifecycleButtons.tsx`, `kitchen/KitchenCatalogPage.tsx`, `kitchen/KitchenDashboardPage.tsx`, `kitchen/kitchenRoutes.ts`, `kitchen/kitchenStationName.ts`, `kitchen/KitchenStationsPage.tsx`, `kitchen/KitchenUnresolvedWorkPage.tsx`, `kitchen/lookup/ExternalIngredientProfile.ts`, `kitchen/lookup/IngredientDatabaseLookup.tsx`, `kitchen/lookup/parseIngredientNutritionFromForm.ts`, `kitchen/MenuDetailPage.tsx`, `kitchen/MenuDetailsEditor.tsx`, `kitchen/MenuDishManager.tsx`, `kitchen/menuPdf.ts`, `kitchen/MenuPriceChangePlanner.tsx`, `kitchen/MenuProfitabilityAnalysis.ts`, `kitchen/MenuProfitabilityPanel.tsx`, `kitchen/menuTemplates.ts`, `kitchen/prepQuantityLabel.ts`, `kitchen/prepTaskCheck.ts`, `kitchen/prepTaskQuantity.ts`, `kitchen/PrepTaskRow.tsx`, `kitchen/PrepTemplateQuantityCoordinator.ts`, `kitchen/prepTiming.ts`, `kitchen/PublishedMethodPanel.tsx`, `kitchen/RecipeEditionNotice.tsx`, `kitchen/recipeEquipment.ts`, `kitchen/RecipeNotes.tsx`, `kitchen/useEventMenuSync.ts`, `kitchen/VendorItemsPanel.tsx`, `kitchen/VendorPriceComparisonPanel.tsx`, `production/BatchAllocationsPanel.tsx`, `production/batchCompletion.ts`, `production/BatchCompletionFields.tsx`, `production/BatchShortfallPanel.tsx`, `production/KitchenDisplayPage.tsx`, `production/KitchenDisplayTaskFacts.tsx`, `production/PrepActionReasonForm.tsx`, `production/PrepBoardPage.tsx`, `production/PrepTaskCommentThread.tsx`, `production/PrepTaskDependencies.ts`, `production/ProductionFailureBanner.tsx`, `production/ProductionLifecyclePolicy.ts`, `production/ProductionPlanPage.tsx`, `production/productionRoutes.ts`, `production/ProductionWorkspaceNav.tsx`, `production/productionYield.ts`, `production/ProductionYieldDashboardPage.tsx`
 
 ### Generated reads
 
@@ -1286,12 +1295,20 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listDishIngredient` - live read
 - `queries.listDishTask` - live read
 - `queries.listDishTaskMaterial` - live read
+- `queries.listEquipment` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
+- `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverride` - live read
-- `queries.listEventGuest` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listIngredientPriceObservation` - live read
 - `queries.listInventoryItem` - live read
 - `queries.listInventoryLot` - live read
@@ -1301,14 +1318,19 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listMenu` - live read
 - `queries.listMenuDish` - live read
 - `queries.listOrganization` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTask` - live read
+- `queries.listPrepTaskByEventId` - live read
 - `queries.listPrepTaskComment` - live read
 - `queries.listPrepTaskDependency` - live read
 - `queries.listProductionBatch` - live read
 - `queries.listProductionBatchAllocation` - live read
+- `queries.listProposalByEventId` - live read
 - `queries.listQualityCheck` - live read
-- `queries.listReviewFlag` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listShiftByEventId` - live read
 - `queries.listStation` - live read
 - `queries.listVendor` - live read
 - `queries.listVendorItem` - live read
@@ -1563,6 +1585,13 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen staff and managers may see dish task templates"; "Kitchen staff and managers may update dish task templates"; "Kitchen staff and managers may change dish task templates"; "Guard 0 failed"; "Guard 1 failed"; "This dish task needs a reason before you retire it. Write why you're taking it off."; and 2 more
   - effects: DishTaskRetired
+  - refresh: live reads update by themselves; reads affected: DishTask.list, DishTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get and 4 more
+- `mutations.DishTask_revise` (DishTask.revise)
+  - inputs from the screen: name, category, taskType, defaultQuantity, defaultUnit, station, sortOrder, componentId, ingredientId, instructions, synchronizePrep; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see dish task templates"; "Kitchen staff and managers may update dish task templates"; "Kitchen staff and managers may change dish task templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: DishTaskRevised
   - refresh: live reads update by themselves; reads affected: DishTask.list, DishTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get and 4 more
 - `mutations.DishTask_specifyWork` (DishTask.specifyWork)
   - inputs from the screen: stage, resolution, choiceOptions, leadTimeMinDays, leadTimeMaxDays, sequenceAfterDishTaskId, stationId; filled by the server: none
@@ -2204,12 +2233,17 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.publishRecipeEdition` - mutation; authored step; live reads update by themselves
 - `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMenuLookup.forDish` - query; live read, updates by itself
+- `eventMenuLookup.forEvents` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
 - `ingredientLookup.applyCostToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
@@ -2236,6 +2270,7 @@ Screens (158): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `menuRecipeLookup.forDishes` - query; live read, updates by itself
 
 ## 5. Timeline and route
 
@@ -2244,14 +2279,23 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 ### Generated reads
 
 - `queries.getEvent` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
-- `queries.listEventAssignment` - live read
-- `queries.listEventStaffNeed` - live read
-- `queries.listEventTimelineActivity` - live read
-- `queries.listEventTimelineComment` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listOperatingLocation` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPerson` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listShift` - live read
+- `queries.listShiftByEventId` - live read
 
 ### Generated actions
 
@@ -2325,6 +2369,13 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
   - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: EventVehicleLoadingZoneSet
   - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_setTripCost` (EventVehicleAssignment.setTripCost)
+  - inputs from the screen: tripCost; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Trip cost can't be negative. Use zero or more."; and 2 more
+  - effects: EventVehicleTripCostSet
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
 - `mutations.Event_chooseOperatingLocation` (Event.chooseOperatingLocation)
   - inputs from the screen: operatingLocationId; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -2381,6 +2432,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -2417,27 +2469,37 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listAvailabilityWindow` - live read
 - `queries.listCandidate` - live read
 - `queries.listDelivery` - live read
-- `queries.listDish` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
+- `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventCloseout` - live read
-- `queries.listEventDish` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listEventStaffNeed` - live read
-- `queries.listEventTimelineActivity` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listInterview` - live read
 - `queries.listOneOnOne` - live read
 - `queries.listOneOnOneAction` - live read
 - `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPackListItem` - live read
 - `queries.listPerformanceReview` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTask` - live read
+- `queries.listPrepTaskByEventId` - live read
 - `queries.listPrepTaskDependency` - live read
+- `queries.listProposalByEventId` - live read
 - `queries.listQualification` - live read
 - `queries.listRecurringAvailability` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listRoleScorecard` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShift` - live read
+- `queries.listShiftByEventId` - live read
 - `queries.listShiftSwapRequest` - live read
 - `queries.listShiftType` - live read
 - `queries.listStaffNeedWaitlistEntry` - live read
@@ -2997,10 +3059,10 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - effects: TimeRecordApproved
   - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.TimeRecord_clockOut` (TimeRecord.clockOut)
-  - inputs from the screen: breakMinutes, notes, paidBreakMinutes; filled by the server: none
+  - inputs from the screen: breakMinutes, notes, paidBreakMinutes, latitude, longitude, accuracyMeters; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
   - effects: TimeRecordClockedOut
   - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.TimeRecord_correct` (TimeRecord.correct)
@@ -3074,12 +3136,17 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `candidateHireRevocation.revokeHire` - mutation; authored step; live reads update by themselves
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMenuLookup.forDish` - query; live read, updates by itself
+- `eventMenuLookup.forEvents` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
@@ -3103,6 +3170,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `teamChat.searchLinkTargets` - query; live read, updates by itself
 - `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
 - `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
+- `vendorNames.active` - query; live read, updates by itself
 - `workforceScheduling.autoFillEventStaffNeeds` - mutation; authored step; live reads update by themselves
 - `workforceScheduling.scheduleShift` - mutation; authored step; live reads update by themselves
 - `workforceScheduling.suggestStaffForNeed` - query; live read, updates by itself
@@ -3116,7 +3184,6 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `queries.getPackList` - live read
 - `queries.listDelivery` - live read
 - `queries.listDepartureOverride` - live read
-- `queries.listDish` - live read
 - `queries.listEquipment` - live read
 - `queries.listEquipmentReservation` - live read
 - `queries.listEvent` - live read
@@ -3565,11 +3632,14 @@ Screens (28): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 ### Authored reads and steps
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
 - `driverAssignment.assign` - mutation; authored step; live reads update by themselves
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3605,14 +3675,27 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `queries.listEquipmentMaintenanceTask` - live read
 - `queries.listEquipmentPart` - live read
 - `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEquipmentServiceEntry` - live read
 - `queries.listEvent` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSection` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPackListItem` - live read
 - `queries.listPerson` - live read
-- `queries.listRentalOrderLine` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listShiftByEventId` - live read
+- `queries.listStorageLocation` - live read
 - `queries.listVenueLayoutTemplate` - live read
 
 ### Generated actions
@@ -3698,70 +3781,70 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EquipmentImageChanged
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_createViaRegister` (Equipment.register)
   - inputs from the screen: name, assetTag, category, ownership, quantity, purchaseValue, condition, trackingMode, serialNumber, description, countUnit, replacementCost, customerPrice, vendorId, homeLocation; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Give this equipment a name."; and 7 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Give this equipment a name."; and 7 more
   - effects: EquipmentRegistered
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_reactivate` (Equipment.reactivate)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: EquipmentReactivated
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_recount` (Equipment.recount)
   - inputs from the screen: actualQuantity; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "This equipment's counted amount can't be negative. Use zero or more."; and 3 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "This equipment's counted amount can't be negative. Use zero or more."; and 3 more
   - effects: EquipmentRecounted
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_retire` (Equipment.retire)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: EquipmentRetired
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_reviseDetails` (Equipment.reviseDetails)
   - inputs from the screen: name, category, ownership, purchaseValue, homeLocation, currentLocation, trackingMode, serialNumber, description, countUnit, replacementCost, customerPrice, vendorId; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
   - effects: EquipmentDetailsRevised
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_setCustomFields` (Equipment.setCustomFields)
   - inputs from the screen: customFieldsJson; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EquipmentCustomFieldsSet
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_setPrimaryImage` (Equipment.setPrimaryImage)
   - inputs from the screen: storageId, fileName; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Add a photo before you set it as the main picture."; and 2 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Add a photo before you set it as the main picture."; and 2 more
   - effects: EquipmentImageChanged
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_transfer` (Equipment.transfer)
   - inputs from the screen: toLocation, note; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Say where the equipment is going."; and 2 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Say where the equipment is going."; and 2 more
   - effects: EquipmentTransferred
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_updateCondition` (Equipment.updateCondition)
   - inputs from the screen: condition, note; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EquipmentConditionUpdated
   - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.EventLayoutSection_createViaAdd` (EventLayoutSection.add)
@@ -3838,6 +3921,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
@@ -3855,7 +3939,19 @@ Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 ### Generated reads
 
 - `queries.getEvent` - live read
-- `queries.listReviewFlag` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listShiftByEventId` - live read
 
 ### Generated actions
 
@@ -3964,7 +4060,7 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
 - `queries.listEventCloseout` - live read
-- `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
 - `queries.listIngredientPriceObservation` - live read
@@ -4342,6 +4438,7 @@ Screens (66): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself

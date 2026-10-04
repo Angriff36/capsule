@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 import {
   useListComponent,
   useListPerson,
-  useListDish,
-  useListDishIngredient,
-  useListEventDish,
-  useListIngredient,
-  useListPrepTask,
 } from "../../lib/manifest-convex-react";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useEventPrepTasks } from "../../lib/useEventRows";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
@@ -26,13 +25,15 @@ type Props = {
 };
 
 export function EventPrepTab({ eventId, eventStage }: Props) {
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
+  const eventDishes = useEventMenuLines(eventId);
   const components = useListComponent();
   const people = useListPerson();
-  const dishIngredients = useListDishIngredient();
-  const ingredients = useListIngredient();
-  const prepTasks = useListPrepTask();
+  // The menu's dish lines and ingredients only. Recipes stay the whole list:
+  // a prep step can name a sub-recipe that is not on a dish directly.
+  const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));
+  const dishIngredients = recipe?.dishIngredients;
+  const ingredients = recipe?.ingredients;
+  const prepTasks = useEventPrepTasks(eventId);
   const { ready, syncPrepForDish } = useEventMenuSync();
   const [busy, setBusy] = useState(false);
   const { notice, setNotice } = useActionNotice();
@@ -54,6 +55,15 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           row.status !== "cancelled",
       ),
     [eventId, prepTasks],
+  );
+  // Only the dishes this event's menu lines and prep tasks name.
+  const dishes = useDishesByIds(
+    eventDishes === undefined || prepTasks === undefined
+      ? undefined
+      : [
+          ...eventDishes.map((row) => row.dishId),
+          ...tasks.map((row) => row.dishId),
+        ],
   );
 
   const recipeFlags = useMemo(() => {

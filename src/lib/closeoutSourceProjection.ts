@@ -16,6 +16,7 @@ export type CloseoutLineKey =
   | "labor"
   | "vendor"
   | "commission"
+  | "transport"
   | "headcount";
 
 export type CloseoutSourceRecord = {
@@ -104,6 +105,10 @@ export type ProjectionAttribution = Versioned & {
   allocatedAmount: number;
 };
 export type ProjectionGuest = Versioned & { checkedInAt?: number | null };
+export type ProjectionTruckRun = Versioned & {
+  label: string;
+  tripCost?: number | null;
+};
 
 export type CloseoutProjectionInput = {
   event: {
@@ -121,6 +126,8 @@ export type CloseoutProjectionInput = {
   equipmentIssues: ProjectionEquipmentIssue[];
   attributions: ProjectionAttribution[];
   guests: ProjectionGuest[];
+  /** The event's truck runs and vendor drops still on it (not released). */
+  truckRuns?: ProjectionTruckRun[];
 };
 
 export type CloseoutCaptureValues = {
@@ -416,6 +423,34 @@ function commissionLine(input: CloseoutProjectionInput): CloseoutLine {
   };
 }
 
+// Transport (BE-20.1-20): the trip cost typed on each truck run or vendor drop
+// (a hired truck's bill, a delivery fee, fuel and tolls). A run with no cost
+// counts as nothing and is named in the note; it does not hold up the
+// closeout, the same as an event with no waste.
+function transportLine(input: CloseoutProjectionInput): CloseoutLine {
+  const sources: CloseoutSourceRecord[] = [];
+  let total = 0;
+  const unpriced: string[] = [];
+  for (const run of live(input.truckRuns ?? [])) {
+    if (run.tripCost == null) {
+      unpriced.push(run.label);
+      continue;
+    }
+    const amount = cents(run.tripCost);
+    total += amount;
+    sources.push(ref("eventVehicleAssignments", run, amount, run.label));
+  }
+  return {
+    key: "transport",
+    label: "Transport",
+    planned: null,
+    actual: money(total),
+    complete: true,
+    note: unpriced.length > 0 ? `No trip cost on ${unpriced.join(", ")}` : null,
+    sources,
+  };
+}
+
 function headcountLine(input: CloseoutProjectionInput): CloseoutLine {
   const checkedIn = live(input.guests).filter(
     (guest) => guest.checkedInAt != null,
@@ -444,6 +479,7 @@ export function projectCloseoutSources(
     laborLine(input),
     vendorLine(input),
     commissionLine(input),
+    transportLine(input),
     headcountLine(input),
   ];
   const incomplete = lines.filter((line) => !line.complete).map((l) => l.key);
@@ -463,8 +499,9 @@ export function projectCloseoutSources(
 /**
  * The capture numbers: each line's record total, or the amount a person
  * entered for a line the records cannot answer. A line with neither is an
- * error - Capsule never stores a made-up zero. Commission is a cost, so it
- * is added to the "vendor and other" amount the closeout stores.
+ * error - Capsule never stores a made-up zero. Commission and transport are
+ * costs, so they are added to the "vendor and other" amount the closeout
+ * stores.
  */
 export function closeoutCaptureValues(
   projection: CloseoutProjection,
@@ -495,7 +532,9 @@ export function closeoutCaptureValues(
   const actualWasteCost = amount("waste");
   const actualLaborCost = amount("labor");
   const actualVendorCost = money(
-    cents(amount("vendor")) + cents(amount("commission")),
+    cents(amount("vendor")) +
+      cents(amount("commission")) +
+      cents(amount("transport")),
   );
   const actualHeadcount = Math.trunc(amount("headcount"));
   const totalActualCost = money(

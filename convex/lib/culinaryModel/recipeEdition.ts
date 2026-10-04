@@ -35,6 +35,13 @@ export interface PublishedEditionSubRecipeLine {
   quantityBasis?: string | null;
 }
 
+/** One numbered method step as published; cooks read these while a draft is open. */
+export interface PublishedEditionStep {
+  instruction: string;
+  sortOrder: number;
+  durationMinutes?: number | null;
+}
+
 export interface PublishedEdition {
   edition: typeof PUBLISHED_EDITION;
   versionNumber: number;
@@ -49,7 +56,17 @@ export interface PublishedEdition {
   servesPerYield: number;
   lines: PublishedEditionLine[];
   componentLines: PublishedEditionSubRecipeLine[];
+  /** Absent on editions published before steps were kept. */
+  steps?: PublishedEditionStep[];
 }
+
+type StepRow = {
+  instruction: string;
+  sortOrder: number;
+  durationMinutes?: number | null;
+  addedAt?: number | null;
+  deletedAt?: number | null;
+};
 
 type RecipeRow = {
   name: string;
@@ -97,6 +114,7 @@ export function buildPublishedEdition(
   ingredientLines: IngredientLineRow[],
   subRecipeLines: SubRecipeLineRow[],
   ingredientName: (id: string) => string,
+  steps: StepRow[] = [],
 ): PublishedEdition {
   return {
     edition: PUBLISHED_EDITION,
@@ -132,6 +150,14 @@ export function buildPublishedEdition(
       wasteFactor: l.wasteFactor ?? 1,
       quantityBasis: l.quantityBasis ?? null,
     })),
+    steps: steps
+      .filter(liveLine)
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((s) => ({
+        instruction: s.instruction,
+        sortOrder: s.sortOrder,
+        durationMinutes: s.durationMinutes ?? null,
+      })),
   };
 }
 

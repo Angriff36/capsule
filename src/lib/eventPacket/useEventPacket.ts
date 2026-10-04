@@ -2,6 +2,7 @@ import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { api, type Id } from "../api";
 import { importSources } from "./importSources";
 import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
+import { venueMapPicture } from "./venueMapPicture";
 import type { EventPacketSnapshot, FieldValue } from "./model";
 import type { FinalLockPrint } from "./finalLock/evaluate";
 import type { PacketWorkbookSummary } from "./summaryProjection";
@@ -119,12 +120,13 @@ export function useEventPacket(eventId: Id<"events">) {
         read: async () =>
           (await client.query(commands.getPacket, { eventId })) as PacketView,
         upload,
-        files: async () => {
+        files: async (snapshot) => {
           const listed = (await client.query(commands.packetPrintFiles, {
             eventId,
           })) as { name: string; contentType: string; url: string }[];
-          return Promise.all(
-            listed.map(async (file) => {
+          const [map, ...kept] = await Promise.all([
+            venueMapPicture(snapshot.native?.route.venueAddress),
+            ...listed.map(async (file) => {
               const response = await fetch(file.url);
               // An unreadable file still gets a page that names it.
               const bytes = response.ok
@@ -132,7 +134,8 @@ export function useEventPacket(eventId: Id<"events">) {
                 : new Uint8Array();
               return { name: file.name, contentType: file.contentType, bytes };
             }),
-          );
+          ]);
+          return map ? [map, ...kept] : kept;
         },
         record: async (input) =>
           record({

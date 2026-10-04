@@ -189,7 +189,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border px-5 text-base font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border px-5 py-1 text-center text-base leading-tight font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
   }
   .btn-primary {
     @apply border-brand bg-brand text-white hover:-translate-y-px hover:bg-ink;
@@ -205,7 +205,31 @@
     @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
   }
   .btn-sm {
-    @apply h-8 px-3.5 text-sm;
+    @apply min-h-8 px-3.5 text-sm;
+  }
+  /* Every file picker gets the small ghost button look. The browser's own
+     grey "Choose File" box read as plain text on a phone, on every import. */
+  input[type="file"] {
+    max-width: 100%;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+  }
+  input[type="file"]::file-selector-button {
+    margin-right: 0.75rem;
+    min-height: 2rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--color-line-2);
+    border-radius: var(--radius-pill);
+    background: var(--color-panel);
+    color: var(--color-ink);
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  input[type="file"]:hover::file-selector-button {
+    border-color: var(--color-brand);
   }
   .input {
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink shadow-[inset_0_1px_1px_rgb(36_50_45/0.06)] placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-inset disabled:text-ink-3 disabled:shadow-none;
@@ -1254,7 +1278,7 @@
     height: 78px;
     border-top: 1px solid var(--color-accent);
     border-bottom: 1px solid var(--color-line);
-    content: "HOUSE\A COMPONENTS";
+    content: attr(data-label);
     color: var(--color-brand);
     font-family: var(--font-display);
     font-size: 18px;
@@ -2200,6 +2224,47 @@
     overflow-x: auto;
     overscroll-behavior-x: contain;
     white-space: nowrap;
+  }
+  /* Opt-in for tables people work in on a phone: one card per row, each
+     value led by its data-label. Rows with actions in a hidden column grew
+     very tall and the first column was cut at the screen edge. */
+  .workspace-sheet table.phone-cards {
+    display: block;
+    min-width: 0;
+    overflow-x: visible;
+    white-space: normal;
+  }
+  table.phone-cards thead {
+    display: none;
+  }
+  table.phone-cards tbody,
+  table.phone-cards tr,
+  table.phone-cards td {
+    display: block;
+    width: 100%;
+  }
+  table.phone-cards tr {
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-line);
+    border-bottom: 0;
+  }
+  table.phone-cards tbody tr:first-child {
+    border-top: 0;
+  }
+  table.phone-cards td {
+    max-width: none;
+    padding: 0.1rem 0;
+    border-top: 0;
+    text-align: left;
+    white-space: normal;
+  }
+  table.phone-cards td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: var(--color-ink-3);
+  }
+  /* A cell that only repeats the group heading above the cards. */
+  table.phone-cards td.phone-hide {
+    display: none;
   }
 }
 

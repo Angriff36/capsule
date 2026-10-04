@@ -230,7 +230,7 @@ export const publishRecipeEdition = mutation({
       version: args.version,
     });
     const recipe = await requireRecipe(ctx, tenantId, args.componentId);
-    const [ingredientLines, subRecipeLines] = await Promise.all([
+    const [ingredientLines, subRecipeLines, steps] = await Promise.all([
       ctx.db
         .query("componentIngredients")
         .withIndex("by_componentId", (q) =>
@@ -239,6 +239,12 @@ export const publishRecipeEdition = mutation({
         .collect(),
       ctx.db
         .query("componentComponents")
+        .withIndex("by_componentId", (q) =>
+          q.eq("componentId", args.componentId),
+        )
+        .collect(),
+      ctx.db
+        .query("componentSteps")
         .withIndex("by_componentId", (q) =>
           q.eq("componentId", args.componentId),
         )
@@ -273,6 +279,7 @@ export const publishRecipeEdition = mutation({
         .filter((l) => l.tenantId === tenantId)
         .map((l) => ({ ...l, quantity: Number(l.quantity) })),
       (id) => names.get(id) ?? "Unknown ingredient",
+      steps.filter((s) => s.tenantId === tenantId),
     );
     await ctx.runMutation(api.mutations.ComponentSnapshot_createViaCapture, {
       componentId: String(args.componentId),

@@ -794,7 +794,17 @@ function as(t: Harness, caller: Caller): Harness {
 
 type Outcome = { value: unknown } | { error: string };
 
+// The probes only await promises, so the worker never reaches its message
+// queue on its own; after a minute the test runner's own calls time out
+// ("Timeout calling onTaskUpdate") and fail the run though every test
+// passed. Hand the queue a turn about once a second.
+let lastBreak = performance.now();
+
 async function run(h: Harness, entry: Entry, args: Doc): Promise<Outcome> {
+  if (performance.now() - lastBreak > 1000) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    lastBreak = performance.now();
+  }
   try {
     const value =
       entry.kind === "query"

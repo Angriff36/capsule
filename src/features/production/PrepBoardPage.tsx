@@ -4,8 +4,6 @@ import {
   useCreatePrepTask,
   useCreatePrepTaskDependency,
   useCreateQualityCheck,
-  useListDish,
-  useListEventDish,
   useListIngredient,
   useListPrepTask,
   useListPrepTaskComment,
@@ -30,7 +28,11 @@ import {
 } from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
-import { useEventsById } from "../facilities/useEventsById";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
+
+const DAY = 86_400_000;
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
@@ -86,7 +88,26 @@ export function PrepBoardPage() {
   const tasks = useListPrepTask();
   const dependencies = useListPrepTaskDependency();
   const checks = useListQualityCheck();
-  const eventDishes = useListEventDish();
+  // Menu lines of the next 60 days' events (the new-task list) and of the
+  // events the tasks belong to, never every event's (PL-SCALE).
+  const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
+  const upcoming = useEventsInRange({
+    from: today - DAY,
+    to: today + 60 * DAY,
+  });
+  const lineEventIds = useMemo(
+    () =>
+      tasks === undefined || upcoming === undefined
+        ? undefined
+        : [
+            ...upcoming.map((event) => event._id),
+            ...tasks
+              .filter((task) => task.deletedAt == null)
+              .map((task) => task.eventId),
+          ],
+    [tasks, upcoming],
+  );
+  const eventDishes = useMenuLinesForEvents(lineEventIds);
   // Names only: read the events these tasks and dishes belong to (PL-SCALE).
   const eventIds = useMemo(
     () =>
@@ -99,7 +120,23 @@ export function PrepBoardPage() {
     [tasks, eventDishes],
   );
   const events = useEventsById(eventIds);
-  const dishes = useListDish();
+  // Only the dishes these tasks and menu lines name (open tasks first, as
+  // one read takes at most 500 dishes), never the whole dish list.
+  const dishes = useDishesByIds(
+    useMemo(
+      () =>
+        tasks === undefined || eventDishes === undefined
+          ? undefined
+          : [
+              ...tasks
+                .filter((task) => String(task.status) !== "completed")
+                .map((task) => task.dishId),
+              ...eventDishes.map((row) => row.dishId),
+              ...tasks.map((task) => task.dishId),
+            ],
+      [tasks, eventDishes],
+    ),
+  );
   const ingredients = useListIngredient();
   const comments = useListPrepTaskComment();
   const createTask = useCreatePrepTask();

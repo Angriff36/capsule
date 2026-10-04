@@ -88,6 +88,13 @@ export function projectProposalPdf(
         dishSelections: Array.isArray(frozen.dishSelections)
           ? frozen.dishSelections
           : [],
+        // AC-654: the pictures frozen at send; none on older sends.
+        menuPictures: Array.isArray(frozen.pictures)
+          ? frozen.pictures.map((picture: any) => ({
+              dishName: String(picture.dishName ?? ""),
+              storageId: picture.storageId ?? null,
+            }))
+          : [],
         pricingLines: (frozen.lineItems ?? []).map((line: any) => ({
           description: line.description,
           pricingBasis: line.pricingBasis as PricingBasis,

@@ -926,6 +926,10 @@ export function App() {
               }
             />
             <Route
+              path="/inventory/orders"
+              element={<Navigate to="/inventory/purchasing" replace />}
+            />
+            <Route
               path="/inventory/orders/:id"
               element={
                 <SupplyRoute>

@@ -8,6 +8,7 @@ import {
   useEquipmentTransfer,
   useEquipmentUpdateCondition,
   useListEquipment,
+  useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { formatMoney } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
@@ -25,6 +26,8 @@ import {
   EQUIPMENT_CONDITIONS as CONDITIONS,
   EquipmentForm,
   equipmentCatalogFields,
+  equipmentPlaceChoices,
+  matchEquipmentPlace,
   type EquipmentDetailRow,
   type VendorChoice,
 } from "./EquipmentForm";
@@ -51,6 +54,13 @@ export function EquipmentCatalogPage() {
 
   const rows = (equipment ?? []).filter((item) => item.deletedAt == null);
   const detailItem = rows.find((item) => item._id === detailId) ?? null;
+  const storagePlaces = useListStorageLocation();
+  const places = equipmentPlaceChoices(
+    rows,
+    (storagePlaces ?? [])
+      .filter((place) => place.status === "active")
+      .map((place) => place.name),
+  );
   const activeRows = rows.filter((item) => item.status === "active");
   const ownedValue = activeRows
     .filter((item) => item.ownership === "owned")
@@ -85,7 +95,7 @@ export function EquipmentCatalogPage() {
         quantity: Number(data.get("quantity")),
         purchaseValue: Number(data.get("purchaseValue")),
         condition: String(data.get("condition")) as (typeof CONDITIONS)[number],
-        ...equipmentCatalogFields(data),
+        ...equipmentCatalogFields(data, places),
       });
       element.reset();
       setShowForm(false);
@@ -106,9 +116,15 @@ export function EquipmentCatalogPage() {
         category: String(data.get("category") ?? "").trim(),
         ownership: String(data.get("ownership")) as "owned" | "rented",
         purchaseValue: Number(data.get("purchaseValue")),
-        ...equipmentCatalogFields(data),
-        homeLocation: String(data.get("homeLocation") ?? "").trim(),
-        currentLocation: String(data.get("currentLocation") ?? "").trim(),
+        ...equipmentCatalogFields(data, places),
+        homeLocation: matchEquipmentPlace(
+          String(data.get("homeLocation") ?? ""),
+          places,
+        ),
+        currentLocation: matchEquipmentPlace(
+          String(data.get("currentLocation") ?? ""),
+          places,
+        ),
       });
       element.reset();
       setEditing(null);
@@ -173,12 +189,22 @@ export function EquipmentCatalogPage() {
               label: "New place",
               defaultValue: "",
               required: true,
+              suggestions: places,
+              helper: "Pick a place already in use, or type a new one.",
             },
-            { name: "note", label: "Note (optional)", defaultValue: "" },
+            {
+              name: "note",
+              label: "Note (optional)",
+              defaultValue: "",
+              required: false,
+            },
           ],
           confirmLabel: "Move it",
         });
-        const toLocation = values?.toLocation?.trim();
+        const toLocation = matchEquipmentPlace(
+          values?.toLocation ?? "",
+          places,
+        );
         if (!toLocation) return;
         await transfer({
           ...base,
@@ -280,6 +306,7 @@ export function EquipmentCatalogPage() {
           onSubmit={submit}
           onClose={() => setShowForm(false)}
           vendors={vendors}
+          places={places}
         />
       ) : null}
       {editing ? (
@@ -289,6 +316,7 @@ export function EquipmentCatalogPage() {
           onClose={() => setEditing(null)}
           editItem={editing}
           vendors={vendors}
+          places={places}
         />
       ) : null}
       {detailItem ? (

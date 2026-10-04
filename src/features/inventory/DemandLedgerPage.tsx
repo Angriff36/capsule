@@ -305,7 +305,7 @@ export function DemandLedgerPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Event</th>
@@ -345,7 +345,7 @@ export function DemandLedgerPage() {
                         </tr>
                       ) : null}
                       <tr>
-                        <td>
+                        <td className="phone-hide">
                           <strong>{eventName(demand.eventId)}</strong>
                         </td>
                         <td>
@@ -372,7 +372,7 @@ export function DemandLedgerPage() {
                             );
                           })()}
                         </td>
-                        <td className="supply-number">
+                        <td className="supply-number" data-label="Required">
                           {demand.requiredQuantity} {demand.unit}
                           {(() => {
                             const anomaly = anomalies.get(demand._id);
@@ -395,10 +395,10 @@ export function DemandLedgerPage() {
                             );
                           })()}
                         </td>
-                        <td>
+                        <td data-label="State">
                           <StatusChip status={String(demand.status)} />
                         </td>
-                        <td>
+                        <td data-label="Purchase">
                           {need ? (
                             <StatusChip status={String(need.status)} />
                           ) : (

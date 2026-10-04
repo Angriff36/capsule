@@ -109,7 +109,8 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   transition status from "retired" to ["active"]
 
   // Logistics staff read/execute too: pack-out and event checkout consume this catalog.
-  default policy equipmentRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may see equipment"
+  // Kitchen staff read it so a recipe's equipment comes from the same list.
+  default policy equipmentRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") "Inventory, logistics or kitchen staff may see equipment"
   default policy equipmentWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment"
   default policy equipmentExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment"
 

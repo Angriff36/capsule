@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
-  useListDish,
-  useListEventDish,
   useListPerson,
   useListInvoice,
   useListPrepTask,
@@ -21,6 +19,8 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { useEventsInRange } from "../facilities/useEventsById";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
@@ -75,8 +75,6 @@ import { prepTimeLabel } from "./prepTiming";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
   const components = useListComponent();
   const tasks = useListPrepTask();
   const invoices = useListInvoice();
@@ -122,6 +120,24 @@ export function KitchenDashboardPage() {
     from: horizon.start().getTime(),
     to: horizon.end().getTime(),
   });
+  // Menu lines of those events only, never every event's (PL-SCALE).
+  const eventDishes = useMenuLinesForEvents(
+    useMemo(() => events?.map((event) => event._id), [events]),
+  );
+  // Only the dishes those events' menu lines and prep tasks name.
+  const dishes = useDishesByIds(
+    useMemo(() => {
+      if (events === undefined || eventDishes === undefined || !tasks)
+        return undefined;
+      const inWindow = new Set(events.map((event) => String(event._id)));
+      return [
+        ...eventDishes.map((row) => row.dishId),
+        ...tasks
+          .filter((task) => inWindow.has(String(task.eventId)))
+          .map((task) => task.dishId),
+      ];
+    }, [eventDishes, events, tasks]),
+  );
 
   const model = useMemo(
     () =>
@@ -1143,7 +1159,7 @@ export function KitchenDashboardPage() {
           </label>
           <select
             id="kcd-m-service"
-            className="input h-11 min-w-0 flex-1"
+            className="input order-last h-11 min-w-0 basis-full"
             value={selectedEventId}
             onChange={(e) => pickEvent(e.target.value)}
           >

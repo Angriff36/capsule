@@ -209,6 +209,25 @@ export function SharedProposalPage({ token }: { token: string }) {
         </div>
       </div>
     ) : null;
+  // AC-654: the dishes' pictures, kept with the menu.
+  const picturesBlock =
+    sectionVisible("menu_sections") && data.pictures.length > 0 ? (
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {data.pictures.map((picture, index) => (
+          <figure key={index}>
+            <img
+              className="aspect-[4/3] w-full rounded-sm object-cover"
+              src={picture.imageUrl}
+              alt={picture.dishName}
+              loading="lazy"
+            />
+            <figcaption className="mt-1 text-2xs text-ink-3">
+              {picture.dishName}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    ) : null;
   const timelineBlock =
     sectionVisible("timeline") && data.timeline.length > 0 ? (
       <div className="mb-6">
@@ -341,7 +360,7 @@ export function SharedProposalPage({ token }: { token: string }) {
   // and total together when moved.
   const blocks: Record<string, ReactNode[]> = {
     event_summary: [eventSummaryBlock],
-    menu_sections: [menuBlock],
+    menu_sections: [menuBlock, picturesBlock],
     timeline: [timelineBlock],
     venue_logistics: [venueBlock],
     pricing_summary: [pricingBreakdownBlock, pricingTotalBlock],
@@ -354,6 +373,7 @@ export function SharedProposalPage({ token }: { token: string }) {
     : [
         eventSummaryBlock,
         menuBlock,
+        picturesBlock,
         timelineBlock,
         venueBlock,
         pricingBreakdownBlock,

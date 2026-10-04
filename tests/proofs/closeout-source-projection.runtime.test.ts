@@ -207,9 +207,20 @@ describe("closeout numbers come from Capsule's records (AC-625, AC-628, AC-386)"
     const events = rolesFor(proof, T).events;
     expect(await readSources(kitchen, eventId)).toBeNull();
     expect(await readSources(outsider, eventId)).toBeNull();
-    expect((await readSources(events, eventId))!.projection.lines).toHaveLength(
-      7,
-    );
+    // Revenue, ingredients, waste, labor, vendors, commission, transport
+    // (ee2d6374) and headcount.
+    expect(
+      (await readSources(events, eventId))!.projection.lines.map((l) => l.key),
+    ).toEqual([
+      "revenue",
+      "ingredient",
+      "waste",
+      "labor",
+      "vendor",
+      "commission",
+      "transport",
+      "headcount",
+    ]);
     await expect(
       proof.executeCommand(
         outsider,

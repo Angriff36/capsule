@@ -76,6 +76,13 @@ describe("proposal public renderers", () => {
           serviceStyle: null,
         },
       ],
+      // AC-654: the dish picture shows with the menu, named under it.
+      pictures: [
+        {
+          dishName: "Roasted carrots",
+          imageUrl: "https://files.example/carrots.jpg",
+        },
+      ],
       timeline: [
         {
           name: "Hidden timeline activity",
@@ -93,6 +100,8 @@ describe("proposal public renderers", () => {
     );
     expect(text).toContain("Valid through");
     expect(text).toContain("Roasted carrots");
+    // Menu line + picture caption.
+    expect(text.split("Roasted carrots")).toHaveLength(3);
     expect(text).toContain("Frozen client note");
     expect(text).toContain("Frozen terms");
     expect(text).not.toContain("Hidden timeline activity");
@@ -193,6 +202,7 @@ describe("proposal public renderers", () => {
       lineItems: [],
       enhancements: [],
       dishSelections: [],
+      pictures: [],
       timeline: [
         {
           name: "Dinner service",

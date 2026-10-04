@@ -204,12 +204,8 @@ describe("timing proof: busy screens' reads at 10,000 events and 5,000 dishes (A
       ),
     );
     timings.push(
-      await time("Event picker window (eventLookup.range)", () =>
-        owner.query(api.eventLookup.range, {
-          from: today - 183 * DAY,
-          to: today + 731 * DAY,
-          withUndated: true,
-        }),
+      await time("Event picker (eventLookup.picker)", () =>
+        owner.query(api.eventLookup.picker, { today }),
       ),
     );
     timings.push(

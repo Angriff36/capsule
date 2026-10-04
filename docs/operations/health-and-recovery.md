@@ -6,6 +6,12 @@ The rules live in `src/lib/operationalHealth.ts`; proof
 `tests/operational-health-classification.test.ts`. This page is the longer
 version of each next step.
 
+Every "Needs action" item except "server not answering" also shows in each
+manager's notification bell on every screen, labelled "System health", and
+opens this list (`convex/systemHealthNotices.ts`; proof
+`tests/proofs/system-health-notices.runtime.test.ts`). "Check" items stay on
+the list only.
+
 The list reads only the manager's own company. It shows counts and states,
 never provider error text, so no key, token or address reaches the screen.
 

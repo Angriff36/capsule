@@ -103,6 +103,138 @@ vi.mock("convex/react", async (importOriginal) => {
           capped: false,
         };
       }
+      // One event's menu lines: the test's menu line rows for that event.
+      if (
+        name === "queries:listEventDishByEventId" &&
+        !backend.values.has(name)
+      ) {
+        const { eventId } = args as { eventId: string };
+        const rows = (backend.values.get("useListEventDish") ?? []) as {
+          eventId?: string;
+          deletedAt?: number | null;
+        }[];
+        return rows.filter(
+          (row) => row.eventId === eventId && row.deletedAt == null,
+        );
+      }
+      // One event's guests or prep tasks: the test's rows for that event.
+      for (const [query, hook] of [
+        ["queries:listEventGuestByEventId", "useListEventGuest"],
+        ["queries:listPrepTaskByEventId", "useListPrepTask"],
+        ["queries:listReviewFlagByEventId", "useListReviewFlag"],
+        ["queries:listProposalByEventId", "useListProposal"],
+        ["queries:listEventAssignmentByEventId", "useListEventAssignment"],
+        ["queries:listEventStaffNeedByEventId", "useListEventStaffNeed"],
+        ["queries:listShiftByEventId", "useListShift"],
+        ["queries:listPackListByEventId", "useListPackList"],
+        ["queries:listIngredientDemandByEventId", "useListIngredientDemand"],
+        [
+          "queries:listEquipmentReservationByEventId",
+          "useListEquipmentReservation",
+        ],
+        ["queries:listRentalOrderLineByEventId", "useListRentalOrderLine"],
+        [
+          "queries:listEventTimelineCommentByEventId",
+          "useListEventTimelineComment",
+        ],
+        [
+          "queries:listEventTimelineActivityByEventId",
+          "useListEventTimelineActivity",
+        ],
+      ] as const)
+        if (name === query && !backend.values.has(name)) {
+          const { eventId } = args as { eventId: string };
+          const rows = (backend.values.get(hook) ?? []) as {
+            eventId?: string;
+            deletedAt?: number | null;
+          }[];
+          return rows.filter(
+            (row) => row.eventId === eventId && row.deletedAt == null,
+          );
+        }
+      // Menu lines of some events, or of one dish: the test's menu rows.
+      if (
+        (name === "eventMenuLookup:forEvents" ||
+          name === "eventMenuLookup:forDish") &&
+        !backend.values.has(name)
+      ) {
+        const { eventIds, dishId } = args as {
+          eventIds?: string[];
+          dishId?: string;
+        };
+        const rows = (backend.values.get("useListEventDish") ?? []) as {
+          eventId?: string;
+          dishId?: string;
+          deletedAt?: number | null;
+        }[];
+        return rows.filter(
+          (row) =>
+            row.deletedAt == null &&
+            (eventIds
+              ? eventIds.includes(String(row.eventId))
+              : row.dishId === dishId),
+        );
+      }
+      // Dishes by id: the test's dish rows with those ids.
+      if (name === "dishLookup:byIds" && !backend.values.has(name)) {
+        const ids = new Set((args as { ids: string[] }).ids);
+        const rows = (backend.values.get("useListDish") ?? []) as {
+          _id: string;
+          deletedAt?: number | null;
+        }[];
+        return rows.filter((row) => ids.has(row._id) && row.deletedAt == null);
+      }
+      // Month tracker rows of some events: the test's rows for those events.
+      if (name === "eventMonthRows:forEvents" && !backend.values.has(name)) {
+        const ids = new Set((args as { eventIds: string[] }).eventIds);
+        const rows = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as {
+              eventId?: string;
+              deletedAt?: number | null;
+            }[]
+          ).filter(
+            (row) => ids.has(String(row.eventId)) && row.deletedAt == null,
+          );
+        return {
+          packLists: rows("useListPackList"),
+          reviewFlags: rows("useListReviewFlag"),
+          vehicleAssignments: rows("useListEventVehicleAssignment"),
+          numberAssignments: rows("useListEventNumberAssignment"),
+        };
+      }
+      // A menu's recipe, price and stock rows: the test's lists, as given.
+      if (name === "menuRecipeLookup:forDishes" && !backend.values.has(name)) {
+        const list = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as { deletedAt?: number | null }[]
+          ).filter((row) => row.deletedAt == null);
+        return {
+          dishIngredients: list("useListDishIngredient"),
+          dishComponents: list("useListDishComponent"),
+          components: list("useListComponent"),
+          componentIngredients: list("useListComponentIngredient"),
+          ingredients: list("useListIngredient"),
+          priceObservations: list("useListIngredientPriceObservation"),
+          unitMappings: list("useListItemUnitMapping"),
+          containers: list("useListDishContainer"),
+          inventoryItems: list("useListInventoryItem"),
+          inventoryReservations: list("useListInventoryReservation"),
+        };
+      }
+      // The whole dish list read straight (an open dish picker).
+      if (name === "queries:listDish" && !backend.values.has(name))
+        return backend.values.get("useListDish");
+      // The picker's events: every live row the test gives (a small list).
+      if (name === "eventLookup:picker" && !backend.values.has(name)) {
+        const rows = (backend.values.get("useListEvent") ?? []) as {
+          deletedAt?: number | null;
+        }[];
+        return {
+          rows: rows.filter((row) => row.deletedAt == null),
+          capped: false,
+        };
+      }
       // Whole event records for a window: the same rows, as they are.
       if (name === "eventLookup:rangeDocs" && !backend.values.has(name)) {
         const { from, to, withUndated } = args as {
@@ -124,18 +256,23 @@ vi.mock("convex/react", async (importOriginal) => {
       }
       return backend.values.get(name);
     },
-    // All-time event pages (eventLookup:reportPage) answer in one page from
-    // the generated list's rows, unless the test sets its own.
+    // All-time event pages (eventLookup:reportPage) and dish pages
+    // (dishLookup:page) answer in one page from the generated list's rows,
+    // unless the test sets its own.
     usePaginatedQuery: (
       reference: Parameters<typeof getFunctionName>[0],
       args?: unknown,
     ) => {
       const name = getFunctionName(reference);
       backend.reads(name, args);
+      if (args === "skip")
+        return { results: [], status: "LoadingFirstPage", loadMore: () => {} };
       const rows =
         name === "eventLookup:reportPage" && !backend.values.has(name)
           ? backend.values.get("useListEvent")
-          : backend.values.get(name);
+          : name === "dishLookup:page" && !backend.values.has(name)
+            ? backend.values.get("useListDish")
+            : backend.values.get(name);
       return rows === undefined
         ? { results: [], status: "LoadingFirstPage", loadMore: () => {} }
         : { results: rows, status: "Exhausted", loadMore: () => {} };

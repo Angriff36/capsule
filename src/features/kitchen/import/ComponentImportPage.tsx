@@ -522,8 +522,8 @@ export function ComponentImportPage() {
           <p className="eyebrow">Culinary book · Import</p>
           <h1 className="display-title mt-2">Import recipe</h1>
           <p className="mt-3 max-w-150 text-ink-2">
-            Paste text or upload `.txt` / CSV exports, review ingredient
-            matches, then save the review and open the recipe.
+            Paste the recipe or upload a text or CSV file, check the ingredient
+            matches, then save and open the recipe.
           </p>
         </div>
         <div className="component-import-actions">

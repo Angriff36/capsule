@@ -40,6 +40,9 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   property clockInLatitude: float?
   property clockInLongitude: float?
   property clockInAccuracyMeters: float?
+  property clockOutLatitude: float?
+  property clockOutLongitude: float?
+  property clockOutAccuracyMeters: float?
   property encrypted notes: string?
   property required status: TimeRecordStatus = "open"
   property correctedAt: datetime?
@@ -114,7 +117,10 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   command clockOut(
     optional breakMinutes: number,
     optional notes: string,
-    optional paidBreakMinutes: number
+    optional paidBreakMinutes: number,
+    optional latitude: number,
+    optional longitude: number,
+    optional accuracyMeters: number
   ) {
     guard self.status == "open"
     guard self.clockInAt != null
@@ -124,6 +130,10 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
     constraint clockOutPaidBreakNonNegative: paidBreakMinutes == null or paidBreakMinutes >= 0 "Paid break minutes can't be negative. Use zero or more."
+    constraint clockOutLocationPair: (latitude == null and longitude == null) or (latitude != null and longitude != null and latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180) "The clock-out location is incomplete. Send both latitude and longitude, or neither."
+    mutate clockOutLatitude = latitude
+    mutate clockOutLongitude = longitude
+    mutate clockOutAccuracyMeters = accuracyMeters
     mutate clockOutAt = now()
     mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes
     mutate paidBreakMinutes = paidBreakMinutes != null ? paidBreakMinutes : self.paidBreakMinutes

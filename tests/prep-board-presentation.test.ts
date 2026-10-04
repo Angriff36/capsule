@@ -46,6 +46,15 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
 
 vi.mock("../src/features/facilities/useEventsById", () => ({
   useEventsById: () => manifest.events,
+  useEventsInRange: () => manifest.events,
+}));
+
+vi.mock("../src/features/facilities/useMenuLinesFor", () => ({
+  useMenuLinesForEvents: () => manifest.eventDishes,
+}));
+
+vi.mock("../src/lib/useDishesByIds", () => ({
+  useDishesByIds: () => manifest.dishes,
 }));
 
 vi.mock("../src/features/kitchen/KitchenBookNav", () => ({

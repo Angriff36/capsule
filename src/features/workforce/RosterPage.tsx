@@ -651,7 +651,7 @@ export function RosterPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Event</th>
@@ -667,9 +667,9 @@ export function RosterPage() {
                     <td>
                       <strong>{eventName(row.eventId)}</strong>
                     </td>
-                    <td>{personName(row.personId)}</td>
-                    <td>{row.role || "—"}</td>
-                    <td>
+                    <td data-label="Person">{personName(row.personId)}</td>
+                    <td data-label="Role">{row.role || "—"}</td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                       {row.declineReason ? (
                         <div className="text-2xs text-ink-3">
@@ -1005,7 +1005,7 @@ export function RosterPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Person</th>
@@ -1040,8 +1040,8 @@ export function RosterPage() {
                         </small>
                       ) : null}
                     </td>
-                    <td>{eventName(row.eventId)}</td>
-                    <td>
+                    <td data-label="Event">{eventName(row.eventId)}</td>
+                    <td data-label="Window">
                       {row.startsAt
                         ? `${formatDate(row.startsAt)} ${formatTime(row.startsAt)}`
                         : "—"}{" "}
@@ -1050,7 +1050,7 @@ export function RosterPage() {
                         ? `${formatDate(row.endsAt)} ${formatTime(row.endsAt)}`
                         : "—"}
                     </td>
-                    <td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                       {row.cancellationReason ? (
                         <small>{row.cancellationReason}</small>

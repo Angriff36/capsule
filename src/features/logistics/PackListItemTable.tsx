@@ -10,6 +10,7 @@ import type { PackLineFacts } from "./packLineExplanation";
 import { packReturnSummary } from "./packReturn";
 import { packRowFacts } from "./packRowFacts";
 import { ReviewFlagInline } from "../events/review-flags/ReviewFlagInline";
+import "./PackListItemTable.css";
 
 export interface PackListItemRow extends PackLineFacts {
   _id: string;
@@ -119,7 +120,7 @@ export function PackListItemTable({
 
   return (
     <div className="supply-table-wrap">
-      <table className="supply-table">
+      <table className="supply-table pack-items-table">
         <thead>
           <tr>
             <th className="w-8">
@@ -210,10 +211,10 @@ export function PackListItemTable({
                   </small>
                 ) : null}
               </td>
-              <td>
+              <td data-label="Required">
                 {item.requiredQuantity} {item.unit}
               </td>
-              <td>
+              <td data-label="Packed">
                 {item.packedQuantity} {item.unit}
                 {packedByName(item.packedByPersonId) ? (
                   <small className="block">
