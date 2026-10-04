@@ -39,6 +39,8 @@ never provider error text, so no key, token or address reaches the screen.
 - **Backend (production box):** redeploy a known release commit with
   `scripts/deploy-backend.sh --expect <sha>`. The database is not rolled back
   by a code deploy; data written by the newer code stays.
+- **Data (lost or broken records):** restore the newest good backup; see
+  backup-and-restore.md.
 
 ## Things a code rollback cannot undo
 

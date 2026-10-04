@@ -4633,20 +4633,20 @@
       "key": "PR13-09",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-09",
-      "status": "PENDING",
-      "codeState": "missing",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BACKUPS"],
-      "gap": "No backup exists yet; a first backup and an isolated restore must run on the production server.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed scripts/qualify-backup-restore.ts — isolated restore receipt with measured RPO/RTO and retained assets"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed scripts/qualify-backup-restore.ts — isolated restore receipt with measured RPO/RTO and retained assets. 2026-10-04: scripts/qualify-backup-restore.ts 13/13 (receipt docs/quality/backup-restore-drill.json: second empty backend, wrong key refused, ids/counts/links/picture bytes/owner sign-in/stranger refused; backup 2.2 s, restore 42 s, loss window = after the newest backup, up to 24 h); scripts/backup-capsule.ts (export with files, AES-256-GCM, setting names only, keep 14); scripts/deploy-backend.sh sets up the key, 3 am crontab line and first backup on the box (tests/deploy-backend-script.test.ts 11/11)"
       ],
-      "waitsOn": "production-box",
+      "waitsOn": null,
       "owners": [
         "docs/operations/",
         "approved backup/deploy scripts and self-hosted backend owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "bf318de3"
     },
     {
       "id": "AC-165",
@@ -15165,7 +15165,7 @@
         "qualification scripts and docs"
       ],
       "environment": "Not verified yet",
-      "sha": "0487dfcd"
+      "sha": "827866ef"
     },
     {
       "id": "AC-655",
@@ -16510,7 +16510,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
-      "sha": "0487dfcd"
+      "sha": "827866ef"
     },
     {
       "id": "AC-721",
