@@ -35,6 +35,7 @@ import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 import { useWorkingEventId } from "../events/workingEvent";
+import { FieldHelp } from "../../ui/FieldHelp";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   reservedOn,
@@ -413,6 +414,7 @@ export function StockBookPage() {
           {
             name: "parLevel",
             label: `PAR level (${unitFor(item)})`,
+            help: "parLevel",
             defaultValue: String(item.parLevel),
             inputType: "number",
             required: true,
@@ -1267,16 +1269,19 @@ function SupplyStockForm({
             {["quantityOnHand", "parLevel", "reorderThreshold", "unitCost"].map(
               (name) => (
                 <label key={name} className="field-label">
-                  {
-                    (
-                      {
-                        quantityOnHand: "Opening quantity",
-                        parLevel: "PAR level",
-                        reorderThreshold: "Reorder threshold",
-                        unitCost: "Unit cost",
-                      } as Record<string, string>
-                    )[name]
-                  }
+                  <span className="field-label-row">
+                    {
+                      (
+                        {
+                          quantityOnHand: "Opening quantity",
+                          parLevel: "PAR level",
+                          reorderThreshold: "Reorder threshold",
+                          unitCost: "Unit cost",
+                        } as Record<string, string>
+                      )[name]
+                    }
+                    {name === "parLevel" ? <FieldHelp term="parLevel" /> : null}
+                  </span>
                   <input
                     name={name}
                     className="input"
