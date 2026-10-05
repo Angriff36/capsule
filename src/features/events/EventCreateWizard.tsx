@@ -19,15 +19,19 @@ import {
   createEventWizardDraft,
   EVENT_WIZARD_STEPS,
   eventWizardCreateErrors,
+  eventWizardStepInputs,
   eventWizardStepState,
   eventWizardUnlocks,
   parseEventWizardDraft,
   validateEventWizardStep,
   type EventWizardDraft,
+  type EventWizardStep,
 } from "./eventCreateWizardModel";
 import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
 
 const DRAFT_KEY = "capsule.event-create-wizard.active";
+/** An explicitly saved draft survives closing the tab; the active key is per tab. */
+const SAVED_DRAFT_KEY = "capsule.event-create-wizard.saved";
 const lineId = () =>
   globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
 const newDraftKey = () =>
@@ -35,9 +39,17 @@ const newDraftKey = () =>
 
 export function storedDraft(
   storage: Pick<Storage, "getItem" | "removeItem"> = sessionStorage,
+  saved: Pick<Storage, "getItem" | "removeItem"> | null = localStorage,
 ): EventWizardDraft {
   try {
     const raw = storage.getItem(DRAFT_KEY);
+    if (raw === null && saved) {
+      const savedRaw = saved.getItem(SAVED_DRAFT_KEY);
+      const parsedSaved =
+        savedRaw === null ? null : parseEventWizardDraft(JSON.parse(savedRaw));
+      if (parsedSaved) return parsedSaved;
+      if (savedRaw !== null) saved.removeItem(SAVED_DRAFT_KEY);
+    }
     if (raw === null) return createEventWizardDraft(newDraftKey());
     const parsed = parseEventWizardDraft(JSON.parse(raw));
     if (parsed) return parsed;
@@ -78,7 +90,8 @@ export function EventCreateWizard({
   const [step, setStep] = useState(0),
     [errors, setErrors] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
-    [failure, setFailure] = useState("");
+    [failure, setFailure] = useState(""),
+    [savedAt, setSavedAt] = useState<Date | null>(null);
   const activeClients = useMemo(
     () =>
       (clients ?? []).filter(
@@ -123,8 +136,36 @@ export function EventCreateWizard({
     }
     setDraft(next);
   };
-  const update = (changes: Partial<EventWizardDraft>) =>
+  const update = (changes: Partial<EventWizardDraft>) => {
+    setSavedAt(null);
     saveDraft({ ...draftRef.current, ...changes });
+  };
+  const saveAsDraft = () => {
+    try {
+      localStorage.setItem(SAVED_DRAFT_KEY, JSON.stringify(draftRef.current));
+      setSavedAt(new Date());
+      setFailure("");
+    } catch {
+      setFailure(
+        "The draft could not be saved in this browser. Keep this tab open to keep your work.",
+      );
+    }
+  };
+  const discardDraft = () => {
+    try {
+      localStorage.removeItem(SAVED_DRAFT_KEY);
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      /* storage is optional */
+    }
+    const fresh = createEventWizardDraft(newDraftKey());
+    draftRef.current = fresh;
+    setDraft(fresh);
+    setSavedAt(null);
+    setErrors([]);
+    setFailure("");
+    setStep(0);
+  };
   const currentStep = EVENT_WIZARD_STEPS[step];
   const eventProgress = draft.commitProgress.event;
   const savedEvent =
@@ -163,6 +204,11 @@ export function EventCreateWizard({
           saveDraft({ ...draftRef.current, commitProgress }),
         navigate: (eventId) => {
           finishedRef.current = true;
+          try {
+            localStorage.removeItem(SAVED_DRAFT_KEY);
+          } catch {
+            /* storage is optional */
+          }
           navigate(eventDetailPath(eventId));
         },
       });
@@ -242,27 +288,30 @@ export function EventCreateWizard({
       ) : null}
       <fieldset disabled={busy} className="contents">
         <div className="card p-4">
-          {currentStep === "Client" ? (
-            <ClientStep
-              draft={draft}
-              clients={activeClients}
-              update={update}
-              locked={!!eventProgress}
-            />
-          ) : null}
-          {currentStep === "Date, venue & headcount" ? (
-            <ScheduleStep
+          {currentStep === "Basics" ? (
+            <BasicsStep
               draft={draft}
               venues={activeVenues}
               update={update}
               locked={!!eventProgress}
             />
           ) : null}
-          {currentStep === "Dishes" ? (
+          {currentStep === "Client & headcount" ? (
+            <ClientHeadcountStep
+              draft={draft}
+              clients={activeClients}
+              update={update}
+              locked={!!eventProgress}
+            />
+          ) : null}
+          {currentStep === "Menu & dishes" ? (
             <DishStep draft={draft} dishes={activeDishes} update={update} />
           ) : null}
-          {currentStep === "Staff" ? (
+          {currentStep === "Staffing" ? (
             <StaffStep draft={draft} people={activePeople} update={update} />
+          ) : null}
+          {currentStep !== "Review" ? (
+            <StepUnlocks draft={draft} step={currentStep} />
           ) : null}
           {currentStep === "Review" ? (
             <ReviewStep
@@ -288,7 +337,12 @@ export function EventCreateWizard({
             >
               Back
             </button>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <DraftControls
+                savedAt={savedAt}
+                onSave={saveAsDraft}
+                onDiscard={discardDraft}
+              />
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -302,7 +356,7 @@ export function EventCreateWizard({
             </div>
           </div>
         ) : (
-          <div className="flex">
+          <div className="flex flex-wrap justify-between gap-2">
             <button
               type="button"
               className="btn btn-ghost"
@@ -310,6 +364,13 @@ export function EventCreateWizard({
             >
               Back
             </button>
+            <div className="flex flex-wrap gap-2">
+              <DraftControls
+                savedAt={savedAt}
+                onSave={saveAsDraft}
+                onDiscard={discardDraft}
+              />
+            </div>
           </div>
         )}
       </fieldset>
@@ -317,60 +378,61 @@ export function EventCreateWizard({
   );
 }
 
-function ClientStep({
-  draft,
-  clients,
-  update,
-  locked,
+function DraftControls({
+  savedAt,
+  onSave,
+  onDiscard,
 }: {
-  draft: EventWizardDraft;
-  clients: readonly any[];
-  update: (changes: Partial<EventWizardDraft>) => void;
-  locked: boolean;
+  savedAt: Date | null;
+  onSave: () => void;
+  onDiscard: () => void;
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      <label className="field-label sm:col-span-2">
-        Client
-        <SearchSelect
-          value={draft.clientId}
-          disabled={locked}
-          onChange={(id) => update({ clientId: id })}
-          recentsKey="client"
-          placeholder="Search clients…"
-          options={clients.map((client) => ({
-            id: client._id,
-            label: clientName(client),
-          }))}
-        />
-      </label>
-      <label className="field-label">
-        Event title
-        <input
-          className="field-input"
-          value={draft.title}
-          disabled={locked}
-          onChange={(event) => update({ title: event.target.value })}
-        />
-      </label>
-      <label className="field-label">
-        Primary contact
-        <input
-          className="field-input"
-          value={draft.primaryContactName}
-          disabled={locked}
-          onChange={(event) =>
-            update({ primaryContactName: event.target.value })
-          }
-        />
-      </label>
-      <p className="text-sm text-ink-3 sm:col-span-2">
-        Unlocks the governed event plan for this client.
-      </p>
+    <>
+      {savedAt ? (
+        <span className="self-center text-sm text-success" role="status">
+          Draft saved{" "}
+          {new Intl.DateTimeFormat(undefined, { timeStyle: "short" }).format(
+            savedAt,
+          )}
+        </span>
+      ) : null}
+      <button type="button" className="btn btn-ghost" onClick={onDiscard}>
+        Start over
+      </button>
+      <button type="button" className="btn btn-secondary" onClick={onSave}>
+        Save draft
+      </button>
+    </>
+  );
+}
+function StepUnlocks({
+  draft,
+  step,
+}: {
+  draft: EventWizardDraft;
+  step: EventWizardStep;
+}) {
+  const inputs = eventWizardStepInputs(step, draft);
+  if (!inputs.length) return null;
+  return (
+    <div className="mt-4 border-t border-line pt-3" data-testid="step-unlocks">
+      <p className="text-sm font-semibold text-ink">What this step unlocks</p>
+      <ul className="mt-2 space-y-1">
+        {inputs.map((item) => (
+          <li key={item.input} className="text-sm text-ink-2">
+            <span className={item.filled ? "text-success" : "text-warning"}>
+              {item.filled ? "Ready" : "Missing"}
+            </span>{" "}
+            · <span className="font-medium text-ink">{item.input}</span>:{" "}
+            {item.unlocks}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
-function ScheduleStep({
+function BasicsStep({
   draft,
   venues,
   update,
@@ -378,6 +440,57 @@ function ScheduleStep({
 }: {
   draft: EventWizardDraft;
   venues: readonly any[];
+  update: (changes: Partial<EventWizardDraft>) => void;
+  locked: boolean;
+}) {
+  const field = (label: string, key: keyof EventWizardDraft, type = "text") => (
+    <label className="field-label">
+      {label}
+      <input
+        className="field-input"
+        type={type}
+        value={draft[key] as string}
+        disabled={locked}
+        onChange={(event) => update({ [key]: event.target.value })}
+      />
+    </label>
+  );
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {field("Event title", "title")}
+      {field("Event type", "eventType")}
+      {field("Start", "startsAt", "datetime-local")}
+      {field("End", "endsAt", "datetime-local")}
+      <div className="sm:col-span-2">
+        <DateHoldCollisionNotice dateKey={draft.startsAt.slice(0, 10)} />
+      </div>
+      <label className="field-label sm:col-span-2">
+        Venue
+        <select
+          className="field-input"
+          value={draft.venueId}
+          disabled={locked}
+          onChange={(event) => update({ venueId: event.target.value })}
+        >
+          <option value="">Select a venue</option>
+          {venues.map((venue) => (
+            <option key={venue._id} value={venue._id}>
+              {venue.name}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+}
+function ClientHeadcountStep({
+  draft,
+  clients,
+  update,
+  locked,
+}: {
+  draft: EventWizardDraft;
+  clients: readonly any[];
   update: (changes: Partial<EventWizardDraft>) => void;
   locked: boolean;
 }) {
@@ -401,35 +514,24 @@ function ScheduleStep({
   );
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <label className="field-label">
-        Venue
-        <select
-          className="field-input"
-          value={draft.venueId}
+      <label className="field-label sm:col-span-2">
+        Client
+        <SearchSelect
+          value={draft.clientId}
           disabled={locked}
-          onChange={(event) => update({ venueId: event.target.value })}
-        >
-          <option value="">Select a venue</option>
-          {venues.map((venue) => (
-            <option key={venue._id} value={venue._id}>
-              {venue.name}
-            </option>
-          ))}
-        </select>
+          onChange={(id) => update({ clientId: id })}
+          recentsKey="client"
+          placeholder="Search clients…"
+          options={clients.map((client) => ({
+            id: client._id,
+            label: clientName(client),
+          }))}
+        />
       </label>
-      {field("Event type", "eventType")}
-      {field("Start", "startsAt", "datetime-local")}
-      {field("End", "endsAt", "datetime-local")}
-      <div className="sm:col-span-2">
-        <DateHoldCollisionNotice dateKey={draft.startsAt.slice(0, 10)} />
-      </div>
+      {field("Primary contact", "primaryContactName")}
       {field("Headcount", "expectedHeadcount", "number", "1")}
       {field("Budget", "budgetAmount", "number", "0")}
       {field("Quoted price", "quotedPrice", "number", "0")}
-      <p className="text-sm text-ink-3 sm:col-span-2">
-        Unlocks logistics, Event Day context, and the date/headcount basis for
-        demand planning.
-      </p>
     </div>
   );
 }
@@ -514,10 +616,6 @@ function DishStep({
           No dishes selected. Choose Skip for now to mark this incomplete.
         </p>
       )}
-      <p className="text-sm text-ink-3">
-        Selected dishes use the event headcount, unlocking menu demand, prep,
-        and allergen checks.
-      </p>
     </div>
   );
 }
@@ -638,9 +736,6 @@ function StaffStep({
           No staff assigned. Choose Skip for now to mark this incomplete.
         </p>
       )}
-      <p className="text-sm text-ink-3">
-        Staff assignments unlock staffing and labor planning.
-      </p>
     </div>
   );
 }
@@ -691,12 +786,12 @@ function ReviewStep({
             className="text-link"
             onClick={() => onGoToStep(0)}
           >
-            Edit client
+            Edit basics
           </button>
           <p className="text-sm text-ink-2">
-            {client ? clientName(client) : "Incomplete"} ·{" "}
-            {draft.title || "Incomplete"} ·{" "}
-            {draft.primaryContactName || "Incomplete"}
+            {draft.title || "Incomplete"} · {draft.eventType || "Incomplete"} ·{" "}
+            {localDate(draft.startsAt)} – {localDate(draft.endsAt)} ·{" "}
+            {venue?.name ?? "Incomplete"}
           </p>
         </div>
         <div>
@@ -705,11 +800,11 @@ function ReviewStep({
             className="text-link"
             onClick={() => onGoToStep(1)}
           >
-            Edit event
+            Edit client & headcount
           </button>
           <p className="text-sm text-ink-2">
-            {venue?.name ?? "Incomplete"} · {draft.eventType || "Incomplete"} ·{" "}
-            {localDate(draft.startsAt)} – {localDate(draft.endsAt)} ·{" "}
+            {client ? clientName(client) : "Incomplete"} ·{" "}
+            {draft.primaryContactName || "Incomplete"} ·{" "}
             {draft.expectedHeadcount || "Incomplete"} guests ·{" "}
             {formatMoney(Number(draft.budgetAmount))} budget ·{" "}
             {formatMoney(Number(draft.quotedPrice))} quoted
@@ -793,13 +888,12 @@ function ReviewStep({
           <p>Create is blocked:</p>
           <ul className="mt-1 list-disc pl-5">
             {required.map((error) => {
-              const step = error.startsWith("Client:")
-                ? 0
-                : error.startsWith("Date,")
-                  ? 1
-                  : error.startsWith("Dishes:")
-                    ? 2
-                    : 3;
+              const step = Math.max(
+                0,
+                EVENT_WIZARD_STEPS.findIndex((label) =>
+                  error.startsWith(`${label}:`),
+                ),
+              );
               const label = EVENT_WIZARD_STEPS[step];
               return (
                 <li key={error}>
