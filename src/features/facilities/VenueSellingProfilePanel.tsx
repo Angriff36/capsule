@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import { useVenueSetSellingProfile } from "../../lib/manifest-convex-react";
 import { Section } from "../../ui/primitives";
@@ -7,6 +8,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
+import { venueInfoPacketPath } from "./facilitiesRoutes";
 import {
   VENUE_VIBES,
   VENUE_VIBE_GUIDE,
@@ -176,7 +178,13 @@ export function VenueSellingProfilePanel({ venue }: { venue: Doc<"venues"> }) {
               }}
             >
               {lines.length === 0 ? "Write the venue profile" : "Edit"}
-            </button>
+            </button>{" "}
+            <Link
+              className="btn btn-secondary"
+              to={venueInfoPacketPath(String(venue._id))}
+            >
+              Venue info packet
+            </Link>
           </>
         )}
       </div>

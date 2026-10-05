@@ -474,6 +474,11 @@ const VenueMenuCardPage = lazy(() =>
     default: module.VenueMenuCardPage,
   })),
 );
+const VenueInfoPacketPage = lazy(() =>
+  import("../features/facilities/VenueInfoPacketPage").then((module) => ({
+    default: module.VenueInfoPacketPage,
+  })),
+);
 const VenueVendorRelationshipsPage = lazy(() =>
   import("../features/facilities/VenueVendorRelationshipsPage").then(
     (module) => ({
@@ -1536,6 +1541,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <VenueMenuCardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/:id/info-packet"
+              element={
+                <SupplyRoute>
+                  <VenueInfoPacketPage />
                 </SupplyRoute>
               }
             />

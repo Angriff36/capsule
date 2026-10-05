@@ -28,6 +28,10 @@ export function venueMenuCardPath(id: string): string {
   return `/facilities/venues/${id}/menu-card`;
 }
 
+export function venueInfoPacketPath(id: string): string {
+  return `/facilities/venues/${id}/info-packet`;
+}
+
 export function venueListPath(): string {
   return "/facilities/venues";
 }
