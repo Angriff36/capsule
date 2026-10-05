@@ -872,6 +872,10 @@ export function InvoiceDetailPage() {
               .invoiceActions(String(invoice.status), invoice)
               .some((action) => action.key === candidate.key),
           )}
+          blocked={policy.invoiceBlockedActions(
+            String(invoice.status),
+            invoice,
+          )}
           busy={busy != null}
           onAction={invoke}
         />

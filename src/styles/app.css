@@ -356,6 +356,12 @@
   .lifecycle-step-action {
     @apply justify-self-center normal-case;
   }
+  .lifecycle-action {
+    @apply inline-grid max-w-48 justify-items-center gap-1 justify-self-center;
+  }
+  .lifecycle-action-reason {
+    @apply text-xs font-normal text-ink-2;
+  }
   .lifecycle-stepper-branches {
     @apply mt-3 flex flex-wrap gap-2 border-t border-line pt-3;
   }

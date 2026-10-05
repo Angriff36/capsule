@@ -3,6 +3,8 @@ export type LifecycleAction = {
   label: string;
   to: string;
   needsInput?: boolean;
+  /** Set when the move is legal from here but a record check blocks it. */
+  disabledReason?: string;
 };
 
 export type LifecycleDefinition = {

@@ -497,6 +497,10 @@ function EventDetailContent({
     stage: String(event.stage),
     currencyCode: currencyCode,
     lifecycleActions: lifecycle,
+    blockedLifecycleActions: eventLifecyclePolicy.blockedActions(
+      String(event.stage),
+      event,
+    ),
     onAction: runAction,
     people: people,
     dishCount: dishCount,

@@ -118,12 +118,24 @@ const HEADCOUNT_REVISION_STAGES = new Set<string>([
   ...EventCompleteLifecycle.map((transition) => transition.from),
 ]);
 
+/** Event fields the submit and sales-lock guards read. */
+export interface EventReadiness {
+  plannedAt?: number | null;
+  clientId?: string | null;
+  startsAt?: number | null;
+  endsAt?: number | null;
+  expectedHeadcount?: number | null;
+}
+
 /** UI offer set derived from generated, proven Event stage transitions. */
 export class EventLifecyclePolicy {
   availableActions(
     stage: string,
-    planning?: { plannedAt?: number | null },
+    planning?: EventReadiness,
   ): EventLifecycleAction[] {
+    const blocked = planning
+      ? this.blockedActions(stage, planning).map((item) => item.key)
+      : [];
     return (
       ACTIONS.filter((action) =>
         action.lifecycle.some(
@@ -137,14 +149,45 @@ export class EventLifecyclePolicy {
         .filter(
           (action) => !(action.key === "complete" && stage === "planning"),
         )
-        .filter(
-          (action) =>
-            action.key !== "submitForApproval" ||
-            planning === undefined ||
-            planning.plannedAt != null,
-        )
+        .filter((action) => !blocked.includes(action.key))
         .map(({ lifecycle: _lifecycle, ...action }) => action)
     );
+  }
+
+  /**
+   * Stage moves the lifecycle allows from `stage` that the Event command
+   * guards would still reject, with the reason a person can fix.
+   */
+  blockedActions(
+    stage: string,
+    event: EventReadiness,
+  ): { key: EventLifecycleActionKey; reason: string }[] {
+    if (stage === "planning" && event.plannedAt == null) {
+      return [
+        {
+          key: "submitForApproval",
+          reason: "Use Complete planning below before you submit for approval.",
+        },
+      ];
+    }
+    if (stage === "approved") {
+      const missing = [
+        event.clientId == null ? "a client" : null,
+        event.plannedAt == null ? "completed planning" : null,
+        event.startsAt == null ? "a start time" : null,
+        event.endsAt == null ? "an end time" : null,
+        !(Number(event.expectedHeadcount ?? 0) > 0) ? "a headcount" : null,
+      ].filter((item): item is string => item != null);
+      if (missing.length) {
+        return [
+          {
+            key: "lockForSales",
+            reason: `Add ${missing.join(", ")} before the sales lock.`,
+          },
+        ];
+      }
+    }
+    return [];
   }
 
   isEditableStage(stage: string): boolean {
