@@ -359,6 +359,39 @@ release merges `dev` into `main`:
 bash scripts/release.sh --reviewer <model>
 ```
 
+**One validation run per release (owner, 2026-09-17).** Do not run a separate
+`bun run check` as a release preflight: release.sh runs the identical full gate
+on the final merge. For an authorized release, the low-level split workflow can
+overlap independent review with that gate in a private release checkout
+(not the shared dev checkout):
+
+1. Commit and push the working branch, then run
+   `bash scripts/release.sh --prepare --reviewer <model>`.
+2. Once it prints the candidate SHA and base SHA, review that exact diff while
+   validation runs. Preparation makes no remote writes and leaves main on the
+   candidate. Do not edit this checkout during validation/review.
+3. After validation passes AND the independent reviewer APPROVES, run
+   `bash scripts/release.sh --publish --reviewer <model>`. It reuses the passing
+   proof for that exact commit, rejects changes to the local source or origin/main
+   and a dirty checkout, and never reruns the full gate. This command asserts review approval;
+   preparation alone is not approval or authorization to publish.
+
+For rejected/stale candidates, return to the source branch, preserve the old
+candidate on a local branch if useful, and move local main back to origin/main
+only after verifying it contains no other local work. Fix, prepare, and review
+again. Ordinary development still uses `bun run check`; no checks are removed.
+Archive-only pushes skip regeneration only for a matching source deletion and
+archive creation at the same commit already reachable from the push destination’s
+current main. The permanent `dev` branch is never archived.
+
+The split commands only publish the Git release; they do not deploy the
+self-hosted backend. `scripts/deploy-production.sh` remains the complete
+production entry point. To finish a split release, check out its published
+`main` in the private release checkout and run that orchestrator; it resumes
+without repeating the release gate. `--candidate <sha>` is supported by
+`--prepare` and retained for `--publish`, so later remote `dev` commits wait
+for the next release.
+
 It requires a clean tree, the branch pushed, and the reviewer that APPROVED
 the diff (merge gate above). It merges `--no-ff` into `main`, runs
 `bun run check` on the merge (CI does not run on `main`; the pre-push hook

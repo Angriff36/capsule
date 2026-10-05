@@ -66,6 +66,10 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
   A release merges `dev` into `main`, via
   `bash scripts/release.sh --reviewer <model>` after the cross-model review APPROVES
   (only when the merge gate requires a review).
+  Do not run a duplicate full check before release. To run review alongside the
+  final merge check, use `release.sh --prepare --reviewer <model>`, review the
+  printed candidate/base, then `release.sh --publish --reviewer <model>` only
+  after both validation and independent APPROVE. See AGENTS.md.
   That single push is the only Vercel production build, and the only Convex
   Cloud deploy unless the build runs in self-hosted backend mode
   (`CONVEX_SELF_HOSTED_URL` set → UI-only, no Convex Cloud deploy): Vercel

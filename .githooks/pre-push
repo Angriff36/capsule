@@ -19,7 +19,24 @@ case "$(git rev-parse --show-toplevel)" in
     ;;
 esac
 
-while read -r _local_ref local_sha remote_ref _remote_sha; do
+ref_count=0
+archive_ref=""
+archive_sha=""
+deleted_ref=""
+deleted_sha=""
+while read -r _local_ref local_sha remote_ref remote_sha; do
+  ref_count=$((ref_count + 1))
+  case "$local_sha" in
+    0000000000000000000000000000000000000000)
+      deleted_ref="$remote_ref"
+      deleted_sha="$remote_sha"
+      ;;
+    *)
+      case "$remote_ref" in
+        refs/heads/archive/*) archive_ref="$remote_ref"; archive_sha="$local_sha" ;;
+      esac
+      ;;
+  esac
   case "$remote_ref" in
     refs/heads/main)
       if [ "${CAPSULE_RELEASE:-0}" != "1" ]; then
@@ -38,6 +55,21 @@ while read -r _local_ref local_sha remote_ref _remote_sha; do
       ;;
   esac
 done
+
+# A release archive only renames the already-published source commit. Match
+# both ref updates and their SHAs; an unrelated/mixed push still runs the gate.
+if [ "$ref_count" = "2" ] && [ -n "$archive_sha" ] &&
+   [ "$archive_sha" = "$deleted_sha" ] &&
+   [ "$archive_ref" = "refs/heads/archive/${deleted_ref#refs/heads/}" ]; then
+  # Check the actual push destination, not a possibly stale tracking ref.
+  # If it cannot be verified (including a new SHA missing locally), use the
+  # ordinary regeneration gate instead of granting the archive shortcut.
+  remote_main="$(git ls-remote "${2:-${1:-origin}}" refs/heads/main 2>/dev/null | cut -f1)"
+  if [ -n "$remote_main" ] && git merge-base --is-ancestor "$archive_sha" "$remote_main" 2>/dev/null; then
+    echo "pre-push: released branch archive only; generated output is unchanged."
+    exit 0
+  fi
+fi
 
 # Regeneration uses the CLI committed in scripts/manifest-builder. Owned output
 # must be regenerated and current BEFORE anything reaches GitHub. Blocks when the Builder

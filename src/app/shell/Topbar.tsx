@@ -1,11 +1,24 @@
-import { UserButton, useUser } from "@clerk/react";
+import {
+  UserButton,
+  useOrganization,
+  useOrganizationList,
+  useUser,
+} from "@clerk/react";
 import { useQuery } from "convex/react";
+import { useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { WorkingEventErrorBoundary } from "../../features/events/WorkingEventErrorBoundary";
 import { NotificationTray } from "../../features/notifications/NotificationTray";
 import { api } from "../../lib/api";
 import { WORKSPACE_NAME } from "../../lib/workspace";
-import { ChevronRightIcon, GearIcon, SearchIcon } from "../../ui/icons";
+import { reportActionFail } from "../../ui/action-result";
+import {
+  BuildingIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  GearIcon,
+  SearchIcon,
+} from "../../ui/icons";
 import { useDismissibleMenu } from "../../ui/useDismissibleMenu";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { breadcrumbsForPath, type Breadcrumb } from "./breadcrumbs";
@@ -156,6 +169,36 @@ export function Topbar({
 /** Clerk user menu. Authorization stays server-side (linked Person). */
 function AccountMenu() {
   const { user } = useUser();
+  const { organization } = useOrganization();
+  const { isLoaded, setActive, userMemberships } = useOrganizationList({
+    userMemberships: { infinite: true, pageSize: 100 },
+  });
+  const switching = useRef(false);
+  const [pendingOrganization, setPendingOrganization] = useState<string | null>(
+    null,
+  );
+  const switchOrganization = async (organizationId: string) => {
+    if (!setActive || switching.current || organizationId === organization?.id)
+      return;
+    switching.current = true;
+    setPendingOrganization(organizationId);
+    try {
+      await setActive({
+        organization: organizationId,
+        navigate: async () => {
+          // Start with fresh page state instead of another organization's record.
+          window.location.assign("/");
+        },
+      });
+    } catch {
+      reportActionFail(
+        "Couldn't switch organizations. Open your user menu and try again.",
+      );
+    } finally {
+      switching.current = false;
+      setPendingOrganization(null);
+    }
+  };
   return (
     <div className="flex items-center gap-2 pl-1.5">
       <div className="text-right max-sm:hidden">
@@ -164,7 +207,9 @@ function AccountMenu() {
             user?.primaryEmailAddress?.emailAddress ??
             "Account"}
         </p>
-        <p className="text-2xs leading-tight text-ink-3">{WORKSPACE_NAME}</p>
+        <p className="max-w-40 truncate text-2xs leading-tight text-ink-3">
+          {organization?.name ?? WORKSPACE_NAME}
+        </p>
       </div>
       <Link
         to="/settings/email"
@@ -174,7 +219,56 @@ function AccountMenu() {
       >
         <GearIcon width={15} height={15} />
       </Link>
-      <UserButton />
+      <UserButton>
+        <UserButton.MenuItems>
+          {(userMemberships.data ?? []).map(
+            ({ organization: memberOrganization }) => (
+              <UserButton.Action
+                key={memberOrganization.id}
+                label={
+                  pendingOrganization === memberOrganization.id
+                    ? `Switching to ${memberOrganization.name}…`
+                    : `${memberOrganization.name}${organization?.id === memberOrganization.id ? " (current organization)" : ""}`
+                }
+                labelIcon={
+                  organization?.id === memberOrganization.id ? (
+                    <CheckIcon />
+                  ) : (
+                    <BuildingIcon />
+                  )
+                }
+                onClick={() => void switchOrganization(memberOrganization.id)}
+              />
+            ),
+          )}
+          {(!isLoaded || userMemberships.isLoading) && (
+            <UserButton.Action
+              label="Loading organizations…"
+              labelIcon={<BuildingIcon />}
+              onClick={() => {}}
+            />
+          )}
+          {userMemberships.error ? (
+            <UserButton.Action
+              label="Retry loading organizations"
+              labelIcon={<BuildingIcon />}
+              onClick={() => userMemberships.revalidate()}
+            />
+          ) : userMemberships.hasNextPage ? (
+            <UserButton.Action
+              label={
+                userMemberships.isFetching
+                  ? "Loading organizations…"
+                  : "More organizations"
+              }
+              labelIcon={<BuildingIcon />}
+              onClick={() => {
+                if (!userMemberships.isFetching) userMemberships.fetchNext();
+              }}
+            />
+          ) : null}
+        </UserButton.MenuItems>
+      </UserButton>
     </div>
   );
 }
