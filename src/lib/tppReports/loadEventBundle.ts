@@ -6,6 +6,8 @@ import type {
 } from "./eventBundle";
 import { mergeEventBundle } from "./mergeEventBundle";
 import { parseBattleBoard } from "./parseBattleBoard";
+import { parseBeoText } from "./parseBeoText";
+import { beoPdfText, isBeoPdf } from "./beoPdfText";
 import { bundlePartFromSheets } from "./bundlePartFromSheets";
 import { readPdfTextLines } from "./pdfTextReader";
 import { readXlsxWorkbook } from "./xlsxReader";
@@ -46,7 +48,10 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   }
 
   if (lower.endsWith(".pdf")) {
-    return parseBattleBoard(readPdfTextLines(file.contents));
+    const lines = readPdfTextLines(file.contents);
+    // TPP prints the BEO as PDF too; any other PDF is the battle board.
+    if (isBeoPdf(lines)) return parseBeoText(beoPdfText(lines));
+    return parseBattleBoard(lines);
   }
   if (lower.endsWith(".xlsx")) {
     // Typed read: date cells print as M/D/YYYY and format-literal units ride

@@ -430,6 +430,24 @@ function readContact(value: string | undefined): {
 }
 
 /**
+ * TPP prints the client's phone under the "Contact:" name as "Home: (206)
+ * 321-2642". Read it there before any other phone line, which may be the
+ * venue contact's.
+ */
+function contactBlockPhone(lines: ReadLine[]): string | undefined {
+  const at = lines.findIndex((line) => /^contact\s*:/.test(line.lower));
+  if (at < 0) return undefined;
+  for (const line of lines.slice(at + 1, at + 4)) {
+    const phone = line.text.match(
+      /^(?:home|cell|work|mobile|phone)\s*:\s*(.+)$/i,
+    );
+    if (phone) return parsePhone(phone[1]);
+    if (looksLikeLabel(line.text)) return undefined;
+  }
+  return undefined;
+}
+
+/**
  * A BEO that prints "Venue: Singh Campsite" on one line and "Address: 47.01359°
  * N, 116.52979° W" (or a street address) on the next: fold the address line
  * into the venue when the venue line did not already carry one.
@@ -675,9 +693,13 @@ export function parseBeoText(text: string): EventBundlePart {
     locationAt >= 0 ? lines[locationAt + 1]?.text : undefined;
   const gpsLine =
     afterLocation && readCoordinates(afterLocation) ? afterLocation : undefined;
+  // The BEO PDF prints "Location: Barn and Blossom" with the street on the
+  // next line: a street under the name makes it a place, not a person.
+  const streetNext =
+    afterLocation !== undefined && /^\d+\s+\S/.test(afterLocation);
   const locationIsPlace =
     locationValue !== undefined &&
-    (/\d/.test(locationValue) || gpsLine !== undefined);
+    (/\d/.test(locationValue) || gpsLine !== undefined || streetNext);
   if (!contact.name && !locationIsPlace && locationValue) {
     contact.name = locationValue;
   }
@@ -738,7 +760,10 @@ export function parseBeoText(text: string): EventBundlePart {
               /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(text) &&
               text !== salespersonEmail,
           ),
-      phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
+      phone:
+        contact.phone ??
+        contactBlockPhone(lines) ??
+        parsePhone(labelValue(lines, "phone")),
     },
     venue: (() => {
       const venue =
