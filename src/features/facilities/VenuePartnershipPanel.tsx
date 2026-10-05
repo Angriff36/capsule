@@ -19,6 +19,8 @@ import {
 import { FailureBanner } from "../events/FailureBanner";
 import { useAllEventReportRows } from "./useEventsById";
 import { VenueBrandForm } from "./VenueBrandForm";
+import { VenueHandoffPanel } from "./VenueHandoffPanel";
+import { ownerProblem } from "./venueHandoff";
 import {
   CONTACT_DAYS,
   GRADE_MEANING,
@@ -94,6 +96,15 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
       source.deletedAt == null && String(source.venueId ?? "") === venueId,
   );
   const tier = venue.partnerTier as PartnerTier | null | undefined;
+  const ownerWarning = ownerProblem({
+    isPartner: tier != null,
+    ownerId: venue.partnerOwnerPersonId,
+    activeStaffIds: new Set(staff.map((person) => String(person._id))),
+    staffLoaded: people !== undefined,
+  });
+  const warnings = ownerWarning
+    ? [ownerWarning, ...card.warnings]
+    : card.warnings;
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -176,23 +187,32 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
               ))}
             </select>
           </label>
-          <label className="field-label">
-            <span>Relationship owner</span>
-            <select
-              className="input"
+          {/* Once there is an owner, a new one comes through the hand-over. */}
+          {venue.partnerOwnerPersonId ? (
+            <input
+              type="hidden"
               name="partnerOwnerPersonId"
-              defaultValue={String(venue.partnerOwnerPersonId ?? "")}
-            >
-              <option value="">No owner yet</option>
-              {staff.map((person) => (
-                <option key={person._id} value={person._id}>
-                  {[person.givenName, person.familyName]
-                    .filter(Boolean)
-                    .join(" ")}
-                </option>
-              ))}
-            </select>
-          </label>
+              value={String(venue.partnerOwnerPersonId)}
+            />
+          ) : (
+            <label className="field-label">
+              <span>Relationship owner</span>
+              <select
+                className="input"
+                name="partnerOwnerPersonId"
+                defaultValue=""
+              >
+                <option value="">No owner yet</option>
+                {staff.map((person) => (
+                  <option key={person._id} value={person._id}>
+                    {[person.givenName, person.familyName]
+                      .filter(Boolean)
+                      .join(" ")}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label className="field-label">
             <span>Ease of work (1-10)</span>
             <input
@@ -294,13 +314,22 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
                 }
               />
             </dl>
-            {card.warnings.length > 0 ? (
+            {warnings.length > 0 ? (
               <ul className="space-y-1 rounded-sm border border-warn/40 bg-warn-soft p-3 text-sm text-ink">
-                {card.warnings.map((warning) => (
+                {warnings.map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}
               </ul>
             ) : null}
+
+            <VenueHandoffPanel
+              venue={venue}
+              staff={staff}
+              notes={notes ?? []}
+              events={events ?? []}
+              run={run}
+              busy={busy}
+            />
 
             <div className="space-y-2" data-testid="venue-partner-last-month">
               <h3 className="text-sm font-semibold text-ink">

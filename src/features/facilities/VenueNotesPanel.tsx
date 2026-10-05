@@ -37,6 +37,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   debrief: "Team debrief",
   social_post: "Social post",
   site_visit: "Site visit",
+  handoff: "Hand-over brief",
   other: "Other",
 };
 

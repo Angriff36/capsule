@@ -11,6 +11,7 @@ import { formatDate } from "../../lib/format";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { venueDetailPath } from "./facilitiesRoutes";
 import { useAllEventReportRows } from "./useEventsById";
+import { handoffStatus, ownerProblem } from "./venueHandoff";
 import {
   CONTACT_DAYS,
   PARTNER_TIER_LABELS,
@@ -39,6 +40,11 @@ export function VenuePartnersPage() {
 
   const rows = useMemo(() => {
     const now = Date.now();
+    const activeStaffIds = new Set(
+      (people ?? [])
+        .filter((person) => person.deletedAt == null)
+        .map((person) => String(person._id)),
+    );
     return (venues ?? [])
       .filter((venue) => venue.deletedAt == null && venue.partnerTier)
       .map((venue) => {
@@ -46,19 +52,36 @@ export function VenuePartnersPage() {
           (person) =>
             String(person._id) === String(venue.partnerOwnerPersonId ?? ""),
         );
+        const card = partnerScorecard({
+          venue,
+          events: events ?? [],
+          notes: notes ?? [],
+          referralSources: sources ?? [],
+          leads: leads ?? [],
+          now,
+        });
+        const ownerWarning = ownerProblem({
+          isPartner: true,
+          ownerId: venue.partnerOwnerPersonId,
+          activeStaffIds,
+          staffLoaded: people !== undefined,
+        });
+        const handoff = handoffStatus({
+          venueId: String(venue._id),
+          notes: notes ?? [],
+          now,
+        });
         return {
           venue,
           ownerName: owner
             ? [owner.givenName, owner.familyName].filter(Boolean).join(" ")
             : null,
-          card: partnerScorecard({
-            venue,
-            events: events ?? [],
-            notes: notes ?? [],
-            referralSources: sources ?? [],
-            leads: leads ?? [],
-            now,
-          }),
+          card,
+          warnings: [
+            ...(ownerWarning ? [ownerWarning] : []),
+            ...(handoff?.reminders ?? []),
+            ...card.warnings,
+          ],
         };
       })
       .sort(
@@ -95,7 +118,7 @@ export function VenuePartnersPage() {
             {overdue > 0 ? ` · ${overdue} need a check-in` : ""}
           </p>
           <ul className="space-y-3">
-            {rows.map(({ venue, ownerName, card }) => (
+            {rows.map(({ venue, ownerName, card, warnings }) => (
               <li
                 key={venue._id}
                 className={`rounded-sm border bg-panel p-4 ${card.contactOverdue ? "border-warn" : "border-line"}`}
@@ -143,9 +166,9 @@ export function VenuePartnersPage() {
                     </dd>
                   </div>
                 </dl>
-                {card.warnings.length > 0 ? (
+                {warnings.length > 0 ? (
                   <p className="mt-2 text-sm text-warn">
-                    {card.warnings.join(" · ")}
+                    {warnings.join(" · ")}
                   </p>
                 ) : null}
               </li>
