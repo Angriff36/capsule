@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/react";
 import { useAction, useQuery } from "convex/react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect } from "react";
 import { api } from "../lib/api";
 import {
   OfflineAuthProvider,
@@ -45,7 +45,11 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
       offlineAuthSnapshotStore.forget(user.id);
       return;
     }
-    if (!live.personId || !live.tenantId) return;
+    if (!live.personId || !live.tenantId) {
+      // A new organization must not retain the previous organization's offline access.
+      offlineAuthSnapshotStore.forget(user.id);
+      return;
+    }
     offlineAuthSnapshotStore.write({
       accountId: live.accountId,
       capturedAt: Date.now(),
@@ -72,7 +76,14 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
     return <MembershipRequired />;
   }
   if (!status.personId) {
-    return <AccountProfileSetup key={`${user?.id}:${status.tenantId}`} />;
+    // The backend has confirmed workspace membership and role. A staff profile
+    // is needed for personal workflows, not for entering an empty organization.
+    return (
+      <>
+        <BackgroundProfileSetup key={`${user?.id}:${status.tenantId}`} />
+        {children}
+      </>
+    );
   }
   const stored = status as StoredAuthStatus;
   const readOnly = restore;
@@ -92,42 +103,17 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
   );
 }
 
-function AccountProfileSetup() {
+function BackgroundProfileSetup() {
   const ensureProfile = useAction(api.authLink.ensureAccountProfile);
-  const [attempt, setAttempt] = useState(0);
-  const [failed, setFailed] = useState(false);
   useEffect(() => {
-    let active = true;
-    setFailed(false);
     void ensureProfile({})
       .then((result) => {
-        if (active && !result.linked) setFailed(true);
+        if (!result.linked)
+          console.warn("Capsule staff profile setup:", result.reason);
       })
       .catch(() => {
-        if (active) setFailed(true);
+        console.warn("Capsule staff profile setup is unavailable.");
       });
-    return () => {
-      active = false;
-    };
-  }, [ensureProfile, attempt]);
-  return (
-    <GateShell
-      title={failed ? "Couldn’t open your profile" : "Opening Capsule…"}
-    >
-      <p role="status" className="text-ink-2">
-        {failed
-          ? "Your sign-in is saved. We couldn’t load your Capsule account. Try again without signing out."
-          : "Loading your account and workspace."}
-      </p>
-      {failed && (
-        <button
-          className="btn btn-primary mt-4 min-h-11"
-          type="button"
-          onClick={() => setAttempt((value) => value + 1)}
-        >
-          Try again
-        </button>
-      )}
-    </GateShell>
-  );
+  }, [ensureProfile]);
+  return null;
 }

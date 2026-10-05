@@ -224,6 +224,37 @@ git push -u origin feat/<name>              # chore push: no build, no deploy
 bash scripts/release.sh --reviewer <model>         # ONE merge + ONE main push, then archive/<branch>
 ```
 
+For parallel review and validation in a private release checkout, the low-level
+release command supports:
+
+```bash
+bash scripts/release.sh --prepare --reviewer <model>
+# Review the printed candidate SHA against its printed base while check runs.
+# Only after the full gate passes and the independent reviewer APPROVES:
+bash scripts/release.sh --publish --reviewer <model>
+```
+
+Do not run a separate full check before preparing a release. Preparation runs
+the same `bun run check` on the final merge and leaves local main on that
+candidate without pushing. Publishing requires a clean, unchanged candidate,
+matching passing proof and reviewer, and unchanged local source branch and origin/main.
+It pushes the already-validated commit without another full check. Never publish
+a rejected review. If the candidate becomes stale, return to the source branch,
+preserve any useful local candidate commit, restore local main to origin/main
+after verifying it has no other local work, and prepare/review again.
+
+The existing single-command release remains available after review approval;
+it also runs the full check exactly once. Source-to-archive renames at a released
+commit no longer regenerate code; ordinary branch and main pushes still do.
+
+The split commands only publish the Git release; they do not deploy the
+self-hosted backend. `scripts/deploy-production.sh` remains the complete
+production entry point. To finish a split release, check out its published
+`main` in the private release checkout and run that orchestrator; it resumes
+without repeating the release gate. `--candidate <sha>` is supported by
+`--prepare` and retained for `--publish`, so later remote `dev` commits wait
+for the next release.
+
 ### Deploy
 
 ```bash
