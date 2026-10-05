@@ -48,6 +48,7 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
 import { FailureBanner } from "./FailureBanner";
 import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
+import { CascadePreviewDialog } from "./CascadePreviewDialog";
 
 const LANE_DAYS = 14;
 const TRACKER_DAYS_BACK = 60;
@@ -195,6 +196,8 @@ export function EventTrackerPage() {
     event: CalendarEventFacts;
     newHeadcount: number;
   } | null>(null);
+  const [approvePreview, setApprovePreview] =
+    useState<CalendarEventFacts | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
 
   const loading = [
@@ -805,7 +808,11 @@ export function EventTrackerPage() {
                             type="button"
                             className="btn btn-primary btn-sm ml-auto"
                             disabled={busy}
-                            onClick={() =>
+                            onClick={() => {
+                              if (move.run === approve) {
+                                setApprovePreview(event);
+                                return;
+                              }
                               void run(
                                 event,
                                 () =>
@@ -814,8 +821,8 @@ export function EventTrackerPage() {
                                     version: event.version,
                                   }),
                                 "Stage updated",
-                              )
-                            }
+                              );
+                            }}
                           >
                             {move.label}
                           </button>
@@ -848,6 +855,24 @@ export function EventTrackerPage() {
               version: headcountPreview.event.version,
               expectedFingerprint,
             })
+          }
+        />
+      ) : null}
+      {approvePreview ? (
+        <CascadePreviewDialog
+          eventId={approvePreview.id}
+          action="approve"
+          onClose={() => setApprovePreview(null)}
+          onConfirm={() =>
+            void run(
+              approvePreview,
+              () =>
+                approve({
+                  docId: approvePreview.id,
+                  version: approvePreview.version,
+                }),
+              "Stage updated",
+            )
           }
         />
       ) : null}
