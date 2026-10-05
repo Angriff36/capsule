@@ -32,6 +32,17 @@ export function useDishesByIds(
   return rows ?? [];
 }
 
+/**
+ * Dishes offered only at this venue. `undefined` while loading; `[]` when the
+ * caller may not read dishes.
+ */
+export function useDishesExclusiveToVenue(
+  venueId: string,
+): DishRow[] | undefined {
+  const rows = useQuery(api.dishLookup.exclusiveToVenue, { venueId });
+  return rows === undefined ? undefined : (rows ?? []);
+}
+
 const DISH_PAGE = 500;
 
 /**

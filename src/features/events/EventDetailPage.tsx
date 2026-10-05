@@ -592,7 +592,11 @@ function EventDetailContent({
       ) : null}
       {activeTab === "prep" ? (
         <EventTabErrorBoundary tabLabel="Prep" key="prep">
-          <EventPrepTab eventId={event._id} eventStage={String(event.stage)} />
+          <EventPrepTab
+            eventId={event._id}
+            eventStage={String(event.stage)}
+            serviceStyleId={event.serviceStyleId ?? null}
+          />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "equipment" ? (

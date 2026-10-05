@@ -18,6 +18,7 @@ import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
 import { EquipmentRepairsPanel } from "./EquipmentRepairsPanel";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { EquipmentBulkAddPanel } from "./EquipmentBulkAddPanel";
+import { GoodshuffleItemsImport } from "./GoodshuffleItemsImport";
 import { assetTagFor } from "./equipmentPackListParser";
 import { useRentalVendorChoices } from "./equipmentCheckout";
 import { EquipmentCatalogTable } from "./EquipmentCatalogTable";
@@ -46,6 +47,7 @@ export function EquipmentCatalogPage() {
   const reviseDetails = useEquipmentReviseDetails();
   const [showForm, setShowForm] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
+  const [showGoodshuffle, setShowGoodshuffle] = useState(false);
   const [bulkNotice, setBulkNotice] = useState<string | null>(null);
   const [editing, setEditing] = useState<EquipmentDetailRow | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -247,6 +249,7 @@ export function EquipmentCatalogPage() {
             onClick={() => {
               setEditing(null);
               setShowForm(false);
+              setShowGoodshuffle(false);
               setShowBulk(true);
             }}
             data-testid="equipment-open-bulk"
@@ -254,10 +257,23 @@ export function EquipmentCatalogPage() {
             Paste a pack list
           </button>
           <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setEditing(null);
+              setShowForm(false);
+              setShowBulk(false);
+              setShowGoodshuffle(true);
+            }}
+            data-testid="equipment-open-goodshuffle"
+          >
+            Bring in Goodshuffle items
+          </button>
+          <button
             className="btn btn-primary"
             onClick={() => {
               setEditing(null);
               setShowBulk(false);
+              setShowGoodshuffle(false);
               setShowForm(true);
             }}
           >
@@ -299,6 +315,9 @@ export function EquipmentCatalogPage() {
           }
           onClose={() => setShowBulk(false)}
         />
+      ) : null}
+      {showGoodshuffle ? (
+        <GoodshuffleItemsImport onClose={() => setShowGoodshuffle(false)} />
       ) : null}
       {showForm ? (
         <EquipmentForm

@@ -9,7 +9,10 @@ import {
   useListComponent,
   useListComponentImportLine,
   useListIngredient,
+  useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
+import type { ServiceStyleOption } from "../stylePackaging";
+import { isRecipeSheet, recipeSheetSave } from "./RecipeSheetParser";
 import {
   useCreateComponentImportReview,
   useImportComponentSafely,
@@ -78,6 +81,8 @@ export function ComponentImportPage() {
   const liveRef = useRef<HTMLDivElement>(null);
   const ingredients = useListIngredient();
   const components = useListComponent();
+  const serviceStyles = useListServiceStyle() as
+    ServiceStyleOption[] | undefined;
   const allImports = useListComponentImport();
   const allImportLines = useListComponentImportLine();
   // Generated id queries throw on malformed ids, so an implausible ?importId
@@ -307,6 +312,21 @@ export function ComponentImportPage() {
           recipes,
         );
       }
+      // The one-file recipe sheet says more than the review holds: list what
+      // else will be saved with the recipe so nothing is a surprise.
+      const sheetSave =
+        readiness.kind === "csv_bundle"
+          ? null
+          : recipeSheetSave(source, serviceStyles);
+      if (sheetSave) {
+        next = {
+          ...next,
+          warnings: [
+            ...next.warnings,
+            ...sheetSave.notes.map((note) => `Saved with the recipe: ${note}`),
+          ],
+        };
+      }
       setReview(next);
       markClean();
       setSaveState("idle");
@@ -481,7 +501,15 @@ export function ComponentImportPage() {
       });
       const scope = "component-import";
       const pending = beginPendingOperation(scope, current);
-      const saved = await finalizer.finalize(pending.payload, pending.key);
+      const sheet = recipeSheetSave(
+        current.rawSourceText ?? source,
+        serviceStyles,
+      )?.sheet;
+      const saved = await finalizer.finalize(
+        pending.payload,
+        pending.key,
+        sheet,
+      );
       confirmPendingOperation(scope);
       const outcome = componentImportOutcome({
         ...saved,
@@ -658,6 +686,15 @@ export function ComponentImportPage() {
                     setSourceHint(null);
                   }}
                   onSheetChange={(value, filename) => {
+                    // The one-file recipe sheet needs no lines file.
+                    if (isRecipeSheet(value)) {
+                      setSource(value);
+                      setTextFilename(filename);
+                      setSheetCsv("");
+                      setSheetFilename(undefined);
+                      setSourceHint(null);
+                      return;
+                    }
                     setSheetCsv(value);
                     setSheetFilename(filename);
                     setSourceHint(null);

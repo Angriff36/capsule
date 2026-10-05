@@ -27,11 +27,13 @@ export function SystemHealthSection({ canManage }: { canManage: boolean }) {
     calendar: calendar && {
       state: calendar.state,
       failedCount: calendar.failed.length,
+      accessEndsAt: calendar.accessEndsAt,
     },
     quickBooks: quickBooks && {
       connected: quickBooks.connected,
       lastStatus: quickBooks.lastSync?.status ?? null,
       failed: quickBooks.lastSync?.failed ?? 0,
+      accessEndsAt: quickBooks.accessEndsAt,
     },
   });
 

@@ -3,6 +3,7 @@
 // connections, each with a next step, and never shows provider error text.
 import { describe, expect, it } from "vitest";
 import {
+  ACCESS_ENDING_WITHIN_MS,
   classifyHealth,
   STUCK_AFTER_MS,
   type HealthSnapshot,
@@ -135,6 +136,88 @@ describe("operational health classification", () => {
             connected: false,
             lastStatus: "disconnected",
             failed: 0,
+          },
+        }),
+      ),
+    ).toEqual([]);
+  });
+
+  it("warns 14 days before a connection's access ends", () => {
+    const DAY = 24 * 60 * 60_000;
+    expect(
+      keys(
+        snapshot({
+          calendar: {
+            state: "in_step",
+            failedCount: 0,
+            accessEndsAt: NOW + 30 * DAY,
+          },
+          quickBooks: {
+            connected: true,
+            lastStatus: "ok",
+            failed: 0,
+            accessEndsAt: NOW + ACCESS_ENDING_WITHIN_MS + DAY,
+          },
+        }),
+      ),
+    ).toEqual([]);
+    const ending = classifyHealth(
+      snapshot({
+        calendar: {
+          state: "in_step",
+          failedCount: 0,
+          accessEndsAt: NOW + 6 * DAY + 60_000,
+        },
+        quickBooks: {
+          connected: true,
+          lastStatus: "ok",
+          failed: 0,
+          accessEndsAt: NOW + DAY - 60_000,
+        },
+      }),
+    );
+    expect(ending.map((a) => [a.key, a.level, a.title])).toEqual([
+      [
+        "calendar-access-ending",
+        "act",
+        "Google Calendar access ends in 7 days",
+      ],
+      ["quickbooks-access-ending", "act", "QuickBooks access ends tomorrow"],
+    ]);
+    expect(
+      classifyHealth(
+        snapshot({
+          quickBooks: {
+            connected: true,
+            lastStatus: "ok",
+            failed: 0,
+            accessEndsAt: NOW - DAY,
+          },
+        }),
+      )[0].title,
+    ).toBe("QuickBooks access has ended");
+    // Already broken: the reconnect alert says it; no second line.
+    expect(
+      keys(
+        snapshot({
+          quickBooks: {
+            connected: true,
+            lastStatus: "needs_reconnect",
+            failed: 0,
+            accessEndsAt: NOW + DAY,
+          },
+        }),
+      ),
+    ).toEqual(["quickbooks-reconnect"]);
+    // Not connected: no warning about an old connection's date.
+    expect(
+      keys(
+        snapshot({
+          quickBooks: {
+            connected: false,
+            lastStatus: null,
+            failed: 0,
+            accessEndsAt: NOW + DAY,
           },
         }),
       ),

@@ -20,7 +20,9 @@
 #    a baseline query and every --verify query, then deploymentProbe:health
 #    must name the release sha (the deployed code is the release's code), then
 #    the production frontend returns HTTP 200.
-# 5. Prints RESULT: PASS or RESULT: FAIL with the sha.
+# 5. Sets up daily backups once (key, crontab line, first backup); a problem
+#    there is a warning, not a failed deploy.
+# 6. Prints RESULT: PASS or RESULT: FAIL with the sha.
 #
 # --verify takes zero-argument queries as a comma list (listA,listB). A query
 # with required arguments takes its own flag with the payload:
@@ -241,6 +243,45 @@ fi
 
 code="$(curl -s -o /dev/null -m 30 -w '%{http_code}' "$FRONTEND_URL" || true)"
 [ "$code" = "200" ] || fail "the production frontend returned HTTP ${code:-none}"
+
+# 5. Daily backups (docs/operations/backup-and-restore.md), set up by the first
+#    release that carries the backup script: a backup key in .env.local (never
+#    printed), a 3 am crontab line, and a first backup when the folder has
+#    none. Each step runs only when missing. A failure here is a warning: the
+#    deploy above is already done and verified.
+setup_backups() {
+  [ -f scripts/backup-capsule.ts ] || return 0
+  local dir="${CAPSULE_BACKUP_DIR:-$HOME/capsule-backups}" key bun_path line
+  mkdir -p "$dir" || { echo "  warn  backups: cannot make $dir"; return 0; }
+  if ! grep -Eqs '^CAPSULE_BACKUP_KEY=.+' .env.local; then
+    key="$(openssl rand -base64 32 2>/dev/null || true)"
+    if [ -z "$key" ]; then
+      echo "  warn  backups: openssl is missing, so no backup key was made"
+      return 0
+    fi
+    printf '\nCAPSULE_BACKUP_KEY=%s\n' "$key" >> .env.local
+    echo "  new   backup key written to .env.local - keep a copy OFF this box (password manager)"
+  fi
+  bun_path="$(command -v bun)"
+  line="0 3 * * * cd '$(pwd)' && PATH='$PATH' '$bun_path' scripts/backup-capsule.ts backup --dir '$dir' >> '$dir/backup.log' 2>&1"
+  if ! command -v crontab >/dev/null 2>&1; then
+    echo "  warn  backups: crontab is missing, so there is no daily backup"
+  elif ! crontab -l 2>/dev/null | grep -q 'backup-capsule.ts backup'; then
+    if { crontab -l 2>/dev/null; echo "$line"; } | crontab -; then
+      echo "  new   daily backup at 3 am added to crontab"
+    else
+      echo "  warn  backups: crontab refused the daily backup line"
+    fi
+  fi
+  if ! ls "$dir"/*.capsule-backup >/dev/null 2>&1; then
+    if bun scripts/backup-capsule.ts backup --dir "$dir" >> "$dir/backup.log" 2>&1; then
+      echo "  ok    first backup taken in $dir"
+    else
+      echo "  warn  backups: the first backup failed, see $dir/backup.log"
+    fi
+  fi
+}
+setup_backups
 
 echo ""
 echo "RESULT: PASS - backend deployed from $head_sha; $count queries respond; frontend HTTP 200"

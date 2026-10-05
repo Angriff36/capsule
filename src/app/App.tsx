@@ -4,6 +4,7 @@ import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedDeckPage } from "../features/clients/SharedDeckPage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
+import { SharedVenueGalleryPage } from "../features/facilities/SharedVenueGalleryPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
 import { PublicMenuPage } from "../features/sales/PublicMenuPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
@@ -459,9 +460,24 @@ const VenuesPage = lazy(() =>
     default: module.VenuesPage,
   })),
 );
+const VenuePartnersPage = lazy(() =>
+  import("../features/facilities/VenuePartnersPage").then((module) => ({
+    default: module.VenuePartnersPage,
+  })),
+);
 const VenueDetailPage = lazy(() =>
   import("../features/facilities/VenueDetailPage").then((module) => ({
     default: module.VenueDetailPage,
+  })),
+);
+const VenueMenuCardPage = lazy(() =>
+  import("../features/facilities/VenueMenuCardPage").then((module) => ({
+    default: module.VenueMenuCardPage,
+  })),
+);
+const VenueInfoPacketPage = lazy(() =>
+  import("../features/facilities/VenueInfoPacketPage").then((module) => ({
+    default: module.VenueInfoPacketPage,
   })),
 );
 const VenueVendorRelationshipsPage = lazy(() =>
@@ -628,6 +644,7 @@ export function App() {
   const deckMatch = useMatch("/deck/:token");
   const quoteMatch = useMatch("/quote");
   const publicMenuMatch = useMatch("/menu");
+  const venueGalleryMatch = useMatch("/venue-gallery/:token");
 
   if (clientPortalMatch?.params.token) {
     return (
@@ -662,6 +679,14 @@ export function App() {
     return (
       <AppErrorBoundary>
         <SharedDeckPage token={deckMatch.params.token} />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (venueGalleryMatch?.params.token) {
+    return (
+      <AppErrorBoundary>
+        <SharedVenueGalleryPage token={venueGalleryMatch.params.token} />
       </AppErrorBoundary>
     );
   }
@@ -1506,10 +1531,34 @@ export function App() {
               }
             />
             <Route
+              path="/facilities/venues/partners"
+              element={
+                <SupplyRoute>
+                  <VenuePartnersPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/facilities/venues/:id"
               element={
                 <SupplyRoute>
                   <VenueDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/:id/menu-card"
+              element={
+                <SupplyRoute>
+                  <VenueMenuCardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/:id/info-packet"
+              element={
+                <SupplyRoute>
+                  <VenueInfoPacketPage />
                 </SupplyRoute>
               }
             />

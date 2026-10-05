@@ -95,7 +95,66 @@ type SharedProposal = {
   // still shows what was shared, and names the newer proposal; its link token
   // is given when that proposal has a working link.
   replacedBy: { title: string; shareToken: string | null } | null;
+  // Venue Partner Playbook section 06: the company's name and logo first;
+  // at a partner venue, the venue's name, logo and colour next to it.
+  brand: {
+    companyName: string | null;
+    companyLogoUrl: string | null;
+    partnerVenue: {
+      name: string;
+      logoUrl: string | null;
+      color: string | null;
+    } | null;
+  };
 };
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/iu;
+
+/** The company's own logo today (the Branding page), or null. */
+async function companyLogoUrl(
+  ctx: QueryCtx,
+  tenantId: string,
+): Promise<string | null> {
+  const organizations = await ctx.db
+    .query("organizations")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  const live =
+    organizations.find(
+      (row) => row.deletedAt == null && String(row.status) === "active",
+    ) ?? organizations.find((row) => row.deletedAt == null);
+  return await frozenPictureUrl(ctx, live?.brandLogoStorageId);
+}
+
+async function sharedBrand(
+  ctx: QueryCtx,
+  tenantId: string,
+  snapshot: Record<string, unknown>,
+): Promise<SharedProposal["brand"]> {
+  const tenant = (snapshot.tenant ?? {}) as Record<string, unknown>;
+  const partner =
+    snapshot.partnerVenue && typeof snapshot.partnerVenue === "object"
+      ? (snapshot.partnerVenue as Record<string, unknown>)
+      : null;
+  const color =
+    typeof partner?.brandColor === "string" &&
+    HEX_COLOR.test(partner.brandColor)
+      ? partner.brandColor
+      : null;
+  return {
+    companyName:
+      typeof tenant.name === "string" && tenant.name ? tenant.name : null,
+    companyLogoUrl: await companyLogoUrl(ctx, tenantId),
+    partnerVenue:
+      partner && typeof partner.name === "string" && partner.name
+        ? {
+            name: partner.name,
+            logoUrl: await frozenPictureUrl(ctx, partner.logoStorageId),
+            color,
+          }
+        : null,
+  };
+}
 
 /** A link saved without an end date stops working 90 days after it was made. */
 export const SHARE_LINK_DEFAULT_LIFETIME_MS = 90 * 24 * 60 * 60 * 1000;
@@ -355,6 +414,7 @@ export const getSharedProposal = query({
       linkCreatedAt: link.createdAt ?? null,
       linkExpiresAt: linkEndsAt(link),
       replacedBy: await replacementOf(ctx, liveProposal),
+      brand: await sharedBrand(ctx, link.tenantId, snapshot),
     };
   },
 });

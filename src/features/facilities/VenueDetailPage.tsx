@@ -24,8 +24,13 @@ import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
+import { VenuePartnershipPanel } from "./VenuePartnershipPanel";
+import { VenueSellingProfilePanel } from "./VenueSellingProfilePanel";
+import { VenueExclusiveDishesPanel } from "./VenueExclusiveDishesPanel";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
 import { VenueOperatingFactsPanel } from "./VenueOperatingFactsPanel";
+import { VenueSiteVisitPanel } from "./VenueSiteVisitPanel";
+import { VenueEventGalleryPanel } from "./VenueEventGalleryPanel";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import {
   coordinatesFromFields,
@@ -876,7 +881,17 @@ export function VenueDetailPage() {
       {/* Venue Rooms & Spaces */}
       <VenueScorecardPanel venueId={venue._id} />
 
+      <VenueSellingProfilePanel venue={venue} />
+
+      <VenuePartnershipPanel venue={venue} />
+
+      <VenueExclusiveDishesPanel venueId={String(venue._id)} />
+
       <VenueRoomsPanel venueId={venue._id} />
+
+      <VenueSiteVisitPanel venue={venue} />
+
+      <VenueEventGalleryPanel venue={venue} />
 
       {/* Venue Notes */}
       <VenueNotesPanel venueId={venue._id} />

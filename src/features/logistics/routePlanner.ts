@@ -82,7 +82,45 @@ export function routeLegs(
   });
 }
 
-const CACHE_PREFIX = "capsule.geocode:";
+// v2: earlier versions cached a miss for addresses that the cleanup below now finds.
+const CACHE_PREFIX = "capsule.geocode2:";
+
+/**
+ * Searches to try, best first. A pasted first line often carries a building
+ * label before the street ("2440 BUILDING 2440 NE Hopkins Ct."), which the map
+ * service cannot find; the last "number + street" in that line can be found.
+ */
+export function geocodeQueries(destination: string): string[] {
+  const parts = destination.split(",").map((part) => part.trim());
+  const streets = (parts[0] ?? "").match(/\d+[A-Za-z]?\s+[^\d,]+/g) ?? [];
+  const street = streets.at(-1)?.trim();
+  const queries = [destination.trim()];
+  if (street && street !== parts[0]) {
+    queries.push([street, ...parts.slice(1)].filter(Boolean).join(", "));
+  }
+  return queries;
+}
+
+type Geocoder = (query: string) => Promise<GeoPoint | null>;
+let googleGeocoder: Geocoder | undefined;
+
+/** Set once at start-up: Google is asked first, OpenStreetMap after it. */
+export function setGoogleGeocoder(geocoder: Geocoder): void {
+  googleGeocoder = geocoder;
+}
+
+async function searchOnce(query: string): Promise<GeoPoint | null> {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
+    { headers: { Accept: "application/json" } },
+  );
+  if (!response.ok) return null;
+  const results = (await response.json()) as { lat?: string; lon?: string }[];
+  const hit = results[0];
+  return hit?.lat != null && hit?.lon != null
+    ? { lat: Number(hit.lat), lon: Number(hit.lon) }
+    : null;
+}
 
 // Geocode a free-text destination via Nominatim (OpenStreetMap), caching hits
 // and misses in localStorage so repeat renders never re-query.
@@ -98,19 +136,14 @@ export async function geocodeDestination(
   }
   let point: GeoPoint | null = null;
   try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(destination)}`,
-      { headers: { Accept: "application/json" } },
-    );
-    if (response.ok) {
-      const results = (await response.json()) as {
-        lat?: string;
-        lon?: string;
-      }[];
-      const hit = results[0];
-      if (hit?.lat != null && hit?.lon != null) {
-        point = { lat: Number(hit.lat), lon: Number(hit.lon) };
-      }
+    if (googleGeocoder) point = await googleGeocoder(destination.trim());
+  } catch {
+    // Google unreachable — OpenStreetMap below
+  }
+  try {
+    for (const query of point ? [] : geocodeQueries(destination)) {
+      point = await searchOnce(query);
+      if (point) break;
     }
   } catch {
     return null; // network failure: do not cache, retry next visit

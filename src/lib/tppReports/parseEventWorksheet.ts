@@ -1,10 +1,15 @@
 import type {
   BundleMenuItem,
+  BundleNotes,
   BundlePackListItem,
   BundleStaffAssignment,
   BundleTimelineEntry,
   EventBundlePart,
 } from "./eventBundle";
+import {
+  bundleNotesFromSections,
+  splitBeoNoteSections,
+} from "./beoNoteSections";
 import { findLabelledValue, isBlankRow } from "./csvRows";
 import {
   parseAddressBlob,
@@ -136,6 +141,10 @@ export function parseEventWorksheet(rows: string[][]): EventBundlePart {
   const venueAddress = venueStreet?.trim()
     ? parseAddressBlob(venueStreet)
     : undefined;
+  // The worksheet header has no event time; the timeline rows carry it.
+  const timeline = readTimeline(rows);
+  const timelineMinutes = (pattern: RegExp) =>
+    timeline.find((entry) => pattern.test(entry.name))?.minutes;
 
   return {
     source: "eventWorksheet",
@@ -143,6 +152,8 @@ export function parseEventWorksheet(rows: string[][]): EventBundlePart {
       invoiceNumber: label("Invoice #"),
       title: label("Event Title"),
       eventDate: parseReportDate(label("Event Date")),
+      startMinutes: timelineMinutes(/^event start/i),
+      endMinutes: timelineMinutes(/^event end/i),
       guestCount: parseCount(label("Guest Count")),
       serviceStyle: label("Service Style"),
       occasion: label("Occasion"),
@@ -171,11 +182,54 @@ export function parseEventWorksheet(rows: string[][]): EventBundlePart {
         venueBlob?.match(/(?:Work|Phone|Main)\s*:\s*([\d()\-. ]+)/i)?.[1],
       ),
     },
-    timeline: readTimeline(rows),
+    timeline,
     menu: readMenu(rows),
     packList: readEquipment(rows),
     staff: readStaff(rows),
+    notes: readSetupNotes(rows),
   };
+}
+
+/**
+ * "Setup": the overview, arrival, service and on-site contact prose, one long
+ * cell per printed page. Text before any known heading is the overview.
+ */
+function readSetupNotes(rows: readonly string[][]): BundleNotes {
+  const parts: string[] = [];
+  let active = false;
+  for (const row of rows) {
+    const section = sectionOf(row);
+    if (section === "setup") {
+      active = true;
+      continue;
+    }
+    if (!active) continue;
+    if (section === "rental / equipment" || section === "event labor") break;
+    if (PRINTED_FOOTER.test(row[0] ?? "")) continue;
+    const text = row
+      .map((cell) => cell.trim())
+      .filter(Boolean)
+      .join(" ");
+    if (text) parts.push(text);
+  }
+  const blob = parts.join("\n\n").trim();
+  if (!blob) return {};
+  const sections = splitBeoNoteSections(blob);
+  const firstHeading = Object.keys(sections).length
+    ? Math.min(...Object.keys(sections).map((heading) => blob.indexOf(heading)))
+    : blob.length;
+  const lead = blob.slice(0, firstHeading).trim();
+  const notes = bundleNotesFromSections(sections);
+  for (const key of Object.keys(notes) as Array<keyof BundleNotes>) {
+    const value = notes[key]?.replace(/^:\s*/, "");
+    if (value) notes[key] = value;
+    else delete notes[key];
+  }
+  if (lead)
+    notes.eventOverview = notes.eventOverview
+      ? `${lead}\n\n${notes.eventOverview}`
+      : lead;
+  return notes;
 }
 
 /**

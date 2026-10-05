@@ -2986,6 +2986,22 @@
   grid-column: 1 / -1;
 }
 
+div.tpp-parameter-wide {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tpp-saved-texts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.tpp-saved-texts label {
+  flex: 1 1 14rem;
+}
+
 .tpp-checkbox {
   display: flex !important;
   align-items: center;
@@ -3125,6 +3141,13 @@
   font-size: 1.15rem;
 }
 
+.tpp-document-logo {
+  display: block;
+  max-width: 12rem;
+  max-height: 5rem;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
 .tpp-document dl > div {
   display: grid;
   grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
@@ -4447,13 +4470,21 @@
   .print-sheet * {
     visibility: visible;
   }
+  /* !important: screen rules (.card, the report drawer's slide-in shift) are
+     stronger and kept the sheet in place on the paper - it printed half way
+     down, or two fifths across. The frames around a sheet are unpinned so it
+     starts at the top-left of the paper. */
   .print-sheet {
-    position: absolute;
+    position: absolute !important;
     top: 0;
     left: 0;
     width: 100%;
     border: none;
     box-shadow: none;
+  }
+  *:has(.print-sheet) {
+    position: static !important;
+    transform: none !important;
   }
   .print-sheet .supply-table-wrap {
     overflow: visible;

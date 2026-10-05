@@ -49,6 +49,8 @@ export interface CalendarHealth {
     fieldsOwnedByCapsule: string[];
   } | null;
   scopes: string | null;
+  /** When Google stops accepting Capsule's access; null when Google did not say. */
+  accessEndsAt: number | null;
   waitingCount: number;
   failed: CalendarFailedEvent[];
   canManage: boolean;
@@ -79,6 +81,7 @@ export const connectionHealth = query({
       lastAttemptAt: null,
       basis: null,
       scopes: null,
+      accessEndsAt: null,
       waitingCount: 0,
       failed: [],
       canManage: canManage(auth.role),
@@ -172,6 +175,7 @@ export const connectionHealth = query({
           }
         : null,
       scopes: connection.scopes,
+      accessEndsAt: connection.refreshTokenExpiresAt,
       waitingCount,
       failed: failed.slice(0, 50),
       canManage: canManage(auth.role),

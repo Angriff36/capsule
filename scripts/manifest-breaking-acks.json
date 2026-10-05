@@ -2658,6 +2658,240 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-03",
       "reason": "New optional clock-out location; existing time entries read as no location."
+    },
+    {
+      "path": "update.parameters.priceDate",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "VendorItem.update takes an optional price date (an old price list read in); callers that leave it out keep today's date."
+    },
+    {
+      "path": "VendorItemAdded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "The event now carries the pack price, pack and price date so the price history can be read from it; no reaction listens to it."
+    },
+    {
+      "path": "VendorItemUpdated.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "The event also carries the optional price date; older events without it read as dated when they happened."
+    },
+    {
+      "path": "Dish.versionOfDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Dish.versionLabel",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Dish.recipeDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "Dish.usesMainRecipe",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "EventDish.recipeDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Dish versions share the main recipe (Ryan 2026-10-04): new optional field; existing rows stay valid and keep their own recipe."
+    },
+    {
+      "path": "EventDishAdded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "EventDishAdded carries recipeDishId (the dish whose recipe the line cooks from); dishId unchanged."
+    },
+    {
+      "path": "Dish.finishTiming",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "When a dish is finished (Ryan 2026-10-04): new optional field; existing dishes stay valid with no value."
+    },
+    {
+      "path": "Component.activePrepMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Recipe sheet times (Ryan 2026-10-04): new optional field; existing recipes stay valid with no value."
+    },
+    {
+      "path": "Component.passiveCookMinutes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Recipe sheet times (Ryan 2026-10-04): new optional field; existing recipes stay valid with no value."
+    },
+    {
+      "path": "Component.declaredAllergens",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-04",
+      "reason": "Allergens marked on the recipe sheet (Ryan 2026-10-04): optional list, stored as optional; existing recipes stay valid with none."
+    },
+    {
+      "path": "Venue.partnerTier",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue partner program (Mangia Venue Partner Playbook): optional field; existing venues stay valid as non-partners."
+    },
+    {
+      "path": "Venue.partnerOwnerPersonId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue partner program: optional relationship owner; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.partnerSince",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue partner program: optional start date, set only when a tier is set."
+    },
+    {
+      "path": "Venue.opsEaseScore",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue partner program: optional 1-10 rating; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.relationshipScore",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue partner program: optional 1-10 rating; existing venues stay valid with none."
+    },
+    {
+      "path": "ReferralSource.venueId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue partner program: optional link from a referral source to the venue that sends its leads; existing sources stay valid unlinked."
+    },
+    {
+      "path": "Dish.exclusiveVenueId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue-exclusive menu items: optional venue a dish is offered only at; existing dishes stay offered anywhere."
+    },
+    {
+      "path": "VenueNote.rating",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "After-event venue follow-up: optional 1-10 client score on a client feedback note; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.escalationLevel",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels (playbook section 14): optional level 1-4 on a problem note; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.resolution",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: optional text of how a problem was settled; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.resolvedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: optional time a problem was settled; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.resolvedByName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: optional name of who settled a problem; existing notes stay valid with none."
+    },
+    {
+      "path": "post.parameters.escalationLevel",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: VenueNote.post takes an optional level; existing callers send none."
+    },
+    {
+      "path": "post.parameters.rating",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "After-event venue follow-up: VenueNote.post takes an optional client score; existing callers send none."
+    },
+    {
+      "path": "Venue.logoStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Co-branded proposals: optional venue logo file; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.brandColor",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Co-branded proposals: optional venue brand colour; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.socialHandle",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "After-event social post: optional venue social handle for the tag; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.galleryToken",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Shared event gallery: optional secret part of the venue's gallery link; existing venues stay valid with none (not shared)."
+    },
+    {
+      "path": "Venue.vibe",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional venue look; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.vibeWords",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional look in a few words; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.topFeature",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional stand-out feature; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.otherFeatures",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional other features; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.targetClient",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional who books it; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.competitivePosition",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional comparison with other venues; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.photoFocus",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional what to photograph; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.exclusiveItemIdea",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional only-here dish idea; existing venues stay valid with none."
     }
   ]
 }

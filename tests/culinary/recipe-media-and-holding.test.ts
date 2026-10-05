@@ -23,6 +23,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => ({
   useComponentSetPrimaryImage: () => async () => null,
   useComponentClearPrimaryImage: () => async () => null,
   useCreateAttachment: () => async () => null,
+  useAttachmentRemove: () => async () => null,
 }));
 vi.mock("convex/react", async (importOriginal) => ({
   ...(await importOriginal<object>()),

@@ -169,6 +169,13 @@ describe("runtime proof: vendor price list file", () => {
       history.find((row) => row.payload?.packPrice === 58.5)?.payload,
     ).toMatchObject({ previousPackPrice: 54, packPrice: 58.5 });
 
+    // The price history read: the import price, then the change.
+    const creamHistory = (await roles.procurement.query(
+      api.vendorPriceList.priceHistory,
+      { ingredientId: cream.docId },
+    )) as any[];
+    expect(creamHistory.map((p) => p.packPrice)).toEqual([58.5, 54]);
+
     const cookRole = proof.asRole({
       subject: `cook-${TENANT}`,
       role: "kitchen_staff",
@@ -179,5 +186,101 @@ describe("runtime proof: vendor price list file", () => {
         rows: sheet("1").map((row) => ({ ...row, Vendor: "Other dairy" })),
       }),
     ).rejects.toThrow();
+  });
+
+  it("brings in dated old prices as history; the newest stays the price", async () => {
+    const proof = harness();
+    const tenant = `${TENANT}-dated`;
+    const roles = rolesFor(proof, tenant);
+    const kitchen = runner(proof, roles.kitchen);
+    const cream = await kitchen(api.mutations.Ingredient_createViaIntroduce, {
+      name: "Heavy Cream",
+      unit: "quart",
+      costPerUnit: 4,
+      allergens: [],
+      category: "dairy",
+    });
+    const row = (price: string, date: string) => ({
+      Vendor: "Hillside Dairy",
+      "Item number": "HD-12",
+      "Item name": "Heavy cream 36% case",
+      Ingredient: "Heavy Cream",
+      "Pack amount": "12",
+      "Pack unit": "qt",
+      "Pack price": price,
+      "Price date": date,
+    });
+    const at = (y: number, m: number, d: number) => Date.UTC(y, m - 1, d, 12);
+    // Out of order in the file on purpose; one bad date, one future date.
+    const history = [
+      row("52.00", "6/1/2025"),
+      row("48.00", "2025-01-15"),
+      row("50.00", "3/10/25"),
+      row("49.00", "soon"),
+      row("60.00", "2099-01-01"),
+    ];
+    const first = (await roles.procurement.mutation(
+      api.vendorPriceList.importVendorPriceRows,
+      { rows: history },
+    )) as any;
+    expect(first).toMatchObject({ added: 1, updated: 2, pastPrices: 0 });
+    expect(first.problems).toEqual([
+      { row: 5, reason: expect.stringMatching(/"soon" is not a date/) },
+      { row: 6, reason: "The price date is after today." },
+    ]);
+    const item = (
+      (await roles.procurement.query(api.queries.listVendorItem, {})) as any[]
+    ).find((r) => r.ingredientId === cream.docId);
+    expect(item).toMatchObject({ packPrice: 52, priceSetAt: at(2025, 6, 1) });
+
+    const read = async () =>
+      (
+        (await roles.procurement.query(api.vendorPriceList.priceHistory, {
+          ingredientId: cream.docId,
+        })) as any[]
+      ).map((p) => [p.packPrice, p.pricedAt]);
+    expect(await read()).toEqual([
+      [52, at(2025, 6, 1)],
+      [50, at(2025, 3, 10)],
+      [48, at(2025, 1, 15)],
+    ]);
+
+    // An older file read later: its prices go into the history only.
+    const older = (await roles.procurement.mutation(
+      api.vendorPriceList.importVendorPriceRows,
+      { rows: [row("45.00", "2024-11-02")] },
+    )) as any;
+    expect(older).toMatchObject({ updated: 0, pastPrices: 1 });
+    const after = (
+      (await roles.procurement.query(api.queries.listVendorItem, {})) as any[]
+    ).find((r) => r._id === item._id);
+    expect(after).toMatchObject({ packPrice: 52, priceSetAt: at(2025, 6, 1) });
+    expect((await read()).at(-1)).toEqual([45, at(2024, 11, 2)]);
+
+    // Both files again change nothing.
+    const again = (await roles.procurement.mutation(
+      api.vendorPriceList.importVendorPriceRows,
+      { rows: [...history.slice(0, 3), row("45.00", "2024-11-02")] },
+    )) as any;
+    expect(again).toMatchObject({
+      added: 0,
+      updated: 0,
+      pastPrices: 0,
+      unchanged: 4,
+    });
+    expect(await read()).toHaveLength(4);
+
+    // Another company sees none of it; a cook in this company may read it.
+    const other = rolesFor(proof, `${tenant}-other`);
+    expect(
+      await other.procurement.query(api.vendorPriceList.priceHistory, {
+        ingredientId: cream.docId,
+      }),
+    ).toEqual([]);
+    expect(
+      await roles.kitchen.query(api.vendorPriceList.priceHistory, {
+        ingredientId: cream.docId,
+      }),
+    ).toHaveLength(4);
   });
 });

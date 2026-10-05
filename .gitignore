@@ -35,6 +35,8 @@ generated/ir/
 
 # Loop fix-attempt worktrees (loop-worktree tool)
 .loop-worktrees/
+# Other agent worktrees
+.worktrees/
 
 # AboardAI board data lives in .aboardai/ (features, kanban). Do NOT move that
 # tree under .local/ — agents did that once and emptied the Kanban. .local/ is
@@ -67,6 +69,7 @@ storybook-static/
 
 # Ralph loop state (loop.sh writes these every iteration; never commit them)
 .ralph-checkpoint
+.ralph-complete
 .ralph-telemetry.jsonl
 .ralph-failures.md
 .ralph-tasks/

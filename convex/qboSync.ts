@@ -57,6 +57,8 @@ interface ConnectionPayload {
   connectedAt: number;
   connectedBy: string;
   refreshToken: EncryptedRefreshToken;
+  /** When QuickBooks stops accepting the stored token; null when it did not say. */
+  refreshTokenExpiresAt: number | null;
 }
 
 interface EntitySyncState {
@@ -191,7 +193,18 @@ function parseConnection(payload: unknown): ConnectionPayload | null {
     connectedAt,
     connectedBy,
     refreshToken: { ciphertext, keyId },
+    refreshTokenExpiresAt: numberValue(value.refreshTokenExpiresAt),
   };
+}
+
+function tokenEndsAt(expiresInSeconds: number | undefined): number | null {
+  return expiresInSeconds != null && expiresInSeconds > 0
+    ? Date.now() + expiresInSeconds * 1000
+    : null;
+}
+
+function withEndsAt(at: number | null): { refreshTokenExpiresAt?: number } {
+  return at == null ? {} : { refreshTokenExpiresAt: at };
 }
 
 function parseSyncState(payload: unknown): EntitySyncState | null {
@@ -274,6 +287,7 @@ export const getConnectionStatus = query({
       connected: connection != null,
       realmId: connection?.realmId ?? null,
       connectedAt: connection?.connectedAt ?? null,
+      accessEndsAt: connection?.refreshTokenExpiresAt ?? null,
       providerConfigured: providerConfigured(),
       redirectUri: process.env.QBO_REDIRECT_URI?.trim() ?? null,
       canManage: canManage(auth.role),
@@ -361,6 +375,7 @@ export const completeConnection = action({
         connectedAt: Date.now(),
         connectedBy: auth.id,
         refreshToken: encrypted,
+        ...withEndsAt(tokenEndsAt(tokens.refreshTokenExpiresIn)),
       });
       await ctx.scheduler.runAfter(0, internal.qboSync.reconcileTenant, {
         tenantId,
@@ -531,6 +546,7 @@ export const recordConnection = internalMutation({
     connectedAt: v.number(),
     connectedBy: v.string(),
     refreshToken: v.object({ ciphertext: v.string(), keyId: v.string() }),
+    refreshTokenExpiresAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("manifestEvents", {
@@ -647,7 +663,7 @@ export const reconcileTenant = internalAction({
   handler: async (ctx, args): Promise<ReconciliationResult> => {
     const context: ReconciliationContext | null = await ctx.runQuery(
       internal.qboSync.loadReconciliationContext,
-      args,
+      { tenantId: args.tenantId, connectionId: args.connectionId },
     );
     if (!context) {
       return {
@@ -664,6 +680,7 @@ export const reconcileTenant = internalAction({
 
     let accessToken: string;
     let newRefreshToken: string | undefined;
+    let newRefreshTokenExpiresIn: number | undefined;
     try {
       const refreshToken = await decrypt(
         context.connection.refreshToken.ciphertext,
@@ -673,6 +690,7 @@ export const reconcileTenant = internalAction({
       const tokens = await refreshQboAccessToken(environment, refreshToken);
       accessToken = tokens.accessToken;
       newRefreshToken = tokens.refreshToken;
+      newRefreshTokenExpiresIn = tokens.refreshTokenExpiresIn;
     } catch (cause) {
       const error = safeQboProviderMessage(cause);
       const needsReconnect = /invalid_grant|revoked|expired/iu.test(error);
@@ -719,6 +737,10 @@ export const reconcileTenant = internalAction({
         connectedAt: context.connection.connectedAt,
         connectedBy: context.connection.connectedBy,
         refreshToken: encrypted,
+        ...withEndsAt(
+          tokenEndsAt(newRefreshTokenExpiresIn) ??
+            context.connection.refreshTokenExpiresAt,
+        ),
       });
     }
 

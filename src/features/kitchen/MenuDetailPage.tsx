@@ -27,6 +27,7 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
+import { dishRecipeLinks, shareRecipeLines } from "./dishVersions";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
@@ -64,8 +65,23 @@ export function MenuDetailPage() {
   useTrackRecent("Menu", menu?.name);
   const dishes = useWholeDishList();
   const menuDishes = useListMenuDish();
-  const dishComponents = useListDishComponent();
-  const dishIngredients = useListDishIngredient();
+  // A version that shares its main dish's recipe shows those lines as its own.
+  const rawDishComponents = useListDishComponent();
+  const rawDishIngredients = useListDishIngredient();
+  const dishComponents = useMemo(
+    () =>
+      rawDishComponents && dishes
+        ? shareRecipeLines(rawDishComponents, dishRecipeLinks(dishes))
+        : undefined,
+    [dishes, rawDishComponents],
+  );
+  const dishIngredients = useMemo(
+    () =>
+      rawDishIngredients && dishes
+        ? shareRecipeLines(rawDishIngredients, dishRecipeLinks(dishes))
+        : undefined,
+    [dishes, rawDishIngredients],
+  );
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
@@ -98,6 +114,7 @@ export function MenuDetailPage() {
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
+      components: components ?? [],
     });
     const map = new Map<string, string[]>();
     for (const { dish, sources } of rows) {
@@ -111,6 +128,7 @@ export function MenuDetailPage() {
     dishComponents,
     componentIngredients,
     ingredients,
+    components,
   ]);
   const profitability = useMemo(
     () =>
@@ -523,13 +541,16 @@ export function MenuDetailPage() {
           _id: dish._id,
           name: dish.name,
           description: dish.description,
-          allergenSummary: dish.allergenSummary,
+          allergenSummary:
+            allergensByDish.get(String(dish._id)) ?? dish.allergenSummary,
           primaryImageStorageId: dish.primaryImageStorageId,
           editionNumber: dish.editionNumber,
           deletedAt: dish.deletedAt,
           status: String(dish.status),
           mergedIntoDishId: dish.mergedIntoDishId,
           canonicalDishId: dish.canonicalDishId,
+          versionOfDishId: dish.versionOfDishId,
+          versionLabel: dish.versionLabel,
         }))}
         onError={setFailure}
       />

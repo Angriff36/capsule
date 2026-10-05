@@ -8,15 +8,23 @@
  * as a problem, nothing is guessed). An item already on file for that vendor
  * and ingredient (same item number, or same name when there is no number) is
  * updated, so a new price keeps the old one in the item's history
- * (VendorItemUpdated). Reading the same file again changes nothing. Every
+ * (VendorItemUpdated). A row may carry a price date: rows run oldest first,
+ * and a dated price older than the item's current one goes into its history
+ * only (VendorItem.recordPastPrice), so an old price file brings price history
+ * in. Reading the same file again changes nothing. Every
  * write goes through the generated Vendor and VendorItem commands, so their
  * role and tenant checks still apply.
  */
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { api } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { getAuthContext, requireTenant } from "./lib/authContext";
+import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
+import {
+  hasPricePoint,
+  vendorItemPriceHistory,
+} from "./lib/vendorItemPriceHistory";
 import {
   nameKey,
   readVendorPriceRow,
@@ -71,13 +79,30 @@ export const importVendorPriceRows = mutation({
     let added = 0;
     let updated = 0;
     let unchanged = 0;
+    let pastPrices = 0;
     const problems: { row: number; reason: string }[] = [];
     const first = args.firstRowNumber ?? 2;
+    const now = Date.now();
 
-    for (const [index, raw] of args.rows.entries()) {
-      const rowNumber = first + index;
-      const row = readVendorPriceRow(raw);
-      const problem = vendorPriceRowProblem(row);
+    // Oldest dated rows first, undated rows last (they are today's price), so
+    // a file holding several prices for one item ends at the newest one.
+    const rows = args.rows
+      .map((raw, index) => ({
+        rowNumber: first + index,
+        row: readVendorPriceRow(raw),
+      }))
+      .sort(
+        (a, b) =>
+          (a.row.priceDate ?? Infinity) - (b.row.priceDate ?? Infinity) ||
+          a.rowNumber - b.rowNumber,
+      );
+
+    for (const { rowNumber, row } of rows) {
+      const problem =
+        vendorPriceRowProblem(row) ??
+        (row.priceDate != null && row.priceDate > now
+          ? "The price date is after today."
+          : null);
       if (problem) {
         problems.push({ row: rowNumber, reason: problem });
         continue;
@@ -106,6 +131,7 @@ export const importVendorPriceRows = mutation({
         packUnit: row.packUnit as string,
         itemCode: row.itemCode || undefined,
         packPrice: row.packPrice ?? undefined,
+        priceDate: row.priceDate ?? undefined,
       };
       const existing = items.find(
         (item) =>
@@ -123,6 +149,35 @@ export const importVendorPriceRows = mutation({
         );
         if (doc) items.push(doc);
         added += 1;
+        continue;
+      }
+      // A price from before the item's current one goes into its history
+      // only; the item keeps its current price and details.
+      if (
+        row.priceDate != null &&
+        row.packPrice != null &&
+        existing.priceSetAt != null &&
+        row.priceDate < existing.priceSetAt
+      ) {
+        const history = vendorItemPriceHistory(
+          existing,
+          await ctx.db
+            .query("manifestEvents")
+            .withIndex("by_entityId", (q) => q.eq("entityId", existing._id))
+            .collect(),
+        );
+        if (hasPricePoint(history, row.packPrice, row.priceDate)) {
+          unchanged += 1;
+          continue;
+        }
+        await ctx.runMutation(api.mutations.VendorItem_recordPastPrice, {
+          docId: existing._id,
+          packPrice: row.packPrice,
+          priceDate: row.priceDate,
+        });
+        const fresh = await ctx.db.get(existing._id);
+        if (fresh) items[items.indexOf(existing)] = fresh;
+        pastPrices += 1;
         continue;
       }
       // A blank price cell keeps the price already on file.
@@ -147,6 +202,65 @@ export const importVendorPriceRows = mutation({
       if (fresh) items[items.indexOf(existing)] = fresh;
       updated += 1;
     }
-    return { vendorsAdded, added, updated, unchanged, problems };
+    problems.sort((a, b) => a.row - b.row);
+    return { vendorsAdded, added, updated, unchanged, pastPrices, problems };
+  },
+});
+
+// Same readers as VendorItem's read policy: kitchen, purchasing, managers.
+const MANAGER_ROLES = new Set([
+  "manager",
+  "kitchen_manager",
+  "sales_manager",
+  "event_manager",
+  "inventory_manager",
+  "logistics_manager",
+  "workforce_manager",
+  "finance_manager",
+  "admin",
+  "owner",
+  "system",
+]);
+const KITCHEN_ROLES = new Set(["kitchen_staff", "kitchen_lead"]);
+
+/**
+ * Every price each vendor item for one ingredient has had, newest first: the
+ * prices set on the item, changes, and older prices read in from a price list.
+ */
+export const priceHistory = query({
+  args: { ingredientId: v.string() },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    const role = String(auth.role ?? "");
+    const allowed =
+      MANAGER_ROLES.has(role) ||
+      (KITCHEN_ROLES.has(role) &&
+        !orgCapabilityDeniesAction(
+          "kitchenAccess",
+          auth.disabledCapabilities,
+        )) ||
+      (role === "procurement_staff" &&
+        !orgCapabilityDeniesAction(
+          "procurementAccess",
+          auth.disabledCapabilities,
+        ));
+    const ingredientId = ctx.db.normalizeId("ingredients", args.ingredientId);
+    if (!auth.tenantId || !allowed || !ingredientId) return [];
+    const tenantId = auth.tenantId;
+    const items = live(
+      await ctx.db
+        .query("vendorItems")
+        .withIndex("by_ingredientId", (q) => q.eq("ingredientId", ingredientId))
+        .collect(),
+    ).filter((item) => item.tenantId === tenantId && item.addedAt != null);
+    const history = [];
+    for (const item of items) {
+      const events = await ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) => q.eq("entityId", item._id))
+        .collect();
+      history.push(...vendorItemPriceHistory(item, events));
+    }
+    return history.sort((a, b) => b.pricedAt - a.pricedAt);
   },
 });

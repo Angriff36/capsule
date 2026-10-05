@@ -29,6 +29,7 @@ never provider error text, so no key, token or address reaches the screen.
 | Some events did not reach Google Calendar | Single events were refused. | Retry each event from the Google Calendar list. | — |
 | QuickBooks needs connecting again | QuickBooks refused Capsule's access. | Disconnect and connect again. | — |
 | Last QuickBooks run did not send everything | Some items failed. | Sync now; items already in QuickBooks are skipped, not sent twice. | — |
+| Google Calendar / QuickBooks access ends in N days | The provider gave access for a fixed time (QuickBooks always; Google only for time-limited access) and the end is 14 days or less away. | Connect again before the date; nothing already sent is sent twice. | — |
 
 ## Rollback and roll forward
 
@@ -38,6 +39,8 @@ never provider error text, so no key, token or address reaches the screen.
 - **Backend (production box):** redeploy a known release commit with
   `scripts/deploy-backend.sh --expect <sha>`. The database is not rolled back
   by a code deploy; data written by the newer code stays.
+- **Data (lost or broken records):** restore the newest good backup; see
+  backup-and-restore.md.
 
 ## Things a code rollback cannot undo
 
@@ -51,10 +54,20 @@ take them back; fix them in the other system or by hand:
 - invoices, customers and payments written to QuickBooks
 - payment links already opened or paid
 
-## Not built yet
+## Who gets told
 
-- A paging alert (text or email to a named person) when an "act" item appears.
-  Who receives it is an open question in
-  specs/ralph/production-13-release-recovery.md.
-- The recovery drill (break a disposable backend, see the alert, recover,
-  record the times) needs a disposable production-like backend.
+Every manager, in the notification bell, while Capsule is open. There is no
+text or email page to one named on-call person (nobody has an on-call
+setting); see the 2026-10-04 PL-MONITORING plan note for why.
+
+## Drill
+
+`bun run scripts/qualify-recovery-drill.ts` breaks a throwaway local backend
+(never the dev or production data) and follows this page to recover. Receipt
+`docs/quality/recovery-drill.json`. Run on 2026-10-04, 14/14 checks passed:
+
+| Break | Alert seen | Recovery step | Time to recover |
+| --- | --- | --- | --- |
+| Webhook receiver switched off (404) | "Capsule stopped trying 1 webhook" in every manager's bell after 61 s (one try, then stop); another company sees nothing | Fix the receiver, then Try again | Delivered 61 s later with the same delivery id; bell clear |
+| Backend process killed | Server does not answer (screens show "server is not answering") | Restart the server on the same data | Answers in 2 s, ready in 8 s; data kept; webhook schedule resumed by itself (next event out in 51 s, nothing sent twice) |
+| Backend set up outside a release | "The server was set up by hand" check | Run the normal production release | — |

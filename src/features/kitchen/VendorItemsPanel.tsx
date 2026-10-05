@@ -5,6 +5,7 @@ import {
   useVendorItemRemove,
   useVendorItemUpdate,
 } from "../../lib/manifest-convex-react";
+import { useVendorItemPriceHistory } from "../facilities/vendorPriceList";
 import { formatMoneyExact } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
@@ -21,6 +22,8 @@ const PRICE_DATE = new Intl.DateTimeFormat(undefined, {
   month: "short",
   day: "numeric",
 });
+
+const EARLIER_SHOWN = 4;
 
 /** Pack price per ingredient unit, when the pack is counted in that unit. */
 export function vendorItemUnitPrice(
@@ -51,6 +54,7 @@ export function VendorItemsPanel({
   onFailure: (error: unknown) => void;
 }) {
   const items = useListVendorItem();
+  const priceHistory = useVendorItemPriceHistory(ingredientId);
   const addItem = useCreateVendorItem();
   const updateItem = useVendorItemUpdate();
   const removeItem = useVendorItemRemove();
@@ -169,6 +173,10 @@ export function VendorItemsPanel({
               String(row.packUnit),
               ingredientUnit,
             );
+            // The newest point is the price shown above; the rest are earlier.
+            const earlier = (priceHistory ?? [])
+              .filter((point) => point.vendorItemId === row._id)
+              .slice(1);
             return (
               <li key={row._id}>
                 <strong>{vendorName(row.vendorId)}</strong>
@@ -195,6 +203,21 @@ export function VendorItemsPanel({
                       ]
                         .filter(Boolean)
                         .join(" · ")}
+                  {earlier.length > 0 ? (
+                    <span className="block">
+                      Earlier prices:{" "}
+                      {earlier
+                        .slice(0, EARLIER_SHOWN)
+                        .map(
+                          (point) =>
+                            `${formatMoneyExact(point.packPrice)} from ${PRICE_DATE.format(point.pricedAt)}`,
+                        )
+                        .join(" · ")}
+                      {earlier.length > EARLIER_SHOWN
+                        ? ` · and ${earlier.length - EARLIER_SHOWN} older`
+                        : ""}
+                    </span>
+                  ) : null}
                 </span>
                 <div className="culinary-line-actions">
                   <button

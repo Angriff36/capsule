@@ -9,13 +9,15 @@ import {
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
+import { venueExclusiveNote } from "./venueExclusiveNote";
 import { useEventGuests } from "../../lib/useEventRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
-import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
+import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
@@ -31,8 +33,10 @@ import {
   confirmPendingOperation,
 } from "../../lib/pendingOperationKey";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
+import { deriveDishAllergens } from "../kitchen/dishAllergens";
 import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
+import { eventLineRecipeDishId } from "../kitchen/dishVersions";
 import { EventMenuStockShortageBanner } from "../kitchen/EventMenuStockShortageBanner";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
@@ -118,7 +122,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const eventGuests = useEventGuests(eventId);
   const reviewFlags = useEventReviewFlags(eventId);
   // Recipe, price and stock rows of the menu's dishes only.
-  const recipe = useMenuRecipeRows(eventDishes?.map((row) => row.dishId));
+  const recipe = useSharedRecipeRows(eventDishes);
   const dishIngredients = recipe?.dishIngredients;
   const dishComponents = recipe?.dishComponents;
   const components = recipe?.components;
@@ -145,6 +149,11 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const pickerDishes = useWholeDishList(showPicker);
+  const venues = useListVenue();
+  const venueNames = useMemo(
+    () => new Map((venues ?? []).map((v) => [String(v._id), v.name])),
+    [venues],
+  );
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
   );
@@ -382,14 +391,36 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     ],
   );
 
-  const menuAllergenCodes = useMemo(() => {
-    const codes = new Set<string>();
+  // Allergens from the recipe (ingredients and recipe marks) plus the dish's own.
+  const allergenCodesByDish = useMemo(() => {
+    const recipe = {
+      dishIngredients: dishIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
+      ingredients: ingredients ?? [],
+      components: components ?? [],
+    };
+    const byDish = new Map<string, string[]>();
     for (const selection of selections) {
       const dish = dishes?.find((row) => row._id === selection.dishId);
-      for (const code of dish?.allergenSummary ?? []) codes.add(String(code));
+      if (!dish || byDish.has(dish._id)) continue;
+      byDish.set(dish._id, deriveDishAllergens(dish, recipe).codes);
     }
-    return [...codes];
-  }, [dishes, selections]);
+    return byDish;
+  }, [
+    componentIngredients,
+    components,
+    dishComponents,
+    dishIngredients,
+    dishes,
+    ingredients,
+    selections,
+  ]);
+
+  const menuAllergenCodes = useMemo(
+    () => [...new Set([...allergenCodesByDish.values()].flat())],
+    [allergenCodesByDish],
+  );
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -775,6 +806,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             status: String(dish.status),
             mergedIntoDishId: dish.mergedIntoDishId,
             canonicalDishId: dish.canonicalDishId,
+            versionOfDishId: dish.versionOfDishId,
+            versionLabel: dish.versionLabel,
+            note: venueExclusiveNote(
+              dish.exclusiveVenueId,
+              event?.venueId,
+              venueNames,
+            ),
           }))}
           excludeIds={existingDishIds}
           onSelect={(dishId) =>
@@ -1048,7 +1086,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                   Catalog dish ↗
                                 </Link>
                               ) : null}
-                              <AllergenIconRow codes={dish?.allergenSummary} />
+                              <AllergenIconRow
+                                codes={
+                                  dish
+                                    ? allergenCodesByDish.get(dish._id)
+                                    : undefined
+                                }
+                              />
                               <span
                                 className={`rounded-sm px-2 py-0.5 text-xs font-semibold ${
                                   estimateKind === "priced"
@@ -1076,7 +1120,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             <EventMenuLineOverrides
                               eventId={eventId}
                               eventDishId={selection._id}
-                              dishId={selection.dishId}
+                              dishId={eventLineRecipeDishId(selection)}
                               dishName={dishTitle}
                               busy={busy != null}
                               prompt={prompt}
@@ -1340,6 +1384,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                         <div className="border-t border-line bg-inset/40 px-4 py-3">
                           <EventMenuRecipeEditor
                             dishId={selection.dishId}
+                            recipeDishId={selection.recipeDishId}
                             servings={
                               dishCost?.servings ??
                               Number(selection.quantityServings)

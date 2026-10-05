@@ -30,6 +30,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   restrictions: "Restrictions",
   policies: "Policies",
   weather_contingency: "Weather",
+  check_in: "Check-in",
+  incident: "Problem or damage",
+  thank_you: "Thank-you sent",
+  client_feedback: "Client feedback",
+  debrief: "Team debrief",
+  social_post: "Social post",
+  site_visit: "Site visit",
+  handoff: "Hand-over brief",
   other: "Other",
 };
 
@@ -201,7 +209,20 @@ export function VenueNotesPanel({ venueId }: Props) {
                         : "Internal"}
                   </span>
                 </div>
-                <p className="text-base text-ink mt-1">{note.content}</p>
+                <p className="text-base text-ink mt-1 whitespace-pre-line">
+                  {note.escalationLevel
+                    ? `Level ${note.escalationLevel}: `
+                    : ""}
+                  {note.content}
+                </p>
+                {note.resolvedAt ? (
+                  <p className="mt-1 text-sm text-ink-2 whitespace-pre-line">
+                    Closed {formatDate(note.resolvedAt)}
+                    {note.resolvedByName
+                      ? ` by ${note.resolvedByName}`
+                      : ""}: {note.resolution}
+                  </p>
+                ) : null}
                 <p className="mt-1 font-mono text-xs text-ink-3">
                   {authorLabel(people, note)}
                   {note.postedAt

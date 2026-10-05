@@ -71,6 +71,9 @@ const ALIASES: Record<string, CapsuleUnit> = {
   gallons: "gallon",
   gal: "gallon",
   portions: "portion",
+  // Production worksheets print "575.00 recipe portion" for a Drive Recipe.
+  "recipe portion": "portion",
+  "recipe portions": "portion",
   servings: "serving",
   batches: "batch",
   melons: "melon",

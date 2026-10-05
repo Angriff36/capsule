@@ -5,25 +5,35 @@ import {
   type CanonicalLike,
 } from "./CulinaryCanonicalMatcher";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
+import { versionTabLabel, versionsByMain } from "./dishVersions";
 
 export type PickerDish = CanonicalLike & {
   description?: string | null;
   allergenSummary?: string[] | null;
   primaryImageStorageId?: string | null;
   editionNumber?: number | null;
+  versionOfDishId?: string | null;
+  versionLabel?: string | null;
+  /** A short line under the name, for example "Only at Kindred + Co.". */
+  note?: string | null;
 };
 
 type Props = {
   kind: "dish" | "ingredient";
   records: readonly PickerDish[];
   onSelect: (id: string) => void;
-  onCreateNew: (name: string) => void;
+  /** Leave out to hide the "Create new" button. */
+  onCreateNew?: (name: string) => void;
   onCreateEdition?: (sourceId: string, name: string) => void;
   excludeIds?: readonly string[];
   label?: string;
 };
 
-/** Search-first picker with duplicate warnings and deliberate edition create. */
+/**
+ * Search-first picker with duplicate warnings and deliberate edition create.
+ * Dishes show as main dishes only; a main dish with versions asks which
+ * version to pick, and searching a version's name finds its main dish.
+ */
 export function CulinaryRecordPicker({
   kind,
   records,
@@ -35,13 +45,28 @@ export function CulinaryRecordPicker({
 }: Props) {
   const [query, setQuery] = useState("");
   const excluded = useMemo(() => new Set(excludeIds), [excludeIds]);
-  const matches = useMemo(
-    () =>
-      culinaryCanonicalMatcher
-        .findNameMatches(records, query || " ", 12)
-        .filter((row) => !excluded.has(row._id)),
-    [excluded, query, records],
+  const versions = useMemo(() => versionsByMain(records), [records]);
+  const choices = (row: PickerDish) =>
+    [row, ...(versions.get(row._id) ?? [])].filter(
+      (choice) => !excluded.has(choice._id),
+    );
+  const mainOf = useMemo(() => {
+    const byVersion = new Map<string, PickerDish>();
+    for (const [mainId, list] of versions) {
+      const main = records.find((row) => row._id === mainId);
+      if (main) for (const version of list) byVersion.set(version._id, main);
+    }
+    return (row: PickerDish) => byVersion.get(row._id) ?? row;
+  }, [records, versions]);
+  const asMains = (rows: readonly PickerDish[]) =>
+    [...new Map(rows.map((row) => [mainOf(row)._id, mainOf(row)])).values()]
+      .filter((row) => choices(row).length > 0)
+      .slice(0, 12);
+  const nameMatches = useMemo(
+    () => culinaryCanonicalMatcher.findNameMatches(records, query || " ", 40),
+    [query, records],
   );
+  const matches = asMains(nameMatches);
   const exact = culinaryCanonicalMatcher.likelyDuplicate(records, query);
 
   return (
@@ -72,10 +97,7 @@ export function CulinaryRecordPicker({
       <ul className="max-h-56 space-y-2 overflow-y-auto">
         {(query.trim()
           ? matches
-          : culinaryCanonicalMatcher
-              .filterPickerCandidates(records)
-              .filter((r) => !excluded.has(r._id))
-              .slice(0, 12)
+          : asMains(culinaryCanonicalMatcher.filterPickerCandidates(records))
         ).map((row) => (
           <li
             key={row._id}
@@ -94,18 +116,37 @@ export function CulinaryRecordPicker({
                 Edition {row.editionNumber ?? 1}
                 {row.description ? ` · ${row.description.slice(0, 80)}` : ""}
               </p>
+              {row.note ? (
+                <p className="text-xs font-semibold text-ink-2">{row.note}</p>
+              ) : null}
               {kind === "dish" ? (
                 <AllergenIconRow codes={row.allergenSummary} className="mt-1" />
               ) : null}
             </div>
-            <div className="flex flex-wrap gap-1">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => onSelect(row._id)}
-              >
-                Select
-              </button>
+            <div className="flex flex-wrap items-center gap-1">
+              {versions.has(row._id) ? (
+                <>
+                  <span className="text-xs text-ink-3">Pick a version:</span>
+                  {choices(row).map((choice) => (
+                    <button
+                      key={choice._id}
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => onSelect(choice._id)}
+                    >
+                      {versionTabLabel(choice)}
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => onSelect(row._id)}
+                >
+                  Select
+                </button>
+              )}
               {onCreateEdition ? (
                 <button
                   type="button"
@@ -119,15 +160,17 @@ export function CulinaryRecordPicker({
           </li>
         ))}
       </ul>
-      <button
-        type="button"
-        className="btn btn-ghost"
-        disabled={!query.trim()}
-        onClick={() => onCreateNew(query.trim())}
-      >
-        Create new {kind}
-        {exact ? " anyway" : ""}
-      </button>
+      {onCreateNew ? (
+        <button
+          type="button"
+          className="btn btn-ghost"
+          disabled={!query.trim()}
+          onClick={() => onCreateNew(query.trim())}
+        >
+          Create new {kind}
+          {exact ? " anyway" : ""}
+        </button>
+      ) : null}
     </div>
   );
 }

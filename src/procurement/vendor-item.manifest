@@ -2,7 +2,9 @@
 // item number, the pack it comes in, and the pack price. Replaces Galley's
 // vendor item list (PL-REPLACEMENT-PROOF). One ingredient can have items from
 // several vendors. A price change is an update; its event keeps the price
-// before and after, so the item's price history is the event history.
+// before and after, so the item's price history is the event history. A price
+// may carry the date it was set (an old price list read in); a price older
+// than the current one is kept with recordPastPrice and changes nothing else.
 // Compile entry: uses vendor → culinary (Ingredient, UnitOfMeasure).
 
 use "./vendor.manifest"
@@ -42,7 +44,8 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     packQuantity: decimal(12, 4),
     packUnit: UnitOfMeasure,
     optional itemCode: string,
-    optional packPrice: money(12, 2)
+    optional packPrice: money(12, 2),
+    optional priceDate: datetime
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -53,6 +56,7 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     constraint addVendorItemDescription: length(trim(description)) > 0 "Say what the vendor calls this item."
     constraint addVendorItemPack: packQuantity > 0 "The pack amount has to be more than zero."
     constraint addVendorItemPrice: packPrice == null or packPrice >= 0 "The pack price can't be negative. Use zero or more."
+    constraint addVendorItemPriceDate: priceDate == null or priceDate <= now() "The price date can't be after today."
     mutate vendorId = vendorId
     mutate ingredientId = ingredientId
     mutate description = description
@@ -61,13 +65,17 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     mutate itemCode = itemCode
     mutate packPrice = packPrice
     mutate pricedPackQuantity = packPrice != null ? packQuantity : 0
-    mutate priceSetAt = packPrice != null ? now() : null
+    mutate priceSetAt = packPrice == null ? null : (priceDate != null ? priceDate : now())
     mutate addedAt = now()
     emit VendorItemAdded {
       vendorItemId: self.id
       tenantId: self.tenantId
       vendorId: vendorId
       ingredientId: ingredientId
+      packPrice: packPrice
+      packQuantity: packQuantity
+      packUnit: packUnit
+      priceDate: priceDate
     }
   }
 
@@ -76,15 +84,17 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
     packQuantity: decimal(12, 4),
     packUnit: UnitOfMeasure,
     optional itemCode: string,
-    optional packPrice: money(12, 2)
+    optional packPrice: money(12, 2),
+    optional priceDate: datetime
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
     constraint updateVendorItemDescription: length(trim(description)) > 0 "Say what the vendor calls this item."
     constraint updateVendorItemPack: packQuantity > 0 "The pack amount has to be more than zero."
     constraint updateVendorItemPrice: packPrice == null or packPrice >= 0 "The pack price can't be negative. Use zero or more."
+    constraint updateVendorItemPriceDate: priceDate == null or priceDate <= now() "The price date can't be after today."
     compute previousPackPrice = self.packPrice
-    mutate priceSetAt = packPrice != self.packPrice ? now() : self.priceSetAt
+    mutate priceSetAt = packPrice != self.packPrice ? (priceDate != null ? priceDate : now()) : self.priceSetAt
     mutate description = description
     mutate packQuantity = packQuantity
     mutate packUnit = packUnit
@@ -100,6 +110,26 @@ entity VendorItem mixin TenantScoped, SoftDeletable {
       packPrice: packPrice
       packQuantity: packQuantity
       packUnit: packUnit
+      priceDate: priceDate
+    }
+  }
+
+  // A price from before the current one (an old price list read in): kept in
+  // the item's history; the current price stays as it is.
+  command recordPastPrice(packPrice: money(12, 2), priceDate: datetime) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint pastVendorItemPrice: packPrice >= 0 "The pack price can't be negative. Use zero or more."
+    constraint pastVendorItemPriceOlder: self.priceSetAt == null or priceDate < self.priceSetAt "This price is not older than the item's current price. Change the item's price instead."
+    emit VendorItemPastPriceRecorded {
+      vendorItemId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      ingredientId: self.ingredientId
+      packPrice: packPrice
+      packQuantity: self.packQuantity
+      packUnit: self.packUnit
+      priceDate: priceDate
     }
   }
 
@@ -124,6 +154,10 @@ event VendorItemAdded: "vendor_item.added" {
   tenantId: string
   vendorId: string
   ingredientId: string
+  packPrice: number?
+  packQuantity: number
+  packUnit: string
+  priceDate: datetime?
 }
 
 event VendorItemUpdated: "vendor_item.updated" {
@@ -135,6 +169,18 @@ event VendorItemUpdated: "vendor_item.updated" {
   packPrice: number?
   packQuantity: number
   packUnit: string
+  priceDate: datetime?
+}
+
+event VendorItemPastPriceRecorded: "vendor_item.past_price_recorded" {
+  vendorItemId: string
+  tenantId: string
+  vendorId: string
+  ingredientId: string
+  packPrice: number
+  packQuantity: number
+  packUnit: string
+  priceDate: datetime
 }
 
 event VendorItemRemoved: "vendor_item.removed" {

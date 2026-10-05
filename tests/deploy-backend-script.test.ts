@@ -55,6 +55,14 @@ esac
   uname: `#!/usr/bin/env bash
 echo "\${STUB_UNAME:-Linux}"
 `,
+  // The crontab lives in a file beside the log.
+  crontab: `#!/usr/bin/env bash
+if [ "$1" = "-l" ]; then cat "$STUB_LOG.cron" 2>/dev/null; exit 0; fi
+cat > "$STUB_LOG.cron"
+`,
+  openssl: `#!/usr/bin/env bash
+echo "c3R1Yi1iYWNrdXAta2V5LXN0dWItYmFja3VwLWtleS0="
+`,
 };
 
 interface Checkout {
@@ -442,6 +450,57 @@ describe("scripts/deploy-backend.sh", () => {
       expect(readFileSync(unstamped.log, "utf8")).not.toContain(
         "convex deploy",
       );
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "sets up daily backups once when the release has the backup script",
+    async () => {
+      const checkout = await makeCheckout();
+      writeFileSync(
+        join(checkout.work, "scripts", "backup-capsule.ts"),
+        "// stub\n",
+      );
+      await git(checkout.work, "add", "-A");
+      await git(checkout.work, "commit", "-qm", "backup script");
+      await git(checkout.work, "push", "-q", "origin", "main");
+      const sha = await git(checkout.work, "rev-parse", "HEAD");
+      const backups = join(checkout.work, "..", "backups");
+      const env = { CAPSULE_BACKUP_DIR: backups.replace(/\\/g, "/") };
+
+      const first = await checkout.run(["--expect", sha], env);
+      expect(first.output).toContain("RESULT: PASS");
+      expect(first.output).toContain("backup key written to .env.local");
+      expect(first.output).toContain("daily backup at 3 am added");
+      expect(first.output).not.toContain("c3R1Yi1iYWNrdXAta2V5");
+      expect(readFileSync(join(checkout.work, ".env.local"), "utf8")).toContain(
+        "CAPSULE_BACKUP_KEY=c3R1Yi1iYWNrdXAta2V5",
+      );
+      const cron = readFileSync(`${checkout.log}.cron`, "utf8");
+      expect(cron).toContain("0 3 * * *");
+      expect(cron).toContain("scripts/backup-capsule.ts backup --dir");
+      expect(readFileSync(checkout.log, "utf8")).toContain(
+        "bun scripts/backup-capsule.ts backup --dir",
+      );
+      expect(await git(checkout.work, "status", "--porcelain")).toBe("");
+
+      // A backup exists now: the second run adds nothing and takes none.
+      writeFileSync(join(backups, "capsule-1.capsule-backup"), "x");
+      writeFileSync(checkout.log, "");
+      const second = await checkout.run(["--expect", sha], env);
+      expect(second.output).toContain("RESULT: PASS");
+      expect(second.output).not.toContain("backup key written");
+      expect(second.output).not.toContain("added to crontab");
+      expect(readFileSync(`${checkout.log}.cron`, "utf8")).toBe(cron);
+      expect(readFileSync(checkout.log, "utf8")).not.toContain(
+        "backup-capsule.ts",
+      );
+      expect(
+        readFileSync(join(checkout.work, ".env.local"), "utf8").match(
+          /CAPSULE_BACKUP_KEY=/g,
+        ),
+      ).toHaveLength(1);
     },
     TIMEOUT,
   );

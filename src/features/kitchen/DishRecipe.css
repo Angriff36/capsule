@@ -224,3 +224,27 @@
 .dish-recipe .culinary-studio-back {
   font-size: 14px;
 }
+
+.dish-versions {
+  margin-top: 1rem;
+}
+
+.dish-version-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.dish-version-tabs a {
+  border: 1px solid var(--color-line-2);
+  background: var(--color-inset);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.dish-version-tabs a.is-active {
+  border-color: var(--color-accent-deep);
+  background: var(--color-accent-soft);
+  font-weight: 600;
+}

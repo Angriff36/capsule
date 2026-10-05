@@ -83,6 +83,23 @@ enum VenueStatus {
   inactive
 }
 
+// Venue partner program tiers (Mangia Venue Partner Playbook, section 01).
+enum VenuePartnerTier {
+  catering_only
+  catering_rentals
+  full_event
+}
+
+// The venue looks of the playbook's Food Presentation Alignment Guide.
+enum VenueVibe {
+  rustic
+  modern_industrial
+  garden_outdoor
+  grand_ballroom
+  brewery_winery
+  warehouse_raw
+}
+
 enum RsvpStatus {
   pending
   confirmed
@@ -414,12 +431,47 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property wasteRules: string?
   property permitsInsuranceNotes: string?
   property restrictions: string?
+  // Venue partner program (Mangia Venue Partner Playbook): the partnership
+  // tier, the one person who owns the relationship, when it started, and the
+  // owner's 1-10 ratings for ease of work and relationship health. No tier =
+  // not a partner. Set by setPartnership only.
+  property partnerTier: VenuePartnerTier?
+  property partnerOwnerPersonId: uuid?
+  property partnerSince: datetime?
+  property opsEaseScore: int?
+  property relationshipScore: int?
+  // Co-branded proposals (playbook section 06): the venue's logo (Convex
+  // storage id) and its brand colour, shown next to the company's on a
+  // proposal for an event at a partner venue. Set by setBrand only.
+  property logoStorageId: string?
+  property brandColor: string?
+  // The venue's social media handle, without "@" (playbook section 06: tag
+  // the venue in every post about an event there). Set by setSocialHandle.
+  property socialHandle: string?
+  // Shared event gallery (playbook section 06): the secret part of the
+  // link the venue opens to see and save our photos from events there.
+  // Blank = not shared. Read by convex/venueGallery.ts. Set by
+  // setGalleryToken only.
+  property indexed galleryToken: string?
+  // Venue selling profile (playbook section 09): the venue's look, what
+  // makes it special, who books it, and what to photograph there. The look
+  // picks the food presentation and serve style from the playbook's
+  // alignment guide. Set by setSellingProfile only.
+  property vibe: VenueVibe?
+  property vibeWords: string?
+  property topFeature: string?
+  property otherFeatures: string?
+  property targetClient: string?
+  property competitivePosition: string?
+  property photoFocus: string?
+  property exclusiveItemIdea: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
   property deactivationReason: string?
 
   hasMany events: Event
+  ref partnerOwner: Person fields [tenantId, partnerOwnerPersonId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
 
@@ -429,6 +481,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
   constraint venueStandingNonnegative: self.standingCapacity == null or self.standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
   constraint venueLatitudeRange: self.latitude == null or (self.latitude >= -90 and self.latitude <= 90) "Latitude must be between -90 and 90"
   constraint venueLongitudeRange: self.longitude == null or (self.longitude >= -180 and self.longitude <= 180) "Longitude must be between -180 and 180"
+  constraint venueOpsEaseRange: self.opsEaseScore == null or (self.opsEaseScore >= 1 and self.opsEaseScore <= 10) "Rate ease of work from 1 to 10"
+  constraint venueRelationshipRange: self.relationshipScore == null or (self.relationshipScore >= 1 and self.relationshipScore <= 10) "Rate the relationship from 1 to 10"
 
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
@@ -626,6 +680,90 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate hasRefrigeration = hasRefrigeration
     mutate loadInFrom = loadInFrom != null and length(trim(loadInFrom)) > 0 ? trim(loadInFrom) : null
     mutate loadOutBy = loadOutBy != null and length(trim(loadOutBy)) > 0 ? trim(loadOutBy) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Partner tier, relationship owner and ratings. Each call states all four;
+  // a blank clears that one. Clearing the tier ends the partnership.
+  command setPartnership(
+    optional partnerTier: VenuePartnerTier,
+    optional partnerOwnerPersonId: uuid,
+    optional opsEaseScore: number,
+    optional relationshipScore: number
+  ) {
+    guard self.deletedAt == null
+    constraint setVenueOpsEase: opsEaseScore == null or (opsEaseScore >= 1 and opsEaseScore <= 10) "Rate ease of work from 1 to 10"
+    constraint setVenueRelationship: relationshipScore == null or (relationshipScore >= 1 and relationshipScore <= 10) "Rate the relationship from 1 to 10"
+    mutate partnerSince = partnerTier == null ? null : (self.partnerSince != null ? self.partnerSince : now())
+    mutate partnerTier = partnerTier
+    mutate partnerOwnerPersonId = partnerOwnerPersonId
+    mutate opsEaseScore = opsEaseScore
+    mutate relationshipScore = relationshipScore
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Venue logo and brand colour for co-branded proposals. Each call states
+  // both; a blank clears that one. A replaced logo file is kept, because
+  // proposals already sent still show it.
+  command setBrand(optional logoStorageId: string, optional brandColor: string) {
+    guard self.deletedAt == null
+    mutate logoStorageId = logoStorageId != null and length(trim(logoStorageId)) > 0 ? trim(logoStorageId) : null
+    mutate brandColor = brandColor != null and length(trim(brandColor)) > 0 ? trim(brandColor) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setSocialHandle(optional socialHandle: string) {
+    guard self.deletedAt == null
+    mutate socialHandle = socialHandle != null and length(trim(socialHandle)) > 0 ? trim(socialHandle) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // A new token makes a new gallery link (the old link stops working); a
+  // blank stops sharing. Short tokens are refused so a link cannot be
+  // guessed.
+  command setGalleryToken(optional galleryToken: string) {
+    guard self.deletedAt == null
+    constraint galleryTokenLength: galleryToken == null or length(trim(galleryToken)) == 0 or length(trim(galleryToken)) >= 24 "This gallery link is too short. Make a new link."
+    mutate galleryToken = galleryToken != null and length(trim(galleryToken)) > 0 ? trim(galleryToken) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The whole selling profile is stated on each save; a blank clears that
+  // line.
+  command setSellingProfile(
+    optional vibe: VenueVibe,
+    optional vibeWords: string,
+    optional topFeature: string,
+    optional otherFeatures: string,
+    optional targetClient: string,
+    optional competitivePosition: string,
+    optional photoFocus: string,
+    optional exclusiveItemIdea: string
+  ) {
+    guard self.deletedAt == null
+    mutate vibe = vibe
+    mutate vibeWords = vibeWords != null and length(trim(vibeWords)) > 0 ? trim(vibeWords) : null
+    mutate topFeature = topFeature != null and length(trim(topFeature)) > 0 ? trim(topFeature) : null
+    mutate otherFeatures = otherFeatures != null and length(trim(otherFeatures)) > 0 ? trim(otherFeatures) : null
+    mutate targetClient = targetClient != null and length(trim(targetClient)) > 0 ? trim(targetClient) : null
+    mutate competitivePosition = competitivePosition != null and length(trim(competitivePosition)) > 0 ? trim(competitivePosition) : null
+    mutate photoFocus = photoFocus != null and length(trim(photoFocus)) > 0 ? trim(photoFocus) : null
+    mutate exclusiveItemIdea = exclusiveItemIdea != null and length(trim(exclusiveItemIdea)) > 0 ? trim(exclusiveItemIdea) : null
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId
@@ -938,7 +1076,7 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // Quote → Planning → Pending Approval → Approved → Sales Lock → Executing → Final → Complete → Close Out lifecycle
   transition stage from "quote" to ["planning", "cancelled"]
-  transition stage from "planning" to ["pending_approval", "cancelled"]
+  transition stage from "planning" to ["pending_approval", "completed", "cancelled"]
   transition stage from "pending_approval" to ["planning", "approved", "cancelled"]
   transition stage from "approved" to ["sales_lock", "cancelled"]
   transition stage from "sales_lock" to ["executing", "cancelled"]
@@ -1839,6 +1977,23 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "eventManageAccess")
     mutate stage = "completed"
     mutate completedAt = now()
+    emit EventCompleted {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // An event that already happened (the old system says Complete or Closed
+  // Out) is recorded as completed straight from planning. It never goes
+  // through approval here, so no invoice, staffing, pack list or purchasing
+  // work is drafted for an event that is over.
+  command recordPastCompletion() {
+    guard self.stage == "planning"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint pastEventOnly: self.endsAt < now() "Only an event that has already happened can be marked finished from planning."
+    mutate stage = "completed"
+    mutate completedAt = self.endsAt
     emit EventCompleted {
       eventId: self.id
       tenantId: self.tenantId

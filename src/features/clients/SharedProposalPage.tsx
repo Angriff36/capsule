@@ -6,6 +6,7 @@ import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 import { loadWindowLabel } from "../facilities/venueOperatingFacts";
+import { ProposalBrandRow } from "./ProposalBrandRow";
 
 /**
  * Client-facing shared proposal view (spec §4.6).
@@ -97,6 +98,7 @@ export function SharedProposalPage({ token }: { token: string }) {
   }
 
   const { proposal, lineItems, enhancements } = data;
+  const venueColor = data.brand?.partnerVenue?.color ?? null;
   const sectionVisible = (section: string) =>
     proposal.visibleSections.length === 0 ||
     proposal.visibleSections.includes(section);
@@ -386,7 +388,14 @@ export function SharedProposalPage({ token }: { token: string }) {
     <div className="min-h-screen bg-canvas py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="bg-panel rounded-sm shadow-lg overflow-hidden">
-          <div className="border-b border-line bg-brand-soft px-8 py-6">
+          <div
+            className="border-b border-line bg-brand-soft px-8 py-6"
+            style={
+              venueColor ? { borderTop: `4px solid ${venueColor}` } : undefined
+            }
+          >
+            {/* An older server sends no brand; the head then shows as before. */}
+            {data.brand ? <ProposalBrandRow brand={data.brand} /> : null}
             <h1 className="text-xl font-bold text-brand">{proposal.title}</h1>
             <p className="text-ink-2 mt-1">
               Prepared for {data.clientName}

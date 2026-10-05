@@ -11,6 +11,10 @@ import {
   SourceLinkList,
   type SourceLink,
 } from "../src/features/events/SourceLinkList";
+import {
+  oldSystemCancelReason,
+  oldSystemFinishedStage,
+} from "../convex/lib/oldSystemEventStage";
 
 function link(rawSourceData: string | null): SourceLink {
   return {
@@ -41,7 +45,49 @@ describe("old-system status on an imported event", () => {
     ]);
     expect(html).toContain("Status in the old system");
     expect(html).toContain("Confirmed");
-    expect(html).toContain("Imported events start in Planning here.");
+    expect(html).toContain("the others start in Planning");
+  });
+
+  it("copies a booked old event that is over, and a cancelled, lost or unbooked one", () => {
+    const now = Date.UTC(2026, 9, 4);
+    const past = now - 86_400_000;
+    const future = now + 86_400_000;
+    // TPP's report words, with their sort numbers.
+    for (const booked of [
+      "Complete",
+      "Closed Out",
+      "Approved",
+      "Executing",
+      "3- Final",
+      "00- Closed",
+      "1- Confirmed",
+      "2- Sales Lock",
+      "1- Sales Lock Planning",
+    ]) {
+      expect(oldSystemFinishedStage(booked, past, now)).toBe("completed");
+      expect(oldSystemFinishedStage(booked, future, now)).toBeNull();
+    }
+    expect(oldSystemFinishedStage(" cancelled ", future, now)).toBe(
+      "cancelled",
+    );
+    expect(oldSystemFinishedStage("9-Cancelled", future, now)).toBe(
+      "cancelled",
+    );
+    expect(oldSystemFinishedStage("QUOTE (LOST)", future, now)).toBe(
+      "cancelled",
+    );
+    expect(oldSystemCancelReason("QUOTE (LOST)")).toBe(
+      "Quote lost in the old system",
+    );
+    // A quote whose date passed was never booked; one still to come waits.
+    expect(oldSystemFinishedStage("0- Quote", past, now)).toBe("cancelled");
+    expect(oldSystemCancelReason("0- Quote")).toBe(
+      "Quote not booked in the old system before its date",
+    );
+    expect(oldSystemFinishedStage("0- Quote", future, now)).toBeNull();
+    for (const other of ["Planning", ""]) {
+      expect(oldSystemFinishedStage(other, past, now)).toBeNull();
+    }
   });
 
   it("shows nothing extra when the import kept no status", () => {

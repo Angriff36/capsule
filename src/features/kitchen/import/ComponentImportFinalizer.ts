@@ -71,6 +71,8 @@ export class ComponentImportFinalizer {
   async finalize(
     review: ComponentImportReviewState,
     operationKey?: string,
+    /** Recipe-sheet extras saved with the recipe (times, steps, packaging…). */
+    sheet?: Record<string, unknown>,
   ): Promise<ComponentImportFinalizeResult> {
     const name = review.name.trim();
     if (!name) throw new Error("Give this recipe a name.");
@@ -125,6 +127,7 @@ export class ComponentImportFinalizer {
           cuisine: review.cuisine?.trim() || undefined,
           description: review.description?.trim() || undefined,
           instructions: review.instructions?.trim() || undefined,
+          ...(sheet ? { sheet } : {}),
           lines: measuredLines.map(({ line, quantity, unit }, index) => ({
             name: line.name.trim(),
             componentId:

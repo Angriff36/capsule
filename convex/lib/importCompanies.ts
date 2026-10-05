@@ -69,6 +69,8 @@ export async function commitImportedCompany(
       {
         clientType: "company",
         companyName: details.name,
+        email: company.email,
+        phone: company.phone,
         addressLine1: company.addressLine1,
         city: company.city,
         region: company.region,

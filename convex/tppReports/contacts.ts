@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { TPP_CONTACT_REPORTS } from "../../src/features/reports/tpp/catalog.contacts";
 import type {
+  TppDocumentSection,
   TppReportResult,
   TppRow,
 } from "../../src/features/reports/tpp/types";
@@ -32,6 +33,7 @@ const VENUE_READ = ["eventAccess"];
 const INVOICE_READ = ["financeAccess", "manageAccess"];
 const PROPOSAL_READ = ["salesAccess"];
 const CONTRACT_READ = ["salesAccess"];
+const TIMELINE_READ = ["staffAccess"];
 const CLIENT_REPORTS = new Set([
   "address-phone-list",
   "birthday-list",
@@ -140,6 +142,62 @@ function birthdayRows(
         phone: client.phone ?? "",
       },
     }));
+}
+
+/**
+ * The company's logo, printed name and address, as the letter and contract
+ * head. Null when the company has none of them.
+ */
+async function companyHeading(
+  ctx: QueryCtx,
+  tenantId: string,
+): Promise<TppDocumentSection | null> {
+  const organizations = await ctx.db
+    .query("organizations")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .take(10);
+  const organization =
+    organizations.find(
+      (row) => row.deletedAt == null && row.status === "active",
+    ) ?? organizations.find((row) => row.deletedAt == null);
+  const rows = [
+    organization?.brandDisplayName?.trim() || organization?.name?.trim() || "",
+    organization?.brandAddress?.trim() ?? "",
+  ]
+    .filter(Boolean)
+    .map((value) => ({ value }));
+  const storageId = organization?.brandLogoStorageId;
+  const logoId =
+    typeof storageId === "string" && storageId
+      ? ctx.db.system.normalizeId("_storage", storageId)
+      : null;
+  const logoUrl = logoId ? await ctx.storage.getUrl(logoId) : null;
+  if (rows.length === 0 && !logoUrl) return null;
+  return { id: "company", rows, ...(logoUrl ? { logoUrl } : {}) };
+}
+
+/** The kitchen's own time zone, so printed times match the event clock. */
+async function kitchenTimeZone(
+  ctx: QueryCtx,
+  tenantId: string,
+  locationId: string | null | undefined,
+): Promise<string | undefined> {
+  const locations = await ctx.db
+    .query("operatingLocations")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .take(50);
+  const live = locations.filter((row) => row.deletedAt == null && row.timeZone);
+  const zone = (
+    live.find((row) => String(row._id) === String(locationId)) ??
+    live.find((row) => row.status === "active")
+  )?.timeZone;
+  if (!zone) return undefined;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: zone });
+    return zone;
+  } catch {
+    return undefined;
+  }
 }
 
 async function eventBundle(
@@ -359,25 +417,77 @@ export const run = query({
         ],
         clientRaw,
       );
-      return document(args.reportId, "contact_letter", [
-        { id: "date", rows: [{ value: dateText(Date.now()) }] },
+      const said = (key: string) => {
+        const value = parameters[key];
+        return typeof value === "string" ? value.trim() : "";
+      };
+      // Lines the writer left empty are left out of the letter.
+      const lines = (rows: { label?: string; value: string }[]) =>
+        rows.filter((row) => row.value !== "");
+      const company =
+        parameters.showCompanyInfo !== false
+          ? await companyHeading(ctx, tenantId)
+          : null;
+      const letterDate =
+        parameters.noLetterDate === true
+          ? ""
+          : new Date(
+              typeof parameters.letterDate === "number"
+                ? parameters.letterDate
+                : Date.now(),
+            ).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            });
+      const sections: TppDocumentSection[] = [
+        { id: "date", rows: lines([{ value: letterDate }]) },
         {
           id: "recipient",
-          rows: [
+          rows: lines([
             { value: clientName(client) },
             {
               value: [
                 client.addressLine1,
-                client.city,
-                client.region,
-                client.postalCode,
+                client.addressLine2,
+                [client.city, client.region, client.postalCode]
+                  .filter(Boolean)
+                  .join(" "),
               ]
                 .filter(Boolean)
-                .join(", "),
+                .join("\n"),
             },
-          ],
+          ]),
         },
-        { id: "body", rows: [{ value: String(parameters.body ?? "") }] },
+        {
+          id: "reference",
+          rows: lines([
+            { label: "Ref", value: said("ref") },
+            { label: "Attn", value: said("attn") },
+            { label: "Subject", value: said("subject") },
+          ]),
+        },
+        {
+          id: "body",
+          rows: lines([
+            { value: said("salutation") },
+            { value: String(parameters.body ?? "") },
+            { value: said("closing") },
+          ]),
+        },
+        {
+          id: "sender",
+          rows: lines([
+            { value: said("senderName") },
+            { value: said("senderTitle") },
+            { value: said("senderCompany") },
+          ]),
+        },
+        { id: "cc", rows: lines([{ label: "CC", value: said("cc") }]) },
+      ];
+      return document(args.reportId, "contact_letter", [
+        ...(company ? [company] : []),
+        ...sections.filter((section) => section.rows.length > 0),
       ]);
     }
 
@@ -570,12 +680,173 @@ export const run = query({
       const contract = bundle.contracts.sort(
         (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
       )[0];
+      // The old system's contract printout: company head, who it is for and
+      // the event facts, the timeline, then the terms with initial lines.
+      const proposal = canRead(auth, PROPOSAL_READ)
+        ? bundle.proposals.sort(
+            (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
+          )[0]
+        : undefined;
+      const event = bundle.event;
+      const [company, zone, timeline] = await Promise.all([
+        companyHeading(ctx, tenantId),
+        kitchenTimeZone(ctx, tenantId, event.operatingLocationId),
+        canRead(auth, TIMELINE_READ)
+          ? ctx.db
+              .query("eventTimelineActivities")
+              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "timeline steps"))
+          : null,
+      ]);
+      const when = (value: number, options: Intl.DateTimeFormatOptions) =>
+        new Date(value).toLocaleString("en-US", { ...options, timeZone: zone });
+      const client = bundle.client;
+      const filled = (rows: { label: string; value: string }[]) =>
+        rows.filter((row) => row.value.trim() !== "");
+      const timelineRows = (timeline ?? [])
+        .filter((row) => isLiveTenantRow(row, tenantId))
+        .sort(
+          (a, b) =>
+            (a.startsAt ?? Number.MAX_SAFE_INTEGER) -
+              (b.startsAt ?? Number.MAX_SAFE_INTEGER) ||
+            (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+        )
+        .map((row) => ({
+          label:
+            row.startsAt == null
+              ? ""
+              : when(row.startsAt, { hour: "numeric", minute: "2-digit" }),
+          value: [
+            row.name,
+            row.responsibleParty ?? row.assigneeTeams?.join(", "),
+          ]
+            .filter(Boolean)
+            .join(" · "),
+        }));
+      const total = proposal?.total ?? event.quotedPrice;
       return document(args.reportId, "contract", [
-        { id: "event", heading: "Contract for Service", rows: eventHeader },
+        ...(company ? [company] : []),
+        {
+          id: "event",
+          heading: "Contract for Service",
+          rows: filled([
+            { label: "Prepared for", value: contact },
+            {
+              label: "Address",
+              value: client
+                ? [
+                    client.addressLine1,
+                    client.addressLine2,
+                    [client.city, client.region, client.postalCode]
+                      .filter(Boolean)
+                      .join(" "),
+                  ]
+                    .filter(Boolean)
+                    .join("\n")
+                : "",
+            },
+            {
+              label: "Phone",
+              value: client?.phone ?? event.primaryContactPhone ?? "",
+            },
+            {
+              label: "Email",
+              value: client?.email ?? event.primaryContactEmail ?? "",
+            },
+            {
+              label: "Contract #",
+              value: contract?.contractNumber ?? event.eventNumber ?? "",
+            },
+            {
+              label: "Event date",
+              value:
+                event.startsAt == null
+                  ? ""
+                  : when(event.startsAt, {
+                      month: "numeric",
+                      day: "numeric",
+                      year: "numeric",
+                      weekday: "long",
+                    }),
+            },
+            { label: "Event title", value: event.title },
+            {
+              label: "Guest count",
+              value:
+                event.expectedHeadcount == null
+                  ? ""
+                  : String(event.expectedHeadcount),
+            },
+            { label: "Service style", value: event.serviceStyleName ?? "" },
+            { label: "Occasion", value: event.occasionName ?? "" },
+            { label: "Salesperson", value: event.ownerName ?? "" },
+            {
+              label: "Event total",
+              value:
+                // No priced proposal yet: leave the line off, never "$0.00".
+                total == null || total <= 0
+                  ? ""
+                  : total.toLocaleString("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }),
+            },
+            {
+              label: "Venue",
+              value: event.venueAddress?.startsWith(event.venueName ?? "\0")
+                ? event.venueAddress
+                : [event.venueName, event.venueAddress]
+                    .filter(Boolean)
+                    .join("\n"),
+            },
+            {
+              label: "Last change",
+              value:
+                event.updatedAt == null
+                  ? ""
+                  : when(event.updatedAt, {
+                      month: "numeric",
+                      day: "numeric",
+                      year: "numeric",
+                    }),
+            },
+          ]),
+        },
+        ...(timelineRows.length > 0
+          ? [{ id: "timeline", heading: "Timeline", rows: timelineRows }]
+          : []),
+        {
+          id: "menu-review",
+          heading: "Menu review",
+          rows: [
+            {
+              value:
+                "I have reviewed my menu in detail and the menu displayed is correct. I understand that what is listed is what will be provided at my event.",
+            },
+            { label: "Initial", value: "________________" },
+          ],
+        },
         {
           id: "terms",
+          heading: "Terms",
+          rows: [
+            {
+              value:
+                proposal?.terms?.trim() ||
+                "No terms written yet. Put your standard terms on the event's proposal (or its proposal template).",
+            },
+            ...(contract?.notes?.trim()
+              ? [{ label: "Notes", value: contract.notes.trim() }]
+              : []),
+            { label: "Client initial", value: "________________" },
+          ],
+        },
+        {
+          id: "contract",
+          heading: "Contract",
           rows: contract
-            ? [
+            ? filled([
                 {
                   label: "Contract",
                   value: contract.contractNumber ?? contract.title,
@@ -583,8 +854,7 @@ export const run = query({
                 { label: "Status", value: contract.status },
                 { label: "Expires", value: dateText(contract.expiresAt) },
                 { label: "Signed by", value: contract.signedBy ?? "" },
-                { label: "Notes", value: contract.notes ?? "" },
-              ]
+              ])
             : [{ value: "No contract has been created for this event." }],
         },
       ]);

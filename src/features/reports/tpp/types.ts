@@ -57,6 +57,10 @@ export type TppReportParameter =
       type: "text";
       label: string;
       required: boolean;
+      /** 1 = a one-line box; otherwise the number of text rows (5). */
+      lines?: number;
+      /** Offer the team's saved texts for this box (TPP "Body Message"). */
+      savedTexts?: boolean;
     };
 
 export interface TppReportEvidence {
@@ -133,6 +137,8 @@ export interface TppDocumentSection {
   heading?: string;
   headingLevel?: 3 | 4;
   printContext?: string;
+  /** The company's own logo, printed above the rows (letter and contract head). */
+  logoUrl?: string;
   rows: readonly {
     label?: string;
     value: string;

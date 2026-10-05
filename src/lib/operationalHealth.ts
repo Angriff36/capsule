@@ -13,6 +13,10 @@
 // "Not sure it arrived" is kept apart from "stopped trying": a message Capsule
 // is not sure about may already be with the customer, so the advice is to
 // check before sending again; a stopped one surely did not arrive.
+//
+// A connection whose access ends on a known date (QuickBooks always says;
+// Google says only for time-limited access) is flagged 14 days ahead, so a
+// manager reconnects before sending stops.
 
 export type HealthLevel = "act" | "check";
 
@@ -32,6 +36,8 @@ export interface MessageChannelSnapshot {
   oldestWaitingSince: number | null;
   stopped: number;
   notSure: number;
+  /** Phone alerts only: who owns the phones that missed the last alert. */
+  missedBy?: string[];
 }
 
 export interface HealthSnapshot {
@@ -46,6 +52,8 @@ export interface HealthSnapshot {
     | {
         state: string;
         failedCount: number;
+        /** When Google stops accepting Capsule's access; null = Google did not say. */
+        accessEndsAt?: number | null;
       }
     | null
     | undefined;
@@ -54,6 +62,8 @@ export interface HealthSnapshot {
         connected: boolean;
         lastStatus: string | null;
         failed: number;
+        /** When QuickBooks stops accepting Capsule's access; null = it did not say. */
+        accessEndsAt?: number | null;
       }
     | null
     | undefined;
@@ -61,6 +71,11 @@ export interface HealthSnapshot {
 
 /** Waiting longer than this is stuck, not slow (retries run within minutes). */
 export const STUCK_AFTER_MS = 30 * 60_000;
+
+/** A connection whose access ends within this is flagged, so someone reconnects in time. */
+export const ACCESS_ENDING_WITHIN_MS = 14 * 24 * 60 * 60_000;
+
+const DAY_MS = 24 * 60 * 60_000;
 
 const RUNBOOK = 'See "Health and recovery" in the operations guide.';
 
@@ -127,6 +142,25 @@ function messageAlerts(snapshot: HealthSnapshot): HealthAlert[] {
         action: `Check the connection for ${channel.label.toLowerCase()} below. Capsule keeps trying by itself; nothing is lost while it waits. ${RUNBOOK}`,
       });
     }
+    if (channel.channel === "phoneAlerts") {
+      // Counted per phone. A "check", not a bell item: one lost or switched-off
+      // phone must not ring every manager's bell until someone deals with it.
+      if (channel.stopped > 0) {
+        const who = channel.missedBy?.length
+          ? ` Phones of: ${channel.missedBy.join(", ")}.`
+          : "";
+        alerts.push({
+          key: "phoneAlerts-missed",
+          level: "check",
+          title: `${plural(channel.stopped, "phone", "phones")} did not get the last alert`,
+          detail: `Shift, chat and run-of-show alerts are not reaching ${channel.stopped === 1 ? "this phone" : "these phones"}. Everything still shows when the person opens Capsule.${who}`,
+          action:
+            "Ask the person to open Capsule on that phone and turn phone alerts off and on again. If every phone misses alerts, check the phone alert keys on the server. " +
+            RUNBOOK,
+        });
+      }
+      continue;
+    }
     if (channel.stopped > 0) {
       alerts.push({
         key: `${channel.channel}-stopped`,
@@ -154,9 +188,59 @@ function messageAlerts(snapshot: HealthSnapshot): HealthAlert[] {
   return alerts;
 }
 
+function accessEndingAlert(
+  now: number,
+  accessEndsAt: number | null | undefined,
+  key: string,
+  name: string,
+  action: string,
+): HealthAlert[] {
+  if (accessEndsAt == null || accessEndsAt - now > ACCESS_ENDING_WITHIN_MS) {
+    return [];
+  }
+  const days = Math.ceil((accessEndsAt - now) / DAY_MS);
+  const when =
+    days <= 0
+      ? "has ended"
+      : days === 1
+        ? "ends tomorrow"
+        : `ends in ${days} days`;
+  return [
+    {
+      key,
+      level: "act",
+      title: `${name} access ${when}`,
+      detail: `${name} gave Capsule access for a fixed time. When it ends, nothing more is sent to ${name} until someone connects it again.`,
+      action,
+    },
+  ];
+}
+
 function connectionAlerts(snapshot: HealthSnapshot): HealthAlert[] {
   const alerts: HealthAlert[] = [];
   const { calendar, quickBooks } = snapshot;
+  if (calendar && calendar.state !== "needs_reconnect") {
+    alerts.push(
+      ...accessEndingAlert(
+        snapshot.now,
+        calendar.accessEndsAt,
+        "calendar-access-ending",
+        "Google Calendar",
+        "Use Connect under Google Calendar below before then. Events catch up by themselves after that.",
+      ),
+    );
+  }
+  if (quickBooks?.connected && quickBooks.lastStatus !== "needs_reconnect") {
+    alerts.push(
+      ...accessEndingAlert(
+        snapshot.now,
+        quickBooks.accessEndsAt,
+        "quickbooks-access-ending",
+        "QuickBooks",
+        "Disconnect and connect QuickBooks again below before then. Items already in QuickBooks are not sent twice.",
+      ),
+    );
+  }
   if (calendar?.state === "needs_reconnect") {
     alerts.push({
       key: "calendar-reconnect",

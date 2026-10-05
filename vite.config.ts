@@ -240,7 +240,9 @@ export default defineConfig(({ mode }) => ({
     markItDownDev(),
     // The build says which commit it is: <site>/version.json. A Vercel build
     // has VERCEL_GIT_COMMIT_SHA; scripts/verify-vercel-release.ts reads this
-    // file from the production address to prove a release is live.
+    // file from the production address to prove a release is live. It also
+    // names the backend this build calls (VITE_CONVEX_URL, already public in
+    // the page code) for the release receipt (scripts/release-receipt.ts).
     {
       name: "capsule-version-json",
       apply: "build",
@@ -248,7 +250,11 @@ export default defineConfig(({ mode }) => ({
         this.emitFile({
           type: "asset",
           fileName: "version.json",
-          source: `${JSON.stringify({ commit: process.env.VERCEL_GIT_COMMIT_SHA ?? null })}\n`,
+          source: `${JSON.stringify({
+            commit: process.env.VERCEL_GIT_COMMIT_SHA ?? null,
+            convexUrl:
+              loadEnv(mode, process.cwd(), "VITE_").VITE_CONVEX_URL ?? null,
+          })}\n`,
         });
       },
     },

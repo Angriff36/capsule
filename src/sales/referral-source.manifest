@@ -34,9 +34,13 @@ entity ReferralSource mixin TenantScoped, SoftDeletable {
   property registeredAt: datetime?
   property deactivatedAt: datetime?
   property deactivationReason: string?
+  // The partner venue that sends these leads (Venue Partner Playbook section
+  // 11: venue referrals are tagged with the venue). Feeds the venue scorecard.
+  property venueId: uuid?
 
   // Leads using this referral source (inverse relation)
   hasMany leads: Lead
+  ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
 
@@ -98,6 +102,17 @@ entity ReferralSource mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Ties this source to the partner venue that sends its leads; blank unties it.
+  command linkVenue(optional venueId: uuid) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    mutate venueId = venueId
+    emit ReferralSourceVenueLinked {
+      referralSourceId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command deactivate(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -146,6 +161,11 @@ event ReferralSourceDetailsRevised: "referral_source.details_revised" {
   tenantId: string
   name: string
   sortOrder: number
+}
+
+event ReferralSourceVenueLinked: "referral_source.venue_linked" {
+  referralSourceId: string
+  tenantId: string
 }
 
 event ReferralSourceDeactivated: "referral_source.deactivated" {

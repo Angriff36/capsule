@@ -282,6 +282,14 @@ export const getBriefing = query({
     const dishIds = [
       ...new Set(eventDishes.map((row: any) => String(row.dishId))),
     ];
+    // A version may cook from its main dish's recipe (recipeDishId): read
+    // those lines and show them under the menu's dish, so allergens match.
+    const recipeOf = new Map<string, string>(
+      eventDishes.map((row: any) => [
+        String(row.dishId),
+        String(row.recipeDishId ?? row.dishId),
+      ]),
+    );
     const dishes = (
       await Promise.all(
         eventDishes
@@ -304,11 +312,15 @@ export const getBriefing = query({
 
     const dishLineRows = (
       await Promise.all(
-        dishIds.map((dishId) =>
-          ctx.db
-            .query("dishIngredients")
-            .withIndex("by_dishId", (q: any) => q.eq("dishId", dishId))
-            .collect(),
+        dishIds.map(async (dishId) =>
+          (
+            await ctx.db
+              .query("dishIngredients")
+              .withIndex("by_dishId", (q: any) =>
+                q.eq("dishId", recipeOf.get(dishId) ?? dishId),
+              )
+              .collect()
+          ).map((row: any) => ({ ...row, dishId })),
         ),
       )
     )
@@ -316,11 +328,15 @@ export const getBriefing = query({
       .filter((row: any) => row.tenantId === tenantId && live(row));
     const dishComponentRows = (
       await Promise.all(
-        dishIds.map((dishId) =>
-          ctx.db
-            .query("dishComponents")
-            .withIndex("by_dishId", (q: any) => q.eq("dishId", dishId))
-            .collect(),
+        dishIds.map(async (dishId) =>
+          (
+            await ctx.db
+              .query("dishComponents")
+              .withIndex("by_dishId", (q: any) =>
+                q.eq("dishId", recipeOf.get(dishId) ?? dishId),
+              )
+              .collect()
+          ).map((row: any) => ({ ...row, dishId })),
         ),
       )
     )
@@ -343,6 +359,23 @@ export const getBriefing = query({
     )
       .flat()
       .filter((row: any) => row.tenantId === tenantId && live(row));
+
+    // Allergens marked on a recipe itself (recipe sheet) count for its dishes,
+    // even when the recipe was removed but a live dish line still uses it.
+    const componentRows = (
+      await Promise.all(
+        componentIds.map((componentId) =>
+          tenantDocAllowDeleted(ctx, tenantId, componentId),
+        ),
+      )
+    )
+      .filter((row: any) => row != null)
+      .map((row: any) => ({
+        _id: row._id,
+        deletedAt: null,
+        name: row.name,
+        declaredAllergens: row.declaredAllergens ?? [],
+      }));
 
     const dishIngredients = await Promise.all(
       dishLineRows.map((line: any) => hydrateLine(ctx, tenantId, line)),
@@ -506,6 +539,9 @@ export const getBriefing = query({
               accessNotes: venueRaw.accessNotes ?? null,
               cateringNotes: venueRaw.cateringNotes ?? null,
               restrictions: venueRaw.restrictions ?? null,
+              vibe: venueRaw.vibe ?? null,
+              topFeature: venueRaw.topFeature ?? null,
+              photoFocus: venueRaw.photoFocus ?? null,
               contactName: await decryptField(
                 ctx,
                 "Venue",
@@ -579,6 +615,7 @@ export const getBriefing = query({
         componentId: row.componentId,
       })),
       componentIngredients,
+      components: componentRows,
       deliveries: (deliveries as any[]).map((row) => ({
         _id: row._id,
         eventId: row.eventId,

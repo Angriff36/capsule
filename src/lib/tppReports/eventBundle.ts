@@ -85,6 +85,8 @@ export interface BundleMenuItem {
   specialInstructions?: string;
   unitPriceCents?: number;
   totalPriceCents?: number;
+  /** How the kitchen finishes it, from the production worksheet ("Finish at Kitchen"). */
+  finish?: string;
 }
 
 export interface BundlePrepTask {

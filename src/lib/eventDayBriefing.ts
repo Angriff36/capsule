@@ -100,6 +100,10 @@ export type EventDayVenue = {
   accessNotes: string | null;
   cateringNotes: string | null;
   restrictions: string | null;
+  // Venue selling profile (playbook 09): the look sets the food look here.
+  vibe?: string | null;
+  topFeature?: string | null;
+  photoFocus?: string | null;
   contactName: string | null;
   contactPhone: string | null;
 };
@@ -267,6 +271,13 @@ export type EventDayMe = {
   role: string;
 };
 
+export type EventDayComponent = {
+  _id: string;
+  deletedAt: number | null;
+  name: string;
+  declaredAllergens: string[];
+};
+
 export type EventDayBriefing = {
   packetReadiness: EventDayPacketReadiness;
   event: EventDayEvent;
@@ -279,6 +290,8 @@ export type EventDayBriefing = {
   dishIngredients: EventDayRecipeLine[];
   dishComponents: EventDayDishComponent[];
   componentIngredients: EventDayRecipeLine[];
+  /** Recipes on the menu with the allergens marked on the recipe itself. */
+  components?: EventDayComponent[];
   deliveries: EventDayDelivery[];
   vehicles: EventDayVehicle[];
   layoutSections: EventDayLayoutSection[];

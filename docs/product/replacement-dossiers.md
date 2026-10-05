@@ -56,8 +56,18 @@ did not go (invoice page and the proposal's "Emails" list). Capsule knows
 callbacks wait on issue #52).
 
 Open:
-- Imported events all start in Planning; the TPP status shows on the event's
-  "Imported from" panel as "Status in the old system".
+- Imported events that are over and were booked in TPP (Confirmed, Sales
+  Lock, Final, Complete, Closed ...) come in Completed, and Cancelled ones,
+  lost quotes and quotes past their date come in Cancelled, with no invoice,
+  staff or pack list made for them (`proofs/import-old-event-status`, since
+  2026-10-04). Events still to come start in Planning, so approval still
+  makes their work. TPP's event list report (the 2,505-event history file,
+  "Invoice No", client by name) comes in through "Import a file from the old
+  system" > Events; each event finds its client by name among the clients
+  read from the contact list (`proofs/import-event-list-report`). Two
+  clients with one name, or none, leave the event waiting with a note. The TPP status shows on the event's "Imported from" panel as
+  "Status in the old system"; an event read in before 2026-10-04 has a
+  "Mark finished" / "Mark cancelled" button there.
 - Old invoices are not created as invoices; finance gets a rebuild preview
   (`/admin/imports`, old invoice rebuild).
 - Old payments wait on `/admin/reconcile` to be matched by hand.
@@ -82,7 +92,7 @@ delivery is not being built now (owner, 2026-09-29).
 | Offer, claim, assign, decline, waitlist, swap | `/my`, `/staff/swaps` | `proofs/coverage-flows`, `proofs/staff-coverage-flows` | Built |
 | Schedule and change acknowledgement | `/my` | `proofs/schedule-change-ack` | Built |
 | Event instructions for crew | `/my` | `proofs/field-staff-booking-read` | Built |
-| Reminders | sent on their own before each shift; staff get them on their phone and see their shifts on `/my`; managers check sending on `/admin/integrations` "Outside messages" | `proofs/sms-reminder-dedupe`, `proofs/push-outbox-dedupe`, `proofs/backend-delivery-states` | Built: "Outside messages" shows text alerts waiting, stopped after failed tries, and not sure; a phone (push) alert that fails is only written to the server log, so managers do not see it yet (open) |
+| Reminders | sent on their own before each shift; staff get them on their phone and see their shifts on `/my`; managers check sending on `/admin/integrations` "Outside messages" | `proofs/sms-reminder-dedupe`, `proofs/push-outbox-dedupe`, `proofs/backend-delivery-states`, `proofs/phone-alert-health` | Built: "Outside messages" shows text alerts waiting, stopped after failed tries, and not sure; it also shows phone (push) alerts per phone: how many phones get alerts and whose phone missed the last one, and System health lists it with what to do |
 | Announcements | `/admin/announcements`, banner | `proofs/announcement-board` | Built ("read and closed by" count for managers) |
 | Clock in and out, location at clock-in and clock-out | `/my`, `/staff/time` | `proofs/time-correction-audit`, `proofs/offline-clock-reconcile`, `features/workforce/clock-out-location` | Built: both taps keep the phone location when the person allows it; the time sheet says how far the clock-out was from the clock-in |
 | Late and no-show alerts | `/staff/time` | `proofs/clock-alerts` | Built |
@@ -112,10 +122,10 @@ Retires when recipe-to-production and purchasing work is covered (§20.6).
 | Allergen roll-up for a menu or event | `/kitchen/allergen-matrix` | `proofs/incident-allergen-corrective-action` | Built |
 | Units and conversions | ingredient page | `culinary-unit-meaning`, `proofs/incompatible-unit-review` | Built (never guesses) |
 | Pack sizes and vendor items | ingredient page, `/inventory/contracts` | `proofs/menu-profitability-direct-ingredient`, `proofs/vendor-item-record`, `proofs/vendor-item-order-price` | Built: vendor items per ingredient (item number, pack, pack price with history); weekly order lines take the vendor's pack price |
-| Prices and price history | ingredient page, `/inventory/purchasing` (price list file) | `culinary-model-cost-dated`, `proofs/receipt-exact-once`, `proofs/vendor-price-list-import` | Built: history grows from receipts and from each vendor price list read in (a new price keeps the old one) |
+| Prices and price history | ingredient page, `/inventory/purchasing` (price list file) | `culinary-model-cost-dated`, `proofs/receipt-exact-once`, `proofs/vendor-price-list-import` | Built: history grows from receipts and from each vendor price list read in (a new price keeps the old one); a Price date column brings old prices in with their dates; each vendor item on the ingredient page shows its earlier prices and dates |
 | Recipes, sub-recipes, yields, versions | `/kitchen/components/:id`, `/kitchen/dishes/:id` | `proofs/safe-culinary-operations` | Built |
 | Method, station, equipment | recipe page, `/kitchen/stations` | `proofs/prep-work-baselines`, `dish-editing-behavior` | Built: each recipe step offers the kitchen station list and saves another spelling as the station's own name; a station change moves unstarted event prep. Recipe equipment is picked from the company equipment list (other words still allowed); each listed piece shows how many the company has |
-| Photos, video, plating, holding and reheating | recipe page | `culinary/recipe-media-and-holding` | Built (one photo) |
+| Photos, video, plating, holding and reheating | recipe page | `culinary/recipe-media-and-holding` | Built (a main photo plus more pictures and short videos) |
 | Substitutions | ingredient and recipe pages | `proofs/live-substitution-at-executing`, `features/kitchen/ingredient-substitution-ranking` | Built: saved swaps per ingredient (ingredient page), ranked on a stock shortage by free stock, new allergens and cost; recipe-level notes too |
 | Menus and event servings | `/kitchen/menus/:id`, event Menu tab | `proofs/event-dish-demand-lifecycle` | Built |
 | Live cost, known against missing | dish, menu and event pages | `proofs/menu-profitability-direct-ingredient`, `proofs/event-estimated-food-cost` | Built |
@@ -135,8 +145,10 @@ History: recipes through the recipe import screen (`/kitchen/components/import`)
 and the TPP recipe repair scripts; ingredients are filled from the USDA
 library; opening stock through `/inventory/opening-stock`; vendors and their
 item prices through the vendor price list card on `/inventory/purchasing`
-(`proofs/vendor-price-list-import`). Older price history before that file
-still has no way in.
+(`proofs/vendor-price-list-import`). Older prices come in through the same
+card: one row per price with its Price date; the newest becomes the item's
+price and older ones go into its history, also when an older file is read
+after a newer one.
 
 ## Goodshuffle Pro (rentals and decor)
 
@@ -144,7 +156,7 @@ Retires when quote-to-availability-to-pull-to-return work is covered (§20.6).
 
 | Job | Where in Capsule | Proof | State |
 | --- | --- | --- | --- |
-| Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount`, `features/facilities/equipment-place-choices` | Built (one photo). Storage place and Move offer the places already in use (catalog places and kitchen storage places); another spelling saves as the known place's name |
+| Catalog: photo, price, replacement cost, serial, place | `/facilities/equipment` | `features/logistics/catalog-fields`, `features/facilities/equipment-register-recount`, `features/facilities/equipment-place-choices` | Built (a main photo plus more pictures and short videos). Storage place and Move offer the places already in use (catalog places and kitchen storage places); another spelling saves as the known place's name |
 | Availability across events, repairs, late returns | event Equipment panel | `proofs/availability-realtime`, `proofs/equipment-reservation-conflict` | Built |
 | Rental lines on proposals, approval, changes | `/clients/proposals` Pricing | `proofs/rental-proposal-lines`, `proofs/post-acceptance-change-order` | Built |
 | Approved rentals held for the event | event Equipment panel (held there on their own when the proposal is approved) | `proofs/accepted-rental-holds` | Built 2026-10-03 |
@@ -167,9 +179,16 @@ No retyping: since 2026-10-03 an item on the accepted proposal is held for the
 event on approval (and on an accepted change), as many as are free; the rest
 shows on the event as "approved by the client but not held".
 
-History: no way in yet for Goodshuffle items, holds or orders. Needs a
-Goodshuffle export file to build against (blocked). The event packet still has
-a "check current Goodshuffle rentals" item for imported events.
+History: Goodshuffle items come in from the Goodshuffle inventory export
+(.xlsx or .csv) on `/facilities/equipment`, "Bring in Goodshuffle items"
+(`proofs/goodshuffle-items-import`, since 2026-10-04). Each product becomes an
+equipment item tagged GS-<Product ID> with its count, client price, storage
+place, description, details and first picture; services and delivery fees are
+charges and are named, not added. Reading the file again updates the same
+items; counts changed in Capsule stay and are listed to recount. The export
+has no holds or orders, so old Goodshuffle bookings stay in Goodshuffle until
+their events pass. The event packet still has a "check current Goodshuffle
+rentals" item for imported events.
 
 ## Final Lock binder, tracker, shared drives, event chat
 
@@ -180,7 +199,7 @@ assigned as field work (§20.6).
 | --- | --- | --- | --- |
 | Prove the event is ready | event page Workbook, `/workbooks` | `proofs/final-lock-readiness`, `proofs/readiness-projections` | Built |
 | Ops Final Lock questions | Workbook, Final Lock questions | `proofs/event-packet-final-lock`, `proofs/event-packet-final-lock-sources` | Built |
-| Sales Lock | event stage actions | `proofs/lifecycle-sales-lock-completeness` | Built as a completeness check (spec §3.3 asks for gate checks) |
+| Sales Lock | event stage actions | `proofs/lifecycle-sales-lock-completeness` | Built: locking checks client, dates, guest count, name, venue and service style, and says what is missing |
 | The eight packet parts in binder order | Workbook, prepare | `proofs/event-packet-native-parts` | Built |
 | Office answers and blank field forms | Workbook field forms, `/my` | `proofs/event-packet-field-confirmation` | Built (field forms never pre-filled) |
 | Binder color and event number on the cover | packet cover and brief | `event-packet-workbook`, `proofs/event-packet-native-parts` | Built (cover says "Event" since 2026-10-03) |

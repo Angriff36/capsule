@@ -1,6 +1,7 @@
-import type { FormEvent } from "react";
+import { useRef, type FormEvent } from "react";
 import { BoundedDateInput } from "../../../ui/BoundedDateInputs";
 import { useWorkingEventId } from "../../events/workingEvent";
+import { SavedLetterTextPicker } from "./SavedLetterTextPicker";
 import type { TppReportDefinition, TppReportOption } from "./types";
 
 export interface TppReportOptions {
@@ -25,6 +26,38 @@ function entityOptions(
   if (entity === "person") return options.people;
   if (entity === "vendor") return options.vendors;
   return options.venues;
+}
+
+function SavedTextBox({
+  name,
+  label,
+  rows,
+  required,
+  error,
+}: {
+  name: string;
+  label: string;
+  rows: number;
+  required: boolean;
+  error: string | undefined;
+}) {
+  const box = useRef<HTMLTextAreaElement>(null);
+  return (
+    <div className="tpp-parameter-wide">
+      <SavedLetterTextPicker target={box} />
+      <label>
+        <span>{label}</span>
+        <textarea
+          ref={box}
+          className="input"
+          name={name}
+          rows={rows}
+          required={required}
+        />
+        {error ? <small className="field-error">{error}</small> : null}
+      </label>
+    </div>
+  );
 }
 
 export function TppReportParameters({
@@ -116,16 +149,41 @@ export function TppReportParameters({
                 </label>
               );
             }
+            if (parameter.type === "text" && parameter.savedTexts) {
+              return (
+                <SavedTextBox
+                  key={parameter.key}
+                  name={parameter.key}
+                  label={parameter.label}
+                  rows={parameter.lines ?? 5}
+                  required={parameter.required}
+                  error={errors[parameter.key]}
+                />
+              );
+            }
             if (parameter.type === "text") {
               return (
-                <label className="tpp-parameter-wide" key={parameter.key}>
+                <label
+                  className={
+                    parameter.lines === 1 ? undefined : "tpp-parameter-wide"
+                  }
+                  key={parameter.key}
+                >
                   <span>{parameter.label}</span>
-                  <textarea
-                    className="input"
-                    name={parameter.key}
-                    rows={5}
-                    required={parameter.required}
-                  />
+                  {parameter.lines === 1 ? (
+                    <input
+                      className="input"
+                      name={parameter.key}
+                      required={parameter.required}
+                    />
+                  ) : (
+                    <textarea
+                      className="input"
+                      name={parameter.key}
+                      rows={parameter.lines ?? 5}
+                      required={parameter.required}
+                    />
+                  )}
                   {errors[parameter.key] ? (
                     <small className="field-error">
                       {errors[parameter.key]}

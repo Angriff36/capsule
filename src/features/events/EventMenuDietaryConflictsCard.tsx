@@ -67,8 +67,17 @@ export type DietaryConflictInputs = {
     ingredientId: string;
     deletedAt?: number | null;
   }[];
-  ingredients: readonly { _id: string; name: string }[];
-  components: readonly { _id: string; name: string }[];
+  ingredients: readonly {
+    _id: string;
+    name: string;
+    allergens?: readonly string[] | null;
+  }[];
+  components: readonly {
+    _id: string;
+    name: string;
+    /** Allergens marked on the recipe itself. */
+    declaredAllergens?: readonly string[] | null;
+  }[];
 };
 
 /** The event's "must not contain" list, from its text and its guest list. */
@@ -97,9 +106,32 @@ export function menuDishTextSources(
   const ingredientName = new Map(
     inputs.ingredients.map((row) => [row._id, row.name]),
   );
+  const ingredientAllergens = new Map(
+    inputs.ingredients.map((row) => [
+      row._id,
+      allergenSummaryText(row.allergens),
+    ]),
+  );
   const componentName = new Map(
     inputs.components.map((row) => [row._id, row.name]),
   );
+  const componentMarks = new Map(
+    inputs.components.map((row) => [
+      row._id,
+      allergenSummaryText(row.declaredAllergens),
+    ]),
+  );
+  const pushIngredient = (
+    texts: { label: string; text: string }[],
+    ingredientId: string,
+    label: string,
+  ) => {
+    const name = ingredientName.get(ingredientId);
+    if (name) texts.push({ label, text: name });
+    const allergens = ingredientAllergens.get(ingredientId);
+    if (allergens)
+      texts.push({ label: `${name ?? label} allergens`, text: allergens });
+  };
   const componentIngredientIds = new Map<string, string[]>();
   for (const row of inputs.componentIngredients) {
     if (row.deletedAt != null) continue;
@@ -119,23 +151,25 @@ export function menuDishTextSources(
     }
     for (const link of inputs.dishIngredients) {
       if (link.dishId !== dish._id || link.deletedAt != null) continue;
-      const name = ingredientName.get(link.ingredientId);
-      if (name) texts.push({ label: "ingredient", text: name });
+      pushIngredient(texts, link.ingredientId, "ingredient");
     }
     for (const link of inputs.dishComponents) {
       if (link.dishId !== dish._id || link.deletedAt != null) continue;
       const name = componentName.get(link.componentId);
       if (name) texts.push({ label: "component", text: name });
+      const marks = componentMarks.get(link.componentId);
+      if (marks)
+        texts.push({
+          label: `${name ?? "recipe"} marked on recipe`,
+          text: marks,
+        });
       for (const ingredientId of componentIngredientIds.get(link.componentId) ??
-        []) {
-        const ingredient = ingredientName.get(ingredientId);
-        if (ingredient) {
-          texts.push({
-            label: `${name ?? "component"} ingredient`,
-            text: ingredient,
-          });
-        }
-      }
+        [])
+        pushIngredient(
+          texts,
+          ingredientId,
+          `${name ?? "component"} ingredient`,
+        );
     }
     if (dish.recipeInstructions) {
       texts.push({ label: "recipe", text: dish.recipeInstructions });

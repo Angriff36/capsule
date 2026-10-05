@@ -1,6 +1,7 @@
 import { ComponentCsvParser } from "./ComponentCsvParser";
 import { IngredientCatalogMatcher } from "./IngredientCatalogMatcher";
 import { ComponentTextParser } from "./ComponentTextParser";
+import { isRecipeSheet, parseRecipeSheet } from "./RecipeSheetParser";
 import {
   isLineResolved,
   type CatalogIngredient,
@@ -28,7 +29,9 @@ export class ComponentImportCoordinator {
     sourceFilename?: string,
     recipes: readonly CatalogRecipe[] = [],
   ): ComponentImportReviewState {
-    const parsed = this.parser.parse(source);
+    const parsed = isRecipeSheet(source)
+      ? parseRecipeSheet(source, sourceFilename).draft
+      : this.parser.parse(source);
     return this.toReview(parsed, catalog, sourceKind, sourceFilename, recipes);
   }
 
@@ -38,7 +41,9 @@ export class ComponentImportCoordinator {
     catalog: readonly CatalogIngredient[],
     recipes: readonly CatalogRecipe[] = [],
   ): ComponentImportReviewState {
-    const parsed = this.csvParser.parseTextFile(source, filename);
+    const parsed = isRecipeSheet(source)
+      ? parseRecipeSheet(source, filename).draft
+      : this.csvParser.parseTextFile(source, filename);
     return this.toReview(parsed, catalog, "text_file", filename, recipes);
   }
 

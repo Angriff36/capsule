@@ -378,47 +378,6 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
             </label>
           </>
         ) : null}
-        {section === "dishes" ? (
-          <>
-            <label className="field-label">
-              Portion size
-              <input
-                name="portionSize"
-                type="number"
-                min={0.01}
-                step="0.01"
-                defaultValue={1}
-                className="input"
-                required
-              />
-            </label>
-            <UnitField name="portionUnit" label="Portion unit" />
-            <label className="field-label">
-              Category
-              <input name="category" className="input" />
-            </label>
-            <label className="field-label">
-              Course
-              <input name="course" className="input" />
-            </label>
-            <label className="field-label">
-              Service style
-              <input name="serviceStyle" className="input" />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Dietary tags
-              <input
-                name="dietaryTags"
-                className="input"
-                placeholder="vegan, gluten-free"
-              />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Description
-              <textarea name="description" className="input min-h-20 py-2" />
-            </label>
-          </>
-        ) : null}
         {section === "menus" ? (
           <>
             <label className="field-label">

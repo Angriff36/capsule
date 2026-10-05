@@ -16,6 +16,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { live, tenantEvent, tenantPerson } from "./lib/teamChatRead";
+import { recordPushFailures } from "./pushDeviceHealth";
 
 /** A push older than this when the action finally runs is not worth sending. */
 const STALE_MS = 5 * 60_000;
@@ -172,6 +173,8 @@ export const recordPushResults = internalMutation({
     gone: v.array(
       v.object({ id: v.id("pushSubscriptions"), version: v.number() }),
     ),
+    // Devices the push service refused for another reason; kept for managers.
+    failed: v.optional(v.array(v.id("pushSubscriptions"))),
     now: v.number(),
   },
   handler: async (ctx, args) => {
@@ -179,6 +182,7 @@ export const recordPushResults = internalMutation({
       const row = await ctx.db.get(id);
       if (row && live(row)) await ctx.db.patch(id, { lastUsedAt: args.now });
     }
+    await recordPushFailures(ctx, args.failed ?? [], args.now);
     // 404/410 from the push service: the browser dropped the subscription.
     // Only if the row is the same one the delivery held — a re-registered or
     // re-owned device has a newer version and stays.

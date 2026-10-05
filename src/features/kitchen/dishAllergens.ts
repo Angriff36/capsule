@@ -27,6 +27,8 @@ export type DishAllergenInput = {
   dishComponents: readonly AllergenSourceRecord[];
   componentIngredients: readonly AllergenSourceRecord[];
   ingredients: readonly AllergenSourceRecord[];
+  /** Recipes, for the allergens marked on the recipe itself (declaredAllergens). */
+  components?: readonly AllergenSourceRecord[];
 };
 
 export type DishAllergenReport = {
@@ -60,6 +62,8 @@ export function deriveDishAllergens(
   dish: AllergenSourceRecord,
   input: DishAllergenInput,
 ): DishAllergenReport {
+  // A version may cook from its main dish's recipe (recipeDishId).
+  const recipeId = String(dish.recipeDishId ?? dish._id);
   const sources = new Map<CulinaryAllergenCode, string[]>();
   const flag = (code: CulinaryAllergenCode, source: string) => {
     const list = sources.get(code) ?? [];
@@ -100,19 +104,30 @@ export function deriveDishAllergens(
   };
 
   for (const line of input.dishIngredients) {
-    if (line.deletedAt != null || line.dishId !== dish._id) continue;
+    if (line.deletedAt != null || String(line.dishId) !== recipeId) continue;
     takeLine(line);
   }
 
   const componentIds = new Set(
     input.dishComponents
-      .filter((line) => line.deletedAt == null && line.dishId === dish._id)
+      .filter(
+        (line) => line.deletedAt == null && String(line.dishId) === recipeId,
+      )
       .map((line) => String(line.componentId)),
   );
   for (const line of input.componentIngredients) {
     if (line.deletedAt != null || !componentIds.has(String(line.componentId)))
       continue;
     takeLine(line);
+  }
+  // Allergens marked on a recipe's own sheet count like the dish's own marks.
+  for (const component of input.components ?? []) {
+    if (component.deletedAt != null || !componentIds.has(String(component._id)))
+      continue;
+    for (const code of (component.declaredAllergens ??
+      []) as CulinaryAllergenCode[]) {
+      flag(code, `${String(component.name)} (marked on recipe)`);
+    }
   }
 
   for (const code of (dish.allergenSummary ?? []) as CulinaryAllergenCode[]) {
