@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type RefObject } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ALLERGEN_BRIEFING_HASH } from "../AllergenBriefingButton";
 import type { EventDetailTab } from "../eventRoutes";
@@ -23,6 +23,8 @@ type Props = {
   readonly overview: EventDashOverviewProps;
   /** Banners and notices that sit between the heading and the sections. */
   readonly notices: ReactNode;
+  /** Marks the end of the heading; the page's sticky header shows past it. */
+  readonly heroSentinelRef?: RefObject<HTMLDivElement>;
   /** Every tab except the overview, rendered by the page. */
   readonly children: ReactNode;
 };
@@ -122,6 +124,7 @@ export function EventDashboard(props: Props) {
           onOpenEdit={() => setSheet("edit")}
           actions={props.actions}
         />
+        <div ref={props.heroSentinelRef} aria-hidden="true" />
         {props.notices}
         <EventDashPipeline
           eventId={overview.eventId}

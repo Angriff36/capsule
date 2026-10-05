@@ -79,7 +79,7 @@ export function EventDashHero(props: Props) {
           </span>
         ) : null}
       </div>
-      <h1 className="evd-title">
+      <h1 id="event-detail-title" tabIndex={-1} className="evd-title">
         {lead}
         {accent ? (
           <>

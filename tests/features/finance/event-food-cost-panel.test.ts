@@ -47,8 +47,19 @@ const contribution = (ingredientId: string, quantity: number): Contribution =>
     sourceDishIngredientId: null,
     sourceDishComponentId: null,
     servings: 40,
+    calculationSnapshot: {
+      version: 1,
+      kind: "direct_dish",
+      recipeLineQuantity: quantity,
+      wasteFactor: 1,
+      batchMultiplier: 1,
+      servings: 40,
+      yieldQuantity: 1,
+      resultQuantity: quantity,
+      resultUnit: "pound",
+      componentPath: [],
+    },
     purchasable: true,
-    calculationSnapshot: {} as Contribution["calculationSnapshot"],
   }) as Contribution;
 
 const report = eventFoodCost({

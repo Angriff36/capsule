@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import { normalizeCurrencyCode } from "../../lib/format";
+import {
+  formatCount,
+  formatDate,
+  normalizeCurrencyCode,
+} from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
@@ -45,6 +50,7 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
 import { WalkieToggle } from "../chat/WalkieToggle";
@@ -129,6 +135,8 @@ function EventDetailContent({
   event: Doc<"events">;
   id: string | undefined;
 }) {
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
@@ -725,7 +733,23 @@ function EventDetailContent({
   );
 
   return (
-    <>
+    <div ref={sectionScopeRef}>
+      <StickyRecordHeader
+        title={event.title}
+        facts={[
+          { label: "Date", value: formatDate(event.startsAt) },
+          {
+            label: "Headcount",
+            value: `${formatCount(event.expectedHeadcount)} guests`,
+          },
+          { label: "Status", value: formatStatusLabel(String(event.stage)) },
+        ]}
+        actions={headerActions}
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        sectionKey={activeTab}
+        headingId="event-detail-title"
+      />
       <EventDashboard
         title={String(event.title)}
         updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
@@ -753,6 +777,7 @@ function EventDetailContent({
         onTab={setTab}
         overview={overviewProps}
         notices={notices}
+        heroSentinelRef={headerSentinelRef}
       >
         {otherTabs}
       </EventDashboard>
@@ -774,6 +799,6 @@ function EventDetailContent({
           }
         />
       ) : null}
-    </>
+    </div>
   );
 }
