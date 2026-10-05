@@ -40,11 +40,15 @@ type Props = {
   form?: string;
   required?: boolean;
   disabled?: boolean;
+  autoFocus?: boolean;
   emptyText?: string;
   "aria-label"?: string;
   /** Test id prefix for the combobox input. */
   testId?: string;
   maxVisible?: number;
+  /** Starts an external, portal-backed create flow for the current no-match query. */
+  onCreate?: (query: string) => void;
+  createLabel?: (query: string) => string;
 };
 
 /**
@@ -64,10 +68,13 @@ export function SearchSelect({
   form,
   required = false,
   disabled = false,
+  autoFocus = false,
   emptyText = "No matches.",
   "aria-label": ariaLabel,
   testId,
   maxVisible = 40,
+  onCreate,
+  createLabel = (query) => `Create “${query}”`,
 }: Props) {
   const listId = useId();
   const [internalValue, setInternalValue] = useState(defaultValue);
@@ -154,16 +161,26 @@ export function SearchSelect({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    const itemCount = visible.length + (canCreate ? 1 : 0);
     if (event.key === "ArrowDown") {
       event.preventDefault();
       if (!open) setOpen(true);
-      setActiveIndex((index) => Math.min(index + 1, visible.length - 1));
+      setActiveIndex((index) =>
+        Math.min(index + 1, Math.max(itemCount - 1, 0)),
+      );
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       setActiveIndex((index) => Math.max(index - 1, 0));
     } else if (event.key === "Enter") {
       if (!open) return;
       event.preventDefault();
+      event.stopPropagation();
+      if (canCreate && activeIndex === visible.length) {
+        const typed = query.trim();
+        setOpen(false);
+        onCreate?.(typed);
+        return;
+      }
       const option = visible[activeIndex];
       if (option) choose(option.id);
     } else if (event.key === "Escape") {
@@ -178,6 +195,8 @@ export function SearchSelect({
   };
 
   const inputValue = open ? query : (selected?.label ?? "");
+  const canCreate =
+    !!onCreate && query.trim().length > 0 && visible.length === 0;
 
   return (
     <div ref={rootRef} className="relative">
@@ -200,14 +219,19 @@ export function SearchSelect({
         aria-autocomplete="list"
         aria-label={ariaLabel}
         aria-activedescendant={
-          open && visible[activeIndex]
-            ? `${listId}-${visible[activeIndex].id}`
+          open
+            ? canCreate && activeIndex === visible.length
+              ? `${listId}-create`
+              : visible[activeIndex]
+                ? `${listId}-${visible[activeIndex].id}`
+                : undefined
             : undefined
         }
         className="input"
         placeholder={selected ? selected.label : placeholder}
         value={inputValue}
         disabled={disabled}
+        autoFocus={autoFocus}
         required={required && !value}
         autoComplete="off"
         data-testid={testId}
@@ -232,6 +256,27 @@ export function SearchSelect({
         >
           {visible.length === 0 ? (
             <li className="px-2 py-1.5 text-sm text-ink-3">{emptyText}</li>
+          ) : null}
+          {canCreate ? (
+            <li
+              id={`${listId}-create`}
+              role="option"
+              aria-selected={activeIndex === visible.length}
+              className={`mt-1 cursor-pointer border-t border-line px-2 py-1.5 text-sm font-semibold text-brand ${
+                activeIndex === visible.length
+                  ? "bg-accent-soft"
+                  : "hover:bg-accent-soft"
+              }`}
+              onMouseEnter={() => setActiveIndex(visible.length)}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                const typed = query.trim();
+                setOpen(false);
+                onCreate?.(typed);
+              }}
+            >
+              + {createLabel(query.trim())}
+            </li>
           ) : null}
           {visible.map((option, index) => {
             const header =

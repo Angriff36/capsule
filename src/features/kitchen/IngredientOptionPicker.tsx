@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useStorageUrls } from "../../lib/fileStorageClient";
 import {
+  InlineReferenceCreateSheet,
+  useCanCreateInlineReference,
+} from "../../ui/InlineReferenceCreateSheet";
+import {
   pinRecents,
   rankBySearch,
   readRecents,
@@ -75,6 +79,8 @@ export function IngredientOptionPicker({
 }: Props) {
   const [internalValue, setInternalValue] = useState("");
   const [filter, setFilter] = useState("");
+  const [createName, setCreateName] = useState<string | null>(null);
+  const canCreateIngredient = useCanCreateInlineReference("ingredient");
   const [recentIds, setRecentIds] = useState(() => readRecents("ingredient"));
   // A just-created ingredient, kept until the live catalog list catches up so
   // the hidden select can hold its id.
@@ -205,6 +211,20 @@ export function IngredientOptionPicker({
             </li>
           );
         })}
+        {filteredRows.length === 0 &&
+        filter.trim() &&
+        canCreateIngredient &&
+        !allowCreate ? (
+          <li>
+            <button
+              type="button"
+              className="w-full rounded-xs px-2 py-2 text-left text-sm font-semibold text-brand hover:bg-accent-soft"
+              onClick={() => setCreateName(filter.trim())}
+            >
+              + Create ingredient “{filter.trim()}”
+            </button>
+          </li>
+        ) : null}
       </ul>
       {!rows.length ? (
         <p className="text-sm text-ink-3">
@@ -212,6 +232,28 @@ export function IngredientOptionPicker({
         </p>
       ) : filteredRows.length === 0 ? (
         <p className="text-sm text-ink-3">No ingredients match that filter.</p>
+      ) : null}
+      {createName ? (
+        <InlineReferenceCreateSheet
+          kind="ingredient"
+          open
+          initialName={createName}
+          existingOptions={rows.map((row) => ({
+            id: row._id,
+            label: row.name,
+          }))}
+          onClose={() => setCreateName(null)}
+          onUseExisting={(id) => {
+            pick(id);
+            setCreateName(null);
+          }}
+          onCreated={(record) => {
+            setJustCreated({ _id: record.id, name: record.label });
+            pick(record.id);
+            setFilter("");
+            setCreateName(null);
+          }}
+        />
       ) : null}
       {allowCreate ? (
         <IngredientQuickCreate

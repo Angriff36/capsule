@@ -579,7 +579,9 @@
     .card,
     .working-ledger,
     .attention-ledger {
-      animation: rise-in 380ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+      /* backwards, not both: a filled transform keeps a stacking context
+         that traps dropdowns (SearchSelect) under later siblings. */
+      animation: rise-in 380ms cubic-bezier(0.22, 0.9, 0.3, 1) backwards;
       animation-delay: 60ms;
     }
   }
