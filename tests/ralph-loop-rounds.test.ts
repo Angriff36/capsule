@@ -4,7 +4,7 @@
 // checkout with a local bare `origin`. A stand-in `claude` / `codex` on PATH
 // plays each round from a script; nothing is contacted.
 import { describe, expect, it } from "vitest";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import {
   copyFileSync,
   existsSync,
@@ -88,22 +88,39 @@ function makeLoop(rounds: Record<number, string>) {
   return { root, work, stub, bin };
 }
 
-function runLoop(
+// Async on purpose: a spawnSync of loop.sh blocks the vitest worker past its
+// 60s "onTaskUpdate" call and fails the run even when every test passes.
+async function runLoop(
   loop: ReturnType<typeof makeLoop>,
   iterations: number,
   env: Record<string, string> = {},
 ) {
-  const result = spawnSync(BASH, ["loop.sh", String(iterations)], {
-    cwd: loop.work,
-    encoding: "utf8",
-    env: {
-      ...process.env,
-      PATH: `${loop.bin}${delimiter}${process.env.PATH ?? ""}`,
-      STUB_DIR: loop.stub.replace(/\\/g, "/"),
-      RALPH_FAIL_WAIT: "0",
-      RALPH_ROUND_TEST_CMD: "",
-      ...env,
-    },
+  const result = await new Promise<{
+    status: number | null;
+    stdout: string;
+    stderr: string;
+  }>((resolve, reject) => {
+    const child = spawn(BASH, ["loop.sh", String(iterations)], {
+      cwd: loop.work,
+      env: {
+        ...process.env,
+        PATH: `${loop.bin}${delimiter}${process.env.PATH ?? ""}`,
+        STUB_DIR: loop.stub.replace(/\\/g, "/"),
+        RALPH_FAIL_WAIT: "0",
+        RALPH_ROUND_TEST_CMD: "",
+        ...env,
+      },
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8").on("data", (chunk: string) => {
+      stdout += chunk;
+    });
+    child.stderr.setEncoding("utf8").on("data", (chunk: string) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (status) => resolve({ status, stdout, stderr }));
   });
   const rounds = readFileSync(join(loop.work, ".ralph-telemetry.jsonl"), "utf8")
     .trim()
@@ -130,9 +147,9 @@ git add IMPLEMENTATION_PLAN.md && git commit -qm "salad done"
 describe("loop.sh records what each round really did", () => {
   it(
     "(1) records tests, push, integration and deployment states separately; a dev push is never a deployment",
-    () => {
+    async () => {
       const loop = makeLoop({ 1: TICK_AND_COMMIT, 2: "exit 1\n" });
-      const run = runLoop(loop, 2, { RALPH_ROUND_TEST_CMD: "true" });
+      const run = await runLoop(loop, 2, { RALPH_ROUND_TEST_CMD: "true" });
       expect(run.rounds).toHaveLength(2);
       expect(run.rounds[0]).toMatchObject({
         round: "pass",
@@ -157,9 +174,9 @@ describe("loop.sh records what each round really did", () => {
 
   it(
     "(1) a failing test run is recorded as fail, not hidden in the exit code",
-    () => {
+    async () => {
       const loop = makeLoop({ 1: TICK_AND_COMMIT });
-      const run = runLoop(loop, 1, { RALPH_ROUND_TEST_CMD: "false" });
+      const run = await runLoop(loop, 1, { RALPH_ROUND_TEST_CMD: "false" });
       expect(run.rounds[0]).toMatchObject({ round: "pass", tests: "fail" });
     },
     TIMEOUT,
@@ -167,7 +184,7 @@ describe("loop.sh records what each round really did", () => {
 
   it(
     "(2) a codex turn whose answer is a 429 provider error is a failed round",
-    () => {
+    async () => {
       const answer = (text: string) =>
         `echo '{"type":"thread.started"}'
 echo '{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"${text}"}}'
@@ -180,7 +197,7 @@ exit 0
         ),
         2: answer("Ticked nothing; the plan is current."),
       });
-      const run = runLoop(loop, 2, { RALPH_CLI: "codex" });
+      const run = await runLoop(loop, 2, { RALPH_CLI: "codex" });
       expect(run.rounds[0]).toMatchObject({
         round: "fail",
         failure: "provider-fail",
@@ -197,14 +214,14 @@ exit 0
 
   it(
     "(3) an all-complete claim is recorded with the specs/ hash and dies when specs/ change",
-    () => {
+    async () => {
       const loop = makeLoop({
         // Round 1 ticks the last box; meanwhile someone adds a spec on dev.
         1: `${TICK_AND_COMMIT}
 cd ../other && echo "Add bread." > specs/bread.md && git add specs && git commit -qm "new spec" && git push -q origin dev
 `,
       });
-      const run = runLoop(loop, 3);
+      const run = await runLoop(loop, 3);
       const claimFile = join(loop.work, ".ralph-complete");
       expect(run.rounds[0]).toMatchObject({ specs_claim: "none" });
       expect(run.rounds[1]).toMatchObject({ specs_claim: "stale" });
@@ -228,11 +245,11 @@ cd ../other && echo "Add bread." > specs/bread.md && git add specs && git commit
 
   it(
     "(4) rounds that change nothing get a diagnosis, and the loop keeps going",
-    () => {
+    async () => {
       const loop = makeLoop({
         1: "echo 'lint error in menu.ts' >&2\nexit 1\n",
       });
-      const run = runLoop(loop, 4);
+      const run = await runLoop(loop, 4);
       expect(run.rounds).toHaveLength(4);
       expect(run.out).toContain(
         "no progress in 3 rounds in a row (no plan tick, no commit): round 1 exit 1 (lint-fail);round 2 exit 0;round 3 exit 0",
@@ -248,9 +265,9 @@ cd ../other && echo "Add bread." > specs/bread.md && git add specs && git commit
 
   it(
     "(4) a round with a commit resets the count",
-    () => {
+    async () => {
       const loop = makeLoop({ 3: TICK_AND_COMMIT });
-      const run = runLoop(loop, 4);
+      const run = await runLoop(loop, 4);
       expect(run.rounds.map((r) => r.no_progress_rounds)).toEqual([1, 2, 0, 1]);
       expect(run.out).not.toContain("no progress in");
     },
