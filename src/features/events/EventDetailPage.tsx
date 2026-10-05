@@ -45,6 +45,7 @@ import {
 import { useTrackRecent } from "../../lib/recents";
 import { DownloadIcon } from "../../ui/icons";
 import { eventVenueLabel } from "./eventVenueLabel";
+import { useCascadeReceiptToast } from "./useCascadeReceiptToast";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
@@ -163,6 +164,7 @@ function EventDetailContent({
     "USD",
   );
   useTrackRecent("Event", event?.title);
+  useCascadeReceiptToast(event._id);
   useEffect(() => {
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
