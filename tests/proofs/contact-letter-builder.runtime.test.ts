@@ -125,4 +125,124 @@ describe("runtime proof: Contact Letter Builder writes a full letter", () => {
     expect(bareText).not.toContain("2026");
     expect(bareText).not.toContain('"—"');
   });
+
+  it("prints the contract like the old system: event facts, timeline in kitchen time, terms, initials", async () => {
+    process.env.CONVEX_FIELD_ENCRYPTION_KEY ??=
+      "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
+    const proof = createManifestTestContext({
+      convexTest: convexTest as never,
+      schema,
+      modules,
+    });
+    const owner = proof.asRole({
+      subject: "contract-owner",
+      role: "owner",
+      tenantId,
+    });
+    // 3:00 PM on Sept 5 2026 in Spokane (UTC-7) = 22:00 UTC.
+    const ceremony = Date.UTC(2026, 8, 5, 22);
+    const eventId = await owner.run(async (ctx) => {
+      const base = {
+        tenantId,
+        version: 1,
+        createdAt: day,
+        updatedAt: day,
+        deletedAt: null,
+      };
+      const insert = (table: string, doc: Record<string, unknown>) =>
+        ctx.db.insert(table as never, { ...base, ...doc } as never);
+      await insert("organizations", {
+        name: "Mangia Catering LLC",
+        brandDisplayName: "Mangia Catering",
+        status: "active",
+      });
+      const locationId = await insert("operatingLocations", {
+        name: "Liberty Lake kitchen",
+        timeZone: "America/Los_Angeles",
+        status: "active",
+      });
+      const clientId = await insert("clients", {
+        clientType: "person",
+        givenName: "Ashley",
+        familyName: "Borello",
+        addressLine1: "1102 N 16th Ave",
+        city: "Yakima",
+        region: "WA",
+        postalCode: "98902",
+        email: "ash@example.com",
+        taxExempt: false,
+        paymentTermsDays: 30,
+        status: "active",
+      });
+      const eventId = await insert("events", {
+        title: "Ashley's Wedding",
+        eventType: "wedding",
+        eventNumber: "6014",
+        stage: "planning",
+        startsAt: ceremony,
+        clientId,
+        operatingLocationId: locationId,
+        expectedHeadcount: 167,
+        serviceStyleName: "Buffet - Cook Onsite",
+        occasionName: "Wedding",
+        ownerName: "Joshua Mitchell",
+        venueName: "Private Residence",
+      });
+      await insert("eventTimelineActivities", {
+        eventId,
+        name: "Ceremony Start",
+        startsAt: ceremony,
+      });
+      await insert("eventTimelineActivities", {
+        eventId,
+        name: "Removed step",
+        startsAt: ceremony,
+        deletedAt: day,
+      });
+      await insert("proposals", {
+        clientId,
+        eventId,
+        title: "Ashley proposal",
+        proposalNumber: "P-6014",
+        status: "sent",
+        eventDate: ceremony,
+        guestCount: 167,
+        terms: "Standard Service time is 1.5 hours from meal service.",
+        subtotal: 38238.15,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 38238.15,
+      });
+      return String(eventId);
+    });
+
+    const result = (await owner.query(api.tppReports.contacts.run, {
+      reportId: "contract-for-service",
+      parameters: { eventId },
+    })) as TppReportResult;
+    if (result.kind !== "document") throw new Error("expected a document");
+    const text = JSON.stringify(result);
+    for (const part of [
+      "Mangia Catering",
+      "Ashley Borello",
+      "1102 N 16th Ave",
+      "ash@example.com",
+      "6014",
+      "Saturday",
+      "167",
+      "Buffet - Cook Onsite",
+      "Joshua Mitchell",
+      "$38,238.15",
+      "Private Residence",
+      "3:00 PM",
+      "Ceremony Start",
+      "I have reviewed my menu",
+      "Standard Service time is 1.5 hours",
+      "Client initial",
+      "No contract has been created for this event.",
+    ]) {
+      expect(text).toContain(part);
+    }
+    expect(text).not.toContain("Removed step");
+  });
 });
