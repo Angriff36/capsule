@@ -91,7 +91,12 @@ const DELIVERY_ACTIONS = [
 
 export class LogisticsLifecyclePolicy {
   packListActions(status: string) {
-    return available(status, PACK_LIST_ACTIONS);
+    // Start packing on a packed or loaded list reopens it.
+    return available(status, PACK_LIST_ACTIONS).map((action) =>
+      action.key === "startPacking" && status !== "draft"
+        ? { ...action, label: "Back to packing" }
+        : action,
+    );
   }
 
   packItemActions(status: string) {

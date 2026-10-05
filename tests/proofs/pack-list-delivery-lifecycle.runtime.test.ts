@@ -171,6 +171,26 @@ describe("runtime proof: PackList → Delivery lifecycle", () => {
     );
     expect(packed).toMatchObject({ status: "packed", version: 3 });
 
+    // Back to packing from packed (fix a line before the truck leaves), then
+    // packed again: the first start time stays and no second delivery is made.
+    await proof.executeCommand(logistics, api.mutations.PackList_startPacking, {
+      docId: pack.docId,
+      version: 3,
+    });
+    const reopened = (await logistics.run(async (ctx) =>
+      ctx.db.get(pack.docId as never),
+    )) as { status: string; version: number; packingStartedAt: number };
+    expect(reopened).toMatchObject({
+      status: "packing",
+      version: 4,
+      packingStartedAt: (packing as { packingStartedAt: number })
+        .packingStartedAt,
+    });
+    await proof.executeCommand(logistics, api.mutations.PackList_markPacked, {
+      docId: pack.docId,
+      version: 4,
+    });
+
     // PackListPacked reaction match-else-creates Delivery.schedule.
     const autoDeliveries = await logistics.run(async (ctx) =>
       (await ctx.db.query("deliveries").collect()).filter(

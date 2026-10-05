@@ -37,6 +37,14 @@ describe("Logistics routes and lifecycle bindings", () => {
     expect(policy.packListActions("loaded").map((a) => a.key)).toEqual(
       expect.arrayContaining(["dispatch", "cancel"]),
     );
+    expect(
+      policy.packListActions("packed").find((a) => a.key === "startPacking")
+        ?.label,
+    ).toBe("Back to packing");
+    expect(
+      policy.packListActions("draft").find((a) => a.key === "startPacking")
+        ?.label,
+    ).toBe("Start packing");
     expect(policy.deliveryActions("scheduled").map((a) => a.key)).toEqual(
       expect.arrayContaining(["startTransit", "markFailed", "cancel"]),
     );

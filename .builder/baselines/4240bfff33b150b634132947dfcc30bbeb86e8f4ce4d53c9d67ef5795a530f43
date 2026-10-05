@@ -40861,7 +40861,7 @@ async function __runPackListStartPacking(ctx: MutationCtx, { docId, version }: a
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
-    if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
+    if (!((((doc.status === "draft") || (doc.status === "packed")) || (doc.status === "loaded")))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     const previousStatus = doc.status;
@@ -40882,7 +40882,7 @@ async function __runPackListStartPacking(ctx: MutationCtx, { docId, version }: a
     }
     const updates = {
       status: "packing",
-      packingStartedAt: Date.now(),
+      packingStartedAt: ((doc.packingStartedAt != null) ? doc.packingStartedAt : Date.now()),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "PackList", ["notes"], updates);
