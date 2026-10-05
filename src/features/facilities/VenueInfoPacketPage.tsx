@@ -125,7 +125,7 @@ export function VenueInfoPacketPage() {
                         className="h-full w-full object-cover"
                       />
                       {out ? (
-                        <span className="absolute inset-x-0 bottom-0 bg-panel/90 text-[10px]">
+                        <span className="absolute inset-x-0 bottom-0 bg-panel/90 text-2xs">
                           Left out
                         </span>
                       ) : null}
