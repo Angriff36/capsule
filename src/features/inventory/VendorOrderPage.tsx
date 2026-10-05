@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useEventsById } from "../facilities/useEventsById";
 import { formatMoneyExact } from "../../lib/format";
@@ -110,9 +111,12 @@ export function VendorOrderPage() {
   if (order === undefined) {
     return (
       <div className="operations-stage supply-stage order-folio">
-        <Link className="text-link" to="/inventory/purchasing">
+        <ReturnToListLink
+          fallback="/inventory/purchasing"
+          className="text-link"
+        >
           ← Purchase queue
-        </Link>
+        </ReturnToListLink>
         <InventoryWorkspaceNav />
         <QueryLoadState
           title="Order data is not loading"
@@ -372,9 +376,9 @@ export function VendorOrderPage() {
 
   return (
     <div className="operations-stage supply-stage order-folio">
-      <Link className="text-link" to="/inventory/purchasing">
+      <ReturnToListLink fallback="/inventory/purchasing" className="text-link">
         ← Purchase queue
-      </Link>
+      </ReturnToListLink>
       <header className="order-folio-masthead">
         <div>
           <p className="eyebrow">Vendor order</p>

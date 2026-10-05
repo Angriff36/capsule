@@ -28,6 +28,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
 import { ClientContactsPanel } from "./ClientContactsPanel";
@@ -250,9 +251,12 @@ export function ClientDetailPage() {
       <PageHeader
         eyebrow={
           <>
-            <Link className="hover:underline" to={CLIENTS_ROUTES.root}>
+            <ReturnToListLink
+              fallback={CLIENTS_ROUTES.root}
+              className="hover:underline"
+            >
               All clients
-            </Link>
+            </ReturnToListLink>
             {" / "}
             <b>{formatStatusLabel(String(client.status))}</b>
           </>

@@ -21,6 +21,7 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { formatDate } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
@@ -111,9 +112,12 @@ export function VenueDetailPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center text-ink-3">
           <p>Venue not found</p>
-          <Link to={venueListPath()} className="text-brand hover:underline">
+          <ReturnToListLink
+            fallback={venueListPath()}
+            className="text-brand hover:underline"
+          >
             Back to Venues
-          </Link>
+          </ReturnToListLink>
         </div>
       </div>
     );
@@ -254,12 +258,12 @@ export function VenueDetailPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link
-            to={venueListPath()}
+          <ReturnToListLink
+            fallback={venueListPath()}
             className="text-xs text-brand hover:underline"
           >
             ← Back to Venues
-          </Link>
+          </ReturnToListLink>
         </div>
         <StatusChip
           status={venue.status === "active" ? "active" : "inactive"}

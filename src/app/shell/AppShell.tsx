@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
@@ -16,6 +16,8 @@ import { Sidebar } from "./Sidebar";
 import { SwitchedOffAreaGuard } from "./SwitchedOffAreaGuard";
 import { isBrowserRefreshChord, shouldFireSingleKeyNav } from "./singleKeyNav";
 import { Topbar } from "./Topbar";
+import { ListScrollCoordinator } from "../../features/list-state/ListScrollCoordinator";
+import { ListNavigationManager } from "../../features/list-state/ListNavigationManager";
 
 const onlineMonitor = new ShellOnlineMonitor();
 
@@ -36,6 +38,8 @@ export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const mainScrollRef = useRef<HTMLElement>(null);
+  const workspaceSheetRef = useRef<HTMLDivElement>(null);
   const online = useOnline();
 
   useEffect(() => {
@@ -88,8 +92,19 @@ export function AppShell() {
           <NewVersionBanner />
           <AnnouncementBanner />
           <ActionResultHost />
-          <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
-            <div className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3">
+          <main
+            ref={mainScrollRef}
+            className="app-canvas min-h-0 flex-1 overflow-y-auto"
+          >
+            <ListNavigationManager />
+            <ListScrollCoordinator
+              scrollRef={mainScrollRef}
+              contentRef={workspaceSheetRef}
+            />
+            <div
+              ref={workspaceSheetRef}
+              className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3"
+            >
               <PageGuide />
               <RouteErrorBoundary>
                 <SwitchedOffAreaGuard>

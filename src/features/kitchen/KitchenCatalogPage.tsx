@@ -60,6 +60,9 @@ import {
   useIngredientLookupApplyCostToIngredient,
 } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
+import { useListViewState } from "../list-state/useListViewState";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListOrigin } from "../list-state/listOrigin";
 
 const UNITS = UNIT_OF_MEASURE;
 
@@ -117,6 +120,39 @@ function MenuCatalogPage() {
   );
 }
 
+const kitchenListState = new ListStateManager<{
+  search: string;
+  category: string;
+  sort: "name-asc" | "name-desc" | "category";
+  showHidden: boolean;
+}>({
+  search: {
+    key: "q",
+    defaultValue: "",
+    parse: (value) => value ?? "",
+    serialize: (value) => value || null,
+  },
+  category: {
+    key: "category",
+    defaultValue: "all",
+    parse: (value) => value ?? "all",
+    serialize: (value) => (value === "all" ? null : value),
+  },
+  sort: {
+    key: "sort",
+    defaultValue: "name-asc",
+    parse: (value) =>
+      value === "name-desc" || value === "category" ? value : "name-asc",
+    serialize: (value) => (value === "name-asc" ? null : value),
+  },
+  showHidden: {
+    key: "hidden",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+});
+
 function KitchenCatalogPageContent({
   section,
   data,
@@ -126,6 +162,7 @@ function KitchenCatalogPageContent({
 }) {
   const tenantId = useAuthStatus()?.tenantId ?? null;
   const navigate = useNavigate();
+  const listOrigin = useListOrigin();
   const createIngredient = useCreateIngredient();
   const createComponent = useCreateComponent();
   const createMenu = useCreateMenu();
@@ -144,12 +181,8 @@ function KitchenCatalogPageContent({
   const unpublishMenu = useMenuUnpublish();
   const archiveMenu = useMenuArchive();
   const restoreMenu = useMenuRestore();
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [sort, setSort] = useState<"name-asc" | "name-desc" | "category">(
-    "name-asc",
-  );
-  const [showHidden, setShowHidden] = useState(false);
+  const [listState, setListState] = useListViewState(kitchenListState);
+  const { search, category, sort, showHidden } = listState;
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -186,16 +219,13 @@ function KitchenCatalogPageContent({
   }, [visibleRows]);
 
   useEffect(() => {
-    setCategory("all");
-    setSearch("");
-    setSort("name-asc");
-  }, [section]);
-
-  useEffect(() => {
-    if (!categories.some((option) => option.value === category)) {
-      setCategory("all");
+    if (
+      data !== undefined &&
+      !categories.some((option) => option.value === category)
+    ) {
+      setListState({ category: "all" });
     }
-  }, [categories, category]);
+  }, [categories, category, data, setListState]);
 
   const rows = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase();
@@ -507,7 +537,7 @@ function KitchenCatalogPageContent({
             <span aria-hidden="true">⌕</span>
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => setListState({ search: event.target.value })}
               placeholder={`Search ${sectionLabel.toLowerCase()} by name or category…`}
               aria-label={`Search ${sectionLabel.toLowerCase()}`}
             />
@@ -516,7 +546,9 @@ function KitchenCatalogPageContent({
             <span>Category</span>
             <select
               value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              onChange={(event) =>
+                setListState({ category: event.target.value })
+              }
             >
               {categories.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -530,9 +562,10 @@ function KitchenCatalogPageContent({
             <select
               value={sort}
               onChange={(event) =>
-                setSort(
-                  event.target.value as "name-asc" | "name-desc" | "category",
-                )
+                setListState({
+                  sort: event.target.value as
+                    "name-asc" | "name-desc" | "category",
+                })
               }
             >
               <option value="name-asc">Name A–Z</option>
@@ -547,7 +580,9 @@ function KitchenCatalogPageContent({
               <input
                 type="checkbox"
                 checked={showHidden}
-                onChange={(event) => setShowHidden(event.target.checked)}
+                onChange={(event) =>
+                  setListState({ showHidden: event.target.checked })
+                }
               />
               Show deleted / retired
             </label>
@@ -590,11 +625,13 @@ function KitchenCatalogPageContent({
             viewKey={`${section}:${category}:${deferredSearch}:${sort}:${showHidden}`}
             categories={categories}
             activeCategory={category}
-            onCategoryChange={setCategory}
+            onCategoryChange={(next) => setListState({ category: next })}
             busy={busy}
             showHidden={showHidden}
             run={run}
             commands={lifecycleCommands}
+            origin={listOrigin}
+            loaded={data !== undefined}
           />
         )}
       </section>

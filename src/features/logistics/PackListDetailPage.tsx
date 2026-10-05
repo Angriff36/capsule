@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
@@ -203,9 +204,9 @@ export function PackListDetailPage() {
   if (packList === undefined) {
     return (
       <div className="operations-stage supply-stage order-folio">
-        <Link className="text-link" to="/logistics/packs">
+        <ReturnToListLink fallback="/logistics/packs" className="text-link">
           ← Pack lists
-        </Link>
+        </ReturnToListLink>
         <LogisticsWorkspaceNav />
         <QueryLoadState
           title="Pack list data is not loading"
@@ -1003,9 +1004,9 @@ export function PackListDetailPage() {
 
   return (
     <div className="operations-stage supply-stage order-folio">
-      <Link className="text-link" to="/logistics/packs">
+      <ReturnToListLink fallback="/logistics/packs" className="text-link">
         ← Pack lists
-      </Link>
+      </ReturnToListLink>
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Load sheet</p>

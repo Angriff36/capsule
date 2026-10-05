@@ -27,6 +27,9 @@ import {
 } from "./contactDedup";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { useActionNotice } from "../../ui/action-result";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -45,9 +48,18 @@ const EMPTY_STATS: ClientEventStats = {
   lastPastAt: 0,
   lifetimeValue: 0,
 };
+const clientsState = new ListStateManager({
+  archived: {
+    key: "archived",
+    defaultValue: false,
+    parse: (value: string | null) => value === "1",
+    serialize: (value: boolean) => (value ? "1" : null),
+  },
+});
 
 export function ClientsPage() {
   const navigate = useNavigate();
+  const listOrigin = useListOrigin();
   const clients = useListClient();
   const contacts = useListClientContact();
   const events = useAllEventReportRows();
@@ -55,7 +67,8 @@ export function ClientsPage() {
   const createClient = useCreateClient();
   const createClientMerge = useCreateClientMerge();
   const [showRegister, setShowRegister] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
+  const [{ archived: showArchived }, setListState] =
+    useListViewState(clientsState);
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
@@ -249,7 +262,7 @@ export function ClientsPage() {
             key="archived"
             className="btn btn-ghost"
             type="button"
-            onClick={() => setShowArchived((value) => !value)}
+            onClick={() => setListState({ archived: !showArchived })}
           >
             {showArchived ? "Hide archived" : "Show archived"}
           </button>,
@@ -414,7 +427,11 @@ export function ClientsPage() {
                 return (
                   <tr
                     key={row._id}
-                    onClick={() => navigate(CLIENTS_ROUTES.detail(row._id))}
+                    onClick={() =>
+                      navigate(CLIENTS_ROUTES.detail(row._id), {
+                        state: listOriginState(listOrigin),
+                      })
+                    }
                     className="cursor-pointer transition-colors hover:bg-inset/60"
                   >
                     <td className="td w-full max-w-0 truncate">

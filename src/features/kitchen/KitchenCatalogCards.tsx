@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -11,6 +12,8 @@ import { formatStatusLabel } from "../../lib/statusLabels";
 import { ChevronRightIcon } from "../../ui/icons";
 import { RecordPreviewSheet } from "../../ui/RecordPreviewSheet";
 import { useVirtualWindow } from "../../ui/useVirtualWindow";
+import { useListScrollRestoration } from "../list-state/ListScrollCoordinator";
+import { type ListOrigin } from "../list-state/listOrigin";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
@@ -81,6 +84,8 @@ type Props = Readonly<{
   showHidden: boolean;
   run: (key: string, work: () => Promise<void>) => Promise<void>;
   commands: LifecycleCommands;
+  origin: ListOrigin;
+  loaded: boolean;
 }>;
 
 const ROW_HEIGHT = 68;
@@ -100,6 +105,8 @@ export function KitchenCatalogCards({
   showHidden,
   run,
   commands,
+  origin,
+  loaded,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = useMemo(
@@ -115,9 +122,18 @@ export function KitchenCatalogCards({
     [activeId, rows],
   );
   const closePreview = useCallback(() => setSelectedId(null), []);
-  const { scrollRef, virtualRows, totalHeight, onScroll } = useVirtualWindow({
-    count: rows.length,
-    rowHeight: ROW_HEIGHT,
+  const { scrollRef, virtualRows, totalHeight, onScroll, restoreScrollTop } =
+    useVirtualWindow({
+      count: rows.length,
+      rowHeight: ROW_HEIGHT,
+    });
+  useListScrollRestoration({
+    scrollRef,
+    namespace: `culinary:${section}`,
+    restoreScrollTop,
+    ready: totalHeight,
+    loaded,
+    revision: rows.length,
   });
   const tabStopIndex = useMemo(
     () =>
@@ -127,11 +143,13 @@ export function KitchenCatalogCards({
     [activeIndex, virtualRows],
   );
 
+  const previousViewKey = useRef(viewKey);
   useEffect(() => {
+    if (previousViewKey.current === viewKey) return;
+    previousViewKey.current = viewKey;
     setSelectedId(null);
     setActiveId(null);
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [scrollRef, viewKey]);
+  }, [viewKey]);
 
   useEffect(() => {
     if (pendingFocusIndex == null) return;
@@ -373,6 +391,7 @@ export function KitchenCatalogCards({
                 selected._id,
                 "Open full card",
                 "btn btn-primary",
+                origin,
               )}
               <KitchenCatalogLifecycleButtons
                 section={section}
@@ -502,16 +521,26 @@ function recordLink(
   id: string,
   body: ReactNode,
   className?: string,
+  origin?: ListOrigin,
 ): ReactNode {
   if (section === "ingredients") {
     return (
-      <CulinaryEntityLink className={className} kind="ingredient" id={id}>
+      <CulinaryEntityLink
+        className={className}
+        kind="ingredient"
+        id={id}
+        state={{ listOrigin: origin }}
+      >
         {body}
       </CulinaryEntityLink>
     );
   }
   return (
-    <Link className={className} to={catalogPath(section, id)}>
+    <Link
+      className={className}
+      to={catalogPath(section, id)}
+      state={{ listOrigin: origin }}
+    >
       {body}
     </Link>
   );
