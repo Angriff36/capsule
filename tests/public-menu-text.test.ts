@@ -1,7 +1,26 @@
 // The public menu reads like the printed menu book: short diet marks and
 // dishes under course headings (work/mangia-menu-catalog-redesign.pdf).
 import { describe, expect, it } from "vitest";
-import { courseGroups, dietMark } from "../src/features/sales/publicMenuText";
+import {
+  courseGroups,
+  dietMark,
+  isPickOneCourse,
+  serverRatioText,
+} from "../src/features/sales/publicMenuText";
+
+describe("public menu service", () => {
+  it("states the server ratio only when the menu has one", () => {
+    expect(serverRatioText(12)).toBe("One server for every 12 guests");
+    expect(serverRatioText(null)).toBeNull();
+    expect(serverRatioText(0)).toBeNull();
+  });
+
+  it("matches a pick-one course however it is typed", () => {
+    expect(isPickOneCourse("Entrée ", ["entrée"])).toBe(true);
+    expect(isPickOneCourse("Salad", ["Entrée"])).toBe(false);
+    expect(isPickOneCourse(null, ["Entrée"])).toBe(false);
+  });
+});
 
 describe("public menu diet marks", () => {
   it("reads hand-typed diet tags as the menu book marks", () => {

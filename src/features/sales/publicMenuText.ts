@@ -45,6 +45,23 @@ export function seasonText(
   return null;
 }
 
+// "1:12 server ratio" in the menu book; null when the menu states none.
+export function serverRatioText(guestsPerServer: number | null): string | null {
+  if (guestsPerServer == null || guestsPerServer < 1) return null;
+  return `One server for every ${guestsPerServer} guests`;
+}
+
+/** True when each guest picks one dish from this course. */
+export function isPickOneCourse(
+  course: string | null,
+  pickOneCourses: readonly string[],
+): boolean {
+  const key = course?.trim().toLowerCase();
+  return (
+    Boolean(key) && pickOneCourses.some((c) => c.trim().toLowerCase() === key)
+  );
+}
+
 // The menu book's short diet marks (V, VG, GF, DF, NF) with their key words.
 // Dish diet tags are typed by hand, so "Gluten free", "gluten-free" and "GF"
 // all read as GF. A tag outside this list stays a word on the dish.

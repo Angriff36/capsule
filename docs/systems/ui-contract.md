@@ -2022,6 +2022,13 @@ Screens (171): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: MenuSeasonSet
   - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get
+- `mutations.Menu_setService` (Menu.setService)
+  - inputs from the screen: guestsPerServer, pickOneCourses; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuServiceSet
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get
 - `mutations.Menu_unpublish` (Menu.unpublish)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

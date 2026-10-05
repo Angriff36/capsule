@@ -16,11 +16,13 @@ import { MenuDetailsEditor } from "../../../src/features/kitchen/MenuDetailsEdit
 const harness = vi.hoisted(() => ({
   schedule: vi.fn(async () => null),
   setSeason: vi.fn(async () => null),
+  setService: vi.fn(async () => null),
 }));
 
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useMenuDishSchedulePriceChange: () => harness.schedule,
   useMenuSetSeason: () => harness.setSeason,
+  useMenuSetService: () => harness.setService,
   useMenuReviseDetails: () => vi.fn(async () => null),
   useMenuUpdatePricing: () => vi.fn(async () => null),
 }));
@@ -110,6 +112,61 @@ describe("menu price update flow (AC-332)", () => {
     expect(done).toHaveBeenCalledWith(
       "Short rib goes to $60.00 on 2026-12-01.",
     );
+  });
+
+  it("saves the server ratio and the courses where guests pick one", async () => {
+    await act(async () =>
+      root.render(
+        createElement(MenuDetailsEditor, {
+          menu: {
+            _id: "menu-1",
+            version: 2,
+            name: "Plated dinner",
+            isTemplate: false,
+            basePrice: 0,
+            pricePerPerson: 75,
+            minGuests: 0,
+            maxGuests: 0,
+            status: "published",
+            pickOneCourses: [],
+          },
+          courses: ["Salad", "Entrée"],
+          onFailure: vi.fn(),
+        }),
+      ),
+    );
+    const serviceForm = [...container.querySelectorAll("form")].find((f) =>
+      f.textContent?.includes("Save service"),
+    )!;
+    await act(async () => {
+      setValue(labelled("Guests per server"), "12");
+      (labelled("Entrée") as HTMLInputElement).click();
+    });
+    await act(async () => {
+      serviceForm.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      );
+    });
+    expect(harness.setService).toHaveBeenLastCalledWith({
+      docId: "menu-1",
+      version: 2,
+      guestsPerServer: 12,
+      pickOneCourses: ["Entrée"],
+    });
+
+    // An empty ratio is sent as "not stated".
+    await act(async () => setValue(labelled("Guests per server"), ""));
+    await act(async () => {
+      serviceForm.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      );
+    });
+    expect(harness.setService).toHaveBeenLastCalledWith({
+      docId: "menu-1",
+      version: 2,
+      guestsPerServer: undefined,
+      pickOneCourses: ["Entrée"],
+    });
   });
 
   it("saves a season as whole days, and clears it when both dates are empty", async () => {

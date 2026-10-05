@@ -106,6 +106,26 @@ export function MenuDetailPage() {
       ),
     [id, menuDishes],
   );
+  // Course names in menu order, as the public menu groups them.
+  const menuCourses = useMemo(() => {
+    const dishCourse = new Map(
+      (dishes ?? []).map((dish) => [String(dish._id), dish.course]),
+    );
+    const names: string[] = [];
+    for (const selection of [...selectedMenuDishes].sort(
+      (a, b) => a.sortOrder - b.sortOrder,
+    )) {
+      const course = (
+        selection.course ?? dishCourse.get(String(selection.dishId))
+      )?.trim();
+      if (
+        course &&
+        !names.some((n) => n.toLowerCase() === course.toLowerCase())
+      )
+        names.push(course);
+    }
+    return names;
+  }, [dishes, selectedMenuDishes]);
   const allergensByDish = useMemo(() => {
     const rows = deriveAllergenRows({
       dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
@@ -529,7 +549,10 @@ export function MenuDetailPage() {
           status: String(menu.status),
           availableFrom: menu.availableFrom,
           availableUntil: menu.availableUntil,
+          guestsPerServer: menu.guestsPerServer,
+          pickOneCourses: menu.pickOneCourses,
         }}
+        courses={menuCourses}
         onFailure={setFailure}
       />
 

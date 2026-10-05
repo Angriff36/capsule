@@ -41,6 +41,10 @@ export type PublicMenu = {
   maxGuests: number;
   availableFrom: number | null;
   availableUntil: number | null;
+  /** One server for this many guests; null = not stated. */
+  guestsPerServer: number | null;
+  /** Courses where each guest picks one dish. */
+  pickOneCourses: string[];
   /** Why this menu does not fit the given event; empty when it does. */
   notAvailableBecause: string[];
   dishes: PublicMenuDish[];
@@ -133,6 +137,8 @@ export const getPublicMenu = query({
           maxGuests: menu.maxGuests,
           availableFrom: menu.availableFrom ?? null,
           availableUntil: menu.availableUntil ?? null,
+          guestsPerServer: menu.guestsPerServer ?? null,
+          pickOneCourses: menu.pickOneCourses ?? [],
           notAvailableBecause: menuIneligibleReasons(menu, {
             eventDate,
             guestCount,

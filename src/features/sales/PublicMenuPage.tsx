@@ -7,8 +7,10 @@ import {
   dietMark,
   dishPriceText,
   guestRangeText,
+  isPickOneCourse,
   menuPriceText,
   seasonText,
+  serverRatioText,
 } from "./publicMenuText";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 
@@ -109,6 +111,7 @@ export function PublicMenuPage() {
                 <p className="mt-1 text-xs text-ink-3">
                   {[
                     sharedStyle,
+                    serverRatioText(menu.guestsPerServer),
                     guestRangeText(menu.minGuests, menu.maxGuests),
                     season,
                   ]
@@ -118,65 +121,82 @@ export function PublicMenuPage() {
                 {menu.description ? (
                   <p className="mt-3 text-ink-2">{menu.description}</p>
                 ) : null}
-                {courseGroups(menu.dishes).map((group) => (
-                  <div key={group.course ?? ""} className="mt-4">
-                    {group.course ? (
-                      <h3 className="text-xs font-semibold text-ink-3 uppercase">
-                        {group.course}
-                      </h3>
-                    ) : null}
-                    <ul className="divide-y divide-line">
-                      {group.dishes.map((dish) => {
-                        const marks = dish.dietaryTags
-                          .map(dietMark)
-                          .filter((mark) => mark !== null);
-                        const otherTags = dish.dietaryTags.filter(
-                          (tag) => dietMark(tag) === null,
-                        );
-                        const details = [
-                          sharedStyle ? null : dish.serviceStyle,
-                          ...otherTags,
-                        ].filter(Boolean);
-                        return (
-                          <li key={dish.menuDishId} className="py-3">
-                            <div className="flex items-baseline justify-between gap-4">
-                              <span className="font-medium text-ink">
-                                {dish.name}
-                                {marks.map((mark) => (
-                                  <span
-                                    key={mark.mark}
-                                    className="chip chip-tone-mute ml-2"
-                                    title={mark.label}
-                                    aria-label={mark.label}
-                                  >
-                                    {mark.mark}
-                                  </span>
-                                ))}
-                              </span>
-                              <span className="text-ink-2 whitespace-nowrap">
-                                {dishPriceText(dish.price)}
-                              </span>
-                            </div>
-                            {dish.description ? (
-                              <p className="text-ink-2">{dish.description}</p>
-                            ) : null}
-                            {details.length > 0 ? (
-                              <p className="text-xs text-ink-3">
-                                {details.join(" · ")}
-                              </p>
-                            ) : null}
-                            {dish.allergens.length > 0 ? (
-                              <p className="text-xs text-ink-3">
-                                Contains:{" "}
-                                {dish.allergens.map(allergenText).join(", ")}
-                              </p>
-                            ) : null}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ))}
+                {courseGroups(menu.dishes).map((group) => {
+                  const pickOne =
+                    group.dishes.length > 1 &&
+                    isPickOneCourse(group.course, menu.pickOneCourses);
+                  return (
+                    <div key={group.course ?? ""} className="mt-4">
+                      {group.course ? (
+                        <h3 className="text-xs font-semibold text-ink-3 uppercase">
+                          {group.course}
+                        </h3>
+                      ) : null}
+                      {pickOne ? (
+                        <p className="text-xs italic text-ink-2">
+                          Each guest picks one
+                        </p>
+                      ) : null}
+                      <ul
+                        className={pickOne ? undefined : "divide-y divide-line"}
+                      >
+                        {group.dishes.map((dish, index) => {
+                          const marks = dish.dietaryTags
+                            .map(dietMark)
+                            .filter((mark) => mark !== null);
+                          const otherTags = dish.dietaryTags.filter(
+                            (tag) => dietMark(tag) === null,
+                          );
+                          const details = [
+                            sharedStyle ? null : dish.serviceStyle,
+                            ...otherTags,
+                          ].filter(Boolean);
+                          return (
+                            <li key={dish.menuDishId} className="py-3">
+                              {pickOne && index > 0 ? (
+                                <p className="pb-3 text-center text-xs italic text-ink-3">
+                                  or
+                                </p>
+                              ) : null}
+                              <div className="flex items-baseline justify-between gap-4">
+                                <span className="font-medium text-ink">
+                                  {dish.name}
+                                  {marks.map((mark) => (
+                                    <span
+                                      key={mark.mark}
+                                      className="chip chip-tone-mute ml-2"
+                                      title={mark.label}
+                                      aria-label={mark.label}
+                                    >
+                                      {mark.mark}
+                                    </span>
+                                  ))}
+                                </span>
+                                <span className="text-ink-2 whitespace-nowrap">
+                                  {dishPriceText(dish.price)}
+                                </span>
+                              </div>
+                              {dish.description ? (
+                                <p className="text-ink-2">{dish.description}</p>
+                              ) : null}
+                              {details.length > 0 ? (
+                                <p className="text-xs text-ink-3">
+                                  {details.join(" · ")}
+                                </p>
+                              ) : null}
+                              {dish.allergens.length > 0 ? (
+                                <p className="text-xs text-ink-3">
+                                  Contains:{" "}
+                                  {dish.allergens.map(allergenText).join(", ")}
+                                </p>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
               </section>
             );
           })

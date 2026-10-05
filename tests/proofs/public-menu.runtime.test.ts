@@ -167,6 +167,57 @@ describe("public menu shows effective sell prices and nothing private (AC-240)",
     }
   });
 
+  it("shows the server ratio and the courses where guests pick one (menu book)", async () => {
+    const proof = harness();
+    const { owner, menuId } = await seedCatalog(proof, "tenant-menu-svc");
+    const [before] = (await proof.anonymous.query(
+      api.publicMenu.getPublicMenu,
+      {},
+    )) as any[];
+    expect(before).toMatchObject({ guestsPerServer: null, pickOneCourses: [] });
+
+    const menuRow = (
+      (await owner.query(api.queries.listMenu, {})) as any[]
+    ).find((m) => m._id === menuId);
+    // A published menu can still change its service.
+    await proof.executeCommand(owner, M.Menu_setService, {
+      docId: menuId,
+      version: menuRow.version,
+      guestsPerServer: 12,
+      pickOneCourses: ["Main"],
+    });
+    const [after] = (await proof.anonymous.query(
+      api.publicMenu.getPublicMenu,
+      {},
+    )) as any[];
+    expect(after).toMatchObject({
+      guestsPerServer: 12,
+      pickOneCourses: ["Main"],
+    });
+
+    await expect(
+      proof.executeCommand(owner, M.Menu_setService, {
+        docId: menuId,
+        guestsPerServer: 0,
+        pickOneCourses: [],
+      }),
+    ).rejects.toThrow("Guests per server has to be 1 or more");
+
+    // Empty ratio and no courses clear both.
+    await proof.executeCommand(owner, M.Menu_setService, {
+      docId: menuId,
+      pickOneCourses: [],
+    });
+    const [cleared] = (await proof.anonymous.query(
+      api.publicMenu.getPublicMenu,
+      {},
+    )) as any[];
+    expect(cleared).toMatchObject({
+      guestsPerServer: null,
+      pickOneCourses: [],
+    });
+  });
+
   it("says why a menu does not fit the event date or guest count", async () => {
     const proof = harness();
     await seedCatalog(proof, "tenant-menu-b");
