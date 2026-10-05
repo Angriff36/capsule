@@ -315,6 +315,7 @@ import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as vendorNames from "../vendorNames.js";
 import type * as vendorOrderEmail from "../vendorOrderEmail.js";
 import type * as vendorPriceList from "../vendorPriceList.js";
+import type * as venueGallery from "../venueGallery.js";
 import type * as venueVendorPolicy from "../venueVendorPolicy.js";
 import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
@@ -634,6 +635,7 @@ declare const fullApi: ApiFromModules<{
   vendorNames: typeof vendorNames;
   vendorOrderEmail: typeof vendorOrderEmail;
   vendorPriceList: typeof vendorPriceList;
+  venueGallery: typeof venueGallery;
   venueVendorPolicy: typeof venueVendorPolicy;
   webhookDeliveries: typeof webhookDeliveries;
   webhookIntegrations: typeof webhookIntegrations;

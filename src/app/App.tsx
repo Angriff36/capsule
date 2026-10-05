@@ -4,6 +4,7 @@ import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedDeckPage } from "../features/clients/SharedDeckPage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
+import { SharedVenueGalleryPage } from "../features/facilities/SharedVenueGalleryPage";
 import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
 import { PublicMenuPage } from "../features/sales/PublicMenuPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
@@ -643,6 +644,7 @@ export function App() {
   const deckMatch = useMatch("/deck/:token");
   const quoteMatch = useMatch("/quote");
   const publicMenuMatch = useMatch("/menu");
+  const venueGalleryMatch = useMatch("/venue-gallery/:token");
 
   if (clientPortalMatch?.params.token) {
     return (
@@ -677,6 +679,14 @@ export function App() {
     return (
       <AppErrorBoundary>
         <SharedDeckPage token={deckMatch.params.token} />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (venueGalleryMatch?.params.token) {
+    return (
+      <AppErrorBoundary>
+        <SharedVenueGalleryPage token={venueGalleryMatch.params.token} />
       </AppErrorBoundary>
     );
   }
