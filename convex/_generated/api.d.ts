@@ -68,6 +68,7 @@ import type * as lib_culinaryModel_importMapping from "../lib/culinaryModel/impo
 import type * as lib_culinaryModel_tppImport from "../lib/culinaryModel/tppImport.js";
 import type * as lib_culinaryModel_units from "../lib/culinaryModel/units.js";
 import type * as lib_culinaryOperations from "../lib/culinaryOperations.js";
+import type * as lib_demandChangePreview from "../lib/demandChangePreview.js";
 import type * as lib_demandProvenance_DemandProvenanceManager from "../lib/demandProvenance/DemandProvenanceManager.js";
 import type * as lib_demandProvenance_DemandSnapshotDiffManager from "../lib/demandProvenance/DemandSnapshotDiffManager.js";
 import type * as lib_demandProvenance_types from "../lib/demandProvenance/types.js";
@@ -264,6 +265,7 @@ declare const fullApi: ApiFromModules<{
   "lib/culinaryModel/tppImport": typeof lib_culinaryModel_tppImport;
   "lib/culinaryModel/units": typeof lib_culinaryModel_units;
   "lib/culinaryOperations": typeof lib_culinaryOperations;
+  "lib/demandChangePreview": typeof lib_demandChangePreview;
   "lib/demandProvenance/DemandProvenanceManager": typeof lib_demandProvenance_DemandProvenanceManager;
   "lib/demandProvenance/DemandSnapshotDiffManager": typeof lib_demandProvenance_DemandSnapshotDiffManager;
   "lib/demandProvenance/types": typeof lib_demandProvenance_types;

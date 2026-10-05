@@ -47,11 +47,11 @@ export type EventDetailRevisePanelsProps = {
     endsAt: number;
     version: number | undefined;
   }) => Promise<unknown>;
-  readonly onChangeHeadcount: (input: {
+  readonly onPreviewHeadcount: (input: {
     docId: Id<"events">;
     newHeadcount: number;
     version: number | undefined;
-  }) => Promise<unknown>;
+  }) => void;
   readonly onChangeVenue: (input: {
     docId: Id<"events">;
     venueId?: Id<"venues">;
@@ -113,7 +113,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
     operationalRequirements,
     run,
     onReschedule,
-    onChangeHeadcount,
+    onPreviewHeadcount,
     onChangeVenue,
     onChangePricing,
     onChangePrimaryContact,
@@ -199,13 +199,11 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
             onSubmit={(formEvent) => {
               formEvent.preventDefault();
               const data = new FormData(formEvent.currentTarget);
-              void run(() =>
-                onChangeHeadcount({
-                  docId: eventId,
-                  newHeadcount: Number(data.get("headcount")),
-                  version,
-                }),
-              );
+              onPreviewHeadcount({
+                docId: eventId,
+                newHeadcount: Number(data.get("headcount")),
+                version,
+              });
             }}
           >
             <label className="field-label min-w-0 flex-1">

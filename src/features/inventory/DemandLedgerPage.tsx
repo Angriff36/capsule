@@ -4,12 +4,12 @@ import { formatCountNoun } from "../../lib/format";
 import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
-  useIngredientDemandSupersede,
   useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListPurchaseNeed,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandSupersede } from "../../lib/culinaryDemandClient";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -25,6 +25,7 @@ import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { useWorkingEventId } from "../events/workingEvent";
 import { IngredientDemandProvenancePanel } from "./IngredientDemandProvenancePanel";
+import { DemandChangePreviewDialog } from "./DemandChangePreviewDialog";
 
 const UNITS = [
   "each",
@@ -53,7 +54,7 @@ export function DemandLedgerPage() {
   const purchaseNeeds = useListPurchaseNeed();
   const createDemand = useCreateIngredientDemand();
   const fulfillDemand = useIngredientDemandFulfill();
-  const supersedeDemand = useIngredientDemandSupersede();
+  const applyDemandSupersede = useApplyDemandSupersede();
   const [showCreate, setShowCreate] = useState(false);
   const [thresholdPct, setThresholdPct] = useState(
     Math.round(DEFAULT_ANOMALY_THRESHOLD * 100),
@@ -61,6 +62,12 @@ export function DemandLedgerPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [expandedDemandId, setExpandedDemandId] = useState<string | null>(null);
+  const [supersedePreview, setSupersedePreview] = useState<{
+    demandId: string;
+    eventId: string;
+    version?: number;
+    reason: string;
+  } | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeDemands = (demands ?? []).filter(
@@ -116,12 +123,11 @@ export function DemandLedgerPage() {
           tone: "danger",
         });
         if (!reason) return;
-        void run(`${demand._id}:${key}`, async () => {
-          await supersedeDemand({
-            docId: demand._id,
-            version: demand.version,
-            reason,
-          });
+        setSupersedePreview({
+          demandId: demand._id,
+          eventId: demand.eventId,
+          version: demand.version,
+          reason,
         });
         return;
       }
@@ -196,6 +202,19 @@ export function DemandLedgerPage() {
       ) : null}
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {host}
+      {supersedePreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: supersedePreview.eventId,
+            kind: "supersede",
+            demandId: supersedePreview.demandId,
+          }}
+          onClose={() => setSupersedePreview(null)}
+          onApply={(expectedFingerprint) =>
+            applyDemandSupersede({ ...supersedePreview, expectedFingerprint })
+          }
+        />
+      ) : null}
 
       {showCreate ? (
         <form className="supply-form" onSubmit={submitDemand}>
