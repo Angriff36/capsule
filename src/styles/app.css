@@ -4682,9 +4682,16 @@ div.tpp-parameter-wide {
     border: none;
     box-shadow: none;
   }
+  /* The app frame is one screen tall and clips or scrolls the rest; on paper
+     that kept a long sheet to its first page, so the frames grow to fit. A
+     frame's slide-in animation also pinned the sheet below the page title. */
   *:has(.print-sheet) {
     position: static !important;
     transform: none !important;
+    animation: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
   .print-sheet .supply-table-wrap {
     overflow: visible;
