@@ -10,6 +10,10 @@ enum VenueNoteCategory {
   restrictions
   policies
   weather_contingency
+  // Venue partner program: a call, text or visit with the venue, and a
+  // problem or damage at the venue (Venue Partner Playbook sections 03-05, 13).
+  check_in
+  incident
   other
 }
 

@@ -719,6 +719,7 @@ import {
   RecurringAvailabilityWithdrawParamsSchema,
   ReferralSourceActivateParamsSchema,
   ReferralSourceDeactivateParamsSchema,
+  ReferralSourceLinkVenueParamsSchema,
   ReferralSourceRegisterParamsSchema,
   ReferralSourceReviseDetailsParamsSchema,
   RentalOrderLineAskVendorParamsSchema,
@@ -927,6 +928,7 @@ import {
   VenueRoomAddParamsSchema,
   VenueRoomRemoveParamsSchema,
   VenueRoomReviseParamsSchema,
+  VenueSetPartnershipParamsSchema,
   VenueSetSiteFactsParamsSchema,
   VenueSetTimeZoneParamsSchema,
   VenueUpdateDetailsParamsSchema,
@@ -10756,6 +10758,16 @@ export function useReferralSourceDeactivate() {
   };
 }
 
+/** Mutation hook for ReferralSource.linkVenue. */
+export function useReferralSourceLinkVenue() {
+  const mutate = useMutation(api.mutations.ReferralSource_linkVenue);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReferralSourceLinkVenueParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for ReferralSource.register. */
 export function useReferralSourceRegister() {
   const mutate = useMutation(api.mutations.ReferralSource_register);
@@ -13629,6 +13641,16 @@ export function useVenueRegister() {
   };
 }
 
+/** Mutation hook for Venue.setPartnership. */
+export function useVenueSetPartnership() {
+  const mutate = useMutation(api.mutations.Venue_setPartnership);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueSetPartnershipParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Venue.setSiteFacts. */
 export function useVenueSetSiteFacts() {
   const mutate = useMutation(api.mutations.Venue_setSiteFacts);
@@ -14108,4 +14130,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1492 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1494 as const;

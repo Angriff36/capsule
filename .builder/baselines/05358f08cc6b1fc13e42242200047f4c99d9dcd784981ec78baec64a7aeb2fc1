@@ -3734,6 +3734,7 @@ export const ReferralSourceSchema = z.object({
   registeredAt: z.coerce.date().nullable().optional(),
   deactivatedAt: z.coerce.date().nullable().optional(),
   deactivationReason: z.string().nullable().optional(),
+  venueId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -4923,6 +4924,11 @@ export const VenueSchema = z.object({
   wasteRules: z.string().nullable().optional(),
   permitsInsuranceNotes: z.string().nullable().optional(),
   restrictions: z.string().nullable().optional(),
+  partnerTier: z.enum(["catering_only", "catering_rentals", "full_event"]).nullable().optional(),
+  partnerOwnerPersonId: z.string().uuid().nullable().optional(),
+  partnerSince: z.coerce.date().nullable().optional(),
+  opsEaseScore: z.number().int().nullable().optional(),
+  relationshipScore: z.number().int().nullable().optional(),
   status: z.enum(["active", "inactive"]).default("active"),
   registeredAt: z.coerce.date().nullable().optional(),
   deactivatedAt: z.coerce.date().nullable().optional(),
@@ -4993,7 +4999,7 @@ export const VenueNoteSchema = z.object({
   authorPersonId: z.string().uuid(),
   authorName: z.string().default(""),
   authorAuthSubjectId: z.string().nullable().optional(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "other"]).default("other"),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "other"]).default("other"),
   content: z.string().default(""),
   isPinned: z.boolean().optional().default(false),
   visibility: z.enum(["public", "internal", "management_only"]).default("internal"),
@@ -11289,6 +11295,13 @@ export const ReferralSourceDeactivateParamsSchema = z.object({
 
 export type ReferralSourceDeactivateParams = z.infer<typeof ReferralSourceDeactivateParamsSchema>;
 
+// Command: linkVenue on ReferralSource
+export const ReferralSourceLinkVenueParamsSchema = z.object({
+  venueId: z.string().min(1).optional(),
+});
+
+export type ReferralSourceLinkVenueParams = z.infer<typeof ReferralSourceLinkVenueParamsSchema>;
+
 // Command: register on ReferralSource
 export const ReferralSourceRegisterParamsSchema = z.object({
   name: z.string(),
@@ -12977,6 +12990,16 @@ export const VenueRegisterParamsSchema = z.object({
 
 export type VenueRegisterParams = z.infer<typeof VenueRegisterParamsSchema>;
 
+// Command: setPartnership on Venue
+export const VenueSetPartnershipParamsSchema = z.object({
+  partnerTier: z.enum(["catering_only", "catering_rentals", "full_event"]).optional(),
+  partnerOwnerPersonId: z.string().uuid().optional(),
+  opsEaseScore: z.number().optional(),
+  relationshipScore: z.number().optional(),
+});
+
+export type VenueSetPartnershipParams = z.infer<typeof VenueSetPartnershipParamsSchema>;
+
 // Command: setSiteFacts on Venue
 export const VenueSetSiteFactsParamsSchema = z.object({
   seatedCapacity: z.number().optional(),
@@ -13095,7 +13118,7 @@ export type VenueNotePinParams = z.infer<typeof VenueNotePinParamsSchema>;
 export const VenueNotePostParamsSchema = z.object({
   venueId: z.string().min(1),
   eventId: z.string().min(1).optional(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "other"]),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "other"]),
   content: z.string(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
   isPinned: z.boolean().optional(),
@@ -13111,7 +13134,7 @@ export type VenueNoteRemoveParams = z.infer<typeof VenueNoteRemoveParamsSchema>;
 // Command: revise on VenueNote
 export const VenueNoteReviseParamsSchema = z.object({
   content: z.string(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "other"]).optional(),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "other"]).optional(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
 });
 
