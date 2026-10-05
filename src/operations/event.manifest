@@ -831,6 +831,12 @@ entity Event mixin TenantScoped, SoftDeletable {
   // The kitchen the crew leaves from (PL-ROUTES). Unset: the company's only
   // active kitchen, when it has exactly one.
   property operatingLocationId: uuid?
+  // Travel & delivery fee for this event (src/lib/travelFee.ts). Distance
+  // typed by a person wins over the drive-time route distance; an override
+  // amount (zero waives the fee) wins over the company rule.
+  property travelDistanceMiles: float?
+  property travelFeeOverride: money(12, 2)?
+  property travelFeeOverrideReason: string?
   property assignedToId: uuid?
   // Printed owner/salesperson name at plan / assign time. A later catalog
   // Person.correctIdentity rename must not rewrite this Event. assignedToId
@@ -1465,6 +1471,27 @@ entity Event mixin TenantScoped, SoftDeletable {
       eventId: self.id
       tenantId: self.tenantId
       operatingLocationId: operatingLocationId
+    }
+  }
+
+  // Travel fee inputs for this event; an omitted value clears it (back to the
+  // route distance / the company rule). Allowed at any stage so a live event
+  // stays correctable.
+  command setTravelFee(
+    optional distanceMiles: number,
+    optional overrideAmount: money(12, 2),
+    optional overrideReason: string
+  ) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Sales staff, event staff and managers may set the travel fee"
+    constraint travelDistanceNonnegative: distanceMiles == null or distanceMiles >= 0 "Distance can't be negative. Use zero or more."
+    constraint travelFeeOverrideNonnegative: overrideAmount == null or overrideAmount >= 0 "The travel fee can't be negative. Use zero to waive it."
+    mutate travelDistanceMiles = distanceMiles
+    mutate travelFeeOverride = overrideAmount
+    mutate travelFeeOverrideReason = overrideReason
+    emit EventTravelFeeSet {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -2999,6 +3026,11 @@ event EventTimingConfigured: "event.timing_configured" {
 }
 
 event EventTimingRuleRestored: "event.timing_rule_restored" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTravelFeeSet: "event.travel_fee_set" {
   eventId: string
   tenantId: string
 }

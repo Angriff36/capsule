@@ -21,6 +21,7 @@ import type { Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
 import { getAuthContext, requireTenant } from "./authContext";
 import { assertValidCatalogLink, assertValidRentalLink } from "./proposalPricing";
+import { readEventTravelFee, travelFeeLine } from "../travelFees";
 
 export const draftProposalWithLines = mutation({
   args: {
@@ -69,8 +70,16 @@ export const draftProposalWithLines = mutation({
     // creation sources tenantId from auth). Validate every catalog link against
     // it up front (codex review finding 3) — same-tenant published priced dish.
     const tenantId = requireTenant(await getAuthContext(ctx));
+    // An event proposal gets the event's travel & delivery fee line on its own
+    // (convex/travelFees.ts); sales can change or remove it while it's a draft.
+    const travel = args.eventId ? await readEventTravelFee(ctx, tenantId, args.eventId) : null;
+    const travelLine = travel ? travelFeeLine(travel) : null;
+    const lines: Array<(typeof args.lines)[number] & { notes?: string; travelFee?: boolean }> = [
+      ...args.lines,
+      ...(travelLine ? [{ ...travelLine, travelFee: true }] : []),
+    ];
     const pricing = computeProposalPricing({
-      lines: args.lines.map((l) => ({
+      lines: lines.map((l) => ({
         pricingBasis: l.pricingBasis as PricingBasis,
         unitPrice: l.unitPrice,
         quantity: l.quantity ?? 0,
@@ -104,8 +113,8 @@ export const draftProposalWithLines = mutation({
 
     // Persist every line with its authoritative amount (positional). One
     // transaction → all-or-nothing with the proposal create above.
-    for (let i = 0; i < args.lines.length; i++) {
-      const line = args.lines[i];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       await assertValidCatalogLink(ctx, line.menuDishId, tenantId);
       await assertValidRentalLink(ctx, line.equipmentId, tenantId);
       await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
@@ -120,6 +129,8 @@ export const draftProposalWithLines = mutation({
         menuDishId: line.menuDishId,
         overrideReason: line.overrideReason,
         equipmentId: line.equipmentId,
+        notes: line.notes,
+        travelFee: line.travelFee,
       });
     }
     // Explicitly typed (an untyped return cascades TS7006 through `api`):
