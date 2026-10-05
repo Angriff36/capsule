@@ -9,6 +9,7 @@ import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
 import { EventInvoiceCard } from "../EventInvoiceCard";
 import { EventMapPanel } from "../EventMapPanel";
+import { EventVenueLogisticsCard } from "../EventVenueLogisticsCard";
 import { EventOverviewRail } from "../EventOverviewRail";
 import { EventReadinessCard } from "../EventReadinessCard";
 import { EventAutomaticWhyCard } from "../EventAutomaticWhyCard";
@@ -127,6 +128,7 @@ export function EventDashSheetBody({
             <EventMapPanel venue={venue} startsAt={startsAt}>
               <EventWeatherChip venue={venue} startsAt={startsAt} />
             </EventMapPanel>
+            <EventVenueLogisticsCard venue={venue} />
             <div className="evd-center">
               <button
                 type="button"

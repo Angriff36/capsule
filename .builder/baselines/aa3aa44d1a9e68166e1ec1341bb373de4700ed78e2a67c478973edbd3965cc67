@@ -5022,6 +5022,14 @@ export const VenueSchema = z.object({
   wasteRules: z.string().nullable().optional(),
   permitsInsuranceNotes: z.string().nullable().optional(),
   restrictions: z.string().nullable().optional(),
+  loadingDock: z.string().nullable().optional(),
+  elevatorNotes: z.string().nullable().optional(),
+  kitchenEquipment: z.string().nullable().optional(),
+  powerDetails: z.string().nullable().optional(),
+  parkingDetails: z.string().nullable().optional(),
+  arrivalRestrictions: z.string().nullable().optional(),
+  dayOfContactName: z.string().nullable().optional(),
+  dayOfContactPhone: z.string().nullable().optional(),
   partnerTier: z.enum(["catering_only", "catering_rentals", "full_event"]).nullable().optional(),
   partnerOwnerPersonId: z.string().uuid().nullable().optional(),
   partnerSince: z.coerce.date().nullable().optional(),
@@ -13284,6 +13292,20 @@ export const VenueSetGalleryTokenParamsSchema = z.object({
 });
 
 export type VenueSetGalleryTokenParams = z.infer<typeof VenueSetGalleryTokenParamsSchema>;
+
+// Command: setLogisticsProfile on Venue
+export const VenueSetLogisticsProfileParamsSchema = z.object({
+  loadingDock: z.string().optional(),
+  elevatorNotes: z.string().optional(),
+  kitchenEquipment: z.string().optional(),
+  powerDetails: z.string().optional(),
+  parkingDetails: z.string().optional(),
+  arrivalRestrictions: z.string().optional(),
+  dayOfContactName: z.string().optional(),
+  dayOfContactPhone: z.string().optional(),
+});
+
+export type VenueSetLogisticsProfileParams = z.infer<typeof VenueSetLogisticsProfileParamsSchema>;
 
 // Command: setPartnership on Venue
 export const VenueSetPartnershipParamsSchema = z.object({
