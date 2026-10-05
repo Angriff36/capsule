@@ -12,7 +12,6 @@ import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import {
   useEventApprove,
   useEventAssignOwner,
-  useEventChangeHeadcount,
   useEventChangeVenue,
   useEventConfirmSalesLock,
   useEventLockForSales,
@@ -29,6 +28,7 @@ import {
   useListVehicle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
 import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { QueryLoadState } from "../../ui/QueryLoadState";
@@ -47,6 +47,7 @@ import "./EventTracker.css";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
 import { FailureBanner } from "./FailureBanner";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
 
 const LANE_DAYS = 14;
 const TRACKER_DAYS_BACK = 60;
@@ -175,7 +176,7 @@ export function EventTrackerPage() {
   const numberAssignments = useListEventNumberAssignment();
 
   const reschedule = useEventReschedule();
-  const changeHeadcount = useEventChangeHeadcount();
+  const applyDemandHeadcount = useApplyDemandHeadcount();
   const changeVenue = useEventChangeVenue();
   const assignOwner = useEventAssignOwner();
   const submitForApproval = useEventSubmitForApproval();
@@ -190,6 +191,10 @@ export function EventTrackerPage() {
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   // Bumped when an inline edit is rejected so the inputs fall back to the saved value.
   const [resetKey, setResetKey] = useState(0);
+  const [headcountPreview, setHeadcountPreview] = useState<{
+    event: CalendarEventFacts;
+    newHeadcount: number;
+  } | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
 
   const loading = [
@@ -405,16 +410,7 @@ export function EventTrackerPage() {
       setResetKey((key) => key + 1);
       return;
     }
-    void run(
-      event,
-      () =>
-        changeHeadcount({
-          docId: event.id,
-          version: event.version,
-          newHeadcount: Math.round(value),
-        }),
-      "Guest count saved",
-    );
+    setHeadcountPreview({ event, newHeadcount: Math.round(value) });
   };
 
   const commitDate = (event: CalendarEventFacts, value: string) => {
@@ -834,6 +830,27 @@ export function EventTrackerPage() {
         })}
       </div>
       {savedToast}
+      {headcountPreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: headcountPreview.event.id,
+            kind: "headcount",
+            newHeadcount: headcountPreview.newHeadcount,
+          }}
+          onClose={() => {
+            setHeadcountPreview(null);
+            setResetKey((key) => key + 1);
+          }}
+          onApply={(expectedFingerprint) =>
+            applyDemandHeadcount({
+              eventId: headcountPreview.event.id,
+              newHeadcount: headcountPreview.newHeadcount,
+              version: headcountPreview.event.version,
+              expectedFingerprint,
+            })
+          }
+        />
+      ) : null}
     </div>
   );
 }

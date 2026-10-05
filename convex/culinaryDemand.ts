@@ -56,6 +56,12 @@ import {
   type QuantityBasis,
   type UnitCode,
 } from "./lib/culinaryModel/units";
+import {
+  classifyDemandChange,
+  demandPreviewFingerprint,
+  type DemandChangeKind,
+  type DemandChangeLine,
+} from "./lib/demandChangePreview";
 
 type Ctx = QueryCtx | MutationCtx;
 
@@ -101,7 +107,9 @@ async function byTenant<
     | "eventIngredientContributions"
     | "productionBatchAllocations"
     | "productionBatches"
-    | "events",
+    | "events"
+    | "ingredientDemands"
+    | "purchaseNeeds",
 >(ctx: Ctx, table: T, tenantId: string): Promise<Doc<T>[]> {
   // Every table here carries the TenantScoped mixin and its by_tenantId index;
   // typing the builder against one concrete table keeps the index call typed
@@ -380,7 +388,19 @@ async function loadEventDishes(
   ctx: Ctx,
   tenantId: string,
   eventId: Id<"events">,
+  proposedHeadcount?: number,
 ): Promise<EventDishLike[]> {
+  const previousHeadcount =
+    proposedHeadcount != null
+      ? Number((await ctx.db.get(eventId))?.expectedHeadcount ?? 0)
+      : 0;
+  // Mirrors EventDish.syncHeadcount: legacy rows (followsEventHeadcount
+  // unset) follow only when they still match the previous headcount.
+  const follows = (ed: Doc<"eventDishes">) =>
+    ed.followsEventHeadcount != null
+      ? ed.followsEventHeadcount
+      : Number(ed.quantityServings ?? 0) === previousHeadcount &&
+        (ed.headcountOverride == null || ed.headcountOverride === 0);
   const [eventDishes, overrides, prepTasks] = await Promise.all([
     byTenant(ctx, "eventDishes", tenantId),
     byTenant(ctx, "eventDishLineOverrides", tenantId),
@@ -397,7 +417,10 @@ async function loadEventDishes(
       id: String(ed._id),
       eventId: String(ed.eventId),
       dishId: String(ed.dishId),
-      quantityServings: Number(ed.quantityServings ?? 0),
+      quantityServings:
+        proposedHeadcount != null && follows(ed)
+          ? proposedHeadcount
+          : Number(ed.quantityServings ?? 0),
       overrides: overrides
         .filter(
           (o) =>
@@ -505,10 +528,16 @@ async function reviewEvent(
   ctx: Ctx,
   tenantId: string,
   eventId: Id<"events">,
+  proposedHeadcount?: number,
 ): Promise<EventDemandReview> {
   await requireEvent(ctx, tenantId, eventId);
   const catalog = await loadCatalog(ctx, tenantId);
-  const eventDishes = await loadEventDishes(ctx, tenantId, eventId);
+  const eventDishes = await loadEventDishes(
+    ctx,
+    tenantId,
+    eventId,
+    proposedHeadcount,
+  );
   const allocations = (
     await byTenant(ctx, "productionBatchAllocations", tenantId)
   ).filter(
@@ -1013,6 +1042,338 @@ export const reconcileEventDemand = mutation({
   args: { eventId: v.id("events") },
   handler: (ctx, args): Promise<ReconcileEventDemandResult> =>
     writeReconciledEventDemand(ctx, args.eventId),
+});
+
+export interface DemandChangePreview {
+  kind: DemandChangeKind;
+  eventId: string;
+  fingerprint: string;
+  lines: Array<
+    DemandChangeLine & {
+      change: "added" | "removed" | "changed" | "unchanged";
+    }
+  >;
+  affectedPurchaseNeeds: Array<{
+    id: string;
+    ingredientId: string;
+    status: string;
+    currentQuantity: number;
+    nextQuantity: number;
+    isCommitted: boolean;
+  }>;
+}
+
+type DemandPreviewInput = {
+  eventId: Id<"events">;
+  kind: DemandChangeKind;
+  newHeadcount?: number;
+  demandId?: Id<"ingredientDemands">;
+};
+
+type PreviewContribution = {
+  ingredientId: string;
+  unit: UnitCode;
+  quantity: number;
+  ingredientName: string;
+};
+
+/** The read side of demand reconciliation. It deliberately uses the same
+ * review and reconcile plan as `writeReconciledEventDemand`; this is the
+ * only place an operator preview is calculated. */
+async function buildDemandChangePreview(
+  ctx: Ctx,
+  tenantId: string,
+  input: DemandPreviewInput,
+): Promise<DemandChangePreview> {
+  const event = await requireEvent(ctx, tenantId, input.eventId);
+  const contributionRows = (
+    await byTenant(ctx, "eventIngredientContributions", tenantId)
+  ).filter((row) => String(row.eventId) === String(input.eventId));
+  const demandRows = (
+    await byTenant(ctx, "ingredientDemands", tenantId)
+  ).filter((row) => String(row.eventId) === String(input.eventId));
+  const purchaseNeeds = (await byTenant(ctx, "purchaseNeeds", tenantId)).filter(
+    (row) => String(row.eventId) === String(input.eventId),
+  );
+
+  const sourceParts = [
+    `${input.kind}:${input.eventId}:${input.newHeadcount ?? ""}:${input.demandId ?? ""}`,
+    `event:${event._id}:${event.version}:${event.updatedAt}`,
+    ...contributionRows.map(
+      (row) =>
+        `contribution:${row._id}:${row.version}:${row.updatedAt}:${row.quantity}:${row.deletedAt ?? ""}`,
+    ),
+    ...demandRows.map(
+      (row) =>
+        `demand:${row._id}:${row.version}:${row.updatedAt}:${row.requiredQuantity}:${row.status}`,
+    ),
+    ...purchaseNeeds.map(
+      (row) =>
+        `purchase:${row._id}:${row.version}:${row.updatedAt}:${row.requiredQuantity}:${row.status}`,
+    ),
+  ];
+
+  if (input.kind === "supersede") {
+    const demand = input.demandId
+      ? demandRows.find((row) => String(row._id) === String(input.demandId))
+      : null;
+    if (!demand) throw new Error("Ingredient demand not found");
+    const affectedPurchaseNeeds = purchaseNeeds
+      .filter((need) => String(need.ingredientDemandId) === String(demand._id))
+      .map((need) => ({
+        id: String(need._id),
+        ingredientId: String(need.ingredientId),
+        status: String(need.status),
+        currentQuantity: Number(need.requiredQuantity),
+        nextQuantity: 0,
+        isCommitted: need.status === "ordered" || need.status === "fulfilled",
+      }));
+    const ingredient = (
+      await loadCatalog(ctx, tenantId)
+    ).lookups.ingredients.get(String(demand.ingredientId));
+    const line: DemandChangeLine = {
+      key: String(demand._id),
+      ingredientId: String(demand.ingredientId),
+      ingredientName: ingredient?.name ?? String(demand.ingredientId),
+      unit: unitOf(demand.unit),
+      currentQuantity: Number(demand.requiredQuantity),
+      nextQuantity: 0,
+    };
+    return {
+      kind: input.kind,
+      eventId: String(input.eventId),
+      fingerprint: demandPreviewFingerprint(sourceParts),
+      lines: [{ ...line, change: "removed" }],
+      affectedPurchaseNeeds,
+    };
+  }
+
+  const review = await reviewEvent(
+    ctx,
+    tenantId,
+    input.eventId,
+    input.kind === "headcount" ? input.newHeadcount : undefined,
+  );
+  const existing = contributionRows.map((row) => ({
+    id: String(row._id),
+    sourceKey: row.sourceKey ?? null,
+    eventDishId: String(row.eventDishId),
+    componentId: row.componentId ? String(row.componentId) : null,
+    ingredientId: String(row.ingredientId),
+    unit: unitOf(row.unit),
+    quantity: Number(row.quantity),
+    deletedAt: row.deletedAt ?? null,
+  }));
+  const current = new Map<string, PreviewContribution>();
+  const next = new Map<string, PreviewContribution>();
+  const catalog = await loadCatalog(ctx, tenantId);
+  const put = (
+    target: Map<string, PreviewContribution>,
+    key: string,
+    value: PreviewContribution,
+  ) => target.set(key, value);
+  for (const row of contributionRows) {
+    if (row.deletedAt != null) continue;
+    const key = String(row._id);
+    const ingredientId = String(row.ingredientId);
+    put(next, key, {
+      ingredientId,
+      unit: unitOf(row.unit),
+      quantity: Number(row.quantity),
+      ingredientName:
+        catalog.lookups.ingredients.get(ingredientId)?.name ?? ingredientId,
+    });
+    put(current, key, next.get(key)!);
+  }
+  for (const eventDish of review.eventDishes) {
+    const plan = reconcileContributions(
+      existing,
+      eventDish.contributions,
+      eventDish.eventDishId,
+    );
+    for (const created of plan.create) {
+      put(next, `new:${created.sourceKey}`, {
+        ingredientId: created.ingredientId,
+        unit: created.unit,
+        quantity: created.quantity,
+        ingredientName: created.ingredientName,
+      });
+    }
+    for (const updated of plan.update) {
+      put(next, updated.id, {
+        ingredientId: updated.next.ingredientId,
+        unit: updated.next.unit,
+        quantity: updated.next.quantity,
+        ingredientName: updated.next.ingredientName,
+      });
+    }
+    for (const removed of plan.supersede) next.delete(removed.id);
+  }
+  const totals = (rows: Iterable<PreviewContribution>) => {
+    const grouped = new Map<string, DemandChangeLine>();
+    for (const row of rows) {
+      const key = `${row.ingredientId}:${row.unit}`;
+      const found = grouped.get(key) ?? {
+        key,
+        ingredientId: row.ingredientId,
+        ingredientName: row.ingredientName,
+        unit: row.unit,
+        currentQuantity: 0,
+        nextQuantity: 0,
+      };
+      grouped.set(key, found);
+    }
+    return grouped;
+  };
+  const linesByKey = totals([...current.values(), ...next.values()]);
+  for (const row of current.values()) {
+    const line = linesByKey.get(`${row.ingredientId}:${row.unit}`)!;
+    line.currentQuantity += row.quantity;
+  }
+  for (const row of next.values()) {
+    const line = linesByKey.get(`${row.ingredientId}:${row.unit}`)!;
+    line.nextQuantity += row.quantity;
+  }
+  const lines = [...linesByKey.values()]
+    .map((line) => ({
+      ...line,
+      currentQuantity: Number(line.currentQuantity.toFixed(6)),
+      nextQuantity: Number(line.nextQuantity.toFixed(6)),
+      change: classifyDemandChange(
+        Number(line.currentQuantity.toFixed(6)),
+        Number(line.nextQuantity.toFixed(6)),
+      ),
+    }))
+    .sort((a, b) => a.ingredientName.localeCompare(b.ingredientName));
+  const changedIngredients = new Set(
+    lines
+      .filter((line) => line.change !== "unchanged")
+      .map((line) => line.ingredientId),
+  );
+  const projectedByIngredient = new Map<string, number>();
+  for (const line of lines) {
+    projectedByIngredient.set(line.ingredientId, line.nextQuantity);
+  }
+  return {
+    kind: input.kind,
+    eventId: String(input.eventId),
+    fingerprint: demandPreviewFingerprint(sourceParts),
+    lines,
+    affectedPurchaseNeeds: purchaseNeeds
+      .filter((need) => changedIngredients.has(String(need.ingredientId)))
+      .map((need) => ({
+        id: String(need._id),
+        ingredientId: String(need.ingredientId),
+        status: String(need.status),
+        currentQuantity: Number(need.requiredQuantity),
+        nextQuantity:
+          projectedByIngredient.get(String(need.ingredientId)) ??
+          Number(need.requiredQuantity),
+        isCommitted: need.status === "ordered" || need.status === "fulfilled",
+      })),
+  };
+}
+
+const demandChangeKind = v.union(
+  v.literal("recalculate"),
+  v.literal("headcount"),
+  v.literal("supersede"),
+);
+
+export const previewDemandChange = query({
+  args: {
+    eventId: v.id("events"),
+    kind: demandChangeKind,
+    newHeadcount: v.optional(v.number()),
+    demandId: v.optional(v.id("ingredientDemands")),
+  },
+  handler: async (ctx, args): Promise<DemandChangePreview> => {
+    // A headcount edit is not a culinary report: anyone who may change the
+    // guest count must see its impact. The apply commands keep their guards.
+    const auth = await getAuthContext(ctx);
+    const tenantId =
+      args.kind === "headcount"
+        ? requireTenant(auth)
+        : requireCulinaryReader(auth);
+    return buildDemandChangePreview(ctx, tenantId, args);
+  },
+});
+
+function assertFreshPreview(
+  preview: DemandChangePreview,
+  expectedFingerprint: string,
+): void {
+  if (preview.fingerprint !== expectedFingerprint) {
+    throw new Error(
+      "Demand data changed since this preview. Review the updated changes before applying.",
+    );
+  }
+}
+
+export const applyDemandRecalculation = mutation({
+  args: { eventId: v.id("events"), expectedFingerprint: v.string() },
+  handler: async (ctx, args): Promise<ReconcileEventDemandResult> => {
+    const tenantId = requireTenant(await getAuthContext(ctx));
+    assertFreshPreview(
+      await buildDemandChangePreview(ctx, tenantId, {
+        eventId: args.eventId,
+        kind: "recalculate",
+      }),
+      args.expectedFingerprint,
+    );
+    return writeReconciledEventDemand(ctx, args.eventId);
+  },
+});
+
+export const applyDemandHeadcount = mutation({
+  args: {
+    eventId: v.id("events"),
+    newHeadcount: v.number(),
+    version: v.optional(v.number()),
+    expectedFingerprint: v.string(),
+  },
+  handler: async (ctx, args): Promise<unknown> => {
+    const tenantId = requireTenant(await getAuthContext(ctx));
+    assertFreshPreview(
+      await buildDemandChangePreview(ctx, tenantId, {
+        eventId: args.eventId,
+        kind: "headcount",
+        newHeadcount: args.newHeadcount,
+      }),
+      args.expectedFingerprint,
+    );
+    return ctx.runMutation(api.mutations.Event_changeHeadcount, {
+      docId: args.eventId,
+      version: args.version,
+      newHeadcount: args.newHeadcount,
+    });
+  },
+});
+
+export const applyDemandSupersede = mutation({
+  args: {
+    eventId: v.id("events"),
+    demandId: v.id("ingredientDemands"),
+    version: v.optional(v.number()),
+    reason: v.string(),
+    expectedFingerprint: v.string(),
+  },
+  handler: async (ctx, args): Promise<unknown> => {
+    const tenantId = requireTenant(await getAuthContext(ctx));
+    assertFreshPreview(
+      await buildDemandChangePreview(ctx, tenantId, {
+        eventId: args.eventId,
+        kind: "supersede",
+        demandId: args.demandId,
+      }),
+      args.expectedFingerprint,
+    );
+    return ctx.runMutation(api.mutations.IngredientDemand_supersede, {
+      docId: args.demandId,
+      version: args.version,
+      reason: args.reason,
+    });
+  },
 });
 
 /**

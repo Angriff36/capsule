@@ -117,6 +117,7 @@ import type * as lib_culinaryOperations from "../lib/culinaryOperations.js";
 import type * as lib_cutoverGate from "../lib/cutoverGate.js";
 import type * as lib_cutoverProviders from "../lib/cutoverProviders.js";
 import type * as lib_deliveryState from "../lib/deliveryState.js";
+import type * as lib_demandChangePreview from "../lib/demandChangePreview.js";
 import type * as lib_demandProvenance_DemandProvenanceManager from "../lib/demandProvenance/DemandProvenanceManager.js";
 import type * as lib_demandProvenance_DemandSnapshotDiffManager from "../lib/demandProvenance/DemandSnapshotDiffManager.js";
 import type * as lib_demandProvenance_types from "../lib/demandProvenance/types.js";
@@ -441,6 +442,7 @@ declare const fullApi: ApiFromModules<{
   "lib/cutoverGate": typeof lib_cutoverGate;
   "lib/cutoverProviders": typeof lib_cutoverProviders;
   "lib/deliveryState": typeof lib_deliveryState;
+  "lib/demandChangePreview": typeof lib_demandChangePreview;
   "lib/demandProvenance/DemandProvenanceManager": typeof lib_demandProvenance_DemandProvenanceManager;
   "lib/demandProvenance/DemandSnapshotDiffManager": typeof lib_demandProvenance_DemandSnapshotDiffManager;
   "lib/demandProvenance/types": typeof lib_demandProvenance_types;

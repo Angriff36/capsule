@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import { normalizeCurrencyCode } from "../../lib/format";
+import {
+  formatCount,
+  formatDate,
+  normalizeCurrencyCode,
+} from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
@@ -10,7 +15,6 @@ import {
   useEventArchive,
   useEventBeginExecution,
   useEventCancel,
-  useEventChangeHeadcount,
   useEventChangePricing,
   useEventChangePrimaryContact,
   useEventChangeRequirements,
@@ -29,6 +33,7 @@ import {
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventTimelineActivities } from "../../lib/useEventRows";
@@ -45,6 +50,7 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
 import { WalkieToggle } from "../chat/WalkieToggle";
@@ -74,6 +80,7 @@ import {
 } from "./EventLifecyclePolicy";
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
 import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
@@ -128,6 +135,8 @@ function EventDetailContent({
   event: Doc<"events">;
   id: string | undefined;
 }) {
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
@@ -187,7 +196,7 @@ function EventDetailContent({
   const cancel = useEventCancel();
   const archive = useEventArchive();
   const returnToPlanning = useEventReturnToPlanning();
-  const changeHeadcount = useEventChangeHeadcount();
+  const applyDemandHeadcount = useApplyDemandHeadcount();
   const changePricing = useEventChangePricing();
   const changePrimaryContact = useEventChangePrimaryContact();
   const changeRequirements = useEventChangeRequirements();
@@ -200,6 +209,10 @@ function EventDetailContent({
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
+  const [headcountPreview, setHeadcountPreview] = useState<{
+    newHeadcount: number;
+    version?: number;
+  } | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
@@ -489,7 +502,13 @@ function EventDetailContent({
     timelineCount: timelineCount,
     run: run,
     onReschedule: reschedule,
-    onChangeHeadcount: changeHeadcount,
+    onPreviewHeadcount: ({
+      newHeadcount,
+      version: nextVersion,
+    }: {
+      newHeadcount: number;
+      version: number | undefined;
+    }) => setHeadcountPreview({ newHeadcount, version: nextVersion }),
     onChangeVenue: changeVenue,
     onChangePricing: changePricing,
     onChangePrimaryContact: changePrimaryContact,
@@ -714,31 +733,72 @@ function EventDetailContent({
   );
 
   return (
-    <EventDashboard
-      title={String(event.title)}
-      updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
-      client={(() => {
-        const client = clients?.find((c) => c._id === event.clientId);
-        const name = clientDisplayName(event.clientId, clients);
-        if (!client) return name;
-        return (
-          <HoverPreview card={<ClientPreviewCard client={client} />}>
-            <Link to={`/clients/${client._id}`} className="hover:underline">
-              {name}
-            </Link>
-          </HoverPreview>
-        );
-      })()}
-      venue={
-        event.venueId ? <Link to="/facilities">{venueLabel}</Link> : venueLabel
-      }
-      actions={headerActions}
-      activeTab={activeTab}
-      onTab={setTab}
-      overview={overviewProps}
-      notices={notices}
-    >
-      {otherTabs}
-    </EventDashboard>
+    <div ref={sectionScopeRef}>
+      <StickyRecordHeader
+        title={event.title}
+        facts={[
+          { label: "Date", value: formatDate(event.startsAt) },
+          {
+            label: "Headcount",
+            value: `${formatCount(event.expectedHeadcount)} guests`,
+          },
+          { label: "Status", value: formatStatusLabel(String(event.stage)) },
+        ]}
+        actions={headerActions}
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        sectionKey={activeTab}
+        headingId="event-detail-title"
+      />
+      <EventDashboard
+        title={String(event.title)}
+        updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
+        client={(() => {
+          const client = clients?.find((c) => c._id === event.clientId);
+          const name = clientDisplayName(event.clientId, clients);
+          if (!client) return name;
+          return (
+            <HoverPreview card={<ClientPreviewCard client={client} />}>
+              <Link to={`/clients/${client._id}`} className="hover:underline">
+                {name}
+              </Link>
+            </HoverPreview>
+          );
+        })()}
+        venue={
+          event.venueId ? (
+            <Link to="/facilities">{venueLabel}</Link>
+          ) : (
+            venueLabel
+          )
+        }
+        actions={headerActions}
+        activeTab={activeTab}
+        onTab={setTab}
+        overview={overviewProps}
+        notices={notices}
+        heroSentinelRef={headerSentinelRef}
+      >
+        {otherTabs}
+      </EventDashboard>
+      {headcountPreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: event._id,
+            kind: "headcount",
+            newHeadcount: headcountPreview.newHeadcount,
+          }}
+          onClose={() => setHeadcountPreview(null)}
+          onApply={(expectedFingerprint) =>
+            applyDemandHeadcount({
+              eventId: event._id,
+              newHeadcount: headcountPreview.newHeadcount,
+              version: headcountPreview.version,
+              expectedFingerprint,
+            })
+          }
+        />
+      ) : null}
+    </div>
   );
 }
