@@ -37,6 +37,12 @@ projections:
       # convex/teamChatCursor.ts and every cursor read look the caller's row up
       # directly instead of filtering a channel-wide page.
       indexes:
+        TppUpload:
+          - fields: [tenantId, fingerprint]
+            name: by_tenant_fingerprint
+        TppUploadPart:
+          - fields: [uploadId, sequence]
+            name: by_upload_sequence
         # Personal swap lookup: current staff and matching evidence/windows,
         # without scanning the tenant's historical schedule or private records.
         Person:

@@ -32,6 +32,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // Remember explicit counts so a later coincidentally matching headcount
   // does not turn a fixed appetizer/pizza count into a whole-event line.
   property followsEventHeadcount: boolean?
+  // Imported package selections already have their equipment recorded.
+  // A new selection starts without this flag and uses current packing rules.
+  property packingAlreadyRecorded: boolean?
   // 0/null = no override (use Event.expectedHeadcount). >0 = this dish's guest count.
   // Optional so pre-field EventDish rows still validate under Convex schema push.
   property headcountOverride: int? = 0

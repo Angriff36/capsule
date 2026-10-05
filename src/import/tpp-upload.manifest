@@ -1,0 +1,40 @@
+// Account exports are uploaded in bounded parts. Authored seams own the job,
+// receipts, and historical writes; importing never replays business commands.
+entity TppUpload mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+  property required fingerprint: string
+  property required sourceAccount: string
+  property required fileName: string
+  property required fileSize: int
+  property required metadata: string
+  property required status: string = "uploading"
+  property required nextPart: int = 0
+  property required bytesReceived: int = 0
+  property required counts: string = "{}"
+  property required actorId: string
+  property required timeZone: string
+  default policy uploadRead read: false "Use the organization-scoped TPP import page."
+  default policy uploadWrite write: false "Use the TPP upload seam."
+  default policy uploadExecute execute: false "Use the TPP upload seam."
+  store TppUpload in durable
+}
+
+entity TppUploadPart mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+  property required uploadId: string
+  property required sequence: int
+  property required collection: string
+  property required storageId: string
+  property required checksum: string
+  property required byteSize: int
+  property required rowCount: int
+  property required outcome: string
+  default policy partRead read: false "Use the organization-scoped TPP import page."
+  default policy partWrite write: false "Use the TPP upload seam."
+  default policy partExecute execute: false "Use the TPP upload seam."
+  store TppUploadPart in durable
+}

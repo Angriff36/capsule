@@ -11,6 +11,7 @@ const sections = [
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
   { label: "Imports", path: "/admin/imports" },
+  { label: "TPP upload", path: "/admin/imports/tpp" },
   { label: "Compare with TPP", path: "/admin/parallel-run" },
   { label: "Match leftover items", path: "/admin/reconcile" },
   { label: "Switch from TPP", path: "/admin/cutover" },

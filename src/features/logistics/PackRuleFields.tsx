@@ -158,10 +158,18 @@ export function PackRuleFields({
         (scaleBy) => ({ scaleBy }),
       )}
       {draft.scaleBy !== "fixed"
-        ? input("One more per", draft.perUnits, (perUnits) => ({ perUnits }), {
+        ? input("For every", draft.perUnits, (perUnits) => ({ perUnits }), {
             type: "number",
             placeholder: "e.g. 10",
           })
+        : null}
+      {draft.scaleBy !== "fixed"
+        ? input(
+            "Send this many",
+            draft.quantityPerUnit ?? "1",
+            (quantityPerUnit) => ({ quantityPerUnit }),
+            { type: "number" },
+          )
         : null}
       {draft.scaleBy !== "fixed"
         ? input(
