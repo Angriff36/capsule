@@ -1,6 +1,5 @@
-import { useQuery } from "convex/react";
 import { Link } from "react-router-dom";
-import { api } from "../../lib/api";
+import { useDemandProvenance } from "../facilities/useDemandProvenance";
 
 const number = (value: unknown) =>
   typeof value === "number"
@@ -21,9 +20,7 @@ export function IngredientDemandProvenancePanel({
 }: {
   demandId: string;
 }) {
-  const provenance = useQuery(api.demandProvenance.get, {
-    ingredientDemandId: demandId as never,
-  });
+  const provenance = useDemandProvenance(demandId);
   if (provenance === undefined)
     return (
       <p className="demand-provenance-loading">Loading calculation trace.</p>

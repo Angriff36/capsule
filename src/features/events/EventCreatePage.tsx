@@ -54,6 +54,7 @@ import {
 } from "./EventCreateInlineForms";
 import { findLikelyDuplicates } from "./inlineRecordDuplicates";
 import { venueAddress, venueSummary } from "./venuePickerSummary";
+import { EventCreateWizard } from "./EventCreateWizard";
 import {
   coordinatesFromFields,
   formatCoordinates,
@@ -75,6 +76,15 @@ function eventFieldRules(data: FormData): Record<string, string> {
     return { endsAt: "End must be after the start time." };
   }
   return {};
+}
+
+/** Proposal, client and template bookings retain their established long-form carryover. */
+export function guidedEventCreateAvailable(params: {
+  clientId: string;
+  templateId: string;
+  proposalId: string;
+}): boolean {
+  return !params.clientId && !params.templateId && !params.proposalId;
 }
 
 // Collapsible form block (native <details>) styled like Section. Uncontrolled:
@@ -144,12 +154,27 @@ function revealInvalidSections(form: HTMLFormElement) {
 export function EventCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [creationMode, setCreationMode] = useState<"form" | "guided">(() => {
+    try {
+      return localStorage.getItem("capsule.event-create.mode") === "guided"
+        ? "guided"
+        : "form";
+    } catch {
+      return "form";
+    }
+  });
+  const [wizardBusy, setWizardBusy] = useState(false);
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const templateId = searchParams.get("templateId")?.trim() || "";
   // Accepted proposal to book (issue #141): pre-fills the form; when the
   // proposal is still unlinked, submit goes through the proposal-booking seam
   // so the new event is linked and the accepted menu copies onto it.
   const proposalId = searchParams.get("proposalId")?.trim() || "";
+  const guidedAvailable = guidedEventCreateAvailable({
+    clientId: prefillClientId,
+    templateId,
+    proposalId,
+  });
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
   const proposalEnhancements = useListProposalEnhancement();
@@ -556,6 +581,43 @@ export function EventCreatePage() {
     clientId,
   });
 
+  const switchCreationMode = (mode: "form" | "guided") => {
+    setCreationMode(mode);
+    try {
+      localStorage.setItem("capsule.event-create.mode", mode);
+    } catch {
+      // The choice remains active for this page in private browsing.
+    }
+  };
+
+  if (creationMode === "guided" && guidedAvailable) {
+    return (
+      <div className="space-y-4">
+        <Link
+          to={eventsIndexPath()}
+          className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
+        >
+          <ArrowLeftIcon width={12} height={12} /> All events
+        </Link>
+        <PageHeader
+          title="New event"
+          lead="Build a booking step by step, then create it once you have reviewed the operational consequences."
+          actions={
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              disabled={wizardBusy}
+              onClick={() => switchCreationMode("form")}
+            >
+              Use long form
+            </button>
+          }
+        />
+        <EventCreateWizard onBusyChange={setWizardBusy} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <Link
@@ -568,11 +630,28 @@ export function EventCreatePage() {
         title="New event"
         lead="The essentials for a new booking — who it's for, where, when, and the budget."
         actions={
-          <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
-            Have a BEO? Import it instead
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            {guidedAvailable ? (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => switchCreationMode("guided")}
+              >
+                Use guided setup
+              </button>
+            ) : null}
+            <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
+              Have a BEO? Import it instead
+            </Link>
+          </div>
         }
       />
+
+      {!guidedAvailable ? (
+        <p className="banner banner-warn">
+          Guided setup isn't available when booking from a proposal or template.
+        </p>
+      ) : null}
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
