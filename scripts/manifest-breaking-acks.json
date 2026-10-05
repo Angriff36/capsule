@@ -2958,6 +2958,66 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Place-card name: optional; existing guests stay valid and print their name."
+    },
+    {
+      "path": "Event.travelDistanceMiles",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Event.travelFeeOverride",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Event.travelFeeOverrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeFreeMiles",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeMinimum",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeMode",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeRatePerMile",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeRoundTrip",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeZonesJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "ProposalLineItem.travelFee",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
     }
   ]
 }
