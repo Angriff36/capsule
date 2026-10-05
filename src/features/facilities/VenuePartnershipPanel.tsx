@@ -20,6 +20,7 @@ import { FailureBanner } from "../events/FailureBanner";
 import { useAllEventReportRows } from "./useEventsById";
 import { VenueBrandForm } from "./VenueBrandForm";
 import { VenueHandoffPanel } from "./VenueHandoffPanel";
+import { VenueOnboardingPanel } from "./VenueOnboardingPanel";
 import { ownerProblem } from "./venueHandoff";
 import {
   CONTACT_DAYS,
@@ -321,6 +322,14 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
                 ))}
               </ul>
             ) : null}
+
+            <VenueOnboardingPanel
+              venue={venue}
+              notes={notes ?? []}
+              events={events ?? []}
+              run={run}
+              busy={busy}
+            />
 
             <VenueHandoffPanel
               venue={venue}

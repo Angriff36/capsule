@@ -12,6 +12,7 @@ import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { venueDetailPath } from "./facilitiesRoutes";
 import { useAllEventReportRows } from "./useEventsById";
 import { handoffStatus, ownerProblem } from "./venueHandoff";
+import { onboardingStatus } from "./venueOnboarding";
 import {
   CONTACT_DAYS,
   PARTNER_TIER_LABELS,
@@ -71,6 +72,15 @@ export function VenuePartnersPage() {
           notes: notes ?? [],
           now,
         });
+        // Only late start-up steps show here; venue-only dishes are not read.
+        const onboarding = onboardingStatus({
+          venue,
+          notes: notes ?? [],
+          events: events ?? [],
+          venueOnlyDishCount: null,
+          now,
+          formatDate,
+        });
         return {
           venue,
           ownerName: owner
@@ -80,6 +90,7 @@ export function VenuePartnersPage() {
           warnings: [
             ...(ownerWarning ? [ownerWarning] : []),
             ...(handoff?.reminders ?? []),
+            ...(onboarding?.reminders ?? []),
             ...card.warnings,
           ],
         };
