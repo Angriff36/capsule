@@ -105,6 +105,8 @@ describe("proposal public renderers", () => {
     expect(text).toContain("Frozen client note");
     expect(text).toContain("Frozen terms");
     expect(text).not.toContain("Hidden timeline activity");
+    // No brand from an older server: the head shows as before.
+    expect(text).not.toContain("×");
     // No saved order (older revisions): the standard layout.
     expect(text.indexOf("Event Details")).toBeLessThan(
       text.indexOf("Roasted carrots"),
@@ -131,6 +133,34 @@ describe("proposal public renderers", () => {
     expect(ordered.indexOf("Roasted carrots")).toBeLessThan(
       ordered.indexOf("Event Details"),
     );
+
+    // Playbook section 06: at a partner venue the company comes first and
+    // the venue's logo sits next to it.
+    queryResult = {
+      ...queryResult,
+      brand: {
+        companyName: "Mangia Catering Co.",
+        companyLogoUrl: null,
+        partnerVenue: {
+          name: "Garden Hall",
+          logoUrl: "https://files.example/garden-hall.png",
+          color: "#1f3a5f",
+        },
+      },
+    };
+    container = document.createElement("div");
+    document.body.append(container);
+    const root = createRoot(container);
+    await act(async () =>
+      root.render(createElement(SharedProposalPage, { token: "token" })),
+    );
+    const row = container.querySelector('[data-testid="proposal-brand"]');
+    expect(row?.textContent).toContain("Mangia Catering Co.");
+    expect(row?.textContent).toContain("×");
+    const logo = row?.querySelector("img");
+    expect(logo?.getAttribute("alt")).toBe("Garden Hall");
+    expect(row?.textContent?.indexOf("Mangia Catering Co.")).toBe(0);
+    await act(async () => root.unmount());
   });
 
   it("keeps the signing control available when presentation hides the acceptance CTA and terms", async () => {

@@ -18,6 +18,7 @@ import {
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { useAllEventReportRows } from "./useEventsById";
+import { VenueBrandForm } from "./VenueBrandForm";
 import {
   CONTACT_DAYS,
   GRADE_MEANING,
@@ -368,6 +369,8 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
                 {busy === "checkin" ? "Saving…" : "Save check-in"}
               </button>
             </form>
+
+            <VenueBrandForm venue={venue} run={run} busy={busy} />
 
             {linkedSource ? (
               <p className="text-sm text-ink-3">

@@ -1,6 +1,7 @@
 // Proposal Revision Capture - Authored seam for proposal revision snapshotting
 
-import { internalMutation, mutation } from "../_generated/server";
+import { internalMutation, mutation, type QueryCtx } from "../_generated/server";
+import { storageNotOwnedElsewhere } from "../fileStorage";
 import { api, internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
@@ -116,6 +117,14 @@ export interface ProposalRevisionSnapshot {
   // proposal.venueName/venueAddress remain the always-present fallback then.
   // PL-VENUE-PROFILE operating facts are optional: absent on older revisions.
   venue: VenueFactsSnapshot | null;
+  // Venue Partner Playbook section 06: the partner venue whose logo shows
+  // next to the company's. Null when the venue is not a partner; absent on
+  // revisions made before co-branding.
+  partnerVenue?: {
+    name: string;
+    logoStorageId: string | null;
+    brandColor: string | null;
+  } | null;
   dishSelections: Array<{
     id: string;
     menuId: string;
@@ -182,16 +191,35 @@ export interface ProposalRevisionSnapshot {
 // venue — the free-text proposal.venueName/venueAddress remain the venue
 // identity in that case. Same-tenant guard is belt-and-braces; the FK
 // `references` already enforce tenant scoping.
-async function resolveVenueLogistics(
+async function linkedVenue(
   ctx: { db: any },
   proposal: Doc<"proposals">,
-): Promise<ProposalRevisionSnapshot["venue"]> {
+): Promise<Doc<"venues"> | null> {
   if (!proposal.eventId) return null;
   const event: any = await ctx.db.get(proposal.eventId);
   if (!event || event.tenantId !== proposal.tenantId) return null;
   if (!event.venueId) return null;
-  const venue = await liveVenue(ctx, proposal.tenantId, event.venueId);
-  return venue ? venueFactsSnapshot(venue) : null;
+  return await liveVenue(ctx, proposal.tenantId, event.venueId);
+}
+
+// Venue Partner Playbook section 06: a proposal for an event at a partner
+// venue carries the venue's name, logo and brand colour, frozen at send.
+// A logo file another company owns is never frozen (knowing a storage id
+// grants nothing).
+async function partnerVenueBrand(
+  ctx: { db: any },
+  venue: Doc<"venues"> | null,
+): Promise<ProposalRevisionSnapshot["partnerVenue"]> {
+  if (!venue || !venue.partnerTier) return null;
+  const logo = venue.logoStorageId;
+  return {
+    name: venue.name,
+    logoStorageId:
+      logo && (await storageNotOwnedElsewhere(ctx as QueryCtx, venue.tenantId, logo))
+        ? logo
+        : null,
+    brandColor: venue.brandColor ?? null,
+  };
 }
 
 // The tenant's customer-facing name from its live organization record (the
@@ -356,6 +384,7 @@ export async function buildProposalRevisionSnapshot(
         }))
     : [];
 
+  const venue = await linkedVenue(ctx, proposal);
   const snapshot: ProposalRevisionSnapshot = {
     proposal: {
       id: proposal._id.toString(),
@@ -388,7 +417,8 @@ export async function buildProposalRevisionSnapshot(
       name: client.clientType === "company" ? (client.companyName ?? "Unknown Company") : `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim() || "Unknown Client",
     },
     changeOf: await acceptedChangeSource(ctx, proposal),
-    venue: await resolveVenueLogistics(ctx, proposal),
+    venue: venue ? venueFactsSnapshot(venue) : null,
+    partnerVenue: await partnerVenueBrand(ctx, venue),
     dishSelections: dishSelectionsData,
     timeline: timelineData,
     lineItems: lineItemsData,
