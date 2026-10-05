@@ -13,6 +13,12 @@ import { PDFDocument } from "pdf-lib";
 import { api } from "../../convex/_generated/api";
 import { buildWorkbook } from "../../src/lib/eventPacket/buildWorkbook";
 import {
+  venueLeads,
+  type ReferralLeadRow,
+  type ReferralSourceRow,
+} from "../../src/features/facilities/venueReferrals";
+import { eventMatches } from "../../src/features/reports/reportFilters";
+import {
   action,
   emitted,
   eventRows,
@@ -115,7 +121,11 @@ const id = {
   truckRun: "",
 };
 
-async function submitAndConvert(eventDate: number, eventEndTime: number) {
+async function submitAndConvert(
+  eventDate: number,
+  eventEndTime: number,
+  referralSourceId?: string,
+) {
   const submitted = await action<{
     submissionId: string;
     isDuplicate: boolean;
@@ -123,6 +133,7 @@ async function submitAndConvert(eventDate: number, eventEndTime: number) {
     ...QUOTE,
     eventDate,
     eventEndTime,
+    ...(referralSourceId ? { referralSourceId } : {}),
   });
   expect(submitted.isDuplicate).toBe(false);
   const converted = await action<Converted>(
@@ -139,9 +150,25 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
     "golden event 01: Create or match a Client and Contact from a Lead/quote submission",
     async () => {
       w = await seedWorld();
+      // The inquiry came from a partner venue: its lead source is tied to
+      // the venue (venue attribution, AC-184).
+      const venue = await w.run.owner(M.Venue_createViaRegister, {
+        name: QUOTE.venueName,
+        venueType: "other",
+        capacity: 200,
+      });
+      const source = await w.run.sales(M.ReferralSource_createViaRegister, {
+        name: `${QUOTE.venueName} (venue referral)`,
+        code: "venue-hillside",
+      });
+      await w.run.sales(M.ReferralSource_linkVenue, {
+        docId: source.docId,
+        venueId: venue.docId,
+      });
       const first = await submitAndConvert(
         WEEK.golden.startsAt,
         WEEK.golden.endsAt,
+        source.docId,
       );
       id.client = first.clientId!;
       id.golden = first.eventId!;
@@ -166,11 +193,40 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         startsAt: number;
         expectedHeadcount: number;
         venueName: string | null;
+        referralSourceId?: string | null;
       }>(w.owner, id.golden);
       expect(golden.clientId).toBe(id.client);
       expect(golden.startsAt).toBe(WEEK.golden.startsAt);
       expect(golden.expectedHeadcount).toBe(FACTS.headcount);
       expect(golden.venueName).toBe(QUOTE.venueName);
+
+      // Venue attribution: the lead and the event both keep the source, so
+      // the venue's referral figures count a booked lead and a report
+      // filtered by that source holds the golden event only.
+      expect(golden.referralSourceId).toBe(source.docId);
+      const sent = venueLeads({
+        venueId: venue.docId,
+        sources: await liveRows<
+          ReferralSourceRow & { tenantId: string; deletedAt?: number | null }
+        >(w.owner, "referralSources", TENANT),
+        leads: await liveRows<
+          ReferralLeadRow & { tenantId: string; deletedAt?: number | null }
+        >(w.owner, "leads", TENANT),
+      });
+      expect(sent).toHaveLength(1);
+      expect(sent[0]!.convertedAt).toBeTruthy();
+      const rival = await readRow<{ referralSourceId?: string | null }>(
+        w.owner,
+        id.rival,
+      );
+      const bySource = { referralSourceId: source.docId };
+      const lookups = { venueOnPremise: new Map<string, boolean>() };
+      expect(
+        eventMatches({ _id: id.golden, ...golden }, bySource, lookups),
+      ).toBe(true);
+      expect(eventMatches({ _id: id.rival, ...rival }, bySource, lookups)).toBe(
+        false,
+      );
     },
     LONG,
   );

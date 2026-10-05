@@ -1751,8 +1751,8 @@ const COMMAND_DISPATCH = {
   },
   "FieldConfirmation.complete": {
     ref: api.mutations.FieldConfirmation_complete,
-    params: ["docId","outcome","observedAt","note","photoStorageId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"outcome","type":"FieldConfirmationOutcome","required":true},{"name":"observedAt","type":"datetime","required":false},{"name":"note","type":"string","required":false},{"name":"photoStorageId","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","outcome","observedAt","note","photoStorageId","answers","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"outcome","type":"FieldConfirmationOutcome","required":true},{"name":"observedAt","type":"datetime","required":false},{"name":"note","type":"string","required":false},{"name":"photoStorageId","type":"string","required":false},{"name":"answers","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "FieldConfirmation.countersign": {
     ref: api.mutations.FieldConfirmation_countersign,

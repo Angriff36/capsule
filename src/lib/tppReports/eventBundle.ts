@@ -14,6 +14,7 @@ export type EventBundleSource =
   | "beo"
   | "eventWorksheet"
   | "proposal"
+  | "eventMenu"
   | "packList"
   | "orderList"
   | "productionWorksheet"

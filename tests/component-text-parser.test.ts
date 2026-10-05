@@ -166,6 +166,108 @@ describe("ComponentTextParser", () => {
     expect(parsed.instructions).toContain("Blend all ingredients");
   });
 
+  it("reads the kitchen's own recipe sheets with no headings (work/recipes)", () => {
+    const parser = new ComponentTextParser();
+    const pesto = parser.parse(readFixture("kitchen/Basil_Pesto.txt"));
+    expect(pesto.name).toBe("BASIL PESTO");
+    expect([pesto.yieldQuantity, pesto.yieldUnit]).toEqual([3, "pound"]);
+    expect(pesto.lines).toHaveLength(5);
+    expect(pesto.instructions).toBe(
+      "1. BLEND ALL INGREDIENTS TOGETHER USING FOOD PROCESSOR\n2. FINAL SEASON WITH SALT AND PEPPER",
+    );
+
+    // Stages restart at 1; the steps keep their order, numbered straight through.
+    const mac = parser.parse(readFixture("kitchen/Cougar_Gold_Mac_Sauce.txt"));
+    expect([mac.yieldQuantity, mac.yieldUnit]).toEqual([5, "gallon"]);
+    expect(mac.lines).toHaveLength(13);
+    const steps = mac.instructions?.split("\n") ?? [];
+    expect(steps).toHaveLength(7);
+    expect(steps[0]).toBe("1. MELT BUTTER THEN ADD FLOUR");
+    expect(steps[2]).toBe("3. ADD TO ROUX AND USE IMMERSION BLENDER TO MIX");
+    expect(steps[6]).toMatch(/^7\. MIX CORNSTARCH/);
+    expect(mac.lines.at(-1)).toMatchObject({
+      name: "Water",
+      quantity: 0.25,
+      unit: "cup",
+    });
+
+    const butter = parser.parse(
+      readFixture("kitchen/Honey_Cinnamon_Butter.txt"),
+    );
+    expect(butter.lines[0]).toMatchObject({
+      name: "Whipped Butter Blend",
+      quantity: 1,
+      unit: "tub",
+      prepNotes: "ROOM TEMP",
+    });
+    expect(
+      parser.parse("Brine\nYields 1 gallon\n\n6 SPRIGS THYME\n").lines[0],
+    ).toMatchObject({ name: "Thyme", quantity: 6, unit: "each" });
+    expect(butter.lines.at(-1)).toMatchObject({
+      name: "Salt",
+      quantity: 1,
+      unit: "teaspoon",
+    });
+    expect(butter.instructions?.split("\n")).toHaveLength(2);
+  });
+
+  it("keeps sub-steps, wrapped step text and unmeasured lines from the macaroni salad sheet", () => {
+    // Typed from work/recipes/prep recipe1.jpg as it pastes from the doc.
+    const salad = new ComponentTextParser().parse(
+      readFixture("kitchen/Macaroni_Salad.txt"),
+    );
+    expect([salad.yieldQuantity, salad.yieldUnit]).toEqual([3, "quart"]);
+    expect(salad.lines.map((line) => line.name)).toEqual([
+      "Whole Milk",
+      "Mayonnaise",
+      "Brown Sugar",
+      "Salt And Pepper",
+      "Elbow Macaroni",
+      "Cider Vinegar",
+      "Scallions",
+      "Carrot",
+      "Celery Rib",
+    ]);
+    expect(salad.lines[3]).toMatchObject({ quantity: null, unit: null });
+    expect(salad.lines[6]).toMatchObject({
+      quantity: 4,
+      prepNotes: "sliced thin",
+    });
+    const steps = salad.instructions?.split("\n") ?? [];
+    expect(steps[0]).toBe("1. Make dressing");
+    expect(steps[1]).toBe(
+      "   a. Whisk ¾ cups milk, 1 ½ cup mayonnaise, sugar, 1/2 teaspoon salt, and 2 teaspoons pepper in bowl",
+    );
+    expect(steps[2]).toBe("2. Cook pasta");
+    expect(steps[4]).toBe(
+      "   b. Add 1 tablespoon salt and pasta and cook until very soft, about 15 minutes",
+    );
+    expect(steps.filter((step) => /^\d+\. /.test(step))).toHaveLength(4);
+    expect(steps).toHaveLength(15);
+  });
+
+  it("does not take a 'per 5 pounds of chicken' note or an ingredient amount as the yield", () => {
+    const parser = new ComponentTextParser();
+    const brine = parser.parse(readFixture("kitchen/BBQ_Chicken_Brine.txt"));
+    expect(brine.yieldQuantity).toBeNull();
+    expect(brine.warnings.join(" ")).toContain("Yield not found");
+    expect(brine.description).toBe("*PER 5 POUNDS AIRLINE CHICKEN BREAST*");
+    expect(brine.lines).toHaveLength(5);
+    expect(brine.lines[4]).toMatchObject({
+      name: "Whole Garlic Clove",
+      prepNotes: "FRESH",
+    });
+    expect(brine.instructions).toBe(
+      "1. BRING 2 CUPS WATER TO BOIL AND THOROUGHLY DISSOLVE SALT AND SUGAR. COMBINE WITH REMAINING COLD WATER, GARLIC, AND THYME. POUR OVER CHICKEN COMPLETELY SUBMERGING IT.",
+    );
+
+    const noYield = parser.parse("Pesto\n\n3 pounds basil\n1 cup oil\n");
+    expect(noYield.yieldQuantity).toBeNull();
+    expect(
+      parser.parse("Iced Tea\nYields 2 gallons\n\n4 tea bags\n").lines[0],
+    ).toMatchObject({ quantity: 4, unit: null });
+  });
+
   it("maps C / qts / gallons yield and unit aliases", () => {
     const parser = new ComponentTextParser();
     expect(parser.mapUnitAlias("C")).toBe("cup");

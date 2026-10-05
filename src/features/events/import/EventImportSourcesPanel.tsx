@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { TextReportSource } from "../../../lib/tppReports/loadEventBundleFromText";
+import { readPdfTextLinesInBrowser } from "../../../lib/tppReports/pdfTextReaderBrowser";
 import { isRtf, rtfToText } from "../../../lib/tppReports/rtfToText";
 import { XlsxReportGrid } from "../../../lib/tppReports/xlsxReportGrid";
 import { readXlsxWorkbookFromEntries } from "../../../lib/tppReports/xlsxWorkbookParser";
@@ -77,6 +78,18 @@ export function EventImportSourcesPanel({
         }
         continue;
       }
+      // A report printed to PDF: read its text lines here in the page.
+      if (/\.pdf$/i.test(file.name)) {
+        try {
+          const pdfLines = await readPdfTextLinesInBrowser(
+            new Uint8Array(await file.arrayBuffer()),
+          );
+          next.push({ name: file.name, text: "", pdfLines });
+        } catch {
+          setReadError(`${file.name} could not be read as a PDF.`);
+        }
+        continue;
+      }
       // TPP "Save As → Excel": unzip and read the workbook here in the page.
       if (/\.xlsx$/i.test(file.name)) {
         try {
@@ -94,7 +107,7 @@ export function EventImportSourcesPanel({
       }
       if (!/\.csv$/i.test(file.name)) {
         setReadError(
-          `${file.name}: only .rtf, .xlsx and .csv exports are read here. Save the report as Excel or CSV, or copy its text into the box above.`,
+          `${file.name}: only .pdf, .rtf, .xlsx and .csv reports are read here. Save the report as PDF, Excel or CSV, or copy its text into the box above.`,
         );
         continue;
       }
@@ -132,10 +145,10 @@ export function EventImportSourcesPanel({
 
       <div className="space-y-1">
         <label className="field-label">
-          Add TPP exports: BEO .rtf, or Excel / CSV reports (optional)
+          Add TPP reports: PDF, BEO .rtf, or Excel / CSV (optional)
           <input
             type="file"
-            accept=".rtf,.xlsx,.csv,text/csv,application/rtf,text/rtf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept=".pdf,.rtf,.xlsx,.csv,application/pdf,text/csv,application/rtf,text/rtf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             multiple
             className="input py-1.5"
             disabled={disabled}
@@ -147,10 +160,12 @@ export function EventImportSourcesPanel({
           />
           <span className="field-hint">
             A BEO saved from TPP as .rtf is read into the box above. Reports
-            saved as Excel or CSV (BEO, Event Worksheet, Production Worksheet,
-            Pack List, Proposal, Order List) are recognized by their content.
-            Where the worksheet and the BEO disagree, the worksheet count is
-            used and the disagreement is flagged for review on the event.
+            printed to PDF (BEO, Event Worksheet, Pack List, Event Menu, Battle
+            Board) or saved as Excel or CSV (BEO, Event Worksheet, Production
+            Worksheet, Pack List, Proposal, Order List) are recognized by their
+            content. Where the worksheet and the BEO disagree, the worksheet
+            count is used and the disagreement is flagged for review on the
+            event.
           </span>
         </label>
         {csvFiles.length > 0 ? (

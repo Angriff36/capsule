@@ -9,6 +9,13 @@
 //
 // Pure: convex/closeoutSources.ts loads the rows and calls this.
 
+import {
+  decodeAnswers,
+  keptLeftovers,
+  LEFTOVER_HANDLING_LABEL,
+  type MudaAnswers,
+} from "./eventPacket/finalLock/fieldFormAnswers";
+
 export type CloseoutLineKey =
   | "revenue"
   | "ingredient"
@@ -105,6 +112,11 @@ export type ProjectionAttribution = Versioned & {
   allocatedAmount: number;
 };
 export type ProjectionGuest = Versioned & { checkedInAt?: number | null };
+/** A signed food waste form (FieldConfirmation "field.muda", status done). */
+export type ProjectionFoodWasteForm = Versioned & {
+  completedAt?: number | null;
+  answers?: string | null;
+};
 export type ProjectionTruckRun = Versioned & {
   label: string;
   tripCost?: number | null;
@@ -128,6 +140,8 @@ export type CloseoutProjectionInput = {
   guests: ProjectionGuest[];
   /** The event's truck runs and vendor drops still on it (not released). */
   truckRuns?: ProjectionTruckRun[];
+  /** The event's signed food waste forms (the paper "Event Food MUDA"). */
+  foodWasteForms?: ProjectionFoodWasteForm[];
 };
 
 export type CloseoutCaptureValues = {
@@ -294,6 +308,40 @@ function ingredientLine(input: CloseoutProjectionInput): CloseoutLine {
   };
 }
 
+// The newest signed food waste form with readable answers. The lead's counts
+// are servings and pounds, not money, so they are listed beside the waste
+// line and give the guest count when nobody checked guests in.
+function foodWasteForm(input: CloseoutProjectionInput) {
+  let newest: { form: ProjectionFoodWasteForm; muda: MudaAnswers } | null =
+    null;
+  for (const form of live(input.foodWasteForms ?? [])) {
+    const answers = decodeAnswers(form.answers);
+    if (answers?.kind !== "muda") continue;
+    if (newest && (newest.form.completedAt ?? 0) >= (form.completedAt ?? 0))
+      continue;
+    newest = { form, muda: answers.muda };
+  }
+  return newest;
+}
+
+function leftoverText(muda: MudaAnswers) {
+  const left = keptLeftovers(muda).map((l) =>
+    l.kind === "appetizer"
+      ? `${l.item} ${plural(l.amount, "serving")}`
+      : `${l.item} ${l.amount} lb`,
+  );
+  const parts = [
+    left.length > 0 ? `Left over: ${left.join(", ")}` : "Nothing left over",
+  ];
+  if (muda.mainsHandling)
+    parts.push(LEFTOVER_HANDLING_LABEL[muda.mainsHandling].toLowerCase());
+  if (muda.staffError)
+    parts.push(
+      `staff mistake${muda.staffErrorNote.trim() ? `: ${muda.staffErrorNote.trim()}` : ""}`,
+    );
+  return parts.join(" · ");
+}
+
 function wasteLine(input: CloseoutProjectionInput): CloseoutLine {
   const sources: CloseoutSourceRecord[] = [];
   let total = 0;
@@ -305,6 +353,11 @@ function wasteLine(input: CloseoutProjectionInput): CloseoutLine {
     total += amount;
     sources.push(ref("wasteRecords", row, amount, "Waste logged"));
   }
+  const form = foodWasteForm(input);
+  if (form)
+    sources.push(
+      ref("fieldConfirmations", form.form, 0, leftoverText(form.muda)),
+    );
   return {
     key: "waste",
     label: "Waste",
@@ -455,6 +508,23 @@ function headcountLine(input: CloseoutProjectionInput): CloseoutLine {
   const checkedIn = live(input.guests).filter(
     (guest) => guest.checkedInAt != null,
   );
+  // Guests checked in one by one beat the lead's estimate; with no check-in,
+  // the count on the signed food waste form answers the line.
+  const form = checkedIn.length === 0 ? foodWasteForm(input) : null;
+  const counted = form?.muda.attendance;
+  if (form && counted != null && Number.isFinite(counted) && counted >= 0) {
+    return {
+      key: "headcount",
+      label: "Guests who came",
+      planned: input.event.expectedHeadcount ?? null,
+      actual: Math.trunc(counted),
+      complete: true,
+      note: "Counted on the food waste form",
+      sources: [
+        ref("fieldConfirmations", form.form, 0, "Guests counted by the lead"),
+      ],
+    };
+  }
   return {
     key: "headcount",
     label: "Guests who came",

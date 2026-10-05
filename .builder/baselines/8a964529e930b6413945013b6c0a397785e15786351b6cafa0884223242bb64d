@@ -27779,7 +27779,7 @@ export const ExternalRecordLink_verifyLink = mutation({
   },
 });
 
-async function __runFieldConfirmationComplete(ctx: MutationCtx, { docId, outcome, observedAt, note, photoStorageId, version }: any, __creation = false) {
+async function __runFieldConfirmationComplete(ctx: MutationCtx, { docId, outcome, observedAt, note, photoStorageId, answers, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -27818,6 +27818,7 @@ async function __runFieldConfirmationComplete(ctx: MutationCtx, { docId, outcome
       formCompletedById: user.personId,
       note: note,
       photoStorageId: photoStorageId,
+      answers: answers,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -27836,6 +27837,7 @@ export const FieldConfirmation_complete = mutation({
     observedAt: v.optional(v.number()),
     note: v.optional(v.string()),
     photoStorageId: v.optional(v.string()),
+    answers: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

@@ -2839,7 +2839,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - effects: EventStaffNeedReleased
   - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
 - `mutations.FieldConfirmation_complete` (FieldConfirmation.complete)
-  - inputs from the screen: outcome, observedAt, note, photoStorageId; filled by the server: none
+  - inputs from the screen: outcome, observedAt, note, photoStorageId, answers; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."; "This form is already signed."; and 5 more
@@ -4168,7 +4168,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 
 ## 9. Final Lock and event packet
 
-Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbookRow.tsx`, `events/packet/EventWorkbooksPage.tsx`, `events/packet/FieldFormCard.tsx`, `events/packet/FieldFormsPanel.tsx`, `events/packet/FinalLockQuestions.tsx`, `events/packet/OutsideChannelForm.tsx`, `events/review-flags/EventReviewFlagsPanel.tsx`, `events/review-flags/EventReviewFlagsSection.tsx`, `events/review-flags/ReviewFlagButton.tsx`, `events/review-flags/ReviewFlagInline.tsx`, `events/review-flags/useEventReviewFlags.ts`
+Screens (13): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbookRow.tsx`, `events/packet/EventWorkbooksPage.tsx`, `events/packet/FieldFormAnswerInputs.tsx`, `events/packet/FieldFormCard.tsx`, `events/packet/FieldFormsPanel.tsx`, `events/packet/FinalLockQuestions.tsx`, `events/packet/OutsideChannelForm.tsx`, `events/review-flags/EventReviewFlagsPanel.tsx`, `events/review-flags/EventReviewFlagsSection.tsx`, `events/review-flags/ReviewFlagButton.tsx`, `events/review-flags/ReviewFlagInline.tsx`, `events/review-flags/useEventReviewFlags.ts`
 
 ### Generated reads
 
@@ -4204,7 +4204,7 @@ Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
   - effects: EventExternalChannelUnlinked
   - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
 - `mutations.FieldConfirmation_complete` (FieldConfirmation.complete)
-  - inputs from the screen: outcome, observedAt, note, photoStorageId; filled by the server: none
+  - inputs from the screen: outcome, observedAt, note, photoStorageId, answers; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."; "This form is already signed."; and 5 more

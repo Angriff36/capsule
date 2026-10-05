@@ -1786,6 +1786,7 @@ export default defineSchema({
     outcome: v.optional(v.union(v.literal("all_good"), v.literal("problem"), v.null())),
     note: v.optional(v.union(v.string(), v.null())),
     photoStorageId: v.optional(v.union(v.string(), v.null())),
+    answers: v.optional(v.union(v.string(), v.null())),
     secondCompletedAt: v.optional(v.union(v.number(), v.null())),
     secondObservedAt: v.optional(v.union(v.number(), v.null())),
     formCheckedById: v.optional(v.union(v.string(), v.null())),

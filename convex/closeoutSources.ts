@@ -35,6 +35,7 @@ import {
   type CloseoutLineKey,
   type CloseoutProjection,
 } from "../src/lib/closeoutSourceProjection";
+import { MUDA_FORM_KEY } from "../src/lib/eventPacket/finalLock/fieldFormAnswers";
 
 // Mirrors financeAccess | eventManageAccess in src/foundation/base.manifest
 // (finance_staff, finance_manager, event_manager, admin, owner, system).
@@ -190,16 +191,25 @@ async function loadProjection(
   const eventId = String(event._id);
   const mine = <T extends { tenantId?: string }>(rows: T[]) =>
     rows.filter((row) => row.tenantId === tenantId);
-  const [invoices, waste, orders, rentals, issues, attributions, guests] =
-    await Promise.all([
-      byEvent(ctx, "invoices", eventId),
-      byEvent(ctx, "wasteRecords", eventId),
-      byEvent(ctx, "vendorOrders", eventId),
-      byEvent(ctx, "rentalOrderLines", eventId),
-      byEvent(ctx, "equipmentIssues", eventId),
-      byEvent(ctx, "revenueAttributions", eventId),
-      byEvent(ctx, "eventGuests", eventId),
-    ]);
+  const [
+    invoices,
+    waste,
+    orders,
+    rentals,
+    issues,
+    attributions,
+    guests,
+    forms,
+  ] = await Promise.all([
+    byEvent(ctx, "invoices", eventId),
+    byEvent(ctx, "wasteRecords", eventId),
+    byEvent(ctx, "vendorOrders", eventId),
+    byEvent(ctx, "rentalOrderLines", eventId),
+    byEvent(ctx, "equipmentIssues", eventId),
+    byEvent(ctx, "revenueAttributions", eventId),
+    byEvent(ctx, "eventGuests", eventId),
+    byEvent(ctx, "fieldConfirmations", eventId),
+  ]);
   const eventInvoices = mine(invoices as Doc<"invoices">[]);
   const payments = new Map<string, Doc<"payments">>();
   const creditMemos: Doc<"creditMemos">[] = [];
@@ -273,6 +283,11 @@ async function loadProjection(
     attributions: ids(mine(attributions as Doc<"revenueAttributions">[])),
     guests: ids(mine(guests as Doc<"eventGuests">[])),
     truckRuns: await truckRuns(ctx, tenantId, eventId),
+    foodWasteForms: ids(
+      mine(forms as Doc<"fieldConfirmations">[]).filter(
+        (form) => form.formKey === MUDA_FORM_KEY && form.status === "done",
+      ),
+    ),
   });
 }
 

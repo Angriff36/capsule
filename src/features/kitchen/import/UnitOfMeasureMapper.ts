@@ -60,6 +60,8 @@ const ALIASES: Record<string, UnitOfMeasure> = {
   pcs: "each",
   clove: "each",
   cloves: "each",
+  sprig: "each",
+  sprigs: "each",
   can: "each",
   cans: "each",
   bunch: "each",
@@ -124,6 +126,9 @@ const ALIASES: Record<string, UnitOfMeasure> = {
   melons: "melon",
   bottle: "bottle",
   bottles: "bottle",
+  // A tub of whipped butter is a purchase pack; it keeps its own unit.
+  tub: "tub",
+  tubs: "tub",
 };
 
 /**

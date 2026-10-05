@@ -8,12 +8,14 @@ import type {
 } from "./eventBundle";
 import { mergeEventBundle } from "./mergeEventBundle";
 import { parseBeoText } from "./parseBeoText";
+import { bundlePartFromPdfLines } from "./pdfReports";
+import type { PdfTextLine } from "./pdfTextReader";
 import { packetEvidenceFromText } from "../eventPacket/packetContract";
 
 /**
- * The browser's way in: pasted BEO / worksheet text plus any TPP CSV exports
- * the user dropped in. Everything here is plain strings, so it runs in the
- * page; the xlsx / pdf readers stay on the agent path.
+ * The browser's way in: pasted BEO / worksheet text plus any TPP exports
+ * the user dropped in. Files arrive already read in the page (CSV text, an
+ * unzipped .xlsx, a PDF's text lines), so everything here runs in the page.
  */
 
 export interface TextReportSource {
@@ -22,6 +24,8 @@ export interface TextReportSource {
   text: string;
   /** An .xlsx export, already unzipped and read in the page; text is "". */
   sheets?: readonly XlsxSheet[];
+  /** A report printed to PDF, its text lines read in the page; text is "". */
+  pdfLines?: readonly PdfTextLine[];
 }
 
 export interface TextBundleLoadResult {
@@ -52,6 +56,15 @@ export function loadEventBundleFromText(input: {
   ]) {
     let part: EventBundlePart | undefined;
     try {
+      if (file.pdfLines) {
+        part = bundlePartFromPdfLines(file.pdfLines);
+        if (part === undefined) unrecognized.push(file.name);
+        else {
+          parts.push(part);
+          recognized.push({ name: file.name, source: part.source });
+        }
+        continue;
+      }
       if (file.sheets) {
         part = bundlePartFromSheets(file.sheets);
         if (part === undefined) unrecognized.push(file.name);
@@ -81,7 +94,7 @@ export function loadEventBundleFromText(input: {
   const bundle = mergeEventBundle(parts);
   if (unrecognized.length > 0) {
     bundle.warnings.push(
-      `These files were not recognized as TPP reports: ${unrecognized.join(", ")}. Excel (.xlsx) and CSV exports (BEO, Event Worksheet, Production Worksheet, Pack List, Proposal, Order List) are read here; .pdf goes through the agent bundle import.`,
+      `These files were not recognized as TPP reports: ${unrecognized.join(", ")}. PDF, Excel (.xlsx) and CSV reports (BEO, Event Worksheet, Production Worksheet, Pack List, Event Menu, Battle Board, Proposal, Order List) are read here.`,
     );
   }
   return { bundle, recognized, unrecognized };
