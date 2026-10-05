@@ -750,6 +750,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.SignatureRequest_createViaRequestSignature, { "proposalRevisionId": "proposalRevisionId-signature-request-1", "proposalId": "proposalId-signature-request-1", "recipientEmail": "user1@example.com", "recipientName": "SignatureRequest 1", "recipientPersonId": "recipientPersonId-signature-request-1", "recipientContactId": "recipientContactId-signature-request-1", "provider": "demo-provider-1", "expiresAt": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.SignatureRequest_createViaRequestSignature, { "proposalRevisionId": "proposalRevisionId-signature-request-2", "proposalId": "proposalId-signature-request-2", "recipientEmail": "user2@example.com", "recipientName": "SignatureRequest 2", "recipientPersonId": "recipientPersonId-signature-request-2", "recipientContactId": "recipientContactId-signature-request-2", "provider": "demo-provider-2", "expiresAt": 1767355200000 } as any);
+  // SkillLevel → api.mutations.SkillLevel_createViaRate
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.SkillLevel_createViaRate, { "personId": "personId-skill-level-1", "trainingModuleId": "trainingModuleId-skill-level-1", "level": 1, "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.SkillLevel_createViaRate, { "personId": "personId-skill-level-2", "trainingModuleId": "trainingModuleId-skill-level-2", "level": 2, "note": "demo-note-2" } as any);
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
   // StaffChatReadCursor → api.mutations.StaffChatReadCursor_createViaOpen
   rowsAttempted += 1;
@@ -1728,6 +1733,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "SignatureRequest",
       "createMutation": "SignatureRequest_createViaRequestSignature",
+      "rowCount": 2
+    },
+    {
+      "entity": "SkillLevel",
+      "createMutation": "SkillLevel_createViaRate",
       "rowCount": 2
     },
     {
