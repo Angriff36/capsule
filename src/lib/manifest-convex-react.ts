@@ -472,6 +472,9 @@ import {
   LeadershipItemDropParamsSchema,
   LeadershipItemReopenParamsSchema,
   LeadershipItemReviseParamsSchema,
+  LeftoverDispositionRecordParamsSchema,
+  LeftoverDispositionRemoveParamsSchema,
+  LeftoverDispositionReviseParamsSchema,
   MenuArchiveParamsSchema,
   MenuDishAddParamsSchema,
   MenuDishRemoveParamsSchema,
@@ -7410,6 +7413,57 @@ export function useCreateLeadershipItem() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = LeadershipItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for LeftoverDisposition. */
+export function useListLeftoverDisposition() {
+  return useQuery(api.queries.listLeftoverDisposition);
+}
+
+/** Reactive get-by-id for LeftoverDisposition. Pass "skip" to suspend. */
+export function useGetLeftoverDisposition(id: string | "skip") {
+  return useQuery(api.queries.getLeftoverDisposition, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for LeftoverDisposition.record. */
+export function useLeftoverDispositionRecord() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeftoverDisposition.remove. */
+export function useLeftoverDispositionRemove() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeftoverDisposition.revise. */
+export function useLeftoverDispositionRevise() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for LeftoverDisposition.record. */
+export function useCreateLeftoverDisposition() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionRecordParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -14663,4 +14717,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1549 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1555 as const;

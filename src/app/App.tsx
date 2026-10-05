@@ -346,6 +346,11 @@ const CloseoutPage = lazy(() =>
     default: module.CloseoutPage,
   })),
 );
+const DonationSummaryPage = lazy(() =>
+  import("../features/finance/DonationSummaryPage").then((module) => ({
+    default: module.DonationSummaryPage,
+  })),
+);
 const PayrollPage = lazy(() =>
   import("../features/finance/PayrollPage").then((module) => ({
     default: module.PayrollPage,
@@ -1345,6 +1350,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <CloseoutPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/donations"
+              element={
+                <SupplyRoute>
+                  <DonationSummaryPage />
                 </SupplyRoute>
               }
             />

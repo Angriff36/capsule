@@ -2448,6 +2448,32 @@ export const LeadershipItemSchema = z.object({
 
 export type LeadershipItem = z.infer<typeof LeadershipItemSchema>;
 
+// Entity: LeftoverDisposition
+export const LeftoverDispositionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  disposition: z.enum(["donated", "returned_to_stock", "discarded"]).default("donated"),
+  itemDescription: z.string().default(""),
+  dispositionDate: z.string().default(""),
+  weightLb: z.number().nullable().optional(),
+  estimatedValue: z.number().nullable().optional(),
+  recipientOrganization: z.string().nullable().optional(),
+  recipientEin: z.string().nullable().optional(),
+  recipientAddress: z.string().nullable().optional(),
+  recipientContact: z.string().nullable().optional(),
+  receiptReference: z.string().nullable().optional(),
+  handlingNote: z.string().nullable().optional(),
+  note: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  recordedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type LeftoverDisposition = z.infer<typeof LeftoverDispositionSchema>;
+
 // Entity: MaterializationReceipt
 export const MaterializationReceiptSchema = z.object({
   id: z.string().uuid(),
@@ -9354,6 +9380,48 @@ export const LeadershipItemReviseParamsSchema = z.object({
 });
 
 export type LeadershipItemReviseParams = z.infer<typeof LeadershipItemReviseParamsSchema>;
+
+// Command: record on LeftoverDisposition
+export const LeftoverDispositionRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  disposition: z.enum(["donated", "returned_to_stock", "discarded"]),
+  itemDescription: z.string(),
+  dispositionDate: z.string(),
+  weightLb: z.number().optional(),
+  estimatedValue: z.number().optional(),
+  recipientOrganization: z.string().optional(),
+  recipientEin: z.string().optional(),
+  recipientAddress: z.string().optional(),
+  recipientContact: z.string().optional(),
+  receiptReference: z.string().optional(),
+  handlingNote: z.string().optional(),
+  note: z.string().optional(),
+});
+
+export type LeftoverDispositionRecordParams = z.infer<typeof LeftoverDispositionRecordParamsSchema>;
+
+// Command: remove on LeftoverDisposition
+export const LeftoverDispositionRemoveParamsSchema = z.object({});
+
+export type LeftoverDispositionRemoveParams = z.infer<typeof LeftoverDispositionRemoveParamsSchema>;
+
+// Command: revise on LeftoverDisposition
+export const LeftoverDispositionReviseParamsSchema = z.object({
+  disposition: z.enum(["donated", "returned_to_stock", "discarded"]),
+  itemDescription: z.string(),
+  dispositionDate: z.string(),
+  weightLb: z.number().optional(),
+  estimatedValue: z.number().optional(),
+  recipientOrganization: z.string().optional(),
+  recipientEin: z.string().optional(),
+  recipientAddress: z.string().optional(),
+  recipientContact: z.string().optional(),
+  receiptReference: z.string().optional(),
+  handlingNote: z.string().optional(),
+  note: z.string().optional(),
+});
+
+export type LeftoverDispositionReviseParams = z.infer<typeof LeftoverDispositionReviseParamsSchema>;
 
 // Command: archive on Menu
 export const MenuArchiveParamsSchema = z.object({

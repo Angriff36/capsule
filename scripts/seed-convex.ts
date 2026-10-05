@@ -445,6 +445,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-1", "title": "LeadershipItem 1", "ownerPersonId": "ownerPersonId-leadership-item-1", "dueAt": 1767268800000, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-2", "title": "LeadershipItem 2", "ownerPersonId": "ownerPersonId-leadership-item-2", "dueAt": 1767355200000, "notes": "demo-notes-2" } as any);
+  // LeftoverDisposition has multiple initialization commands (record, remove); using the selected initialization command: record.
+  // LeftoverDisposition → api.mutations.LeftoverDisposition_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.LeftoverDisposition_createViaRecord, { "eventId": "eventId-leftover-disposition-1", "disposition": "demo-disposition-1", "itemDescription": "demo-itemDescription-1", "dispositionDate": "demo-dispositionDate-1", "weightLb": 1, "estimatedValue": 1, "recipientOrganization": "demo-recipientOrganization-1", "recipientEin": "demo-recipientEin-1", "recipientAddress": "demo-recipientAddress-1", "recipientContact": "demo-recipientContact-1", "receiptReference": "demo-receiptReference-1", "handlingNote": "demo-handlingNote-1", "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.LeftoverDisposition_createViaRecord, { "eventId": "eventId-leftover-disposition-2", "disposition": "demo-disposition-2", "itemDescription": "demo-itemDescription-2", "dispositionDate": "demo-dispositionDate-2", "weightLb": 2, "estimatedValue": 2, "recipientOrganization": "demo-recipientOrganization-2", "recipientEin": "demo-recipientEin-2", "recipientAddress": "demo-recipientAddress-2", "recipientContact": "demo-recipientContact-2", "receiptReference": "demo-receiptReference-2", "handlingNote": "demo-handlingNote-2", "note": "demo-note-2" } as any);
   // skip MaterializationReceipt: no creation command in IR (2 rows unused)
   // Menu → api.mutations.Menu_createViaDraft
   rowsAttempted += 1;
@@ -1454,6 +1460,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "LeadershipItem",
       "createMutation": "LeadershipItem_createViaAdd",
+      "rowCount": 2
+    },
+    {
+      "entity": "LeftoverDisposition",
+      "createMutation": "LeftoverDisposition_createViaRecord",
       "rowCount": 2
     },
     {

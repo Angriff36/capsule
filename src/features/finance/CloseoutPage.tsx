@@ -30,6 +30,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
 import { EventFoodCostPanel } from "./EventFoodCostPanel";
+import { LeftoverDispositionPanel } from "./LeftoverDispositionPanel";
 import { EventEquipmentProblems } from "../events/EventEquipmentProblems";
 import { canReadEventFoodCost } from "../../lib/culinaryDemandClient";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -74,6 +75,9 @@ export function CloseoutPage() {
     null,
   );
   const [photoCloseoutId, setPhotoCloseoutId] = useState<string | null>(null);
+  const [leftoverCloseoutId, setLeftoverCloseoutId] = useState<string | null>(
+    null,
+  );
 
   const activeCloseouts = (closeouts ?? []).filter(
     (row) => row.deletedAt == null,
@@ -424,6 +428,20 @@ export function CloseoutPage() {
                             <button
                               className="btn btn-ghost btn-sm"
                               type="button"
+                              aria-expanded={leftoverCloseoutId === row._id}
+                              onClick={() =>
+                                setLeftoverCloseoutId((current) =>
+                                  current === row._id ? null : row._id,
+                                )
+                              }
+                            >
+                              {leftoverCloseoutId === row._id
+                                ? "Hide leftovers"
+                                : "Leftovers"}
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              type="button"
                               aria-expanded={photoCloseoutId === row._id}
                               onClick={() =>
                                 setPhotoCloseoutId((current) =>
@@ -470,6 +488,15 @@ export function CloseoutPage() {
                               eventId={String(row.eventId)}
                               busy={busy === `${row._id}:correct`}
                               onSubmit={submitCorrection(row._id)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                      {leftoverCloseoutId === row._id ? (
+                        <tr>
+                          <td colSpan={7} className="!p-3">
+                            <LeftoverDispositionPanel
+                              eventId={String(row.eventId)}
                             />
                           </td>
                         </tr>
