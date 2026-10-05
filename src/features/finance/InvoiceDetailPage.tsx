@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatDate,
   formatMoney,
@@ -710,9 +711,12 @@ export function InvoiceDetailPage() {
       <header className="supply-masthead invoice-doc-masthead">
         <div>
           <p className="eyebrow">
-            <Link className="text-link" to={FINANCE_ROUTES.invoices}>
+            <ReturnToListLink
+              fallback={FINANCE_ROUTES.invoices}
+              className="text-link"
+            >
               Invoices
-            </Link>{" "}
+            </ReturnToListLink>{" "}
             · Detail
           </p>
           <h1

@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatCount,
   formatDate,
@@ -140,6 +146,7 @@ function EventDetailContent({
 }) {
   const headerSentinelRef = useRef<HTMLDivElement>(null);
   const sectionScopeRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
@@ -250,7 +257,7 @@ function EventDetailContent({
     const next = new URLSearchParams(searchParams);
     next.set("tab", tab);
     next.delete("full");
-    setSearchParams(next, { replace: true });
+    setSearchParams(next, { replace: true, state: location.state });
   };
 
   const run = async (work: () => Promise<unknown>, okMessage = "Saved") => {
@@ -745,6 +752,12 @@ function EventDetailContent({
 
   return (
     <div ref={sectionScopeRef}>
+      <ReturnToListLink
+        fallback="/events"
+        className="text-link mb-4 inline-flex"
+      >
+        ← Back to events
+      </ReturnToListLink>
       <StickyRecordHeader
         title={event.title}
         facts={[

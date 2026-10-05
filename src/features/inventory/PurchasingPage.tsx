@@ -41,6 +41,7 @@ import { WeeklyDraftPanel } from "./WeeklyDraftPanel";
 import { currentWeeklyDraft, weeklyDraftLines } from "./weeklyDraftView";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { purchasingStockContext } from "./purchasingStockContext";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
 import { VendorPriceListImport } from "./VendorPriceListImport";
 import { SentOrderSurplusPanel } from "./SentOrderSurplusPanel";
@@ -59,6 +60,7 @@ import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 const policy = new SupplyLifecyclePolicy();
 
 export function PurchasingPage() {
+  const listOrigin = useListOrigin();
   const eventScope = useWorkingEventScope("purchasing");
   const needs = useListPurchaseNeed();
   const vendors = useListVendor();
@@ -580,6 +582,7 @@ export function PurchasingPage() {
                       <Link
                         className="text-link"
                         to={`/inventory/orders/${order._id}`}
+                        state={listOriginState(listOrigin)}
                       >
                         Review &amp; submit →
                       </Link>
@@ -697,6 +700,7 @@ export function PurchasingPage() {
                       <Link
                         className="text-link"
                         to={`/inventory/orders/${order._id}`}
+                        state={listOriginState(listOrigin)}
                       >
                         Open folio →
                       </Link>

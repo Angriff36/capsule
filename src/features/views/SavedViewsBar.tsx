@@ -12,6 +12,8 @@ type Props<S> = {
   currentState: S;
   /** Apply a saved view's state back onto the page. */
   onApply: (state: S) => void;
+  /** A URL-restored list state must take precedence over a saved default. */
+  hasExplicitState?: boolean;
 };
 
 /**
@@ -24,6 +26,7 @@ export function SavedViewsBar<S>({
   subjectArea,
   currentState,
   onApply,
+  hasExplicitState = false,
 }: Props<S>) {
   const { ready, views, save, setDefault, remove } = useSavedViews<S>(
     pageKey,
@@ -56,7 +59,7 @@ export function SavedViewsBar<S>({
 
   // Open the workspace on the user's default view exactly once.
   useEffect(() => {
-    if (!ready || appliedDefault.current) return;
+    if (!ready || appliedDefault.current || hasExplicitState) return;
     appliedDefault.current = true;
     const fallback = views.find((v) => v.isDefault);
     if (fallback) {

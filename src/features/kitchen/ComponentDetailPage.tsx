@@ -80,6 +80,7 @@ import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperati
 import { componentRestoreOutcome } from "./culinaryRecovery";
 import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
 import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { FieldHelp } from "../../ui/FieldHelp";
 
 const policy = new CulinaryLifecyclePolicy();
@@ -450,9 +451,12 @@ export function ComponentDetailPage() {
         sectionScopeRef={sectionScopeRef}
         headingId="recipe-detail-title"
       />
-      <Link to="/kitchen/components" className="culinary-studio-back">
+      <ReturnToListLink
+        fallback="/kitchen/components"
+        className="culinary-studio-back"
+      >
         ← Recipes
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {host}
       {failure ? (

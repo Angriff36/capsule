@@ -20,6 +20,11 @@ import {
   eventServiceStyleKey,
   NO_SERVICE_STYLE,
 } from "./eventServiceStyle";
+import { useListViewState } from "../list-state/useListViewState";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
+import type { ListField } from "../list-state/useListViewState";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { ListVisitManager, useListVisit } from "../list-state/ListVisitManager";
 
 /** Question tabs first (what is upcoming / needs action), then the stages. */
 type Tab = "upcoming" | "attention" | "all" | EventStage;
@@ -30,9 +35,69 @@ type EventsView = {
   style?: string;
 };
 
+type EventsListState = EventsView & { archived: boolean; limit: number };
+
 const DAY = 86_400_000;
 /** Rows per window; "Show more" adds another window (PL-SCALE). */
 const WINDOW = 200;
+
+const eventsListSchema: {
+  [K in keyof EventsListState]: ListField<EventsListState[K]>;
+} = {
+  tab: {
+    key: "view",
+    defaultValue: "upcoming",
+    parse: (value) =>
+      value === "upcoming" ||
+      value === "attention" ||
+      value === "all" ||
+      EVENT_STAGES.includes(value as EventStage)
+        ? (value as Tab)
+        : "upcoming",
+    serialize: (value) => value,
+  },
+  search: {
+    key: "q",
+    defaultValue: "",
+    parse: (value) => value ?? "",
+    serialize: (value) => value || null,
+  },
+  style: {
+    key: "style",
+    defaultValue: "",
+    parse: (value) => value ?? "",
+    serialize: (value) => value || null,
+  },
+  dir: {
+    key: "order",
+    defaultValue: "asc",
+    parse: (value) => (value === "desc" ? "desc" : "asc"),
+    serialize: (value) => value,
+  },
+  archived: {
+    key: "archived",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+  limit: {
+    key: "limit",
+    defaultValue: WINDOW,
+    parse: (value) => {
+      const parsed = Number(value);
+      return Number.isInteger(parsed) &&
+        parsed >= WINDOW &&
+        parsed <= 2000 &&
+        parsed % WINDOW === 0
+        ? parsed
+        : WINDOW;
+    },
+    serialize: (value) => String(value),
+  },
+};
+const eventsListState = new ListStateManager(eventsListSchema);
+const eventsVisits = new ListVisitManager();
+
 const DONE_STAGES = new Set(["completed", "cancelled", "closed_out"]);
 
 type EventRow = {
@@ -84,21 +149,15 @@ function timeLabel(startsAt: number | null | undefined): string {
 
 export function EventsListPage() {
   const navigate = useNavigate();
-  // Open on "Upcoming"; when nothing is upcoming, fall back to "All" so the
-  // page never opens empty. A user choice always wins.
-  const [chosenTab, setTab] = useState<Tab | null>(null);
-  const [search, setSearch] = useState("");
-  // Service style filter: "" = any style; otherwise a style id or "none".
-  const [style, setStyle] = useState("");
-  const [dir, setDir] = useState<"asc" | "desc">("asc");
+  const listOrigin = useListOrigin();
+  const [listState, setListState, hasExplicitState] =
+    useListViewState(eventsListState);
+  const visit = useListVisit(eventsVisits);
+  const { tab, search, style, dir, archived: showArchived, limit } = listState;
   const [filtersOpen, setFiltersOpen] = useState(false);
-  // Archived events stay out of the ledger until the operator asks for them.
-  const [showArchived, setShowArchived] = useState(false);
-  const [limit, setLimit] = useState(WINDOW);
   // The read takes the start of today, so it does not re-run every render.
   const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
   const now = Date.now();
-  const tab: Tab = chosenTab ?? "upcoming";
 
   // One date-ordered window of events, never the whole table (PL-SCALE).
   const ledger = useEventLedgerWindow({
@@ -113,11 +172,20 @@ export function EventsListPage() {
   });
   const events = ledger?.rows;
 
+  const [initialFallbackPending, setInitialFallbackPending] = useState(
+    visit.allowInitialDefaults,
+  );
   useEffect(() => {
-    if (chosenTab == null && ledger && ledger.upcomingCount === 0)
-      setTab("all");
-  }, [chosenTab, ledger]);
-  useEffect(() => setLimit(WINDOW), [tab, dir, showArchived, style]);
+    if (!visit.allowInitialDefaults || !initialFallbackPending || !ledger)
+      return;
+    setInitialFallbackPending(false);
+    if (ledger.upcomingCount === 0) setListState({ tab: "all" });
+  }, [
+    initialFallbackPending,
+    ledger,
+    setListState,
+    visit.allowInitialDefaults,
+  ]);
 
   const live = useMemo(() => events ?? [], [events]);
   const counts = {
@@ -248,7 +316,10 @@ export function EventsListPage() {
             type="button"
             role="tab"
             aria-selected={tab === t}
-            onClick={() => setTab(t)}
+            onClick={() => {
+              setInitialFallbackPending(false);
+              setListState({ tab: t, limit: WINDOW });
+            }}
             className={`h-11 cursor-pointer rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors md:h-9 ${
               tab === t
                 ? "bg-panel text-ink shadow-[0_1px_2px_rgb(30_40_36/0.15)]"
@@ -272,9 +343,13 @@ export function EventsListPage() {
           className="input h-11 w-44 md:h-9"
           aria-label="Filter by stage"
           value={stageFilter}
-          onChange={(e) =>
-            setTab(e.target.value ? (e.target.value as EventStage) : "all")
-          }
+          onChange={(e) => {
+            setInitialFallbackPending(false);
+            setListState({
+              tab: e.target.value ? (e.target.value as EventStage) : "all",
+              limit: WINDOW,
+            });
+          }}
         >
           <option value="">Any stage</option>
           {EVENT_STAGES.map((s) => (
@@ -290,7 +365,9 @@ export function EventsListPage() {
           className="input h-11 w-44 md:h-9"
           aria-label="Filter by service style"
           value={style}
-          onChange={(e) => setStyle(e.target.value)}
+          onChange={(e) =>
+            setListState({ style: e.target.value, limit: WINDOW })
+          }
         >
           <option value="">Any style</option>
           {styleChoices.map((choice) => (
@@ -302,7 +379,7 @@ export function EventsListPage() {
       </label>
       <input
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => setListState({ search: e.target.value })}
         placeholder="Search title, client, venue…"
         className="input h-11 min-w-0 flex-1 basis-56 md:h-9"
         aria-label="Filter events"
@@ -310,7 +387,9 @@ export function EventsListPage() {
       <button
         type="button"
         className="btn btn-ghost btn-sm h-11 md:h-8"
-        onClick={() => setDir((d) => (d === "asc" ? "desc" : "asc"))}
+        onClick={() =>
+          setListState({ dir: dir === "asc" ? "desc" : "asc", limit: WINDOW })
+        }
         aria-label={`Sort by date, currently ${dir === "asc" ? "soonest first" : "latest first"}`}
       >
         {dir === "asc" ? "Soonest first" : "Latest first"}
@@ -321,11 +400,9 @@ export function EventsListPage() {
           subjectArea="events"
           currentState={{ tab, search, dir, style }}
           onApply={(s) => {
-            setTab(s.tab);
-            setSearch(s.search);
-            setDir(s.dir);
-            setStyle(s.style ?? "");
+            setListState({ ...s, limit: WINDOW });
           }}
+          hasExplicitState={hasExplicitState || visit.restored}
         />
       </div>
     </>
@@ -360,7 +437,9 @@ export function EventsListPage() {
             type="button"
             className="btn btn-ghost"
             data-testid="events-show-archived"
-            onClick={() => setShowArchived((value) => !value)}
+            onClick={() =>
+              setListState({ archived: !showArchived, limit: WINDOW })
+            }
           >
             {showArchived ? "Hide archived" : "Show archived"}
           </button>
@@ -466,7 +545,11 @@ export function EventsListPage() {
                 {group.list.map((e) => (
                   <div
                     key={e._id}
-                    onClick={() => navigate(`/events/${e._id}`)}
+                    onClick={() =>
+                      navigate(`/events/${e._id}`, {
+                        state: listOriginState(listOrigin),
+                      })
+                    }
                     className="grid cursor-pointer grid-cols-[104px_minmax(0,1fr)_180px_78px_142px_104px] items-center gap-x-5 border-b border-line py-4 transition-colors hover:bg-inset max-md:grid-cols-1 max-md:gap-y-1.5 max-md:py-3.5"
                   >
                     <div>
@@ -482,6 +565,7 @@ export function EventsListPage() {
                     <div className="min-w-0">
                       <Link
                         to={`/events/${e._id}`}
+                        state={listOriginState(listOrigin)}
                         onClick={(click) => click.stopPropagation()}
                         className="font-display block truncate text-xl text-ink hover:underline"
                       >
@@ -508,6 +592,7 @@ export function EventsListPage() {
                       <StatusChip status={String(e.stage)} />
                       <Link
                         to={`/events/${e._id}`}
+                        state={listOriginState(listOrigin)}
                         onClick={(click) => click.stopPropagation()}
                         className="text-base text-brand underline underline-offset-4 md:hidden"
                       >
@@ -517,6 +602,7 @@ export function EventsListPage() {
                     <div className="text-right max-md:hidden">
                       <Link
                         to={`/events/${e._id}`}
+                        state={listOriginState(listOrigin)}
                         onClick={(click) => click.stopPropagation()}
                         className="text-base text-brand underline underline-offset-4"
                       >
@@ -535,7 +621,9 @@ export function EventsListPage() {
                 {" "}
                 <button
                   type="button"
-                  onClick={() => setLimit((current) => current + WINDOW)}
+                  onClick={() =>
+                    setListState({ limit: Math.min(2000, limit + WINDOW) })
+                  }
                   className="cursor-pointer text-brand underline underline-offset-4"
                 >
                   Show more
@@ -547,7 +635,7 @@ export function EventsListPage() {
                 {" "}
                 <button
                   type="button"
-                  onClick={() => setTab("all")}
+                  onClick={() => setListState({ tab: "all", limit: WINDOW })}
                   className="cursor-pointer text-brand underline underline-offset-4"
                 >
                   See all

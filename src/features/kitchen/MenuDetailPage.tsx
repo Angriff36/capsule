@@ -25,6 +25,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
 import { dishRecipeLinks, shareRecipeLines } from "./dishVersions";
@@ -324,9 +325,12 @@ export function MenuDetailPage() {
 
   return (
     <article className="culinary-document culinary-document-compact culinary-studio">
-      <Link to={kitchenCatalogPath("menus")} className="culinary-studio-back">
+      <ReturnToListLink
+        fallback={kitchenCatalogPath("menus")}
+        className="culinary-studio-back"
+      >
         ← Menu index
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {host}
       {failure ? (

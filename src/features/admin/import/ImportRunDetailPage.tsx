@@ -21,6 +21,7 @@ import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 import { classifyCommandFailure } from "../../events/CommandFailure";
+import { ReturnToListLink } from "../../list-state/listOrigin";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -169,12 +170,12 @@ export function ImportRunDetailPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center text-ink-3">
           <p>Import not found</p>
-          <Link
-            to={importRunsListPath()}
+          <ReturnToListLink
+            fallback={importRunsListPath()}
             className="text-brand hover:text-brand"
           >
             Back to imports
-          </Link>
+          </ReturnToListLink>
         </div>
       </div>
     );
@@ -485,12 +486,12 @@ export function ImportRunDetailPage() {
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div className="flex items-center gap-4">
-          <Link
-            to={importRunsListPath()}
+          <ReturnToListLink
+            fallback={importRunsListPath()}
             className="text-ink-2 hover:text-ink text-xs"
           >
             ← Imports
-          </Link>
+          </ReturnToListLink>
           <div className="h-6 w-px bg-line" />
         </div>
         <div className="mt-2">
