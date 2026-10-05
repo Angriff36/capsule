@@ -18,7 +18,7 @@ interface FormSetup {
   evidence: FieldEvidence;
   instructions: string;
   /** Which planned items the form lists for checking. */
-  items?: "pack" | "equipment";
+  items?: "pack" | "equipment" | "menu";
 }
 
 export const FIELD_FORMS: Record<string, FormSetup> = {
@@ -41,7 +41,7 @@ export const FIELD_FORMS: Record<string, FormSetup> = {
     owner: "driver",
     evidence: "none",
     instructions:
-      "Before the truck leaves: everything on the pack list is on board, hot and cold food is held right, and the event folder is in the truck.",
+      "The event lead fills this in before leaving the shop with the event: tick each line of the paperwork, walk through, team and vehicle checks.",
     items: "pack",
   },
   "field.takeoff-readiness": {
@@ -58,7 +58,7 @@ export const FIELD_FORMS: Record<string, FormSetup> = {
     owner: "lead",
     evidence: "none",
     instructions:
-      "On arrival: meet the contact, check the room against the setup plan, and write down anything that is different.",
+      "The event lead fills this in on arrival to get the lay of the land (about 5 minutes): meet the person in charge, walk the venue, agree the after-event plan.",
   },
   "field.buffet-drawing": {
     dueAt: "service",
@@ -70,7 +70,9 @@ export const FIELD_FORMS: Record<string, FormSetup> = {
     dueAt: "venue_departure",
     owner: "lead",
     evidence: "note",
-    instructions: "Count the food left over and the food thrown away.",
+    instructions:
+      "Count the food left over and the food thrown away. Be exact: use scales at the event or weigh it back at the kitchen. If you do not know a number, leave it out - a guess does harm.",
+    items: "menu",
   },
   "field.after-event": {
     dueAt: "venue_departure",
@@ -153,6 +155,9 @@ export function planFieldForms(
   const equipment = listItems(
     input.equipment.map((e) => `${e.name} x ${e.quantity}`),
   );
+  const menu = listItems([
+    ...new Set(input.dishes.map((d) => d.name.trim()).filter(Boolean)),
+  ]);
   return QUESTIONS.filter((q) => q.form && !existing.has(q.form)).map((q) => {
     const form = q.form!;
     const setup = FIELD_FORMS[form]!;
@@ -174,7 +179,9 @@ export function planFieldForms(
           ? pack
           : setup.items === "equipment"
             ? equipment
-            : null,
+            : setup.items === "menu"
+              ? menu
+              : null,
     };
   });
 }

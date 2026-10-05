@@ -16,6 +16,8 @@ export interface CompleteFieldForm {
   note?: string;
   /** An uploaded photo (see FieldFormCard's sign form). */
   photoStorageId?: string;
+  /** The filled-in paper form (fieldFormAnswers.encodeAnswers). */
+  answers?: string;
 }
 
 /** Sign-offs on day-of forms: the first person and the second person. */
@@ -31,6 +33,7 @@ function useFieldFormActions() {
         observedAt: input.observedAt,
         note: input.note?.trim() || undefined,
         photoStorageId: input.photoStorageId,
+        answers: input.answers,
       }),
     countersign: (form: FieldFormRow, note?: string, observedAt?: number) =>
       countersign({
