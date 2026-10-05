@@ -11,6 +11,8 @@ import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascad
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { formatDate, formatTime } from "../../lib/format";
 
 export const WASTE_REASON_LABELS: Record<string, string> = {
   spoilage: "Spoilage",
@@ -146,21 +148,30 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
         </label>
         <label className="field-label">
           Event
-          <select
+          <SearchSelect
             key={events?.length ? "events-ready" : "events-loading"}
             name="eventId"
-            className="input"
             defaultValue={workingId ?? ""}
-          >
-            <option value="">No event · kitchen operations</option>
-            {(events ?? [])
+            placeholder="No event · kitchen operations — or search…"
+            options={(events ?? [])
               .filter((item) => item.deletedAt == null)
-              .map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.title}
-                </option>
-              ))}
-          </select>
+              .map((item) => ({
+                id: item._id,
+                label: item.title,
+                // Same-name events (three "Ewing Wedding"s) differ by date.
+                hint:
+                  [
+                    item.startsAt
+                      ? `${formatDate(item.startsAt)} ${formatTime(item.startsAt)}`
+                      : null,
+                    "eventNumber" in item && item.eventNumber
+                      ? `#${item.eventNumber}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || null,
+              }))}
+          />
         </label>
         <label className="field-label">
           Notes
