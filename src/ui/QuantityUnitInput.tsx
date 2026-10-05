@@ -59,7 +59,7 @@ export function QuantityUnitInput({
       scope,
     );
     if (converted.status === "resolved") {
-      feedback = `≈ ${formatQuantity(converted.quantity)} ${normalizeUnit(canonicalUnit) ?? canonicalUnit} in catalog units`;
+      feedback = `= ${formatQuantity(converted.quantity)} ${normalizeUnit(canonicalUnit) ?? canonicalUnit}, the unit this is stocked in`;
     } else if (converted.status === "unresolved") {
       feedback = converted.reason;
       warning = true;

@@ -6,6 +6,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import { createPortal } from "react-dom";
 import { ActionMenu } from "./primitives";
 
 export type StickyRecordFact = {
@@ -215,7 +216,9 @@ export function StickyRecordHeader({
     });
   };
 
-  return (
+  // Rendered on <body>: a transformed page wrapper would otherwise become the
+  // fixed header's frame and carry it off screen as the page scrolls.
+  return createPortal(
     <div
       className="sticky-record-header"
       data-testid="sticky-record-header"
@@ -261,6 +264,7 @@ export function StickyRecordHeader({
         </button>
         {primaryAction}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
