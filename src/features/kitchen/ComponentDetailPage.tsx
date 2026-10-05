@@ -776,7 +776,11 @@ export function ComponentDetailPage() {
             <form className="culinary-line-form" onSubmit={submitLine}>
               <label className="field-label sm:col-span-2">
                 Ingredient
-                <IngredientOptionPicker ingredients={ingredients} required />
+                <IngredientOptionPicker
+                  ingredients={ingredients}
+                  required
+                  allowCreate
+                />
               </label>
               <label className="field-label">
                 Quantity

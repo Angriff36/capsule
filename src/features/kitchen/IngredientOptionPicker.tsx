@@ -7,6 +7,7 @@ import {
   rememberRecent,
 } from "../../ui/pickerSearch";
 import type { IngredientCatalogRow } from "./IngredientCatalogLabel";
+import { IngredientQuickCreate } from "./IngredientQuickCreate";
 
 const THUMB_CLASS =
   "h-14 w-14 rounded-xs object-cover flex items-center justify-center border border-dashed border-line bg-inset text-xs text-ink-3";
@@ -17,6 +18,8 @@ type Props = {
   required?: boolean;
   value?: string;
   onChange?: (ingredientId: string) => void;
+  /** Show "+ New ingredient" so a missing catalog row is made in place. */
+  allowCreate?: boolean;
 };
 
 function IngredientPickerThumb({
@@ -68,20 +71,28 @@ export function IngredientOptionPicker({
   required = false,
   value: controlledValue,
   onChange,
+  allowCreate = false,
 }: Props) {
   const [internalValue, setInternalValue] = useState("");
   const [filter, setFilter] = useState("");
   const [recentIds, setRecentIds] = useState(() => readRecents("ingredient"));
-  const selectedId = controlledValue ?? internalValue;
-  const rows = useMemo(
-    () =>
-      (ingredients ?? []).filter(
-        (row) =>
-          row.deletedAt == null &&
-          (row.status == null || row.status === "active"),
-      ),
-    [ingredients],
+  // A just-created ingredient, kept until the live catalog list catches up so
+  // the hidden select can hold its id.
+  const [justCreated, setJustCreated] = useState<IngredientCatalogRow | null>(
+    null,
   );
+  const selectedId = controlledValue ?? internalValue;
+  const rows = useMemo(() => {
+    const active = (ingredients ?? []).filter(
+      (row) =>
+        row.deletedAt == null &&
+        (row.status == null || row.status === "active"),
+    );
+    if (justCreated && !active.some((row) => row._id === justCreated._id)) {
+      return [justCreated, ...active];
+    }
+    return active;
+  }, [ingredients, justCreated]);
   // Typing ranks fuzzy matches; an empty filter pins the five recent picks.
   const { recentCount, filteredRows } = useMemo(() => {
     if (filter.trim()) {
@@ -201,6 +212,16 @@ export function IngredientOptionPicker({
         </p>
       ) : filteredRows.length === 0 ? (
         <p className="text-sm text-ink-3">No ingredients match that filter.</p>
+      ) : null}
+      {allowCreate ? (
+        <IngredientQuickCreate
+          initialName={filter}
+          onCreated={({ id, name: createdName }) => {
+            setJustCreated({ _id: id, name: createdName });
+            setFilter("");
+            pick(id);
+          }}
+        />
       ) : null}
     </div>
   );
