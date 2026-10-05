@@ -1,0 +1,77 @@
+use "./tasting.manifest"
+use "../culinary/menu-dish.manifest"
+
+enum TastingDishDecision { pending approved rejected maybe }
+
+entity TastingDish mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required tastingId: uuid
+  property required menuId: uuid
+  property required dishId: uuid
+  property required portionCount: int = 1
+  property required sortOrder: int = 0
+  property clientRating: int?
+  property clientFeedback: string?
+  property required decision: TastingDishDecision = "pending"
+  property appliedToProposalId: uuid?
+  property appliedAt: datetime?
+  property addedAt: datetime?
+
+  belongsTo tasting: Tasting fields [tenantId, tastingId] references [tenantId, id]
+  belongsTo menu: Menu fields [tenantId, menuId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  ref appliedToProposal: Proposal fields [tenantId, appliedToProposalId] references [tenantId, id]
+
+  constraint tastingDishValues: self.addedAt == null or (self.portionCount > 0 and self.sortOrder >= 0) "Portions must be positive and order cannot be negative"
+  constraint tastingDishRating: self.clientRating == null or (self.clientRating >= 1 and self.clientRating <= 5) "Rating must be between 1 and 5"
+
+  default policy tastingDishRead read: roleAllows(user.role, "salesAccess") "Sales staff may see tasting dishes"
+  default policy tastingDishWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update tasting dishes"
+  default policy tastingDishExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may manage tasting dishes"
+
+  command add(tastingId: uuid, menuId: uuid, dishId: uuid, portionCount: int, optional sortOrder: int) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.tasting != null and self.tasting.status == "scheduled"
+    guard self.menu != null and self.menu.status == "published"
+    guard self.dish != null and self.dish.status == "active"
+    constraint addValues: portionCount > 0 "Add at least one portion"
+    mutate tastingId = tastingId
+    mutate menuId = menuId
+    mutate dishId = dishId
+    mutate portionCount = portionCount
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate addedAt = now()
+    emit TastingDishAdded { tastingDishId: self.id tastingId: tastingId tenantId: self.tenantId }
+  }
+
+  command recordFeedback(decision: TastingDishDecision, optional clientRating: int, optional clientFeedback: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.tasting != null and (self.tasting.status == "scheduled" or self.tasting.status == "completed")
+    constraint feedbackRating: clientRating == null or (clientRating >= 1 and clientRating <= 5) "Rating must be between 1 and 5"
+    mutate decision = decision
+    mutate clientRating = clientRating
+    mutate clientFeedback = clientFeedback
+    emit TastingDishFeedbackRecorded { tastingDishId: self.id tastingId: self.tastingId tenantId: self.tenantId decision: decision }
+  }
+
+  command markOnProposal(proposalId: uuid) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.decision == "approved"
+    mutate appliedToProposalId = proposalId
+    mutate appliedAt = now()
+    emit TastingDishApplied { tastingDishId: self.id tastingId: self.tastingId tenantId: self.tenantId proposalId: proposalId }
+  }
+
+  store TastingDish in durable
+}
+
+query listTastingDishesByTasting(tastingId: uuid): TastingDish[] { filter self.tastingId == tastingId filter self.deletedAt == null sort self.sortOrder asc }
+event TastingDishAdded: "tasting_dish.added" { tastingDishId: string tastingId: string tenantId: string }
+event TastingDishFeedbackRecorded: "tasting_dish.feedback_recorded" { tastingDishId: string tastingId: string tenantId: string decision: TastingDishDecision }
+event TastingDishApplied: "tasting_dish.applied" { tastingDishId: string tastingId: string tenantId: string proposalId: string }

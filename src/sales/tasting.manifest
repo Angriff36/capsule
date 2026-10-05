@@ -1,0 +1,101 @@
+// Client tastings are a sales step. They intentionally remain separate from
+// Events so a sample service never contributes to event demand or labor.
+
+use "./lead.manifest"
+use "./proposal.manifest"
+
+enum TastingStatus {
+  scheduled
+  completed
+  selectionsApplied
+  cancelled
+}
+
+entity Tasting mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property leadId: uuid?
+  property proposalId: uuid?
+  property eventId: uuid?
+  property required scheduledAt: datetime
+  property required durationMinutes: int = 60
+  property location: string?
+  property required guestCount: int = 1
+  property attendeeNames: list<string>?
+  property notes: string?
+  property createdByPersonId: uuid?
+  property required status: TastingStatus = "scheduled"
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+  property selectionsAppliedAt: datetime?
+  property bookedAt: datetime?
+
+  ref lead: Lead fields [tenantId, leadId] references [tenantId, id]
+  ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref createdBy: Person fields [tenantId, createdByPersonId] references [tenantId, id]
+
+  constraint tastingSchedule: self.scheduledAt > 0 and self.durationMinutes > 0 and self.guestCount > 0 "Choose a date and time, a positive duration, and at least one tasting guest"
+  constraint tastingSalesLink: self.leadId != null or self.proposalId != null "Attach this tasting to a lead or proposal"
+
+  default policy tastingRead read: roleAllows(user.role, "salesAccess") "Sales staff may see tastings"
+  default policy tastingWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update tastings"
+  default policy tastingExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may manage tastings"
+
+  command schedule(scheduledAt: datetime, durationMinutes: int, guestCount: int, optional leadId: uuid, optional proposalId: uuid, optional eventId: uuid, optional location: string, optional attendeeNames: list<string>, optional notes: string) {
+    guard self.bookedAt == null
+    guard self.deletedAt == null
+    constraint scheduleSalesLink: leadId != null or proposalId != null "Attach this tasting to a lead or proposal"
+    constraint scheduleValues: scheduledAt > 0 and durationMinutes > 0 and guestCount > 0 "Choose a date and time, a positive duration, and at least one tasting guest"
+    mutate leadId = leadId
+    mutate proposalId = proposalId
+    mutate eventId = eventId
+    mutate scheduledAt = scheduledAt
+    mutate durationMinutes = durationMinutes
+    mutate guestCount = guestCount
+    mutate location = location
+    mutate attendeeNames = attendeeNames
+    mutate notes = notes
+    mutate createdByPersonId = user.personId
+    mutate bookedAt = now()
+    emit TastingScheduled { tastingId: self.id tenantId: self.tenantId }
+  }
+
+  command markTasted() {
+    guard self.deletedAt == null
+    guard self.status == "scheduled"
+    mutate status = "completed"
+    mutate completedAt = now()
+    emit TastingCompleted { tastingId: self.id tenantId: self.tenantId }
+  }
+
+  command cancel() {
+    guard self.deletedAt == null
+    guard self.status == "scheduled"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    emit TastingCancelled { tastingId: self.id tenantId: self.tenantId }
+  }
+
+  // Approved dishes were copied into the proposal menu (convex/tastingApply.ts).
+  command markSelectionsApplied(proposalId: uuid) {
+    guard self.deletedAt == null
+    guard self.status != "cancelled"
+    mutate proposalId = proposalId
+    mutate status = "selectionsApplied"
+    mutate selectionsAppliedAt = now()
+    emit TastingSelectionsApplied { tastingId: self.id tenantId: self.tenantId proposalId: proposalId }
+  }
+
+  store Tasting in durable
+}
+
+query listTastingsByLead(leadId: uuid): Tasting[] { filter self.leadId == leadId filter self.deletedAt == null sort self.scheduledAt desc }
+query listTastingsByProposal(proposalId: uuid): Tasting[] { filter self.proposalId == proposalId filter self.deletedAt == null sort self.scheduledAt desc }
+
+event TastingScheduled: "tasting.scheduled" { tastingId: string tenantId: string }
+event TastingCompleted: "tasting.completed" { tastingId: string tenantId: string }
+event TastingCancelled: "tasting.cancelled" { tastingId: string tenantId: string }
+event TastingSelectionsApplied: "tasting.selections_applied" { tastingId: string tenantId: string proposalId: string }
