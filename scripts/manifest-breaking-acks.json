@@ -2808,6 +2808,54 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "After-event social post: optional venue social handle for the tag; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.vibe",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional venue look; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.vibeWords",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional look in a few words; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.topFeature",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional stand-out feature; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.otherFeatures",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional other features; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.targetClient",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional who books it; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.competitivePosition",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional comparison with other venues; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.photoFocus",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional what to photograph; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.exclusiveItemIdea",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue selling profile: optional only-here dish idea; existing venues stay valid with none."
     }
   ]
 }

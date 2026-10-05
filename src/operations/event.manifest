@@ -90,6 +90,16 @@ enum VenuePartnerTier {
   full_event
 }
 
+// The venue looks of the playbook's Food Presentation Alignment Guide.
+enum VenueVibe {
+  rustic
+  modern_industrial
+  garden_outdoor
+  grand_ballroom
+  brewery_winery
+  warehouse_raw
+}
+
 enum RsvpStatus {
   pending
   confirmed
@@ -438,6 +448,18 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // The venue's social media handle, without "@" (playbook section 06: tag
   // the venue in every post about an event there). Set by setSocialHandle.
   property socialHandle: string?
+  // Venue selling profile (playbook section 09): the venue's look, what
+  // makes it special, who books it, and what to photograph there. The look
+  // picks the food presentation and serve style from the playbook's
+  // alignment guide. Set by setSellingProfile only.
+  property vibe: VenueVibe?
+  property vibeWords: string?
+  property topFeature: string?
+  property otherFeatures: string?
+  property targetClient: string?
+  property competitivePosition: string?
+  property photoFocus: string?
+  property exclusiveItemIdea: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
@@ -697,6 +719,33 @@ entity Venue mixin TenantScoped, SoftDeletable {
   command setSocialHandle(optional socialHandle: string) {
     guard self.deletedAt == null
     mutate socialHandle = socialHandle != null and length(trim(socialHandle)) > 0 ? trim(socialHandle) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The whole selling profile is stated on each save; a blank clears that
+  // line.
+  command setSellingProfile(
+    optional vibe: VenueVibe,
+    optional vibeWords: string,
+    optional topFeature: string,
+    optional otherFeatures: string,
+    optional targetClient: string,
+    optional competitivePosition: string,
+    optional photoFocus: string,
+    optional exclusiveItemIdea: string
+  ) {
+    guard self.deletedAt == null
+    mutate vibe = vibe
+    mutate vibeWords = vibeWords != null and length(trim(vibeWords)) > 0 ? trim(vibeWords) : null
+    mutate topFeature = topFeature != null and length(trim(topFeature)) > 0 ? trim(topFeature) : null
+    mutate otherFeatures = otherFeatures != null and length(trim(otherFeatures)) > 0 ? trim(otherFeatures) : null
+    mutate targetClient = targetClient != null and length(trim(targetClient)) > 0 ? trim(targetClient) : null
+    mutate competitivePosition = competitivePosition != null and length(trim(competitivePosition)) > 0 ? trim(competitivePosition) : null
+    mutate photoFocus = photoFocus != null and length(trim(photoFocus)) > 0 ? trim(photoFocus) : null
+    mutate exclusiveItemIdea = exclusiveItemIdea != null and length(trim(exclusiveItemIdea)) > 0 ? trim(exclusiveItemIdea) : null
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

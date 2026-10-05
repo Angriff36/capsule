@@ -4933,6 +4933,14 @@ export const VenueSchema = z.object({
   logoStorageId: z.string().nullable().optional(),
   brandColor: z.string().nullable().optional(),
   socialHandle: z.string().nullable().optional(),
+  vibe: z.enum(["rustic", "modern_industrial", "garden_outdoor", "grand_ballroom", "brewery_winery", "warehouse_raw"]).nullable().optional(),
+  vibeWords: z.string().nullable().optional(),
+  topFeature: z.string().nullable().optional(),
+  otherFeatures: z.string().nullable().optional(),
+  targetClient: z.string().nullable().optional(),
+  competitivePosition: z.string().nullable().optional(),
+  photoFocus: z.string().nullable().optional(),
+  exclusiveItemIdea: z.string().nullable().optional(),
   status: z.enum(["active", "inactive"]).default("active"),
   registeredAt: z.coerce.date().nullable().optional(),
   deactivatedAt: z.coerce.date().nullable().optional(),
@@ -13019,6 +13027,20 @@ export const VenueSetPartnershipParamsSchema = z.object({
 });
 
 export type VenueSetPartnershipParams = z.infer<typeof VenueSetPartnershipParamsSchema>;
+
+// Command: setSellingProfile on Venue
+export const VenueSetSellingProfileParamsSchema = z.object({
+  vibe: z.enum(["rustic", "modern_industrial", "garden_outdoor", "grand_ballroom", "brewery_winery", "warehouse_raw"]).optional(),
+  vibeWords: z.string().optional(),
+  topFeature: z.string().optional(),
+  otherFeatures: z.string().optional(),
+  targetClient: z.string().optional(),
+  competitivePosition: z.string().optional(),
+  photoFocus: z.string().optional(),
+  exclusiveItemIdea: z.string().optional(),
+});
+
+export type VenueSetSellingProfileParams = z.infer<typeof VenueSetSellingProfileParamsSchema>;
 
 // Command: setSiteFacts on Venue
 export const VenueSetSiteFactsParamsSchema = z.object({
