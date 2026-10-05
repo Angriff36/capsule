@@ -1,2 +1,2 @@
-# Resolved issues
+# Fixes Log
 
