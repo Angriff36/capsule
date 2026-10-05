@@ -20363,7 +20363,7 @@ export const listVenue = query({
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("venues").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone","dayOfContactName","dayOfContactPhone"], row)));
     return (__plainRows).map((__row) => { (__row as any).isActive = ((__row as any).status === "active"); return { ...(__row as any), isActive: (__row as any).isActive }; });
   },
 });
@@ -20380,7 +20380,7 @@ export const getVenue = query({
     if (doc && (doc as any).deletedAt != null) return null;
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
-    const __doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __rawDoc);
+    const __doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone","dayOfContactName","dayOfContactPhone"], __rawDoc);
     (__doc as any).isActive = ((__doc as any).status === "active");
     const __hydrated = { ...(__doc as any), isActive: (__doc as any).isActive };
     return __hydrated;
@@ -20397,7 +20397,7 @@ export const listVenueByTenantId = query({
     if (__tenant == null) return [];
     let rows = await ctx.db.query("venues").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone","dayOfContactName","dayOfContactPhone"], row)));
     return (__plainRows).map((__row) => { (__row as any).isActive = ((__row as any).status === "active"); return { ...(__row as any), isActive: (__row as any).isActive }; });
   },
 });
@@ -20413,7 +20413,7 @@ export const listVenueByGalleryToken = query({
     let rows = await ctx.db.query("venues").withIndex("by_galleryToken", (q) => q.eq("galleryToken", galleryToken)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone","dayOfContactName","dayOfContactPhone"], row)));
     return (__plainRows).map((__row) => { (__row as any).isActive = ((__row as any).status === "active"); return { ...(__row as any), isActive: (__row as any).isActive }; });
   },
 });
@@ -20429,7 +20429,7 @@ export const listVenueByPartnerOwnerPersonId = query({
     let rows = await ctx.db.query("venues").withIndex("by_partnerOwnerPersonId", (q) => q.eq("partnerOwnerPersonId", partnerOwnerPersonId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone","dayOfContactName","dayOfContactPhone"], row)));
     return (__plainRows).map((__row) => { (__row as any).isActive = ((__row as any).status === "active"); return { ...(__row as any), isActive: (__row as any).isActive }; });
   },
 });
