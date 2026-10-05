@@ -3305,7 +3305,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 
 ## 7. Pack list and warehouse
 
-Screens (29): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`, `logistics/EventTripChecks.tsx`, `logistics/LogisticsOverviewPage.tsx`, `logistics/PackFoodPackaging.tsx`, `logistics/PackingFloorPage.tsx`, `logistics/PackLineWhy.tsx`, `logistics/PackListDetailPage.tsx`, `logistics/PackListItemForm.tsx`, `logistics/PackListItemTable.tsx`, `logistics/PackListKitAssistBar.tsx`, `logistics/PackListSourcePanel.tsx`, `logistics/PackListsPage.tsx`, `logistics/PackListTemplatesPage.tsx`, `logistics/PackListViews.tsx`, `logistics/PackReadinessNotice.tsx`, `logistics/PackRuleFields.tsx`, `logistics/PackRulesPage.tsx`, `logistics/PackScanPanel.tsx`, `logistics/PackTemplatePreview.tsx`, `logistics/RoutePlannerPage.tsx`, `logistics/ServiceStyleKitLineFields.tsx`, `logistics/ServiceStyleKitLineTable.tsx`, `logistics/ServiceStyleKitsPage.tsx`, `logistics/TripCheckPanel.tsx`, `logistics/usePackRigs.ts`, `logistics/VehicleFleetPage.tsx`, `logistics/VehicleMaintenancePage.tsx`, `logistics/VehicleSchedulePage.tsx`
+Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`, `logistics/EventTripChecks.tsx`, `logistics/LogisticsOverviewPage.tsx`, `logistics/PackBinSheet.tsx`, `logistics/PackFoodPackaging.tsx`, `logistics/PackingFloorPage.tsx`, `logistics/PackLineWhy.tsx`, `logistics/PackListDetailPage.tsx`, `logistics/PackListItemForm.tsx`, `logistics/PackListItemTable.tsx`, `logistics/PackListKitAssistBar.tsx`, `logistics/PackListSourcePanel.tsx`, `logistics/PackListsPage.tsx`, `logistics/PackListTemplatesPage.tsx`, `logistics/PackListViews.tsx`, `logistics/PackReadinessNotice.tsx`, `logistics/PackRuleFields.tsx`, `logistics/PackRulesPage.tsx`, `logistics/PackScanPanel.tsx`, `logistics/PackTemplatePreview.tsx`, `logistics/RoutePlannerPage.tsx`, `logistics/ServiceStyleKitLineFields.tsx`, `logistics/ServiceStyleKitLineTable.tsx`, `logistics/ServiceStyleKitsPage.tsx`, `logistics/TripCheckPanel.tsx`, `logistics/usePackRigs.ts`, `logistics/VehicleFleetPage.tsx`, `logistics/VehicleMaintenancePage.tsx`, `logistics/VehicleSchedulePage.tsx`
 
 ### Generated reads
 
@@ -3480,6 +3480,13 @@ Screens (29): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
   - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: PackListItemRequirementSynced
   - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_setBin` (PackListItem.setBin)
+  - inputs from the screen: binNumber; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Use a bin number above zero."; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListItemBinSet
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
 - `mutations.PackListItem_setUnitVolume` (PackListItem.setUnitVolume)
   - inputs from the screen: unitVolumeM3; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -3577,6 +3584,13 @@ Screens (29): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: PackListAssistanceResolved
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_setBinSheet` (PackList.setBinSheet)
+  - inputs from the screen: binSheet; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "ConcurrencyConflict:"; "PackList not found"
+  - effects: PackListBinSheetSet
   - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
 - `mutations.PackList_startPacking` (PackList.startPacking)
   - inputs from the screen: none; filled by the server: none

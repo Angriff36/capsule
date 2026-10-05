@@ -17,6 +17,7 @@ export interface PackListItemRow extends PackLineFacts {
   description: string;
   note?: string | null;
   sentInstead?: string | null;
+  binNumber?: number | null;
   dishId?: string | null;
   requiredQuantity: number;
   packedQuantity: number;
@@ -157,6 +158,11 @@ export function PackListItemTable({
               </td>
               <td>
                 <strong>{packingItemDescription(item.description)}</strong>
+                {item.binNumber ? (
+                  <span className="ml-2 text-sm font-medium text-ink-2">
+                    Bin {item.binNumber}
+                  </span>
+                ) : null}
                 {item.dishId ? (
                   dishName(item.dishId) ? (
                     <small className="block">
@@ -305,6 +311,13 @@ export function PackListItemTable({
                   ))}
                   {canEditLines ? (
                     <>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() => onInvokeItem(item, "bin")}
+                      >
+                        {item.binNumber ? `Bin ${item.binNumber}` : "Bin"}
+                      </button>
                       <button
                         className="btn btn-ghost btn-sm"
                         disabled={busy != null}

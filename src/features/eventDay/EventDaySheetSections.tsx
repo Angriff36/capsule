@@ -16,6 +16,7 @@ import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import { loadWindowLabel } from "../facilities/venueOperatingFacts";
 import { vibeGuide } from "../facilities/venueSellingProfile";
+import { binColorSummary, binRows, parseBinSheet } from "../logistics/packBins";
 import {
   allergenLabel,
   deriveDishAllergens,
@@ -587,6 +588,19 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
               {String(list.name ?? "Pack list")} ·{" "}
               {formatStatusLabel(String(list.status))}
             </p>
+            {binColorSummary(
+              binRows(
+                items.map((row) => ({
+                  description: String(row.description ?? ""),
+                  binNumber: row.binNumber,
+                })),
+                parseBinSheet(list.binSheet),
+              ),
+            ).map((line) => (
+              <p key={line} className="evd-kicker">
+                {line}
+              </p>
+            ))}
             {items.length === 0 ? (
               <Empty>No items listed.</Empty>
             ) : (
@@ -597,9 +611,14 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
                   <Row
                     key={row._id}
                     title={String(row.description ?? "Item")}
-                    sub={[row.requiredQuantity, row.unit]
-                      .filter((part) => part != null && part !== "")
-                      .join(" ")}
+                    sub={[
+                      [row.requiredQuantity, row.unit]
+                        .filter((part) => part != null && part !== "")
+                        .join(" "),
+                      row.binNumber ? `Bin ${row.binNumber}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                     flag={missing ? "Missing" : packed ? "Packed" : undefined}
                     flagClass={missing ? "evd-missing" : "evd-tone-ok"}
                   />

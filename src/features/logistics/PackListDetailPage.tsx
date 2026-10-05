@@ -11,6 +11,7 @@ import {
   usePackListDispatch,
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
+  usePackListItemSetBin,
   usePackListItemAssignLoad,
   usePackListItemSetUnitVolume,
   usePackListItemSetUnitWeight,
@@ -61,6 +62,7 @@ import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PackScanPanel } from "./PackScanPanel";
 import { PackFoodPackaging } from "./PackFoodPackaging";
+import { PackBinSheet } from "./PackBinSheet";
 import { PackListSourcePanel } from "./PackListSourcePanel";
 import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
@@ -121,6 +123,7 @@ export function PackListDetailPage() {
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const annotateItem = usePackListItemAnnotate();
+  const setItemBin = usePackListItemSetBin();
   const excludeItem = usePackListItemExclude();
   const assignLoad = usePackListItemAssignLoad();
   const setUnitWeight = usePackListItemSetUnitWeight();
@@ -528,6 +531,7 @@ export function PackListDetailPage() {
       status: unknown;
       note?: string | null;
       sentInstead?: string | null;
+      binNumber?: number | null;
       checkedQuantity?: number | null;
       loadedQuantity?: number | null;
       returnedQuantity?: number | null;
@@ -674,6 +678,35 @@ export function PackListDetailPage() {
             ? "Saved what went out instead."
             : "Cleared what went out instead.",
         );
+      });
+      return;
+    }
+    if (key === "bin") {
+      const values = await prompt.askFields({
+        title: "Which bin is it in?",
+        description:
+          "Write the number on the black bin this line went in, so the crew can find it onsite. Leave it empty to clear it.",
+        confirmLabel: "Save bin",
+        fields: [
+          {
+            name: "bin",
+            label: "Bin number",
+            inputType: "number",
+            required: false,
+            defaultValue: item.binNumber ? String(item.binNumber) : "",
+          },
+        ],
+      });
+      if (!values) return;
+      const raw = values.bin?.trim() ?? "";
+      const binNumber = raw === "" ? undefined : Math.round(Number(raw));
+      void run(`${item._id}:bin`, async () => {
+        await setItemBin({
+          docId: item._id,
+          version: item.version,
+          binNumber,
+        });
+        setNotice(binNumber ? `In bin ${binNumber}.` : "Bin number cleared.");
       });
       return;
     }
@@ -1267,6 +1300,16 @@ export function PackListDetailPage() {
           reviewEventId={String(packList.eventId)}
         />
       </section>
+
+      <PackBinSheet
+        packList={{
+          _id: packList._id,
+          version: packList.version,
+          binSheet: packList.binSheet,
+          status: String(packList.status),
+        }}
+        lines={listItems}
+      />
 
       <PackFoodPackaging
         eventId={packList.eventId}
