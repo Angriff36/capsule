@@ -60,10 +60,17 @@ const NOTE_LINE =
  * change the shared catalog dish.
  */
 const INSTRUCTION_CUE =
-  /\b(?:on the side|away from|own (?:tray|platter|plate)|separate(?:ly)?|bride|groom|rare|medium|well[- ]done|less done|more done|overcook|undercook|dry|no |not |without|hold (?:the )?|omit|extra|double|half|only|instead|swap|substitut|allerg|gluten|dairy|vegan|vegetarian|kosher|halal|nut[- ]free|must|please|do not|don't|make sure|be sure|keep|serve|cook|prep|cut|slice|plate|label|warm|hot|cold|chill|reheat|tasting|last time|client (?:wants|asked|prefers)|per client)\b/i;
+  /\b(?:on the side|away from|own (?:tray|platter|plate)|separate(?:ly)?|bride|groom|rare|medium|well[- ]done|less done|more done|overcook|undercook|dry|no |not |without|hold (?:the )?|omit|extra|double|half|only|instead|swap|substitut|allerg|gluten|dairy|vegan|vegetarian|kosher|halal|nut[- ]free|must|please|do not|don't|make sure|be sure|keep|serve|cook|prep|cut|slice|plate|label|chill|reheat|tasting|last time|client (?:wants|asked|prefers)|per client)\b/i;
+/**
+ * "Hot" / "cold" / "warm" is an instruction when it leads ("Warm the rolls")
+ * or ends a phrase ("Pack cold"); before a noun it describes the dish
+ * ("Assorted cold crostini appetizers.").
+ */
+const TEMPERATURE_CUE =
+  /^(?:hot|cold|warm)\b|\b(?:hot|cold|warm)\b(?!\s+[a-z])/i;
 
 function looksLikeInstruction(text: string): boolean {
-  return INSTRUCTION_CUE.test(text);
+  return INSTRUCTION_CUE.test(text) || TEMPERATURE_CUE.test(text);
 }
 const PRINTED_FOOTER = /^printed date/i;
 const PAGE_FOOTER = /^page \d+( of \d+)?$/i;

@@ -194,6 +194,15 @@ describe("ComponentTextParser", () => {
     const butter = parser.parse(
       readFixture("kitchen/Honey_Cinnamon_Butter.txt"),
     );
+    expect(butter.lines[0]).toMatchObject({
+      name: "Whipped Butter Blend",
+      quantity: 1,
+      unit: "tub",
+      prepNotes: "ROOM TEMP",
+    });
+    expect(
+      parser.parse("Brine\nYields 1 gallon\n\n6 SPRIGS THYME\n").lines[0],
+    ).toMatchObject({ name: "Thyme", quantity: 6, unit: "each" });
     expect(butter.lines.at(-1)).toMatchObject({
       name: "Salt",
       quantity: 1,

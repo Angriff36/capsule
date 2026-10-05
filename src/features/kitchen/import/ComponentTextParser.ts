@@ -494,6 +494,11 @@ export class ComponentTextParser {
     name: string;
     prepNotes?: string;
   } {
+    // Kitchen sheets write the state after "@": "BUTTER BLEND @ ROOM TEMP".
+    const at = rest.match(/^(.+?)\s+@\s+(.+)$/);
+    if (at && !at[1].includes(",")) {
+      return { name: this.titleCase(at[1].trim()), prepNotes: at[2].trim() };
+    }
     const comma = rest.indexOf(",");
     if (comma < 0) {
       return { name: this.titleCase(rest) };
