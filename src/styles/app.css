@@ -4776,6 +4776,20 @@ div.tpp-parameter-wide {
     size: letter landscape;
     margin: 10mm;
   }
+  /* Client handouts (menus, venue packet) are portrait sheets; the app's
+     landscape default printed them sideways in the left half of the paper. */
+  body:has(.print-sheet--handout),
+  .print-sheet--handout {
+    page: handout;
+  }
+  .print-sheet--handout {
+    max-width: none !important;
+    box-shadow: none !important;
+  }
+  @page handout {
+    size: letter portrait;
+    margin: 0.5in;
+  }
   @page {
     size: landscape;
   }

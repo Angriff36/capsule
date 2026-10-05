@@ -13,6 +13,7 @@ import {
   serverRatioText,
 } from "./publicMenuText";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 /**
  * Public menu (spec CF-4-2). Anyone can open it; it lists the published
@@ -59,7 +60,7 @@ export function PublicMenuPage() {
         </div>
       </header>
 
-      <main className="print-sheet max-w-3xl mx-auto px-4 py-8 space-y-6">
+      <main className="print-sheet print-sheet--handout max-w-3xl mx-auto px-4 py-8 space-y-6">
         {company ? (
           <div className="flex items-center gap-3">
             {company.logoUrl ? (
@@ -110,7 +111,7 @@ export function PublicMenuPage() {
                 </p>
                 <p className="mt-1 text-xs text-ink-3">
                   {[
-                    sharedStyle,
+                    sharedStyle ? formatStatusLabel(sharedStyle) : null,
                     serverRatioText(menu.guestsPerServer),
                     guestRangeText(menu.minGuests, menu.maxGuests),
                     season,
@@ -148,7 +149,9 @@ export function PublicMenuPage() {
                             (tag) => dietMark(tag) === null,
                           );
                           const details = [
-                            sharedStyle ? null : dish.serviceStyle,
+                            sharedStyle || !dish.serviceStyle
+                              ? null
+                              : formatStatusLabel(dish.serviceStyle),
                             ...otherTags,
                           ].filter(Boolean);
                           return (
