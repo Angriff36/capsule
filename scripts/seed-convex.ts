@@ -150,6 +150,17 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.CutoverDecision_create, { "reason": "demo-reason-1", "rollbackPlan": "demo-rollbackPlan-1", "businessApproved": false } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.CutoverDecision_create, { "reason": "demo-reason-2", "rollbackPlan": "demo-rollbackPlan-2", "businessApproved": false } as any);
+  // DateHold has multiple initialization commands (extend, place); using the selected initialization command: place.
+  // DateHold → api.mutations.DateHold_createViaPlace
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DateHold_createViaPlace, { "holdDate": "demo-holdDate-1", "clientId": "clientId-date-hold-1", "leadId": "leadId-date-hold-1", "venueId": "venueId-date-hold-1", "expiresAt": 1, "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DateHold_createViaPlace, { "holdDate": "demo-holdDate-2", "clientId": "clientId-date-hold-2", "leadId": "leadId-date-hold-2", "venueId": "venueId-date-hold-2", "expiresAt": 2, "note": "demo-note-2" } as any);
+  // DateWaitlistEntry → api.mutations.DateWaitlistEntry_createViaJoin
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DateWaitlistEntry_createViaJoin, { "holdDate": "demo-holdDate-1", "clientId": "clientId-date-waitlist-entry-1", "leadId": "leadId-date-waitlist-entry-1", "note": "demo-note-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DateWaitlistEntry_createViaJoin, { "holdDate": "demo-holdDate-2", "clientId": "clientId-date-waitlist-entry-2", "leadId": "leadId-date-waitlist-entry-2", "note": "demo-note-2" } as any);
   // DeckShareLink → api.mutations.DeckShareLink_create
   rowsAttempted += 1;
   await client.mutation(api.mutations.DeckShareLink_create, { "attachmentId": "attachmentId-deck-share-link-1", "audience": "demo-audience-1", "expiresAt": 1767268800000 } as any);
@@ -1118,6 +1129,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "CutoverDecision",
       "createMutation": "CutoverDecision_create",
+      "rowCount": 2
+    },
+    {
+      "entity": "DateHold",
+      "createMutation": "DateHold_createViaPlace",
+      "rowCount": 2
+    },
+    {
+      "entity": "DateWaitlistEntry",
+      "createMutation": "DateWaitlistEntry_createViaJoin",
       "rowCount": 2
     },
     {

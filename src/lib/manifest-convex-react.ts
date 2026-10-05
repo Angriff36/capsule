@@ -115,6 +115,15 @@ import {
   CutoverDecisionRecordApprovalsParamsSchema,
   CutoverDecisionRollbackParamsSchema,
   CutoverDecisionSetTppReadOnlyParamsSchema,
+  DateHoldConvertParamsSchema,
+  DateHoldExpireParamsSchema,
+  DateHoldExtendParamsSchema,
+  DateHoldPlaceParamsSchema,
+  DateHoldReleaseParamsSchema,
+  DateWaitlistEntryJoinParamsSchema,
+  DateWaitlistEntryOfferParamsSchema,
+  DateWaitlistEntryPromoteParamsSchema,
+  DateWaitlistEntryWithdrawParamsSchema,
   DeckShareLinkCreateParamsSchema,
   DeckShareLinkRevokeParamsSchema,
   DeliveryCancelParamsSchema,
@@ -2632,6 +2641,138 @@ export function useCutoverDecisionSetTppReadOnly() {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = CutoverDecisionSetTppReadOnlyParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Reactive list for DateHold. */
+export function useListDateHold() {
+  return useQuery(api.queries.listDateHold);
+}
+
+/** Reactive get-by-id for DateHold. Pass "skip" to suspend. */
+export function useGetDateHold(id: string | "skip") {
+  return useQuery(api.queries.getDateHold, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DateHold.convert. */
+export function useDateHoldConvert() {
+  const mutate = useMutation(api.mutations.DateHold_convert);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldConvertParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.expire. */
+export function useDateHoldExpire() {
+  const mutate = useMutation(api.mutations.DateHold_expire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldExpireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.extend. */
+export function useDateHoldExtend() {
+  const mutate = useMutation(api.mutations.DateHold_extend);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldExtendParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.place. */
+export function useDateHoldPlace() {
+  const mutate = useMutation(api.mutations.DateHold_place);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.release. */
+export function useDateHoldRelease() {
+  const mutate = useMutation(api.mutations.DateHold_release);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldReleaseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for DateHold.place. */
+export function useCreateDateHold() {
+  const mutate = useMutation(api.mutations.DateHold_createViaPlace);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for DateWaitlistEntry. */
+export function useListDateWaitlistEntry() {
+  return useQuery(api.queries.listDateWaitlistEntry);
+}
+
+/** Reactive get-by-id for DateWaitlistEntry. Pass "skip" to suspend. */
+export function useGetDateWaitlistEntry(id: string | "skip") {
+  return useQuery(api.queries.getDateWaitlistEntry, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DateWaitlistEntry.join. */
+export function useDateWaitlistEntryJoin() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_join);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryJoinParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateWaitlistEntry.offer. */
+export function useDateWaitlistEntryOffer() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_offer);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryOfferParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateWaitlistEntry.promote. */
+export function useDateWaitlistEntryPromote() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_promote);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryPromoteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateWaitlistEntry.withdraw. */
+export function useDateWaitlistEntryWithdraw() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_withdraw);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryWithdrawParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for DateWaitlistEntry.join. */
+export function useCreateDateWaitlistEntry() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_createViaJoin);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryJoinParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
 }
 
@@ -14370,4 +14511,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1518 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1533 as const;

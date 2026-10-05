@@ -122,6 +122,8 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
+      dateHolds,
+      dateWaitlistEntries,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -288,7 +290,42 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
+      // Date holds and their waitlist: low-volume sales rows (listDateHold /
+      // listDateWaitlistEntry read guard; the tray prompt is for sales).
+      when(can(auth, "salesAccess"), () =>
+        ctx.db.query("dateHolds").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "salesAccess"), () =>
+        ctx.db
+          .query("dateWaitlistEntries")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
     ]);
+
+    // Names of waiting clients, tenant-checked, for the date-opened prompt.
+    const clientNames: Record<string, string> = {};
+    await Promise.all(
+      [
+        ...new Set(
+          (dateWaitlistEntries ?? [])
+            .filter((row) => row.status === "waiting" && row.clientId)
+            .map((row) => String(row.clientId)),
+        ),
+      ].map(async (id) => {
+        const clientId = ctx.db.normalizeId("clients", id);
+        const client = clientId ? await ctx.db.get(clientId) : null;
+        if (client && client.tenantId === tenantId) {
+          const person = [client.givenName, client.familyName]
+            .filter(Boolean)
+            .join(" ");
+          clientNames[id] =
+            client.clientType === "company"
+              ? (client.companyName ?? person)
+              : person || (client.companyName ?? "");
+        }
+      }),
+    );
 
     // A mention hides once its channel has been read. The caller's cursor is
     // read per mention channel through the (channel, account) index, never
@@ -413,6 +450,9 @@ export const listNotifications = query({
       staffChatReadCursors,
       mentionEventTitles,
       eventTitles,
+      dateHolds,
+      dateWaitlistEntries,
+      clientNames,
     });
   },
 });

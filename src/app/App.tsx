@@ -430,6 +430,11 @@ const LeadPipelinePage = lazy(() =>
     default: module.LeadPipelinePage,
   })),
 );
+const DateHoldsPage = lazy(() =>
+  import("../features/sales/DateHoldsPage").then((module) => ({
+    default: module.DateHoldsPage,
+  })),
+);
 const QuoteSubmissionsReviewPage = lazy(() =>
   import("../features/sales/QuoteSubmissionsReviewPage").then((module) => ({
     default: module.QuoteSubmissionsReviewPage,
@@ -1479,6 +1484,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <QuoteSubmissionsReviewPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/date-holds"
+              element={
+                <SupplyRoute>
+                  <DateHoldsPage />
                 </SupplyRoute>
               }
             />

@@ -24,6 +24,7 @@ import {
   validateEventWizardStep,
   type EventWizardDraft,
 } from "./eventCreateWizardModel";
+import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
 
 const DRAFT_KEY = "capsule.event-create-wizard.active";
 const lineId = () =>
@@ -420,6 +421,9 @@ function ScheduleStep({
       {field("Event type", "eventType")}
       {field("Start", "startsAt", "datetime-local")}
       {field("End", "endsAt", "datetime-local")}
+      <div className="sm:col-span-2">
+        <DateHoldCollisionNotice dateKey={draft.startsAt.slice(0, 10)} />
+      </div>
       {field("Headcount", "expectedHeadcount", "number", "1")}
       {field("Budget", "budgetAmount", "number", "0")}
       {field("Quoted price", "quotedPrice", "number", "0")}

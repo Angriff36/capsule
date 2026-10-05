@@ -20,6 +20,7 @@ describe("Clients CRM routes and lifecycle bindings", () => {
       "/clients/retention",
       "/clients/quote-requests",
       "/clients/inbox",
+      "/clients/date-holds",
     ]);
   });
 
