@@ -12993,7 +12993,7 @@ export type VenueRegisterParams = z.infer<typeof VenueRegisterParamsSchema>;
 // Command: setPartnership on Venue
 export const VenueSetPartnershipParamsSchema = z.object({
   partnerTier: z.enum(["catering_only", "catering_rentals", "full_event"]).optional(),
-  partnerOwnerPersonId: z.string().uuid().optional(),
+  partnerOwnerPersonId: z.string().min(1).optional(),
   opsEaseScore: z.number().optional(),
   relationshipScore: z.number().optional(),
 });

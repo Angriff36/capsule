@@ -40,6 +40,7 @@ entity ReferralSource mixin TenantScoped, SoftDeletable {
 
   // Leads using this referral source (inverse relation)
   hasMany leads: Lead
+  ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
 

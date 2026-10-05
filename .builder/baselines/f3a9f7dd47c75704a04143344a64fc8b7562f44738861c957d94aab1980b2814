@@ -55483,6 +55483,7 @@ export const ReferralSource_activate = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runReferralSourceActivate(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -55548,6 +55549,7 @@ export const ReferralSource_deactivate = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runReferralSourceDeactivate(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -55597,7 +55599,7 @@ export const ReferralSource_linkVenue = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runReferralSourceLinkVenue(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -55670,6 +55672,7 @@ export const ReferralSource_register = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runReferralSourceRegister(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -55693,6 +55696,7 @@ export const ReferralSource_createViaRegister = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, code, sortOrder, description } = args;
@@ -55785,6 +55789,7 @@ export const ReferralSource_reviseDetails = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"}]);
     const __result = await __runReferralSourceReviseDetails(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71337,6 +71342,7 @@ export const Venue_activate = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueActivate(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71390,6 +71396,7 @@ export const Venue_changeCapacity = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueChangeCapacity(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71457,6 +71464,7 @@ export const Venue_deactivate = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueDeactivate(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71568,6 +71576,7 @@ export const Venue_register = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueRegister(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71616,6 +71625,7 @@ export const Venue_createViaRegister = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes } = args;
@@ -71761,7 +71771,7 @@ export const Venue_setPartnership = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueSetPartnership(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71824,6 +71834,7 @@ export const Venue_setSiteFacts = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueSetSiteFacts(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71874,6 +71885,7 @@ export const Venue_setTimeZone = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueSetTimeZone(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -71980,6 +71992,7 @@ export const Venue_updateDetails = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"partnerOwnerPersonId","table":"people"}]);
     const __result = await __runVenueUpdateDetails(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);

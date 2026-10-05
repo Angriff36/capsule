@@ -436,6 +436,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property deactivationReason: string?
 
   hasMany events: Event
+  ref partnerOwner: Person fields [tenantId, partnerOwnerPersonId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
 

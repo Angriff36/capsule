@@ -3495,12 +3495,13 @@ export default defineSchema({
     registeredAt: v.optional(v.union(v.number(), v.null())),
     deactivatedAt: v.optional(v.union(v.number(), v.null())),
     deactivationReason: v.optional(v.union(v.string(), v.null())),
-    venueId: v.optional(v.union(v.string(), v.null())),
+    venueId: v.optional(v.union(v.id("venues"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_venueId", ["venueId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   rentalOrderLines: defineTable({
     tenantId: v.string(),
@@ -4575,7 +4576,7 @@ export default defineSchema({
     permitsInsuranceNotes: v.optional(v.union(v.string(), v.null())),
     restrictions: v.optional(v.union(v.string(), v.null())),
     partnerTier: v.optional(v.union(v.literal("catering_only"), v.literal("catering_rentals"), v.literal("full_event"), v.null())),
-    partnerOwnerPersonId: v.optional(v.union(v.string(), v.null())),
+    partnerOwnerPersonId: v.optional(v.union(v.id("people"), v.null())),
     partnerSince: v.optional(v.union(v.number(), v.null())),
     opsEaseScore: v.optional(v.union(v.number(), v.null())),
     relationshipScore: v.optional(v.union(v.number(), v.null())),
@@ -4588,6 +4589,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_partnerOwnerPersonId", ["partnerOwnerPersonId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   venueCommissionTerms: defineTable({
     tenantId: v.string(),
