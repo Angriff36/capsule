@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
+import { staffNeedDemandSummary } from "./eventStaffNeedDemand";
+import { StaffNeedSuggestions } from "./StaffNeedSuggestions";
+import {
+  StaffNeedWaitlist,
+  type StaffNeedWaitlistControls,
+} from "./StaffNeedWaitlist";
 import {
   EventTimelineStaffRoster,
   type PersonRow,
@@ -19,6 +25,14 @@ export type EventStaffNeedRow = StaffNeedRow & {
   readonly cancellationReason?: string | null;
   readonly previousStaffNeedId?: string | null;
   readonly coverageContinuedAt?: number | null;
+  readonly qualificationName?: string | null;
+  readonly certificationType?: string | null;
+  readonly skills?: string | null;
+  readonly uniform?: string | null;
+  readonly workLocation?: string | null;
+  readonly payBasis?: string | null;
+  readonly budgetHourlyRate?: number | null;
+  readonly templateSlot?: number | null;
 };
 
 /** Renders the "Edit times" control for one assignment or staffing request. */
@@ -69,24 +83,21 @@ function AvailabilityChips({
   const chips: ReactNode[] = [];
   if (conflict.overlappingShifts.length > 0) {
     chips.push(
-      <span key="shift" className="chip border-warn/30 bg-warn-soft text-warn">
+      <span key="shift" className="chip chip-tone-warn">
         Overlapping shift
       </span>,
     );
   }
   if (conflict.approvedOff.length > 0) {
     chips.push(
-      <span
-        key="off"
-        className="chip border-danger/30 bg-danger-soft text-danger"
-      >
+      <span key="off" className="chip chip-tone-danger">
         Approved time off
       </span>,
     );
   }
   if (chips.length === 0 && conflict.available) {
     chips.push(
-      <span key="ok" className="chip border-ok/30 bg-ok-soft text-ok">
+      <span key="ok" className="chip chip-tone-ok">
         Window ok
       </span>,
     );
@@ -114,6 +125,8 @@ export function EventStaffingCoverageView({
   onReleaseClaim,
   onCancel,
   onChangeCoverage,
+  onDescribeDemand,
+  waitlist,
   timingControl,
   conflictsFor,
 }: {
@@ -133,6 +146,8 @@ export function EventStaffingCoverageView({
   onReleaseClaim?: (need: EventStaffNeedRow) => void;
   onCancel: (need: EventStaffNeedRow) => void;
   onChangeCoverage?: (need: EventStaffNeedRow) => void;
+  onDescribeDemand?: (need: EventStaffNeedRow) => void;
+  waitlist?: StaffNeedWaitlistControls;
   timingControl?: StaffTimingControlRenderer;
   conflictsFor: (
     personId: string,
@@ -200,6 +215,22 @@ export function EventStaffingCoverageView({
                           ? ` · ${formatTime(entry.startsAt)}`
                           : ""}
                       </p>
+                      {coveredNeeds.some((need) => need.qualificationName) ? (
+                        <p
+                          className="text-xs text-ink-2"
+                          data-testid="event-staffing-roster-requirement"
+                        >
+                          {coveredNeeds
+                            .flatMap((need) =>
+                              need.qualificationName
+                                ? [
+                                    `${need.qualificationName} certificate on file`,
+                                  ]
+                                : [],
+                            )
+                            .join(" · ")}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="block px-3 py-2 md:table-cell align-top font-mono text-xs whitespace-nowrap text-ink-2">
                       <span className="mr-2 font-sans md:hidden">Shift:</span>
@@ -336,6 +367,22 @@ export function EventStaffingCoverageView({
                           ? ` · ${formatDate(need.startsAt)} ${formatTime(need.startsAt)}${need.endsAt != null ? ` – ${formatTime(need.endsAt)}` : " · End time needed"}`
                           : " · Timing needed"}
                       </p>
+                      {staffNeedDemandSummary(need) ? (
+                        <p
+                          className="text-sm text-ink-2"
+                          data-testid="event-staff-need-demand"
+                        >
+                          {staffNeedDemandSummary(need)}
+                        </p>
+                      ) : null}
+                      {waitlist ? (
+                        <StaffNeedWaitlist
+                          need={need}
+                          people={people ?? []}
+                          currentPersonId={currentPersonId}
+                          controls={waitlist}
+                        />
+                      ) : null}
                     </td>
                     <td className="block px-3 py-2 md:table-cell align-top">
                       <StatusChip status={String(need.status)} />
@@ -376,6 +423,15 @@ export function EventStaffingCoverageView({
                             })}
                           </select>
                         </label>
+                      ) : null}
+                      {canManage && claimable ? (
+                        <StaffNeedSuggestions
+                          needId={need._id}
+                          disabled={busy != null}
+                          onPick={(personId) =>
+                            onNeedPersonChange(need._id, personId)
+                          }
+                        />
                       ) : (
                         <span className="text-base text-ink-3">—</span>
                       )}
@@ -451,6 +507,16 @@ export function EventStaffingCoverageView({
                         {canManage && claimable ? (
                           <>
                             {timingControl?.("need", need._id)}
+                            {onDescribeDemand ? (
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => onDescribeDemand(need)}
+                              >
+                                What the work needs
+                              </button>
+                            ) : null}
                             <button
                               type="button"
                               className="btn btn-ghost btn-sm"
@@ -513,6 +579,14 @@ export function EventStaffingCoverageView({
                     ) : null}
                     {need.notes ? (
                       <p className="mt-1 text-base text-ink-2">{need.notes}</p>
+                    ) : null}
+                    {need.status === "filled" && waitlist ? (
+                      <StaffNeedWaitlist
+                        need={need}
+                        people={people ?? []}
+                        currentPersonId={currentPersonId}
+                        controls={waitlist}
+                      />
                     ) : null}
                     {need.cancellationReason ? (
                       <p className="mt-1 text-base text-ink-2">

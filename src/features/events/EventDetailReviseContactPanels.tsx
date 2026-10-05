@@ -1,4 +1,5 @@
-import type { Id } from "../../lib/api";
+import type { Doc, Id } from "../../lib/api";
+import { EventClientForm } from "./EventClientForm";
 import { list, optional } from "./eventDetailFormHelpers";
 import { EventFormCluster } from "./EventFormCluster";
 
@@ -8,6 +9,8 @@ type Props = {
   readonly busy: boolean;
   readonly canRevise: boolean;
   readonly reviseBlockedReason: string | undefined;
+  readonly clientId?: string | null;
+  readonly clients: Doc<"clients">[] | undefined;
   readonly primaryContactName?: string | null;
   readonly primaryContactEmail?: string | null;
   readonly primaryContactPhone?: string | null;
@@ -43,6 +46,8 @@ export function EventDetailReviseContactPanels({
   busy,
   canRevise,
   reviseBlockedReason,
+  clientId,
+  clients,
   primaryContactName,
   primaryContactEmail,
   primaryContactPhone,
@@ -55,6 +60,17 @@ export function EventDetailReviseContactPanels({
 }: Props) {
   return (
     <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <EventFormCluster title="Client" hint="Who the event is booked for">
+        <EventClientForm
+          eventId={eventId}
+          version={version}
+          clientId={clientId}
+          clients={clients}
+          busy={busy}
+          run={run}
+        />
+      </EventFormCluster>
+
       <EventFormCluster title="Primary contact" hint="Who we call on the day">
         <form
           key={`contact-${version}`}

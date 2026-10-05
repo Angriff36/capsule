@@ -1,13 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
-import {
-  useListEvent,
-  useListEventCloseout,
-  useListInvoice,
-  useListPackList,
-  useListPrepTask,
-} from "../../lib/manifest-convex-react";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { eventsIndexPath } from "../events/eventRoutes";
@@ -122,7 +115,13 @@ function ServiceRow({
   );
 }
 
-function Decision({ item }: { item: HomeAttentionItem }) {
+function Decision({
+  item,
+  capped,
+}: {
+  item: HomeAttentionItem;
+  capped: boolean;
+}) {
   const severity = severityOf(item);
   return (
     <div>
@@ -134,7 +133,8 @@ function Decision({ item }: { item: HomeAttentionItem }) {
         {severity === "danger" ? "Blocking" : "Open"}
       </span>
       <div className="font-display mt-3 text-2xl leading-tight text-ink">
-        {item.count} {item.label.toLowerCase()}
+        {item.count}
+        {capped ? "+" : ""} {item.label.toLowerCase()}
       </div>
       <p className="mt-1 text-base text-ink-2">{item.detail}</p>
       <Link to={item.href} className="btn btn-primary mt-4">
@@ -152,20 +152,12 @@ function Decision({ item }: { item: HomeAttentionItem }) {
  */
 export function HomePage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
-  const events = useListEvent();
-  const invoices = useListInvoice();
-  const prepTasks = useListPrepTask();
-  const packLists = useListPackList();
-  const closeouts = useListEventCloseout();
+  // PL-SCALE: one bounded read of what this page shows (convex/todayDesk.ts).
+  const desk = useQuery(api.todayDesk.desk, {
+    startOfToday: startOfDay(Date.now()),
+  });
 
-  const loading = [
-    authStatus,
-    events,
-    invoices,
-    prepTasks,
-    packLists,
-    closeouts,
-  ].some((value) => value === undefined);
+  const loading = authStatus === undefined || desk === undefined;
   const { loadingTooLong } = useSlowQuery(loading ? undefined : true);
 
   if (loading) {
@@ -179,12 +171,13 @@ export function HomePage() {
 
   const snapshot = policy.build({
     role: authStatus?.role ?? "staff",
-    events,
-    invoices,
-    prepTasks,
-    packLists,
-    closeouts,
+    events: desk?.events,
+    invoices: desk?.invoices,
+    prepTasks: desk?.prepTasks,
+    packLists: desk?.packLists,
+    closeouts: desk?.closeouts,
   });
+  const capped = new Set(desk?.capped ?? []);
 
   const now = Date.now();
   const startOfToday = startOfDay(now);
@@ -221,7 +214,7 @@ export function HomePage() {
             Today’s service
           </h1>
           <div className="fact-row mt-3">
-            <Fact label="Today" value={`${today.length} services`} />
+            <Fact label="Today" value={`${snapshot.todayCount} services`} />
             <Fact label="This week" value={String(thisWeek?.count ?? 0)} />
             {today[0] ? (
               <Fact
@@ -250,7 +243,11 @@ export function HomePage() {
         ) : (
           <div className="mt-4 grid gap-x-11 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
             {decisions.map((item) => (
-              <Decision key={item.id} item={item} />
+              <Decision
+                key={item.id}
+                item={item}
+                capped={capped.has(item.id)}
+              />
             ))}
           </div>
         )}
@@ -281,8 +278,8 @@ export function HomePage() {
       {later.length > 0 ? (
         <div className="mt-7">
           <SectionRule
-            label="Week ahead"
-            trailing={`${later.length} services`}
+            label="Coming up"
+            trailing={`${snapshot.weekAheadCount} in the next 7 days`}
           />
           <div className="fact-row mt-3 gap-x-8">
             {later.slice(0, 5).map((service) => (

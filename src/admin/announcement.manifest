@@ -27,8 +27,8 @@ entity Announcement mixin TenantScoped, SoftDeletable {
   // Auth subject of the manager who posted, stamped from trusted context.
   property postedById: string?
 
-  constraint announcementTitlePresent: length(trim(self.title)) > 0 "Announcement title is required"
-  constraint announcementBodyPresent: length(trim(self.body)) > 0 "Announcement body is required"
+  constraint announcementTitlePresent: length(trim(self.title)) > 0 "Give this announcement a title."
+  constraint announcementBodyPresent: length(trim(self.body)) > 0 "Give this announcement something to say."
 
   // All staff see announcements. Posting and removing are manager actions and
   // are gated explicitly on each command (manageAccess capability).
@@ -39,8 +39,8 @@ entity Announcement mixin TenantScoped, SoftDeletable {
   command post(title: string, body: string, category: AnnouncementCategory, expiresAt: datetime) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "manageAccess")
-    constraint postTitlePresent: length(trim(title)) > 0 "Announcement title is required"
-    constraint postBodyPresent: length(trim(body)) > 0 "Announcement body is required"
+    constraint postTitlePresent: length(trim(title)) > 0 "Give this announcement a title."
+    constraint postBodyPresent: length(trim(body)) > 0 "Give this announcement something to say."
     mutate title = title
     mutate body = body
     mutate category = category
@@ -79,7 +79,7 @@ entity AnnouncementDismissal mixin TenantScoped {
 
   belongsTo announcement: Announcement fields [tenantId, announcementId] references [tenantId, id]
 
-  constraint dismissalSubjectPresent: length(trim(self.authSubjectId)) > 0 "Dismissal requires a signed-in account"
+  constraint dismissalSubjectPresent: length(trim(self.authSubjectId)) > 0 "Sign in to dismiss this announcement."
 
   default policy announcementDismissalRead read: roleAllows(user.role, "staffAccess") "Staff may see announcement dismissals"
   default policy announcementDismissalWrite write: roleAllows(user.role, "staffAccess") "Staff may update their own announcement dismissals"

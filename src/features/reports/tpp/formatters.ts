@@ -39,6 +39,12 @@ export function formatTppQuantity(
   );
 }
 
+/** A percent, or "Not known yet" when there was nothing to divide by. */
+export function formatTppPercent(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "Not known yet";
+  return `${formatTppQuantity(value)}%`;
+}
+
 export function safeLabelPart(value: unknown): string {
   return String(value ?? "")
     .replace(/[\r\n\t]+/g, " ")

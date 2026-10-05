@@ -151,6 +151,7 @@ describe("plain words on event screens", () => {
       "src/features/events/EventClientContactsPanel.tsx",
       "src/features/events/EventCapacityPlannerPage.tsx",
       "src/features/events/EventAllergenBriefingPage.tsx",
+      "src/features/events/EventAllergenBriefingBody.tsx",
       "src/features/events/GuestListCoverageNotice.tsx",
     ];
     const all = files.map((path) => readFileSync(path, "utf8")).join("\n");
@@ -204,6 +205,7 @@ describe("plain words on event screens", () => {
       "src/features/events/EventMenuTab.tsx",
       "src/features/events/EventMenuDietaryConflictsCard.tsx",
       "src/features/events/EventOverviewRail.tsx",
+      "src/features/events/dashboard/eventDashFacts.ts",
       "src/features/events/EventStaffingTab.tsx",
       "src/features/events/EventGuestSidebar.tsx",
       "src/features/events/eventGuestSummary.ts",
@@ -212,8 +214,6 @@ describe("plain words on event screens", () => {
       "src/features/events/EventEquipmentPanel.tsx",
       "src/features/events/EventTimingPlanner.tsx",
       "src/features/events/venuePickerSummary.ts",
-      "src/features/events/mobile/MobileEventInfoCards.tsx",
-      "src/features/events/mobile/MobileEventReadCards.tsx",
       "src/features/events/EventCreatePage.tsx",
       "src/features/events/EventSourceProvenancePanel.tsx",
       "src/features/events/eventRoutes.ts",
@@ -283,8 +283,6 @@ describe("plain words on event screens", () => {
       "keeps its saved timing.",
       "Timing saved on this event.",
       "No address on file",
-      "No notes on this event.",
-      "No staff coverage on file.",
       "This venue has no capacity on file",
       'title="Imported from"',
       'label: "Photos & incidents"',
@@ -439,7 +437,7 @@ describe("plain words on event screens", () => {
 
     for (const fresh of [
       "Sales and finance may see client accounts for CRM and billing",
-      "Event staff may see venues",
+      "Staff may see venues",
       "Staff may see shared event plans and operational context",
       "Event staff may see guest attendance",
       "Staff may see the shared event timeline",

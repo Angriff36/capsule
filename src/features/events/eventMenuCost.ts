@@ -18,6 +18,8 @@ export type EventMenuCostDish = SoftDelete & {
   id: string;
   eventId: string;
   dishId: string;
+  /** The dish whose recipe this line cooks from; null = dishId. */
+  recipeDishId?: string | null;
   quantityServings: number;
   headcountOverride?: number | null;
 };
@@ -245,7 +247,8 @@ export function buildEventMenuCost(
       let pricedLineCount = 0;
       let incompleteLineCount = 0;
 
-      for (const line of linesByDish.get(row.dishId) ?? []) {
+      for (const line of linesByDish.get(row.recipeDishId ?? row.dishId) ??
+        []) {
         const ingredient = ingredientsById.get(line.ingredientId);
         if (!ingredient) {
           incompleteLineCount += 1;
@@ -274,7 +277,9 @@ export function buildEventMenuCost(
         }
       }
 
-      for (const attachment of attachmentsByDish.get(row.dishId) ?? []) {
+      for (const attachment of attachmentsByDish.get(
+        row.recipeDishId ?? row.dishId,
+      ) ?? []) {
         const component = componentsById.get(attachment.componentId);
         const componentLines =
           linesByComponent.get(attachment.componentId) ?? [];

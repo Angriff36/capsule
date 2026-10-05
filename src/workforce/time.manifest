@@ -19,6 +19,11 @@ enum QualificationStatus {
 // Worked time for a Person (maps capsule-pro TimeEntry). Optional Shift/Event
 // refs; duration is a pure computed from clock datetimes (durationBetween).
 // No pay-rate fields — none evidenced on TimeEntry.
+// Breaks (spec §12.2): breakMinutes is the UNPAID lunch and is taken off paid
+// time; paidBreakMinutes are other defined breaks and stay paid. Elapsed time
+// is instant-to-instant, so overnight and daylight-saving nights count the
+// real minutes; timeZone records where the clock was read. Payroll counts
+// only approved entries; a correction clears the approval.
 entity TimeRecord mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -30,9 +35,21 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   property clockInAt: datetime?
   property clockOutAt: datetime?
   property breakMinutes: int? = 0
+  property paidBreakMinutes: int? = 0
+  property timeZone: string?
+  property clockInLatitude: float?
+  property clockInLongitude: float?
+  property clockInAccuracyMeters: float?
+  property clockOutLatitude: float?
+  property clockOutLongitude: float?
+  property clockOutAccuracyMeters: float?
   property encrypted notes: string?
   property required status: TimeRecordStatus = "open"
   property correctedAt: datetime?
+  property correctedById: uuid?
+  property correctionReason: string?
+  property approvedAt: datetime?
+  property approvedById: uuid?
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   belongsTo shift: Shift fields [tenantId, shiftId] references [tenantId, id]
@@ -41,9 +58,11 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   // Pure datetime arithmetic (builtins.md durationBetween / durationMinutes) —
   // no now() in computed. Named workedMinutes to avoid shadowing the builtin.
   computed workedMinutes: number? = self.clockOutAt != null and self.clockInAt != null ? durationBetween(self.clockInAt, self.clockOutAt) / durationMinutes(1) : null
+  computed paidMinutes: number? = self.clockOutAt != null and self.clockInAt != null ? durationBetween(self.clockInAt, self.clockOutAt) / durationMinutes(1) - (self.breakMinutes != null ? self.breakMinutes : 0) : null
 
-  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "Closed or corrected time entries require clock-out at or after clock-in"
-  constraint timeRecordBreakNonNegative: self.breakMinutes == null or self.breakMinutes >= 0 "Break minutes must be non-negative"
+  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "This time entry's clock-out has to be at or after its clock-in."
+  constraint timeRecordBreakNonNegative: self.breakMinutes == null or self.breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
+  constraint timeRecordPaidBreakNonNegative: self.paidBreakMinutes == null or self.paidBreakMinutes >= 0 "Paid break minutes can't be negative. Use zero or more."
 
   transition status from "open" to ["closed"]
   transition status from "closed" to ["corrected"]
@@ -53,27 +72,36 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update time entries"
   default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change time entries"
 
-  // The linked Person is authoritative for self-service; the old direct-ID
-  // identity path remains available only to unlinked bootstrap identities.
+  // The linked Person is the only self-service path; an unlinked sign-in
+  // has no own-work path and needs the workforce role.
   command clockIn(
     personId: uuid,
     optional shiftId: uuid,
     optional eventId: uuid,
-    optional notes: string
+    optional notes: string,
+    optional timeZone: string,
+    optional latitude: number,
+    optional longitude: number,
+    optional accuracyMeters: number
   ) {
     guard self.clockInAt == null
     guard self.status == "open"
     guard self.deletedAt == null
     guard user.id != null
-    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    guard (user.personId != null and personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
     guard self.person != null and self.person.status == "active"
     constraint clockInPersonMatch: personId == self.personId "This clock-in is for a different person. Pick the person already on this time entry."
     constraint clockInShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry."
     constraint clockInEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This clock-in is for a different event. Leave the event blank or pick the one already on this time entry."
+    constraint clockInLocationPair: (latitude == null and longitude == null) or (latitude != null and longitude != null and latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180) "The clock-in location is incomplete. Send both latitude and longitude, or neither."
     mutate personId = personId
     mutate shiftId = shiftId != null ? shiftId : self.shiftId
-    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate eventId = eventId != null ? eventId : (self.eventId != null ? self.eventId : (self.shift != null ? self.shift.eventId : null))
     mutate notes = notes != null ? notes : self.notes
+    mutate timeZone = timeZone != null ? timeZone : self.timeZone
+    mutate clockInLatitude = latitude
+    mutate clockInLongitude = longitude
+    mutate clockInAccuracyMeters = accuracyMeters
     mutate clockInAt = now()
     emit TimeRecordClockedIn {
       timeRecordId: self.id
@@ -88,17 +116,27 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
 
   command clockOut(
     optional breakMinutes: number,
-    optional notes: string
+    optional notes: string,
+    optional paidBreakMinutes: number,
+    optional latitude: number,
+    optional longitude: number,
+    optional accuracyMeters: number
   ) {
     guard self.status == "open"
     guard self.clockInAt != null
     guard self.clockOutAt == null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
-    constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess")
+    constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
+    constraint clockOutPaidBreakNonNegative: paidBreakMinutes == null or paidBreakMinutes >= 0 "Paid break minutes can't be negative. Use zero or more."
+    constraint clockOutLocationPair: (latitude == null and longitude == null) or (latitude != null and longitude != null and latitude >= -90 and latitude <= 90 and longitude >= -180 and longitude <= 180) "The clock-out location is incomplete. Send both latitude and longitude, or neither."
+    mutate clockOutLatitude = latitude
+    mutate clockOutLongitude = longitude
+    mutate clockOutAccuracyMeters = accuracyMeters
     mutate clockOutAt = now()
     mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes
+    mutate paidBreakMinutes = paidBreakMinutes != null ? paidBreakMinutes : self.paidBreakMinutes
     mutate notes = notes != null ? notes : self.notes
     mutate status = "closed"
     emit TimeRecordClockedOut {
@@ -110,32 +148,48 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
       clockInAt: self.clockInAt
       clockOutAt: self.clockOutAt
       breakMinutes: breakMinutes != null ? breakMinutes : self.breakMinutes
+      paidBreakMinutes: paidBreakMinutes != null ? paidBreakMinutes : self.paidBreakMinutes
       status: "closed"
     }
   }
 
+  // A manager correction keeps who, why, and the values it replaced (event
+  // ledger), and sends the entry back for approval.
   command correct(
     clockInAt: datetime,
     clockOutAt: datetime,
+    reason: string,
     optional breakMinutes: number,
-    optional notes: string
+    optional notes: string,
+    optional paidBreakMinutes: number,
+    optional timeZone: string
   ) {
     guard self.status == "closed" or self.status == "corrected"
     guard self.clockInAt != null
     guard self.clockOutAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint correctDates: clockOutAt >= clockInAt "Corrected clock-out must be at or after clock-in"
-    constraint correctBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
+    constraint correctDates: clockOutAt >= clockInAt "The corrected clock-out has to be at or after the clock-in."
+    constraint correctBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
     compute previousClockInAt = self.clockInAt
     compute previousClockOutAt = self.clockOutAt
+    constraint correctPaidBreakNonNegative: paidBreakMinutes == null or paidBreakMinutes >= 0 "Paid break minutes can't be negative. Use zero or more."
+    constraint correctReasonPresent: length(trim(reason)) > 0 "Say why you're changing this time entry."
     compute previousBreakMinutes = self.breakMinutes
+    compute previousPaidBreakMinutes = self.paidBreakMinutes
+    compute wasApprovedAt = self.approvedAt
     mutate clockInAt = clockInAt
     mutate clockOutAt = clockOutAt
     mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes
+    mutate paidBreakMinutes = paidBreakMinutes != null ? paidBreakMinutes : self.paidBreakMinutes
+    mutate timeZone = timeZone != null ? timeZone : self.timeZone
     mutate notes = notes != null ? notes : self.notes
     mutate status = "corrected"
     mutate correctedAt = now()
+    mutate correctedById = user.personId
+    mutate correctionReason = reason
+    mutate approvedAt = null
+    mutate approvedById = null
     emit TimeRecordCorrected {
       timeRecordId: self.id
       tenantId: self.tenantId
@@ -143,10 +197,41 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
       previousClockInAt: previousClockInAt
       previousClockOutAt: previousClockOutAt
       previousBreakMinutes: previousBreakMinutes
+      previousPaidBreakMinutes: previousPaidBreakMinutes
+      wasApprovedAt: wasApprovedAt
       clockInAt: clockInAt
       clockOutAt: clockOutAt
       breakMinutes: breakMinutes != null ? breakMinutes : self.breakMinutes
+      paidBreakMinutes: paidBreakMinutes != null ? paidBreakMinutes : self.paidBreakMinutes
+      timeZone: timeZone != null ? timeZone : self.timeZone
+      correctedById: user.personId
+      correctedByUserId: user.id
+      reason: reason
       status: "corrected"
+    }
+  }
+
+  // Timesheet approval: a manager signs off a finished entry; only approved
+  // time reaches payroll.
+  command approve() {
+    guard self.status == "closed" or self.status == "corrected"
+    guard self.clockInAt != null
+    guard self.clockOutAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint approveOnce: self.approvedAt == null "This time entry is already approved."
+    mutate approvedAt = now()
+    mutate approvedById = user.personId
+    emit TimeRecordApproved {
+      timeRecordId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      clockInAt: self.clockInAt
+      clockOutAt: self.clockOutAt
+      breakMinutes: self.breakMinutes
+      paidBreakMinutes: self.paidBreakMinutes
+      approvedById: user.personId
     }
   }
 
@@ -175,8 +260,8 @@ entity Qualification mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.certificationType != null and length(trim(self.certificationType)) > 0 and self.issuingBody != null and length(trim(self.issuingBody)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Granted certifications require a name, type, issuing body, issue date, and valid optional expiry"
-  constraint qualificationExpiryOrder: self.expiresAt == null or self.issuedAt == null or self.expiresAt > self.issuedAt "Qualification expiry must be after issued date"
+  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.certificationType != null and length(trim(self.certificationType)) > 0 and self.issuingBody != null and length(trim(self.issuingBody)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Give this certification a name, type, issuing body, and issue date. If it expires, the expiry has to be after the issue date."
+  constraint qualificationExpiryOrder: self.expiresAt == null or self.issuedAt == null or self.expiresAt > self.issuedAt "This certification's expiry has to be after its issue date."
 
   transition status from "active" to ["expired", "revoked"]
   transition status from "expired" to []
@@ -202,10 +287,10 @@ entity Qualification mixin TenantScoped, SoftDeletable {
     guard self.person != null and self.person.status == "active"
     guard roleAllows(user.role, "workforceManageAccess")
     constraint grantPersonMatch: personId == self.personId "This qualification is for a different person. Pick the person already on this qualification."
-    constraint grantNamePresent: length(trim(name)) > 0 "Qualification name is required"
-    constraint grantTypePresent: length(trim(certificationType)) > 0 "Certification type is required"
-    constraint grantIssuingBodyPresent: length(trim(issuingBody)) > 0 "Issuing body is required"
-    constraint grantExpiryOrder: expiresAt == null or expiresAt > issuedAt "Qualification expiry must be after issued date"
+    constraint grantNamePresent: length(trim(name)) > 0 "Give this certification a name."
+    constraint grantTypePresent: length(trim(certificationType)) > 0 "Pick a certification type."
+    constraint grantIssuingBodyPresent: length(trim(issuingBody)) > 0 "Say who issued this certification."
+    constraint grantExpiryOrder: expiresAt == null or expiresAt > issuedAt "This certification's expiry has to be after its issue date."
     mutate personId = personId
     mutate name = name
     mutate certificationType = certificationType
@@ -289,7 +374,20 @@ event TimeRecordClockedOut: "time_record.clocked_out" {
   clockInAt: datetime?
   clockOutAt: datetime?
   breakMinutes: number?
+  paidBreakMinutes: number?
   status: TimeRecordStatus
+}
+
+event TimeRecordApproved: "time_record.approved" {
+  timeRecordId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  clockInAt: datetime?
+  clockOutAt: datetime?
+  breakMinutes: number?
+  paidBreakMinutes: number?
+  approvedById: string?
 }
 
 event TimeRecordCorrected: "time_record.corrected" {
@@ -299,9 +397,16 @@ event TimeRecordCorrected: "time_record.corrected" {
   previousClockInAt: datetime?
   previousClockOutAt: datetime?
   previousBreakMinutes: number?
+  previousPaidBreakMinutes: number?
+  wasApprovedAt: datetime?
   clockInAt: datetime
   clockOutAt: datetime
   breakMinutes: number?
+  paidBreakMinutes: number?
+  timeZone: string?
+  correctedById: string?
+  correctedByUserId: string?
+  reason: string
   status: TimeRecordStatus
 }
 

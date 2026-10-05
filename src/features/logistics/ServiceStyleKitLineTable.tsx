@@ -7,6 +7,7 @@ export interface KitLine {
   description: string;
   baseQuantity: number;
   guestsPerUnit?: number | null;
+  sparePercent?: number | null;
   unit: string;
   note?: string | null;
   sortOrder?: number | null;
@@ -17,7 +18,8 @@ export interface KitLine {
 function quantityRule(line: KitLine): string {
   const base = `${line.baseQuantity} ${line.unit}`;
   if (line.guestsPerUnit == null) return base;
-  const scaled = `1 per ${line.guestsPerUnit} guests`;
+  const spare = line.sparePercent ? ` +${line.sparePercent}% spare` : "";
+  const scaled = `1 per ${line.guestsPerUnit} guests${spare}`;
   return line.baseQuantity > 0 ? `${base} + ${scaled}` : scaled;
 }
 
@@ -41,7 +43,7 @@ export function ServiceStyleKitLineTable({
 }: ServiceStyleKitLineTableProps) {
   return (
     <div className="supply-table-wrap mt-3">
-      <table className="supply-table">
+      <table className="supply-table phone-cards">
         <thead>
           <tr>
             <th>Item</th>
@@ -57,9 +59,9 @@ export function ServiceStyleKitLineTable({
               <td>
                 <strong>{line.description}</strong>
               </td>
-              <td>{quantityRule(line)}</td>
-              <td>{line.note || "—"}</td>
-              <td>
+              <td data-label="Quantity">{quantityRule(line)}</td>
+              <td data-label="Packer note">{line.note || "—"}</td>
+              <td data-label="State">
                 <StatusChip status={String(line.status)} />
               </td>
               <td>

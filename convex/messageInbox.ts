@@ -2,14 +2,15 @@ import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
 import { action, type ActionCtx } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { mediaRefsFromEnvelope } from "./lib/messageMedia";
+import { redactSecrets } from "./lib/redactPayload";
 
 // §4.4 retryable sync-error queue: record an ingest/parse failure as a SyncError.
 // Tenant-scoped find-or-upsert — REOPEN (bump attempts, refresh, return to
 // pending) an existing error with the SAME (sourceSystem, recordType, externalId),
-// else create. The generated command-idempotency cache is keyed by the key string
-// ALONE (commandIdempotencyKeys.by_key, no tenantId), so an idempotency key would
-// collide across tenants and suppress recurrences after dismissal — find-or-upsert
-// avoids that data loss. Only reopens when externalId (provider message id) is
+// else create. The cached create result is immutable, so an idempotency key
+// would suppress recurrences after dismissal — find-or-upsert avoids that
+// data loss. Only reopens when externalId (provider message id) is
 // present: two DISTINCT no-message-id failures must NOT collapse onto one row
 // (that would overwrite and lose the independent failure). The verbatim input is
 // stored as rawPayload ONLY when it fits under the cap — a truncated JSON blob
@@ -29,7 +30,7 @@ async function recordMessageSyncError(
   try {
     const sourceSystem = opts.provider || "unknown";
     const externalId = opts.providerMessageId?.trim() || undefined;
-    const fullPayload = JSON.stringify(opts.payloadObject);
+    const fullPayload = JSON.stringify(redactSecrets(opts.payloadObject));
     const rawPayload =
       fullPayload.length <= MAX_RAW_PAYLOAD ? fullPayload : undefined;
     if (externalId) {
@@ -66,6 +67,34 @@ async function recordMessageSyncError(
   }
 }
 
+// §4.4 / AC-247: a new conversation is matched to the client contact whose
+// email or phone is the sender. Only an exact, single match links; a sender
+// two contacts share stays unlinked for staff to pick. No contact is made
+// up from an unknown sender (that would fill the client list with spam).
+async function matchSenderContact(
+  ctx: ActionCtx,
+  senderIdentity: string | undefined,
+): Promise<Id<"clientContacts"> | undefined> {
+  const sender = (senderIdentity ?? "").trim().toLowerCase();
+  if (!sender) return undefined;
+  const digits = sender.replace(/\D/g, "");
+  const phoneKey = digits.length >= 10 ? digits.slice(-10) : null;
+  // A reader without client access just gets no match, never a failed intake.
+  const contacts = await ctx
+    .runQuery(api.queries.listClientContact, {})
+    .catch(() => []);
+  const matches = contacts.filter((c) => {
+    if (c.deletedAt != null) return false;
+    if (sender.includes("@"))
+      return (c.email ?? "").trim().toLowerCase() === sender;
+    if (!phoneKey) return false;
+    return [c.phone, c.mobile].some(
+      (p) => (p ?? "").replace(/\D/g, "").slice(-10) === phoneKey,
+    );
+  });
+  return matches.length === 1 ? matches[0]!._id : undefined;
+}
+
 // Idempotent inbound message ingestion (spec §4.4 "Done when": replaying the
 // same provider delivery creates no duplicate message — including under
 // concurrent retry). Provider-neutral: a provider sync action (authenticated,
@@ -94,6 +123,7 @@ export const ingestInboundMessage = action({
     subject: v.optional(v.string()),
     sentAt: v.optional(v.number()),
     rawPayload: v.optional(v.string()),
+    mediaJson: v.optional(v.string()),
     contactId: v.optional(v.id("clientContacts")),
   },
   handler: async (
@@ -116,14 +146,13 @@ export const ingestInboundMessage = action({
     // verbatim input (rawPayload) so it can be retried or dismissed from the
     // inbox. Recording is best-effort and never masks the original error.
     //
-    // TENANT-SCOPED FIND-OR-UPSERT (not a global create-idempotency key): the
-    // generated command-idempotency cache is keyed by the key string ALONE
-    // (commandIdempotencyKeys.by_key, no tenantId), so a key like
-    // `syncerr:message:<providerMessageId>` would collide across tenants and
-    // suppress a recurrence after dismissal (the cached create result is
-    // immutable). Instead we look up an existing tenant error by
-    // (sourceSystem, recordType, externalId) and REOPEN it (bump attempts,
-    // refresh message/payload, return to pending), else create a new row.
+    // TENANT-SCOPED FIND-OR-UPSERT (not a create-idempotency key): the
+    // cached create result is immutable, so a key like
+    // `syncerr:message:<providerMessageId>` would suppress a recurrence of
+    // the same failure after dismissal. Instead we look up an existing tenant
+    // error by (sourceSystem, recordType, externalId) and REOPEN it (bump
+    // attempts, refresh message/payload, return to pending), else create a
+    // new row.
     // Find-then-(reopen|create) in an action is not atomic, so two concurrent
     // identical failures could create two rows — acceptable for an error queue
     // (a rare duplicate is far less bad than silently dropping a failure).
@@ -153,8 +182,8 @@ export const ingestInboundMessage = action({
       );
     }
     if (!bodyText) {
-      await recordSyncError("missing_field", "Message text is required");
-      throw new ConvexError("Message text is required");
+      await recordSyncError("missing_field", "Type a message before sending.");
+      throw new ConvexError("Type a message before sending.");
     }
 
     // Ingest core (thread resolve → message post). Any unexpected failure here
@@ -189,6 +218,9 @@ export const ingestInboundMessage = action({
         threadId = existingThread._id;
         threadCreated = false;
       } else {
+        const contactId =
+          args.contactId ??
+          (await matchSenderContact(ctx, args.senderIdentity));
         const created = await ctx.runMutation(
           api.mutations.MessageThread_create,
           {
@@ -197,8 +229,8 @@ export const ingestInboundMessage = action({
             providerThreadId,
             subject: args.subject,
             senderIdentity: args.senderIdentity,
-            contactId: args.contactId,
-            idempotencyKey: `mt:${provider}:${account}:${providerThreadId}`,
+            contactId,
+            idempotencyKey: `tenant-shared/mt:${provider}:${account}:${providerThreadId}`,
           },
         );
         // Literal `create` allocating mutations return { _id, ...doc }.
@@ -238,8 +270,12 @@ export const ingestInboundMessage = action({
           providerMessageId,
           senderIdentity: args.senderIdentity,
           sentAt: args.sentAt,
-          rawPayload: args.rawPayload,
-          idempotencyKey: `msg:${threadId}:${providerMessageId}`,
+          rawPayload:
+            args.rawPayload === undefined
+              ? undefined
+              : (redactSecrets(args.rawPayload) as string),
+          mediaJson: args.mediaJson,
+          idempotencyKey: `tenant-shared/msg:${threadId}:${providerMessageId}`,
         },
       );
 
@@ -273,6 +309,24 @@ function pickEnvelopeField(
   return undefined;
 }
 
+// The provider's own send time (epoch ms, epoch seconds, or a date string),
+// so a late or repeated delivery still sorts where it was sent.
+function pickEnvelopeTime(
+  parsed: Record<string, unknown>,
+  keys: string[],
+): number | undefined {
+  for (const k of keys) {
+    const val = parsed[k];
+    if (typeof val === "number" && Number.isFinite(val) && val > 0)
+      return val < 1e11 ? val * 1000 : val;
+    if (typeof val === "string" && val.trim()) {
+      const ms = Date.parse(val.trim());
+      if (Number.isFinite(ms)) return ms;
+    }
+  }
+  return undefined;
+}
+
 // Provider raw-envelope ingress — the §4.4 "failed parsing appears in a
 // retryable sync-error queue" parse boundary. Accepts a raw provider envelope
 // (a signed-webhook body, a polling-API response, or an operator-pasted export)
@@ -295,6 +349,7 @@ export const ingestProviderEnvelope = action({
     recorded: "ingested" | "sync_error";
     threadId?: Id<"messageThreads">;
     messageId?: Id<"messages">;
+    isDuplicate?: boolean;
     reason?: string;
   }> => {
     const provider = args.provider.trim();
@@ -365,6 +420,8 @@ export const ingestProviderEnvelope = action({
       };
     }
 
+    const media = mediaRefsFromEnvelope(parsed);
+    const storedRaw = JSON.stringify(redactSecrets(parsed));
     try {
       const result = await ctx.runAction(
         api.messageInbox.ingestInboundMessage,
@@ -384,14 +441,22 @@ export const ingestProviderEnvelope = action({
             "subject_line",
             "title",
           ]),
+          sentAt: pickEnvelopeTime(parsed, [
+            "sentAt",
+            "sent_at",
+            "timestamp",
+            "date",
+          ]),
           rawPayload:
-            args.rawJson.length <= MAX_RAW_PAYLOAD ? args.rawJson : undefined,
+            storedRaw.length <= MAX_RAW_PAYLOAD ? storedRaw : undefined,
+          mediaJson: media.length > 0 ? JSON.stringify(media) : undefined,
         },
       );
       return {
         recorded: "ingested",
         threadId: result.threadId,
         messageId: result.messageId,
+        isDuplicate: result.isDuplicate,
       };
     } catch (e) {
       // ingestInboundMessage already recorded the failure (validation or
@@ -428,7 +493,7 @@ const LEAD_SOURCE_BY_PROVIDER: Record<string, string> = {
 //
 // Idempotent by construction:
 //  - thread already has a leadId → return it (no create, no relink);
-//  - the Lead create carries idempotencyKey `qualify:<threadId>`, so a double
+//  - the Lead create carries idempotencyKey `tenant-shared/qualify:<threadId>`, so a double
 //    click or two concurrent qualifies resolve to ONE lead;
 //  - linkLead is called without a version (idempotent set of leadId), so the
 //    second of two concurrent qualifies harmlessly re-sets the same id.
@@ -467,7 +532,7 @@ export const qualifyThreadAsLead = action({
       notes: subject
         ? `From ${source} thread "${subject}"`
         : `From ${source} thread`,
-      idempotencyKey: `qualify:${args.threadId}`,
+      idempotencyKey: `tenant-shared/qualify:${args.threadId}`,
     });
     const leadId = created.docId as Id<"leads">;
 

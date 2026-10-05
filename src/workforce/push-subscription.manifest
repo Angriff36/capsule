@@ -55,8 +55,8 @@ entity PushSubscription mixin TenantScoped, SoftDeletable {
     // Creation only: the generator also emits an instance form of every
     // command, and re-running register on a stored row would re-own a device.
     guard self.authSubjectId == null "A device is registered once; turn notifications off and on again instead"
-    constraint registerEndpoint: length(trim(endpoint)) > 0 "Endpoint is required"
-    constraint registerKeys: length(trim(p256dh)) > 0 and length(trim(auth)) > 0 "Push keys are required"
+    constraint registerEndpoint: length(trim(endpoint)) > 0 "This device is missing its push address. Try turning notifications on again."
+    constraint registerKeys: length(trim(p256dh)) > 0 and length(trim(auth)) > 0 "This device is missing its notification keys. Try turning notifications on again."
     mutate authSubjectId = user.id
     mutate personId = user.personId
     mutate endpoint = endpoint

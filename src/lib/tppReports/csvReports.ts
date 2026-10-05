@@ -20,7 +20,8 @@ export function detectCsvSource(
 
   if (head.includes("event worksheet")) return "eventWorksheet";
   if (head.includes("pack list")) return "packList";
-  if (head.includes("order list")) return "orderList";
+  if (head.includes("order list") || head.includes("shopping list"))
+    return "orderList";
   if (head.includes("prepared for")) return "proposal";
   return undefined;
 }

@@ -9,13 +9,13 @@ export const durationFields = [
     "setupMinutes",
     "timingSetupMinutes",
     "Onsite setup",
-    "Before service; full service 180 min, limited service 90 min.",
+    "Before service; filled from your company timing rules for the service style.",
   ],
   [
     "loadMinutes",
     "timingLoadMinutes",
     "Load at shop",
-    "Start with 60 min; allow more for larger loads or more vehicles.",
+    "Filled from your company load rules; change it for a bigger or smaller load.",
   ],
   [
     "outboundTravelMinutes",
@@ -47,6 +47,10 @@ export type Draft = {
   version: number;
   serviceStartsAt: string;
   originalServiceAt?: number | null;
+  /** Optional reasons for a setup or load time that differs from the saved
+   * one (PL-TIMING); kept on the event with who changed it. */
+  setupOverrideReason?: string;
+  loadOverrideReason?: string;
 } & Record<(typeof durationFields)[number][0], string>;
 
 export function startDraft(plan: Plan): Draft {
@@ -59,7 +63,6 @@ export function startDraft(plan: Plan): Draft {
   const defaults: Record<string, number | null | undefined> =
     event.timingConfiguredAt == null
       ? {
-          setupMinutes: event.timingSuggestedSetupMinutes,
           loadMinutes: 60,
           cleanupMinutes: 60,
         }

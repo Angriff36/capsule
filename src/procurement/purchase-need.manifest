@@ -30,6 +30,9 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   property preferredVendorId: uuid?
   property required requiredQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
+  // What the event needed when this need was ordered; the buyer compares it
+  // with requiredQuantity after a later kitchen change.
+  property orderedQuantity: decimal(12, 4)?
   property purchasingWeekStart: datetime?
   property vendorOrderId: uuid?
   property vendorOrderLineId: uuid?
@@ -47,7 +50,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   ref vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
   ref vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
 
-  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
+  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "The amount needed can't be negative. Use zero or more."
 
   transition status from "open" to ["ordered", "cancelled"]
   transition status from "ordered" to ["open", "fulfilled", "cancelled"]
@@ -72,15 +75,26 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     optional purchasingWeekStart: datetime,
     optional preferredVendorId: uuid
   ) {
-    // Idempotent create: EventApproved may re-run; unique demand key still binds.
+    // EventApproved may re-run. The generated create always inserts a new need
+    // and never rewrites an existing one (proof: create-server-owned-fields).
     guard self.openedAt == null or (self.eventId == eventId and self.ingredientDemandId == ingredientDemandId)
     guard self.deletedAt == null
-    constraint createNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint createNeedQuantityPositive: requiredQuantity > 0 "The amount needed has to be more than zero."
     // Full event requirement — weekly line applies on-hand once across consolidated needs.
     mutate requiredQuantity = self.openedAt != null ? self.requiredQuantity : requiredQuantity
     mutate purchasingWeekStart = self.openedAt != null ? self.purchasingWeekStart : purchasingWeekStart
     mutate preferredVendorId = self.openedAt != null ? self.preferredVendorId : preferredVendorId
     mutate openedAt = self.openedAt != null ? self.openedAt : now()
+    // A new need is open; ordering, receiving and cancelling are their own steps.
+    // A repeated create keeps an existing need and its history exactly as it is.
+    mutate status = self.openedAt != null ? self.status : "open"
+    mutate orderedQuantity = self.openedAt != null ? self.orderedQuantity : null
+    mutate vendorOrderId = self.openedAt != null ? self.vendorOrderId : null
+    mutate vendorOrderLineId = self.openedAt != null ? self.vendorOrderLineId : null
+    mutate orderedAt = self.openedAt != null ? self.orderedAt : null
+    mutate fulfilledAt = self.openedAt != null ? self.fulfilledAt : null
+    mutate cancelledAt = self.openedAt != null ? self.cancelledAt : null
+    mutate cancellationReason = self.openedAt != null ? self.cancellationReason : null
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -104,6 +118,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     mutate vendorOrderLineId = vendorOrderLineId
     mutate status = "ordered"
     mutate orderedAt = now()
+    mutate orderedQuantity = self.requiredQuantity
     emit PurchaseNeedOrdered {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -119,16 +134,18 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
 
   // A range-generated draft links each contributing demand to its combined
   // order line but deliberately leaves it open until the buyer submits.
+  // An ordered/fulfilled need whose event now needs more keeps its submitted
+  // order link: the weekly line already counts it and orders only the gap.
   command assignToDraft(vendorOrderId: uuid, vendorOrderLineId: uuid) {
-    guard self.status == "open"
+    guard self.status != "cancelled"
     guard self.openedAt != null
     guard self.deletedAt == null
     // Keep one editable draft link; a submitted order remains in the demand
     // link history while a later shortage can link to a new draft.
     guard self.vendorOrderId == null or (self.vendorOrder != null and self.vendorOrder.status != "draft") or (self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId)
     guard self.vendorOrderLineId == null or (self.vendorOrder != null and self.vendorOrder.status != "draft") or self.vendorOrderLineId == vendorOrderLineId
-    mutate vendorOrderId = vendorOrderId
-    mutate vendorOrderLineId = vendorOrderLineId
+    mutate vendorOrderId = self.status == "open" ? vendorOrderId : self.vendorOrderId
+    mutate vendorOrderLineId = self.status == "open" ? vendorOrderLineId : self.vendorOrderLineId
     emit PurchaseNeedDraftAssigned {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -137,16 +154,18 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       vendorOrderId: vendorOrderId
       vendorOrderLineId: vendorOrderLineId
-      status: "open"
+      status: self.status
     }
   }
 
   // Reconcile current need without rewriting previously submitted order lines.
+  // Owner (2026-09-24, #400): an ordered or received need stays ordered when
+  // the event's amount changes; the weekly line orders only the difference.
   command reviseRequired(requiredQuantity: decimal(12, 4), optional unit: UnitOfMeasure) {
     guard self.status == "open" or self.status == "ordered" or self.status == "fulfilled"
     guard self.openedAt != null
     guard self.deletedAt == null
-    constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "Required quantity cannot be negative"
+    constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "The amount needed can't be negative. Use zero or more."
     // Preserve the purchasing unit for compatible recipe measurements.
     // Exact factors mirror src/lib/recipeUnitConversion.ts.
     compute incomingUnit = unit != null ? unit : self.unit
@@ -158,7 +177,6 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     compute unitRatio = incomingUnit == self.unit ? 1 : (sourceMass > 0 and targetMass > 0 ? sourceMass / targetMass : (sourceVolume > 0 and targetVolume > 0 ? sourceVolume / targetVolume : 1))
     mutate requiredQuantity = requiredQuantity * unitRatio
     mutate unit = compatibleUnit ? self.unit : incomingUnit
-    mutate status = "open"
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -169,7 +187,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       requiredQuantity: self.requiredQuantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
-      status: "open"
+      status: self.status
     }
   }
 
@@ -182,6 +200,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "ordered"
     mutate orderedAt = now()
+    mutate orderedQuantity = self.requiredQuantity
     emit PurchaseNeedOrdered {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -219,7 +238,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open" or self.status == "ordered"
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint cancelNeedReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelNeedReason: length(trim(reason)) > 0 "Say why you're cancelling this need."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()

@@ -27,8 +27,6 @@ const COUNT_UNITS = new Set([
   "bottle",
 ]);
 
-const TYPICAL_BOTTLE_ML = 750;
-const USDA_BASIS_GRAMS = 100;
 const WATER_GRAMS_PER_ML = 1;
 
 const TYPICAL_DENSITY: ReadonlyArray<{ test: RegExp; gramsPerMl: number }> = [
@@ -67,16 +65,12 @@ export class CatalogUnitGrams {
 
     if (!COUNT_UNITS.has(unit)) return undefined;
 
+    // A count unit needs a recorded weight per piece; never a cup, a typical
+    // bottle, or a 100 g reference amount.
     if (hints.servingGramsPerEach != null && hints.servingGramsPerEach > 0) {
       return hints.servingGramsPerEach;
     }
-
-    const density = CatalogUnitGrams.density(hints);
-    if (unit === "bottle") return TYPICAL_BOTTLE_ML * density;
-    if (hints.gramsPerMl != null && hints.gramsPerMl > 0) {
-      return ML_PER_UNIT.cup * hints.gramsPerMl;
-    }
-    return USDA_BASIS_GRAMS;
+    return undefined;
   }
 
   static canScale(unit: string): boolean {

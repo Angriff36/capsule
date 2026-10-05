@@ -40,7 +40,7 @@ export class ReportCreatePayloadBuilder {
       data.get("sharingScope") || "owner_only",
     ).trim();
     const notes = String(data.get("notes") || "").trim();
-    if (!name) throw new Error("Report name is required.");
+    if (!name) throw new Error("Give this report a name.");
     if (!REPORT_SUBJECT_AREAS.includes(subjectArea as ReportSubjectArea)) {
       throw new Error("Select a subject area.");
     }
@@ -77,8 +77,8 @@ export function ReportCreateForm({
       onSubmit={onSubmit}
     >
       <p className="text-base text-ink-2">
-        Choose a subject and Capsule will open a live report from its current
-        operational records. You can rename, share, archive, and restore it
+        Choose a subject and Capsule will open a live report from what's
+        happening right now. You can rename, share, archive, and restore it
         later.
       </p>
       <label className="block space-y-1">

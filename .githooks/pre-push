@@ -47,3 +47,11 @@ bun scripts/manifest-regen-check.ts || {
   echo "pre-push blocked: Builder output is stale or conflicted (see above)."
   exit 1
 }
+
+# The proof catalogs are generated from the manifests too. A manifest change
+# pushed without them makes every release check fail later (2026-09-24).
+bun run proof:emit >/dev/null 2>&1 && git diff --quiet -- generated/proof || {
+  echo ""
+  echo "pre-push blocked: generated/proof is stale. It was just regenerated: commit generated/proof and push again."
+  exit 1
+}

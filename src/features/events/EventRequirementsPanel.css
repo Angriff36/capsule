@@ -1,0 +1,42 @@
+/* Phone: "What this event needs" becomes one short card per item. As a
+   760px table the item names were cut mid-word and the From column showed
+   one letter. The selectors outrank the shared phone rule that keeps every
+   table on one scrolling line. */
+@media (max-width: 767px) {
+  .supply-table-wrap table.needs-table {
+    min-width: 0;
+    overflow-x: visible;
+    white-space: normal;
+  }
+  .supply-table-wrap table.needs-table thead {
+    display: none;
+  }
+  .supply-table-wrap table.needs-table tbody,
+  .supply-table-wrap table.needs-table tr,
+  .supply-table-wrap table.needs-table td {
+    display: block;
+    width: 100%;
+  }
+  .supply-table-wrap table.needs-table tr {
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .supply-table-wrap table.needs-table tbody tr:first-child {
+    border-top: 0;
+  }
+  .supply-table-wrap table.needs-table td {
+    padding: 0.1rem 0;
+    border-top: 0;
+  }
+  .supply-table-wrap table.needs-table td:first-child {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .supply-table-wrap table.needs-table td.supply-number {
+    text-align: left;
+  }
+  .supply-table-wrap table.needs-table td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: var(--color-ink-3);
+  }
+}

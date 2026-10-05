@@ -231,7 +231,7 @@ export function enqueueAction(
 ): QueuedAction {
   if (!scope)
     throw new Error(
-      "Your staff identity must be confirmed before saving offline work.",
+      "We can't save this offline yet — confirm your staff identity first.",
     );
   const full: QueuedAction = {
     ...action,
@@ -241,6 +241,41 @@ export function enqueueAction(
   };
   saveQueue([...loadQueue(scope), full], scope);
   return full;
+}
+
+/** Actions this tab is sending right now; a reload clears it. */
+const inFlight = new Set<string>();
+
+/**
+ * Online send with the same safety as the offline queue (PL-TIME / AC-127):
+ * the action is written to this phone's queue BEFORE it is sent, with its own
+ * idempotencyKey. The server answering (yes or no) takes it off the queue. If
+ * the tab reloads or the connection drops before an answer, the action is
+ * still queued and the next drain resends the SAME key, so the server either
+ * returns the first result or applies it once - never twice, never lost.
+ */
+export async function sendAction(
+  action: Omit<QueuedAction, "id" | "idempotencyKey" | "queuedAt">,
+  runner: MutationRunner,
+  scope: string,
+): Promise<unknown> {
+  const queued = enqueueAction(action, scope);
+  inFlight.add(queued.id);
+  try {
+    const result = await runner({
+      ...queued.args,
+      idempotencyKey: queued.idempotencyKey,
+    });
+    removeAction(queued.id, scope);
+    return result;
+  } catch (error) {
+    // The server answered with a refusal: nothing was saved, so there is
+    // nothing to resend. Say why instead of keeping it pending.
+    removeAction(queued.id, scope);
+    throw error;
+  } finally {
+    inFlight.delete(queued.id);
+  }
 }
 
 export function removeAction(id: string, scope: string): void {
@@ -317,6 +352,8 @@ export async function drainQueue(
   while (!sawFailure && stillCurrent()) {
     const action = loadQueue(scope)[0];
     if (!action) return;
+    // Still waiting for this tab's own send; resending now would only race it.
+    if (inFlight.has(action.id)) return;
     const runner = runners[action.runKey];
     if (!runner) {
       removeAction(action.id, scope);

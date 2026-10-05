@@ -36,12 +36,35 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   property completedAt: datetime?
   property cancelledAt: datetime?
   property cancellationReason: string?
+  // Who did the physical work (PL-BATCH, 2026-09-28). Person ids from the
+  // signed-in staff profile, never a name the caller sends.
+  property startedById: uuid?
+  property completedById: uuid?
+  property cancelledById: uuid?
+  // Waste of the batch's own output, in the batch yield unit. Ingredient
+  // waste stays on WasteRecord.
+  property wasteQuantity: decimal(12, 4)?
+  property wasteReason: string?
+  // Remaining work: what a short batch still owes the plan. The plan
+  // (plannedYield) is never rewritten. Cleared by a make-up batch or by a
+  // person saying no more is needed.
+  property shortfallQuantity: decimal(12, 4)?
+  property shortfallResolvedAt: datetime?
+  property shortfallResolution: string?
+  property makeUpForBatchId: uuid?
+  // A later fix to the counted yield keeps the first count in the event log.
+  property yieldCorrectedAt: datetime?
+  property yieldCorrectedById: uuid?
+  property yieldCorrectionReason: string?
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint batchPlannedPositive: self.plannedAt == null or self.plannedYield > 0 "Planned yield must be positive once planned"
-  constraint batchActualNonnegative: self.actualYield == null or self.actualYield >= 0 "Actual yield cannot be negative"
+  computed yieldVariance: decimal(12, 4) = self.actualYield == null ? 0 : self.actualYield - self.plannedYield
+
+  constraint batchPlannedPositive: self.plannedAt == null or self.plannedYield > 0 "Enter a planned yield more than zero before you plan this batch."
+  constraint batchActualNonnegative: self.actualYield == null or self.actualYield >= 0 "The actual yield can't be negative. Use zero or more."
+  constraint batchWasteNonnegative: self.wasteQuantity == null or self.wasteQuantity >= 0 "The wasted amount can't be negative. Use zero or more."
 
   transition status from "planned" to ["in_progress", "cancelled"]
   transition status from "in_progress" to ["completed", "cancelled"]
@@ -59,20 +82,22 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     plannedYield: decimal(12, 4),
     yieldUnit: UnitOfMeasure,
     optional eventId: uuid,
-    optional notes: string
+    optional notes: string,
+    optional makeUpForBatchId: uuid
   ) {
     guard self.deletedAt == null
     guard self.status == "planned"
     guard self.plannedAt == null or self.componentId == componentId
     guard self.plannedAt != null or (self.component != null and self.component.status == "published")
-    constraint planComponentMatch: componentId == self.componentId "Plan componentId must match the seeded component reference"
-    constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Plan eventId must match the seeded event reference when provided"
-    constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Planned yield must be positive"
+    constraint planComponentMatch: componentId == self.componentId "This batch is for a different component. Pick the component already on this batch."
+    constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This batch is for a different event. Pick the event already on this batch, or leave it blank."
+    constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Enter a planned yield more than zero."
     mutate componentId = componentId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate plannedYield = self.plannedAt != null ? self.plannedYield : plannedYield
     mutate yieldUnit = self.plannedAt != null ? self.yieldUnit : yieldUnit
     mutate notes = notes != null ? notes : self.notes
+    mutate makeUpForBatchId = self.makeUpForBatchId != null ? self.makeUpForBatchId : makeUpForBatchId
     mutate plannedAt = self.plannedAt != null ? self.plannedAt : now()
     emit ProductionBatchPlanned {
       productionBatchId: self.id
@@ -82,6 +107,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
       plannedYield: self.plannedAt != null ? self.plannedYield : plannedYield
       yieldUnit: self.plannedAt != null ? self.yieldUnit : yieldUnit
       status: "planned"
+      makeUpForBatchId: self.makeUpForBatchId != null ? self.makeUpForBatchId : makeUpForBatchId
     }
   }
 
@@ -98,8 +124,8 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.status == "planned"
     guard self.plannedAt != null
     guard self.deletedAt == null
-    constraint reconcileExactNonnegative: plannedExact >= 0 "Exact quantity cannot be negative"
-    constraint reconcileRoundedCoversExact: plannedRounded >= plannedExact "Rounded quantity cannot be below the exact need"
+    constraint reconcileExactNonnegative: plannedExact >= 0 "The exact amount can't be negative. Use zero or more."
+    constraint reconcileRoundedCoversExact: plannedRounded >= plannedExact "The rounded amount can't be less than the exact amount needed."
     mutate plannedExact = plannedExact
     mutate plannedRounded = plannedRounded
     mutate surplusQuantity = plannedRounded - plannedExact
@@ -124,6 +150,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "in_progress"
     mutate startedAt = now()
+    mutate startedById = user.personId
     emit ProductionBatchStarted {
       productionBatchId: self.id
       tenantId: self.tenantId
@@ -136,15 +163,28 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command complete(actualYield: decimal(12, 4)) {
+  // The counted yield is what the cook entered, zero included. A short batch
+  // records what it still owes the plan as remaining work; the plan stays.
+  command complete(
+    actualYield: decimal(12, 4),
+    optional wasteQuantity: decimal(12, 4),
+    optional wasteReason: string
+  ) {
     guard self.status == "in_progress"
     guard self.startedAt != null
     guard self.deletedAt == null
-    constraint completeYieldNonnegative: actualYield >= 0 "Actual yield cannot be negative"
+    constraint completeYieldNonnegative: actualYield >= 0 "The actual yield can't be negative. Use zero or more."
+    constraint completeWasteNonnegative: wasteQuantity == null or wasteQuantity >= 0 "The wasted amount can't be negative. Use zero or more."
+    constraint completeWasteReason: wasteQuantity == null or wasteQuantity == 0 or (wasteReason != null and length(trim(wasteReason)) > 0) "Say why the food was wasted."
     compute previousStatus = self.status
+    compute shortfall = actualYield < self.plannedYield ? self.plannedYield - actualYield : 0
     mutate actualYield = actualYield
+    mutate wasteQuantity = wasteQuantity
+    mutate wasteReason = wasteReason
+    mutate shortfallQuantity = shortfall
     mutate status = "completed"
     mutate completedAt = now()
+    mutate completedById = user.personId
     emit ProductionBatchCompleted {
       productionBatchId: self.id
       tenantId: self.tenantId
@@ -155,6 +195,61 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
       yieldUnit: self.yieldUnit
       previousStatus: previousStatus
       status: "completed"
+      shortfallQuantity: shortfall
+      wasteQuantity: wasteQuantity
+      wasteReason: wasteReason
+      completedById: user.personId
+    }
+  }
+
+  // Fix a miscounted yield after the batch is done. The first count stays in
+  // the event log; remaining work follows the new count unless it was
+  // already settled.
+  command correctYield(actualYield: decimal(12, 4), reason: string) {
+    guard self.status == "completed"
+    guard self.deletedAt == null
+    constraint correctYieldNonnegative: actualYield >= 0 "The actual yield can't be negative. Use zero or more."
+    constraint correctYieldReason: length(trim(reason)) > 0 "Say why you're changing the counted yield."
+    compute previousActualYield = self.actualYield
+    compute shortfall = actualYield < self.plannedYield ? self.plannedYield - actualYield : 0
+    mutate actualYield = actualYield
+    mutate shortfallQuantity = self.shortfallResolvedAt != null ? self.shortfallQuantity : shortfall
+    mutate yieldCorrectedAt = now()
+    mutate yieldCorrectedById = user.personId
+    mutate yieldCorrectionReason = reason
+    emit ProductionBatchYieldCorrected {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      eventId: self.eventId
+      plannedYield: self.plannedYield
+      previousActualYield: previousActualYield
+      actualYield: actualYield
+      yieldUnit: self.yieldUnit
+      shortfallQuantity: self.shortfallResolvedAt != null ? self.shortfallQuantity : shortfall
+      reason: reason
+      correctedById: user.personId
+    }
+  }
+
+  // Settle what a short batch still owes: a make-up batch was planned, or a
+  // person says no more is needed (for example the surplus covers it).
+  // Settling twice keeps the first answer, so a replayed make-up plan never
+  // fails.
+  command resolveShortfall(resolution: string) {
+    guard self.status == "completed"
+    guard self.deletedAt == null
+    constraint resolveShortfallReason: length(trim(resolution)) > 0 "Say how the missing amount was handled."
+    mutate shortfallResolvedAt = self.shortfallResolvedAt != null ? self.shortfallResolvedAt : now()
+    mutate shortfallResolution = self.shortfallResolution != null ? self.shortfallResolution : resolution
+    emit ProductionBatchShortfallResolved {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      eventId: self.eventId
+      shortfallQuantity: self.shortfallQuantity
+      yieldUnit: self.yieldUnit
+      resolution: resolution
     }
   }
 
@@ -162,10 +257,11 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.status == "planned" or self.status == "in_progress"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
-    constraint cancelBatchReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelBatchReason: length(trim(reason)) > 0 "Say why you're cancelling this batch."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
+    mutate cancelledById = user.personId
     mutate cancellationReason = reason
     emit ProductionBatchCancelled {
       productionBatchId: self.id
@@ -192,6 +288,7 @@ event ProductionBatchPlanned: "production_batch.planned" {
   plannedYield: decimal(12, 4)
   yieldUnit: UnitOfMeasure
   status: ProductionBatchStatus
+  makeUpForBatchId: string?
 }
 
 event ProductionBatchStarted: "production_batch.started" {
@@ -215,6 +312,34 @@ event ProductionBatchCompleted: "production_batch.completed" {
   yieldUnit: UnitOfMeasure
   previousStatus: ProductionBatchStatus
   status: ProductionBatchStatus
+  shortfallQuantity: decimal(12, 4)
+  wasteQuantity: decimal(12, 4)?
+  wasteReason: string?
+  completedById: string?
+}
+
+event ProductionBatchYieldCorrected: "production_batch.yield_corrected" {
+  productionBatchId: string
+  tenantId: string
+  componentId: string
+  eventId: string?
+  plannedYield: decimal(12, 4)
+  previousActualYield: decimal(12, 4)?
+  actualYield: decimal(12, 4)
+  yieldUnit: UnitOfMeasure
+  shortfallQuantity: decimal(12, 4)?
+  reason: string
+  correctedById: string?
+}
+
+event ProductionBatchShortfallResolved: "production_batch.shortfall_resolved" {
+  productionBatchId: string
+  tenantId: string
+  componentId: string
+  eventId: string?
+  shortfallQuantity: decimal(12, 4)?
+  yieldUnit: UnitOfMeasure
+  resolution: string
 }
 
 event ProductionBatchCancelled: "production_batch.cancelled" {
@@ -297,8 +422,8 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
 
-  constraint allocationQuantityNonnegative: self.allocatedAt == null or self.allocatedQuantity >= 0 "Allocated quantity cannot be negative"
-  constraint allocationOwner: self.allocatedAt == null or self.isSurplus == true or self.eventId != null "An allocation belongs to an event or is surplus"
+  constraint allocationQuantityNonnegative: self.allocatedAt == null or self.allocatedQuantity >= 0 "The allocated amount can't be negative. Use zero or more."
+  constraint allocationOwner: self.allocatedAt == null or self.isSurplus == true or self.eventId != null "This allocation has to belong to an event, or be marked as surplus."
 
   transition status from "planned" to ["produced", "released"]
   transition status from "produced" to ["portioned", "released"]
@@ -320,9 +445,9 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
   ) {
     guard self.allocatedAt == null
     guard self.deletedAt == null
-    constraint allocateQuantity: allocatedQuantity >= 0 "Allocated quantity cannot be negative"
-    constraint allocateShare: formulaShare >= 0 "Formula share cannot be negative"
-    constraint allocateOwner: (isSurplus != null and isSurplus) or eventId != null "An allocation belongs to an event or is surplus"
+    constraint allocateQuantity: allocatedQuantity >= 0 "The allocated amount can't be negative. Use zero or more."
+    constraint allocateShare: formulaShare >= 0 "The formula share can't be negative. Use zero or more."
+    constraint allocateOwner: (isSurplus != null and isSurplus) or eventId != null "This allocation has to belong to an event, or be marked as surplus."
     mutate productionBatchId = productionBatchId
     mutate eventId = eventId
     mutate eventDishId = eventDishId
@@ -351,6 +476,10 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "produced"
     mutate producedAt = now()
+    emit ProductionBatchAllocationProduced {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command markPortioned() {
@@ -358,15 +487,23 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "portioned"
     mutate portionedAt = now()
+    emit ProductionBatchAllocationPortioned {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command release(reason: string) {
     guard self.status == "planned" or self.status == "produced"
     guard self.deletedAt == null
-    constraint releaseAllocationReason: length(trim(reason)) > 0 "Release reason is required"
+    constraint releaseAllocationReason: length(trim(reason)) > 0 "Say why you're releasing this."
     mutate status = "released"
     mutate releaseReason = reason
     mutate deletedAt = now()
+    emit ProductionBatchAllocationReleased {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store ProductionBatchAllocation in durable
@@ -388,3 +525,24 @@ event ProductionBatchAllocated: "production_batch_allocation.allocated" {
 // packing tasks stay open.
 on ProductionBatchCompleted fanOut ProductionBatchAllocation where productionBatchId = payload.productionBatchId
   run markProduced
+
+// A make-up batch settles what the short batch still owed.
+on ProductionBatchPlanned run ProductionBatch.resolveShortfall
+  resolve payload.makeUpForBatchId
+  params { resolution: "Make-up batch planned" }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ProductionBatchAllocationPortioned: "production.batch.allocation.portioned" {
+  productionBatchAllocationId: string
+  tenantId: string
+}
+
+event ProductionBatchAllocationProduced: "production.batch.allocation.produced" {
+  productionBatchAllocationId: string
+  tenantId: string
+}
+
+event ProductionBatchAllocationReleased: "production.batch.allocation.released" {
+  productionBatchAllocationId: string
+  tenantId: string
+}

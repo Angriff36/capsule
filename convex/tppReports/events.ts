@@ -11,6 +11,12 @@ import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFi
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
+import { loadWindowLabel } from "../../src/features/facilities/venueOperatingFacts";
+import {
+  eventDocumentSections,
+  serviceRows,
+  type EventDocumentTemplate,
+} from "../../src/lib/tppReports/eventDocumentTemplates";
 import type {
   TppColumn,
   TppDocumentSection,
@@ -20,8 +26,12 @@ import type {
 } from "../../src/features/reports/tpp/types";
 import { query, type QueryCtx } from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
+import { getAuthContext } from "../lib/authContext";
+import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -31,6 +41,75 @@ import {
 
 const REPORT_IDS = new Set(TPP_EVENT_REPORTS.map((report) => report.id));
 type Parameters = Record<string, string | string[] | boolean | number>;
+
+// Generated read policies (convex/queries.ts) of the records these reports
+// show. A report opens only for a caller who may read its main records; data
+// joined in from other records shows only when the caller may read those too.
+const EVENT_READ = ["staffAccess"];
+const VENUE_READ = ["eventAccess"];
+const EVENT_DISH_READ = ["staffAccess"];
+const DISH_READ = ["kitchenAccess", "salesAccess", "manageAccess"];
+const TIMELINE_READ = ["staffAccess"];
+const DELIVERY_READ = ["logisticsAccess", "manageAccess"];
+const INVOICE_READ = ["financeAccess", "manageAccess"];
+// Shifts, event assignments and staffing requests: workforce staff, and crew
+// for shared event staffing (every report shift here belongs to an event).
+const STAFFING_READ = ["workforceAccess", "workforceSelfAccess"];
+const PERSON_READ = ["staffAccess"];
+const PREP_TASK_READ = ["kitchenAccess", "manageAccess"];
+const COMPONENT_READ = ["kitchenAccess"];
+const PURCHASE_NEED_READ = ["inventoryAccess", "manageAccess"];
+const INGREDIENT_READ = ["kitchenAccess", "inventoryAccess", "manageAccess"];
+const VENDOR_READ = ["procurementAccess"];
+const RESERVATION_READ = [
+  "inventoryAccess",
+  "logisticsAccess",
+  "eventManageAccess",
+];
+const EQUIPMENT_READ = ["inventoryAccess", "logisticsAccess"];
+// Mirrors RentalOrderLine's read policy.
+const RENTAL_READ = ["logisticsAccess", "inventoryAccess", "eventManageAccess"];
+const PACK_LIST_READ = ["staffAccess"];
+const DEMAND_READ = ["inventoryAccess", "manageAccess"];
+// Dish ingredient lines, dish recipes, component ingredient lines.
+const RECIPE_LINE_READ = ["kitchenAccess"];
+
+const MENU_READS = [EVENT_READ, EVENT_DISH_READ, DISH_READ];
+const ORDER_LIST_READS = [EVENT_READ, PURCHASE_NEED_READ];
+const PRODUCTION_READS = [EVENT_READ, EVENT_DISH_READ, PREP_TASK_READ];
+
+/** Every read policy the report's main records need (all must pass). */
+const REPORT_READS: Record<string, string[][]> = {
+  "contact-worksheet-blank": [],
+  "event-changes": [EVENT_READ],
+  "event-list": [EVENT_READ],
+  "event-schedule": [EVENT_READ],
+  "event-booking": [EVENT_READ],
+  "event-delivery-addresses": [EVENT_READ, DELIVERY_READ],
+  "event-tasks-notes": [EVENT_READ, TIMELINE_READ],
+  "invoice-number-history": [EVENT_READ, INVOICE_READ],
+  "staff-schedules": [EVENT_READ, STAFFING_READ],
+  "master-food-production-worksheet": PRODUCTION_READS,
+  "event-menu-item-production": PRODUCTION_READS,
+  "beverage-order-list-by-vendor": ORDER_LIST_READS,
+  "miscellaneous-order-list-by-vendor": ORDER_LIST_READS,
+  "other-inventory-order-list-by-vendor": ORDER_LIST_READS,
+  "order-list": ORDER_LIST_READS,
+  "rental-order-list-by-vendor": [EVENT_READ, RESERVATION_READ, EQUIPMENT_READ],
+  "event-beo": [EVENT_READ],
+  "event-timeline": [EVENT_READ],
+  "event-worksheet": [EVENT_READ],
+  "heating-serving-event-menu": MENU_READS,
+  "event-menu-item-labels": MENU_READS,
+  "heating-serving-labels": MENU_READS,
+  "menu-item-table-tents": MENU_READS,
+  "production-summary": [EVENT_READ, PREP_TASK_READ],
+  "kitchen-labor": [EVENT_READ, PREP_TASK_READ],
+  "equipment-summary": [EVENT_READ, RESERVATION_READ],
+  "pack-list": [EVENT_READ, PACK_LIST_READ],
+  "shopping-list": [EVENT_READ, DEMAND_READ],
+  "menu-item-recipes": [...MENU_READS, RECIPE_LINE_READ, INGREDIENT_READ],
+};
 
 function reportTitle(reportId: string): string {
   return (
@@ -61,35 +140,45 @@ function range(parameters: Parameters): [number, number] {
   ];
 }
 
+/**
+ * The event's own venue snapshot is event data; filling a missing one from
+ * the Venue record follows the venue read policy (seeVenues).
+ */
+async function reportEvent(
+  ctx: QueryCtx,
+  tenantId: string,
+  event: Doc<"events">,
+  seeVenues: boolean,
+) {
+  const plain = await decryptReportFields(
+    ctx,
+    "Event",
+    ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+    event,
+  );
+  return seeVenues ? resolveReportEventVenue(ctx, tenantId, plain) : plain;
+}
+
 async function eventsInRange(
   ctx: QueryCtx,
   tenantId: string,
   parameters: Parameters,
+  seeVenues: boolean,
 ) {
   const [start, end] = range(parameters);
   const events = (
     await ctx.db
       .query("events")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .take(REPORT_ROW_LIMIT)
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "events"))
   ).filter(
     (event) =>
       isLiveTenantRow(event, tenantId) &&
       inDateRange(event.startsAt, start, end),
   );
   return await Promise.all(
-    events.map(async (event) =>
-      resolveReportEventVenue(
-        ctx,
-        tenantId,
-        await decryptReportFields(
-          ctx,
-          "Event",
-          ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-          event,
-        ),
-      ),
-    ),
+    events.map((event) => reportEvent(ctx, tenantId, event, seeVenues)),
   );
 }
 
@@ -97,6 +186,7 @@ async function selectedEvent(
   ctx: QueryCtx,
   tenantId: string,
   parameters: Parameters,
+  seeVenues: boolean,
 ) {
   const eventId =
     typeof parameters.eventId === "string"
@@ -105,16 +195,7 @@ async function selectedEvent(
   const eventRaw = eventId ? await ctx.db.get(eventId) : null;
   if (!eventRaw || !isLiveTenantRow(eventRaw, tenantId))
     throw new Error("Choose an event");
-  return resolveReportEventVenue(
-    ctx,
-    tenantId,
-    await decryptReportFields(
-      ctx,
-      "Event",
-      ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-      eventRaw,
-    ),
-  );
+  return reportEvent(ctx, tenantId, eventRaw, seeVenues);
 }
 
 async function eventMenu(
@@ -126,7 +207,8 @@ async function eventMenu(
     await ctx.db
       .query("eventDishes")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT)
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "event dishes"))
   ).filter((row) => isLiveTenantRow(row, tenantId) && row.removedAt == null);
   const dishes = await Promise.all(
     eventDishes.map((row) => ctx.db.get(row.dishId)),
@@ -141,24 +223,31 @@ async function eventStaffing(
   ctx: QueryCtx,
   tenantId: string,
   eventId: Id<"events">,
+  seePeople: boolean,
 ) {
   const [assignments, staffNeeds, shifts, people] = await Promise.all([
     ctx.db
       .query("eventAssignments")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT),
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "crew assignments")),
     ctx.db
       .query("eventStaffNeeds")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT),
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "crew needs")),
     ctx.db
       .query("shifts")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .take(REPORT_ROW_LIMIT),
-    ctx.db
-      .query("people")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .take(REPORT_ROW_LIMIT),
+      .take(REPORT_ROW_LIMIT + 1)
+      .then(keepReportRows(ctx, "shifts")),
+    seePeople
+      ? ctx.db
+          .query("people")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "staff"))
+      : [],
   ]);
   const reportAssignments = await Promise.all(
     assignments.map((assignment) =>
@@ -178,7 +267,7 @@ async function eventStaffing(
   ].filter((personId): personId is Id<"people"> => personId != null);
   const missingPeople = await Promise.all(
     [...new Set(referencedPersonIds.map(String))]
-      .filter((personId) => !peopleById.has(personId))
+      .filter((personId) => seePeople && !peopleById.has(personId))
       .map((personId) => ctx.db.get(personId as Id<"people">)),
   );
   const resolvedPeople = [
@@ -309,6 +398,7 @@ async function productionWorksheet(
   tenantId: string,
   events: Doc<"events">[],
   reportId: string,
+  sees: { dishes: boolean; components: boolean; people: boolean },
 ): Promise<TppReportResult> {
   const sections: TppDocumentSection[] = [];
   const rows: TppRow[] = [];
@@ -321,7 +411,8 @@ async function productionWorksheet(
       ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "prep tasks")),
     ]);
     sections.push({
       id: event._id,
@@ -355,7 +446,7 @@ async function productionWorksheet(
     for (const group of groups) {
       const selection = group.selection;
       const dishId = selection?.dishId ?? group.tasks[0]?.dishId;
-      const dish = dishId ? await ctx.db.get(dishId) : null;
+      const dish = dishId && sees.dishes ? await ctx.db.get(dishId) : null;
       const dishName =
         dish && isLiveTenantRow(dish, tenantId) ? dish.name : "Event prep";
       const sectionRows: TppDocumentSection["rows"][number][] = [
@@ -413,8 +504,12 @@ async function productionWorksheet(
       }
       for (const task of group.tasks) {
         const [component, person] = await Promise.all([
-          task.componentId ? ctx.db.get(task.componentId) : null,
-          task.assignedToId ? ctx.db.get(task.assignedToId) : null,
+          task.componentId && sees.components
+            ? ctx.db.get(task.componentId)
+            : null,
+          task.assignedToId && sees.people
+            ? ctx.db.get(task.assignedToId)
+            : null,
         ]);
         const componentName =
           component && isLiveTenantRow(component, tenantId)
@@ -469,7 +564,7 @@ async function productionWorksheet(
             value: componentName,
             recipe: { kind: "component", id: component._id },
           });
-        else if (task.componentId)
+        else if (task.componentId && sees.components)
           sectionRows.push({
             label: "Component recipe",
             value: "Recipe unavailable",
@@ -490,7 +585,8 @@ async function productionWorksheet(
             notes,
             blocked: task.blockReason ?? "",
             component:
-              componentName || (task.componentId ? "Recipe unavailable" : ""),
+              componentName ||
+              (task.componentId && sees.components ? "Recipe unavailable" : ""),
           },
         });
       }
@@ -564,9 +660,16 @@ const EVENT_COLUMNS: TppColumn[] = [
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId)) throw new Error("Unknown Event report");
+    const auth = await getAuthContext(ctx);
+    const reads = REPORT_READS[args.reportId];
+    if (!reads || !reads.every((read) => canRead(auth, read)))
+      throw new Error(
+        "Your role can't open this report. Ask someone who works with these records to run it.",
+      );
+    const seeVenues = canRead(auth, VENUE_READ);
     const parameters = (args.parameters ?? {}) as Parameters;
 
     if (args.reportId === "contact-worksheet-blank") {
@@ -610,12 +713,13 @@ export const run = query({
         "event-tasks-notes",
       ].includes(args.reportId)
     ) {
-      const events = await eventsInRange(ctx, tenantId, parameters);
+      const events = await eventsInRange(ctx, tenantId, parameters, seeVenues);
       if (args.reportId === "event-delivery-addresses") {
         const deliveries = await ctx.db
           .query("deliveries")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT);
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "deliveries"));
         const eventIds = new Set(events.map((event) => String(event._id)));
         return table(
           args.reportId,
@@ -651,7 +755,8 @@ export const run = query({
         const activities = await ctx.db
           .query("eventTimelineActivities")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT);
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "timeline steps"));
         const eventById = new Map(
           events.map((event) => [String(event._id), event]),
         );
@@ -692,7 +797,7 @@ export const run = query({
     }
 
     if (["invoice-number-history", "staff-schedules"].includes(args.reportId)) {
-      const events = await eventsInRange(ctx, tenantId, parameters);
+      const events = await eventsInRange(ctx, tenantId, parameters, seeVenues);
       const eventById = new Map(
         events.map((event) => [String(event._id), event]),
       );
@@ -700,7 +805,8 @@ export const run = query({
         const invoices = await ctx.db
           .query("invoices")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT);
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "invoices"));
         return table(
           args.reportId,
           [
@@ -735,17 +841,24 @@ export const run = query({
         ctx.db
           .query("shifts")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("people")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "shifts")),
+        canRead(auth, PERSON_READ)
+          ? ctx.db
+              .query("people")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "staff"))
+          : [],
       ]);
+      // Removed people never show.
       const peopleById = new Map(
-        people.map((person) => [
-          String(person._id),
-          `${person.givenName} ${person.familyName}`,
-        ]),
+        people
+          .filter((person) => isLiveTenantRow(person, tenantId))
+          .map((person) => [
+            String(person._id),
+            `${person.givenName} ${person.familyName}`,
+          ]),
       );
       return table(
         args.reportId,
@@ -780,12 +893,18 @@ export const run = query({
       );
     }
 
+    const productionSees = {
+      dishes: canRead(auth, DISH_READ),
+      components: canRead(auth, COMPONENT_READ),
+      people: canRead(auth, PERSON_READ),
+    };
     if (args.reportId === "master-food-production-worksheet") {
       return productionWorksheet(
         ctx,
         tenantId,
-        await eventsInRange(ctx, tenantId, parameters),
+        await eventsInRange(ctx, tenantId, parameters, seeVenues),
         args.reportId,
+        productionSees,
       );
     }
 
@@ -798,29 +917,45 @@ export const run = query({
         "order-list",
       ].includes(args.reportId)
     ) {
-      const events = await eventsInRange(ctx, tenantId, parameters);
+      const events = await eventsInRange(ctx, tenantId, parameters, seeVenues);
       const eventById = new Map(
         events.map((event) => [String(event._id), event]),
       );
-      const [needs, ingredients, vendors] = await Promise.all([
-        ctx.db
-          .query("purchaseNeeds")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("ingredients")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("vendors")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-      ]);
+      const seeVendors = canRead(auth, VENDOR_READ);
+      const rental = args.reportId === "rental-order-list-by-vendor";
+      const [needs, ingredients, vendors] = rental
+        ? [[], [], []]
+        : await Promise.all([
+            ctx.db
+              .query("purchaseNeeds")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "purchase needs")),
+            canRead(auth, INGREDIENT_READ)
+              ? ctx.db
+                  .query("ingredients")
+                  .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+                  .take(REPORT_ROW_LIMIT + 1)
+                  .then(keepReportRows(ctx, "ingredients"))
+              : [],
+            seeVendors
+              ? ctx.db
+                  .query("vendors")
+                  .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+                  .take(REPORT_ROW_LIMIT + 1)
+                  .then(keepReportRows(ctx, "vendors"))
+              : [],
+          ]);
+      // Removed ingredients and vendors never show.
       const ingredientById = new Map(
-        ingredients.map((item) => [String(item._id), item]),
+        ingredients
+          .filter((item) => isLiveTenantRow(item, tenantId))
+          .map((item) => [String(item._id), item]),
       );
       const vendorById = new Map(
-        vendors.map((vendor) => [String(vendor._id), vendor.name]),
+        vendors
+          .filter((vendor) => isLiveTenantRow(vendor, tenantId))
+          .map((vendor) => [String(vendor._id), vendor.name]),
       );
       let rows: TppRow[] = needs
         .filter(
@@ -832,9 +967,11 @@ export const run = query({
         .map((row) => ({
           id: row._id,
           values: {
-            vendor: row.preferredVendorId
-              ? (vendorById.get(String(row.preferredVendorId)) ?? "Unassigned")
-              : "Unassigned",
+            vendor: !seeVendors
+              ? ""
+              : row.preferredVendorId
+                ? (vendorById.get(String(row.preferredVendorId)) ?? "")
+                : "Unassigned",
             item: ingredientById.get(String(row.ingredientId))?.name ?? "",
             category:
               ingredientById.get(String(row.ingredientId))?.category ?? "",
@@ -861,19 +998,24 @@ export const run = query({
             String(row.values.category),
           ),
         );
-      if (args.reportId === "rental-order-list-by-vendor") {
+      if (rental) {
         const [reservations, equipment] = await Promise.all([
           ctx.db
             .query("equipmentReservations")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "equipment holds")),
           ctx.db
             .query("equipments")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "equipment items")),
         ]);
+        // Removed equipment never shows.
         const equipmentById = new Map(
-          equipment.map((item) => [String(item._id), item]),
+          equipment
+            .filter((item) => isLiveTenantRow(item, tenantId))
+            .map((item) => [String(item._id), item]),
         );
         rows = reservations
           .filter(
@@ -914,19 +1056,27 @@ export const run = query({
       );
     }
 
-    const event = await selectedEvent(ctx, tenantId, parameters);
+    const event = await selectedEvent(ctx, tenantId, parameters, seeVenues);
     if (args.reportId === "event-booking")
       return table(args.reportId, EVENT_COLUMNS, eventRows([event]));
-    const menu = await eventMenu(ctx, tenantId, event._id);
+    // Menu lines show dish names, so they follow the event dish and dish
+    // read policies (the menu reports require both; the BEO drops the menu).
+    const menu =
+      canRead(auth, EVENT_DISH_READ) && canRead(auth, DISH_READ)
+        ? await eventMenu(ctx, tenantId, event._id)
+        : [];
     const header = [
       { label: "Event", value: event.title },
       { label: "Date", value: dateText(event.startsAt) },
-      { label: "Contact", value: event.primaryContactName ?? "" },
+      {
+        label: "Contact",
+        value: event.primaryContactName?.trim() || "Not recorded",
+      },
       {
         label: "Venue",
-        value: [event.venueName, event.venueAddress]
-          .filter(Boolean)
-          .join(" · "),
+        value:
+          [event.venueName, event.venueAddress].filter(Boolean).join(" · ") ||
+          "No venue picked yet",
       },
       {
         label: "Guests",
@@ -993,124 +1143,197 @@ export const run = query({
         "heating-serving-event-menu",
       ].includes(args.reportId)
     ) {
-      const [timeline, staffing, reservations, equipment] = await Promise.all([
-        ctx.db
-          .query("eventTimelineActivities")
-          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .take(REPORT_ROW_LIMIT),
-        eventStaffing(ctx, tenantId, event._id),
-        ctx.db
-          .query("equipmentReservations")
-          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("equipments")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-      ]);
+      // Each section follows the read policy of its own records.
+      const seeRentals = canRead(auth, RENTAL_READ);
+      const [timeline, staffing, reservations, equipment, rentals, venue] =
+        await Promise.all([
+          canRead(auth, TIMELINE_READ)
+            ? ctx.db
+                .query("eventTimelineActivities")
+                .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "timeline steps"))
+            : [],
+          canRead(auth, STAFFING_READ)
+            ? eventStaffing(
+                ctx,
+                tenantId,
+                event._id,
+                canRead(auth, PERSON_READ),
+              )
+            : [],
+          canRead(auth, RESERVATION_READ)
+            ? ctx.db
+                .query("equipmentReservations")
+                .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "equipment holds"))
+            : [],
+          canRead(auth, EQUIPMENT_READ)
+            ? ctx.db
+                .query("equipments")
+                .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "equipment items"))
+            : [],
+          seeRentals
+            ? ctx.db
+                .query("rentalOrderLines")
+                .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+                .take(REPORT_ROW_LIMIT + 1)
+                .then(keepReportRows(ctx, "rental lines"))
+            : [],
+          seeVenues && event.venueId ? ctx.db.get(event.venueId) : null,
+        ]);
+      // Removed equipment never shows.
       const equipmentById = new Map(
-        equipment.map((item) => [String(item._id), item.name]),
+        equipment
+          .filter((item) => isLiveTenantRow(item, tenantId))
+          .map((item) => [String(item._id), item.name]),
       );
+      const seesMenu =
+        canRead(auth, EVENT_DISH_READ) && canRead(auth, DISH_READ);
+      const menuRows = menu.map(({ item, dish }) => {
+        const menuNotes = displayEventMenuNotes(item.specialInstructions);
+        return {
+          label: item.course ?? dish.course ?? "",
+          value: `${dish.name} · ${item.quantityServings} servings${menuNotes ? ` — ${menuNotes}` : ""}`,
+        };
+      });
+      const heatingRows = menu.map(({ item, dish }) => {
+        const menuNotes = displayEventMenuNotes(item.specialInstructions);
+        return {
+          label: `${dish.name} · ${item.quantityServings} servings`,
+          value: [
+            serviceMethodText(
+              dish.serviceInstructions,
+              dish.serviceInstructionsSource,
+              dish.recipeInstructions,
+            ),
+            serviceSourceText(dish.serviceInstructionsSource),
+            menuNotes ? `Event notes: ${menuNotes}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+          recipe: { kind: "dish" as const, id: String(dish._id) },
+        };
+      });
+      const liveVenue =
+        venue && isLiveTenantRow(venue, tenantId)
+          ? (venue as Doc<"venues">)
+          : null;
       return {
         kind: "document",
         title: reportTitle(args.reportId),
         template: args.reportId,
-        sections: [
+        sections: eventDocumentSections(
+          args.reportId as EventDocumentTemplate,
           {
-            id: "event",
-            heading:
-              args.reportId === "event-beo" ? "Banquet Event Order" : "Event",
-            rows: header,
+            header,
+            rows: {
+              service: serviceRows([
+                ["Service style", event.serviceStyleName],
+                ["Bar service", event.barService],
+                ["Drinks on the menu", event.beveragesOnMenu],
+                ["Place settings", event.placeSettings],
+                ["Table linen", event.linenColorTables],
+                ["Guest tables", event.guestTableSetup],
+                ["Buffet tables", event.buffetTableSetup],
+                ["Rentals", event.eventRentals],
+                ["Decor", event.decorKit],
+                ["Rain plan", event.rainPlan],
+              ]),
+              venue: !seeVenues
+                ? null
+                : liveVenue
+                  ? serviceRows([
+                      ["Load-in window", loadWindowLabel(liveVenue)],
+                      ["Load-in", liveVenue.loadInInstructions],
+                      ["Access", liveVenue.accessNotes],
+                      ["Stairs", liveVenue.hasStairs],
+                      ["Freight elevator", liveVenue.hasFreightElevator],
+                      ["Parking", liveVenue.parkingAvailable],
+                      ["Oven on site", liveVenue.hasOven],
+                      ["Fridge on site", liveVenue.hasRefrigeration],
+                      ["Restrictions", liveVenue.restrictions],
+                    ])
+                  : [],
+              menu: seesMenu ? menuRows : null,
+              heating: seesMenu ? heatingRows : null,
+              timeline: canRead(auth, TIMELINE_READ)
+                ? timeline
+                    .filter((row) => isLiveTenantRow(row, tenantId))
+                    .sort(
+                      (a, b) =>
+                        (a.startsAt ?? a.sortOrder ?? 0) -
+                        (b.startsAt ?? b.sortOrder ?? 0),
+                    )
+                    .map((row) => ({
+                      label: dateText(row.startsAt),
+                      value: `${row.name}${row.notes ? ` — ${row.notes}` : ""}`,
+                    }))
+                : null,
+              staff: canRead(auth, STAFFING_READ)
+                ? staffing.map((entry) => ({
+                    label: `${entry.label} — ${entry.role || "Role not set"}`,
+                    value: staffDetails(entry),
+                  }))
+                : null,
+              equipment: canRead(auth, RESERVATION_READ)
+                ? reservations
+                    .filter(
+                      (row) =>
+                        isLiveTenantRow(row, tenantId) &&
+                        row.status !== "cancelled",
+                    )
+                    .map((row) => ({
+                      label:
+                        equipmentById.get(String(row.equipmentId)) ??
+                        "Equipment",
+                      value: `${row.quantity}`,
+                    }))
+                : null,
+              rentals: seeRentals
+                ? rentals
+                    .filter(
+                      (row) =>
+                        isLiveTenantRow(row, tenantId) &&
+                        row.status !== "cancelled",
+                    )
+                    .map((row) => ({
+                      label: row.description,
+                      value: `${row.quantity} ${row.countUnit} · ${row.status}`,
+                    }))
+                : null,
+              notes: [
+                { label: "Service", value: event.serviceRequirements ?? "" },
+                {
+                  label: "Operations",
+                  value: event.operationalRequirements ?? "",
+                },
+              ],
+            },
           },
-          {
-            id: "menu",
-            heading:
-              args.reportId === "heating-serving-event-menu"
-                ? "Heating and serving"
-                : "Menu",
-            rows: menu.map(({ item, dish }) => {
-              const menuNotes = displayEventMenuNotes(item.specialInstructions);
-              if (args.reportId === "heating-serving-event-menu") {
-                return {
-                  label: `${dish.name} · ${item.quantityServings} servings`,
-                  value: [
-                    serviceMethodText(
-                      dish.serviceInstructions,
-                      dish.serviceInstructionsSource,
-                      dish.recipeInstructions,
-                    ),
-                    serviceSourceText(dish.serviceInstructionsSource),
-                    menuNotes ? `Event notes: ${menuNotes}` : "",
-                  ]
-                    .filter(Boolean)
-                    .join("\n"),
-                  recipe: { kind: "dish" as const, id: String(dish._id) },
-                };
-              }
-              return {
-                label: item.course ?? dish.course ?? "",
-                value: `${dish.name}${menuNotes ? ` — ${menuNotes}` : ""}`,
-              };
-            }),
-          },
-          {
-            id: "timeline",
-            heading: "Timeline",
-            rows: timeline
-              .filter((row) => isLiveTenantRow(row, tenantId))
-              .sort(
-                (a, b) =>
-                  (a.startsAt ?? a.sortOrder ?? 0) -
-                  (b.startsAt ?? b.sortOrder ?? 0),
-              )
-              .map((row) => ({
-                label: dateText(row.startsAt),
-                value: `${row.name}${row.notes ? ` — ${row.notes}` : ""}`,
-              })),
-          },
-          {
-            id: "staff",
-            heading: "Staffing",
-            rows: staffing.map((entry) => ({
-              label: `${entry.label} — ${entry.role || "Role not set"}`,
-              value: staffDetails(entry),
-            })),
-          },
-          {
-            id: "equipment",
-            heading: "Equipment",
-            rows: reservations
-              .filter(
-                (row) =>
-                  isLiveTenantRow(row, tenantId) && row.status !== "cancelled",
-              )
-              .map((row) => ({
-                label:
-                  equipmentById.get(String(row.equipmentId)) ?? "Equipment",
-                value: `${row.quantity}`,
-              })),
-          },
-          {
-            id: "notes",
-            heading: "Notes",
-            rows: [
-              { value: event.serviceRequirements ?? "" },
-              { value: event.operationalRequirements ?? "" },
-            ],
-          },
-        ],
+        ),
       };
     }
 
     if (args.reportId === "event-menu-item-production") {
-      return productionWorksheet(ctx, tenantId, [event], args.reportId);
+      return productionWorksheet(
+        ctx,
+        tenantId,
+        [event],
+        args.reportId,
+        productionSees,
+      );
     }
 
     if (["production-summary", "kitchen-labor"].includes(args.reportId)) {
       const prep = await ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "prep tasks"));
       return table(
         args.reportId,
         [
@@ -1147,13 +1370,22 @@ export const run = query({
         ctx.db
           .query("equipmentReservations")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("equipments")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "equipment holds")),
+        canRead(auth, EQUIPMENT_READ)
+          ? ctx.db
+              .query("equipments")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "equipment items"))
+          : [],
       ]);
-      const byId = new Map(equipment.map((item) => [String(item._id), item]));
+      // Removed equipment never shows.
+      const byId = new Map(
+        equipment
+          .filter((item) => isLiveTenantRow(item, tenantId))
+          .map((item) => [String(item._id), item]),
+      );
       return table(
         args.reportId,
         [
@@ -1206,7 +1438,10 @@ export const run = query({
       const dishIds = [
         ...new Set(items.flatMap((row) => (row.dishId ? [row.dishId] : []))),
       ];
-      const dishes = await Promise.all(dishIds.map((id) => ctx.db.get(id)));
+      const seeDishes = canRead(auth, DISH_READ);
+      const dishes = seeDishes
+        ? await Promise.all(dishIds.map((id) => ctx.db.get(id)))
+        : [];
       const dishNames = new Map(
         dishes
           .filter(
@@ -1249,7 +1484,9 @@ export const run = query({
               association:
                 dishName ??
                 (row.dishId
-                  ? "Dish unavailable"
+                  ? seeDishes
+                    ? "Dish unavailable"
+                    : ""
                   : packingAssociationMissing(row.description)
                     ? "Association not recorded"
                     : ""),
@@ -1291,14 +1528,21 @@ export const run = query({
         ctx.db
           .query("ingredientDemands")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("ingredients")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "ingredient needs")),
+        canRead(auth, INGREDIENT_READ)
+          ? ctx.db
+              .query("ingredients")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "ingredients"))
+          : [],
       ]);
+      // Removed ingredients never show.
       const byId = new Map(
-        ingredients.map((item) => [String(item._id), item.name]),
+        ingredients
+          .filter((item) => isLiveTenantRow(item, tenantId))
+          .map((item) => [String(item._id), item.name]),
       );
       return table(
         args.reportId,
@@ -1351,11 +1595,13 @@ export const run = query({
           ctx.db
             .query("dishIngredients")
             .withIndex("by_dishId", (q) => q.eq("dishId", dish._id))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "dish ingredients")),
           ctx.db
             .query("dishComponents")
             .withIndex("by_dishId", (q) => q.eq("dishId", dish._id))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "dish recipe parts")),
         ]);
         const rows: TppDocumentSection["rows"][number][] = [
           {
@@ -1415,7 +1661,8 @@ export const run = query({
             .withIndex("by_componentId", (q) =>
               q.eq("componentId", component._id),
             )
-            .take(REPORT_ROW_LIMIT);
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "recipe ingredients"));
           const componentRows: TppDocumentSection["rows"][number][] = [
             {
               label: "Recipe",
@@ -1483,5 +1730,5 @@ export const run = query({
       };
     }
     throw new Error(`No Event resolver for ${args.reportId}`);
-  },
+  }),
 });

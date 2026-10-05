@@ -8,6 +8,7 @@ const units: Record<string, readonly [string, number]> = {
   pound: ["mass", 453.59237],
   milliliter: ["volume", 1],
   liter: ["volume", 1000],
+  fluid_ounce: ["volume", 29.5735295625],
   teaspoon: ["volume", 4.92892159375],
   tablespoon: ["volume", 14.78676478125],
   cup: ["volume", 236.5882365],

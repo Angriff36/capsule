@@ -79,9 +79,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   // intentionally the edge entity's first PrepTask relation for Convex inverse hydration.
   hasMany incomingDependencies: PrepTaskDependency
 
-  constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Prep tasks require a name once opened"
-  constraint prepQuantityPositive: self.claimedAt == null or self.quantity >= 0 "Prep quantity cannot be negative"
-  constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "Completed quantity cannot be negative"
+  constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Give this prep task a name."
+  constraint prepQuantityPositive: self.claimedAt == null or self.quantity >= 0 "This task's amount can't be negative. Use zero or more."
+  constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "The completed amount can't be negative. Use zero or more."
 
   transition status from "pending" to ["claimed", "blocked", "cancelled"]
   transition status from "claimed" to ["in_progress", "pending", "blocked", "cancelled"]
@@ -122,11 +122,11 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     // eventDishId + eventId are command params so createViaOpen can seed both parents.
     guard self.eventDishId != null
     guard self.eventId != null
-    constraint openEventDishMatch: eventDishId == self.eventDishId "Open eventDishId must match the seeded event dish reference"
-    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openEventAlign: self.eventDish == null or eventId == self.eventDish.eventId "PrepTask eventId must match EventDish.eventId"
-    constraint openNameRequired: length(trim(name)) > 0 "Prep task name is required"
-    constraint openQuantityPositive: quantity >= 0 "Prep quantity cannot be negative"
+    constraint openEventDishMatch: eventDishId == self.eventDishId "This prep task is for a different menu line. Pick the menu line already on this task."
+    constraint openEventMatch: eventId == self.eventId "This prep task is for a different event. Pick the event already on this task."
+    constraint openEventAlign: self.eventDish == null or eventId == self.eventDish.eventId "This prep task's event doesn't match its menu line's event."
+    constraint openNameRequired: length(trim(name)) > 0 "Give this prep task a name."
+    constraint openQuantityPositive: quantity >= 0 "This task's amount can't be negative. Use zero or more."
     mutate eventDishId = eventDishId
     mutate eventId = eventId
     // An event-specific override keeps its own name and notes across replays.
@@ -187,8 +187,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
-    constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
-    constraint reviseQuantityPositive: quantity == null or quantity > 0 "Prep quantity must be positive"
+    constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Give this prep task a name."
+    constraint reviseQuantityPositive: quantity == null or quantity > 0 "Enter an amount more than zero for this prep task."
     mutate name = name != null ? name : self.name
     mutate quantity = quantity != null ? quantity : self.quantity
     mutate unit = unit != null ? unit : self.unit
@@ -220,7 +220,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending"
     guard self.deletedAt == null
     guard self.isGenerated == true
-    constraint refreshQuantityPositive: quantity >= 0 "Generated prep task quantity cannot be negative"
+    constraint refreshQuantityPositive: quantity >= 0 "This task's amount can't be negative. Use zero or more."
     mutate quantity = quantity
     mutate unit = unit != null ? unit : self.unit
     mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
@@ -255,9 +255,29 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate recipeTemplateName = self.dishTask.name
     mutate recipeTemplateInstructions = self.dishTask.instructions
     mutate recipeTemplateStation = self.dishTask.station
+    emit PrepTaskRecipeTemplateRefreshed {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // A retired template stops untouched, unstarted work on live events.
+  // The event line moved to another recipe (a dish version now uses the main
+  // dish's recipe): generated steps from the old recipe that nobody started
+  // step aside, so the prep list does not show the same work twice. Soft: no
+  // guards, so it can never roll back the recipe switch that triggers it.
+  // "no-recipe-change" (a done event's line) leaves every step alone.
+  command leaveOldRecipe(recipeDishId: uuid) {
+    compute stale = recipeDishId != "no-recipe-change" and self.deletedAt == null and self.isGenerated == true and (self.status == "pending" or self.status == "claimed") and self.startedAt == null and self.dishTask != null and self.dishTask.dishId != recipeDishId
+    mutate status = stale ? "cancelled" : self.status
+    mutate cancelledAt = stale ? now() : self.cancelledAt
+    mutate cancellationReason = stale ? "The dish now cooks from another recipe" : self.cancellationReason
+    emit PrepTaskRecipeLeft {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command retireWithTemplate(expectedVersion: int) {
     guard self.deletedAt == null and self.isGenerated == true
     guard (self.status == "pending" or self.status == "claimed") and self.startedAt == null
@@ -268,6 +288,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate cancelledAt = now()
     mutate templateRetiredAt = now()
     mutate cancellationReason = self.dishTask.retirementReason != null ? self.dishTask.retirementReason : "Recipe step retired"
+    emit PrepTaskRetiredWithTemplate {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Derive the remaining work from this menu line and its recorded output.
@@ -282,17 +306,17 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.version == expectedVersion
     compute recipeUnit = self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion"
     compute sourceMass = recipeUnit == "gram" ? 1 : recipeUnit == "kilogram" ? 1000 : recipeUnit == "ounce" ? 28.349523125 : recipeUnit == "pound" ? 453.59237 : 0
-    compute sourceVolume = recipeUnit == "milliliter" ? 1 : recipeUnit == "liter" ? 1000 : recipeUnit == "teaspoon" ? 4.92892159375 : recipeUnit == "tablespoon" ? 14.78676478125 : recipeUnit == "cup" ? 236.5882365 : recipeUnit == "pint" ? 473.176473 : recipeUnit == "quart" ? 946.352946 : recipeUnit == "gallon" ? 3785.411784 : 0
+    compute sourceVolume = recipeUnit == "milliliter" ? 1 : recipeUnit == "liter" ? 1000 : recipeUnit == "fluid_ounce" ? 29.5735295625 : recipeUnit == "teaspoon" ? 4.92892159375 : recipeUnit == "tablespoon" ? 14.78676478125 : recipeUnit == "cup" ? 236.5882365 : recipeUnit == "pint" ? 473.176473 : recipeUnit == "quart" ? 946.352946 : recipeUnit == "gallon" ? 3785.411784 : 0
     compute targetMass = self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0
-    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
+    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "fluid_ounce" ? 29.5735295625 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
     // Never credit a different ingredient/component or convert across dimensions.
-    guard (self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion") == self.unit or ((self.dishTask.defaultUnit == "gram" or self.dishTask.defaultUnit == "kilogram" or self.dishTask.defaultUnit == "ounce" or self.dishTask.defaultUnit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((self.dishTask.defaultUnit == "milliliter" or self.dishTask.defaultUnit == "liter" or self.dishTask.defaultUnit == "teaspoon" or self.dishTask.defaultUnit == "tablespoon" or self.dishTask.defaultUnit == "cup" or self.dishTask.defaultUnit == "pint" or self.dishTask.defaultUnit == "quart" or self.dishTask.defaultUnit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon"))
-    guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and not (task.unit == self.unit or ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") and (task.unit == "gram" or task.unit == "kilogram" or task.unit == "ounce" or task.unit == "pound")) or ((self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon") and (task.unit == "milliliter" or task.unit == "liter" or task.unit == "teaspoon" or task.unit == "tablespoon" or task.unit == "cup" or task.unit == "pint" or task.unit == "quart" or task.unit == "gallon")))) == 0
+    guard (self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion") == self.unit or ((self.dishTask.defaultUnit == "gram" or self.dishTask.defaultUnit == "kilogram" or self.dishTask.defaultUnit == "ounce" or self.dishTask.defaultUnit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((self.dishTask.defaultUnit == "milliliter" or self.dishTask.defaultUnit == "liter" or self.dishTask.defaultUnit == "fluid_ounce" or self.dishTask.defaultUnit == "teaspoon" or self.dishTask.defaultUnit == "tablespoon" or self.dishTask.defaultUnit == "cup" or self.dishTask.defaultUnit == "pint" or self.dishTask.defaultUnit == "quart" or self.dishTask.defaultUnit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "fluid_ounce" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon"))
+    guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and not (task.unit == self.unit or ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") and (task.unit == "gram" or task.unit == "kilogram" or task.unit == "ounce" or task.unit == "pound")) or ((self.unit == "milliliter" or self.unit == "liter" or self.unit == "fluid_ounce" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon") and (task.unit == "milliliter" or task.unit == "liter" or task.unit == "fluid_ounce" or task.unit == "teaspoon" or task.unit == "tablespoon" or task.unit == "cup" or task.unit == "pint" or task.unit == "quart" or task.unit == "gallon")))) == 0
     guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" and ((self.dishTask.componentId != null and task.componentId != self.dishTask.componentId) or (self.dishTask.ingredientId != null and task.ingredientId != self.dishTask.ingredientId))) == 0
     compute unitRatio = recipeUnit == self.unit ? 1 : (sourceMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
     compute requiredWork = (self.dishTask.taskType == "equipment_fixed" ? (self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1) : (self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1) * self.eventDish.quantityServings) * unitRatio
-    compute completedWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" ? (task.completedQuantity != null ? task.completedQuantity : task.quantity) * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0)
-    compute otherOpenWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status != "completed" ? task.quantity * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0) - self.quantity
+    compute completedWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" ? (task.completedQuantity != null ? task.completedQuantity : task.quantity) * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "fluid_ounce" ? 29.5735295625 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0)
+    compute otherOpenWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status != "completed" ? task.quantity * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "fluid_ounce" ? 29.5735295625 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0) - self.quantity
     compute remainingWork = requiredWork > completedWork + otherOpenWork ? requiredWork - completedWork - otherOpenWork : 0
     mutate quantity = round(remainingWork * 10000) / 10000
     emit PrepTaskGeneratedRefreshed {
@@ -311,11 +335,15 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint linkRecipeTask: self.dishTaskId == null or self.dishTaskId == dishTaskId "Prep already belongs to a different recipe step"
     constraint linkRecipeDish: self.dishId == null or self.dishId == dishId "Prep already belongs to a different dish"
-    constraint linkRecipeEventDish: self.eventDish == null or self.eventDish.dishId == dishId "Recipe dish must match the event menu line"
+    constraint linkRecipeEventDish: self.eventDish == null or self.eventDish.dishId == dishId "This recipe's dish doesn't match this event's menu line."
     constraint linkRecipeComponent: self.componentId == null or self.componentId == componentId "Prep already belongs to a different component"
     mutate dishTaskId = dishTaskId
     mutate dishId = dishId
     mutate componentId = componentId != null ? componentId : self.componentId
+    emit PrepTaskRecipeLinked {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Correct a reviewed recipe link before work starts; retain assignments and quantities.
@@ -324,6 +352,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed"
     constraint replacementMatchesRecipe: self.componentId == previousComponentId "Prep recipe changed since replacement was reviewed"
     mutate componentId = componentId
+    emit PrepTaskRecipeComponentReplaced {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Replace this event's copy of a template step without touching the master
@@ -331,8 +363,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   command markOverride(overrideOfDishTaskId: uuid, reason: string, optional name: string, optional specialInstructions: string) {
     guard self.deletedAt == null
     guard self.status == "pending" or self.status == "claimed" or self.status == "blocked"
-    constraint overrideReasonPresent: length(trim(reason)) > 0 "Override reason is required"
-    constraint overrideNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
+    constraint overrideReasonPresent: length(trim(reason)) > 0 "Say why you're overriding this."
+    constraint overrideNamePresent: name == null or length(trim(name)) > 0 "Give this prep task a name."
     mutate overrideOfDishTaskId = overrideOfDishTaskId
     mutate overrideReason = reason
     mutate name = name != null ? name : self.name
@@ -356,13 +388,17 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate choiceOptions = choiceOptions
     mutate resolution = resolution != null ? resolution : "choice_pending"
     mutate chosenOption = null
+    emit PrepTaskChoiceSet {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command resolveChoice(choice: string) {
     guard self.deletedAt == null
     guard self.resolution == "choice_pending"
-    constraint choicePresent: length(trim(choice)) > 0 "A choice is required"
-    constraint choiceListed: self.choiceOptions == null or self.choiceOptions contains choice "Choice must be one of the listed options"
+    constraint choicePresent: length(trim(choice)) > 0 "Pick a choice."
+    constraint choiceListed: self.choiceOptions == null or self.choiceOptions contains choice "Pick one of the listed choices."
     mutate chosenOption = choice
     mutate resolution = "resolved"
     emit PrepTaskChoiceResolved {
@@ -379,7 +415,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.resolution == null or self.resolution != "choice_pending"
     guard self.deletedAt == null
     guard user.personId != null
-    constraint claimQuantityReady: self.quantity > 0 "Prep quantity must be positive before claim"
+    constraint claimQuantityReady: self.quantity > 0 "This task needs an amount more than zero before you can claim it."
     compute previousStatus = self.status
     // user.id is the IdP subject; this field is a Person reference
     // (belongsTo ... references [tenantId, id]). Writing user.id here stored a
@@ -413,7 +449,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard personId != null
-    constraint assignQuantityReady: self.quantity > 0 "Prep quantity must be positive before assign"
+    constraint assignQuantityReady: self.quantity > 0 "This task needs an amount more than zero before you can assign it."
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     compute nextStatus = self.status == "in_progress" ? "in_progress" : (self.status == "blocked" ? "blocked" : "claimed")
@@ -439,7 +475,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "claimed"
     guard self.claimedAt != null
     guard self.deletedAt == null
-    guard self.assignedToId == user.id or roleAllows(user.role, "kitchenLeadAccess")
+    guard (user.personId != null and self.assignedToId == user.personId) or roleAllows(user.role, "kitchenLeadAccess")
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     mutate assignedToId = null
@@ -465,7 +501,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.claimedAt != null
     guard self.assignedToId != null
     guard self.deletedAt == null
-    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "Required predecessor prep tasks must be complete before this task can start"
+    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "Finish the prep tasks this one depends on before you start it."
     compute previousStatus = self.status
     mutate status = "in_progress"
     mutate startedAt = now()
@@ -487,7 +523,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "in_progress"
     guard self.startedAt != null
     guard self.deletedAt == null
-    constraint completeQuantityNonnegative: completedQuantity == null or completedQuantity >= 0 "Completed quantity cannot be negative"
+    constraint completeQuantityNonnegative: completedQuantity == null or completedQuantity >= 0 "The completed amount can't be negative. Use zero or more."
     compute previousStatus = self.status
     compute nextCompleted = completedQuantity != null ? completedQuantity : self.quantity
     mutate completedQuantity = nextCompleted
@@ -512,7 +548,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
-    constraint blockReasonRequired: length(trim(reason)) > 0 "Block reason is required"
+    constraint blockReasonRequired: length(trim(reason)) > 0 "Say why you're blocking this."
     compute previousStatus = self.status
     mutate status = "blocked"
     mutate blockedAt = now()
@@ -563,7 +599,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
-    constraint cancelPrepReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelPrepReason: length(trim(reason)) > 0 "Say why you're cancelling this."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -587,13 +623,14 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   // work makes the whole removal fail: one cook finishing one step used to make
   // a dish impossible to pull from service, which is exactly when you need to
   // pull it. Finished work stays finished here — the task is left alone rather
-  // than rejected. eventManageAccess is granted because the fan-out runs as the
-  // acting user, and an event manager killing their own event is not a kitchen
-  // lead. `cancel` stays narrow: it is the button a human presses.
+  // than rejected. manageAccess is granted because the fan-out runs as the
+  // acting user: any manager may pull a dish (EventDish.remove), and that
+  // manager is not a kitchen lead. `cancel` stays narrow: it is the button a
+  // human presses.
   command standDown(reason: string) {
     guard self.deletedAt == null
-    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "eventManageAccess")
-    constraint standDownPrepReason: length(trim(reason)) > 0 "Stand-down reason is required"
+    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "manageAccess")
+    constraint standDownPrepReason: length(trim(reason)) > 0 "Say why you're standing this down."
     compute previousStatus = self.status
     compute alreadySettled = self.status == "completed" or self.status == "cancelled"
     mutate status = alreadySettled ? self.status : "cancelled"
@@ -642,7 +679,7 @@ entity PrepTaskDependency mixin TenantScoped {
     guard self.predecessorTask != null
     guard self.dependentTask.status == "pending"
     constraint dependencyTasksDistinct: dependentTaskId != predecessorTaskId "A prep task cannot depend on itself"
-    constraint dependencyEventAlign: self.dependentTask.eventId == self.predecessorTask.eventId "Predecessor prep tasks must belong to the same event"
+    constraint dependencyEventAlign: self.dependentTask.eventId == self.predecessorTask.eventId "The task this depends on has to belong to the same event."
     mutate dependentTaskId = dependentTaskId
     mutate predecessorTaskId = predecessorTaskId
     mutate isSatisfied = self.predecessorTask.status == "completed"
@@ -663,6 +700,25 @@ entity PrepTaskDependency mixin TenantScoped {
     mutate isSatisfied = true
     mutate requirementReleasedAt = now()
     mutate requirementReleaseReason = "Prerequisite retired from recipe"
+    emit PrepTaskDependencyRetiredRequirementReleased {
+      prepTaskDependencyId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // A person drops a "must follow" link that should not hold the work: two
+  // tasks that each wait on the other, or a wrong link. The edge and the
+  // reason stay as history; the waiting task can start.
+  command dropLink(reason: string) {
+    guard self.isSatisfied == false
+    constraint dropLinkReason: length(trim(reason)) > 0 "Say why you're dropping this link."
+    mutate isSatisfied = true
+    mutate requirementReleasedAt = now()
+    mutate requirementReleaseReason = reason
+    emit PrepTaskDependencyLinkDropped {
+      prepTaskDependencyId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command satisfy() {
@@ -868,12 +924,12 @@ on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload
 
 // Compat first — repair activeDishId on templates that predate the field, in
 // the same transaction, so legacy dishes still generate.
-on EventDishAdded fanOut DishTask where dishId = payload.dishId
+on EventDishAdded fanOut DishTask where dishId = payload.recipeDishId
   run DishTask.backfillActiveKey
 
 // One PrepTask per active template. match on (eventDishId, dishTaskId) makes a
 // replayed EventDishAdded update the existing line instead of duplicating it.
-on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
+on EventDishAdded fanOut DishTask where activeDishId = payload.recipeDishId
   run PrepTask.open
   match eventDishId = payload.eventDishId, dishTaskId = self.id
   else create
@@ -897,6 +953,37 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     resolution: self.resolution
     choiceOptions: self.choiceOptions
   }
+
+// A planned event line re-pointed at its dish's recipe source (a version
+// switched to the main dish's recipe) re-seeds from it the same way.
+on EventDishRecipeFollowed fanOut DishTask where dishId = payload.recipeDishId
+  run DishTask.backfillActiveKey
+
+on EventDishRecipeFollowed fanOut DishTask where activeDishId = payload.recipeDishId
+  run PrepTask.open
+  match eventDishId = payload.eventDishId, dishTaskId = self.id
+  else create
+  params {
+    eventDishId: payload.eventDishId
+    eventId: payload.eventId
+    name: self.name
+    // defaultQuantity is PER GUEST (EventPrepTaskSynchronizer.quantityFor uses
+    // the same rule); blank means one per guest. Both must agree or the client
+    // reconcile would resize every generated task on the next sync.
+    quantity: self.taskType == "equipment_fixed" and self.defaultQuantity != null ? self.defaultQuantity : (self.defaultQuantity != null and self.defaultQuantity > 0 ? self.defaultQuantity * payload.quantityServings : payload.quantityServings)
+    unit: self.defaultUnit != null ? self.defaultUnit : "portion"
+    dishTaskId: self.id
+    dishId: payload.dishId
+    category: self.category
+    taskType: self.taskType
+    componentId: self.componentId
+    ingredientId: self.ingredientId
+    specialInstructions: self.instructions
+    station: self.station
+    resolution: self.resolution
+    choiceOptions: self.choiceOptions
+  }
+
 
 event PrepTaskOverridden: "prep_task.overridden" {
   prepTaskId: string
@@ -950,7 +1037,7 @@ entity PrepTaskMaterial mixin TenantScoped, SoftDeletable {
   ) {
     guard self.linkedAt == null
     guard self.deletedAt == null
-    constraint linkPrepMaterialTarget: eventIngredientContributionId != null or productionBatchAllocationId != null or dishIngredientId != null or dishComponentId != null "A prep task material must point at a requirement or allocation"
+    constraint linkPrepMaterialTarget: eventIngredientContributionId != null or productionBatchAllocationId != null or dishIngredientId != null or dishComponentId != null "Link this to a requirement or an allocation."
     mutate prepTaskId = prepTaskId
     mutate eventIngredientContributionId = eventIngredientContributionId
     mutate productionBatchAllocationId = productionBatchAllocationId
@@ -969,7 +1056,7 @@ entity PrepTaskMaterial mixin TenantScoped, SoftDeletable {
   command unlink(reason: string) {
     guard self.linkedAt != null
     guard self.deletedAt == null
-    constraint unlinkPrepMaterialReason: length(trim(reason)) > 0 "Reason is required"
+    constraint unlinkPrepMaterialReason: length(trim(reason)) > 0 "Say why you're unlinking this."
     mutate deletedAt = now()
     emit PrepTaskMaterialUnlinked {
       prepTaskMaterialId: self.id
@@ -993,4 +1080,50 @@ event PrepTaskMaterialUnlinked: "prep_task_material.unlinked" {
   tenantId: string
   prepTaskId: string
   reason: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event PrepTaskRecipeLinked: "prep.task.recipe.linked" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskRecipeTemplateRefreshed: "prep.task.recipe.template.refreshed" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskRecipeComponentReplaced: "prep.task.recipe.component.replaced" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskRecipeLeft: "prep.task.recipe_left" {
+  prepTaskId: string
+  tenantId: string
+}
+
+// Old-recipe steps step aside before the new recipe's steps open.
+on EventDishRecipeFollowed fanOut PrepTask where eventDishId = payload.eventDishId
+  run leaveOldRecipe
+  params { recipeDishId: payload.recipeDishId }
+
+event PrepTaskRetiredWithTemplate: "prep.task.retired.with.template" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskChoiceSet: "prep.task.choice.set" {
+  prepTaskId: string
+  tenantId: string
+}
+
+event PrepTaskDependencyLinkDropped: "prep.task.dependency.link.dropped" {
+  prepTaskDependencyId: string
+  tenantId: string
+}
+
+event PrepTaskDependencyRetiredRequirementReleased: "prep.task.dependency.retired.requirement.released" {
+  prepTaskDependencyId: string
+  tenantId: string
 }

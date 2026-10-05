@@ -1,0 +1,137 @@
+// PL-CUTOVER (AC-285, AC-286, AC-632): the daily TPP vs Capsule comparison.
+// While both systems run, Capsule compares every TPP event it knows (by its
+// stable link) with the Capsule event once a day. Each field that differs is
+// one ParallelRunDifference a manager can give to a person and settle. Each
+// daily run leaves one ParallelRunComparison with both sides' totals.
+// The comparison job writes these rows (convex/parallelRun.ts); people only
+// assign, settle and reopen them.
+
+use "./external-record-link.manifest"
+use "../identity/person.manifest"
+
+// open: still to look at. fixed: someone changed one system so they agree.
+// accepted: the difference is fine (for example TPP keeps an old stage).
+// cleared: the next comparison found both sides the same.
+enum ParallelRunDifferenceStatus {
+  open
+  fixed
+  accepted
+  cleared
+}
+
+entity ParallelRunDifference mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required externalRecordLinkId: uuid
+  property required externalId: string = ""
+  property required capsuleEntity: string = "event_record"
+  property required capsuleId: string = ""
+  // What differs: date, guests, price, stage, salesperson, occasion,
+  // service_style, venue or record.
+  property required field: string = ""
+  property sourceValue: string?
+  property capsuleValue: string?
+  property required status: ParallelRunDifferenceStatus = "open"
+  property firstSeenAt: datetime?
+  property lastSeenAt: datetime?
+  property assignedToPersonId: uuid?
+  property assignedById: string?
+  property assignedAt: datetime?
+  property resolvedByUserId: string?
+  property resolvedAt: datetime?
+  property resolutionNote: string?
+
+  belongsTo externalRecordLink: ExternalRecordLink fields [tenantId, externalRecordLinkId] references [tenantId, id]
+  ref assignedTo: Person fields [tenantId, assignedToPersonId] references [tenantId, id]
+
+  transition status from "open" to ["fixed", "accepted", "cleared"]
+  transition status from "fixed" to ["open", "cleared"]
+  transition status from "accepted" to ["open", "cleared"]
+  transition status from "cleared" to ["open"]
+
+  default policy parallelRunDifferenceRead read: roleAllows(user.role, "importAccess") "Staff with import access may see the TPP comparison"
+  default policy parallelRunDifferenceWrite write: roleAllows(user.role, "importAccess") "Staff with import access may update the TPP comparison"
+  default policy parallelRunDifferenceExecute execute: roleAllows(user.role, "importAccess") "Staff with import access may work the TPP comparison"
+
+  // Give the difference to a person (or take it back with no person).
+  command assign(optional assignedToPersonId: uuid) {
+    guard self.deletedAt == null
+    mutate assignedToPersonId = assignedToPersonId
+    mutate assignedById = user.id
+    mutate assignedAt = now()
+    emit ParallelRunDifferenceAssigned {
+      parallelRunDifferenceId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The person who settles it is the signed-in person (spec CF-15).
+  command settle(resolution: ParallelRunDifferenceStatus, optional note: string) {
+    guard self.deletedAt == null
+    guard self.status == "open"
+    constraint settleIsFixedOrAccepted: resolution == "fixed" or resolution == "accepted" "Say if one system was fixed or the difference is fine."
+    mutate status = resolution
+    mutate resolvedByUserId = user.id
+    mutate resolvedAt = now()
+    mutate resolutionNote = note
+    emit ParallelRunDifferenceSettled {
+      parallelRunDifferenceId: self.id
+      tenantId: self.tenantId
+      field: self.field
+    }
+  }
+
+  command reopen() {
+    guard self.deletedAt == null
+    guard self.status != "open"
+    mutate status = "open"
+    mutate resolvedByUserId = null
+    mutate resolvedAt = null
+    emit ParallelRunDifferenceReopened {
+      parallelRunDifferenceId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store ParallelRunDifference in durable
+}
+
+// One daily comparison: when it ran, both sides' totals (a short JSON text)
+// and when the next one is booked.
+entity ParallelRunComparison mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required comparedAt: datetime
+  property required comparedCount: int = 0
+  property required openCount: int = 0
+  property required newCount: int = 0
+  property required clearedCount: int = 0
+  property summary: string?
+  property nextRunAt: datetime?
+
+  default policy parallelRunComparisonRead read: roleAllows(user.role, "importAccess") "Staff with import access may see the TPP comparison"
+  default policy parallelRunComparisonWrite write: roleAllows(user.role, "importAccess") "Staff with import access may update the TPP comparison"
+  default policy parallelRunComparisonExecute execute: roleAllows(user.role, "importAccess") "Staff with import access may work the TPP comparison"
+
+  store ParallelRunComparison in durable
+}
+
+event ParallelRunDifferenceAssigned: "parallel_run_difference.assigned" {
+  parallelRunDifferenceId: string
+  tenantId: string
+}
+
+event ParallelRunDifferenceSettled: "parallel_run_difference.settled" {
+  parallelRunDifferenceId: string
+  tenantId: string
+  field: string
+}
+
+event ParallelRunDifferenceReopened: "parallel_run_difference.reopened" {
+  parallelRunDifferenceId: string
+  tenantId: string
+}

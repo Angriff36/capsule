@@ -5,27 +5,48 @@ import {
   packingItemDescription,
   packingAssociationMissing,
 } from "../../lib/packingDisplay";
+import { PackLineWhy } from "./PackLineWhy";
+import type { PackLineFacts } from "./packLineExplanation";
+import { packReturnSummary } from "./packReturn";
+import { packRowFacts } from "./packRowFacts";
+import { ReviewFlagInline } from "../events/review-flags/ReviewFlagInline";
+import "./PackListItemTable.css";
 
-interface PackListItemRow {
+export interface PackListItemRow extends PackLineFacts {
   _id: string;
   description: string;
   note?: string | null;
   sentInstead?: string | null;
+  binNumber?: number | null;
   dishId?: string | null;
   requiredQuantity: number;
   packedQuantity: number;
   packedByPersonId?: string | null;
+  missingByPersonId?: string | null;
+  sentInsteadByPersonId?: string | null;
+  checkedQuantity?: number | null;
+  checkedByPersonId?: string | null;
+  loadedQuantity?: number | null;
+  returnedQuantity?: number | null;
+  usedQuantity?: number | null;
+  lostQuantity?: number | null;
+  damagedQuantity?: number | null;
+  returnFinding?: string | null;
+  returnCountedAt?: number | null;
+  returnCountedByPersonId?: string | null;
   unit: string;
   status: unknown;
   version: number;
 }
 
-interface PackListItemTableProps {
+export interface PackListItemTableProps {
   loading: boolean;
   items: PackListItemRow[];
   canAddItems: boolean;
   /** Note and remove stay available until the list is dispatched or cancelled. */
   canEditLines: boolean;
+  /** Second check, on-truck and return counts: any list that is not cancelled. */
+  canCount?: boolean;
   busy: string | null;
   dishName: (dishId?: string | null) => string | null;
   packedByName: (personId?: string | null) => string | null;
@@ -38,7 +59,20 @@ interface PackListItemTableProps {
   onToggleItem: (id: string, on: boolean) => void;
   onToggleAll: (on: boolean) => void;
   selectableCount: number;
-  failedItem?: { id: string; message: string } | null;
+  failedItem?: {
+    id: string;
+    message: string;
+    /** What went wrong and what to do next, in plain words. */
+    detail?: string;
+    /** The row action that failed; the row offers it again in place. */
+    retryKey?: string | null;
+  } | null;
+  /** View-specific line buttons (the truck-load view adds "Truck"). */
+  extraActions?: (
+    item: PackListItemRow,
+  ) => Array<{ key: string; label: string }>;
+  /** The list's event: each line gets "Flag for review" (#368 item 13). */
+  reviewEventId?: string;
 }
 
 export function PackListItemTable({
@@ -59,6 +93,8 @@ export function PackListItemTable({
   onToggleAll,
   selectableCount,
   failedItem,
+  extraActions,
+  reviewEventId,
 }: PackListItemTableProps) {
   if (loading) return <TableSkeleton rows={5} />;
   if (items.length === 0) {
@@ -85,7 +121,7 @@ export function PackListItemTable({
 
   return (
     <div className="supply-table-wrap">
-      <table className="supply-table">
+      <table className="supply-table pack-items-table">
         <thead>
           <tr>
             <th className="w-8">
@@ -106,7 +142,7 @@ export function PackListItemTable({
         </thead>
         <tbody>
           {items.map((item) => (
-            <tr key={item._id}>
+            <tr key={item._id} data-line-id={item._id}>
               <td className="w-8">
                 {canSelectItem(item) ? (
                   <input
@@ -122,6 +158,11 @@ export function PackListItemTable({
               </td>
               <td>
                 <strong>{packingItemDescription(item.description)}</strong>
+                {item.binNumber ? (
+                  <span className="ml-2 text-sm font-medium text-ink-2">
+                    Bin {item.binNumber}
+                  </span>
+                ) : null}
                 {item.dishId ? (
                   dishName(item.dishId) ? (
                     <small className="block">
@@ -134,7 +175,7 @@ export function PackListItemTable({
                     <small className="block">Dish unavailable</small>
                   )
                 ) : packingAssociationMissing(item.description) ? (
-                  <small className="block">Association not recorded</small>
+                  <small className="block">No link on file</small>
                 ) : null}
                 {item.note ? (
                   <small className="block">Note: {item.note}</small>
@@ -142,30 +183,99 @@ export function PackListItemTable({
                 {item.sentInstead ? (
                   <small className="block">
                     Sent instead: {item.sentInstead}
+                    {packedByName(item.sentInsteadByPersonId)
+                      ? ` · ${packedByName(item.sentInsteadByPersonId)}`
+                      : ""}
                   </small>
                 ) : null}
+                {String(item.status) === "missing" &&
+                packedByName(item.missingByPersonId) ? (
+                  <small className="block">
+                    Marked missing by {packedByName(item.missingByPersonId)}
+                  </small>
+                ) : null}
+                <PackLineWhy line={item} />
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
+                    {failedItem.detail ? ` ${failedItem.detail}` : ""}
+                    {failedItem.retryKey ? (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="btn-link btn-link-compact"
+                          disabled={busy != null}
+                          onClick={() =>
+                            onInvokeItem(item, failedItem.retryKey!)
+                          }
+                        >
+                          Try again
+                        </button>
+                      </>
+                    ) : null}
                   </small>
                 ) : null}
               </td>
-              <td>
+              <td data-label="Required">
                 {item.requiredQuantity} {item.unit}
               </td>
-              <td>
+              <td data-label="Packed">
                 {item.packedQuantity} {item.unit}
                 {packedByName(item.packedByPersonId) ? (
                   <small className="block">
                     {packedByName(item.packedByPersonId)}
                   </small>
                 ) : null}
+                {item.checkedQuantity != null ? (
+                  <small className="block">
+                    Checked {item.checkedQuantity}
+                    {packedByName(item.checkedByPersonId)
+                      ? ` · ${packedByName(item.checkedByPersonId)}`
+                      : ""}
+                  </small>
+                ) : null}
+                {item.loadedQuantity != null ? (
+                  <small className="block">
+                    On truck {item.loadedQuantity}
+                  </small>
+                ) : null}
+                {item.returnCountedAt != null ? (
+                  <small className="block">
+                    {packReturnSummary(item)}
+                    {packedByName(item.returnCountedByPersonId)
+                      ? ` · ${packedByName(item.returnCountedByPersonId)}`
+                      : ""}
+                  </small>
+                ) : null}
+                {item.returnFinding ? (
+                  <small className="block">Found: {item.returnFinding}</small>
+                ) : null}
+                {packRowFacts(item).notes.map((fact) => (
+                  <small key={fact} className="block">
+                    {fact}
+                  </small>
+                ))}
               </td>
               <td>
                 <StatusChip status={String(item.status)} />
+                {packRowFacts(item).blocking ? (
+                  <small className="block text-danger">
+                    Holds up Mark packed
+                  </small>
+                ) : null}
               </td>
               <td>
                 <div className="supply-row-actions">
+                  {reviewEventId ? (
+                    <ReviewFlagInline
+                      eventId={reviewEventId}
+                      targetKind="pack_list_item"
+                      targetId={item._id}
+                      targetLabel={`${item.description} ×${item.requiredQuantity}`}
+                      disabled={busy != null}
+                    />
+                  ) : null}
                   {String(item.status) === "listed" ? (
                     <button
                       className="btn btn-ghost btn-sm"
@@ -187,8 +297,27 @@ export function PackListItemTable({
                         : action.label}
                     </button>
                   ))}
+                  {(extraActions?.(item) ?? []).map((action) => (
+                    <button
+                      key={action.key}
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() => onInvokeItem(item, action.key)}
+                    >
+                      {busy === `${item._id}:${action.key}`
+                        ? "Working…"
+                        : action.label}
+                    </button>
+                  ))}
                   {canEditLines ? (
                     <>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() => onInvokeItem(item, "bin")}
+                      >
+                        {item.binNumber ? `Bin ${item.binNumber}` : "Bin"}
+                      </button>
                       <button
                         className="btn btn-ghost btn-sm"
                         disabled={busy != null}
@@ -204,6 +333,18 @@ export function PackListItemTable({
                         onClick={() => onInvokeItem(item, "note")}
                       >
                         {item.note ? "Edit note" : "Note"}
+                      </button>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() =>
+                          onInvokeItem(
+                            item,
+                            item.excludedAt != null ? "putBack" : "leaveOff",
+                          )
+                        }
+                      >
+                        {item.excludedAt != null ? "Put back" : "Leave off"}
                       </button>
                       <button
                         className="btn btn-ghost btn-sm"

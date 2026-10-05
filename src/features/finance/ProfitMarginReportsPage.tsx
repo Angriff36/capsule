@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import {
   useListClient,
-  useListEvent,
   useListEventCloseout,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
@@ -61,6 +61,12 @@ function MetricsCells({ metrics }: { metrics: ProfitMetrics }) {
       <td>{percent(metrics.grossMarginPercent)}</td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
         {formatMoney(metrics.netProfit)}
+        {metrics.costMissingCount > 0 ? (
+          <small data-testid="profit-cost-missing">
+            Not fully known · cost missing on{" "}
+            {formatCountNoun(metrics.costMissingCount, "event")}
+          </small>
+        ) : null}
       </td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
         {percent(metrics.netMarginPercent)}
@@ -287,7 +293,7 @@ export function ProfitMarginDashboard({
 
       {!validRange ? (
         <p className="profit-range-error" role="alert">
-          The start date must be on or before the end date.
+          Pick a start date on or before the end date.
         </p>
       ) : null}
 
@@ -333,7 +339,12 @@ export function ProfitMarginDashboard({
               <strong data-testid="profit-net-margin">
                 {percent(report.summary.netMarginPercent)}
               </strong>
-              <small>{formatMoney(report.summary.netProfit)} net profit</small>
+              <small>
+                {formatMoney(report.summary.netProfit)} net profit
+                {report.summary.costMissingCount > 0
+                  ? ` · not fully known, ${formatCountNoun(report.summary.costMissingCount, "event")} missing food or labor cost`
+                  : ""}
+              </small>
             </div>
           </section>
 
@@ -481,10 +492,19 @@ export function ProfitMarginDashboard({
         <p>
           Only finalized closeouts are included. Gross margin is revenue less
           food cost. Net margin is revenue less food, labor, equipment/vendor
-          hire, and overhead/miscellaneous costs. Closeouts record waste and
+          hire, and overhead/miscellaneous costs. Closeouts log waste and
           miscellaneous spend as one number, so this report shows that combined
           bucket as overheads.
         </p>
+        {report.summary.costMissingCount > 0 ? (
+          <p role="note" data-testid="profit-cost-missing-note">
+            Profit is not fully known for{" "}
+            {formatCountNoun(report.summary.costMissingCount, "event")}: each
+            has revenue but no food cost or no labor cost on its closeout, so
+            the profit shown is too high. Add the missing cost on the closeout
+            to fix it.
+          </p>
+        ) : null}
         {report.excludedCloseoutCount > 0 ? (
           <p role="note">
             {report.excludedCloseoutCount} finalized closeout
@@ -499,7 +519,12 @@ export function ProfitMarginDashboard({
 
 export function ProfitMarginReportsPage() {
   const closeouts = useListEventCloseout();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      closeouts === undefined ? undefined : closeouts.map((c) => c.eventId),
+    [closeouts],
+  );
+  const events = useEventsById(eventIds);
   const clients = useListClient();
   const now = useMemo(() => new Date(), []);
 

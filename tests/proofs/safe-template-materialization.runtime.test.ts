@@ -393,7 +393,9 @@ describe("runtime proof: safe template materialization", () => {
           ],
         },
       ),
-    ).rejects.toThrow(/positive/);
+    ).rejects.toThrow(
+      "This order line's ordered amount has to be more than zero. Enter how much to order.",
+    );
     expect(await buyer.query(api.queries.listVendorOrder, {})).toEqual([]);
     expect(await buyer.query(api.queries.listVendorOrderLine, {})).toEqual([]);
   });

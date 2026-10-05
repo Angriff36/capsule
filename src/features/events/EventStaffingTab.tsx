@@ -2,11 +2,14 @@ import { useMemo, useState } from "react";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
+  useEventAssignmentChooseTravelLeg,
   useEventAssignmentPlanTiming,
   useEventAssignmentUnassign,
   useEventStaffNeedCancel,
   useEventStaffNeedChangeCoverage,
+  useEventStaffNeedChooseTravelLeg,
   useEventStaffNeedClaim,
+  useEventStaffNeedDescribeDemand,
   useEventStaffNeedFill,
   useEventStaffNeedPlanTiming,
   useEventStaffNeedReleaseClaim,
@@ -14,12 +17,15 @@ import {
   useListAvailabilityWindow,
   useListEventAssignment,
   useListEventStaffNeed,
-  useListEventTimelineActivity,
   useListPerson,
   useListShift,
   useListShiftType,
+  useListStaffNeedWaitlistEntry,
   useListTimeOffRequest,
+  useCreateStaffNeedWaitlistEntry,
+  useStaffNeedWaitlistEntryLeave,
 } from "../../lib/manifest-convex-react";
+import { useEventTimelineActivities } from "../../lib/useEventRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
@@ -32,8 +38,15 @@ import {
   type StaffingConflictNote,
 } from "./EventStaffingSummaryAside";
 import { FailureBanner } from "./FailureBanner";
+import { EventShiftChangesPanel } from "./EventShiftChangesPanel";
 import { EventStaffingAddForm } from "./EventStaffingAddForm";
 import { EventStaffTimingControl } from "./EventStaffTimingForm";
+import { EventStaffTravelSelect } from "./EventStaffTravelSelect";
+import { useEventRouteLegs } from "../../lib/useEventRouteLegs";
+import { useAutoFillEventStaffNeeds } from "../../lib/workforceScheduling";
+import { askStaffNeedDemand } from "./staffNeedDemandPrompt";
+import { autoFillSummary } from "./eventStaffNeedDemand";
+import type { Id } from "../../lib/api";
 import { collectStaffRoles } from "./EventStaffingRoleSelect";
 import {
   EventTimelineStaffRoster,
@@ -59,7 +72,7 @@ export function EventStaffingTab({ eventId }: Props) {
   const people = useListPerson();
   const shifts = useListShift();
   const shiftTypes = useListShiftType();
-  const activities = useListEventTimelineActivity();
+  const activities = useEventTimelineActivities(eventId);
   const timeOff = useListTimeOffRequest();
   const availability = useListAvailabilityWindow();
   const createAssignment = useCreateEventAssignment();
@@ -72,6 +85,16 @@ export function EventStaffingTab({ eventId }: Props) {
   const changeCoverage = useEventStaffNeedChangeCoverage();
   const planAssignmentTiming = useEventAssignmentPlanTiming();
   const planNeedTiming = useEventStaffNeedPlanTiming();
+  const chooseAssignmentLeg = useEventAssignmentChooseTravelLeg();
+  const chooseNeedLeg = useEventStaffNeedChooseTravelLeg();
+  const describeDemand = useEventStaffNeedDescribeDemand();
+  const waitlistEntries = useListStaffNeedWaitlistEntry();
+  const joinWaitlist = useCreateStaffNeedWaitlistEntry();
+  const leaveWaitlist = useStaffNeedWaitlistEntryLeave();
+  const autoFill = useAutoFillEventStaffNeeds();
+  const [autoFillNote, setAutoFillNote] = useState<string | null>(null);
+  const routeLegs = useEventRouteLegs(eventId as Id<"events">);
+  const trucks = (routeLegs?.legs ?? []).filter((leg) => leg.kind === "rig");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [needPersonIds, setNeedPersonIds] = useState<Record<string, string>>(
@@ -244,18 +267,70 @@ export function EventStaffingTab({ eventId }: Props) {
       if (!row) return null;
       const person = people?.find((item) => item._id === row.personId);
       return (
+        <>
+          <EventStaffTravelSelect
+            label={person ? personLabel(person) : "this crew member"}
+            rideVehicleAssignmentId={row.rideVehicleAssignmentId}
+            meetsAtVenue={row.meetsAtVenue}
+            trucks={trucks}
+            busy={busy != null}
+            onChange={(choice) =>
+              void run(`travel:${docId}`, () =>
+                chooseAssignmentLeg({ docId, version: row.version, ...choice }),
+              )
+            }
+          />
+          <EventStaffTimingControl
+            key={`timing:${docId}:${row.version}`}
+            label={`${person ? personLabel(person) : "this crew member"}${row.role ? ` · ${row.role}` : ""}`}
+            startsAt={row.startsAt}
+            endsAt={row.endsAt}
+            followsEventTiming={row.followsEventTiming}
+            busy={busy != null}
+            onSave={(plan) =>
+              void run(`timing:${docId}`, () =>
+                planAssignmentTiming({
+                  docId,
+                  version: row.version,
+                  startsAt: plan.startsAt,
+                  endsAt: plan.endsAt,
+                  followsEventTiming: plan.followsEventTiming,
+                  synchronizeShifts: true,
+                }),
+              )
+            }
+          />
+        </>
+      );
+    }
+    const need = eventNeeds.find((item) => item._id === docId);
+    if (!need) return null;
+    return (
+      <>
+        <EventStaffTravelSelect
+          label={String(need.role ?? "this open shift")}
+          rideVehicleAssignmentId={need.rideVehicleAssignmentId}
+          meetsAtVenue={need.meetsAtVenue}
+          trucks={trucks}
+          busy={busy != null}
+          onChange={(choice) =>
+            void run(`travel:${docId}`, () =>
+              chooseNeedLeg({ docId, version: need.version, ...choice }),
+            )
+          }
+        />
         <EventStaffTimingControl
-          key={`timing:${docId}:${row.version}`}
-          label={`${person ? personLabel(person) : "this crew member"}${row.role ? ` · ${row.role}` : ""}`}
-          startsAt={row.startsAt}
-          endsAt={row.endsAt}
-          followsEventTiming={row.followsEventTiming}
+          key={`timing:${docId}:${need.version}`}
+          label={String(need.role ?? "this open shift")}
+          startsAt={need.startsAt}
+          endsAt={need.endsAt}
+          followsEventTiming={need.followsEventTiming}
           busy={busy != null}
           onSave={(plan) =>
             void run(`timing:${docId}`, () =>
-              planAssignmentTiming({
+              planNeedTiming({
                 docId,
-                version: row.version,
+                version: need.version,
                 startsAt: plan.startsAt,
                 endsAt: plan.endsAt,
                 followsEventTiming: plan.followsEventTiming,
@@ -264,31 +339,7 @@ export function EventStaffingTab({ eventId }: Props) {
             )
           }
         />
-      );
-    }
-    const need = eventNeeds.find((item) => item._id === docId);
-    if (!need) return null;
-    return (
-      <EventStaffTimingControl
-        key={`timing:${docId}:${need.version}`}
-        label={String(need.role ?? "this open shift")}
-        startsAt={need.startsAt}
-        endsAt={need.endsAt}
-        followsEventTiming={need.followsEventTiming}
-        busy={busy != null}
-        onSave={(plan) =>
-          void run(`timing:${docId}`, () =>
-            planNeedTiming({
-              docId,
-              version: need.version,
-              startsAt: plan.startsAt,
-              endsAt: plan.endsAt,
-              followsEventTiming: plan.followsEventTiming,
-              synchronizeShifts: true,
-            }),
-          )
-        }
-      />
+      </>
     );
   };
 
@@ -324,9 +375,36 @@ export function EventStaffingTab({ eventId }: Props) {
           <p className="text-base text-ink-3">
             Crew, planned times, open shifts, and availability conflicts.
           </p>
+          {canManage && openShiftCount > 0 ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busy != null}
+              onClick={() =>
+                void run("autoFill", async () => {
+                  setAutoFillNote(
+                    autoFillSummary(
+                      await autoFill({ eventId: eventId as Id<"events"> }),
+                    ),
+                  );
+                })
+              }
+            >
+              Auto-fill open shifts
+            </button>
+          ) : null}
         </div>
       </header>
       {failure ? <FailureBanner failure={failure} /> : null}
+      {autoFillNote ? (
+        <p
+          role="status"
+          className="border-y border-line py-2 text-base text-ink-2"
+        >
+          {autoFillNote}
+        </p>
+      ) : null}
+      <EventShiftChangesPanel eventId={eventId} />
       {activities !== undefined &&
       (crewWindow.startsAt == null || crewWindow.endsAt == null) ? (
         <p
@@ -528,6 +606,35 @@ export function EventStaffingTab({ eventId }: Props) {
                 });
               })();
             }}
+            waitlist={{
+              entries: waitlistEntries ?? [],
+              busy: busy != null,
+              onJoin: (needId, personId) =>
+                void run(`waitlist:${needId}`, () =>
+                  joinWaitlist({ staffNeedId: needId, personId }),
+                ),
+              onLeave: (entry) =>
+                void run(`waitlist:${entry._id}`, () =>
+                  leaveWaitlist({ docId: entry._id, version: entry.version }),
+                ),
+            }}
+            onDescribeDemand={
+              canManage
+                ? (need) => {
+                    void (async () => {
+                      const demand = await askStaffNeedDemand(prompt, need);
+                      if (!demand) return;
+                      void run(`demand:${need._id}`, () =>
+                        describeDemand({
+                          docId: need._id,
+                          version: need.version,
+                          ...demand,
+                        }),
+                      );
+                    })();
+                  }
+                : undefined
+            }
             timingControl={timingControl}
             conflictsFor={conflictsFor}
           />

@@ -7,6 +7,7 @@ import {
   type PacketDecision,
 } from "../../../lib/eventPacket/useEventPacket";
 import { importSources } from "../../../lib/eventPacket/importSources";
+import { describeSource } from "../../../lib/eventPacket/sourceProvenance";
 import {
   parsePacketSnapshot,
   parsePortablePacket,
@@ -23,12 +24,27 @@ import { readiness, fieldLabel } from "../../../lib/eventPacket/reconcile";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
 import { WORKBOOK_REVIEW_PARAM } from "../eventRoutes";
+import { FinalLockPanel } from "./FinalLockQuestions";
 
 function valueText(value: unknown) {
   return Array.isArray(value)
     ? value.join(", ")
     : String(value ?? "Not on file");
 }
+const SECTION_TITLE: Record<string, string> = {
+  packlist: "Pack list",
+  staffing: "Staff and sign-offs",
+  vehicles: "Trucks and trailers",
+  timeline: "Timeline",
+  menu: "Menu",
+  layouts: "Layouts",
+  contacts: "Contacts",
+  equipment: "Equipment and rentals",
+  venue: "Venue",
+};
+const sectionTitle = (key: string) =>
+  SECTION_TITLE[key] ?? key[0].toUpperCase() + key.slice(1);
+
 function openBlank() {
   const target = window.open("about:blank", "_blank");
   if (target) target.opener = null;
@@ -147,7 +163,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
       } else {
         parsePacketSnapshot(json);
         throw new Error(
-          "This snapshot contains references only. Select its portable packet export or original source files so Capsule can retain the evidence.",
+          "This file only points to its source files instead of holding them. Pick its portable packet export, or the original source files, so Capsule can keep the evidence.",
         );
       }
     } else {
@@ -175,6 +191,19 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
               snapshot.identity.invoiceNumber) &&
           candidate.identity.eventDate === snapshot.identity.eventDate,
       );
+      // Only diagrams or forms picked: keep them on this event as they are.
+      const referenceOnly =
+        result.candidates.length === 0 &&
+        result.sharedReferences.length > 0 &&
+        result.ungrouped.length === 0;
+      if (referenceOnly)
+        matches.push({
+          key: "this-event",
+          identity: snapshot.identity,
+          sources: [],
+          associationEvidence: [],
+          observations: [],
+        });
       if (matches.length !== 1)
         throw new Error(
           "These files do not identify this event unambiguously. Review their invoice number and event date, then select this event’s sources.",
@@ -267,8 +296,10 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
       </div>
       {view.latestRevision?.stale && (
         <p className="mt-3 text-sm text-danger" role="status">
-          The printed workbook is out of date. Event information or evidence has
-          changed.
+          The printed workbook is out of date.{" "}
+          {view.latestRevision.staleSections?.length
+            ? `Changed since it printed: ${view.latestRevision.staleSections.join(", ")}.`
+            : "Event information or evidence has changed."}
         </p>
       )}
       {failure && (
@@ -285,7 +316,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
           <input
             className="mt-1 block max-w-full"
             type="file"
-            accept=".pdf,.rtf,.csv,.json"
+            accept=".pdf,.rtf,.csv,.json,.png,.jpg,.jpeg,.gif,.webp"
             multiple
             disabled={busy}
             onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
@@ -302,79 +333,108 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
         </label>
       </div>
       <p className="mt-2 text-sm text-ink-3">
-        What's already on this event stays in charge. Imported approvals require
-        local review. Live TPP, Nowsta, rentals and document checks remain open
-        until verified.
+        What's already on this event stays in charge. The workbook is built from
+        it: add source files only to keep an original document or a setup
+        diagram picture, or to settle a disagreement. You never need to upload a
+        report Capsule already has.
       </p>
-      <button
-        className="btn-link mt-3"
-        onClick={() => setExpanded(!expanded)}
-        aria-expanded={expanded}
-      >
-        {expanded
-          ? "Hide review"
-          : `Review ${open.length} open items and sources`}
-      </button>
-      {expanded && (
-        <div className="mt-4">
-          <label className="text-sm">
-            Review section
-            <select
-              className="input ml-2"
-              value={activeSection}
-              onChange={(e) => setSection(e.target.value)}
-            >
-              <option value="all">All sections</option>
-              {Array.from(new Set(open.map((i) => i.section))).map((key) => (
-                <option key={key} value={key}>
-                  {key === "packlist"
-                    ? "Pack list"
-                    : key[0].toUpperCase() + key.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="attention-band mt-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4">
-              <p className="text-sm font-semibold text-ink">Open decisions</p>
+      <FinalLockPanel eventId={eventId} />
+      {/* The checklist is always shown, one heading per part of the
+          workbook. Checks Capsule can answer from the event (crew, truck,
+          rentals, layouts, pack list, load times) tick themselves. */}
+      {visibleOpen.length === 0 ? (
+        <p className="mt-4 text-sm text-ink-2">
+          Nothing left to check. Capsule ticked what the event already shows.
+        </p>
+      ) : (
+        <div className="attention-band mt-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4">
+            <p className="text-sm font-semibold text-ink">
+              Still to check ({visibleOpen.length})
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {new Set(open.map((i) => i.section)).size > 1 && (
+                <label className="text-sm">
+                  Show
+                  <select
+                    className="input ml-2"
+                    value={activeSection}
+                    onChange={(e) => setSection(e.target.value)}
+                  >
+                    <option value="all">Every part</option>
+                    {Array.from(new Set(open.map((i) => i.section))).map(
+                      (key) => (
+                        <option key={key} value={key}>
+                          {sectionTitle(key)}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </label>
+              )}
               {openChecks.length > 0 && (
                 <button
                   className="btn btn-secondary btn-sm"
                   disabled={busy}
                   onClick={verifyAllChecks}
                 >
-                  Verify all checks ({openChecks.length})
+                  Tick all checks ({openChecks.length})
                 </button>
               )}
             </div>
-            <ul className="divide-y divide-line px-4 pb-4">
-              {visibleOpen.map((issue) => (
-                <IssueRow
-                  key={`${issue.id}:${issue.evidenceFingerprint}`}
-                  issue={issue}
-                  snapshot={snapshot}
-                  targets={view.nativeTargets?.[issue.fieldKey] ?? []}
-                  busy={busy}
-                  onSave={(decision) =>
-                    run(async () => {
-                      await packet.resolve(decision);
-                    })
-                  }
-                  onSource={(fingerprint) => {
-                    const target = openBlank();
-                    return run(async () => {
-                      try {
-                        openLink(await packet.sourceUrl(fingerprint), target);
-                      } catch (error) {
-                        target?.close();
-                        throw error;
-                      }
-                    });
-                  }}
-                />
-              ))}
-            </ul>
           </div>
+          {Array.from(new Set(visibleOpen.map((i) => i.section))).map((key) => (
+            <div key={key} className="px-4 pb-2">
+              <h4 className="mt-3 text-xs font-semibold uppercase tracking-wide text-ink-2">
+                {sectionTitle(key)}
+              </h4>
+              <ul className="divide-y divide-line">
+                {visibleOpen
+                  .filter((issue) => issue.section === key)
+                  .map((issue) => (
+                    <IssueRow
+                      key={`${issue.id}:${issue.evidenceFingerprint}`}
+                      issue={issue}
+                      snapshot={snapshot}
+                      targets={view.nativeTargets?.[issue.fieldKey] ?? []}
+                      busy={busy}
+                      onSave={(decision) =>
+                        run(async () => {
+                          await packet.resolve(decision);
+                        })
+                      }
+                      onSource={(fingerprint) => {
+                        const target = openBlank();
+                        return run(async () => {
+                          try {
+                            openLink(
+                              await packet.sourceUrl(fingerprint),
+                              target,
+                            );
+                          } catch (error) {
+                            target?.close();
+                            throw error;
+                          }
+                        });
+                      }}
+                    />
+                  ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        className="btn-link mt-3"
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+      >
+        {expanded
+          ? "Hide sources and history"
+          : `Show sources and history (${snapshot.artifacts.length} files)`}
+      </button>
+      {expanded && (
+        <div className="mt-4">
           <details className="mt-4">
             <summary>Source evidence ({snapshot.artifacts.length})</summary>
             <ul>
@@ -400,6 +460,16 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                     {artifact.name}
                   </button>{" "}
                   · {artifact.kind.replaceAll("_", " ")}
+                  {(() => {
+                    const kept = view.sources?.find(
+                      (s) => s.checksum === artifact.fingerprint,
+                    );
+                    return kept ? (
+                      <span className="block text-ink-3">
+                        {describeSource(kept)}
+                      </span>
+                    ) : null;
+                  })()}
                 </li>
               ))}
             </ul>

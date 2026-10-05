@@ -83,6 +83,8 @@ async function createEvent(
     clientId: client.docId,
     title,
     eventType: "corporate dinner",
+    venueName: "Proof Hall",
+    serviceStyleName: "Plated",
     startsAt: S.startsAt,
     endsAt: S.endsAt,
     expectedHeadcount: S.expectedHeadcount,
@@ -285,6 +287,7 @@ export async function captureCloseout(
   tenantId: string,
   closeoutId: string,
   eventId: string,
+  overrides: Partial<Record<keyof typeof CAPTURED_ACTUALS, number>> = {},
 ): Promise<void> {
   const { finance } = rolesFor(proof, tenantId);
   const live = (await finance.run(async (ctx) =>
@@ -294,6 +297,7 @@ export async function captureCloseout(
     docId: closeoutId,
     eventId,
     ...CAPTURED_ACTUALS,
+    ...overrides,
     version: live.version,
   });
 }

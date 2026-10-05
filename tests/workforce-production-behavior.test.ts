@@ -31,11 +31,12 @@ it("renders absent and real break durations in the actual time ledger", async ()
   );
   await mount(createElement(TimeSheetPage));
   const table = [...container.querySelectorAll("table")].find((table) =>
-    table.textContent?.includes("Break"),
+    table.textContent?.includes("Lunch (unpaid)"),
   );
   expect(table).toBeDefined();
+  // PL-TIME: the break column is the unpaid lunch.
   const breakIndex = [...table!.querySelectorAll("thead th")].findIndex(
-    (cell) => cell.textContent === "Break",
+    (cell) => cell.textContent === "Lunch (unpaid)",
   );
   expect(breakIndex).toBeGreaterThanOrEqual(0);
   expect(

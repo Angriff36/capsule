@@ -39,7 +39,12 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
 
   useEffect(() => {
     if (!user?.id || !live || live.accountId !== user.id) return;
-    if (!workspaceMembershipPolicy.isReady(live as AuthStatusSnapshot)) return;
+    // The server says this sign-in has no workspace now (switched off or
+    // removed): the old saved access must not reopen the app offline.
+    if (!workspaceMembershipPolicy.isReady(live as AuthStatusSnapshot)) {
+      offlineAuthSnapshotStore.forget(user.id);
+      return;
+    }
     if (!live.personId || !live.tenantId) return;
     offlineAuthSnapshotStore.write({
       accountId: live.accountId,
@@ -59,7 +64,7 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
   if (status === undefined || status.accountId !== user?.id) {
     return (
       <GateShell title="Loading workspace…">
-        <p className="text-ink-2">Confirming your workspace membership.</p>
+        <p className="text-ink-2">Checking which workspace you belong to.</p>
       </GateShell>
     );
   }

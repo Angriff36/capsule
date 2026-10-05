@@ -25,7 +25,10 @@ import {
 } from "../../ui/BoundedDateInputs";
 import { toDatetimeLocalValue } from "../../lib/format";
 import { useListProposalTemplate } from "../../lib/manifest-convex-react";
-import { proposalTemplateDefaults } from "./proposalTemplateDefaults";
+import {
+  proposalTemplateDefaults,
+  templateForServiceStyle,
+} from "./proposalTemplateDefaults";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -152,10 +155,16 @@ export function ProposalCreateForm({
   const [draftVisibleSections, setDraftVisibleSections] = useState<string[]>(
     [],
   );
+  // AC-259: the template's section order, copied onto the proposal.
+  const [draftSectionOrder, setDraftSectionOrder] = useState<string[]>([]);
   const [templateTaxRate, setTemplateTaxRate] = useState<number | null>(null);
   const [templateServiceLineKey, setTemplateServiceLineKey] = useState<
     string | null
   >(null);
+  const [templateChoice, setTemplateChoice] = useState("");
+  // The event's service style picked this template (shown under the field).
+  const [templatePickedForStyle, setTemplatePickedForStyle] = useState(false);
+  const templateAutoPickedFor = useRef<string | null>(null);
 
   // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
   const draftPricing = useMemo(
@@ -198,6 +207,7 @@ export function ProposalCreateForm({
         lines.filter((line) => line.key !== templateServiceLineKey),
       );
       setDraftVisibleSections([]);
+      setDraftSectionOrder([]);
       setTemplateTaxRate(null);
       setTemplateServiceLineKey(null);
       return;
@@ -222,6 +232,7 @@ export function ProposalCreateForm({
     setDraftExpiresOn(defaults.expiresOn);
     setTemplateTaxRate(template.defaultTaxRate ?? null);
     setDraftVisibleSections(defaults.visibleSections);
+    setDraftSectionOrder(defaults.sectionOrder);
     const serviceChargeLine = defaults.serviceChargeLine;
     let nextLines = baseLines;
     let nextServiceLineKey: string | null = null;
@@ -278,6 +289,7 @@ export function ProposalCreateForm({
       const metadata = JSON.parse(saved.values.proposalDraftState ?? "{}") as {
         lines?: DraftLine[];
         visibleSections?: string[];
+        sectionOrder?: string[];
         templateTaxRate?: number | null;
         templateServiceLineKey?: string | null;
       };
@@ -285,11 +297,15 @@ export function ProposalCreateForm({
       setDraftVisibleSections(
         Array.isArray(metadata.visibleSections) ? metadata.visibleSections : [],
       );
+      setDraftSectionOrder(
+        Array.isArray(metadata.sectionOrder) ? metadata.sectionOrder : [],
+      );
       setTemplateTaxRate(metadata.templateTaxRate ?? null);
       setTemplateServiceLineKey(metadata.templateServiceLineKey ?? null);
     } catch {
       setDraftLines([]);
       setDraftVisibleSections([]);
+      setDraftSectionOrder([]);
       setTemplateTaxRate(null);
       setTemplateServiceLineKey(null);
     }
@@ -332,6 +348,24 @@ export function ProposalCreateForm({
       setDraftGuestCount(fromEvent.expectedHeadcount ?? undefined);
     }
   }, [fromEvent?._id]);
+
+  useEffect(() => {
+    // A proposal from an event starts from the template made for the event's
+    // service style (PL-CATALOGS AC-221/AC-222). Once per event, and never over
+    // a template the person already picked.
+    if (!fromEvent || proposalTemplates === undefined) return;
+    if (templateAutoPickedFor.current === fromEvent._id) return;
+    templateAutoPickedFor.current = fromEvent._id;
+    if (templateChoice) return;
+    const match = templateForServiceStyle(
+      proposalTemplates,
+      fromEvent.serviceStyleId,
+    );
+    if (!match) return;
+    setTemplateChoice(match._id);
+    setTemplatePickedForStyle(true);
+    selectTemplate(match._id);
+  }, [fromEvent?._id, proposalTemplates]);
 
   const submitDraft = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -385,7 +419,9 @@ export function ProposalCreateForm({
       taxAmount: draftTax,
     });
     if (pricing.total < 0) {
-      onFailure(new Error("Total cannot be negative."));
+      onFailure(
+        new Error("This proposal's total can't be negative. Use zero or more."),
+      );
       return;
     }
     void run("draft-proposal", async () => {
@@ -412,6 +448,7 @@ export function ProposalCreateForm({
         notes: String(data.get("notes") || "").trim() || undefined,
         terms: String(data.get("terms") || "").trim() || undefined,
         visibleSections: draftVisibleSections,
+        sectionOrder: draftSectionOrder,
         eventId: eventIdRaw ? (eventIdRaw as Id<"events">) : undefined,
         lines: validLines.map((line, i) => ({
           description: line.description.trim(),
@@ -434,6 +471,7 @@ export function ProposalCreateForm({
       setDraftNotes("");
       setDraftExpiresOn(defaultValidityDate());
       setDraftVisibleSections([]);
+      setDraftSectionOrder([]);
       setTemplateTaxRate(null);
       setTemplateServiceLineKey(null);
       onClose();
@@ -492,6 +530,7 @@ export function ProposalCreateForm({
             value={JSON.stringify({
               lines: draftLines,
               visibleSections: draftVisibleSections,
+              sectionOrder: draftSectionOrder,
               templateTaxRate,
               templateServiceLineKey,
             })}
@@ -501,8 +540,13 @@ export function ProposalCreateForm({
               Proposal template
               <select
                 className="input"
-                defaultValue=""
-                onChange={(event) => selectTemplate(event.target.value)}
+                aria-label="Proposal template"
+                value={templateChoice}
+                onChange={(event) => {
+                  setTemplateChoice(event.target.value);
+                  setTemplatePickedForStyle(false);
+                  selectTemplate(event.target.value);
+                }}
               >
                 <option value="">No template</option>
                 {(proposalTemplates ?? [])
@@ -514,6 +558,9 @@ export function ProposalCreateForm({
                   ))}
               </select>
               <span className="text-2xs text-ink-3">
+                {templatePickedForStyle && fromEvent?.serviceStyleName
+                  ? `Picked because this event is ${fromEvent.serviceStyleName}. Change it if you like. `
+                  : ""}
                 Selecting a template initializes this draft. Your later edits
                 stay unchanged.
               </span>

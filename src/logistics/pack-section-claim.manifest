@@ -1,0 +1,109 @@
+// Capsule logistics — who is packing which part of a pack list.
+//
+// A big list is packed by several people at once. A packer takes a section
+// (the kinds the warehouse walk groups lines by: linen, serving pieces,
+// power...) so two people do not pack the same shelf, and gives it back
+// when they are pulled away so someone else can take it. One live row per list and section;
+// a released row stays as history.
+//
+// Taking a section stops nobody: anyone may still count a line in it.
+
+use "../foundation/base.manifest"
+
+entity PackSectionClaim mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required packListId: uuid
+  // The warehouse-walk group key ("cat:linen", "containers", "kit", "other").
+  property required sectionKey: string = ""
+  property personId: uuid?
+  property personName: string = ""
+  property claimedAt: datetime?
+  property releasedAt: datetime?
+  // Set when someone else took the section over, so the change is never silent.
+  property takenOverByPersonId: uuid?
+  property takenOverByName: string?
+
+  belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo takenOverBy: Person fields [tenantId, takenOverByPersonId] references [tenantId, id]
+
+  computed isLive: boolean = self.claimedAt != null and self.releasedAt == null
+
+  // The same people who may count pack lines.
+  default policy packSectionClaimRead read: roleAllows(user.role, "staffAccess") "Staff may see who is packing each section"
+  default policy packSectionClaimWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may take a pack list section"
+  default policy packSectionClaimExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may take a pack list section"
+
+  // Take a section for yourself. The name is kept so the list still says who
+  // had it after a person record is changed.
+  command take(packListId: uuid, sectionKey: string) {
+    guard self.claimedAt == null
+    guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only.
+    guard self.packList != null and self.packList.deletedAt == null
+    constraint takeSectionListMatch: packListId == self.packListId "This section is on a different pack list. Pick the pack list already on it."
+    constraint takeSectionKey: length(trim(sectionKey)) > 0 "Pick the section to take."
+    mutate sectionKey = sectionKey
+    mutate personId = user.personId
+    mutate personName = user.personName != null ? user.personName : ""
+    mutate claimedAt = now()
+    emit PackSectionTaken {
+      packSectionClaimId: self.id
+      tenantId: self.tenantId
+      packListId: packListId
+      sectionKey: sectionKey
+      personName: self.personName
+    }
+  }
+
+  // Give your own section back. Someone else's section is taken with
+  // takeOver, which keeps who took it.
+  command release() {
+    guard self.claimedAt != null and self.releasedAt == null
+    guard self.deletedAt == null
+    constraint releaseOwnSection: self.personId == user.personId "Only the person packing this section can give it back. Use \"Take over\" to take it yourself."
+    mutate releasedAt = now()
+    emit PackSectionReleased {
+      packSectionClaimId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      sectionKey: self.sectionKey
+    }
+  }
+
+  // Take someone else's section: their claim ends with your name on it, and
+  // the take seam makes your claim in the same save.
+  command takeOver() {
+    guard self.claimedAt != null and self.releasedAt == null
+    guard self.deletedAt == null
+    mutate releasedAt = now()
+    mutate takenOverByPersonId = user.personId
+    mutate takenOverByName = user.personName != null ? user.personName : ""
+    emit PackSectionReleased {
+      packSectionClaimId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      sectionKey: self.sectionKey
+    }
+  }
+
+  store PackSectionClaim in durable
+}
+
+event PackSectionTaken: "pack_section.taken" {
+  packSectionClaimId: string
+  tenantId: string
+  packListId: string
+  sectionKey: string
+  personName: string
+}
+
+event PackSectionReleased: "pack_section.released" {
+  packSectionClaimId: string
+  tenantId: string
+  packListId: string
+  sectionKey: string
+}

@@ -1,0 +1,141 @@
+// Capsule workforce — StaffingTemplate: a reusable crew for a service style
+// and event size (spec §12.2 "reusable role and crew templates by service
+// style and event size"). When an event is approved, the best matching active
+// template posts its staffing needs once (convex/lib/shiftSchedulingEvents.ts
+// ensureTemplateStaffNeeds); later guest-count or style changes add or cancel
+// only open slots. No template = approval adds no staff (AC-399).
+//
+// `lines` is a JSON array parsed by src/lib/staffingTemplates.ts:
+// { role, fixedCount?, guestsPerWorker?, minCount?, qualificationName?,
+//   certificationType?, skills?, uniform?, workLocation?, payBasis?,
+//   budgetHourlyRate? }. Stored as a string (like RoleScorecard.expectations)
+// so a line can grow without a schema migration.
+
+use "./assignment.manifest"
+
+enum StaffingTemplateStatus {
+  active
+  retired
+}
+
+entity StaffingTemplate mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required name: string = ""
+  // Empty = any service style.
+  property serviceStyleId: uuid?
+  property minGuests: int?
+  property maxGuests: int?
+  property required lines: string = "[]"
+  property required status: StaffingTemplateStatus = "active"
+  property definedAt: datetime?
+  property retiredAt: datetime?
+
+  ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
+
+  constraint staffingTemplateNamed: self.definedAt == null or length(trim(self.name)) > 0 "Give this crew template a name."
+  constraint staffingTemplateGuestRange: self.minGuests == null or self.maxGuests == null or self.maxGuests >= self.minGuests "The largest guest count has to be at least the smallest."
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy staffingTemplateRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "eventManageAccess") "Workforce staff and event managers may see crew templates"
+  default policy staffingTemplateWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update crew templates"
+  default policy staffingTemplateExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change crew templates"
+
+  command define(
+    name: string,
+    lines: string,
+    optional serviceStyleId: uuid,
+    optional minGuests: int,
+    optional maxGuests: int
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint defineStaffingTemplateName: length(trim(name)) > 0 "Give this crew template a name."
+    constraint defineStaffingTemplateRange: minGuests == null or maxGuests == null or maxGuests >= minGuests "The largest guest count has to be at least the smallest."
+    mutate name = name
+    mutate lines = lines
+    mutate serviceStyleId = serviceStyleId
+    mutate minGuests = minGuests
+    mutate maxGuests = maxGuests
+    mutate status = "active"
+    mutate definedAt = now()
+    emit StaffingTemplateDefined {
+      staffingTemplateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command revise(
+    name: string,
+    lines: string,
+    optional serviceStyleId: uuid,
+    optional minGuests: int,
+    optional maxGuests: int
+  ) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint reviseStaffingTemplateName: length(trim(name)) > 0 "Give this crew template a name."
+    constraint reviseStaffingTemplateRange: minGuests == null or maxGuests == null or maxGuests >= minGuests "The largest guest count has to be at least the smallest."
+    mutate name = name
+    mutate lines = lines
+    mutate serviceStyleId = serviceStyleId
+    mutate minGuests = minGuests
+    mutate maxGuests = maxGuests
+    emit StaffingTemplateRevised {
+      staffingTemplateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = now()
+    emit StaffingTemplateRetired {
+      staffingTemplateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate status = "active"
+    mutate retiredAt = null
+    emit StaffingTemplateReactivated {
+      staffingTemplateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store StaffingTemplate in durable
+}
+
+event StaffingTemplateDefined: "staffing_template.defined" {
+  staffingTemplateId: string
+  tenantId: string
+}
+
+event StaffingTemplateRevised: "staffing_template.revised" {
+  staffingTemplateId: string
+  tenantId: string
+}
+
+event StaffingTemplateRetired: "staffing_template.retired" {
+  staffingTemplateId: string
+  tenantId: string
+}
+
+event StaffingTemplateReactivated: "staffing_template.reactivated" {
+  staffingTemplateId: string
+  tenantId: string
+}

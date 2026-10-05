@@ -2,14 +2,34 @@ import { useState } from "react";
 import { useGetEvent } from "../../lib/manifest-convex-react";
 import { useWorkingEventId } from "./workingEvent";
 
+const SHOW_ALL_KEY = "capsule.showAllEvents.";
+
+function readShowAll(screen: string): boolean {
+  try {
+    return sessionStorage.getItem(SHOW_ALL_KEY + screen) === "1";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * List screens show only the working event's rows until the operator asks
- * for every event. "Show all events" is per screen; it never clears the
- * working event.
+ * for every event. "Show all events" is per screen and kept for the browser
+ * tab (#374), so a return visit shows what the operator last chose; it never
+ * clears the working event.
  */
-export function useWorkingEventScope() {
+export function useWorkingEventScope(screen: string) {
   const workingId = useWorkingEventId();
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAllState] = useState(() => readShowAll(screen));
+  const setShowAll = (next: boolean) => {
+    setShowAllState(next);
+    try {
+      if (next) sessionStorage.setItem(SHOW_ALL_KEY + screen, "1");
+      else sessionStorage.removeItem(SHOW_ALL_KEY + screen);
+    } catch {
+      // Private mode: the choice lasts for this visit only.
+    }
+  };
   return {
     workingId,
     /** The event to filter by, or null for every event. */

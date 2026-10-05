@@ -1,22 +1,54 @@
 // Parallel Run Dashboard — Daily comparison of TPP vs Capsule data for migration validation
 // Spec §6.5: Compare record counts, event totals, status distribution, revenue, salesperson, occasion, service style, venue
+// Both sides' numbers come from the daily comparison (convex/parallelRun.ts):
+// TPP's side is read from the import's own saved rows, Capsule's from the
+// events, and every field difference is listed for a person to settle.
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/lib/api";
+import { useListImportRun } from "../../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../../lib/useDishesByIds";
 import {
-  useListEvent,
-  useListDish,
-  useListImportRun,
-  useListExternalRecordLink,
-  useListServiceStyle,
-  useListOccasion,
-  useListVenue,
-} from "../../../lib/manifest-convex-react";
+  useExternalRecordLinksFor,
+  useMenuLinkStats,
+} from "../../../lib/useExternalRecordLinkLists";
 import { formatCountNoun } from "../../../lib/format";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { Link } from "react-router-dom";
 import { importRunDetailPath } from "./importRoutes";
 import { eventDetailPath } from "../../../features/events/eventRoutes";
+import { ParallelRunDifferences } from "./ParallelRunDifferences";
+import { ParallelRunPeriodCheck } from "./ParallelRunPeriodCheck";
+import { useActionFailure } from "../../../ui/action-result";
+import { classifyCommandFailure } from "../../events/CommandFailure";
+import { FailureBanner } from "../../events/FailureBanner";
+import { useEventsInRange } from "../../facilities/useEventsById";
+
+/** One row of a "by ..." table: both sides' counts under one name. */
+function breakdownRows(
+  tpp: Record<string, number> | undefined,
+  capsule: Record<string, number> | undefined,
+) {
+  const names = new Set([
+    ...Object.keys(tpp ?? {}),
+    ...Object.keys(capsule ?? {}),
+  ]);
+  return [...names]
+    .map((name) => {
+      const capsuleCount = capsule?.[name] ?? 0;
+      const tppCount = tpp?.[name] ?? 0;
+      return {
+        id: name,
+        name: name.replace(/_/g, " "),
+        capsule: capsuleCount,
+        tpp: tppCount,
+        diff: capsuleCount - tppCount,
+      };
+    })
+    .sort((a, b) => b.tpp + b.capsule - (a.tpp + a.capsule));
+}
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -34,6 +66,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
 };
 
 // Item type labels
@@ -57,11 +90,8 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   stock: "Stock",
   location: "Location",
   pack_list: "Pack List",
+  client_communication: "Message or task",
 };
-
-// This dashboard compares the events dataset — events are the spine every
-// other imported record hangs off, so they are the §6.5 parallel-run gate.
-const COMPARISON_DATASET = "events";
 
 // Comparison window: the last 30 days.
 const COMPARISON_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -90,13 +120,40 @@ interface ComparisonMetric {
 }
 
 export function ParallelRunDashboardPage() {
-  const capsuleEvents = useListEvent();
-  const capsuleDishes = useListDish();
+  // Only the comparison window's events (PL-SCALE), not every event. The
+  // window is fixed when the page opens, like selectedDateRange below.
+  const [windowEnd] = useState(() => Date.now());
+  const capsuleEvents = useEventsInRange({
+    from: windowEnd - COMPARISON_WINDOW_MS,
+    to: windowEnd + 1,
+  });
+  const capsuleDishes = useWholeDishList();
   const importRuns = useListImportRun();
-  const externalLinks = useListExternalRecordLink();
-  const serviceStyles = useListServiceStyle();
-  const occasions = useListOccasion();
-  const venues = useListVenue();
+  // The full link list is too long for one read: the menu check is counted
+  // on the server, and only links to imported events are listed.
+  const menuStats = useMenuLinkStats();
+  const externalLinks = useExternalRecordLinksFor({
+    capsuleEntities: ["event_record"],
+  });
+  const overview = useQuery(api.parallelRun.overview, {});
+  const compareNow = useMutation(api.parallelRun.compareNow);
+  const [comparing, setComparing] = useState(false);
+  const { error: compareError, setError: setCompareError } = useActionFailure();
+  const comparison = overview?.comparison ?? null;
+  const summary = comparison?.summary ?? null;
+
+  const handleCompareNow = async () => {
+    setComparing(true);
+    setCompareError(null);
+    try {
+      await compareNow({});
+    } catch (err) {
+      const failure = classifyCommandFailure(err);
+      setCompareError(`${failure.title}: ${failure.detail}`);
+    } finally {
+      setComparing(false);
+    }
+  };
 
   // Computed once per mount so downstream memos are stable across renders.
   const selectedDateRange = useMemo(
@@ -132,40 +189,17 @@ export function ParallelRunDashboardPage() {
     );
   }, [importRuns, selectedDateRange]);
 
-  // Latest completed EVENTS run drives the events comparison; the latest
-  // completed MENUS run drives the dish-catalog comparison.
-  const latestTppImport = useMemo(() => {
-    const eventsRuns = completedImportRuns
-      .filter((run) => run.datasetType === COMPARISON_DATASET)
-      .sort((a, b) => (b.startTime ?? 0) - (a.startTime ?? 0));
-    return eventsRuns[0] ?? null;
-  }, [completedImportRuns]);
-
   const menuCatalogComparison = useMemo(() => {
     const menuRuns = completedImportRuns.filter(
       (run) => run.datasetType === "menus",
     );
-    // Active TPP→Capsule links are the imported catalog. Counting links (not
-    // run recordCounts) stays correct across chunked and re-run imports.
-    // Restricted to tpp_legacy so a future non-TPP menu source cannot skew it.
-    const menuLinks = (externalLinks ?? []).filter(
-      (link) =>
-        link.recordType === "menu" &&
-        link.sourceSystem === "tpp_legacy" &&
-        link.deletedAt == null &&
-        link.conflictStatus !== "superseded",
-    );
+    // Active TPP→Capsule menu links are the imported catalog, counted on the
+    // server (menuLinkStats): a link is resolved only when its dish exists.
     // capsuleDishes === null means the read was denied, NOT an empty catalog.
     const dishesKnown = capsuleDishes !== null;
-    const dishIds = new Set((capsuleDishes ?? []).map((dish) => dish._id));
-    const linkedDishIds = new Set(
-      menuLinks.filter((link) => link.capsuleId).map((link) => link.capsuleId),
-    );
-    const tppTotal = menuLinks.length;
-    // A link is resolved only when its Capsule dish still exists.
-    const unresolvedLinks = menuLinks.filter(
-      (link) => !link.capsuleId || !dishIds.has(link.capsuleId),
-    ).length;
+    const linkedDishIds = new Set(menuStats?.linkedDishIds ?? []);
+    const tppTotal = menuStats?.tppTotal ?? 0;
+    const unresolvedLinks = menuStats?.unresolvedLinks ?? 0;
     const capsuleTotal = capsuleDishes?.length ?? 0;
     const dishesWithoutLink = capsuleDishes
       ? capsuleDishes.filter((dish) => !linkedDishIds.has(dish._id)).length
@@ -192,89 +226,65 @@ export function ParallelRunDashboardPage() {
             : ("warning" as const),
       runCount: menuRuns.length,
     };
-  }, [completedImportRuns, capsuleDishes, externalLinks]);
+  }, [completedImportRuns, capsuleDishes, menuStats]);
 
-  // Parse TPP record counts from JSON string
-  const tppRecordCounts = useMemo(() => {
-    if (!latestTppImport?.recordCounts) return {};
-    try {
-      return JSON.parse(latestTppImport.recordCounts) as Record<string, number>;
-    } catch {
-      return {};
-    }
-  }, [latestTppImport]);
-
-  // Calculate comparison metrics
+  // Both sides from the newest daily comparison (same rows as the list of
+  // differences below).
   const comparisonMetrics = useMemo((): ComparisonMetric[] => {
-    if (!filteredEvents.length && !latestTppImport) return [];
-
-    const metrics: ComparisonMetric[] = [];
-
-    // Total records
-    const capsuleTotal = filteredEvents.length;
-    const tppTotal = tppRecordCounts.total ?? 0;
-    const diff = capsuleTotal - tppTotal;
-    const diffPercent = tppTotal > 0 ? (diff / tppTotal) * 100 : 0;
-
-    metrics.push({
-      label: "Total Events",
-      capsuleCount: capsuleTotal,
-      tppCount: tppTotal,
-      diff,
-      diffPercent,
-      status:
-        diff === 0 ? "match" : Math.abs(diffPercent) > 5 ? "error" : "warning",
-    });
-
-    // Status distribution comparison
-    const capsuleStages: Record<string, number> = {};
-    filteredEvents.forEach((event) => {
-      const stage = String(event.stage);
-      capsuleStages[stage] = (capsuleStages[stage] ?? 0) + 1;
-    });
-
-    // TPP status counts (if available in recordCounts)
-    const tppStages =
-      (tppRecordCounts.byStatus as unknown as
-        Record<string, number> | undefined) ?? {};
-
-    Object.keys(STAGE_LABELS).forEach((stage) => {
-      const capsuleCount = capsuleStages[stage] ?? 0;
-      const tppCount =
-        typeof tppStages === "object" && tppStages !== null
-          ? (tppStages[stage] ?? 0)
-          : 0;
-      const stageDiff = capsuleCount - tppCount;
-      const stageDiffPercent = tppCount > 0 ? (stageDiff / tppCount) * 100 : 0;
-
-      metrics.push({
-        label: `Status: ${STAGE_LABELS[stage]}`,
+    if (!summary) return [];
+    const metric = (
+      label: string,
+      capsuleCount: number,
+      tppCount: number,
+      tolerance: number,
+    ): ComparisonMetric => {
+      const diff = capsuleCount - tppCount;
+      const diffPercent = tppCount > 0 ? (diff / tppCount) * 100 : 0;
+      return {
+        label,
         capsuleCount,
         tppCount,
-        diff: stageDiff,
-        diffPercent: stageDiffPercent,
+        diff,
+        diffPercent,
         status:
-          stageDiff === 0
+          diff === 0
             ? "match"
-            : Math.abs(stageDiffPercent) > 10
+            : Math.abs(diffPercent) > tolerance
               ? "error"
               : "warning",
-      });
-    });
-
-    return metrics;
-  }, [filteredEvents, tppRecordCounts]);
-
-  // Revenue comparison
-  const revenueMetric = useMemo((): ComparisonMetric | null => {
-    const capsuleRevenue = filteredEvents.reduce(
-      (sum, event) => sum + (event.quotedPrice ?? 0),
-      0,
+      };
+    };
+    const metrics = [
+      metric("Total Events", summary.capsule.events, summary.tpp.events, 5),
+    ];
+    const stages = new Set([
+      ...Object.keys(STAGE_LABELS),
+      ...Object.keys(summary.tpp.byStage),
+      ...Object.keys(summary.capsule.byStage),
+    ]);
+    for (const stage of stages) {
+      metrics.push(
+        metric(
+          `Status: ${STAGE_LABELS[stage] ?? stage}`,
+          summary.capsule.byStage[stage] ?? 0,
+          summary.tpp.byStage[stage] ?? 0,
+          10,
+        ),
+      );
+    }
+    metrics.push(
+      metric("Only in TPP (not matched yet)", 0, summary.onlyInTpp, 100),
+      metric("Only in Capsule (made here)", summary.onlyInCapsule, 0, 100),
     );
-    const tppRevenue = (tppRecordCounts.totalRevenue as number) ?? 0;
+    return metrics;
+  }, [summary]);
+
+  const revenueMetric = useMemo((): ComparisonMetric | null => {
+    if (!summary) return null;
+    const capsuleRevenue = summary.capsule.revenue;
+    const tppRevenue = summary.tpp.revenue;
     const diff = capsuleRevenue - tppRevenue;
     const diffPercent = tppRevenue > 0 ? (diff / tppRevenue) * 100 : 0;
-
     return {
       label: "Total Revenue",
       capsuleCount: capsuleRevenue,
@@ -284,170 +294,29 @@ export function ParallelRunDashboardPage() {
       status:
         diff === 0 ? "match" : Math.abs(diffPercent) > 5 ? "error" : "warning",
     };
-  }, [filteredEvents, tppRecordCounts]);
+  }, [summary]);
 
-  // Salesperson breakdown
-  const salespersonBreakdown = useMemo(() => {
-    const breakdown: Record<string, { capsule: number; tpp: number }> = {};
-    filteredEvents.forEach((event) => {
-      if (event.assignedToId) {
-        const key = String(event.assignedToId);
-        breakdown[key] = breakdown[key] ?? { capsule: 0, tpp: 0 };
-        breakdown[key].capsule++;
-      }
-    });
-
-    // TPP salesperson counts (if available)
-    const tppSalespeople =
-      (tppRecordCounts.bySalesperson as unknown as
-        Record<string, number> | undefined) ?? {};
-    Object.entries(
-      typeof tppSalespeople === "object" && tppSalespeople !== null
-        ? tppSalespeople
-        : {},
-    ).forEach(([id, count]) => {
-      breakdown[id] = breakdown[id] ?? { capsule: 0, tpp: 0 };
-      breakdown[id].tpp = count;
-    });
-
-    return Object.entries(breakdown).map(([id, counts]) => ({
-      id,
-      capsule: counts.capsule,
-      tpp: counts.tpp,
-      diff: counts.capsule - counts.tpp,
-    }));
-  }, [filteredEvents, tppRecordCounts]);
-
-  // Occasion breakdown
-  const occasionBreakdown = useMemo(() => {
-    const breakdown: Record<
-      string,
-      { capsule: number; tpp: number; name: string }
-    > = {};
-    filteredEvents.forEach((event) => {
-      if (event.occasionId) {
-        const key = String(event.occasionId);
-        const occasion = occasions?.find((o) => o._id === event.occasionId);
-        breakdown[key] = breakdown[key] ?? {
-          capsule: 0,
-          tpp: 0,
-          name: occasion?.name ?? "Unknown",
-        };
-        breakdown[key].capsule++;
-      }
-    });
-
-    // TPP occasion counts (if available)
-    const tppOccasions =
-      (tppRecordCounts.byOccasion as unknown as
-        Record<string, number> | undefined) ?? {};
-    Object.entries(
-      typeof tppOccasions === "object" && tppOccasions !== null
-        ? tppOccasions
-        : {},
-    ).forEach(([id, count]) => {
-      const occasion = occasions?.find((o) => o._id === id);
-      const name = occasion?.name ?? id;
-      breakdown[id] = breakdown[id] ?? { capsule: 0, tpp: 0, name };
-      breakdown[id].tpp = count;
-    });
-
-    return Object.entries(breakdown).map(([id, data]) => ({
-      id,
-      name: data.name,
-      capsule: data.capsule,
-      tpp: data.tpp,
-      diff: data.capsule - data.tpp,
-    }));
-  }, [filteredEvents, tppRecordCounts, occasions]);
-
-  // Service Style breakdown
-  const serviceStyleBreakdown = useMemo(() => {
-    const breakdown: Record<
-      string,
-      { capsule: number; tpp: number; name: string }
-    > = {};
-    filteredEvents.forEach((event) => {
-      if (event.serviceStyleId) {
-        const key = String(event.serviceStyleId);
-        const style = serviceStyles?.find(
-          (s) => s._id === event.serviceStyleId,
-        );
-        breakdown[key] = breakdown[key] ?? {
-          capsule: 0,
-          tpp: 0,
-          name: style?.name ?? "Unknown",
-        };
-        breakdown[key].capsule++;
-      }
-    });
-
-    // TPP service style counts (if available)
-    const tppServiceStyles =
-      (tppRecordCounts.byServiceStyle as unknown as
-        Record<string, number> | undefined) ?? {};
-    Object.entries(
-      typeof tppServiceStyles === "object" && tppServiceStyles !== null
-        ? tppServiceStyles
-        : {},
-    ).forEach(([id, count]) => {
-      const style = serviceStyles?.find((s) => s._id === id);
-      const name = style?.name ?? id;
-      breakdown[id] = breakdown[id] ?? { capsule: 0, tpp: 0, name };
-      breakdown[id].tpp = count;
-    });
-
-    return Object.entries(breakdown).map(([id, data]) => ({
-      id,
-      name: data.name,
-      capsule: data.capsule,
-      tpp: data.tpp,
-      diff: data.capsule - data.tpp,
-    }));
-  }, [filteredEvents, tppRecordCounts, serviceStyles]);
-
-  // Venue breakdown
-  const venueBreakdown = useMemo(() => {
-    const breakdown: Record<
-      string,
-      { capsule: number; tpp: number; name: string }
-    > = {};
-    filteredEvents.forEach((event) => {
-      const venueId = event.venueId ?? event.venueName ?? "Unknown";
-      const key = typeof venueId === "string" ? venueId : String(venueId);
-      const venue =
-        typeof event.venueId === "string" && event.venueId !== "Unknown"
-          ? venues?.find((v) => v._id === event.venueId)
-          : null;
-      breakdown[key] = breakdown[key] ?? {
-        capsule: 0,
-        tpp: 0,
-        name: venue?.name ?? event.venueName ?? "Unknown",
-      };
-      breakdown[key].capsule++;
-    });
-
-    // TPP venue counts (if available)
-    const tppVenues =
-      (tppRecordCounts.byVenue as unknown as
-        Record<string, number> | undefined) ?? {};
-    Object.entries(
-      typeof tppVenues === "object" && tppVenues !== null ? tppVenues : {},
-    ).forEach(([id, count]) => {
-      const venue = venues?.find((v) => v._id === id);
-      const name = venue?.name ?? id;
-      breakdown[id] = breakdown[id] ?? { capsule: 0, tpp: 0, name };
-      breakdown[id].tpp = count;
-    });
-
-    return Object.entries(breakdown).map(([id, data]) => ({
-      id,
-      name: data.name,
-      capsule: data.capsule,
-      tpp: data.tpp,
-      diff: data.capsule - data.tpp,
-    }));
-  }, [filteredEvents, tppRecordCounts, venues]);
+  const salespersonBreakdown = useMemo(
+    () =>
+      breakdownRows(summary?.tpp.bySalesperson, summary?.capsule.bySalesperson),
+    [summary],
+  );
+  const occasionBreakdown = useMemo(
+    () => breakdownRows(summary?.tpp.byOccasion, summary?.capsule.byOccasion),
+    [summary],
+  );
+  const serviceStyleBreakdown = useMemo(
+    () =>
+      breakdownRows(
+        summary?.tpp.byServiceStyle,
+        summary?.capsule.byServiceStyle,
+      ),
+    [summary],
+  );
+  const venueBreakdown = useMemo(
+    () => breakdownRows(summary?.tpp.byVenue, summary?.capsule.byVenue),
+    [summary],
+  );
 
   // Unresolved mappings (ExternalRecordLinks with verified=false)
   const unresolvedMappings = useMemo(() => {
@@ -477,9 +346,8 @@ export function ParallelRunDashboardPage() {
     capsuleDishes === undefined ||
     importRuns === undefined ||
     externalLinks === undefined ||
-    serviceStyles === undefined ||
-    occasions === undefined ||
-    venues === undefined;
+    menuStats === undefined ||
+    overview === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -487,12 +355,36 @@ export function ParallelRunDashboardPage() {
         <div>
           <h1 className="display-title">Compare with TPP</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            A daily side-by-side of TPP and Capsule events over the last 30
-            days, so you can confirm everything came over correctly before
+            A daily side-by-side of TPP and Capsule events from 30 days back
+            onward, so you can confirm everything came over correctly before
             switching for good. Dig into any differences below.
           </p>
+          <p className="mt-2 text-xs text-ink-3">
+            {comparison
+              ? `Last compared ${new Date(comparison.comparedAt).toLocaleString()}${
+                  comparison.nextRunAt
+                    ? ` · next check ${new Date(comparison.nextRunAt).toLocaleString()}`
+                    : " · daily checks are off"
+                }`
+              : "Not compared yet. Compare now starts the daily check."}
+          </p>
         </div>
+        {overview !== null && (
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            disabled={comparing}
+            onClick={() => void handleCompareNow()}
+          >
+            {comparing ? "Comparing…" : "Compare now"}
+          </button>
+        )}
       </header>
+      {compareError && (
+        <FailureBanner
+          failure={classifyCommandFailure(new Error(compareError))}
+        />
+      )}
 
       <AdminWorkspaceNav />
 
@@ -504,35 +396,42 @@ export function ParallelRunDashboardPage() {
           <section className="grid grid-cols-1 gap-4 md:grid-cols-4 mt-6">
             <div className="bg-white p-4 rounded-sm shadow">
               <h3 className="text-xs font-medium text-ink-3">Capsule Events</h3>
-              <p className="text-xl font-bold">{filteredEvents.length}</p>
+              <p className="text-xl font-bold">
+                {summary ? summary.capsule.events : "—"}
+              </p>
               <p className="text-2xs text-ink-3">
-                {selectedDateRange.start.toLocaleDateString()} -{" "}
-                {selectedDateRange.end.toLocaleDateString()}
+                {summary
+                  ? `From ${new Date(summary.windowStart).toLocaleDateString()} onward`
+                  : "Not compared yet"}
               </p>
             </div>
             <div className="bg-white p-4 rounded-sm shadow">
               <h3 className="text-xs font-medium text-ink-3">TPP Events</h3>
               <p className="text-xl font-bold">
-                {tppRecordCounts.total ?? "—"}
+                {summary ? summary.tpp.events : "—"}
               </p>
               <p className="text-2xs text-ink-3">
-                {latestTppImport
-                  ? `Imported ${new Date(latestTppImport.startTime ?? 0).toLocaleDateString()}`
-                  : "No recent import"}
+                {comparison
+                  ? `${comparison.comparedCount} checked one by one`
+                  : "Not compared yet"}
               </p>
             </div>
             <div className="bg-white p-4 rounded-sm shadow">
-              <h3 className="text-xs font-medium text-ink-3">Difference</h3>
+              <h3 className="text-xs font-medium text-ink-3">
+                Differences to settle
+              </h3>
               <p
                 className={`text-xl font-bold ${
-                  filteredEvents.length - (tppRecordCounts.total ?? 0) === 0
-                    ? "text-ok"
-                    : "text-warn"
+                  (comparison?.openCount ?? 0) === 0 ? "text-ok" : "text-warn"
                 }`}
               >
-                {filteredEvents.length - (tppRecordCounts.total ?? 0)}
+                {comparison ? comparison.openCount : "—"}
               </p>
-              <p className="text-2xs text-ink-3">Events variance</p>
+              <p className="text-2xs text-ink-3">
+                {comparison
+                  ? `${comparison.newCount} new, ${comparison.clearedCount} agree now`
+                  : "Not compared yet"}
+              </p>
             </div>
             <div className="bg-white p-4 rounded-sm shadow">
               <h3 className="text-xs font-medium text-ink-3">
@@ -629,6 +528,14 @@ export function ParallelRunDashboardPage() {
               </table>
             </div>
           </section>
+
+          {overview && (
+            <ParallelRunDifferences
+              differences={overview.differences}
+              total={overview.totalDifferences}
+            />
+          )}
+          {overview && <ParallelRunPeriodCheck last={overview.periodCheck} />}
 
           {/* Menu catalog comparison */}
           <section className="working-ledger mt-6">
@@ -768,7 +675,7 @@ export function ParallelRunDashboardPage() {
                 <table className="supply-table">
                   <thead>
                     <tr>
-                      <th>Salesperson ID</th>
+                      <th>Salesperson</th>
                       <th>Capsule</th>
                       <th>TPP</th>
                       <th>Diff</th>
@@ -777,9 +684,7 @@ export function ParallelRunDashboardPage() {
                   <tbody>
                     {salespersonBreakdown.map((item) => (
                       <tr key={item.id}>
-                        <td className="font-mono text-xs">
-                          {item.id.slice(0, 8)}...
-                        </td>
+                        <td>{item.name}</td>
                         <td>{item.capsule}</td>
                         <td>{item.tpp}</td>
                         <td
@@ -997,7 +902,7 @@ export function ParallelRunDashboardPage() {
                   <tr>
                     <th>Old system</th>
                     <th>Type</th>
-                    <th>Reference in the old system</th>
+                    <th>ID in the old system</th>
                     <th>In Capsule</th>
                     <th>Status</th>
                     <th>Actions</th>

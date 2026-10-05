@@ -76,6 +76,6 @@ describe("plain words on leftover delivery event match copy", () => {
       "This delivery is for a different event. Pick the event already on this delivery.",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Delivery destination is required");
+    expect(visible).toContain("Give this delivery a destination.");
   });
 });

@@ -1,0 +1,8 @@
+Company,First Name,Last Name,Address,City,State,Zip,Phone,Email,Type,Inactive,Account
+,Lena,Hartwell,12 Example St,Spokane,WA,99201,,lena@example.com,Social,False,
+,1st,District Example Association,,Coeur d Alene,ID,,,,Corporate,False,A00001
+Example Studios,Jon,Vale,,,,,,,,False,
+,Frank,,,,,,,frank@example.com,,False,A00002
+Example Hall Co,,,100 Main St,Spokane,WA,99202,5095550100,,Corporate,False,
+,,,,,,,,,,,
+,,,,,,,,nobody@example.com,,True,

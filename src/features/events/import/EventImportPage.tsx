@@ -3,9 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import type { CapsuleEventBundleCatalogMatch } from "../../../agent/CapsuleEventBundleExistingState";
 import {
   useListClient,
-  useListDish,
   useListVenue,
 } from "../../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../../lib/useDishesByIds";
 import {
   loadEventBundleFromText,
   type TextReportSource,
@@ -36,7 +36,7 @@ export function EventImportPage() {
   const navigate = useNavigate();
   const clients = useListClient();
   const venues = useListVenue();
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   const directory = useEventImportDirectory();
 
   const [pastedText, setPastedText] = useState("");
@@ -82,7 +82,12 @@ export function EventImportPage() {
         id: venue._id,
         name: venue.name,
       })),
-      dishes: activeDishes.map((dish) => ({ id: dish._id, name: dish.name })),
+      dishes: activeDishes.map((dish) => ({
+        id: dish._id,
+        name: dish.name,
+        versionLabel: dish.versionLabel,
+        versionOfId: dish.versionOfDishId,
+      })),
     });
   }, [bundle, activeClients, activeVenues, activeDishes]);
   const seedKey = suggestion

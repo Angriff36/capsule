@@ -1,8 +1,14 @@
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { action, internalQuery, type ActionCtx } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  type ActionCtx,
+} from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 // Stripe Connect onboarding — spec §12.1 + issue #112.
 //
@@ -118,6 +124,60 @@ export const loadStripeConnection = internalQuery({
   },
 });
 
+/**
+ * PL-AUTH (AC-372): what Stripe said about the account. linkAccount,
+ * markConnected and recordFailure are private Manifest steps - no signed-in
+ * person can call them - so the actions below record Stripe's own answer
+ * through here, as the tenant's system role, for the tenant the admin proved
+ * membership in. The generated steps still refuse a connection of another
+ * workspace.
+ */
+export const recordStripeAnswer = internalMutation({
+  args: {
+    tenantId: v.string(),
+    connectionId: v.id("integrationConnections"),
+    answer: v.union(
+      v.object({ kind: v.literal("account"), externalAccountId: v.string() }),
+      v.object({
+        kind: v.literal("connected"),
+        externalAccountId: v.string(),
+        displayName: v.string(),
+        chargesEnabled: v.boolean(),
+        payoutsEnabled: v.boolean(),
+      }),
+      v.object({ kind: v.literal("failed"), reason: v.string() }),
+    ),
+  },
+  handler: async (ctx, { tenantId, connectionId, answer }): Promise<void> => {
+    const system = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
+    if (answer.kind === "account") {
+      await system.runMutation(
+        api.mutations.IntegrationConnection_linkAccount,
+        {
+          docId: connectionId,
+          externalAccountId: answer.externalAccountId,
+        },
+      );
+    } else if (answer.kind === "connected") {
+      await system.runMutation(
+        api.mutations.IntegrationConnection_markConnected,
+        {
+          docId: connectionId,
+          externalAccountId: answer.externalAccountId,
+          displayName: answer.displayName,
+          chargesEnabled: answer.chargesEnabled,
+          payoutsEnabled: answer.payoutsEnabled,
+        },
+      );
+    } else {
+      await system.runMutation(
+        api.mutations.IntegrationConnection_recordFailure,
+        { docId: connectionId, reason: answer.reason },
+      );
+    }
+  },
+});
+
 export interface StripeConnectionView {
   /**
    * Whether THIS caller may run the connect/refresh/disconnect commands.
@@ -220,7 +280,6 @@ export const startStripeOnboarding = action({
         api.mutations.IntegrationConnection_createViaAuthorize,
         {
           provider: STRIPE_PROVIDER,
-          externalAccountId: accountId,
           displayName: "Stripe",
           idempotencyKey: `stripe-connect/${auth.tenantId}/authorize`,
         },
@@ -232,6 +291,14 @@ export const startStripeOnboarding = action({
       // attempt revoked → connected, which no transition allows.
       await ctx.runMutation(api.mutations.IntegrationConnection_reauthorize, {
         docId: existing._id as Id<"integrationConnections">,
+      });
+    }
+
+    if (stringValue(existing?.externalAccountId) !== accountId) {
+      await ctx.runMutation(internal.stripeConnect.recordStripeAnswer, {
+        tenantId: auth.tenantId,
+        connectionId: connectionId as Id<"integrationConnections">,
+        answer: { kind: "account", externalAccountId: accountId },
       });
     }
 
@@ -300,22 +367,27 @@ export const refreshStripeConnection = action({
         );
       }
       const businessProfile = asRecord(account.business_profile);
-      await ctx.runMutation(api.mutations.IntegrationConnection_markConnected, {
-        docId: existing._id as Id<"integrationConnections">,
-        externalAccountId: accountId,
-        displayName:
-          stringValue(businessProfile.name) ||
-          stringValue(account.email) ||
-          "Stripe",
-        chargesEnabled: Boolean(account.charges_enabled),
-        payoutsEnabled: Boolean(account.payouts_enabled),
+      await ctx.runMutation(internal.stripeConnect.recordStripeAnswer, {
+        tenantId: auth.tenantId,
+        connectionId: existing._id,
+        answer: {
+          kind: "connected",
+          externalAccountId: accountId,
+          displayName:
+            stringValue(businessProfile.name) ||
+            stringValue(account.email) ||
+            "Stripe",
+          chargesEnabled: Boolean(account.charges_enabled),
+          payoutsEnabled: Boolean(account.payouts_enabled),
+        },
       });
     } catch (cause) {
       // §12.1: a provider outage leaves a visible failed state, it does not
       // roll back unrelated user work.
-      await ctx.runMutation(api.mutations.IntegrationConnection_recordFailure, {
-        docId: existing._id as Id<"integrationConnections">,
-        reason: safeProviderMessage(cause),
+      await ctx.runMutation(internal.stripeConnect.recordStripeAnswer, {
+        tenantId: auth.tenantId,
+        connectionId: existing._id,
+        answer: { kind: "failed", reason: safeProviderMessage(cause) },
       });
       throw new ConvexError(
         `Stripe refresh failed: ${safeProviderMessage(cause)}`,

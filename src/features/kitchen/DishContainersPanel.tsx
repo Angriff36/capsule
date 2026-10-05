@@ -51,7 +51,7 @@ export function DishContainersPanel({ dishId }: Props) {
     const servingsPerContainer = Number(data.get("servingsPerContainer") ?? 0);
     if (!name || servingsPerContainer < 1) {
       setError(
-        "Container name and a servings-per-container of at least 1 are required.",
+        "Give this container a name, and set servings per container to 1 or more.",
       );
       return;
     }

@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectWorkforceManifestIntegration,
-  inspectWorkforceSource,
-} from "../scripts/check-workforce-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectWorkforceManifestIntegration = () =>
+  inspectManifestIntegration("workforce");
+const inspectWorkforceSource = (file: string, source: string) =>
+  inspectManifestSource("workforce", file, source);
 
 describe("Workforce Manifest integration guard", () => {
   it("keeps current authored workforce integration on approved generated surfaces", () => {

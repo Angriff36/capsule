@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateStockCountLine,
@@ -359,6 +360,7 @@ export function StockCountPage() {
     });
   };
 
+  const noLocations = locations !== undefined && activeLocations.length === 0;
   const loading =
     sessions === undefined ||
     lines === undefined ||
@@ -380,15 +382,21 @@ export function StockCountPage() {
             the adjustments needed to bring the ledger back to the shelf.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          data-testid="start-stock-count"
-          disabled={busy != null || activeLocations.length === 0}
-          onClick={() => setShowStart((value) => !value)}
-        >
-          {showStart ? "Close setup" : "Start stock count"}
-        </button>
+        {noLocations ? (
+          <Link className="btn btn-primary" to="/inventory/stock">
+            Add a storage location
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-primary"
+            data-testid="start-stock-count"
+            disabled={busy != null || activeLocations.length === 0}
+            onClick={() => setShowStart((value) => !value)}
+          >
+            {showStart ? "Close setup" : "Start stock count"}
+          </button>
+        )}
       </header>
       <InventoryWorkspaceNav />
 
@@ -489,17 +497,24 @@ export function StockCountPage() {
             <p className="eyebrow">No count sheets yet</p>
             <h2>Start with the room you can finish.</h2>
             <p>
-              Choose a walk-in, freezer, dry store, or several locations. The
-              ledger snapshot happens when each count line is created.
+              {noLocations
+                ? "Counts are taken by storage location. Add your walk-in, freezer or dry store first, then start the count here."
+                : "Choose a walk-in, freezer, dry store, or several locations. The ledger snapshot happens when each count line is created."}
             </p>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => setShowStart(true)}
-          >
-            Start the first count
-          </button>
+          {noLocations ? (
+            <Link className="btn btn-primary" to="/inventory/stock">
+              Add a location
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setShowStart(true)}
+            >
+              Start the first count
+            </button>
+          )}
         </section>
       ) : (
         <div
@@ -826,8 +841,8 @@ export function StockCountPage() {
                         : `${pendingLines.length} ${pendingLines.length === 1 ? "line remains" : "lines remain"}.`}
                   </strong>
                   <span>
-                    Closing preserves the frozen expectations, physical counts,
-                    and posted adjustment references.
+                    Closing keeps the frozen expectations, physical counts, and
+                    posted adjustments.
                   </span>
                 </div>
                 {selectedSession.status === "in_progress" ? (

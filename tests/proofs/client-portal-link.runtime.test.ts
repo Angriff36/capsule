@@ -183,4 +183,23 @@ describe("runtime proof: client portal links expire and turn off", () => {
       }),
     ).toBeNull();
   });
+
+  it("a direct create command cannot make a link that stays open past 90 days", async () => {
+    const proof = harness();
+    const { owner, eventId } = await bookEvent(proof, S.tenantA, "Long link");
+    const day = 24 * 60 * 60 * 1000;
+    await expect(
+      proof.executeCommand(owner, api.mutations.ClientPortalLink_create, {
+        eventId,
+        expiresAt: Date.now() + 365 * day,
+        deletedAt: null,
+      }),
+    ).rejects.toThrow("90 days at most");
+    const ok = (await proof.executeCommand(
+      owner,
+      api.mutations.ClientPortalLink_create,
+      { eventId, expiresAt: Date.now() + 30 * day, deletedAt: null },
+    )) as { _id: string };
+    expect(ok._id).toBeTruthy();
+  });
 });

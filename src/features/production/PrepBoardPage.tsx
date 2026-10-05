@@ -4,9 +4,6 @@ import {
   useCreatePrepTask,
   useCreatePrepTaskDependency,
   useCreateQualityCheck,
-  useListDish,
-  useListEvent,
-  useListEventDish,
   useListIngredient,
   useListPrepTask,
   useListPrepTaskComment,
@@ -15,6 +12,7 @@ import {
   usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
+  usePrepTaskDependencyDropLink,
   usePrepTaskMarkBlocked,
   usePrepTaskRelease,
   usePrepTaskStart,
@@ -30,6 +28,11 @@ import {
 } from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
+
+const DAY = 86_400_000;
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
@@ -43,10 +46,12 @@ import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   prepTaskDependencyLabel,
+  prepTaskDependencyLoopLinks,
   prepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import "./PrepTaskDependencies.css";
 import { useActionNotice } from "../../ui/action-result";
+import { useActionPrompt } from "../../ui/action-prompt";
 
 const UNITS = [
   "each",
@@ -83,9 +88,55 @@ export function PrepBoardPage() {
   const tasks = useListPrepTask();
   const dependencies = useListPrepTaskDependency();
   const checks = useListQualityCheck();
-  const events = useListEvent();
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
+  // Menu lines of the next 60 days' events (the new-task list) and of the
+  // events the tasks belong to, never every event's (PL-SCALE).
+  const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
+  const upcoming = useEventsInRange({
+    from: today - DAY,
+    to: today + 60 * DAY,
+  });
+  const lineEventIds = useMemo(
+    () =>
+      tasks === undefined || upcoming === undefined
+        ? undefined
+        : [
+            ...upcoming.map((event) => event._id),
+            ...tasks
+              .filter((task) => task.deletedAt == null)
+              .map((task) => task.eventId),
+          ],
+    [tasks, upcoming],
+  );
+  const eventDishes = useMenuLinesForEvents(lineEventIds);
+  // Names only: read the events these tasks and dishes belong to (PL-SCALE).
+  const eventIds = useMemo(
+    () =>
+      tasks === undefined || eventDishes === undefined
+        ? undefined
+        : [
+            ...tasks.map((task) => task.eventId),
+            ...eventDishes.map((row) => row.eventId),
+          ],
+    [tasks, eventDishes],
+  );
+  const events = useEventsById(eventIds);
+  // Only the dishes these tasks and menu lines name (open tasks first, as
+  // one read takes at most 500 dishes), never the whole dish list.
+  const dishes = useDishesByIds(
+    useMemo(
+      () =>
+        tasks === undefined || eventDishes === undefined
+          ? undefined
+          : [
+              ...tasks
+                .filter((task) => String(task.status) !== "completed")
+                .map((task) => task.dishId),
+              ...eventDishes.map((row) => row.dishId),
+              ...tasks.map((task) => task.dishId),
+            ],
+      [tasks, eventDishes],
+    ),
+  );
   const ingredients = useListIngredient();
   const comments = useListPrepTaskComment();
   const createTask = useCreatePrepTask();
@@ -97,6 +148,7 @@ export function PrepBoardPage() {
   const markBlocked = usePrepTaskMarkBlocked();
   const unblock = usePrepTaskUnblock();
   const cancel = usePrepTaskCancel();
+  const dropLink = usePrepTaskDependencyDropLink();
   const createCheck = useCreateQualityCheck();
   const passCheck = useQualityCheckPass();
   const failCheck = useQualityCheckFail();
@@ -111,6 +163,7 @@ export function PrepBoardPage() {
   );
   const [threadTaskId, setThreadTaskId] = useState<string | null>(null);
   const optimistic = useOptimisticStatus();
+  const { prompt, host: promptHost } = useActionPrompt(busy != null);
 
   const activeTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
   const activeDependencies = dependencies ?? [];
@@ -224,6 +277,33 @@ export function PrepBoardPage() {
     }
   };
 
+  const dropLoopLink = (
+    task: { name?: string; ingredientId?: string | null },
+    link: { _id: string; predecessorTaskId: string },
+  ) => {
+    const before = activeTasks.find(
+      (row) => row._id === link.predecessorTaskId,
+    );
+    const beforeName = before ? taskLabel(before) : "the other task";
+    void (async () => {
+      const reason = (
+        await prompt.askReason({
+          title: "Drop this link",
+          description: `${taskLabel(task)} will no longer wait for ${beforeName}. The link stays in the history.`,
+          label: "Why drop it",
+          confirmLabel: "Drop link",
+          cancelLabel: "Keep link",
+        })
+      )?.trim();
+      if (!reason) return;
+      await run(
+        `${link._id}:drop-link`,
+        () => dropLink({ docId: link._id, reason }),
+        `${taskLabel(task)} no longer waits for ${beforeName}.`,
+      );
+    })();
+  };
+
   const runBulkPrep = (action: (typeof BULK_PREP)[number]) => {
     const targets = selection.selected.filter((task) =>
       taskBulkKeys(task).some((entry) => entry.key === action.key),
@@ -263,15 +343,25 @@ export function PrepBoardPage() {
           notes: String(data.get("notes") || "") || undefined,
         });
         const predecessorTaskIds = data.getAll("predecessorTaskId").map(String);
-        for (const predecessorTaskId of predecessorTaskIds) {
-          await createDependency({
-            dependentTaskId: created.docId,
-            predecessorTaskId,
-          });
-        }
+        // The task is saved first. Close the form either way, so a second
+        // press cannot make the task twice; say which waits were not saved.
         form.reset();
         setSelectedEventDishId("");
         setShowCreate(false);
+        let linked = 0;
+        try {
+          for (const predecessorTaskId of predecessorTaskIds) {
+            await createDependency({
+              dependentTaskId: created.docId,
+              predecessorTaskId,
+            });
+            linked += 1;
+          }
+        } catch (cause) {
+          throw new Error(
+            `The prep task was saved, but only ${linked} of ${predecessorTaskIds.length} "wait for" tasks were linked. To set the rest, cancel this task and open it again. ${cause instanceof Error ? cause.message : ""}`.trim(),
+          );
+        }
       },
       "Prep task opened and added to the production sheet.",
     );
@@ -424,6 +514,7 @@ export function PrepBoardPage() {
           task, and a lead must have permission to complete the quality action.
         </span>
       </aside>
+      {promptHost}
       <div aria-live="polite" aria-atomic="true">
         {notice ? (
           <div className="card border-ok/40 px-4 py-3" role="status">
@@ -724,6 +815,28 @@ export function PrepBoardPage() {
                             {prepTaskDependencyLabel(dependency)}
                           </small>
                         ) : null}
+                        {dependency.loopNames.length
+                          ? prepTaskDependencyLoopLinks(
+                              task._id,
+                              activeDependencies,
+                            ).map((link) => (
+                              <button
+                                key={link._id}
+                                type="button"
+                                className="text-link"
+                                disabled={busy != null}
+                                aria-busy={busy === `${link._id}:drop-link`}
+                                onClick={() => dropLoopLink(task, link)}
+                              >
+                                Stop waiting for{" "}
+                                {taskLabel(
+                                  activeTasks.find(
+                                    (row) => row._id === link.predecessorTaskId,
+                                  ) ?? {},
+                                )}
+                              </button>
+                            ))
+                          : null}
                       </td>
                       <td>
                         <div

@@ -44,8 +44,8 @@ export function nutritionSkippedReason(unit: string): string {
   if (VolumeMilliliters.isVolumeUnit(unit)) {
     return `Nutrition was not saved — unit "${unit}" could not be scaled from the lookup. Enter nutrition manually.`;
   }
-  if (unit === "each") {
-    return `Nutrition was not saved — unit "${unit}" needs a label serving size from the lookup, or switch to a weight or volume unit.`;
+  if (CatalogUnitGrams.isCountUnit(unit)) {
+    return `Nutrition was not saved — one ${unit} needs a known weight (a label serving size from the lookup). Switch to a weight unit, or enter nutrition by hand.`;
   }
   return `Nutrition was not saved — unit "${unit}" cannot be scaled from per-gram lookup values. Switch to a weight or volume unit, or enter nutrition manually.`;
 }
@@ -55,14 +55,8 @@ export function nutritionAppliedNote(
   source?: DensitySource,
   basis?: CatalogGramBasis,
 ): string {
-  if (basis === "bottle_typical") {
-    return `Nutrition saved per ${unit} using a typical 750 ml bottle — verify the actual bottle size.`;
-  }
-  if (basis === "household_cup") {
-    return `Nutrition saved per ${unit} using one cup from the food database household measure — verify the pack size.`;
-  }
-  if (basis === "usda_basis") {
-    return `Nutrition saved per ${unit} using a 100 g reference amount — verify the actual piece or pack weight.`;
+  if (basis === "serving") {
+    return `Nutrition saved per ${unit} using the label serving weight.`;
   }
   if (source === "typical") {
     return `Nutrition saved per ${unit} using typical kitchen density for this item — verify if the pack is much thicker or thinner than usual.`;

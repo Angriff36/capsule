@@ -3,12 +3,17 @@ import { Link } from "react-router-dom";
 import {
   useListComponent,
   useListPerson,
-  useListDish,
-  useListDishIngredient,
-  useListEventDish,
-  useListIngredient,
-  useListPrepTask,
+  useListServiceStyle,
+  useListStylePackaging,
 } from "../../lib/manifest-convex-react";
+import type {
+  ServiceStyleOption,
+  StylePackagingRow,
+} from "../kitchen/stylePackaging";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useEventPrepTasks } from "../../lib/useEventRows";
+import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
@@ -23,16 +28,23 @@ import { EventUnresolvedMaterialsNotice } from "./EventUnresolvedMaterialsNotice
 type Props = {
   eventId: string;
   eventStage: string;
+  /** The event's service style picks which packaging line each dish shows. */
+  serviceStyleId?: string | null;
 };
 
-export function EventPrepTab({ eventId, eventStage }: Props) {
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
+export function EventPrepTab({ eventId, eventStage, serviceStyleId }: Props) {
+  const eventDishes = useEventMenuLines(eventId);
   const components = useListComponent();
+  const packaging = useListStylePackaging() as StylePackagingRow[] | undefined;
+  const styles = useListServiceStyle() as ServiceStyleOption[] | undefined;
+  const styleName = styles?.find((style) => style._id === serviceStyleId)?.name;
   const people = useListPerson();
-  const dishIngredients = useListDishIngredient();
-  const ingredients = useListIngredient();
-  const prepTasks = useListPrepTask();
+  // The menu's dish lines and ingredients only. Recipes stay the whole list:
+  // a prep step can name a sub-recipe that is not on a dish directly.
+  const recipe = useSharedRecipeRows(eventDishes);
+  const dishIngredients = recipe?.dishIngredients;
+  const ingredients = recipe?.ingredients;
+  const prepTasks = useEventPrepTasks(eventId);
   const { ready, syncPrepForDish } = useEventMenuSync();
   const [busy, setBusy] = useState(false);
   const { notice, setNotice } = useActionNotice();
@@ -54,6 +66,15 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           row.status !== "cancelled",
       ),
     [eventId, prepTasks],
+  );
+  // Only the dishes this event's menu lines and prep tasks name.
+  const dishes = useDishesByIds(
+    eventDishes === undefined || prepTasks === undefined
+      ? undefined
+      : [
+          ...eventDishes.map((row) => row.dishId),
+          ...tasks.map((row) => row.dishId),
+        ],
   );
 
   const recipeFlags = useMemo(() => {
@@ -187,6 +208,9 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           components={components ?? []}
           people={people ?? []}
           recipeFlags={recipeFlags}
+          serviceStyleId={serviceStyleId}
+          serviceStyleName={styleName}
+          packaging={packaging}
           renderQuantityFlags={(flags) =>
             flags.map((flag) => (
               <p

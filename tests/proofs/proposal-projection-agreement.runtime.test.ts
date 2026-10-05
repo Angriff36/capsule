@@ -18,6 +18,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { linkStaffProfile } from "./reconciliation-failure-isolation.runtime.helpers";
 import {
   computeProposalPricing,
   type PricingBasis,
@@ -258,6 +259,7 @@ describe("proposal projection agreement (AC-418 / AC-432)", () => {
       role: "owner",
       tenantId: "tenant-ac418",
     });
+    await linkStaffProfile(proof, "tenant-ac418", "o-ac418");
 
     // Preview — the exact function the draft form uses for its live total.
     const preview = computeProposalPricing({

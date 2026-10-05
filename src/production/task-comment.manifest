@@ -40,38 +40,37 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
   belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
   belongsTo taskOwner: Person fields [tenantId, taskOwnerAssignedToId] references [tenantId, id]
 
-  constraint prepTaskCommentBodyPresent: length(trim(self.body)) > 0 "Comment text is required"
-  constraint prepTaskCommentOwnerImmutable: self.postedAt == null or self.taskOwnerAssignedToId == null or self.authorPersonId != self.taskOwnerAssignedToId or self.taskOwnerAuthSubjectId == null or self.taskOwnerAuthSubjectId != self.authorAuthSubjectId "Task owners cannot post comments that notify themselves"
+  constraint prepTaskCommentBodyPresent: length(trim(self.body)) > 0 "Write something before you post this comment."
+  constraint prepTaskCommentOwnerImmutable: self.postedAt == null or self.taskOwnerAssignedToId == null or self.authorPersonId != self.taskOwnerAssignedToId or self.taskOwnerAuthSubjectId == null or self.taskOwnerAuthSubjectId != self.authorAuthSubjectId "A task owner can't post a comment that notifies themselves."
 
   default policy prepTaskCommentRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may see prep task comments"
   default policy prepTaskCommentWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may update prep task comments"
   default policy prepTaskCommentExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may change prep task comments"
 
+  // The author is the signed-in person's staff profile, never a caller-sent id.
   command post(
     prepTaskId: uuid,
     eventId: uuid,
     body: string,
     optional eventDishId: uuid,
     optional category: PrepTaskCommentCategory,
-    optional authorPersonId: uuid,
-    optional authorName: string,
     optional taskOwnerAssignedToId: uuid,
     optional taskOwnerAuthSubjectId: string
   ) {
     guard self.deletedAt == null
     guard self.postedAt == null
     guard user.id != null
-    constraint postBodyPresent: length(trim(body)) > 0 "Comment text is required"
-    constraint postAuthorName: authorName == null or length(trim(authorName)) > 0 "Author name cannot be blank"
-    constraint postNotSelf: taskOwnerAuthSubjectId == null or taskOwnerAuthSubjectId != user.id "Task owners cannot post comments that notify themselves"
+    guard user.personId != null
+    constraint postBodyPresent: length(trim(body)) > 0 "Write something before you post this comment."
+    constraint postNotSelf: taskOwnerAuthSubjectId == null or taskOwnerAuthSubjectId != user.id "A task owner can't post a comment that notifies themselves."
     mutate prepTaskId = prepTaskId
     mutate eventId = eventId
     mutate eventDishId = eventDishId != null ? eventDishId : self.eventDishId
     mutate taskOwnerAssignedToId = taskOwnerAssignedToId
     mutate taskOwnerAuthSubjectId = taskOwnerAuthSubjectId
-    mutate authorPersonId = authorPersonId != null ? authorPersonId : self.authorPersonId
+    mutate authorPersonId = user.personId
     mutate authorAuthSubjectId = user.id
-    mutate authorName = authorName != null ? authorName : self.authorName
+    mutate authorName = user.personName != null ? user.personName : ""
     mutate category = category != null ? category : "note"
     mutate body = body
     mutate postedAt = now()
@@ -82,8 +81,8 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
       eventId: eventId
       eventDishId: eventDishId != null ? eventDishId : self.eventDishId
       taskOwnerAuthSubjectId: taskOwnerAuthSubjectId
-      authorPersonId: authorPersonId != null ? authorPersonId : self.authorPersonId
-      authorName: authorName != null ? authorName : self.authorName
+      authorPersonId: user.personId
+      authorName: user.personName != null ? user.personName : ""
       category: category != null ? category : "note"
       body: body
     }
@@ -93,7 +92,7 @@ entity PrepTaskComment mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.postedAt != null
     guard self.authorAuthSubjectId == user.id or roleAllows(user.role, "kitchenLeadAccess")
-    constraint editBodyPresent: length(trim(body)) > 0 "Comment text is required"
+    constraint editBodyPresent: length(trim(body)) > 0 "Write something before you post this comment."
     mutate body = body
     emit PrepTaskCommentEdited {
       prepTaskCommentId: self.id

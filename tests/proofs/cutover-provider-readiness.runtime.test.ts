@@ -308,19 +308,30 @@ describe("runtime proof: cutover provider readiness (#386)", () => {
     await ownerA.mutation(api.cutover.recordCutoverApprovals, {
       businessApproved: true,
       rollbackPlan: "Re-enable TPP writes and restore the pre-cutover backup.",
+      businessEvidence: "Walked through three events and the weekly report",
     });
+    // PL-CUTOVER: the other switch facts are in place too.
+    await ownerA.mutation(api.cutover.saveCutoverFacts, {
+      sourceFrozenAt: Date.now() - 60_000,
+      openingStockAsOf: Date.now() - 60_000,
+      financialMode: "reference_history",
+      backupEvidence: "Nightly backup on the Linux box, restored last Friday",
+    });
+    // Clients and events are both needed before the switch (#425).
     await ownerA.run(async (ctx) => {
-      await ctx.db.insert("importRuns", {
-        tenantId: S.tenantA,
-        sourceSystem: "tpp_legacy" as const,
-        datasetType: "events" as const,
-        status: "completed" as const,
-        recordCounts: "{}",
-        actorId: "cutover-owner-a",
-        startTime: Date.now(),
-        completionTime: Date.now(),
-        version: 1,
-      });
+      for (const datasetType of ["events", "contacts"] as const) {
+        await ctx.db.insert("importRuns", {
+          tenantId: S.tenantA,
+          sourceSystem: "tpp_legacy" as const,
+          datasetType,
+          status: "completed" as const,
+          recordCounts: "{}",
+          actorId: "cutover-owner-a",
+          startTime: Date.now(),
+          completionTime: Date.now(),
+          version: 1,
+        });
+      }
     });
     await expect(
       ownerA.mutation(api.cutover.executeCutoverDecision, {
@@ -328,7 +339,7 @@ describe("runtime proof: cutover provider readiness (#386)", () => {
         reason: "attempting GO with unresolved providers",
       }),
     ).rejects.toThrow(
-      /Can't switch yet:.*Fix the connections, or choose Don't switch yet/,
+      /Can't switch yet:.*Fix these, or choose Don't switch yet/,
     );
 
     // Recovery: a clean Calendar sync and Stripe payout qualification clear

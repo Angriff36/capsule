@@ -1,0 +1,345 @@
+// Capsule operations — the planning board's own records.
+//
+// The board itself reads the real plan (crew, trucks, trailers, equipment
+// holds, pack lines). These four records hold only what the board adds:
+//
+// - EventPlanNeeds: what one event needs that no other record says (how many
+//   trucks, and what the site itself supplies: power, water, propane).
+// - PlanningRule: "when X is on the event, also bring Y" (a generator with
+//   each oven, one server for every 40 guests, a task to book the permit).
+//   A rule only ever suggests. Nothing is added until a person accepts it.
+// - PlanningReceipt: a suggestion someone accepted or turned down, so the
+//   board does not ask again until the amount changes.
+// - PlanningOverride: a change saved while the board showed a "fix first"
+//   item, with the reason the person gave. Nothing stops the change.
+
+use "../foundation/base.manifest"
+
+entity EventPlanNeeds mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventId]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  // Empty = not said; the board then asks for no particular number.
+  property trucksNeeded: int?
+  // What the site supplies, as a list of {key, amount} (JSON), read by
+  // src/lib/planningCapabilities.ts. Example: power:240v x 2.
+  property siteProvidesJson: string?
+  property notedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint planNeedsTrucksNotNegative: self.trucksNeeded == null or self.trucksNeeded >= 0 "Trucks needed can't be negative. Use zero or more."
+
+  default policy eventPlanNeedsRead read: roleAllows(user.role, "staffAccess") "Staff may see what an event needs"
+  default policy eventPlanNeedsWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may say what an event needs"
+  default policy eventPlanNeedsExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may say what an event needs"
+
+  command note(
+    eventId: uuid,
+    optional trucksNeeded: int,
+    optional siteProvidesJson: string
+  ) {
+    guard self.notedAt == null
+    guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only.
+    guard self.event != null and self.event.deletedAt == null
+    constraint notePlanNeedsEventMatch: eventId == self.eventId "These needs are for a different event. Pick the event already on them."
+    constraint notePlanNeedsTrucks: trucksNeeded == null or trucksNeeded >= 0 "Trucks needed can't be negative. Use zero or more."
+    mutate trucksNeeded = trucksNeeded
+    mutate siteProvidesJson = siteProvidesJson
+    mutate notedAt = now()
+    emit EventPlanNeedsNoted {
+      eventPlanNeedsId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+    }
+  }
+
+  // Saves both answers; an empty one clears it.
+  command revise(optional trucksNeeded: int, optional siteProvidesJson: string) {
+    guard self.notedAt != null
+    guard self.deletedAt == null
+    constraint revisePlanNeedsTrucks: trucksNeeded == null or trucksNeeded >= 0 "Trucks needed can't be negative. Use zero or more."
+    mutate trucksNeeded = trucksNeeded
+    mutate siteProvidesJson = siteProvidesJson
+    emit EventPlanNeedsNoted {
+      eventPlanNeedsId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  store EventPlanNeeds in durable
+}
+
+event EventPlanNeedsNoted: "event_plan_needs.noted" {
+  eventPlanNeedsId: string
+  tenantId: string
+  eventId: string
+}
+
+// What sets a rule off: every event, one equipment item on the event, or any
+// equipment of one kind on the event.
+enum PlanningRuleTrigger {
+  every_event
+  equipment
+  equipment_kind
+}
+
+enum PlanningRuleStatus {
+  active
+  retired
+}
+
+entity PlanningRule mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required trigger: PlanningRuleTrigger = "every_event"
+  property triggerEquipmentId: uuid?
+  // The equipment kind (Equipment.category) for an equipment_kind rule.
+  property triggerEquipmentKind: string?
+  // What the rule suggests, as a list (JSON) read by src/lib/planningRules.ts:
+  // {kind: equipment | position | task, target, base, perGuest, perTrigger}.
+  property required actionsJson: string = "[]"
+  property required status: PlanningRuleStatus = "active"
+  property definedAt: datetime?
+
+  belongsTo triggerEquipment: Equipment fields [tenantId, triggerEquipmentId] references [tenantId, id]
+
+  constraint planningRuleNamed: self.definedAt == null or length(trim(self.name)) > 0 "Give this rule a name."
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  // The same people who keep pack rules keep planning rules.
+  default policy planningRuleRead read: roleAllows(user.role, "staffAccess") "Staff may see planning rules"
+  default policy planningRuleWrite write: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may update planning rules"
+  default policy planningRuleExecute execute: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may change planning rules"
+
+  command define(
+    name: string,
+    trigger: PlanningRuleTrigger,
+    actionsJson: string,
+    optional triggerEquipmentId: uuid,
+    optional triggerEquipmentKind: string
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    guard triggerEquipmentId == null or self.triggerEquipment != null
+    constraint definePlanningRuleName: length(trim(name)) > 0 "Give this rule a name."
+    constraint definePlanningRuleTrigger: trigger == "every_event" or (trigger == "equipment" and triggerEquipmentId != null) or (trigger == "equipment_kind" and triggerEquipmentKind != null and length(trim(triggerEquipmentKind)) > 0) "Pick the equipment or the kind of equipment that sets this rule off."
+    mutate name = trim(name)
+    mutate trigger = trigger
+    mutate triggerEquipmentId = triggerEquipmentId
+    mutate triggerEquipmentKind = triggerEquipmentKind
+    mutate actionsJson = actionsJson
+    mutate definedAt = now()
+    emit PlanningRuleDefined {
+      planningRuleId: self.id
+      tenantId: self.tenantId
+      name: trim(name)
+    }
+  }
+
+  // The trigger stays: a rule for a different trigger is a new rule.
+  command revise(name: string, actionsJson: string) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint revisePlanningRuleName: length(trim(name)) > 0 "Give this rule a name."
+    mutate name = trim(name)
+    mutate actionsJson = actionsJson
+    emit PlanningRuleRevised {
+      planningRuleId: self.id
+      tenantId: self.tenantId
+      name: trim(name)
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "retired"
+    emit PlanningRuleRetired {
+      planningRuleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    emit PlanningRuleReinstated {
+      planningRuleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store PlanningRule in durable
+}
+
+event PlanningRuleDefined: "planning_rule.defined" {
+  planningRuleId: string
+  tenantId: string
+  name: string
+}
+
+event PlanningRuleRevised: "planning_rule.revised" {
+  planningRuleId: string
+  tenantId: string
+  name: string
+}
+
+event PlanningRuleRetired: "planning_rule.retired" {
+  planningRuleId: string
+  tenantId: string
+}
+
+event PlanningRuleReinstated: "planning_rule.reinstated" {
+  planningRuleId: string
+  tenantId: string
+}
+
+// One answer to one suggestion on one event. The basis is what the
+// suggestion was worked out from (amount, guests, times); when that changes,
+// a turned-down suggestion is asked again.
+entity PlanningReceipt mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  property required suggestionKey: string = ""
+  property required quantity: decimal(12, 4) = 0
+  property required declined: boolean = false
+  property basis: string?
+  property recordedAt: datetime?
+  property recordedByPersonId: uuid?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  default policy planningReceiptRead read: roleAllows(user.role, "staffAccess") "Staff may see answered suggestions"
+  default policy planningReceiptWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"
+  default policy planningReceiptExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"
+
+  command record(
+    eventId: uuid,
+    suggestionKey: string,
+    quantity: decimal(12, 4),
+    declined: boolean,
+    optional basis: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard self.event != null and self.event.deletedAt == null
+    constraint recordReceiptEventMatch: eventId == self.eventId "This answer is for a different event. Pick the event already on it."
+    constraint recordReceiptKey: length(trim(suggestionKey)) > 0 "This answer has no suggestion to go with."
+    constraint recordReceiptAmount: quantity >= 0 "The amount can't be negative. Use zero or more."
+    mutate suggestionKey = suggestionKey
+    mutate quantity = quantity
+    mutate declined = declined
+    mutate basis = basis
+    mutate recordedAt = now()
+    mutate recordedByPersonId = user.personId
+    emit PlanningSuggestionAnswered {
+      planningReceiptId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      suggestionKey: suggestionKey
+      declined: declined
+    }
+  }
+
+  // The same suggestion answered again after its amount changed.
+  command answerAgain(quantity: decimal(12, 4), declined: boolean, optional basis: string) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint answerAgainAmount: quantity >= 0 "The amount can't be negative. Use zero or more."
+    mutate quantity = quantity
+    mutate declined = declined
+    mutate basis = basis
+    mutate recordedAt = now()
+    mutate recordedByPersonId = user.personId
+    emit PlanningSuggestionAnswered {
+      planningReceiptId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      suggestionKey: self.suggestionKey
+      declined: declined
+    }
+  }
+
+  store PlanningReceipt in durable
+}
+
+event PlanningSuggestionAnswered: "planning_receipt.answered" {
+  planningReceiptId: string
+  tenantId: string
+  eventId: string
+  suggestionKey: string
+  declined: boolean
+}
+
+entity PlanningOverride mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  // What was changed, in plain words ("Put Dana Ruiz on the event").
+  property required action: string = ""
+  property required reason: string = ""
+  // The "fix first" items the board showed, one per line.
+  property openItems: string?
+  property recordedAt: datetime?
+  property recordedByPersonId: uuid?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint planningOverrideReasonPresent: self.recordedAt == null or length(trim(self.reason)) > 0 "Say why this change is fine."
+
+  default policy planningOverrideRead read: roleAllows(user.role, "staffAccess") "Staff may see why a plan change was made"
+  default policy planningOverrideWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"
+  default policy planningOverrideExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "manageAccess") "Event, inventory, sales, logistics and workforce staff and managers may save a plan change with open items"
+
+  command record(
+    eventId: uuid,
+    action: string,
+    reason: string,
+    optional openItems: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard self.event != null and self.event.deletedAt == null
+    constraint recordPlanOverrideEventMatch: eventId == self.eventId "This reason is for a different event. Pick the event already on it."
+    constraint recordPlanOverrideReason: length(trim(reason)) > 0 "Say why this change is fine."
+    mutate action = action
+    mutate reason = trim(reason)
+    mutate openItems = openItems
+    mutate recordedAt = now()
+    mutate recordedByPersonId = user.personId
+    emit PlanningOverrideRecorded {
+      planningOverrideId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      action: action
+      reason: trim(reason)
+    }
+  }
+
+  store PlanningOverride in durable
+}
+
+event PlanningOverrideRecorded: "planning_override.recorded" {
+  planningOverrideId: string
+  tenantId: string
+  eventId: string
+  action: string
+  reason: string
+}

@@ -15,7 +15,8 @@
  *
  * - After parent create, before link (venues V-004): the venue is created
  *   directly through the generated Venue_createViaRegister with the EXACT
- *   idempotencyKey the action uses (import:<runId>:venue:<externalId>), and
+ *   idempotencyKey the action uses
+ *   (tenant-shared/import:<runId>:venue:<externalId>), and
  *   no link is written. Resume re-creates under the same key → the
  *   generated command's idempotency cache returns the ORIGINAL docId with
  *   ZERO writes → the link is recorded, no duplicate venue exists, and a
@@ -32,10 +33,9 @@
  *
  * Deposits are the payments dataset's reconciliation-reference links (spec
  * §6.4 — an import never creates Payment entities; the link IS the
- * artifact). Attachments have no ImportDatasetType member (the union is
- * events/contacts/leads/menus/venues/payments/pack_list); the
- * parent-scoped child write an attachments dataset would ride is exactly
- * the PackListItem shape proven here.
+ * artifact). Attachments are an event row's Files (PL-IMPORT-RESUME): each
+ * file is attached after the event create and before its link, under its own
+ * run-scoped key — the last test injects a fault between two files.
  *
  * The setup legs (one contact, two events) go through quickImport.importFile
  * so the one-shot path stays exercised end to end.
@@ -46,6 +46,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { importedEventFileKey } from "../../convex/lib/importEventFiles";
 
 function harness() {
   return createManifestTestContext({
@@ -254,7 +255,7 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
         name: "Crash Window Venue",
         venueType: "other",
         capacity: 40,
-        idempotencyKey: `import:${venuesRunId}:venue:V-004`,
+        idempotencyKey: `tenant-shared/import:${venuesRunId}:venue:V-004`,
       },
     )) as { docId: string };
     expect(crashWindowVenue.docId).toBeTruthy();
@@ -404,7 +405,7 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
       {
         eventId: e100EventId,
         name: "Crash Window List",
-        idempotencyKey: `import:${packRunId}:pack_list:E-100`,
+        idempotencyKey: `tenant-shared/import:${packRunId}:pack_list:E-100`,
       },
     )) as { docId: string };
     const crashWindowItem = (await owner.mutation(
@@ -414,7 +415,7 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
         description: "Chafing dish",
         requiredQuantity: 6,
         unit: "each",
-        idempotencyKey: `import:${packRunId}:pack_list:E-100:item:0`,
+        idempotencyKey: `tenant-shared/import:${packRunId}:pack_list:E-100:item:0`,
       },
     )) as { docId: string };
 
@@ -563,6 +564,55 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
     });
   });
 
+  it("a receipt saved under the old unprefixed import key is refused, never re-run", async () => {
+    const tenantId = "tenant-import-legacy-receipt";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-legacy-owner",
+      role: "owner",
+      tenantId,
+    });
+    const venueRows = [1, 2].map((n) => ({
+      VenueID: `V-00${n}`,
+      VenueName: `Legacy Venue ${n}`,
+      VenueType: "Office",
+      Capacity: 50,
+    }));
+    const runId = await startRun(owner, "venues");
+    await walkToCommitting(owner, runId, "venues", venueRows.length);
+    // The earlier version created V-001 under the key without the
+    // tenant-shared/ prefix, then died before the link was written.
+    await owner.run((ctx) =>
+      ctx.db.insert("commandIdempotencyKeys", {
+        key: `import:${runId}:venue:V-001`,
+        command: "Venue_createViaRegister",
+        result: { docId: "venue-from-old-version" },
+        createdAt: Date.now(),
+      } as never),
+    );
+
+    const result = await commit(owner, {
+      importRunId: runId,
+      rawRows: venueRows,
+    });
+    expect(result.committed).toBe(1);
+
+    // V-001 did not run again: only V-002 was created, and V-001 waits in the
+    // review queue with the refusal.
+    const venues = (await owner.run(async (ctx) =>
+      (await ctx.db.query("venues").collect()).filter(
+        (row) => (row as { tenantId: string }).tenantId === tenantId,
+      ),
+    )) as unknown as Array<{ name: string }>;
+    expect(venues.map((venue) => venue.name)).toEqual(["Legacy Venue 2"]);
+    const v1 = (await linksFor(owner, tenantId, "venue")).find(
+      (link) => link.externalId === "V-001",
+    ) as (LinkRow & { resolutionNote?: string }) | undefined;
+    expect(v1?.capsuleId).toBe("");
+    expect(v1?.conflictStatus).toBe("pending_conflict");
+    expect(v1?.resolutionNote).toContain("earlier version of the app");
+  });
+
   it("completion counts large runs in bounded pages across transactions", async () => {
     const tenantId = "tenant-import-resume-pagination";
     const proof = harness();
@@ -621,5 +671,142 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
     const checkpoint = JSON.parse(after!.commitCheckpoint) as Checkpoint;
     // 501 noise links + 1 real venue — the floor counts every durable link.
     expect(checkpoint.committedCount).toBe(502);
+  });
+
+  // PL-IMPORT-RESUME (AC-024 reopened): an event's files are children of the
+  // event. Fault after the event write AND after file 0, before file 1 and
+  // the link. A person removes file 0 inside the window. Resume re-opens the
+  // SAME event, adds only file 1, and file 0 stays removed.
+  it("resumes event files after a fault between files without bringing back a removed file", async () => {
+    const tenantId = "tenant-import-resume-files";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-resume-files-owner",
+      role: "owner",
+      tenantId,
+    });
+    const contact = (await asActions(owner).action(api.quickImport.importFile, {
+      datasetType: "contacts",
+      sourceSystem: "tpp_legacy",
+      rows: [{ ContactID: "C-200", FirstName: "File", LastName: "Owner" }],
+    })) as CommitResult;
+    expect(contact.committed).toBe(1);
+    const clientId = (await linksFor(owner, tenantId, "contact"))[0]!.capsuleId;
+
+    type Storage = { storage: { store(blob: Blob): Promise<string> } };
+    const contractId = await owner.run(async (ctx) =>
+      (ctx as unknown as Storage).storage.store(new Blob(["contract"])),
+    );
+    const floorPlanId = await owner.run(async (ctx) =>
+      (ctx as unknown as Storage).storage.store(new Blob(["floor plan"])),
+    );
+    const row = {
+      EventID: "E-200",
+      EventName: "Files Fault Event",
+      ClientID: "C-200",
+      EventDate: "2026-08-01",
+      StartTime: "18:00",
+      ExpectedCount: 30,
+      Files: [
+        {
+          FileName: "Contract.pdf",
+          ContentType: "application/pdf",
+          FileSize: 8,
+          StorageId: contractId,
+        },
+        {
+          FileName: "Floor plan.pdf",
+          ContentType: "application/pdf",
+          FileSize: 10,
+          StorageId: floorPlanId,
+        },
+      ],
+    };
+    const runId = await startRun(owner, "events");
+    await walkToCommitting(owner, runId, "events", 1);
+
+    // Fault state: the event and file 0 are durable under the run's own keys;
+    // file 1 and the link are not.
+    const startsAt = Date.UTC(2026, 7, 1, 18);
+    const injected = (await owner.mutation(
+      api.mutations.Event_createViaPlanEngagement,
+      {
+        clientId,
+        title: "Files Fault Event",
+        eventType: "Imported Event",
+        startsAt,
+        endsAt: startsAt + 3_600_000,
+        expectedHeadcount: 30,
+        primaryContactName: "File Owner",
+        budgetAmount: 0,
+        quotedPrice: 0,
+        idempotencyKey: `tenant-shared/import:${runId}:event:E-200`,
+      },
+    )) as { docId: string };
+    const fileZero = (await owner.mutation(
+      api.mutations.Attachment_createViaAttach,
+      {
+        parentType: "eventRecord",
+        parentId: injected.docId,
+        fileName: "Contract.pdf",
+        contentType: "application/pdf",
+        fileSize: 8,
+        storageId: contractId,
+        idempotencyKey: importedEventFileKey(runId, "E-200", 0),
+      },
+    )) as { docId: string };
+    // A person removes file 0 inside the fault window.
+    await owner.mutation(api.mutations.Attachment_remove, {
+      docId: fileZero.docId,
+    });
+
+    const resumed = await commit(owner, {
+      importRunId: runId,
+      rawRows: [row],
+    });
+    expect(resumed.committed).toBe(1);
+    expect((await runRow(owner, runId))?.status).toBe("completed");
+
+    const eventLink = (await linksFor(owner, tenantId, "event")).find(
+      (link) => link.externalId === "E-200",
+    );
+    expect(eventLink?.capsuleId).toBe(injected.docId);
+    const events = await owner.run(async (ctx) =>
+      (await ctx.db.query("events").collect()).filter(
+        (event) => (event as { tenantId: string }).tenantId === tenantId,
+      ),
+    );
+    expect(events).toHaveLength(1);
+
+    const files = (await owner.run(async (ctx) =>
+      (await ctx.db.query("attachments").collect()).filter(
+        (file) => (file as { parentId: string }).parentId === injected.docId,
+      ),
+    )) as unknown as Array<{
+      _id: string;
+      fileName: string;
+      deletedAt?: number | null;
+    }>;
+    // No duplicate file 0; file 1 added once; the removal survives.
+    expect(files.map((file) => file.fileName).sort()).toEqual([
+      "Contract.pdf",
+      "Floor plan.pdf",
+    ]);
+    expect(
+      files.find((file) => file._id === fileZero.docId)?.deletedAt,
+    ).toEqual(expect.any(Number));
+    expect(
+      files.find((file) => file.fileName === "Floor plan.pdf")?.deletedAt ??
+        null,
+    ).toBeNull();
+
+    // Re-running the finished import adds nothing.
+    const again = await asActions(owner)
+      .action(api.importCommit.commitImportRun, {
+        importRunId: runId,
+        rawRows: [row],
+      })
+      .catch((error: unknown) => error);
+    expect(String(again)).toContain("committing");
   });
 });

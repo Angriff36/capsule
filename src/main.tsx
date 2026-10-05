@@ -21,8 +21,18 @@ import {
   SlowSignInNotice,
 } from "./app/shell/OfflineShell";
 import { checkDeploymentConfig } from "./lib/deploymentConfigCheck";
+import { reloadKeepingDrafts } from "./ui/unsavedDrafts";
+import { api } from "../convex/_generated/api";
+import { setGoogleGeocoder } from "./features/logistics/routePlanner";
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
+const convexClient = convexUrl ? new ConvexReactClient(convexUrl) : undefined;
+// Venue maps, weather and routes ask Google for an address first.
+if (convexClient) {
+  setGoogleGeocoder((query) =>
+    convexClient.action(api.geocode.lookup, { query }),
+  );
+}
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as
   string | undefined;
 
@@ -55,7 +65,8 @@ window.addEventListener("vite:preloadError", (event) => {
   if (Date.now() - lastReload < 10_000) return; // just tried — let it surface
   sessionStorage.setItem(CHUNK_RELOAD_AT, String(Date.now()));
   event.preventDefault(); // suppress the rethrow so we reload instead of crashing
-  window.location.reload();
+  // AC-166: write every unsaved form draft first; the form offers it back.
+  reloadKeepingDrafts();
 });
 
 // PWA app shell: the worker caches only same-origin static files (see
@@ -92,10 +103,7 @@ createRoot(root).render(
           <ClerkFailed>
             <SignInUnreachable />
           </ClerkFailed>
-          <ConvexProviderWithClerk
-            client={new ConvexReactClient(convexUrl)}
-            useAuth={useAuth}
-          >
+          <ConvexProviderWithClerk client={convexClient!} useAuth={useAuth}>
             <BrowserRouter>
               <App />
             </BrowserRouter>

@@ -1,11 +1,12 @@
 import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { useEventLaborSummary } from "../facilities/useLaborSummary";
 import {
-  useCreateEventCloseout,
-  useEventCloseoutCapture,
+  useCaptureCloseoutFromSources,
+  useCorrectCloseoutFromSources,
+  useEventCloseoutSources,
+} from "../facilities/useCloseoutSources";
+import {
   useEventCloseoutFinalize,
-  useListEvent,
   useListEventCloseout,
   useListInvoice,
 } from "../../lib/manifest-convex-react";
@@ -15,11 +16,9 @@ import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
 } from "../attachments/RecordPhotoCapture";
-import {
-  CloseoutCaptureForm,
-  CloseoutCapturePayloadBuilder,
-  type CloseoutDraft,
-} from "./CloseoutCaptureForm";
+import { CloseoutCaptureForm, type CloseoutDraft } from "./CloseoutCaptureForm";
+import { CloseoutCorrectionPanel } from "./CloseoutCorrectionPanel";
+import { enteredAmounts } from "./CloseoutSourcesPanel";
 import {
   CloseoutRevenueNote,
   isUnreconciledCloseout,
@@ -30,6 +29,10 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
+import { EventFoodCostPanel } from "./EventFoodCostPanel";
+import { EventEquipmentProblems } from "../events/EventEquipmentProblems";
+import { canReadEventFoodCost } from "../../lib/culinaryDemandClient";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
 import {
   closeoutListedCost,
@@ -39,18 +42,27 @@ import {
   useWorkingEventScope,
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CloseoutLifecyclePolicy();
-const payloadBuilder = new CloseoutCapturePayloadBuilder();
+
+const note = (data: FormData, name: string) =>
+  String(data.get(name) || "").trim() || undefined;
 
 export function CloseoutPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("closeout");
+  const authStatus = useAuthStatus();
   const closeouts = useListEventCloseout();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    closeouts
+      ? [eventScope.workingId, ...closeouts.map((row) => row.eventId)]
+      : undefined,
+  );
   const invoices = useListInvoice();
-  const createCloseout = useCreateEventCloseout();
-  const captureCloseout = useEventCloseoutCapture();
+  const captureCloseout = useCaptureCloseoutFromSources();
+  const correctCloseout = useCorrectCloseoutFromSources();
   const finalize = useEventCloseoutFinalize();
+  const [correctingId, setCorrectingId] = useState<string | null>(null);
   const [showCapture, setShowCapture] = useState(false);
   const [showFinalized, setShowFinalized] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -93,12 +105,12 @@ export function CloseoutPage() {
     ? eventFor(String(summaryCloseout.eventId))
     : undefined;
 
-  // The event whose clocked labor the capture form is showing.
+  // The event whose records the capture form is adding up.
   const formEventId =
     draft?.eventId != null
       ? String(draft.eventId)
       : (selectedEventId ?? capturableEvents[0]?._id ?? null);
-  const labor = useEventLaborSummary(
+  const sources = useEventCloseoutSources(
     showCapture && formEventId ? formEventId : null,
   );
 
@@ -107,12 +119,6 @@ export function CloseoutPage() {
     : capturableEvents;
   const billingFor = (eventId: string) =>
     rollupEventBilling(invoices ?? [], eventId);
-  const formBilling =
-    showCapture && formEventId
-      ? invoices === undefined
-        ? undefined
-        : billingFor(formEventId)
-      : null;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -138,42 +144,30 @@ export function CloseoutPage() {
   };
 
   const openReconcile = (row: (typeof activeCloseouts)[number]) => {
-    setDraft({
-      _id: String(row._id),
-      version: Number(row.version),
-      eventId: String(row.eventId),
-      actualRevenue: row.actualRevenue,
-      budgetedRevenue: row.budgetedRevenue,
-      actualIngredientCost: row.actualIngredientCost,
-      actualWasteCost: row.actualWasteCost,
-      actualLaborCost: row.actualLaborCost,
-      actualVendorCost: row.actualVendorCost,
-      budgetedCost: row.budgetedCost,
-      expectedHeadcount: row.expectedHeadcount,
-      actualHeadcount: row.actualHeadcount,
-    });
+    setDraft({ _id: String(row._id), eventId: String(row.eventId) });
     setShowCapture(true);
   };
 
   const submitCapture = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
+    if (!sources || !formEventId) return;
     try {
-      const payload = payloadBuilder.fromForm(new FormData(form));
+      const data = new FormData(form);
+      const entered = enteredAmounts(data);
       void run("capture-closeout", async () => {
-        if (draft) {
-          await captureCloseout({
-            docId: draft._id,
-            version: draft.version,
-            ...payload,
-          });
-          setNotice("Closeout reconciled. Finalize when numbers are final.");
-        } else {
-          await createCloseout(payload);
-          setNotice(
-            "Closeout captured as draft. Finalize when numbers are final.",
-          );
-        }
+        await captureCloseout({
+          eventId: formEventId,
+          entered,
+          unresolvedIssues: note(data, "unresolvedIssues"),
+          performanceNotes: note(data, "performanceNotes"),
+          notes: note(data, "notes"),
+        });
+        setNotice(
+          draft
+            ? "Closeout reconciled. Finalize when numbers are final."
+            : "Closeout captured as draft. Finalize when numbers are final.",
+        );
         form.reset();
         setShowCapture(false);
         setDraft(null);
@@ -182,6 +176,26 @@ export function CloseoutPage() {
       setFailure(error);
     }
   };
+
+  const submitCorrection =
+    (closeoutId: string) => (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      try {
+        const data = new FormData(event.currentTarget);
+        const entered = enteredAmounts(data);
+        void run(`${closeoutId}:correct`, async () => {
+          await correctCloseout({
+            closeoutId,
+            reason: String(data.get("reason") || ""),
+            entered,
+          });
+          setNotice("Correction saved. The earlier result is kept.");
+          setCorrectingId(null);
+        });
+      } catch (error) {
+        setFailure(error);
+      }
+    };
 
   const invokeFinalize = (row: { _id: string; version: number }) => {
     void run(`${row._id}:finalize`, async () => {
@@ -200,9 +214,10 @@ export function CloseoutPage() {
           <p className="eyebrow">Finance · Closeout</p>
           <h1 className="display-title mt-2">Event closeouts</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Capture reconciled revenue, cost, and headcount for a closed-out
-            event, then finalize to freeze the folio. Labor pre-fills from
-            clocked time and pay rates.
+            Capture revenue, cost, and headcount for a closed-out event, then
+            finalize to freeze the folio. The numbers come from the event's
+            invoices, payments, deliveries, clocked time, rentals and guest
+            check-ins; you only fill in what they can't answer.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -240,14 +255,28 @@ export function CloseoutPage() {
           onClose={() => setSummaryCloseoutId(null)}
         />
       ) : null}
+      {summaryCloseout ? (
+        <EventFoodCostPanel
+          eventId={String(summaryCloseout.eventId)}
+          enabled={canReadEventFoodCost(authStatus?.role)}
+        />
+      ) : null}
+      {summaryCloseout ? (
+        <EventEquipmentProblems
+          eventId={String(summaryCloseout.eventId)}
+          hideWhenEmpty
+        />
+      ) : null}
+      {showCapture && formEventId ? (
+        <EventEquipmentProblems eventId={formEventId} hideWhenEmpty />
+      ) : null}
 
       {showCapture ? (
         <CloseoutCaptureForm
           events={formEvents}
           selectedEventId={formEventId}
           onSelectEvent={setSelectedEventId}
-          labor={labor}
-          billing={formBilling}
+          sources={sources}
           draft={draft}
           busy={busy === "capture-closeout"}
           onSubmit={submitCapture}
@@ -407,11 +436,44 @@ export function CloseoutPage() {
                                 : "Photos"}
                             </button>
                             {String(row.status) === "finalized" ? (
-                              <span className="text-sm text-ink-3">Frozen</span>
+                              <>
+                                <span className="text-sm text-ink-3">
+                                  Frozen
+                                  {Number(row.revision ?? 1) > 1
+                                    ? ` · version ${Number(row.revision)}`
+                                    : ""}
+                                </span>
+                                <button
+                                  className="btn btn-ghost btn-sm"
+                                  type="button"
+                                  aria-expanded={correctingId === row._id}
+                                  onClick={() =>
+                                    setCorrectingId((current) =>
+                                      current === row._id ? null : row._id,
+                                    )
+                                  }
+                                >
+                                  {correctingId === row._id
+                                    ? "Close correction"
+                                    : "Correct"}
+                                </button>
+                              </>
                             ) : null}
                           </div>
                         </td>
                       </tr>
+                      {correctingId === row._id ? (
+                        <tr>
+                          <td colSpan={7} className="!p-3">
+                            <CloseoutCorrectionPanel
+                              closeoutId={row._id}
+                              eventId={String(row.eventId)}
+                              busy={busy === `${row._id}:correct`}
+                              onSubmit={submitCorrection(row._id)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
                       {photoCloseoutId === row._id ? (
                         <tr>
                           <td colSpan={7} className="!p-3">

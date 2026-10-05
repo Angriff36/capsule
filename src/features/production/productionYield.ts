@@ -16,6 +16,15 @@ export type ProductionYieldBatch = {
 export type ProductionYieldComponent = {
   _id: string;
   name?: string | null;
+  yieldQuantity?: number | null;
+  yieldUnit?: string | null;
+};
+
+/** A new recipe yield worth checking, read from repeated actual yields. */
+export type ProductionYieldSuggestion = {
+  currentYield: number;
+  suggestedYield: number;
+  yieldUnit: string;
 };
 
 export type ProductionYieldRow = {
@@ -28,6 +37,7 @@ export type ProductionYieldRow = {
   actualYield: number;
   varianceYield: number;
   variancePercentage: number;
+  suggestion: ProductionYieldSuggestion | null;
 };
 
 export type ProductionYieldReport = {
@@ -55,6 +65,43 @@ function finiteNumber(value: number | null | undefined): number | null {
   if (value == null) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+/** Batches needed before one recipe's yield is worth questioning. */
+export const YIELD_SUGGESTION_MIN_BATCHES = 3;
+/** Shortfall or overage (percent) that is more than normal kitchen spread. */
+export const YIELD_SUGGESTION_MIN_PERCENT = 5;
+
+/**
+ * Suggest a recipe yield only when the batches and the recipe count the
+ * same unit, enough batches agree, and the gap is past normal spread. The
+ * suggestion scales the recipe's own yield by actual over planned.
+ */
+export function suggestRecipeYield(
+  row: Pick<
+    ProductionYieldRow,
+    "batchCount" | "plannedYield" | "actualYield" | "yieldUnit"
+  >,
+  component: ProductionYieldComponent | undefined,
+): ProductionYieldSuggestion | null {
+  const currentYield = finiteNumber(component?.yieldQuantity);
+  const recipeUnit = component?.yieldUnit?.trim();
+  if (
+    currentYield == null ||
+    currentYield <= 0 ||
+    !recipeUnit ||
+    recipeUnit.toLowerCase() !== row.yieldUnit.trim().toLowerCase() ||
+    row.batchCount < YIELD_SUGGESTION_MIN_BATCHES ||
+    row.plannedYield <= 0 ||
+    row.actualYield <= 0
+  ) {
+    return null;
+  }
+  const ratio = row.actualYield / row.plannedYield;
+  if (Math.abs(ratio - 1) * 100 <= YIELD_SUGGESTION_MIN_PERCENT) return null;
+  const suggestedYield = Math.round(currentYield * ratio * 100) / 100;
+  if (suggestedYield <= 0 || suggestedYield === currentYield) return null;
+  return { currentYield, suggestedYield, yieldUnit: recipeUnit };
 }
 
 export function buildProductionYieldReport({
@@ -108,6 +155,7 @@ export function buildProductionYieldReport({
       actualYield: 0,
       varianceYield: 0,
       variancePercentage: 0,
+      suggestion: null,
     };
     current.batchCount += 1;
     current.plannedYield += plannedYield;
@@ -121,6 +169,7 @@ export function buildProductionYieldReport({
       ...row,
       varianceYield,
       variancePercentage: (varianceYield / row.plannedYield) * 100,
+      suggestion: suggestRecipeYield(row, componentsById.get(row.componentId)),
     };
   });
   rows.sort(

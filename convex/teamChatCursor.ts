@@ -12,6 +12,7 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { chatAuth, CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
+import { insertStepEvent } from "./lib/commandAudit";
 
 export const markChannelRead = mutation({
   args: {
@@ -24,10 +25,10 @@ export const markChannelRead = mutation({
     const auth = await chatAuth(ctx);
     if (!auth) throw new Error("Sign in to use team chat");
     const channelKey = args.channelKey.trim();
-    if (channelKey.length === 0) throw new Error("Channel is required");
+    if (channelKey.length === 0) throw new Error("Pick a chat first.");
     const now = Date.now();
     if (args.readUpTo > now) {
-      throw new Error("Read position cannot be in the future");
+      throw new Error("This chat couldn't be marked as read. Try again.");
     }
 
     // The caller's own rows for this channel, directly (composite index);
@@ -51,7 +52,7 @@ export const markChannelRead = mutation({
         updatedAt: now,
         version: 1,
       });
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "StaffChatChannelRead",
         entity: "StaffChatReadCursor",
         entityId: cursorId,
@@ -77,7 +78,7 @@ export const markChannelRead = mutation({
         updatedAt: now,
         version: keep.version + 1,
       });
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "StaffChatChannelRead",
         entity: "StaffChatReadCursor",
         entityId: keep._id,

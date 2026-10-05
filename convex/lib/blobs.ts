@@ -1,13 +1,32 @@
 /**
  * AUTHOR SEAM helper — delete an uploaded blob only when nothing references
  * it: no live Attachment row (the whole exact index range is read, not a
- * page) and no Dish or Ingredient whose primary image it is (those rows hold
+ * page) and no Dish, Ingredient or Equipment whose primary image it is (those rows hold
  * the storage id directly; any such row, live or removed, keeps the blob).
  * One reference keeps the blob, so a caller can never remove a file that is
  * in use — an event document, another message's photo, a dish image — by
  * naming its storage id.
  */
-import type { MutationCtx } from "../_generated/server";
+import type { Doc } from "../_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
+
+/**
+ * The first Attachment row ever written for a blob, live or removed. Every
+ * upload flow writes this row right after the upload, so it names the
+ * company and record the bytes were uploaded for. A later row that names
+ * the same storage id — in another company, or on another chat message —
+ * never owns the file (PR12-05: knowing a storage id grants nothing).
+ */
+export async function firstAttachmentFor(
+  ctx: QueryCtx,
+  storageId: string,
+): Promise<Doc<"attachments"> | null> {
+  return await ctx.db
+    .query("attachments")
+    .withIndex("by_storageId", (q) => q.eq("storageId", storageId))
+    .order("asc")
+    .first();
+}
 
 export async function blobReferenced(
   ctx: MutationCtx,
@@ -31,7 +50,14 @@ export async function blobReferenced(
       q.eq("primaryImageStorageId", storageId),
     )
     .first();
-  return ingredient !== null;
+  if (ingredient) return true;
+  const equipment = await ctx.db
+    .query("equipments")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    )
+    .first();
+  return equipment !== null;
 }
 
 /** True when the blob was deleted; false when a live row keeps it or it is already gone. */

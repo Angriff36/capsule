@@ -32,6 +32,7 @@ import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
 import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { EventCreateStandardList } from "./EventCreateStandardList";
 import { SERVICE_STYLE_CATALOG } from "./serviceStyleCatalog";
 import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
@@ -73,7 +74,7 @@ function eventFieldRules(data: FormData): Record<string, string> {
   const start = String(data.get("startsAt") ?? "");
   const end = String(data.get("endsAt") ?? "");
   if (start && end && new Date(end).getTime() <= new Date(start).getTime()) {
-    return { endsAt: "End must be after the start time." };
+    return { endsAt: "This event's end time has to be after its start time." };
   }
   return {};
 }
@@ -379,7 +380,9 @@ export function EventCreatePage() {
     if (!Number.isFinite(capacity) || capacity < 0) {
       setFailure(
         classifyCommandFailure(
-          new Error("Venue capacity must be zero or greater."),
+          new Error(
+            "This venue's capacity can't be negative. Use zero or more.",
+          ),
         ),
       );
       return;
@@ -744,6 +747,12 @@ export function EventCreatePage() {
                     fills in here right away.
                   </p>
                 ) : null}
+                {occasionsEmpty ? (
+                  <EventCreateStandardList
+                    singular="occasion"
+                    existing={occasions}
+                  />
+                ) : null}
               </div>
               <label className="field-label">
                 Expected headcount *
@@ -863,7 +872,7 @@ export function EventCreatePage() {
 
           <FormSection
             title="Money"
-            hint="Budget and quoted price for the engagement."
+            hint="Budget and quoted price for this event."
             count={2}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
@@ -906,7 +915,7 @@ export function EventCreatePage() {
 
           <FormSection
             title="Details"
-            hint="Sales attribution — salesperson and referral source."
+            hint="Who sold it and how the client found us."
             count={2}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
@@ -963,7 +972,33 @@ export function EventCreatePage() {
                     </option>
                   ))}
                 </select>
+                {referralSources !== undefined &&
+                activeReferralSources.length === 0 ? (
+                  <span
+                    className="field-hint"
+                    data-testid="referral-empty-hint"
+                  >
+                    No referral sources yet. You can leave this blank, or add
+                    them in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      target="_blank"
+                      rel="noopener"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>{" "}
+                    (new tab; this form stays put and the list fills in here).
+                  </span>
+                ) : null}
               </label>
+              {referralSources !== undefined &&
+              activeReferralSources.length === 0 ? (
+                <EventCreateStandardList
+                  singular="referral source"
+                  existing={referralSources}
+                />
+              ) : null}
             </div>
           </FormSection>
         </form>
@@ -1109,7 +1144,7 @@ export function EventCreatePage() {
                   ) : null}
                   {!clientId ? (
                     <p className="text-sm text-ink-3" role="status">
-                      Client is required
+                      Pick a client for this event.
                     </p>
                   ) : null}
                 </>
@@ -1119,7 +1154,7 @@ export function EventCreatePage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowClient((value) => !value)}
               >
-                {showClient ? "Dismiss client form" : "Create client inline"}
+                {showClient ? "Close new client form" : "Add a new client"}
               </button>
             </div>
             {showClient ? (
@@ -1182,7 +1217,7 @@ export function EventCreatePage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowVenue((value) => !value)}
               >
-                {showVenue ? "Dismiss venue form" : "Create venue inline"}
+                {showVenue ? "Close new venue form" : "Add a new venue"}
               </button>
             </div>
             {showVenue ? (

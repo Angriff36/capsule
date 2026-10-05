@@ -7,18 +7,15 @@ import {
   useGetPrepTask,
   useGetEvent,
   useListComponentImport,
-  useListDish,
   useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
   useListItemUnitMapping,
-  useListPerson,
   useListComponentIngredient,
   useListComponentSnapshot,
   useComponentIngredientAdjustQuantity,
   useComponentIngredientRemove,
   useComponentIngredientSetWasteFactor,
-  useComponentPublishVersion,
   useComponentPurge,
   useComponentRetract,
   useComponentReviseDraft,
@@ -26,8 +23,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
-import { useReconcileLiveEventsForComponent } from "../../lib/culinaryDemandClient";
-import { useAuthStatus } from "../../lib/useAuthStatus";
+import {
+  usePublishRecipeEdition,
+  useReconcileLiveEventsForComponent,
+} from "../../lib/culinaryDemandClient";
+import { RecipeEditionNotice } from "./RecipeEditionNotice";
 import { buildComponentSnapshotData } from "./componentSnapshot";
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
 import { captureBeforeChange } from "./componentSnapshotCapture";
@@ -48,6 +48,7 @@ import {
 } from "./IngredientPriceHistory";
 import { calculateComponentCost } from "./ComponentCostCalculator";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -64,7 +65,12 @@ import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
 import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
 import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
+import { cookEdition, PublishedMethodPanel } from "./PublishedMethodPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
+import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
+import { RecipeAllergenMarks } from "./RecipeAllergenMarks";
+import { RecipeTimesEquipmentPanel } from "./RecipeTimesEquipmentPanel";
+import { StylePackagingPanel } from "./StylePackagingPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
 import {
   beginPendingOperation,
@@ -100,10 +106,20 @@ export function ComponentDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const itemUnitMappings = useListItemUnitMapping();
   const lines = useListComponentIngredient();
-  const dishes = useListDish();
   const dishComponents = useListDishComponent();
+  // Only the dishes that use this recipe, never the whole dish list.
+  const dishes = useDishesByIds(
+    component == null || dishComponents === undefined
+      ? undefined
+      : dishComponents
+          .filter(
+            (line) =>
+              line.deletedAt == null && line.componentId === component._id,
+          )
+          .map((line) => line.dishId),
+  );
   const revise = useComponentReviseDraft();
-  const publish = useComponentPublishVersion();
+  const publish = usePublishRecipeEdition();
   const retract = useComponentRetract();
   const purge = useComponentPurge();
   const createLine = useCreateComponentIngredient();
@@ -116,8 +132,6 @@ export function ComponentDetailPage() {
   const captureSnapshot = useCreateComponentSnapshot();
   const restoreSnapshotCommand = useRestoreComponentSnapshotSafely();
   const snapshots = useListComponentSnapshot();
-  const people = useListPerson();
-  const authStatus = useAuthStatus();
   // Completed-import provenance: the original source this component came
   // from. Older native components have none — absence is not an error.
   // Culinary features use generated hooks only (integration guard), so the
@@ -193,6 +207,18 @@ export function ComponentDetailPage() {
     component.deletedAt,
   );
   const prepYield = prepRecipeYield(component, prepTask);
+  // A cook sent here from a prep task follows the published edition while the
+  // chef changes a draft; the chef (no prep task) still edits the draft.
+  const cookMethodEdition = prepTaskId
+    ? cookEdition(
+        {
+          _id: String(component._id),
+          status: String(component.status),
+          versionNumber: Number(component.versionNumber),
+        },
+        snapshots,
+      )
+    : null;
   const hasYieldPreview = yieldPreview?.key === previewKey;
   const targetYield = hasYieldPreview
     ? yieldPreview.value
@@ -212,13 +238,6 @@ export function ComponentDetailPage() {
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
 
-  const myPersonId = authStatus?.personId ?? null;
-  const me = (people ?? []).find(
-    (person) => person._id === myPersonId && person.deletedAt == null,
-  );
-  const myName =
-    [me?.givenName, me?.familyName].filter(Boolean).join(" ") || "Unknown";
-
   const currentData = buildComponentSnapshotData(
     component,
     componentLines,
@@ -234,7 +253,6 @@ export function ComponentDetailPage() {
         captureSnapshot({
           componentId: component._id,
           versionNumber: component.versionNumber,
-          capturedByName: myName,
           changeSummary,
           snapshot: JSON.stringify(currentData),
         }),
@@ -369,7 +387,12 @@ export function ComponentDetailPage() {
   const invokeLifecycle = (key: string) => {
     void run(key, async () => {
       const args = { docId: component._id, version: component.version };
-      if (key === "publishVersion") await publish(args);
+      if (key === "publishVersion") {
+        // Saves the published edition, then brings events not finished yet
+        // up to it; finished events keep their demand.
+        await publish(component._id, component.version);
+        await reconcileEvents(component._id);
+      }
       if (key === "retract") await retract(args);
       if (key === "purge") await purge(args);
     });
@@ -517,6 +540,12 @@ export function ComponentDetailPage() {
             <dd>{component.cuisine || "—"}</dd>
           </div>
         </dl>
+        <RecipeEditionNotice
+          componentId={component._id}
+          status={String(component.status)}
+          versionNumber={component.versionNumber}
+          saved={snapshots}
+        />
         {prepTaskId ? (
           <ComponentPrepContext
             recipe={component}
@@ -533,6 +562,10 @@ export function ComponentDetailPage() {
         component={component}
         onFailure={setFailure}
       />
+
+      <RecipeTimesEquipmentPanel component={component} onFailure={setFailure} />
+
+      <RecipeAllergenMarks component={component} onFailure={setFailure} />
 
       <div className="culinary-work-grid">
         <section className="culinary-section">
@@ -778,11 +811,25 @@ export function ComponentDetailPage() {
           ) : null}
         </section>
 
-        <ComponentMethodStepsPanel
-          componentId={component._id}
-          instructions={component.instructions}
-        />
+        {cookMethodEdition ? (
+          <PublishedMethodPanel edition={cookMethodEdition} />
+        ) : (
+          <ComponentMethodStepsPanel
+            componentId={component._id}
+            instructions={component.instructions}
+          />
+        )}
       </div>
+
+      <ComponentKitchenStandardsPanel
+        component={component}
+        onFailure={setFailure}
+      />
+
+      <StylePackagingPanel
+        owner={{ componentId: component._id }}
+        onFailure={setFailure}
+      />
 
       <ComponentSubRecipesPanel componentId={component._id} />
 
@@ -818,6 +865,7 @@ export function ComponentDetailPage() {
         heading="Per-portion nutrition"
         portionLabel={`per portion · serves ${servesPerYield}`}
         totals={componentNutrition.perPortion}
+        coverage={componentNutrition.coverage}
         coverageNote={nutritionCoverageNote}
         loading={ingredients === undefined || lines === undefined}
       />
@@ -831,6 +879,7 @@ export function ComponentDetailPage() {
           csvLinesText={sourceImport.csvLinesText ?? undefined}
           importId={String(sourceImport._id)}
           status={sourceImport.status}
+          duplicateOutcome={sourceImport.duplicateOutcome ?? undefined}
         />
       ) : null}
 

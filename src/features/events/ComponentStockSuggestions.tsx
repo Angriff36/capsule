@@ -122,8 +122,7 @@ export function ComponentStockSuggestions() {
             </div>
           ) : suggestions.length === 0 ? (
             <p className="text-base text-ink-2">
-              No published components have ingredient coverage from current
-              stock.
+              No components have enough of these ingredients in stock yet.
             </p>
           ) : (
             <ul className="space-y-2">

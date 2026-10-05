@@ -2,14 +2,28 @@ import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { api, type Id } from "../api";
 import { importSources } from "./importSources";
 import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
+import { venueMapPicture } from "./venueMapPicture";
 import type { EventPacketSnapshot, FieldValue } from "./model";
+import type { FinalLockPrint } from "./finalLock/evaluate";
 import type { PacketWorkbookSummary } from "./summaryProjection";
+import type { SourceProvenance } from "./sourceProvenance";
 
 export interface PacketView {
   snapshot: EventPacketSnapshot;
   currentFingerprint: string;
-  latestRevision: { id: string; fingerprint: string; stale: boolean } | null;
+  /** The Final Lock answers a print made now would show. */
+  finalLock: FinalLockPrint;
+  finalLockFingerprint: string;
+  latestRevision: {
+    id: string;
+    fingerprint: string;
+    stale: boolean;
+    /** Packet parts that changed since that print (empty for old prints). */
+    staleSections?: string[];
+  } | null;
   nativeTargets?: Record<string, { id: string; label: string }[]>;
+  /** Kept source files with who uploaded them, when, and their checksum. */
+  sources?: SourceProvenance[];
 }
 export interface PacketDecision {
   issueId: string;
@@ -50,6 +64,7 @@ export function useEventPacket(eventId: Id<"events">) {
     name: string;
     purpose: "source" | "pdf" | "snapshot";
     inputFingerprint?: string;
+    finalLockFingerprint?: string;
   }) => {
     const uploadUrl = await generateUploadUrl({ eventId });
     const response = await fetch(uploadUrl, {
@@ -69,6 +84,7 @@ export function useEventPacket(eventId: Id<"events">) {
       mimeType: file.mimeType,
       purpose: file.purpose,
       inputFingerprint: file.inputFingerprint,
+      finalLockFingerprint: file.finalLockFingerprint,
     });
   };
   return {
@@ -104,6 +120,23 @@ export function useEventPacket(eventId: Id<"events">) {
         read: async () =>
           (await client.query(commands.getPacket, { eventId })) as PacketView,
         upload,
+        files: async (snapshot) => {
+          const listed = (await client.query(commands.packetPrintFiles, {
+            eventId,
+          })) as { name: string; contentType: string; url: string }[];
+          const [map, ...kept] = await Promise.all([
+            venueMapPicture(snapshot.native?.route.venueAddress),
+            ...listed.map(async (file) => {
+              const response = await fetch(file.url);
+              // An unreadable file still gets a page that names it.
+              const bytes = response.ok
+                ? new Uint8Array(await response.arrayBuffer())
+                : new Uint8Array();
+              return { name: file.name, contentType: file.contentType, bytes };
+            }),
+          ]);
+          return map ? [map, ...kept] : kept;
+        },
         record: async (input) =>
           record({
             eventId,

@@ -1,14 +1,12 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  useListDish,
   useListDishComponent,
   useListDishIngredient,
-  useListEvent,
-  useListEventDish,
   useListIngredient,
   useListMenu,
   useListMenuDish,
+  useListComponent,
   useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
@@ -19,6 +17,9 @@ import {
 } from "./CulinaryAllergenVocabulary";
 import { deriveDishAllergens } from "./dishAllergens";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 
 const ALLERGENS = CULINARY_ALLERGENS;
 
@@ -45,6 +46,7 @@ export function deriveAllergenRows(input: {
   dishComponents: MatrixRecord[];
   componentIngredients: MatrixRecord[];
   ingredients: MatrixRecord[];
+  components?: MatrixRecord[];
 }) {
   return [...new Set(input.dishIds)]
     .map((dishId) => {
@@ -60,17 +62,26 @@ export function deriveAllergenRows(input: {
 export function AllergenMatrixPage() {
   const [params, setParams] = useSearchParams();
   const menus = useListMenu();
-  const events = useListEvent();
   const menuDishes = useListMenuDish();
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
+  // Recipes, for allergens marked on the recipe itself.
+  const components = useListComponent();
 
   const menuId = params.get("menu") ?? "";
   const eventId = params.get("event") ?? "";
+  const eventDishes = useMenuLinesForEvents([eventId]);
+  // Only the chosen menu's or event's dishes, never the whole dish list.
+  const dishes = useDishesByIds(
+    menuId
+      ? menuDishes
+          ?.filter((line) => line.deletedAt == null && line.menuId === menuId)
+          .map((line) => line.dishId)
+      : eventDishes?.map((line) => line.dishId),
+  );
+  const events = usePickerAndNamedEvents([eventId]);
   const scopeValue = menuId
     ? `menu:${menuId}`
     : eventId
@@ -115,8 +126,10 @@ export function AllergenMatrixPage() {
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
+      components: components ?? [],
     });
   }, [
+    components,
     loading,
     scopeValue,
     menuId,

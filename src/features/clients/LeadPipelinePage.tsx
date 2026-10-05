@@ -61,6 +61,7 @@ interface LeadRow {
   capturedAt?: number | null;
   convertedAt?: number | null;
   proposalLinkedAt?: number | null;
+  closedAt?: number | null;
   deletedAt?: number | null;
 }
 
@@ -119,9 +120,12 @@ export function LeadPipelinePage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
 
-  const activeLeads = ((leads ?? []) as LeadRow[]).filter(
+  const capturedLeads = ((leads ?? []) as LeadRow[]).filter(
     (lead) => lead.deletedAt == null && lead.capturedAt != null,
   );
+  // A lead the old system closed (won or lost) is history, not pipeline.
+  const activeLeads = capturedLeads.filter((lead) => lead.closedAt == null);
+  const closedCount = capturedLeads.length - activeLeads.length;
 
   const activeReferralSources = (
     (referralSources ?? []) as Array<{
@@ -175,7 +179,9 @@ export function LeadPipelinePage() {
     const estimatedValue = amount(data.get("estimatedValue"));
     const probability = amount(data.get("probability"));
     if (!Number.isFinite(estimatedValue) || !Number.isFinite(probability)) {
-      setFailure(new Error("Estimated value and probability must be numbers."));
+      setFailure(
+        new Error("Enter numbers for the estimated value and probability."),
+      );
       return;
     }
     const referralSourceId = optional(data.get("referralSourceId"));
@@ -209,7 +215,9 @@ export function LeadPipelinePage() {
     const estimatedValue = amount(data.get("estimatedValue"));
     const probability = amount(data.get("probability"));
     if (!Number.isFinite(estimatedValue) || !Number.isFinite(probability)) {
-      setFailure(new Error("Estimated value and probability must be numbers."));
+      setFailure(
+        new Error("Enter numbers for the estimated value and probability."),
+      );
       return;
     }
     void run(`${lead._id}:pipeline`, async () => {
@@ -284,7 +292,9 @@ export function LeadPipelinePage() {
     }
     const proposalValue = amount(data.get("proposalValue"));
     if (!Number.isFinite(proposalValue) || proposalValue < 0) {
-      setFailure(new Error("Proposal value must be a non-negative number."));
+      setFailure(
+        new Error("This proposal's value can't be negative. Use zero or more."),
+      );
       return;
     }
     void run(`${lead._id}:proposal`, async () => {
@@ -747,8 +757,15 @@ export function LeadPipelinePage() {
           );
         })}
       </section>
+      {closedCount > 0 ? (
+        <p className="lead-pipeline-closed-note">
+          {closedCount === 1
+            ? "1 closed deal from the old system is kept off the board."
+            : `${closedCount} closed deals from the old system are kept off the board.`}
+        </p>
+      ) : null}
 
-      <LeadSourceReport leads={activeLeads} />
+      <LeadSourceReport leads={capturedLeads} />
     </div>
   );
 }

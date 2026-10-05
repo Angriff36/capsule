@@ -17,9 +17,12 @@
 #    then npx convex deploy -y.
 # 4. Verifies runtime: POST <CONVEX_SELF_HOSTED_URL>/api/query (the SAME
 #    backend the deploy used; this script holds no second backend address) for
-#    a baseline query and every --verify query, then the production frontend
-#    returns HTTP 200.
-# 5. Prints RESULT: PASS or RESULT: FAIL with the sha.
+#    a baseline query and every --verify query, then deploymentProbe:health
+#    must name the release sha (the deployed code is the release's code), then
+#    the production frontend returns HTTP 200.
+# 5. Sets up daily backups once (key, crontab line, first backup); a problem
+#    there is a warning, not a failed deploy.
+# 6. Prints RESULT: PASS or RESULT: FAIL with the sha.
 #
 # --verify takes zero-argument queries as a comma list (listA,listB). A query
 # with required arguments takes its own flag with the payload:
@@ -29,12 +32,16 @@
 # test uses it; also for an address change).
 # --dry-run runs only the local checks of 1 and 2 (no fetch, no checkout, no
 # install, no deploy, no network) and prints what a real run would do.
-# This script never rolls back Vercel, never edits settings, never edits code.
+# This script never rolls back Vercel and never edits settings. The only code
+# it touches is the release stamp (convex/lib/backendRelease.ts), for the
+# deploy only; it puts the committed file back right after.
 set -uo pipefail
 
 FRONTEND_URL="https://capsule-tau-eight.vercel.app/"
 ORIGIN_MATCH="Angriff36/capsule"
 BASELINE_QUERY="queries:listEvent"
+IDENTITY_QUERY="deploymentProbe:health"
+RELEASE_STAMP="convex/lib/backendRelease.ts"
 CREDENTIAL_NAMES="CONVEX_SELF_HOSTED_URL CONVEX_SELF_HOSTED_ADMIN_KEY"
 
 expected=""
@@ -133,6 +140,16 @@ fi
 # 2. The machine.
 pinned="$(tr -d '[:space:]' < .bun-version)"
 active="$(bun --version 2>/dev/null || true)"
+# Bun went missing on the production box (2026-09-28: a tool there ran its own
+# Bun installer, and the 2026-09-30 release stopped half done: new screens,
+# old backend). A real deploy now puts the pinned Bun back in ~/.bun from the
+# official installer instead of stopping; a dry run only reports.
+if [ "$active" != "$pinned" ] && [ "$dry_run" = 0 ] && [ "$(uname -s)" = Linux ]; then
+  echo "deploy-backend: bun is ${active:-not found}; installing the pinned bun $pinned in ~/.bun"
+  curl -fsSL https://bun.sh/install | bash -s "bun-v$pinned" >/dev/null 2>&1 || true
+  export PATH="$HOME/.bun/bin:$PATH"
+  active="$(bun --version 2>/dev/null || true)"
+fi
 if [ "$active" != "$pinned" ]; then
   fail "bun is ${active:-not found}; .bun-version pins $pinned. Put bun $pinned first in PATH"
 fi
@@ -176,9 +193,15 @@ if [ "$dry_run" = 1 ]; then
   exit 0
 fi
 
-# 3. The documented deploy.
+# 3. The documented deploy. The deployed code names its release commit:
+#    the committed "unreleased" in RELEASE_STAMP becomes this sha for the
+#    deploy only (the release receipt reads it back from deploymentProbe:health).
 bun install --frozen-lockfile || fail "bun install failed"
+grep -q '"unreleased"' "$RELEASE_STAMP" 2>/dev/null || fail "$RELEASE_STAMP is missing or has no \"unreleased\" marker to stamp"
+trap 'git checkout -- "$RELEASE_STAMP" 2>/dev/null || true' EXIT
+sed -i "s/\"unreleased\"/\"$head_sha\"/" "$RELEASE_STAMP" || fail "cannot stamp $RELEASE_STAMP"
 npx convex deploy -y || fail "convex deploy failed"
+git checkout -- "$RELEASE_STAMP" 2>/dev/null || true
 # The Convex CLI rewrites its own generated files on every deploy. They are
 # tracked, so the next release would refuse this "dirty" checkout: put the
 # committed versions back so the box is clean for the next run.
@@ -199,6 +222,12 @@ for i in "${!verify_queries[@]}"; do
   esac
 done
 [ "$bad" = 0 ] || fail "a production query does not respond after the deploy"
+identity="$(curl -s -m 30 -X POST "$backend_url/api/query" -H 'Content-Type: application/json' -d "{\"path\":\"$IDENTITY_QUERY\",\"args\":{},\"format\":\"json\"}" || true)"
+if printf '%s' "$identity" | grep -Eq "\"releaseSha\"[[:space:]]*:[[:space:]]*\"$head_sha\""; then
+  echo "  ok    $IDENTITY_QUERY names $head_sha"
+else
+  fail "the deployed backend does not name the release $head_sha ($IDENTITY_QUERY -> $identity)"
+fi
 
 # Secondary only: the deployed function spec. A miss here is a warning; the
 # runtime probe above is the proof.
@@ -214,6 +243,45 @@ fi
 
 code="$(curl -s -o /dev/null -m 30 -w '%{http_code}' "$FRONTEND_URL" || true)"
 [ "$code" = "200" ] || fail "the production frontend returned HTTP ${code:-none}"
+
+# 5. Daily backups (docs/operations/backup-and-restore.md), set up by the first
+#    release that carries the backup script: a backup key in .env.local (never
+#    printed), a 3 am crontab line, and a first backup when the folder has
+#    none. Each step runs only when missing. A failure here is a warning: the
+#    deploy above is already done and verified.
+setup_backups() {
+  [ -f scripts/backup-capsule.ts ] || return 0
+  local dir="${CAPSULE_BACKUP_DIR:-$HOME/capsule-backups}" key bun_path line
+  mkdir -p "$dir" || { echo "  warn  backups: cannot make $dir"; return 0; }
+  if ! grep -Eqs '^CAPSULE_BACKUP_KEY=.+' .env.local; then
+    key="$(openssl rand -base64 32 2>/dev/null || true)"
+    if [ -z "$key" ]; then
+      echo "  warn  backups: openssl is missing, so no backup key was made"
+      return 0
+    fi
+    printf '\nCAPSULE_BACKUP_KEY=%s\n' "$key" >> .env.local
+    echo "  new   backup key written to .env.local - keep a copy OFF this box (password manager)"
+  fi
+  bun_path="$(command -v bun)"
+  line="0 3 * * * cd '$(pwd)' && PATH='$PATH' '$bun_path' scripts/backup-capsule.ts backup --dir '$dir' >> '$dir/backup.log' 2>&1"
+  if ! command -v crontab >/dev/null 2>&1; then
+    echo "  warn  backups: crontab is missing, so there is no daily backup"
+  elif ! crontab -l 2>/dev/null | grep -q 'backup-capsule.ts backup'; then
+    if { crontab -l 2>/dev/null; echo "$line"; } | crontab -; then
+      echo "  new   daily backup at 3 am added to crontab"
+    else
+      echo "  warn  backups: crontab refused the daily backup line"
+    fi
+  fi
+  if ! ls "$dir"/*.capsule-backup >/dev/null 2>&1; then
+    if bun scripts/backup-capsule.ts backup --dir "$dir" >> "$dir/backup.log" 2>&1; then
+      echo "  ok    first backup taken in $dir"
+    else
+      echo "  warn  backups: the first backup failed, see $dir/backup.log"
+    fi
+  fi
+}
+setup_backups
 
 echo ""
 echo "RESULT: PASS - backend deployed from $head_sha; $count queries respond; frontend HTTP 200"

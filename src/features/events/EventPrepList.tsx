@@ -13,6 +13,8 @@ import { CHIP_TONE_CLASS } from "../../lib/statusLabels";
 import { StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 import { readableRecipeAmount, recipeNoteLines } from "../kitchen/RecipeNotes";
+import type { StylePackagingRow } from "../kitchen/stylePackaging";
+import { EventDishPackaging } from "./EventDishPackaging";
 import { displayEventMenuNotes } from "./eventMenuLineFields";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 
@@ -37,7 +39,13 @@ export function EventPrepList({
   people,
   recipeFlags,
   renderQuantityFlags,
+  serviceStyleId,
+  serviceStyleName,
+  packaging,
 }: {
+  serviceStyleId?: string | null;
+  serviceStyleName?: string;
+  packaging?: readonly StylePackagingRow[];
   selections: Selection[];
   tasks: Task[];
   dishes: NonNullable<ReturnType<typeof useListDish>>;
@@ -126,6 +134,26 @@ export function EventPrepList({
                 </p>
               ))}
               {renderQuantityFlags(recipeFlags.get(group.key) ?? [])}
+              <EventDishPackaging
+                packaging={packaging}
+                serviceStyleId={serviceStyleId}
+                serviceStyleName={serviceStyleName}
+                dishId={dishId}
+                mainDishId={
+                  (dish as { versionOfDishId?: string | null } | undefined)
+                    ?.versionOfDishId
+                }
+                recipes={[
+                  ...new Set(
+                    group.tasks
+                      .map((task) => task.componentId)
+                      .filter((id): id is NonNullable<typeof id> => !!id),
+                  ),
+                ].map((id) => ({
+                  id: String(id),
+                  name: componentById.get(String(id))?.name ?? "Recipe",
+                }))}
+              />
             </header>
             {group.tasks.length === 0 ? (
               <p className="py-4 text-base text-ink-2">

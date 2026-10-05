@@ -13,15 +13,17 @@
 // shipped. "Unverified" (could not be checked from this context) is NOT
 // success; it is partial, with a code that names what was missing.
 //
-// Evidence chain for "matching Convex code/schema": vercel.json's production
-// buildCommand is `convex deploy --cmd 'vite build'`, so a READY deployment
-// built from the integrated SHA has already pushed that tree's Convex
-// functions AND schema — a READY build cannot exist with a failed deploy.
-// This module still demands independent backend evidence before calling the
-// leg verified: the deployment the shipped frontend points at is the one this
-// release targets, the backend answers authenticated traffic, and its
-// command registry matches the integrated tree's COMMAND_DISPATCH size
-// (counted from convex/http.ts, the generated surface this repo compiles).
+// Evidence chain for "matching Convex code/schema" (#382): production Convex
+// is SELF-HOSTED and the Vercel build is UI-only, so a READY build proves
+// nothing about the backend. scripts/deploy-backend.sh stamps the release sha
+// into the deployed code (convex/lib/backendRelease.ts), and
+// deploymentProbe:health reports it. The leg is verified only when the backend
+// the shipped frontend calls names the integrated SHA, or names an earlier
+// release with NO backend change (code, schema, manifests, convex imports)
+// between that release and the integrated SHA. A same-size but older backend
+// is stale; a hand-deployed backend ("unreleased") is never called shipped.
+// Convex deploys functions and schema together, so the code identity is the
+// schema identity.
 
 /** Deployment states Vercel reports; only READY counts as shipped. */
 export const VERCEL_READY_STATE = "READY";
@@ -62,13 +64,13 @@ export interface ReleaseReceiptInput {
     /** Host label of the production VITE_CONVEX_URL (the backend the shipped
      *  frontend actually calls), when it could be read. */
     frontendDeployment: string | null;
-    /** True when the deployed command registry answered authenticated
-     *  traffic (GET /api/manifest/commands with credentials). */
-    functionsReachable: boolean | null;
-    /** Command count the deployed registry reported. */
-    commandCount: number | null;
-    /** COMMAND_DISPATCH size of the integrated tree (convex/http.ts). */
-    expectedCommandCount: number | null;
+    /** releaseSha that deploymentProbe:health on that backend reported
+     *  ("unreleased" for a hand deploy); null when it could not be read. */
+    backendReleaseSha: string | null;
+    /** Backend-changing paths between backendReleaseSha and the integrated
+     *  SHA (scripts/release-backend-scope.ts --since); [] = none; null when
+     *  not computed. Ignored when the two SHAs are equal. */
+    backendChangesSinceDeployed: readonly string[] | null;
   };
   config: {
     /** PR12-01 DeploymentConfigReport.ok for the production environment. */
@@ -85,6 +87,16 @@ export interface ReleaseReceiptInput {
     authenticatedStatus: number | null;
     /** Command count parsed from the authenticated response body. */
     commandCount: number | null;
+    /** The real product step run through the command API with production
+     *  credentials (CAPSULE_RELEASE_WORKFLOW names it); null when none is
+     *  configured or it could not run. */
+    productStep: {
+      /** "Entity.command". */
+      name: string;
+      status: number | null;
+      /** True when the answer carried the command's `data` result. */
+      succeeded: boolean;
+    } | null;
   };
 }
 
@@ -191,26 +203,46 @@ function evaluateConvex(input: ReleaseReceiptInput): ReceiptLeg {
       `The shipped frontend points at Convex deployment "${convex.frontendDeployment}" but this release targets "${convex.expectedDeployment}".`,
     );
   }
-  if (convex.functionsReachable !== true) {
-    return failed(
-      "convex:functions_unreachable",
-      `The ${convex.expectedDeployment} command registry did not answer authenticated traffic.`,
-    );
-  }
-  if (convex.commandCount === null || convex.expectedCommandCount === null) {
+  const deployed = convex.backendReleaseSha;
+  if (deployed === null) {
     return unverified(
-      "convex:command_surface_unverifiable",
-      `The ${convex.expectedDeployment} backend answers, but its command-registry size could not be compared with the integrated tree (observed ${convex.commandCount ?? "?"}, expected ${convex.expectedCommandCount ?? "?"}).`,
+      "convex:backend_identity_unverifiable",
+      `The ${convex.expectedDeployment} backend did not say which release its code came from (deploymentProbe:health did not answer).`,
     );
   }
-  if (convex.commandCount !== convex.expectedCommandCount) {
+  if (!isSha(deployed)) {
     return failed(
-      "convex:command_surface_mismatch",
-      `The ${convex.expectedDeployment} registry serves ${convex.commandCount} commands but the integrated tree compiles ${convex.expectedCommandCount}; the backend does not match this release's code.`,
+      "convex:backend_not_released",
+      `The ${convex.expectedDeployment} backend runs code that was not deployed by the release path (it reports "${deployed}"), so its code and schema are unknown.`,
+    );
+  }
+  const sha = input.integratedSha;
+  if (!isSha(sha)) {
+    return unverified(
+      "convex:integrated_sha_unknown",
+      `The ${convex.expectedDeployment} backend runs ${deployed}, but the integrated SHA is missing.`,
+    );
+  }
+  if (deployed.toLowerCase() === sha.toLowerCase()) {
+    return verified(
+      `Frontend points at ${convex.expectedDeployment}; its backend code and schema were deployed from ${sha}.`,
+    );
+  }
+  const changes = convex.backendChangesSinceDeployed;
+  if (changes === null) {
+    return unverified(
+      "convex:backend_lineage_unverifiable",
+      `The ${convex.expectedDeployment} backend runs ${deployed}, not ${sha}, and the backend changes between them could not be read.`,
+    );
+  }
+  if (changes.length > 0) {
+    return failed(
+      "convex:stale_backend",
+      `The ${convex.expectedDeployment} backend runs ${deployed}, but this release changes the backend after it (${changes.slice(0, 5).join(", ")}); the backend does not match this release.`,
     );
   }
   return verified(
-    `Frontend points at ${convex.expectedDeployment}; its registry serves ${convex.commandCount} commands, matching the integrated tree (functions + schema rode the READY build's \`convex deploy\`).`,
+    `Frontend points at ${convex.expectedDeployment}; its backend runs ${deployed} and nothing between that and ${sha} changes the backend.`,
   );
 }
 
@@ -269,8 +301,23 @@ function evaluateWorkflow(input: ReleaseReceiptInput): ReceiptLeg {
       `${path} answered 200 but the command registry could not be read from the response.`,
     );
   }
+  // A registry listing is not a product workflow (#382): a real command must
+  // run through the deployed guards and answer with its result.
+  const step = workflow.productStep;
+  if (step === null) {
+    return unverified(
+      "workflow:product_step_not_configured",
+      "No real product step ran (set CAPSULE_RELEASE_WORKFLOW to the command the receipt runs with production credentials).",
+    );
+  }
+  if (step.status !== 200 || !step.succeeded) {
+    return failed(
+      "workflow:product_step_failed",
+      `The product step ${step.name} answered ${step.status ?? "nothing"} without a result; the signed-in workflow does not succeed.`,
+    );
+  }
   return verified(
-    `${path} on the canonical URL: 401 anonymous, 200 authenticated (${workflow.commandCount} commands) — edge, API-key gateway, Clerk and Convex answered end to end.`,
+    `On the canonical URL: ${path} 401 anonymous / 200 signed in, and the product step ${step.name} ran with production credentials and returned its result.`,
   );
 }
 

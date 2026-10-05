@@ -8,7 +8,6 @@ import {
   useInvoiceSend,
   useInvoiceWriteOff,
   useListClient,
-  useListEvent,
   useListInvoice,
   useListOrganization,
   useListTaxRate,
@@ -36,6 +35,7 @@ import {
   useWorkingEventScope,
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CommercialLifecyclePolicy();
 
@@ -59,7 +59,7 @@ const clientLabel = (row: {
 };
 
 export function InvoicesPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("invoices");
   const [searchParams, setSearchParams] = useSearchParams();
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const prefillEventId =
@@ -69,7 +69,10 @@ export function InvoicesPage() {
   const openFromLink = searchParams.get("issue") === "1";
   const invoices = useListInvoice();
   const clients = useListClient();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([
+    prefillEventId,
+    eventScope.workingId,
+  ]);
   const taxRates = useListTaxRate();
   const organizations = useListOrganization();
   const createInvoice = useCreateInvoice();
@@ -182,7 +185,9 @@ export function InvoicesPage() {
       [subtotal, taxAmount, discountAmount, total].some((n) => Number.isNaN(n))
     ) {
       setFailure(
-        new Error("Invoice number and all money fields are required."),
+        new Error(
+          "Give this invoice a number and fill in all the money fields.",
+        ),
       );
       return;
     }
@@ -220,7 +225,7 @@ export function InvoicesPage() {
       setShowIssue(false);
       clearIssuePrefill();
       setNotice(
-        "Invoice issued. Deliver it outside Capsule, then record it sent here.",
+        "Invoice issued. Deliver it outside Capsule, then mark it sent here.",
       );
     });
   };
@@ -311,7 +316,7 @@ export function InvoicesPage() {
           <h1 className="display-title mt-2">Client invoices</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Issue an invoice against a client (and optional event), send it for
-            payment, then record and settle payments on the Payments board.
+            payment, then add and settle payments on the Payments board.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -490,7 +495,7 @@ export function InvoicesPage() {
                                 {busy === `${row._id}:${action.key}`
                                   ? "Working…"
                                   : action.key === "send"
-                                    ? "Record sent"
+                                    ? "Mark sent"
                                     : action.label}
                               </button>
                             ))}
@@ -517,7 +522,7 @@ export function InvoicesPage() {
           disabled={busy != null || selection.count === 0}
           onClick={runBulkSend}
         >
-          Record {selection.count} sent
+          Mark {selection.count} sent
         </button>
       </BulkActionBar>
     </div>

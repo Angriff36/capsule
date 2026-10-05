@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListDelivery,
-  useListEvent,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { TableSkeleton } from "../../ui/primitives";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import {
@@ -51,7 +51,14 @@ type VehicleRow = {
 export function RoutePlannerPage() {
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   const deliveries = useListDelivery() as DeliveryRow[] | undefined;
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      deliveries === undefined
+        ? undefined
+        : deliveries.map((row) => row.eventId),
+    [deliveries],
+  );
+  const events = useEventsById(eventIds);
   const [day, setDay] = useState(() => toDateInputValue(new Date()));
   const [vehicleId, setVehicleId] = useState("");
   const [coords, setCoords] = useState<ReadonlyMap<string, GeoPoint>>(

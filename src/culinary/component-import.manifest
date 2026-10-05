@@ -26,6 +26,20 @@ enum ComponentImportMatchStatus {
   new
   confirmed_existing
   confirmed_new
+  subrecipe
+}
+
+// What finalize did when the formula matched a recipe already in the book.
+enum ComponentImportDuplicateOutcome {
+  // Same source text, same formula: linked, nothing copied.
+  identical_source
+  // Same formula at a different batch size: linked, the book keeps its
+  // original serving amounts.
+  scaled_copy
+  // Same formula finished under a different name: both kept.
+  same_formula_other_name
+  // Same name, different formula: both kept so a person can compare.
+  same_name_other_formula
 }
 
 entity ComponentImport mixin TenantScoped, SoftDeletable {
@@ -55,6 +69,10 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   property parsingFailureDetail: string?
   property finalizationFailureDetail: string?
   property resultingComponentId: uuid?
+  // Set when finalize matched an existing recipe (AC-067): the book recipe
+  // this import linked to or sits beside, and which match it was.
+  property duplicateOfComponentId: uuid?
+  property duplicateOutcome: ComponentImportDuplicateOutcome?
   property uploadedAt: datetime?
   property parsedAt: datetime?
   property reviewStartedAt: datetime?
@@ -66,13 +84,14 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
 
   hasMany lines: ComponentImportLine
   belongsTo resultingComponent: Component fields [tenantId, resultingComponentId] references [tenantId, id]
+  belongsTo duplicateOfComponent: Component fields [tenantId, duplicateOfComponentId] references [tenantId, id]
 
   constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Paste recipe text before parsing."
   constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
   constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
   constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "This recipe's line counts can't be negative. Use zero or more."
   constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "You can't finish more lines than this recipe has. Check the numbers."
-  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting recipe"
+  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "This import needs a finished recipe attached before it can complete."
 
   transition status from "uploaded" to ["parsed", "failed", "cancelled"]
   transition status from "parsed" to ["reviewing", "failed", "cancelled"]
@@ -133,7 +152,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status == "uploaded"
     guard self.uploadedAt != null
     guard self.deletedAt == null
-    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed recipe name is required"
+    constraint parseNamePresent: length(trim(parsedName)) > 0 "Give this parsed recipe a name."
     constraint parseLineCountNonnegative: parsedLineCount >= 0 "This recipe can't have a negative number of lines. Use zero or more."
     constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
     constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
@@ -188,7 +207,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.reviewStartedAt != null
     guard self.reviewRevision == expectedReviewRevision
     guard self.deletedAt == null
-    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed recipe name is required"
+    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Give this reviewed recipe a name."
     constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield on this review, it must be more than zero."
     constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size on this review, it must be more than zero."
     mutate parsedName = parsedName
@@ -267,11 +286,29 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The finished formula matched a recipe already in the book. Identical and
+  // scaled matches finish as a link to that recipe — no second recipe row and
+  // no second set of lines. The matched recipe is validated at complete()
+  // through the same tenant-scoped relation as recordComponent's link.
+  command recordDuplicateComponent(resultingComponentId: uuid, matchedComponentId: uuid, outcome: ComponentImportDuplicateOutcome) {
+    guard self.status == "finalizing"
+    guard self.finalizationStartedAt != null
+    guard self.deletedAt == null
+    mutate resultingComponentId = resultingComponentId
+    mutate duplicateOfComponentId = matchedComponentId
+    mutate duplicateOutcome = outcome
+    emit ComponentImportComponentRecorded {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      resultingComponentId: resultingComponentId
+    }
+  }
+
   command markFailed(failureDetail: string, optional duringParsing: boolean) {
     guard self.status != "completed"
     guard self.status != "cancelled"
     guard self.deletedAt == null
-    constraint failureDetailPresent: length(trim(failureDetail)) > 0 "Failure detail is required"
+    constraint failureDetailPresent: length(trim(failureDetail)) > 0 "Say what went wrong."
     compute previousStatus = self.status
     mutate status = "failed"
     mutate failedAt = now()
@@ -314,6 +351,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.resultingComponentId != null
     guard self.resultingComponent != null and self.resultingComponent.deletedAt == null
     guard count_of(filter(self.lines, (line) => line.matchedIngredientId != null and (line.matchedIngredient == null or line.matchedIngredient.deletedAt != null or line.matchedIngredient.tenantId != self.tenantId))) == 0
+    guard count_of(filter(self.lines, (line) => line.matchedComponentId != null and (line.matchedComponent == null or line.matchedComponent.deletedAt != null or line.matchedComponent.tenantId != self.tenantId))) == 0
     guard self.deletedAt == null
     mutate status = "completed"
     mutate completedAt = now()
@@ -327,7 +365,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   command cancel(reason: string) {
     guard self.status != "completed"
     guard self.deletedAt == null
-    constraint cancelReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelReasonPresent: length(trim(reason)) > 0 "Say why you're cancelling this."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -357,14 +395,19 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
   property required matchStatus: ComponentImportMatchStatus = "unresolved"
   property matchedIngredientId: uuid?
   property possibleMatchIngredientIds: list<string> = []
+  // A line that uses another recipe from the recipe book (a sub-recipe) links
+  // that recipe here instead of an ingredient.
+  property matchedComponentId: uuid?
   property resolvedAt: datetime?
   property revisedAt: datetime?
 
   belongsTo import: ComponentImport fields [tenantId, importId] references [tenantId, id]
   belongsTo matchedIngredient: Ingredient fields [tenantId, matchedIngredientId] references [tenantId, id]
+  belongsTo matchedComponent: Component fields [tenantId, matchedComponentId] references [tenantId, id]
 
   constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "This line isn't ready to keep that ingredient. Confirm the match first, or attach the ingredient you created."
   constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "This new line isn't finished yet. Finish it before you attach the ingredient you created."
+  constraint lineMatchedComponentAllowed: self.matchedComponentId == null or self.matchStatus == "subrecipe" "Only a sub-recipe line can point at another recipe."
 
   default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe import lines"
   default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe import lines"
@@ -480,6 +523,26 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The line uses another recipe from the recipe book. Like recordComponent,
+  // the link is stored here and checked at ComponentImport.complete() (and by
+  // the authored save seam before this runs): a relation guard here would read
+  // the old stored key before the assignment.
+  command linkSubrecipe(matchedComponentId: uuid) {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    mutate matchStatus = "subrecipe"
+    mutate matchedIngredientId = null
+    mutate possibleMatchIngredientIds = []
+    mutate matchedComponentId = matchedComponentId
+    mutate resolvedAt = now()
+    emit ComponentImportLineSubrecipeLinked {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      matchedComponentId: matchedComponentId
+    }
+  }
+
   // The created ingredient is produced by the same tenant's finalizer, so the
   // link is stored here and validated at ComponentImport.complete(): the old
   // relation guard dereferenced the previous stored foreign key (null for a
@@ -529,6 +592,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate matchStatus = "unresolved"
     mutate matchedIngredientId = null
+    mutate matchedComponentId = null
     mutate possibleMatchIngredientIds = []
     mutate resolvedAt = null
     emit ComponentImportLineResolutionReset {
@@ -540,7 +604,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
 
   command discard(reason: string) {
     guard self.deletedAt == null
-    constraint discardReasonPresent: length(trim(reason)) > 0 "Discard reason is required"
+    constraint discardReasonPresent: length(trim(reason)) > 0 "Say why you're discarding this line."
     mutate deletedAt = now()
     emit ComponentImportLineDiscarded {
       componentImportLineId: self.id
@@ -673,6 +737,13 @@ event ComponentImportLineCreatedIngredientAttached: "component_import_line.creat
   tenantId: string
   importId: string
   matchedIngredientId: string
+}
+
+event ComponentImportLineSubrecipeLinked: "component_import_line.subrecipe_linked" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  matchedComponentId: string
 }
 
 event ComponentImportLineResolutionReset: "component_import_line.resolution_reset" {

@@ -1,10 +1,50 @@
 import type { QueryCtx } from "../_generated/server";
 import type { Doc } from "../_generated/dataModel";
+import type { TppReportResult } from "../../src/features/reports/tpp/types";
 import { getAuthContext } from "../lib/authContext";
 import { decrypt } from "../lib/encryption";
 
 export const REPORT_ROW_LIMIT = 2_000;
 export const OPTION_ROW_LIMIT = 500;
+
+// Record lists a report run stopped reading at REPORT_ROW_LIMIT, keyed by the
+// run's own ctx so concurrent runs never share them.
+const cutSources = new WeakMap<object, Set<string>>();
+
+/** Reads are taken with one extra row; more than the limit means a cut. */
+export function keepReportRows(ctx: object, source: string) {
+  return <T>(rows: T[]): T[] => {
+    if (rows.length <= REPORT_ROW_LIMIT) return rows;
+    const sources = cutSources.get(ctx) ?? new Set<string>();
+    sources.add(source);
+    cutSources.set(ctx, sources);
+    return rows.slice(0, REPORT_ROW_LIMIT);
+  };
+}
+
+export function readLimitNotice(source: string): string {
+  return `Only the first ${REPORT_ROW_LIMIT.toLocaleString("en-US")} ${source} were read, so rows may be missing. Pick a shorter date range or fewer choices to see them all.`;
+}
+
+export type ReportArgs = { reportId: string; parameters: unknown };
+
+/** Runs a report and names every record list it had to stop reading. */
+export function reportHandler(
+  run: (ctx: QueryCtx, args: ReportArgs) => Promise<TppReportResult>,
+) {
+  return async (ctx: QueryCtx, args: ReportArgs): Promise<TppReportResult> => {
+    const result = await run(ctx, args);
+    const sources = cutSources.get(ctx);
+    if (!sources?.size) return result;
+    return {
+      ...result,
+      notices: [
+        ...(result.notices ?? []),
+        ...[...sources].map(readLimitNotice),
+      ],
+    };
+  };
+}
 
 export async function requireReportTenant(ctx: QueryCtx): Promise<string> {
   const auth = await getAuthContext(ctx);

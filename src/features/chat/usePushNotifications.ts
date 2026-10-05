@@ -197,7 +197,7 @@ export function usePushNotifications(): PushState {
     async (fromGesture: boolean): Promise<void> => {
       if (!publicKey) {
         if (fromGesture) {
-          setError("Notifications are not set up on this deployment yet.");
+          setError("Notifications aren't set up for Capsule yet.");
         }
         return;
       }
@@ -220,7 +220,7 @@ export function usePushNotifications(): PushState {
       if (!registration) {
         if (fromGesture) {
           setError(
-            "This device needs the installed app. Open Capsule from your home screen, or use the production site.",
+            "This device needs the installed app. Open Capsule from your home screen, or use the main Capsule website.",
           );
         }
         return;

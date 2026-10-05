@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import {
-  useListEvent,
   useListRevenueAttribution,
   useListPerson,
 } from "@/lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import {
   DashboardGrid,
   type DashboardGridSize,
@@ -11,14 +11,25 @@ import {
 import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
+import { EmptyState, PageHeader } from "@/ui/primitives";
 import { formatMoney } from "@/lib/format";
+import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { calculateCommissionMetrics } from "./compMasterValues";
+import { MetricDefinitionList } from "./MetricDefinitionList";
+
+const LOADING = "Loading…";
 
 export function CompMasterDashboardPage() {
-  const events = useListEvent();
   const attributions = useListRevenueAttribution();
   const people = useListPerson();
+  const eventIds = useMemo(
+    () =>
+      attributions === undefined
+        ? undefined
+        : attributions.map((attr) => attr.eventId),
+    [attributions],
+  );
+  const events = useEventsById(eventIds);
   const cancelledEventIds = useMemo(
     () =>
       new Set(
@@ -75,10 +86,13 @@ export function CompMasterDashboardPage() {
         !cancelledEventIds.has(String(attr.eventId)),
     )
     .map((attr) => ({
+      attributionId: String(attr._id),
+      eventId: String(attr.eventId),
       event: eventName.get(String(attr.eventId)) ?? "Unknown event",
       salesperson:
         personName.get(String(attr.salespersonId)) ?? "Unknown salesperson",
       commission: Number(attr.allocatedAmount) || 0,
+      appliedAt: attr.appliedAt ?? null,
       status: "Applied",
     }))
     .sort((a, b) => b.commission - a.commission);
@@ -95,12 +109,12 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Applied Commission"
           main={{
-            value: allTime?.totalCommission ?? 0,
+            value: allTime?.totalCommission ?? LOADING,
             format: "currency" as const,
           }}
           rows={[
             {
-              label: "Applied records",
+              label: "Applied lines",
               value: appliedRows.length,
               format: "number" as const,
             },
@@ -117,7 +131,7 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Applied This Month"
           main={{
-            value: thisMonth?.totalCommission ?? 0,
+            value: thisMonth?.totalCommission ?? LOADING,
             format: "currency" as const,
           }}
           rows={[{ label: "Period", value: "Calendar month" }]}
@@ -133,7 +147,7 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Salespeople"
           main={{
-            value: allTime?.salespeople.length ?? 0,
+            value: allTime?.salespeople.length ?? LOADING,
             format: "number" as const,
           }}
           rows={[{ label: "Basis", value: "Applied allocations" }]}
@@ -168,11 +182,16 @@ export function CompMasterDashboardPage() {
     {
       id: "records",
       size: "full",
-      title: "Applied Sales Commission Records",
+      title: "Applied Sales Commission List",
       content: (
         <TableDisplay
           columns={[
-            { key: "event", header: "Event", type: "string" as const },
+            {
+              key: "event",
+              header: "Event",
+              type: "string" as const,
+              href: (row) => `/events/${String(row.eventId)}`,
+            },
             {
               key: "salesperson",
               header: "Salesperson",
@@ -182,7 +201,12 @@ export function CompMasterDashboardPage() {
               key: "commission",
               header: "Allocated Commission",
               type: "currency" as const,
+              href: (row) =>
+                FINANCE_ROUTES.revenueAttributionDetail(
+                  String(row.attributionId),
+                ),
             },
+            { key: "appliedAt", header: "Applied", type: "date" as const },
             {
               key: "status",
               header: "Attribution Status",
@@ -199,20 +223,36 @@ export function CompMasterDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Comp Master Dashboard"
-        lead="Applied sales commission allocations, shown directly from revenue attribution records."
+        lead="Applied sales commission allocations, taken straight from revenue attribution."
       />
+      {attributions?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No commission applied yet"
+            hint="Applied sales commission splits show here."
+          />
+        </div>
+      ) : null}
       <DashboardGrid items={dashboardItems} />
       <div className="mt-6 rounded-sm border border-line bg-panel p-4">
         <h4 className="text-xs font-semibold text-ink">
           Where these numbers come from
         </h4>
         <p className="mt-2 text-xs text-ink-2">
-          Only RevenueAttribution records whose type is sales commission and
-          whose status is applied are included. Allocated amount is already the
+          Only revenue attribution entries marked as sales commission with a
+          status of applied are included. Allocated amount is already the
           commission amount; no percentage or payment status is inferred.
-          Cancelled events are excluded consistently.
+          Cancelled events are excluded consistently. Open an event or an amount
+          in the list to see the record behind it.
         </p>
       </div>
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.commission_applied",
+          "dashboard.commission_month",
+          "dashboard.salespeople",
+        ]}
+      />
     </div>
   );
 }

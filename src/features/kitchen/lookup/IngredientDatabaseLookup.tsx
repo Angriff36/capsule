@@ -43,8 +43,7 @@ function nutritionStatusMessage(
     catalogUnit &&
     hasNutrition &&
     !canScaleNutritionToUnit(catalogUnit) &&
-    !profile.servingGramsPerUnit &&
-    !profile.gramsPerMl
+    !profile.servingGramsPerUnit
   ) {
     return `Nutrition from the lookup was not applied — unit "${catalogUnit}" could not be scaled. Enter nutrition manually.`;
   }

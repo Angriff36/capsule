@@ -1,0 +1,106 @@
+{
+  "acceptance": "AC-706, AC-707, AC-708, AC-709, AC-710 (J leg only)",
+  "at": "2026-10-03T20:33:33.191Z",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "artifact": "docs/product/replacement-dossiers.md, one section per tool",
+  "base": "Artifact: one section of Capsule's replacement map for a catering company (Mangia) moving off an old tool. Audience: the owner deciding when the old tool may stop. Judge only the criterion. Honest 'not done / blocked, waits on X' lines count as meeting the criterion; the operator trials and owner sign-off are judged elsewhere.",
+  "criteria": {
+    "AC-706": "Every recurring job this catering company does in the old tool is mapped to a working Capsule screen (with a proof name), or the page says plainly why it is not done and what it waits on.",
+    "AC-707": "The page says how the job is done in Capsule without typing the same event facts in again (a 'No retyping' answer or the job table shows data flowing from earlier steps).",
+    "AC-708": "The page says how old history and needed documents come into Capsule or are kept, or says plainly that there is no way in yet and what that waits on.",
+    "AC-709": "Each mapped job names the Capsule screen or route where staff do it, in plain words a catering manager can follow.",
+    "AC-710": "Where the job sends something outside (email, payment, map, accounting, payroll, staffing service), the page says how staff see that it worked or failed, or says that delivery is not part of this tool's jobs."
+  },
+  "results": {
+    "TPP": {
+      "AC-706": {
+        "pass": true
+      },
+      "AC-707": {
+        "pass": true
+      },
+      "AC-708": {
+        "pass": true
+      },
+      "AC-709": {
+        "pass": true
+      },
+      "AC-710": {
+        "pass": true
+      }
+    },
+    "Nowsta": {
+      "AC-706": {
+        "pass": true
+      },
+      "AC-707": {
+        "pass": true
+      },
+      "AC-708": {
+        "pass": true
+      },
+      "AC-709": {
+        "pass": true
+      },
+      "AC-710": {
+        "pass": true
+      }
+    },
+    "Galley": {
+      "AC-706": {
+        "pass": true
+      },
+      "AC-707": {
+        "pass": true
+      },
+      "AC-708": {
+        "pass": true
+      },
+      "AC-709": {
+        "pass": true
+      },
+      "AC-710": {
+        "pass": true
+      }
+    },
+    "Goodshuffle": {
+      "AC-706": {
+        "pass": true
+      },
+      "AC-707": {
+        "pass": true
+      },
+      "AC-708": {
+        "pass": true
+      },
+      "AC-709": {
+        "pass": true
+      },
+      "AC-710": {
+        "pass": true
+      }
+    },
+    "Binder": {
+      "AC-706": {
+        "pass": true
+      },
+      "AC-707": {
+        "pass": true
+      },
+      "AC-708": {
+        "pass": true
+      },
+      "AC-709": {
+        "pass": true
+      },
+      "AC-710": {
+        "pass": true
+      }
+    }
+  },
+  "notOwned": "The P leg of each row (operator trials with real Mangia events, owner review) needs people and is not covered here.",
+  "judgedAt": {
+    "Binder": "2026-10-03T20:36:27.534Z"
+  }
+}

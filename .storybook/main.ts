@@ -1,5 +1,26 @@
 import type { StorybookConfig } from "@storybook/react-vite";
 import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from "node:url";
+
+const root = fileURLToPath(new URL("..", import.meta.url))
+  .replace(/\\/g, "/")
+  .replace(/\/$/, "")
+  .toLowerCase();
+
+/** Folders under this checkout that are never story source. */
+const NOT_WATCHED = [
+  "/.git",
+  "/node_modules",
+  "/.loop-worktrees",
+  "/.convex",
+  "/.ralph-tasks",
+  "/.artifacts",
+  "/.builder",
+  "/generated",
+  "/docs",
+  "/output",
+  "/tests",
+];
 
 /**
  * Storybook for the Capsule design system.
@@ -20,6 +41,27 @@ const config: StorybookConfig = {
     // The app's vite.config.ts carries Convex/Clerk dev middleware Storybook
     // has no use for, so we add only the one plugin the styles need.
     viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()];
+    // Watch only this checkout's own source. Without this the watcher held
+    // ~125,000 files open (2026-09-30): every builder copy under
+    // .loop-worktrees with its packages, the local Convex database, task and
+    // report folders. That starved the whole computer of memory. The check
+    // ignores letter case: Windows opens this repo as both C:\projects and
+    // C:\Projects, and a case-sensitive pattern missed half of it.
+    viteConfig.server = {
+      ...viteConfig.server,
+      watch: {
+        ...viteConfig.server?.watch,
+        ignored: (file: string) => {
+          const relative = file
+            .replace(/\\/g, "/")
+            .toLowerCase()
+            .slice(root.length);
+          return NOT_WATCHED.some(
+            (dir) => relative === dir || relative.startsWith(`${dir}/`),
+          );
+        },
+      },
+    };
     return viteConfig;
   },
 };

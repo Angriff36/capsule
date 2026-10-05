@@ -7,7 +7,6 @@ import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliation
 
 type TimingEvent = Doc<"events"> & {
   timingCanRecalculate: boolean;
-  timingSuggestedSetupMinutes: number | null;
   timingOnsiteAt: number | null;
   timingDepartShopAt: number | null;
   timingStaffOnAt: number | null;

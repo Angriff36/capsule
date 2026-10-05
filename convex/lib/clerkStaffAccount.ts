@@ -12,7 +12,11 @@ export type ClerkStaffAccount = {
 };
 
 export class ClerkStaffAccountError extends Error {
-  constructor(message: string, readonly code?: string) {
+  constructor(
+    message: string,
+    readonly code?: string,
+    readonly httpStatus?: number,
+  ) {
     super(message);
   }
 }
@@ -147,6 +151,15 @@ export class ClerkStaffAccountDirectory {
     }
   }
 
+  /** Undo an account this run just created when the Capsule link then fails,
+   * so a failed hire never leaves a stray sign-in holding the address. */
+  async deleteUser(userId: string): Promise<void> {
+    await this.request(
+      `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`,
+      { method: "DELETE" },
+    );
+  }
+
   async setPassword(userId: string, password: string): Promise<void> {
     await this.request<ClerkUserPayload>(
       `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`,
@@ -262,9 +275,9 @@ async function readClerkError(response: Response): Promise<ClerkStaffAccountErro
       first?.long_message ||
       first?.message ||
       body.message ||
-      "The sign-in service rejected the request.", first?.code
+      "The sign-in service rejected the request.", first?.code, response.status
     );
   } catch {
-    return new ClerkStaffAccountError("The sign-in service rejected the request.");
+    return new ClerkStaffAccountError("The sign-in service rejected the request.", undefined, response.status);
   }
 }

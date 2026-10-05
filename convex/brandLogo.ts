@@ -4,8 +4,10 @@
 // Upload goes through fileStorage.generateUploadUrl; this seam resolves the
 // read URL. Person-first admins without a Clerk organization therefore keep
 // their logo (#237); the Clerk org image remains a read fallback in the UI.
+import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { storageNotOwnedElsewhere } from "./fileStorage";
 
 /** Public URL of the tenant's own logo, or null when none is stored. */
 export const getBrandLogoUrl = query({
@@ -25,6 +27,28 @@ export const getBrandLogoUrl = query({
     if (typeof storageId !== "string" || !storageId) return null;
     const id = ctx.db.system.normalizeId("_storage", storageId);
     if (!id) return null;
+    return await ctx.storage.getUrl(id);
+  },
+});
+
+/**
+ * Public URL of a venue's logo (co-branded proposals), for the caller's own
+ * company only. Null when none is stored or another company owns the file.
+ */
+export const getVenueLogoUrl = query({
+  args: { venueId: v.id("venues") },
+  handler: async (ctx, { venueId }): Promise<string | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId) return null;
+    const venue = await ctx.db.get(venueId);
+    if (!venue || venue.deletedAt != null || venue.tenantId !== auth.tenantId)
+      return null;
+    const storageId = venue.logoStorageId;
+    if (typeof storageId !== "string" || !storageId) return null;
+    const id = ctx.db.system.normalizeId("_storage", storageId);
+    if (!id) return null;
+    if (!(await storageNotOwnedElsewhere(ctx, auth.tenantId, storageId)))
+      return null;
     return await ctx.storage.getUrl(id);
   },
 });

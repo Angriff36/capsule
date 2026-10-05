@@ -32,13 +32,20 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   property failureReason: string?
   property cancelledAt: datetime?
   property cancellationReason: string?
+  // Who drove off and who handed it over, and who at the venue took it
+  // (PL-DELIVERY, AC-135). Missing person = that account is not linked to a
+  // staff profile.
+  property departedByPersonId: uuid?
+  property deliveredByPersonId: uuid?
+  property receivedByName: string?
+  property deliveryNote: string?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo driver: Person fields [tenantId, driverId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
 
-  constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Scheduled deliveries require a destination and a valid delivery window"
+  constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Give this delivery a destination and a start and end time before you schedule it."
 
   transition status from "scheduled" to ["in_transit", "failed", "cancelled"]
   transition status from "in_transit" to ["delivered", "failed", "cancelled"]
@@ -69,8 +76,8 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     constraint schedulePackListMatch: packListId == self.packListId "This delivery is for a different pack list. Pick the pack list already on this delivery."
     constraint scheduleEventMatch: eventId == self.eventId "This delivery is for a different event. Pick the event already on this delivery."
     constraint scheduleDriverMatch: driverId == null or self.driverId == null or driverId == self.driverId "This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery."
-    constraint scheduleDestinationPresent: length(trim(destination)) > 0 or length(trim(self.destination)) > 0 "Delivery destination is required"
-    constraint scheduleWindowDates: (self.scheduledAt != null) or (windowEndsAt > windowStartsAt) "Delivery window end must be after its start"
+    constraint scheduleDestinationPresent: length(trim(destination)) > 0 or length(trim(self.destination)) > 0 "Give this delivery a destination."
+    constraint scheduleWindowDates: (self.scheduledAt != null) or (windowEndsAt > windowStartsAt) "This delivery's window end has to be after its start. Fix the times."
     mutate packListId = packListId
     mutate eventId = eventId
     mutate destination = length(trim(self.destination)) > 0 ? self.destination : destination
@@ -98,10 +105,11 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.driverId != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.driverId == user.id or roleAllows(user.role, "logisticsManageAccess")
+    guard (user.personId != null and self.driverId == user.personId) or roleAllows(user.role, "logisticsManageAccess")
     compute previousStatus = self.status
     mutate status = "in_transit"
     mutate departedAt = now()
+    mutate departedByPersonId = user.personId
     emit DeliveryTransitStarted {
       deliveryId: self.id
       tenantId: self.tenantId
@@ -114,15 +122,19 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command confirmDelivery() {
+  // receivedByName: the person at the venue who took the delivery (optional).
+  command confirmDelivery(optional receivedByName: string, optional note: string) {
     guard self.status == "in_transit"
     guard self.departedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.driverId == user.id or roleAllows(user.role, "logisticsManageAccess")
+    guard (user.personId != null and self.driverId == user.personId) or roleAllows(user.role, "logisticsManageAccess")
     compute previousStatus = self.status
     mutate status = "delivered"
     mutate deliveredAt = now()
+    mutate deliveredByPersonId = user.personId
+    mutate receivedByName = receivedByName != null and length(trim(receivedByName)) > 0 ? trim(receivedByName) : null
+    mutate deliveryNote = note != null and length(trim(note)) > 0 ? trim(note) : null
     emit DeliveryConfirmed {
       deliveryId: self.id
       tenantId: self.tenantId
@@ -132,6 +144,8 @@ entity Delivery mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "delivered"
       deliveredAt: self.deliveredAt
+      deliveredByPersonId: user.personId
+      receivedByName: receivedByName
     }
   }
 
@@ -140,7 +154,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "logisticsManageAccess")
-    constraint failDeliveryReason: length(trim(reason)) > 0 "Failure reason is required"
+    constraint failDeliveryReason: length(trim(reason)) > 0 "Say why this delivery failed."
     compute previousStatus = self.status
     mutate status = "failed"
     mutate failedAt = now()
@@ -161,7 +175,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.status == "scheduled" or self.status == "in_transit"
     guard self.deletedAt == null
     guard roleAllows(user.role, "logisticsManageAccess")
-    constraint cancelDeliveryReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelDeliveryReason: length(trim(reason)) > 0 "Say why you're cancelling this delivery."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -236,6 +250,8 @@ event DeliveryConfirmed: "delivery.confirmed" {
   previousStatus: DeliveryStatus
   status: DeliveryStatus
   deliveredAt: datetime?
+  deliveredByPersonId: string?
+  receivedByName: string?
 }
 
 event DeliveryFailed: "delivery.failed" {
@@ -285,14 +301,7 @@ event DeliveryVehicleUnassigned: "delivery.vehicle_unassigned" {
 // The transactional operational callback selects unfinished records before
 // invoking Delivery.standDownWithEvent. Settled history is not mutated.
 
-// Vision cascade: packed pack list ensures one Delivery schedule (match else create).
-on PackListPacked run Delivery.schedule
-  match packListId = payload.packListId
-  else create
-  params {
-    packListId: payload.packListId
-    eventId: payload.eventId
-    destination: payload.destination
-    windowStartsAt: payload.windowStartsAt
-    windowEndsAt: payload.windowEndsAt
-  }
+// A packed pack list books one Delivery (schedule, match by pack list, else
+// create) only for a Drop Off event or an event with no style yet (#377).
+// A reaction cannot read the event's style, so the authored seam
+// convex/lib/dropOffDelivery.ts runs it on PackListPacked.

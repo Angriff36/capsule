@@ -3,9 +3,9 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
-import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
+import { applyOwnWorkspaceLinks } from "./apply-own-workspace-links.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
+import { syncBuilderBaselines } from "./sync-builder-baselines.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -36,15 +36,26 @@ export function runBuilder(args: string[]): number {
 export function regenerate(passthrough: string[] = []): number {
   const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
   if (status !== 0) return status;
-  // Builder emits checkRole(user.role). Re-apply org capability enforcement
-  // and the service-style reference guard, refreshing ownership digests.
-  const touched = [
-    ...applyOrgCapabilityCheckRole(CAPSULE_ROOT),
-    ...applyEventServiceStyleReferenceGuard(CAPSULE_ROOT),
-  ];
+  // The patches below read generated/ir/merged.ir.json, which is gitignored:
+  // rebuild it so a new command from another checkout is never "missing".
+  const compiled = spawnSync(process.execPath, ["run", "manifest:compile"], {
+    stdio: "inherit",
+    cwd: CAPSULE_ROOT,
+  });
+  if (compiled.status !== 0) return compiled.status ?? 1;
+  // Make generated mutations refuse other-workspace record ids, refreshing
+  // ownership digests.
+  const touched = [...applyOwnWorkspaceLinks(CAPSULE_ROOT)];
   if (touched.length > 0) {
     console.log(
       `manifest-regen: applied generated runtime patches (${touched.join(", ")})`,
+    );
+  }
+  // The patches moved ledger digests after Builder's own baseline prune.
+  const synced = syncBuilderBaselines(CAPSULE_ROOT);
+  if (synced.written + synced.removed > 0) {
+    console.log(
+      `manifest-regen: baseline store synced (${String(synced.written)} written, ${String(synced.removed)} removed)`,
     );
   }
   return 0;

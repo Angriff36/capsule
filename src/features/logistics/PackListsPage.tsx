@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackList,
-  useListEvent,
   useListPackList,
   useListPackListItem,
   usePackListCancel,
@@ -23,15 +22,18 @@ import {
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new LogisticsLifecyclePolicy();
 
 export function PackListsPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("pack-lists");
   const workingId = useWorkingEventId();
   const packLists = useListPackList();
   const packListItems = useListPackListItem();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    packLists ? [workingId, ...packLists.map((row) => row.eventId)] : undefined,
+  );
   const createPackList = useCreatePackList();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -134,11 +136,22 @@ export function PackListsPage() {
       }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
-        if (key === "startPacking") await startPacking(args);
-        if (key === "markPacked") await markPacked(args);
-        if (key === "markLoaded") await markLoaded(args);
-        if (key === "dispatch") await dispatch(args);
-        setNotice(`Pack list updated (${key}).`);
+        if (key === "startPacking") {
+          await startPacking(args);
+          setNotice("Packing started.");
+        }
+        if (key === "markPacked") {
+          await markPacked(args);
+          setNotice("Pack list marked packed.");
+        }
+        if (key === "markLoaded") {
+          await markLoaded(args);
+          setNotice("Pack list marked loaded.");
+        }
+        if (key === "dispatch") {
+          await dispatch(args);
+          setNotice("Pack list dispatched.");
+        }
       });
     })();
   };
@@ -261,7 +274,7 @@ export function PackListsPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -282,8 +295,8 @@ export function PackListsPage() {
                       </Link>
                       {row.purpose ? <small>{row.purpose}</small> : null}
                     </td>
-                    <td>{eventName(row.eventId)}</td>
-                    <td>
+                    <td data-label="Event">{eventName(row.eventId)}</td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                     </td>
                     <td>
