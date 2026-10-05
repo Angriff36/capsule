@@ -124,19 +124,27 @@ export class EventLifecyclePolicy {
     stage: string,
     planning?: { plannedAt?: number | null },
   ): EventLifecycleAction[] {
-    return ACTIONS.filter((action) =>
-      action.lifecycle.some(
-        (transition) =>
-          transition.property === "stage" && transition.from === stage,
-      ),
-    )
-      .filter(
-        (action) =>
-          action.key !== "submitForApproval" ||
-          planning === undefined ||
-          planning.plannedAt != null,
+    return (
+      ACTIONS.filter((action) =>
+        action.lifecycle.some(
+          (transition) =>
+            transition.property === "stage" && transition.from === stage,
+        ),
       )
-      .map(({ lifecycle: _lifecycle, ...action }) => action);
+        // Planning -> completed exists only for old-system events that are
+        // already over (Event.recordPastCompletion, its own button); a planned
+        // event is never finished from the stage buttons.
+        .filter(
+          (action) => !(action.key === "complete" && stage === "planning"),
+        )
+        .filter(
+          (action) =>
+            action.key !== "submitForApproval" ||
+            planning === undefined ||
+            planning.plannedAt != null,
+        )
+        .map(({ lifecycle: _lifecycle, ...action }) => action)
+    );
   }
 
   isEditableStage(stage: string): boolean {

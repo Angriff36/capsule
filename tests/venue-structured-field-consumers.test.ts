@@ -38,6 +38,8 @@ const CONSUMERS: Record<string, string> = {
   daySheet: "convex/eventDayBriefing.ts",
   routes: "src/lib/routeFacts.ts",
   weather: "src/features/events/eventWeather.ts",
+  // The Venue partners list grades and sorts partners by their scores.
+  partners: "src/features/facilities/venuePartnership.ts",
 };
 
 describe("structured venue facts have a consumer outside the venue page", () => {
