@@ -10,7 +10,10 @@
  * plain note; the same file again makes nothing new. The printed occasion and
  * referral source ("Referred From") join the company's list of that name, a
  * new one is added to the list once; the sales person is the one active
- * person with that name, and the printed name is kept either way.
+ * person with that name, and the printed name is kept either way. A printed
+ * venue name joins the one saved venue of that name with an address; two
+ * saved venues of one name leave the printed name only. The printed venue
+ * state is kept in the event's venue address.
  */
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -80,6 +83,25 @@ describe("runtime proof: the TPP event list file imports as events", () => {
         } as never),
     );
 
+    // Saved venues: one "Example Barn" with an address, two "Twin Hall".
+    const addVenue = async (name: string) =>
+      (
+        (await (
+          actor as unknown as {
+            mutation: (fn: unknown, args: unknown) => Promise<unknown>;
+          }
+        ).mutation(api.mutations.Venue_createViaRegister, {
+          name,
+          venueType: "other",
+          capacity: 150,
+          addressLine1: "1 Main St",
+          city: "Spokane",
+        })) as { docId: string }
+      ).docId;
+    const barn = await addVenue("Example Barn");
+    await addVenue("Twin Hall");
+    await addVenue("Twin Hall");
+
     const rows = fileRows("event-list-sample.csv", "events");
     expect(rows[0]).toMatchObject({
       EventID: "9101",
@@ -126,7 +148,17 @@ describe("runtime proof: the TPP event list file imports as events", () => {
       occasionName: "Wedding",
       referralSourceId: idOf(sources, "Google"),
     });
+    expect(byTitle("Lena Hartwell Wedding")).toMatchObject({
+      venueId: barn,
+      venueName: "Example Barn",
+      venueAddress: "ID",
+    });
     expect(byTitle("Lena Hartwell Wedding")?.ownerName).toBeUndefined();
+    expect(byTitle("Example Hall Co Corporate Event")).toMatchObject({
+      venueName: "Twin Hall",
+      venueAddress: "WA",
+    });
+    expect(byTitle("Example Hall Co Corporate Event")?.venueId).toBeFalsy();
     expect(byTitle("Example Hall Co Corporate Event")).toMatchObject({
       occasionId: idOf(occasions, "Corporate Event"),
       referralSourceId: idOf(sources, "Repeat Customer"),

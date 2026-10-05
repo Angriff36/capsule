@@ -132,6 +132,7 @@ import {
   type LookAlikeVenue,
 } from "./lib/importIdentity";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
+import { inquiryVenueMatch } from "./lib/quoteInquiryVenue";
 import { eventLookupFields, type BatchLookups } from "./importEventLookups";
 import {
   matchClientByName,
@@ -1341,9 +1342,13 @@ export const commitImportRun = action({
           referralSource: event.referralSourceName,
           owner: event.ownerName,
         };
+        const venueByName = !venueId && Boolean(event.venueName?.trim());
         if (
           !lookups &&
-          (printed.occasion || printed.referralSource || printed.owner)
+          (printed.occasion ||
+            printed.referralSource ||
+            printed.owner ||
+            venueByName)
         )
           lookups = {
             ...(await ctx.runQuery(internal.importEventLookups.eventLookups, {
@@ -1354,6 +1359,10 @@ export const commitImportRun = action({
         const named = lookups
           ? await eventLookupFields(ctx, lookups, printed)
           : {};
+        // The event list report names the venue only: join the one saved
+        // venue of that name that has an address (lib/quoteInquiryVenue).
+        if (venueByName && lookups)
+          venueId = inquiryVenueMatch(event.venueName, lookups.venues)?._id;
 
         const idempotencyKey = `tenant-shared/import:${args.importRunId}:event:${event.externalId}`;
         try {
