@@ -292,6 +292,7 @@ export const CommandAuditRecordSchema = z.object({
   subjectId: z.string().nullable().optional(),
   eventType: z.string().nullable().optional(),
   manifestEventId: z.string().nullable().optional(),
+  manifestEventIds: z.unknown().nullable().optional(),
   eventCount: z.number().int().nullable().optional(),
   versionAfter: z.number().int().nullable().optional(),
   actorUserId: z.string().nullable().optional(),

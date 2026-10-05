@@ -3,7 +3,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ReasonCopy } from "./ReasonCopy";
 import { useActionPrompt } from "./useActionPrompt";
 
-type Variant = "confirm" | "destructive-reason" | "submitting";
+type Variant =
+  "confirm" | "destructive-reason" | "supersede-demand" | "submitting";
 
 /**
  * Drives the real hook with no Convex. Each story opens its prompt on mount;
@@ -29,6 +30,14 @@ function Demo({ variant }: { variant: Variant }) {
     if (variant === "destructive-reason") {
       const reason = await prompt.askReason({
         ...ReasonCopy.cancelShift,
+        tone: "danger",
+      });
+      setLast(reason ? `Reason: ${reason}` : null);
+      return;
+    }
+    if (variant === "supersede-demand") {
+      const reason = await prompt.askReason({
+        ...ReasonCopy.supersedeDemand,
         tone: "danger",
       });
       setLast(reason ? `Reason: ${reason}` : null);
@@ -82,6 +91,10 @@ export const SimpleConfirm: Story = { args: { variant: "confirm" } };
 
 export const DestructiveWithReason: Story = {
   args: { variant: "destructive-reason" },
+};
+
+export const SupersedeDemandReason: Story = {
+  args: { variant: "supersede-demand" },
 };
 
 export const Submitting: Story = { args: { variant: "submitting" } };

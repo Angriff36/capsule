@@ -19,6 +19,9 @@ entity CommandAuditRecord mixin TenantScoped {
   property subjectId: string?
   property eventType: string?
   property manifestEventId: string?
+  // Exact event membership for one command transaction. This deliberately
+  // replaces timestamp-window inference in downstream receipts.
+  property manifestEventIds: json?
   property eventCount: int?
   property versionAfter: int?
   property actorUserId: string?

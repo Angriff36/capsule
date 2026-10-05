@@ -2,6 +2,7 @@ import {
   type CascadeAction,
   useEventCascadePreview,
 } from "../../lib/cascadePreviewClient";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 type Props = {
   eventId: string;
@@ -45,7 +46,10 @@ export function CascadePreviewDialog({
             id="cascade-preview-title"
             className="mt-1 text-2xl font-bold text-ink"
           >
-            {copy.title}
+            <span className="field-label-row">
+              {copy.title}
+              {action === "closeOut" ? <FieldHelp term="closeout" /> : null}
+            </span>
           </h2>
         </header>
         <div className="px-5 py-4 sm:px-7">

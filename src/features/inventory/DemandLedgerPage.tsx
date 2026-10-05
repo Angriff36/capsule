@@ -10,8 +10,8 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useApplyDemandSupersede } from "../../lib/culinaryDemandClient";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { HoverPreview } from "../../ui/HoverPreview";
 import { FieldHelp } from "../../ui/FieldHelp";
+import { HoverPreview } from "../../ui/HoverPreview";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { IngredientPreviewCard } from "../kitchen/IngredientPreviewCard";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
@@ -27,25 +27,11 @@ import { useWorkingEventId } from "../events/workingEvent";
 import { IngredientDemandProvenancePanel } from "./IngredientDemandProvenancePanel";
 import { DemandChangePreviewDialog } from "./DemandChangePreviewDialog";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
-
-const UNITS = [
-  "each",
-  "gram",
-  "kilogram",
-  "ounce",
-  "pound",
-  "milliliter",
-  "liter",
-  "teaspoon",
-  "tablespoon",
-  "cup",
-  "pint",
-  "quart",
-  "gallon",
-  "portion",
-] as const;
+import { DemandLedgerCreateForm, DEMAND_UNITS } from "./DemandLedgerCreateForm";
+import { DemandLedgerMasthead } from "./DemandLedgerMasthead";
 
 const policy = new SupplyLifecyclePolicy();
+const UNITS = DEMAND_UNITS;
 
 export function DemandLedgerPage() {
   const workingId = useWorkingEventId();
@@ -120,7 +106,7 @@ export function DemandLedgerPage() {
         eventId: String(data.get("eventId")),
         ingredientId: String(data.get("ingredientId")),
         requiredQuantity: Number(data.get("requiredQuantity")),
-        unit: String(data.get("unit")) as (typeof UNITS)[number],
+        unit: String(data.get("unit")) as (typeof DEMAND_UNITS)[number],
       });
       form.reset();
       setShowCreate(false);
@@ -152,39 +138,12 @@ export function DemandLedgerPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Inventory · Demand ledger</p>
-          <h1 className="display-title mt-2">What each event needs</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Capsule works this list out for you: every event's dishes and
-            headcount become the ingredients and amounts below. Purchasing draws
-            from this list. You do not type it in.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <label className="field-label" style={{ marginBottom: 0 }}>
-            Flag amounts off from past events by
-            <select
-              className="input"
-              value={thresholdPct}
-              onChange={(event) => setThresholdPct(Number(event.target.value))}
-            >
-              {[20, 30, 40, 50, 75].map((pct) => (
-                <option key={pct} value={pct}>
-                  ±{pct}%
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowCreate((value) => !value)}
-          >
-            {showCreate ? "Close form" : "Add a line by hand"}
-          </button>
-        </div>
-      </header>
+      <DemandLedgerMasthead
+        thresholdPct={thresholdPct}
+        onThresholdChange={setThresholdPct}
+        showCreate={showCreate}
+        onToggleCreate={() => setShowCreate((value) => !value)}
+      />
       <InventoryWorkspaceNav />
 
       <aside className="supply-degraded" role="note">
@@ -229,6 +188,16 @@ export function DemandLedgerPage() {
       ) : null}
 
       {showCreate ? (
+        <DemandLedgerCreateForm
+          events={events}
+          ingredients={ingredients}
+          workingId={workingId}
+          busy={busy != null}
+          submitting={busy === "create-demand"}
+          onSubmit={submitDemand}
+        />
+      ) : null}
+      {false && showCreate ? (
         <form className="supply-form" onSubmit={submitDemand}>
           <div className="supply-form-heading">
             <div>

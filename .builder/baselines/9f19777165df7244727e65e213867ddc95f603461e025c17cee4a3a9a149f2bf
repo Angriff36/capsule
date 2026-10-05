@@ -277,6 +277,7 @@ export default defineSchema({
     subjectId: v.optional(v.union(v.string(), v.null())),
     eventType: v.optional(v.union(v.string(), v.null())),
     manifestEventId: v.optional(v.union(v.string(), v.null())),
+    manifestEventIds: v.optional(v.union(v.any(), v.null())),
     eventCount: v.optional(v.union(v.number(), v.null())),
     versionAfter: v.optional(v.union(v.number(), v.null())),
     actorUserId: v.optional(v.union(v.string(), v.null())),

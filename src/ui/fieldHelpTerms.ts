@@ -6,8 +6,12 @@ export type FieldHelpTerm =
   | "yield"
   | "dishYield"
   | "batchMultiplier"
+  | "demand"
+  | "supersedeDemand"
   | "parLevel"
-  | "purchaseEligibility";
+  | "purchaseEligibility"
+  | "yieldVariance"
+  | "closeout";
 
 export interface FieldHelpEntry {
   title: string;
@@ -44,6 +48,26 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
       label: "See the multiplier in a demand formula",
     },
   },
+  demand: {
+    title: "Demand",
+    body: "The ingredient amount an event requires. Capsule usually calculates it from dishes, guest count, recipe yield, and batch multiplier; staff can add uncovered items by hand. Confirmed demand feeds purchasing.",
+    example:
+      "A 100-guest event with dishes needing 20 lb of vegetables creates that ingredient demand before a buyer opens a purchase need.",
+    link: {
+      href: "/inventory/demand",
+      label: "See the event-to-purchase cascade",
+    },
+  },
+  supersedeDemand: {
+    title: "Supersede demand",
+    body: "Retire a calculated or confirmed demand line without deleting its history. It stops qualifying for new purchase work, requires a reason, and any purchase needs already created from it must be reviewed because Capsule does not silently rewrite them.",
+    example:
+      "After a menu change, supersede the old chicken demand with the regenerated line rather than deleting the original evidence.",
+    link: {
+      href: "/inventory/demand",
+      label: "See the event-to-purchase cascade",
+    },
+  },
   parLevel: {
     title: "PAR level",
     body: "The amount you want on the shelf after event reservations. When available stock drops below PAR, the Stock book suggests buying the difference. 0 means no PAR target.",
@@ -59,6 +83,26 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     link: {
       href: "/inventory/purchasing",
       label: "See open purchase needs",
+    },
+  },
+  yieldVariance: {
+    title: "Yield variance",
+    body: "Actual completed-batch output minus planned output. A negative result is under plan; a positive result is over. Different units stay separate.",
+    example:
+      "A batch planned for 10 gal that produces 8 gal has a -2 gal yield variance.",
+    link: {
+      href: "/kitchen/yield",
+      label: "See the event-to-purchase cascade",
+    },
+  },
+  closeout: {
+    title: "Closeout",
+    body: "An event's wrap-up after completion: close out the event, capture revenue, cost, and headcount from source records, then finalize the folio. Later changes require an audited correction.",
+    example:
+      "After the event is closed out, capture the recorded totals and finalize the folio when the reconciliation is ready.",
+    link: {
+      href: "/finance/closeout",
+      label: "See the event-to-purchase cascade",
     },
   },
 };

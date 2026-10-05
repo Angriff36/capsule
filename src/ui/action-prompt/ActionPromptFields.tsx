@@ -32,7 +32,14 @@ export function ActionPromptFields({
     return (
       <div className="grid gap-1">
         <label className="field-label" htmlFor={reasonId}>
-          {request.label}
+          {request.help ? (
+            <span className="field-label-row">
+              {request.label}
+              <FieldHelp term={request.help} />
+            </span>
+          ) : (
+            request.label
+          )}
         </label>
         <textarea
           id={reasonId}

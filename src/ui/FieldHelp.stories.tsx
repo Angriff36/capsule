@@ -8,7 +8,7 @@ const meta: Meta<typeof FieldHelp> = {
     docs: {
       description: {
         component:
-          "Info icon beside a domain field label. Explains the term, how it feeds downstream math, and links to an example. Hover or focus previews; click, Enter or Space pins; Escape closes. Wording lives in `src/ui/fieldHelpTerms.ts`.",
+          "Info icon beside a domain field label. Explains the term, how it feeds downstream math, and opens its place in the event-to-purchase cascade. Hover or focus previews; click, Enter or Space pins; Escape closes. Wording lives in `src/ui/fieldHelpTerms.ts`.",
       },
     },
   },
@@ -37,8 +37,12 @@ export const AllTerms: Story = {
           ["Yield", "yield"],
           ["Yield on a dish", "dishYield"],
           ["Batch multiplier", "batchMultiplier"],
+          ["Demand", "demand"],
+          ["Supersede demand", "supersedeDemand"],
           ["PAR level", "parLevel"],
           ["Purchase", "purchaseEligibility"],
+          ["Yield variance", "yieldVariance"],
+          ["Closeout", "closeout"],
         ] as const
       ).map(([label, term]) => (
         <span key={term} className="field-label-row text-xs font-semibold">

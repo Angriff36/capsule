@@ -3084,6 +3084,12 @@
       "category": "event-payload-changed",
       "acknowledgedAt": "2026-10-05",
       "reason": "Event carries the new optional supersede/calculation fields; subscribers are in-repo reactions."
+    },
+    {
+      "path": "CommandAuditRecord.manifestEventIds",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Optional (json?, nullable in IR) list of event ids written by one command; old audit rows stay valid with none."
     }
   ]
 }

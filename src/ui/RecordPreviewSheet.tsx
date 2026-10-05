@@ -14,9 +14,12 @@ type Props = Readonly<{
   title: string;
   description?: string;
   label?: string;
+  closeLabel?: string;
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  /** A native dialog host, used when this is a nested help sheet. */
+  portalContainer?: HTMLElement | null;
 }>;
 
 const FOCUSABLE =
@@ -28,9 +31,11 @@ export function RecordPreviewSheet({
   title,
   description,
   label = "Item preview",
+  closeLabel = "Close preview",
   onClose,
   children,
   footer,
+  portalContainer,
 }: Props) {
   const panelRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -72,7 +77,20 @@ export function RecordPreviewSheet({
 
   return createPortal(
     <div
+      data-record-preview-sheet
       className="record-preview-backdrop"
+      onKeyDown={(event) => {
+        // A menu/picker inside the sheet owns its first Escape press.
+        if ((event.target as Element).closest("details[open]")) return;
+        if (event.key === "Escape") {
+          if (panelRef.current?.querySelector("[data-action-prompt]")) return;
+          event.preventDefault();
+          event.stopPropagation();
+          onClose();
+          return;
+        }
+        if (event.key === "Tab") trapTabKey(event, panelRef);
+      }}
       onMouseDown={(event) => {
         if (
           event.target === event.currentTarget &&
@@ -100,7 +118,7 @@ export function RecordPreviewSheet({
             ref={closeRef}
             type="button"
             className="record-preview-close"
-            aria-label="Close preview"
+            aria-label={closeLabel}
             onClick={onClose}
           >
             <XIcon />
@@ -112,7 +130,7 @@ export function RecordPreviewSheet({
         ) : null}
       </section>
     </div>,
-    document.body,
+    portalContainer ?? document.body,
   );
 }
 

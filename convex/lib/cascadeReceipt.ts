@@ -13,10 +13,6 @@
 import type { Doc, Id, TableNames } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 
-/** A step transaction runs well under this; its events fall inside it. */
-const STEP_WINDOW_MS = 5_000;
-/** Most event rows read for one step. */
-const MAX_STEP_ROWS = 2_000;
 /** Most links kept for one kind of record. */
 const MAX_LINKS = 25;
 
@@ -81,30 +77,21 @@ function plain(type: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-/** The history row of the step transaction that wrote this event. */
+/** The history row named directly on this event; old unlinked rows stay hidden. */
 async function stepFor(
   ctx: QueryCtx,
   tenantId: string,
   row: Doc<"manifestEvents">,
 ): Promise<Doc<"commandAuditRecords"> | null> {
-  const candidates = await ctx.db
-    .query("commandAuditRecords")
-    .withIndex("by_occurredAt", (q) =>
-      q
-        .gte("occurredAt", row.createdAt - STEP_WINDOW_MS)
-        .lte("occurredAt", row.createdAt),
-    )
-    .collect();
-  const mine = candidates.filter(
-    (audit) =>
-      audit.tenantId === tenantId &&
-      (audit.lastOccurredAt ?? audit.occurredAt ?? 0) >= row.createdAt,
-  );
-  return (
-    mine.find((audit) => audit.manifestEventId === String(row._id)) ??
-    mine.sort((a, b) => (b.occurredAt ?? 0) - (a.occurredAt ?? 0))[0] ??
-    null
-  );
+  const commandAuditId = row.payload.commandAuditId;
+  if (typeof commandAuditId !== "string") return null;
+  const id = ctx.db.normalizeId("commandAuditRecords", commandAuditId);
+  if (!id) return null;
+  const step = await ctx.db.get(id);
+  if (!step || step.tenantId !== tenantId) return null;
+  const eventIds = step.manifestEventIds;
+  if (!Array.isArray(eventIds) || !eventIds.includes(String(row._id))) return null;
+  return step;
 }
 
 async function ownDoc(ctx: QueryCtx, tenantId: string, entityId: string) {
@@ -131,20 +118,21 @@ export async function cascadeReceiptFor(
 ): Promise<CascadeReceipt | null> {
   const step = await stepFor(ctx, tenantId, trigger);
   if (!step || (step.eventCount ?? 1) <= 1) return null;
-  const from = step.occurredAt ?? trigger.createdAt;
-  const to = step.lastOccurredAt ?? trigger.createdAt;
-  // _creationTime and createdAt are both the clock of the same transaction;
-  // a short margin each side keeps rows on the edge.
-  const rows = await ctx.db
-    .query("manifestEvents")
-    .withIndex("by_creation_time", (q) =>
-      q.gte("_creationTime", from - 1_000).lte("_creationTime", to + 1_000),
+  const eventIds = step.manifestEventIds;
+  if (!Array.isArray(eventIds)) return null;
+  const rows = (
+    await Promise.all(
+      eventIds
+        .filter((id): id is string => typeof id === "string")
+        .map(async (id) => {
+          const eventId = ctx.db.normalizeId("manifestEvents", id);
+          return eventId ? await ctx.db.get(eventId) : null;
+        }),
     )
-    .take(MAX_STEP_ROWS);
+  ).filter((row): row is Doc<"manifestEvents"> => row != null);
 
   const byEntity = new Map<string, Map<string, boolean>>();
   for (const row of rows) {
-    if (row.createdAt < from || row.createdAt > to) continue;
     if (row.entityId === trigger.entityId) continue;
     const seen = byEntity.get(row.entity) ?? new Map<string, boolean>();
     if (seen.has(row.entityId)) continue;
@@ -152,7 +140,7 @@ export async function cascadeReceiptFor(
     if (!doc) continue;
     const made =
       typeof doc.createdAt === "number" ? doc.createdAt : doc._creationTime;
-    seen.set(row.entityId, made >= from);
+    seen.set(row.entityId, made >= (step.occurredAt ?? trigger.createdAt));
     byEntity.set(row.entity, seen);
   }
 

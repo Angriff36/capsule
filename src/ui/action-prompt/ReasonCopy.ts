@@ -179,6 +179,7 @@ export const ReasonCopy = {
     title: "Supersede demand",
     description: "Explain what replaces this demand signal.",
     label: "Supersede reason",
+    help: "supersedeDemand",
     placeholder: "e.g. Regenerated after menu change",
     confirmLabel: "Supersede",
   },

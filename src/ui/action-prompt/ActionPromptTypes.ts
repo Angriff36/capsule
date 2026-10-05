@@ -36,6 +36,8 @@ export interface ReasonPromptRequest {
   confirmLabel: string;
   cancelLabel?: string;
   tone?: ActionPromptTone;
+  /** Domain term explained beside the reason label. */
+  help?: FieldHelpTerm;
 }
 
 export interface ConfirmPromptRequest {
