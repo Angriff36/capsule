@@ -36,6 +36,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   client_feedback: "Client feedback",
   debrief: "Team debrief",
   social_post: "Social post",
+  site_visit: "Site visit",
   other: "Other",
 };
 
@@ -207,7 +208,9 @@ export function VenueNotesPanel({ venueId }: Props) {
                         : "Internal"}
                   </span>
                 </div>
-                <p className="text-base text-ink mt-1">{note.content}</p>
+                <p className="text-base text-ink mt-1 whitespace-pre-line">
+                  {note.content}
+                </p>
                 <p className="mt-1 font-mono text-xs text-ink-3">
                   {authorLabel(people, note)}
                   {note.postedAt
