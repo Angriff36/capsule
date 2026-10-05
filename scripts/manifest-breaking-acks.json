@@ -2772,6 +2772,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Venue partner program: optional link from a referral source to the venue that sends its leads; existing sources stay valid unlinked."
+    },
+    {
+      "path": "Dish.exclusiveVenueId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue-exclusive menu items: optional venue a dish is offered only at; existing dishes stay offered anywhere."
     }
   ]
 }

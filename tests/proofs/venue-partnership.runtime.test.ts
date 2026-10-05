@@ -152,4 +152,46 @@ describe("runtime proof: venue partner program", () => {
     expect(ended.partnerTier ?? null).toBeNull();
     expect(ended.partnerSince ?? null).toBeNull();
   });
+
+  it("a dish can be offered only at one venue, then anywhere again", async () => {
+    const proof = harness();
+    const tenantId = "tenant-venue-exclusive";
+    const manager = proof.asRole({
+      subject: `event-manager-${tenantId}`,
+      role: "event_manager",
+      tenantId,
+    });
+    const kitchen = proof.asRole({
+      subject: `kitchen-${tenantId}`,
+      role: "kitchen_manager",
+      tenantId,
+    });
+    const venueId = await registerVenue(proof, manager, "Kindred + Co.", 180);
+    const dish = (await proof.executeCommand(
+      kitchen,
+      M.Dish_createViaIntroduce,
+      {
+        name: "Kindred Charcuterie Tower",
+        portionSize: 1,
+        portionUnit: "portion",
+      },
+    )) as { docId: string };
+    const read = async () =>
+      (await kitchen.query(api.queries.getDish, {
+        id: dish.docId as never,
+      })) as {
+        exclusiveVenueId?: string | null;
+      };
+
+    await proof.executeCommand(kitchen, M.Dish_setExclusiveVenue, {
+      docId: dish.docId,
+      venueId,
+    });
+    expect((await read()).exclusiveVenueId).toBe(venueId);
+
+    await proof.executeCommand(kitchen, M.Dish_setExclusiveVenue, {
+      docId: dish.docId,
+    });
+    expect((await read()).exclusiveVenueId ?? null).toBeNull();
+  });
 });

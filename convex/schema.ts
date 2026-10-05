@@ -696,6 +696,7 @@ export default defineSchema({
     usesMainRecipe: v.optional(v.union(v.boolean(), v.null())),
     finishTiming: v.optional(v.union(v.literal("finish_at_kitchen"), v.literal("finish_at_event"), v.literal("day_of"), v.null())),
     recipeDishId: v.optional(v.union(v.string(), v.null())),
+    exclusiveVenueId: v.optional(v.union(v.id("venues"), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
@@ -704,6 +705,7 @@ export default defineSchema({
     .index("by_versionOfDishId", ["versionOfDishId"])
     .index("by_canonicalDishId", ["canonicalDishId"])
     .index("by_mergedIntoDishId", ["mergedIntoDishId"])
+    .index("by_exclusiveVenueId", ["exclusiveVenueId"])
     .index("by_primaryImageStorageId", ["primaryImageStorageId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   dishComponents: defineTable({

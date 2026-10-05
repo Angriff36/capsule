@@ -743,6 +743,7 @@ export const DishSchema = z.object({
   usesMainRecipe: z.boolean().nullable().optional(),
   finishTiming: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]).nullable().optional(),
   recipeDishId: z.string().uuid().nullable().optional(),
+  exclusiveVenueId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -6256,6 +6257,13 @@ export const DishSaveServiceInstructionsParamsSchema = z.object({
 });
 
 export type DishSaveServiceInstructionsParams = z.infer<typeof DishSaveServiceInstructionsParamsSchema>;
+
+// Command: setExclusiveVenue on Dish
+export const DishSetExclusiveVenueParamsSchema = z.object({
+  venueId: z.string().min(1).optional(),
+});
+
+export type DishSetExclusiveVenueParams = z.infer<typeof DishSetExclusiveVenueParamsSchema>;
 
 // Command: setFinishTiming on Dish
 export const DishSetFinishTimingParamsSchema = z.object({

@@ -64,6 +64,9 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // separate from the event-wide service style. Null = not set.
   property finishTiming: FinishTiming?
   property recipeDishId: uuid?
+  // Venue-exclusive menu item (Mangia Venue Partner Playbook section 07): a
+  // dish offered only at one partner venue. Null = offered anywhere.
+  property exclusiveVenueId: uuid?
 
   hasMany ingredientLines: DishIngredient
   hasMany componentLines: DishComponent
@@ -71,6 +74,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   belongsTo canonicalDish: Dish fields [tenantId, canonicalDishId] references [tenantId, id]
   belongsTo versionOf: Dish fields [tenantId, versionOfDishId] references [tenantId, id]
   belongsTo mergedIntoDish: Dish fields [tenantId, mergedIntoDishId] references [tenantId, id]
+  ref exclusiveVenue: Venue fields [tenantId, exclusiveVenueId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
   computed isRetired: boolean = self.status == "retired"
@@ -360,6 +364,16 @@ entity Dish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate finishTiming = null
     emit DishFinishTimingSet {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Offer this dish only at one venue; blank offers it anywhere again.
+  command setExclusiveVenue(optional venueId: uuid) {
+    guard self.deletedAt == null
+    mutate exclusiveVenueId = venueId
+    emit DishExclusiveVenueSet {
       dishId: self.id
       tenantId: self.tenantId
     }
@@ -878,6 +892,11 @@ event DishRecipeSourceChanged: "dish.recipe_source_changed" {
 }
 
 event DishFinishTimingSet: "dish.finish_timing_set" {
+  dishId: string
+  tenantId: string
+}
+
+event DishExclusiveVenueSet: "dish.exclusive_venue_set" {
   dishId: string
   tenantId: string
 }
