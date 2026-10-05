@@ -63,6 +63,9 @@ export interface TppEventRecord {
   ClientFirstName?: string;
   ClientLastName?: string;
   Occasion?: string;
+  /** "Referred From" and "Sales Person" on the event list report, by name. */
+  ReferredFrom?: string;
+  SalesPersonName?: string;
   /**
    * PL-IMPORT-RESUME (AC-024): files that belong to the event (contract, BEO,
    * floor plan). The bytes are uploaded first; the row carries the stored id.
@@ -214,6 +217,10 @@ export interface ParsedCapsuleEvent {
   externalId: string;
   title: string;
   occasionId?: string;
+  /** Printed occasion, referral source and sales person (event list report). */
+  occasionName?: string;
+  referralSourceName?: string;
+  ownerName?: string;
   serviceStyleId?: string;
   startsAt?: number;
   endsAt?: number;
@@ -598,6 +605,9 @@ export function mapTppAllergens(value?: string): string[] {
   return out;
 }
 
+const printedText = (key: string, text: string | undefined) =>
+  text?.trim() ? { [key]: text.trim() } : {};
+
 /**
  * Parse TPP Event record to Capsule format
  */
@@ -620,6 +630,9 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
     occasionId: record.EventType
       ? record.EventType.toLowerCase().replace(/\s+/g, "_")
       : undefined,
+    ...printedText("occasionName", record.Occasion),
+    ...printedText("referralSourceName", record.ReferredFrom),
+    ...printedText("ownerName", record.SalesPersonName),
     serviceStyleId: record.ServiceStyle?.toLowerCase().replace(/\s+/g, "_"),
     startsAt,
     endsAt,

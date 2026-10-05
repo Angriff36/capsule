@@ -68,6 +68,7 @@ import type * as importCancel from "../importCancel.js";
 import type * as importClientByName from "../importClientByName.js";
 import type * as importCommit from "../importCommit.js";
 import type * as importCoordinator from "../importCoordinator.js";
+import type * as importEventLookups from "../importEventLookups.js";
 import type * as importHistory from "../importHistory.js";
 import type * as importPaymentMatch from "../importPaymentMatch.js";
 import type * as importPipeline from "../importPipeline.js";
@@ -400,6 +401,7 @@ declare const fullApi: ApiFromModules<{
   importClientByName: typeof importClientByName;
   importCommit: typeof importCommit;
   importCoordinator: typeof importCoordinator;
+  importEventLookups: typeof importEventLookups;
   importHistory: typeof importHistory;
   importPaymentMatch: typeof importPaymentMatch;
   importPipeline: typeof importPipeline;
