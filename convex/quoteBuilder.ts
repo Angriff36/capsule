@@ -850,6 +850,10 @@ export const processQuoteSubmission = action({
               occasionId: submission.occasionId ?? undefined,
               venueName: submission.venueName ?? undefined,
               venueAddress: submission.venueAddress ?? undefined,
+              // The event keeps the lead's "how they heard about us", so
+              // reports filtered by referral source and the venue partner
+              // figures count it.
+              referralSourceId: submission.referralSourceId ?? undefined,
               // Dietary needs are a menu matter: they sit with the menu
               // notes the kitchen reads, never in the operations notes
               // (which the packet prints as setup and load-in notes).
