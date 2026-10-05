@@ -1,16 +1,18 @@
-# Demand calculation provenance repair
+# Flexible unit entry — round 4 plan
 
 ## Goal
-Implement a truthful, policy-enforcing expandable provenance panel for ingredient demand rows, preserving existing work and generated ownership.
+
+Allow recipe ingredient and sub-recipe quantity fields to accept compact kitchen input, show an inline catalog-unit conversion or incompatibility warning, and save the entered compatible unit without downstream ambiguity.
 
 ## Phases
-- [complete] Inspect current implementation, required docs, and missing references.
-- [complete] Repair authored Manifest and Convex provenance data/history/query seams.
-- [complete] Repair ledger UI, extracted view model, and styles.
-- [blocked] Regenerate owned output and run focused/static gates (the commit-required drift gate cannot pass on the pre-existing uncommitted diff).
-- [blocked] Run disposable Playwright verification and remove it (the temporary test was removed, but the worktree has neither a configured local app nor an isolated Playwright runner).
 
-## Errors
-- Initial inventory command failed due to PowerShell `$_:` interpolation; rerun with `${_}`.
-- `bun run check` stops at `check:wiring-drift` because owned generated files are intentionally uncommitted; `manifest:regen:check` reports the same commit-required condition.
-- The disposable Playwright invocation resolved conflicting parent-checkout Playwright packages and found no runnable tests; the temporary spec was deleted.
+- [x] Inspect the existing round-3 diff, unit engine, recipe editors, tests, UI contract, and the #435 supply-manifest failure.
+- [x] Make the targeted test and #435 seam fixes.
+- [x] Check presentation vocabulary and record the result.
+- [ ] Run every required gate separately and record its exit status.
+- [ ] Perform the disposable Playwright verification against the worktree app, clean its records and artifacts, and record the observed result.
+- [ ] Rewrite the planning records as single, non-contradictory documents and prepare the worktree for independent review.
+
+## Scope boundaries
+
+No Manifest source or generated files, deployment, Clerk-user changes, or production services. The #435 repair is limited to extracting the existing read hook into the established `features/facilities` seam location.

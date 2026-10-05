@@ -1,9 +1,22 @@
-# Progress
+# Flexible unit entry — progress
 
-- Began implementation repair and read primary design, Convex, and planning guidance.
-## 2026-10-04
+## Completed
 
-- Preserved the existing dirty feature worktree and began a focused repair against the supplied independent-review findings.
-- Read the design, domain-gating, command-surface, proof-kit, and Convex guidance. The existing provenance query confirms the reported empty recalculation diff, zero-time supersession, hard-coded roles, and capped contribution scan.
-- Added the generated composite contribution index and inventory read policies, made provenance totals unit-safe, switched supersession history to its stored event time, and rendered ordered saved calculation steps.
-- Passed focused demand proofs (8 tests), typecheck, format check, and Vite build. Full check and regeneration drift check correctly require committing the existing generated diff. The requested disposable Playwright test was removed after its runner failed before test discovery because this worktree has no local runtime configuration and resolves incompatible parent Playwright packages.
+- Inspected the prior implementation and confirmed its unit-list test drift, exponent-format gap, and #435 gate failure.
+- Replaced the copied test vocabulary with `UNIT_OF_MEASURE`, added `1e-7` to every-unit round trips, and added the explicit fixed-decimal assertion.
+- Extracted the unchanged demand-provenance query into the facilities hook seam.
+- Ran `bunx vitest run tests/culinary-model-acceptance.test.ts` separately: exit code 0, 35 tests passed. Recorded in `.artifacts/gate-focused-vitest.txt`.
+- Ran `bun scripts/check-design-vocab.ts`: exit code 0. Recorded in `.artifacts/gate-design-vocab.txt`.
+
+## Browser verification
+
+Pending. The prior `node -e` Clerk check was invalid because PowerShell's nested quoting mangled the line split, leaving `CLERK_SECRET_KEY` undefined and sending `Bearer undefined`. The standalone script parsed `.env.local` and successfully created an Angriff36 sign-in ticket. This round uses only one standalone `.cjs` verifier with a real line parser; it will report each required save/reload assertion and clean all disposable data before completion.
+
+## Remaining gates
+
+- `bun run typecheck`
+- `bun run format:check`
+- `bun run build`
+- `bun run check`
+
+Each will run separately and record its own exit code.
