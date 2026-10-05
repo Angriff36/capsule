@@ -59,6 +59,17 @@ export function formatMoneyExact(n: number | null | undefined): string {
   return n == null ? "—" : exactMoneyFmt.format(n);
 }
 
+/**
+ * A stored code such as "private_party" read as words ("Private party") for
+ * clients. Text a person typed with spaces or capitals stays as typed.
+ */
+export function formatCodeAsWords(value: string): string {
+  const text = value.trim();
+  if (!/^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(text)) return text;
+  const words = text.replace(/[_-]/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export function formatCount(n: number | null | undefined): string {
   return n == null ? "—" : numFmt.format(n);
 }

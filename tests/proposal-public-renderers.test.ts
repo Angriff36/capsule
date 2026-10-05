@@ -59,7 +59,7 @@ describe("proposal public renderers", () => {
         taxAmount: 8,
         discountAmount: 0,
         total: 108,
-        expiresAt: Date.UTC(2026, 8, 30),
+        expiresAt: Date.UTC(2099, 8, 30),
         notes: "Frozen client note",
         terms: "Frozen terms",
         visibleSections: ["event_summary", "menu_sections", "terms"],
@@ -161,6 +161,60 @@ describe("proposal public renderers", () => {
     expect(logo?.getAttribute("alt")).toBe("Garden Hall");
     expect(row?.textContent?.indexOf("Mangia Catering Co.")).toBe(0);
     await act(async () => root.unmount());
+  });
+
+  it("says when the offer's own end date has passed and shows a stored service code as words", async () => {
+    queryResult = {
+      ok: true,
+      proposal: {
+        title: "Old offer",
+        proposalNumber: "P-2",
+        eventDate: Date.UTC(2026, 8, 11),
+        eventType: "private_party",
+        guestCount: 64,
+        venueName: "Willow Barn",
+        venueAddress: null,
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        expiresAt: Date.UTC(2020, 8, 25),
+        notes: null,
+        terms: null,
+        visibleSections: [],
+      },
+      venueLogistics: null,
+      clientName: "Jessica",
+      lineItems: [],
+      enhancements: [],
+      dishSelections: [],
+      pictures: [],
+      timeline: [],
+      revisionNumber: 1,
+      capturedAt: Date.UTC(2020, 8, 1),
+      linkCreatedAt: null,
+      linkExpiresAt: null,
+    };
+    const text = await mountedText(
+      createElement(SharedProposalPage, { token: "token" }),
+    );
+    expect(text).toContain("Offer ended");
+    expect(text).not.toContain("Valid through");
+    expect(text).toContain("This offer was good through");
+    expect(text).toContain("Please ask us to confirm");
+    expect(text).toContain("Private party");
+    expect(text).not.toContain("private_party");
+
+    // A replaced proposal already points to the new one: no second warning.
+    queryResult = {
+      ...queryResult,
+      replacedBy: { title: "New offer", shareToken: null },
+    };
+    const replaced = await mountedText(
+      createElement(SharedProposalPage, { token: "token" }),
+    );
+    expect(replaced).toContain("This proposal was replaced by New offer.");
+    expect(replaced).not.toContain("This offer was good through");
   });
 
   it("keeps the signing control available when presentation hides the acceptance CTA and terms", async () => {

@@ -1,7 +1,12 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../lib/api";
-import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
+import {
+  formatCodeAsWords,
+  formatDate,
+  formatMoneyExact,
+  formatTime,
+} from "../../lib/format";
 import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
@@ -102,6 +107,8 @@ export function SharedProposalPage({ token }: { token: string }) {
   const sectionVisible = (section: string) =>
     proposal.visibleSections.length === 0 ||
     proposal.visibleSections.includes(section);
+  // The link can outlive the offer's own end date: say so, never hide it.
+  const offerEnded = proposal.expiresAt != null && proposal.expiresAt < clock;
   const formattedDate = proposal.eventDate
     ? formatDate(proposal.eventDate)
     : "TBD";
@@ -184,7 +191,9 @@ export function SharedProposalPage({ token }: { token: string }) {
         {proposal.eventType && (
           <div className="flex justify-between">
             <span className="text-ink-2">Service:</span>
-            <span className="font-medium">{proposal.eventType}</span>
+            <span className="font-medium">
+              {formatCodeAsWords(proposal.eventType)}
+            </span>
           </div>
         )}
       </div>
@@ -407,7 +416,8 @@ export function SharedProposalPage({ token }: { token: string }) {
             </p>
             {proposal.expiresAt ? (
               <p className="text-ink-3 text-2xs mt-1">
-                Valid through {formatDate(proposal.expiresAt)}
+                {offerEnded ? "Offer ended" : "Valid through"}{" "}
+                {formatDate(proposal.expiresAt)}
               </p>
             ) : null}
           </div>
@@ -429,6 +439,17 @@ export function SharedProposalPage({ token }: { token: string }) {
                   ) : (
                     "Ask us for the link to the new proposal."
                   )}
+                </p>
+              </div>
+            ) : null}
+            {offerEnded && !data.replacedBy ? (
+              <div className="bg-warning-soft border-l-4 border-warning p-4 mb-6">
+                <p className="text-ink">
+                  This offer was good through {formatDate(proposal.expiresAt)}.
+                </p>
+                <p className="text-2xs text-ink-2 mt-1">
+                  Prices and dates may have changed. Please ask us to confirm
+                  them before you go ahead.
                 </p>
               </div>
             ) : null}
