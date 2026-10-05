@@ -202,6 +202,41 @@ describe("ComponentTextParser", () => {
     expect(butter.instructions?.split("\n")).toHaveLength(2);
   });
 
+  it("keeps sub-steps, wrapped step text and unmeasured lines from the macaroni salad sheet", () => {
+    // Typed from work/recipes/prep recipe1.jpg as it pastes from the doc.
+    const salad = new ComponentTextParser().parse(
+      readFixture("kitchen/Macaroni_Salad.txt"),
+    );
+    expect([salad.yieldQuantity, salad.yieldUnit]).toEqual([3, "quart"]);
+    expect(salad.lines.map((line) => line.name)).toEqual([
+      "Whole Milk",
+      "Mayonnaise",
+      "Brown Sugar",
+      "Salt And Pepper",
+      "Elbow Macaroni",
+      "Cider Vinegar",
+      "Scallions",
+      "Carrot",
+      "Celery Rib",
+    ]);
+    expect(salad.lines[3]).toMatchObject({ quantity: null, unit: null });
+    expect(salad.lines[6]).toMatchObject({
+      quantity: 4,
+      prepNotes: "sliced thin",
+    });
+    const steps = salad.instructions?.split("\n") ?? [];
+    expect(steps[0]).toBe("1. Make dressing");
+    expect(steps[1]).toBe(
+      "   a. Whisk ¾ cups milk, 1 ½ cup mayonnaise, sugar, 1/2 teaspoon salt, and 2 teaspoons pepper in bowl",
+    );
+    expect(steps[2]).toBe("2. Cook pasta");
+    expect(steps[4]).toBe(
+      "   b. Add 1 tablespoon salt and pasta and cook until very soft, about 15 minutes",
+    );
+    expect(steps.filter((step) => /^\d+\. /.test(step))).toHaveLength(4);
+    expect(steps).toHaveLength(15);
+  });
+
   it("does not take a 'per 5 pounds of chicken' note or an ingredient amount as the yield", () => {
     const parser = new ComponentTextParser();
     const brine = parser.parse(readFixture("kitchen/BBQ_Chicken_Brine.txt"));

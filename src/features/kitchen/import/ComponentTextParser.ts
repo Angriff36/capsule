@@ -246,23 +246,7 @@ export class ComponentTextParser {
     const start = lines.findIndex((line) =>
       /^(ingredients?|components?)\s*:?\s*$/i.test(line),
     );
-    if (start < 0) {
-      // No INGREDIENTS heading: every measured line is an ingredient, and a
-      // "(FRESH)" line under one is the end of that ingredient wrapped over.
-      const block: string[] = [];
-      lines.forEach((line, index) => {
-        if (this.looksLikeIngredient(line)) {
-          block.push(line);
-        } else if (
-          this.isWrappedNote(line) &&
-          index > 0 &&
-          this.looksLikeIngredient(lines[index - 1])
-        ) {
-          block[block.length - 1] += `, ${line.slice(1, -1).trim()}`;
-        }
-      });
-      return block;
-    }
+    if (start < 0) return this.readUnheadedSheet(lines).ingredients;
     const block: string[] = [];
     for (let i = start + 1; i < lines.length; i += 1) {
       const line = lines[i];
@@ -295,7 +279,10 @@ export class ComponentTextParser {
     const ingredientStart = lines.findIndex((line) =>
       /^(ingredients?|components?)\s*:?\s*$/i.test(line),
     );
-    if (ingredientStart < 0) return this.extractUnheadedSteps(lines);
+    if (ingredientStart < 0) {
+      const { steps } = this.readUnheadedSheet(lines);
+      return steps.length ? steps.join("\n") : undefined;
+    }
     let stepStart = -1;
     for (let i = ingredientStart + 1; i < lines.length; i += 1) {
       if (this.isMethodStepLine(lines[i])) {
@@ -315,41 +302,70 @@ export class ComponentTextParser {
    * Kitchen recipe sheets often have no headings: name, yield, measured lines,
    * then the steps. Some work in stages (two ingredients, "1. MELT BUTTER",
    * three more, "1. ADD TO ROUX"), so each stage restarts at 1; the steps keep
-   * their order and are numbered straight through. Plain sentences wrapped
-   * over several lines become one step per paragraph.
+   * their order and are numbered straight through. "a. / b." sub-steps stay
+   * under their step. Step text wrapped onto the next line ("... 1 ½ cup
+   * mayonnaise, and" / "2 teaspoons pepper in bowl") stays with its step, never
+   * an ingredient. Plain sentences wrapped over several lines become one step
+   * per paragraph. An unmeasured line under an ingredient ("Salt and pepper")
+   * is an ingredient with no amount; a "(FRESH)" line is that ingredient's note.
    */
-  private extractUnheadedSteps(lines: string[]): string | undefined {
+  private readUnheadedSheet(lines: string[]): {
+    ingredients: string[];
+    steps: string[];
+  } {
+    const ingredients: string[] = [];
+    const steps: string[] = [];
     const first = lines.findIndex(
       (line) => this.looksLikeIngredient(line) || this.isMethodStepLine(line),
     );
-    if (first < 0) return undefined;
-    const steps: string[] = [];
+    if (first < 0) return { ingredients, steps };
+    let stepNumber = 0;
+    let previous: "blank" | "ingredient" | "step" | "prose" = "blank";
     let paragraph: string[] = [];
     const endParagraph = () => {
-      if (paragraph.length) steps.push(paragraph.join(" "));
+      if (paragraph.length) {
+        stepNumber += 1;
+        steps.push(`${stepNumber}. ${paragraph.join(" ")}`);
+      }
       paragraph = [];
     };
-    lines.slice(first).forEach((line, offset) => {
-      const index = first + offset;
-      if (!line || this.looksLikeIngredient(line)) {
+    for (const line of lines.slice(first)) {
+      if (!line) {
         endParagraph();
-        return;
-      }
-      if (
-        this.isWrappedNote(line) &&
-        this.looksLikeIngredient(lines[index - 1])
-      )
-        return;
-      if (this.isMethodStepLine(line)) {
+        previous = "blank";
+      } else if (this.isMethodStepLine(line)) {
         endParagraph();
-        steps.push(line.replace(/^\s*(?:\d+|[a-z])[.)]\s*/i, ""));
-        return;
+        const marker = line
+          .replace(/^[-*•]\s*/, "")
+          .match(/^(\d+|[a-z])[.)]+/i);
+        const text = line
+          .replace(/^[-*•]\s*/, "")
+          .replace(/^(?:\d+|[a-z])[.)]+\s*/i, "");
+        if (marker && /^[a-z]$/i.test(marker[1]) && stepNumber > 0) {
+          steps.push(`   ${marker[1].toLowerCase()}. ${text}`);
+        } else {
+          stepNumber += 1;
+          steps.push(`${stepNumber}. ${text}`);
+        }
+        previous = "step";
+      } else if (previous === "step") {
+        steps[steps.length - 1] += ` ${line}`;
+      } else if (previous === "prose") {
+        paragraph.push(line);
+      } else if (this.looksLikeIngredient(line)) {
+        ingredients.push(line);
+        previous = "ingredient";
+      } else if (previous === "ingredient" && this.isWrappedNote(line)) {
+        ingredients[ingredients.length - 1] += `, ${line.slice(1, -1).trim()}`;
+      } else if (previous === "ingredient") {
+        ingredients.push(line);
+      } else {
+        paragraph.push(line);
+        previous = "prose";
       }
-      paragraph.push(line);
-    });
+    }
     endParagraph();
-    if (steps.length === 0) return undefined;
-    return steps.map((step, index) => `${index + 1}. ${step}`).join("\n");
+    return { ingredients, steps };
   }
 
   private isTeaspoonShorthand(unitMatch: RegExpMatchArray): boolean {
