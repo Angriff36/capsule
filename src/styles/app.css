@@ -222,6 +222,50 @@
     @apply rounded-md border border-line bg-panel shadow-[0_1px_2px_rgb(30_40_36/0.05),0_2px_8px_-2px_rgb(30_40_36/0.08)];
   }
 
+  .lifecycle-stepper {
+    @apply border-y border-line bg-inset px-3 py-3;
+  }
+  .lifecycle-stepper-track {
+    @apply flex min-w-max items-start gap-0 overflow-x-auto pb-1;
+  }
+  .lifecycle-step {
+    @apply relative grid min-w-28 flex-1 grid-rows-[20px_auto_auto] gap-1 text-center text-xs font-semibold text-ink-3;
+  }
+  .lifecycle-step:not(:last-child)::after {
+    position: absolute;
+    top: 9px;
+    left: calc(50% + 12px);
+    width: calc(100% - 24px);
+    height: 1px;
+    background: var(--color-line-2);
+    content: "";
+  }
+  .lifecycle-step-dot {
+    @apply z-10 mx-auto grid h-5 w-5 place-items-center rounded-full border border-line-2 bg-panel text-xs text-ink-3;
+  }
+  .lifecycle-step-completed .lifecycle-step-dot {
+    @apply border-ok bg-ok text-on-brand;
+  }
+  .lifecycle-step-current .lifecycle-step-dot,
+  .lifecycle-step-next .lifecycle-step-dot {
+    @apply border-brand bg-brand text-on-brand;
+  }
+  .lifecycle-step-current .lifecycle-step-label {
+    @apply text-ink;
+  }
+  .lifecycle-step-next .lifecycle-step-label {
+    @apply text-brand;
+  }
+  .lifecycle-step-action {
+    @apply justify-self-center normal-case;
+  }
+  .lifecycle-stepper-branches {
+    @apply mt-3 flex flex-wrap gap-2 border-t border-line pt-3;
+  }
+  .lifecycle-stepper-branch {
+    @apply mt-2 text-sm text-ink-2;
+  }
+
   /* --- DESIGN.md document grammar -------------------------------------- */
 
   /* fact-pair: `VENUE: Willow Barn`. The default way a value is shown. */

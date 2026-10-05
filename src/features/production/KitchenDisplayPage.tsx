@@ -26,6 +26,8 @@ import {
   type PrepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { productionBatchLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import "./KitchenDisplayPage.css";
 
 const policy = new ProductionLifecyclePolicy();
@@ -351,6 +353,13 @@ export function KitchenDisplayPage() {
                       }
                     />
                   </label>
+                ) : null}
+                {item.kind === "batch" ? (
+                  <LifecycleStepper
+                    definition={productionBatchLifecycle}
+                    status={item.status}
+                    actions={[]}
+                  />
                 ) : null}
                 {bumpAction ? (
                   <button

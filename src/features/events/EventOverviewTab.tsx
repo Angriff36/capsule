@@ -16,7 +16,9 @@ import { EventReadinessCard } from "./EventReadinessCard";
 import { EventOverviewRail } from "./EventOverviewRail";
 import { EventPipelineStageCard } from "./EventPipelineStageCard";
 import { EventSetupProgress } from "./EventSetupProgress";
-import { EventStageActionsCard } from "./EventStageActionsCard";
+import { EventOverviewCard } from "./EventOverviewCard";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { eventLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
 import { EventWeatherPanel } from "./EventWeatherPanel";
 import { EventReviewFlagsSection } from "./review-flags/EventReviewFlagsSection";
@@ -99,6 +101,9 @@ export function EventOverviewTab({
   ...reviseProps
 }: Props) {
   const eventId = reviseProps.eventId;
+  const stepperActions = eventLifecycle.actions.filter((action) =>
+    lifecycleActions.some((available) => available.key === action.key),
+  );
   const editHref = `${eventDetailPath(eventId, "overview")}#event-setup-basics`;
 
   return (
@@ -106,11 +111,20 @@ export function EventOverviewTab({
       <div className="event-overview-grid">
         <div className="event-overview-main">
           <EventPipelineStageCard stage={stage} />
-          <EventStageActionsCard
-            actions={lifecycleActions}
-            busy={reviseProps.busy}
-            onAction={onAction}
-          />
+          <EventOverviewCard title="Stage actions" testId="event-stage-actions">
+            <LifecycleStepper
+              definition={eventLifecycle}
+              status={stage}
+              actions={stepperActions}
+              busy={reviseProps.busy}
+              onAction={(key) => {
+                const action = lifecycleActions.find(
+                  (item) => item.key === key,
+                );
+                if (action) onAction(action.key);
+              }}
+            />
+          </EventOverviewCard>
           <EventReviewFlagsSection eventId={eventId} />
           <EventImportDraftPanel eventId={eventId} />
           <EventPacketPanel eventId={eventId} />

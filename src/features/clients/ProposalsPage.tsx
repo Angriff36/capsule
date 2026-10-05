@@ -48,6 +48,8 @@ import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 import { useActionNotice } from "../../ui/action-result";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { proposalLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import {
   projectProposalPdf,
   downloadProjectedProposalPdf,
@@ -779,21 +781,18 @@ export function ProposalsPage() {
                             )}
                           </>
                         )}
-                        {policy
-                          .proposalActions(String(row.status))
-                          .map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost"
-                              type="button"
-                              disabled={busy != null}
-                              onClick={() => invoke(row, action.key)}
-                            >
-                              {action.key === "send"
-                                ? "Publish proposal"
-                                : action.label}
-                            </button>
-                          ))}
+                        <LifecycleStepper
+                          definition={proposalLifecycle}
+                          status={String(row.status)}
+                          actions={proposalLifecycle.actions.filter(
+                            (candidate) =>
+                              policy
+                                .proposalActions(String(row.status))
+                                .some((action) => action.key === candidate.key),
+                          )}
+                          busy={busy != null}
+                          onAction={(key) => invoke(row, key)}
+                        />
                         {String(row.status) === "accepted" ? (
                           <>
                             <ProposalChangeAction
