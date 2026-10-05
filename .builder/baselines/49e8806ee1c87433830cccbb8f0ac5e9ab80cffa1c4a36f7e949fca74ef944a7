@@ -841,6 +841,13 @@ import {
   SyncErrorMarkResolvedParamsSchema,
   SyncErrorRecordParamsSchema,
   SyncErrorReopenParamsSchema,
+  TastingCancelParamsSchema,
+  TastingDishAddParamsSchema,
+  TastingDishMarkOnProposalParamsSchema,
+  TastingDishRecordFeedbackParamsSchema,
+  TastingMarkSelectionsAppliedParamsSchema,
+  TastingMarkTastedParamsSchema,
+  TastingScheduleParamsSchema,
   TaxRateDefineParamsSchema,
   TaxRateReviseParamsSchema,
   TaxRateSetActiveParamsSchema,
@@ -12582,6 +12589,118 @@ export function useCreateSyncError() {
   };
 }
 
+/** Reactive list for Tasting. */
+export function useListTasting() {
+  return useQuery(api.queries.listTasting);
+}
+
+/** Reactive get-by-id for Tasting. Pass "skip" to suspend. */
+export function useGetTasting(id: string | "skip") {
+  return useQuery(api.queries.getTasting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Tasting.cancel. */
+export function useTastingCancel() {
+  const mutate = useMutation(api.mutations.Tasting_cancel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Tasting.markSelectionsApplied. */
+export function useTastingMarkSelectionsApplied() {
+  const mutate = useMutation(api.mutations.Tasting_markSelectionsApplied);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingMarkSelectionsAppliedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Tasting.markTasted. */
+export function useTastingMarkTasted() {
+  const mutate = useMutation(api.mutations.Tasting_markTasted);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingMarkTastedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Tasting.schedule. */
+export function useTastingSchedule() {
+  const mutate = useMutation(api.mutations.Tasting_schedule);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for Tasting.schedule. */
+export function useCreateTasting() {
+  const mutate = useMutation(api.mutations.Tasting_createViaSchedule);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for TastingDish. */
+export function useListTastingDish() {
+  return useQuery(api.queries.listTastingDish);
+}
+
+/** Reactive get-by-id for TastingDish. Pass "skip" to suspend. */
+export function useGetTastingDish(id: string | "skip") {
+  return useQuery(api.queries.getTastingDish, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for TastingDish.add. */
+export function useTastingDishAdd() {
+  const mutate = useMutation(api.mutations.TastingDish_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TastingDish.markOnProposal. */
+export function useTastingDishMarkOnProposal() {
+  const mutate = useMutation(api.mutations.TastingDish_markOnProposal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishMarkOnProposalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TastingDish.recordFeedback. */
+export function useTastingDishRecordFeedback() {
+  const mutate = useMutation(api.mutations.TastingDish_recordFeedback);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishRecordFeedbackParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for TastingDish.add. */
+export function useCreateTastingDish() {
+  const mutate = useMutation(api.mutations.TastingDish_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for TaxRate. */
 export function useListTaxRate() {
   return useQuery(api.queries.listTaxRate);
@@ -14511,4 +14630,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1533 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1546 as const;

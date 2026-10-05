@@ -824,6 +824,16 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.SyncError_createViaRecord, { "sourceSystem": "demo-sourceSystem-1", "recordType": "demo-recordType-1", "externalId": "externalId-sync-error-1", "kind": "demo-kind-1", "errorMessage": "demo-errorMessage-1", "rawPayload": "demo-rawPayload-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.SyncError_createViaRecord, { "sourceSystem": "demo-sourceSystem-2", "recordType": "demo-recordType-2", "externalId": "externalId-sync-error-2", "kind": "demo-kind-2", "errorMessage": "demo-errorMessage-2", "rawPayload": "demo-rawPayload-2" } as any);
+  // Tasting → api.mutations.Tasting_createViaSchedule
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Tasting_createViaSchedule, { "leadId": "leadId-tasting-1", "proposalId": "proposalId-tasting-1", "eventId": "eventId-tasting-1", "scheduledAt": 1767268800000, "durationMinutes": 1, "location": "demo-location-1", "guestCount": 1, "attendeeNames": "Tasting 1", "notes": "demo-notes-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Tasting_createViaSchedule, { "leadId": "leadId-tasting-2", "proposalId": "proposalId-tasting-2", "eventId": "eventId-tasting-2", "scheduledAt": 1767355200000, "durationMinutes": 2, "location": "demo-location-2", "guestCount": 2, "attendeeNames": "Tasting 2", "notes": "demo-notes-2" } as any);
+  // TastingDish → api.mutations.TastingDish_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.TastingDish_createViaAdd, { "tastingId": "tastingId-tasting-dish-1", "menuId": "menuId-tasting-dish-1", "dishId": "dishId-tasting-dish-1", "portionCount": 1, "sortOrder": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.TastingDish_createViaAdd, { "tastingId": "tastingId-tasting-dish-2", "menuId": "menuId-tasting-dish-2", "dishId": "dishId-tasting-dish-2", "portionCount": 2, "sortOrder": 2 } as any);
   // TaxRate → api.mutations.TaxRate_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.TaxRate_createViaDefine, { "name": "TaxRate 1", "percentage": 1, "appliesToFood": false, "appliesToService": false, "appliesToRental": false } as any);
@@ -1824,6 +1834,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "SyncError",
       "createMutation": "SyncError_createViaRecord",
+      "rowCount": 2
+    },
+    {
+      "entity": "Tasting",
+      "createMutation": "Tasting_createViaSchedule",
+      "rowCount": 2
+    },
+    {
+      "entity": "TastingDish",
+      "createMutation": "TastingDish_createViaAdd",
       "rowCount": 2
     },
     {

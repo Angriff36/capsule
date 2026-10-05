@@ -1,5 +1,9 @@
 # Findings
 
+- Feature targets production prep tasks and production batches.
+- Candidate authored UI lives under `src/features/production/`; Manifest sources live under `src/production/`.
+- Existing label/print related components include `src/ui/BarcodeLabel.tsx` and event/report label surfaces; exact reuse remains to be determined.
+
 ## Initial
 - The feature must reuse real event and shift semantics discovered in this checkout; the supplied implementation brief is only a hypothesis.
 - This change includes authored UI, so DESIGN.md and the component catalog must guide implementation.

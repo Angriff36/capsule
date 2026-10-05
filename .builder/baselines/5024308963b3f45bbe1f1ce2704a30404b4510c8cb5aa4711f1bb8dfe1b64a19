@@ -4404,6 +4404,54 @@ export const SyncErrorSchema = z.object({
 
 export type SyncError = z.infer<typeof SyncErrorSchema>;
 
+// Entity: Tasting
+export const TastingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  leadId: z.string().uuid().nullable().optional(),
+  proposalId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  scheduledAt: z.coerce.date(),
+  durationMinutes: z.number().int().default(60),
+  location: z.string().nullable().optional(),
+  guestCount: z.number().int().default(1),
+  attendeeNames: z.array(z.string()).nullable().optional(),
+  notes: z.string().nullable().optional(),
+  createdByPersonId: z.string().uuid().nullable().optional(),
+  status: z.enum(["scheduled", "completed", "selectionsApplied", "cancelled"]).default("scheduled"),
+  completedAt: z.coerce.date().nullable().optional(),
+  cancelledAt: z.coerce.date().nullable().optional(),
+  selectionsAppliedAt: z.coerce.date().nullable().optional(),
+  bookedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type Tasting = z.infer<typeof TastingSchema>;
+
+// Entity: TastingDish
+export const TastingDishSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  tastingId: z.string().uuid(),
+  menuId: z.string().uuid(),
+  dishId: z.string().uuid(),
+  portionCount: z.number().int().default(1),
+  sortOrder: z.number().int().default(0),
+  clientRating: z.number().int().nullable().optional(),
+  clientFeedback: z.string().nullable().optional(),
+  decision: z.enum(["pending", "approved", "rejected", "maybe"]).default("pending"),
+  appliedToProposalId: z.string().uuid().nullable().optional(),
+  appliedAt: z.coerce.date().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TastingDish = z.infer<typeof TastingDishSchema>;
+
 // Entity: TaxRate
 export const TaxRateSchema = z.object({
   id: z.string().uuid(),
@@ -12381,6 +12429,65 @@ export const SyncErrorReopenParamsSchema = z.object({
 });
 
 export type SyncErrorReopenParams = z.infer<typeof SyncErrorReopenParamsSchema>;
+
+// Command: cancel on Tasting
+export const TastingCancelParamsSchema = z.object({});
+
+export type TastingCancelParams = z.infer<typeof TastingCancelParamsSchema>;
+
+// Command: markSelectionsApplied on Tasting
+export const TastingMarkSelectionsAppliedParamsSchema = z.object({
+  proposalId: z.string().min(1),
+});
+
+export type TastingMarkSelectionsAppliedParams = z.infer<typeof TastingMarkSelectionsAppliedParamsSchema>;
+
+// Command: markTasted on Tasting
+export const TastingMarkTastedParamsSchema = z.object({});
+
+export type TastingMarkTastedParams = z.infer<typeof TastingMarkTastedParamsSchema>;
+
+// Command: schedule on Tasting
+export const TastingScheduleParamsSchema = z.object({
+  scheduledAt: z.coerce.date(),
+  durationMinutes: z.number().int(),
+  guestCount: z.number().int(),
+  leadId: z.string().min(1).optional(),
+  proposalId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+  location: z.string().optional(),
+  attendeeNames: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+});
+
+export type TastingScheduleParams = z.infer<typeof TastingScheduleParamsSchema>;
+
+// Command: add on TastingDish
+export const TastingDishAddParamsSchema = z.object({
+  tastingId: z.string().min(1),
+  menuId: z.string().min(1),
+  dishId: z.string().min(1),
+  portionCount: z.number().int(),
+  sortOrder: z.number().int().optional(),
+});
+
+export type TastingDishAddParams = z.infer<typeof TastingDishAddParamsSchema>;
+
+// Command: markOnProposal on TastingDish
+export const TastingDishMarkOnProposalParamsSchema = z.object({
+  proposalId: z.string().min(1),
+});
+
+export type TastingDishMarkOnProposalParams = z.infer<typeof TastingDishMarkOnProposalParamsSchema>;
+
+// Command: recordFeedback on TastingDish
+export const TastingDishRecordFeedbackParamsSchema = z.object({
+  decision: z.enum(["pending", "approved", "rejected", "maybe"]),
+  clientRating: z.number().int().optional(),
+  clientFeedback: z.string().optional(),
+});
+
+export type TastingDishRecordFeedbackParams = z.infer<typeof TastingDishRecordFeedbackParamsSchema>;
 
 // Command: define on TaxRate
 export const TaxRateDefineParamsSchema = z.object({
