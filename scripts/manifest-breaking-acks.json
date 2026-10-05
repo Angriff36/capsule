@@ -2810,6 +2810,12 @@
       "reason": "After-event social post: optional venue social handle for the tag; existing venues stay valid with none."
     },
     {
+      "path": "Venue.galleryToken",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Shared event gallery: optional secret part of the venue's gallery link; existing venues stay valid with none (not shared)."
+    },
+    {
       "path": "Venue.vibe",
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",

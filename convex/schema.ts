@@ -4585,6 +4585,7 @@ export default defineSchema({
     logoStorageId: v.optional(v.union(v.string(), v.null())),
     brandColor: v.optional(v.union(v.string(), v.null())),
     socialHandle: v.optional(v.union(v.string(), v.null())),
+    galleryToken: v.optional(v.union(v.string(), v.null())),
     vibe: v.optional(v.union(v.literal("rustic"), v.literal("modern_industrial"), v.literal("garden_outdoor"), v.literal("grand_ballroom"), v.literal("brewery_winery"), v.literal("warehouse_raw"), v.null())),
     vibeWords: v.optional(v.union(v.string(), v.null())),
     topFeature: v.optional(v.union(v.string(), v.null())),
@@ -4602,6 +4603,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_galleryToken", ["galleryToken"])
     .index("by_partnerOwnerPersonId", ["partnerOwnerPersonId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   venueCommissionTerms: defineTable({

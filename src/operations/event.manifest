@@ -448,6 +448,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // The venue's social media handle, without "@" (playbook section 06: tag
   // the venue in every post about an event there). Set by setSocialHandle.
   property socialHandle: string?
+  // Shared event gallery (playbook section 06): the secret part of the
+  // link the venue opens to see and save our photos from events there.
+  // Blank = not shared. Read by convex/venueGallery.ts. Set by
+  // setGalleryToken only.
+  property indexed galleryToken: string?
   // Venue selling profile (playbook section 09): the venue's look, what
   // makes it special, who books it, and what to photograph there. The look
   // picks the food presentation and serve style from the playbook's
@@ -719,6 +724,19 @@ entity Venue mixin TenantScoped, SoftDeletable {
   command setSocialHandle(optional socialHandle: string) {
     guard self.deletedAt == null
     mutate socialHandle = socialHandle != null and length(trim(socialHandle)) > 0 ? trim(socialHandle) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // A new token makes a new gallery link (the old link stops working); a
+  // blank stops sharing. Short tokens are refused so a link cannot be
+  // guessed.
+  command setGalleryToken(optional galleryToken: string) {
+    guard self.deletedAt == null
+    constraint galleryTokenLength: galleryToken == null or length(trim(galleryToken)) == 0 or length(trim(galleryToken)) >= 24 "This gallery link is too short. Make a new link."
+    mutate galleryToken = galleryToken != null and length(trim(galleryToken)) > 0 ? trim(galleryToken) : null
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

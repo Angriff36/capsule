@@ -4933,6 +4933,7 @@ export const VenueSchema = z.object({
   logoStorageId: z.string().nullable().optional(),
   brandColor: z.string().nullable().optional(),
   socialHandle: z.string().nullable().optional(),
+  galleryToken: z.string().nullable().optional(),
   vibe: z.enum(["rustic", "modern_industrial", "garden_outdoor", "grand_ballroom", "brewery_winery", "warehouse_raw"]).nullable().optional(),
   vibeWords: z.string().nullable().optional(),
   topFeature: z.string().nullable().optional(),
@@ -13017,6 +13018,13 @@ export const VenueSetBrandParamsSchema = z.object({
 });
 
 export type VenueSetBrandParams = z.infer<typeof VenueSetBrandParamsSchema>;
+
+// Command: setGalleryToken on Venue
+export const VenueSetGalleryTokenParamsSchema = z.object({
+  galleryToken: z.string().optional(),
+});
+
+export type VenueSetGalleryTokenParams = z.infer<typeof VenueSetGalleryTokenParamsSchema>;
 
 // Command: setPartnership on Venue
 export const VenueSetPartnershipParamsSchema = z.object({
