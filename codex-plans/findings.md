@@ -1,9 +1,25 @@
-# Findings
+# Findings and decisions
 
-- Existing event approval and closeout UI callers are in `src/features/events/EventDetailPage.tsx` and `EventTrackerPage.tsx`.
-- The demand command is exposed through `src/lib/culinaryDemandClient.ts`; its user-facing caller is expected in inventory/event screens and still needs confirmation.
-- The existing backend demand seam is `convex/culinaryDemand.ts`, with reconciliation logic in `convex/lib/culinaryModel/demand.ts`.
-- The feature brief's panel should be built within the existing design vocabulary and only enumerate effects proven in the real command implementation.
-- Demand supersession already opens `DemandChangePreviewDialog`, backed by the existing `previewDemandChange` query and fingerprint-protected apply mutation. It truthfully reports affected purchase needs before confirmation; avoid duplicating or weakening it.
-- `Event.approve` cascades to purchase needs, production batches, a pack list, a draft invoice (only under existing commercial conditions), staff needs, and venue attribution. `Event.closeOut` only ensures/captures a draft event closeout.
-- Event approval and closeout are dispatched centrally by `runAction` in `EventDetailPage`; the tracker has a separate approval shortcut.
+## Requirements
+- Restore filters, sort, pagination, and scroll after list-to-detail navigation.
+- Provide safe browser-back and visible return-link behavior for the listed routes.
+- Verify with a temporary Playwright test and leave evidence under `.artifacts/`.
+
+## Research findings
+- The worktree has an incomplete prior implementation in `src/features/list-state/`, Events, Kitchen, shell, saved views, and virtual scrolling.
+- The shell has one persistent `<main>` scroller; current restoration saves during passive cleanup and observes the scroller rather than its changing workspace content.
+- Existing Events and Kitchen list state is query-backed but schemas are recreated on every render, and saved views use `location.search.length` instead of recognized-list-state detection.
+- Existing list/detail links outside Events and Kitchen are direct links with no origin state, so route coverage needs focused integration rather than a global route interception.
+- Round-3 remediation must preserve all prior in-progress feature changes while replacing incomplete free-function state/scroll behavior with the requested focused manager structure.
+- Repository-design rules require this authored UI work to retain the established visual language; no visual redesign is needed for URL and navigation behavior.
+
+## Technical decisions
+| Decision | Rationale |
+|---|---|
+| Inspect existing patterns before broad edits | Route and detail-page coverage must match the application’s actual paths and links. |
+| Use `ReturnToListLink` for visible list returns | It retains normal anchor behavior for modified clicks and only consumes browser Back when the stored predecessor is exact. |
+
+## Issues encountered
+| Issue | Resolution |
+|---|---|
+| | |
