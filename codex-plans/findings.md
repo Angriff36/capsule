@@ -1,21 +1,21 @@
-# Findings
+# Findings: Venue logistics profile
 
-- Feature targets production prep tasks and production batches.
-- Candidate authored UI lives under `src/features/production/`; Manifest sources live under `src/production/`.
-- Existing label/print related components include `src/ui/BarcodeLabel.tsx` and event/report label surfaces; exact reuse remains to be determined.
+## Requirements
+- Persist dock, elevator, kitchen equipment, power, parking, arrival restrictions, and day-of access contact per venue.
+- Surface the current venue profile on linked event detail and BEO views.
+- Use the approved manifest regeneration path and temporary Playwright verification.
 
-## Initial
-- The feature must reuse real event and shift semantics discovered in this checkout; the supplied implementation brief is only a hypothesis.
-- This change includes authored UI, so DESIGN.md and the component catalog must guide implementation.
+## Research Findings
+- Venue is authored in `src/operations/event.manifest`, not in a separate module manifest.
+- The facilities feature already has `VenueSiteVisitPanel.tsx` and `venueSiteVisit.ts`; these are the first surfaces to inspect rather than creating a competing profile flow.
+- Event detail is the `src/features/events/dashboard/` route, while the current BEO export lead is `src/features/events/beoPdf.ts`.
 
-## Repository rules confirmed
-- The root is a worktree, so changes stay local: no commit, push, release, or deployment.
-- `bun run manifest:regen` is the only permitted Manifest regeneration path; generated outputs must be reviewed as part of the feature.
-- New Convex seam files require codegen before typecheck, and non-node mutations must not be placed in a `"use node"` file.
-- UI must use the established neutral/ink/orange design vocabulary and reuse catalogued components where applicable.
+## Technical Decisions
+| Decision | Rationale |
+| --- | --- |
+| Use optional Venue fields | Existing venues remain valid and an absent profile has a truthful empty state. |
 
-## Staffing implementation discovered
-- `StaffingTemplate` lines already hold role, `guestsPerWorker`, floor, and optional demand facts. `EventStaffNeed` is the correct existing unfilled draft-assignment model; `Shift` cannot be unfilled because it requires a person.
-- `ensureTemplateStaffNeeds` runs on `EventApproved`, headcount changes, and service-style changes. It is idempotent and cancels only open generated needs.
-- Current matching picks one whole template. This wrongly omits any-style roles whenever a matching style template exists; selection will be made per role instead.
-- The event staffing rail currently gives aggregate counts, but not required-versus-filled-by-role or an explicit shortfall callout.
+## Issues Encountered
+| Issue | Resolution |
+| --- | --- |
+| None | — |

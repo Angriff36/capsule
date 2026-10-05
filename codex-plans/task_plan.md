@@ -1,36 +1,43 @@
-# Prep allergen container labels
+# Task Plan: Venue logistics profile
 
 ## Goal
-Add a printable dated food-label flow from existing prep-task and production-batch records.
+Add reusable venue logistics details that operators can maintain once, view from every linked event, and include in BEO output.
 
-## Plan
-- [in_progress] Discover production data, UI entry points, and established print patterns.
-- [pending] Define the smallest source-of-truth label model and implementation.
-- [pending] Implement UI and any required query/seam changes.
-- [pending] Run focused checks, required gate, and a temporary Playwright verification; remove the temporary test.
-
-## Constraints
-- Preserve existing work.
-- Do not hand-edit generated files, commit, push, or deploy.
-- Keep actions within the established design system and derive facts from existing records.
-
-# Staff-to-guest staffing ratios plan
-
-## Goal
-Implement tenant-scoped staffing ratio rules and use them to synchronize safe, draft staffing suggestions for confirmed/accepted events, with settings and event UI.
+## Current Phase
+Phase 1 — discovery
 
 ## Phases
-- [complete] Inspect current manifests, staffing shifts, event acceptance, and UI patterns.
-- [in_progress] Design source-backed changes and update authored manifest/seams/UI.
-- [pending] Regenerate contracts and fix integration/type issues.
-- [pending] Run focused verification, required checks, and temporary Playwright verification.
-- [pending] Review final diff and prepare handoff.
 
-## Constraints
-- Preserve unrelated work and generated-file ownership.
-- Do not deploy, push, or commit.
-- Add only feature-focused tests required by the request and acceptance contract.
-- Use `bun run manifest:regen` for generated artifacts.
+### Phase 1: Requirements and discovery
+- [x] Read task, governing instructions, design and component guidance
+- [ ] Map current Venue, event detail, and BEO data paths
+- **Status:** in_progress
 
-## Design decision
-- Reuse `StaffingTemplate` and `EventStaffNeed`: they already model per-style per-guest rules and safe unfilled scheduling drafts. Extend their selection from one whole-template winner to per-role precedence, so service-style rules win for the same role while any-style rules still contribute other roles.
+### Phase 2: Design and implementation plan
+- [ ] Confirm minimal additive manifest and UI approach
+- [ ] Identify regeneration and verification commands
+- **Status:** pending
+
+### Phase 3: Implementation
+- [ ] Add venue logistics fields and projection
+- [ ] Regenerate owned output
+- [ ] Add event/BEO presentation
+- **Status:** pending
+
+### Phase 4: Verification
+- [ ] Run focused checks and repository gates
+- [ ] Run temporary Playwright verification and remove it
+- **Status:** pending
+
+### Phase 5: Handoff
+- [ ] Inspect diff and report exact changes
+- **Status:** pending
+
+## Decisions Made
+| Decision | Rationale |
+| --- | --- |
+| Extend the existing Venue entity | A single current profile belongs naturally to one venue and avoids a new relation or duplicate profiles. |
+
+## Errors Encountered
+| Error | Attempt | Resolution |
+| --- | --- | --- |
