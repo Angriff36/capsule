@@ -638,6 +638,50 @@ export const CutoverDecisionSchema = z.object({
 
 export type CutoverDecision = z.infer<typeof CutoverDecisionSchema>;
 
+// Entity: DateHold
+export const DateHoldSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  holdDate: z.string(),
+  clientId: z.string().uuid().nullable().optional(),
+  leadId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  venueId: z.string().uuid().nullable().optional(),
+  ownerPersonId: z.string().uuid().nullable().optional(),
+  status: z.enum(["held", "released", "expired", "converted"]).default("held"),
+  expiresAt: z.number().int(),
+  note: z.string().nullable().optional(),
+  placedAt: z.number().int().nullable().optional(),
+  releasedAt: z.number().int().nullable().optional(),
+  convertedAt: z.number().int().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DateHold = z.infer<typeof DateHoldSchema>;
+
+// Entity: DateWaitlistEntry
+export const DateWaitlistEntrySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  holdDate: z.string(),
+  clientId: z.string().uuid().nullable().optional(),
+  leadId: z.string().uuid().nullable().optional(),
+  ownerPersonId: z.string().uuid().nullable().optional(),
+  status: z.enum(["waiting", "offered", "promoted", "withdrawn"]).default("waiting"),
+  note: z.string().nullable().optional(),
+  queuedAt: z.number().int().nullable().optional(),
+  offeredAt: z.number().int().nullable().optional(),
+  promotedAt: z.number().int().nullable().optional(),
+  withdrawnAt: z.number().int().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DateWaitlistEntry = z.infer<typeof DateWaitlistEntrySchema>;
+
 // Entity: DeckShareLink
 export const DeckShareLinkSchema = z.object({
   id: z.string().uuid(),
@@ -6188,6 +6232,67 @@ export const CutoverDecisionSetTppReadOnlyParamsSchema = z.object({
 });
 
 export type CutoverDecisionSetTppReadOnlyParams = z.infer<typeof CutoverDecisionSetTppReadOnlyParamsSchema>;
+
+// Command: convert on DateHold
+export const DateHoldConvertParamsSchema = z.object({
+  eventId: z.string().min(1),
+});
+
+export type DateHoldConvertParams = z.infer<typeof DateHoldConvertParamsSchema>;
+
+// Command: expire on DateHold
+export const DateHoldExpireParamsSchema = z.object({});
+
+export type DateHoldExpireParams = z.infer<typeof DateHoldExpireParamsSchema>;
+
+// Command: extend on DateHold
+export const DateHoldExtendParamsSchema = z.object({
+  expiresAt: z.number().int(),
+});
+
+export type DateHoldExtendParams = z.infer<typeof DateHoldExtendParamsSchema>;
+
+// Command: place on DateHold
+export const DateHoldPlaceParamsSchema = z.object({
+  holdDate: z.string(),
+  expiresAt: z.number().int(),
+  clientId: z.string().min(1).optional(),
+  leadId: z.string().min(1).optional(),
+  venueId: z.string().min(1).optional(),
+  note: z.string().optional(),
+});
+
+export type DateHoldPlaceParams = z.infer<typeof DateHoldPlaceParamsSchema>;
+
+// Command: release on DateHold
+export const DateHoldReleaseParamsSchema = z.object({});
+
+export type DateHoldReleaseParams = z.infer<typeof DateHoldReleaseParamsSchema>;
+
+// Command: join on DateWaitlistEntry
+export const DateWaitlistEntryJoinParamsSchema = z.object({
+  holdDate: z.string(),
+  clientId: z.string().min(1).optional(),
+  leadId: z.string().min(1).optional(),
+  note: z.string().optional(),
+});
+
+export type DateWaitlistEntryJoinParams = z.infer<typeof DateWaitlistEntryJoinParamsSchema>;
+
+// Command: offer on DateWaitlistEntry
+export const DateWaitlistEntryOfferParamsSchema = z.object({});
+
+export type DateWaitlistEntryOfferParams = z.infer<typeof DateWaitlistEntryOfferParamsSchema>;
+
+// Command: promote on DateWaitlistEntry
+export const DateWaitlistEntryPromoteParamsSchema = z.object({});
+
+export type DateWaitlistEntryPromoteParams = z.infer<typeof DateWaitlistEntryPromoteParamsSchema>;
+
+// Command: withdraw on DateWaitlistEntry
+export const DateWaitlistEntryWithdrawParamsSchema = z.object({});
+
+export type DateWaitlistEntryWithdrawParams = z.infer<typeof DateWaitlistEntryWithdrawParamsSchema>;
 
 // Command: create on DeckShareLink
 export const DeckShareLinkCreateParamsSchema = z.object({
