@@ -1,4 +1,4 @@
-# Fixes log
+# Fixes log (resolved issues)
 
 ## 2026-10-05
 - Issue: List scroll was saved in passive cleanup after an incoming route could restore the persistent shell scroller.

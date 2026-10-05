@@ -699,10 +699,12 @@ export function InvoiceDetailPage() {
             <button className="btn btn-ghost" onClick={downloadPdf}>
               Download PDF
             </button>
-            <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
-              Record payment
-            </Link>
           </>
+        }
+        primaryAction={
+          <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
+            Record payment
+          </Link>
         }
         sentinelRef={headerSentinelRef}
         sectionScopeRef={sectionScopeRef}

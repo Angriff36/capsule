@@ -16,3 +16,6 @@
 - Reopened the prior feature implementation after its independent review identified unpersisted controls, visit-classification bugs, virtual-list restoration races, and incomplete verification.
 - Preserving existing uncommitted task work as the baseline; no generated, Manifest, or Convex files will be edited for this UI-only repair.
 - Tooling note: combined delete/add patch against the same file was rejected by the patch tool; split the shared-manager changes into individual patches.
+
+## Sticky header repair
+- Started implementation repair and loaded design, component, domain-restraint, and verification guidance.

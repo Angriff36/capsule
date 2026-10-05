@@ -768,7 +768,21 @@ function EventDetailContent({
           },
           { label: "Status", value: formatStatusLabel(String(event.stage)) },
         ]}
-        actions={headerActions}
+        actions={headerActions.filter(
+          (action) => action.key !== headerPrimary?.key,
+        )}
+        primaryAction={
+          primaryAction ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => runAction(primaryAction.key)}
+              className="btn btn-primary"
+            >
+              {primaryAction.label}
+            </button>
+          ) : undefined
+        }
         sentinelRef={headerSentinelRef}
         sectionScopeRef={sectionScopeRef}
         sectionKey={activeTab}

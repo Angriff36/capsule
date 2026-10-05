@@ -15,6 +15,13 @@ export interface ActionPromptField {
   /** Words offered while typing; other words are still allowed. */
   suggestions?: string[];
   required?: boolean;
+  /**
+   * Quantity stored in this unit: renders a unit picker that converts any
+   * matching unit (lb, oz, g…) and returns the amount in this unit.
+   */
+  unit?: string;
+  /** With `unit`: accept zero. */
+  allowZero?: boolean;
   helper?: string;
   /** Domain term explained by an info icon beside the label. */
   help?: FieldHelpTerm;
