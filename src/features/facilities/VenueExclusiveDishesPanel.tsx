@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useDishesExclusiveToVenue } from "../../lib/useDishesByIds";
 import { Section } from "../../ui/primitives";
 import { dishPath } from "../kitchen/kitchenRoutes";
+import { venueMenuCardPath } from "./facilitiesRoutes";
 
 /**
  * Venue-exclusive menu items (Venue Partner Playbook section 07): the dishes
@@ -30,6 +31,9 @@ export function VenueExclusiveDishesPanel({ venueId }: { venueId: string }) {
             ))}
           </ul>
         )}
+        <Link className="btn btn-secondary" to={venueMenuCardPath(venueId)}>
+          Venue menu card
+        </Link>
       </div>
     </Section>
   );

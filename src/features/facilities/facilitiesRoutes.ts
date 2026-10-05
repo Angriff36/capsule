@@ -24,6 +24,10 @@ export function venueDetailPath(id: string): string {
   return `/facilities/venues/${id}`;
 }
 
+export function venueMenuCardPath(id: string): string {
+  return `/facilities/venues/${id}/menu-card`;
+}
+
 export function venueListPath(): string {
   return "/facilities/venues";
 }
