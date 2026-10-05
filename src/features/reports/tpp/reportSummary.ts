@@ -96,6 +96,8 @@ export function tppReportSummary(
               id)
             : id,
       );
+      // An empty optional letter line is simply left out.
+      if (parameter.type === "text" && picked.length === 0) continue;
       choices.push({
         label: parameter.label,
         value: picked.length ? picked.join(", ") : "Any",

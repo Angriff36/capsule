@@ -118,14 +118,27 @@ export function TppReportParameters({
             }
             if (parameter.type === "text") {
               return (
-                <label className="tpp-parameter-wide" key={parameter.key}>
+                <label
+                  className={
+                    parameter.lines === 1 ? undefined : "tpp-parameter-wide"
+                  }
+                  key={parameter.key}
+                >
                   <span>{parameter.label}</span>
-                  <textarea
-                    className="input"
-                    name={parameter.key}
-                    rows={5}
-                    required={parameter.required}
-                  />
+                  {parameter.lines === 1 ? (
+                    <input
+                      className="input"
+                      name={parameter.key}
+                      required={parameter.required}
+                    />
+                  ) : (
+                    <textarea
+                      className="input"
+                      name={parameter.key}
+                      rows={parameter.lines ?? 5}
+                      required={parameter.required}
+                    />
+                  )}
                   {errors[parameter.key] ? (
                     <small className="field-error">
                       {errors[parameter.key]}

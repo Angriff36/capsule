@@ -359,26 +359,96 @@ export const run = query({
         ],
         clientRaw,
       );
-      return document(args.reportId, "contact_letter", [
-        { id: "date", rows: [{ value: dateText(Date.now()) }] },
+      const said = (key: string) => {
+        const value = parameters[key];
+        return typeof value === "string" ? value.trim() : "";
+      };
+      // Lines the writer left empty are left out of the letter.
+      const lines = (rows: { label?: string; value: string }[]) =>
+        rows.filter((row) => row.value !== "");
+      let companyRows: { value: string }[] = [];
+      if (parameters.showCompanyInfo !== false) {
+        const organizations = await ctx.db
+          .query("organizations")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .take(10);
+        const organization =
+          organizations.find(
+            (row) => row.deletedAt == null && row.status === "active",
+          ) ?? organizations.find((row) => row.deletedAt == null);
+        companyRows = lines([
+          {
+            value:
+              organization?.brandDisplayName?.trim() ||
+              organization?.name?.trim() ||
+              "",
+          },
+          { value: organization?.brandAddress?.trim() ?? "" },
+        ]);
+      }
+      const letterDate =
+        parameters.noLetterDate === true
+          ? ""
+          : new Date(
+              typeof parameters.letterDate === "number"
+                ? parameters.letterDate
+                : Date.now(),
+            ).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            });
+      const sections = [
+        { id: "company", rows: companyRows },
+        { id: "date", rows: lines([{ value: letterDate }]) },
         {
           id: "recipient",
-          rows: [
+          rows: lines([
             { value: clientName(client) },
             {
               value: [
                 client.addressLine1,
-                client.city,
-                client.region,
-                client.postalCode,
+                client.addressLine2,
+                [client.city, client.region, client.postalCode]
+                  .filter(Boolean)
+                  .join(" "),
               ]
                 .filter(Boolean)
-                .join(", "),
+                .join("\n"),
             },
-          ],
+          ]),
         },
-        { id: "body", rows: [{ value: String(parameters.body ?? "") }] },
-      ]);
+        {
+          id: "reference",
+          rows: lines([
+            { label: "Ref", value: said("ref") },
+            { label: "Attn", value: said("attn") },
+            { label: "Subject", value: said("subject") },
+          ]),
+        },
+        {
+          id: "body",
+          rows: lines([
+            { value: said("salutation") },
+            { value: String(parameters.body ?? "") },
+            { value: said("closing") },
+          ]),
+        },
+        {
+          id: "sender",
+          rows: lines([
+            { value: said("senderName") },
+            { value: said("senderTitle") },
+            { value: said("senderCompany") },
+          ]),
+        },
+        { id: "cc", rows: lines([{ label: "CC", value: said("cc") }]) },
+      ];
+      return document(
+        args.reportId,
+        "contact_letter",
+        sections.filter((section) => section.rows.length > 0),
+      );
     }
 
     if (args.reportId === "order-activity-list") {

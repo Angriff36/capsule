@@ -57,6 +57,8 @@ export type TppReportParameter =
       type: "text";
       label: string;
       required: boolean;
+      /** 1 = a one-line box; otherwise the number of text rows (5). */
+      lines?: number;
     };
 
 export interface TppReportEvidence {
