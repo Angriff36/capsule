@@ -34,6 +34,12 @@ const money = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const LAST_MONTH_LABELS: Record<string, string> = {
+  client_feedback: "Client feedback",
+  debrief: "Team debrief",
+  incident: "Problem or damage",
+};
+
 const score = (value: FormDataEntryValue | null) =>
   value === null || value === "" ? undefined : Number(value);
 
@@ -271,6 +277,14 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
                 value={String(card.problemsLast90Days)}
               />
               <Metric
+                label="Client satisfaction"
+                value={
+                  card.clientSatisfaction == null
+                    ? "No client scores yet"
+                    : `${card.clientSatisfaction} / 10`
+                }
+              />
+              <Metric
                 label="Grade"
                 value={
                   card.grade
@@ -286,6 +300,39 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
                 ))}
               </ul>
             ) : null}
+
+            <div className="space-y-2" data-testid="venue-partner-last-month">
+              <h3 className="text-sm font-semibold text-ink">
+                For the monthly check-in: last 30 days
+              </h3>
+              <p className="text-sm text-ink-3">
+                {card.eventsLast30Days} event
+                {card.eventsLast30Days === 1 ? "" : "s"} here.{" "}
+                {card.lastMonth.length === 0
+                  ? "No client feedback, debriefs or problems logged."
+                  : null}
+              </p>
+              {card.lastMonth.length > 0 ? (
+                <ul className="space-y-2 text-sm">
+                  {card.lastMonth.map((note, index) => (
+                    <li
+                      key={`${note.postedAt}-${index}`}
+                      className="rounded-sm border border-line p-2"
+                    >
+                      <span className="font-semibold text-ink">
+                        {LAST_MONTH_LABELS[note.category] ?? note.category}
+                      </span>
+                      <span className="text-ink-3">
+                        {` · ${formatDate(Number(note.postedAt))}`}
+                      </span>
+                      <p className="whitespace-pre-line text-ink-2">
+                        {note.content}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
 
             <form
               className="space-y-2"

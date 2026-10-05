@@ -32,6 +32,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   weather_contingency: "Weather",
   check_in: "Check-in",
   incident: "Problem or damage",
+  thank_you: "Thank-you sent",
+  client_feedback: "Client feedback",
+  debrief: "Team debrief",
   other: "Other",
 };
 

@@ -31,9 +31,16 @@ export interface PartnerEventRow {
 export interface PartnerNoteRow {
   venueId: string;
   category: string;
+  content?: string | null;
+  rating?: number | null;
   postedAt?: number | null;
   deletedAt?: number | null;
 }
+
+/** Notes that count as contact with the venue (playbook sections 03, 13). */
+const CONTACT_KINDS = new Set(["check_in", "thank_you"]);
+/** After-event notes shared at the monthly check-in (playbook section 13 step 5). */
+const MONTHLY_KINDS = new Set(["client_feedback", "debrief", "incident"]);
 export interface PartnerReferralSourceRow {
   _id: string;
   venueId?: string | null;
@@ -67,6 +74,11 @@ export interface PartnerScorecard {
   /** Share of referred leads that booked, 0-1; null with no referrals. */
   referralConversion: number | null;
   problemsLast90Days: number;
+  /** Average client score (1-10) on feedback notes in the last 12 months. */
+  clientSatisfaction: number | null;
+  eventsLast30Days: number;
+  /** Client feedback, debriefs and problems from the last 30 days, newest first. */
+  lastMonth: PartnerNoteRow[];
   grade: PartnerGrade;
   /** Plain reasons the venue needs a closer look (playbook sunset criteria). */
   warnings: string[];
@@ -87,7 +99,7 @@ export function partnerScorecard(input: {
     (note) => note.deletedAt == null && String(note.venueId) === venueId,
   );
   const lastContactAt = mine
-    .filter((note) => note.category === "check_in" && note.postedAt != null)
+    .filter((note) => CONTACT_KINDS.has(note.category) && note.postedAt != null)
     .reduce<number | null>(
       (latest, note) => Math.max(latest ?? 0, Number(note.postedAt)),
       null,
@@ -100,6 +112,23 @@ export function partnerScorecard(input: {
       note.postedAt != null &&
       now - note.postedAt <= 90 * DAY,
   ).length;
+  const scores = mine
+    .filter(
+      (note) =>
+        note.category === "client_feedback" &&
+        note.rating != null &&
+        note.postedAt != null &&
+        now - note.postedAt <= YEAR,
+    )
+    .map((note) => Number(note.rating));
+  const lastMonth = mine
+    .filter(
+      (note) =>
+        MONTHLY_KINDS.has(note.category) &&
+        note.postedAt != null &&
+        now - note.postedAt <= 30 * DAY,
+    )
+    .sort((a, b) => Number(b.postedAt) - Number(a.postedAt));
 
   const yearEvents = input.events.filter(
     (row) =>
@@ -171,6 +200,15 @@ export function partnerScorecard(input: {
       ? referralsBooked / referred.length
       : null,
     problemsLast90Days,
+    clientSatisfaction: scores.length
+      ? Math.round(
+          (scores.reduce((sum, value) => sum + value, 0) / scores.length) * 10,
+        ) / 10
+      : null,
+    eventsLast30Days: yearEvents.filter(
+      (row) => now - Number(row.startsAt) <= 30 * DAY,
+    ).length,
+    lastMonth,
     grade: partnerGrade({
       opsEaseScore: venue.opsEaseScore ?? null,
       relationshipScore: venue.relationshipScore ?? null,
