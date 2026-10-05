@@ -51,17 +51,16 @@ import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { vendorOrderTitle } from "./vendorOrderNumber";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
-import {
-  useWorkingEventScope,
-  WorkingEventScopeNote,
-} from "../events/WorkingEventScope";
+import { WorkingEventScopeNote } from "../events/WorkingEventScope";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { usePurchasingScopeViewModel } from "./PurchasingScopeViewModel";
 
 const policy = new SupplyLifecyclePolicy();
 
 export function PurchasingPage() {
+  const { eventScope, linkedEventId, scopedEventId, showAllEvents } =
+    usePurchasingScopeViewModel();
   const listOrigin = useListOrigin();
-  const eventScope = useWorkingEventScope("purchasing");
   const needs = useListPurchaseNeed();
   const vendors = useListVendor();
   const orders = useListVendorOrder();
@@ -75,7 +74,7 @@ export function PurchasingPage() {
   const events = usePickerAndNamedEvents(
     needs && orders && demands
       ? [
-          eventScope.scopeId,
+          scopedEventId,
           ...needs.map((row) => row.eventId),
           ...orders.map((row) => row.eventId),
           ...demands.map((row) => row.eventId),
@@ -105,12 +104,14 @@ export function PurchasingPage() {
     (item) => item.deletedAt == null,
   );
   const activeOrders = (orders ?? []).filter((item) => item.deletedAt == null);
-  // Only the orders table follows the working event; vendor scores and
-  // weekly drafts keep reading every order.
+  const shownNeeds = activeNeeds.filter(
+    (item) => scopedEventId == null || String(item.eventId) === scopedEventId,
+  );
+  // Vendor scores use every order; operator-facing ledgers honor an explicit
+  // cascade link before falling back to the working-event scope.
   const shownOrders = activeOrders.filter(
     (item) =>
-      eventScope.scopeId == null ||
-      String(item.eventId ?? "") === eventScope.scopeId,
+      scopedEventId == null || String(item.eventId ?? "") === scopedEventId,
   );
   const vendorPerformance = useMemo(
     () =>
@@ -134,6 +135,10 @@ export function PurchasingPage() {
           String(order.status) === "draft" && order.sourceRangeStart != null,
       ),
     [activeOrders],
+  );
+  const shownWeeklyDrafts = weeklyDrafts.filter(
+    (order) =>
+      scopedEventId == null || String(order.eventId ?? "") === scopedEventId,
   );
   // Purchasing opens on the week's automatic draft (BE-10.6).
   const currentDraft = currentWeeklyDraft(weeklyDrafts, Date.now());
@@ -204,7 +209,9 @@ export function PurchasingPage() {
   const selectableNeeds = activeNeeds.filter(
     (need) => needCanCancel(need) || needCanFulfill(need),
   );
-  const selection = useBulkSelection(selectableNeeds);
+  const selection = useBulkSelection(
+    selectableNeeds.filter((need) => shownNeeds.includes(need)),
+  );
   const bulk = useBulkRun();
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -528,11 +535,11 @@ export function PurchasingPage() {
             <p className="eyebrow">All weeks</p>
             <h2>Auto-maintained drafts</h2>
           </div>
-          <span>{weeklyDrafts.length} drafts</span>
+          <span>{shownWeeklyDrafts.length} drafts</span>
         </div>
         {orders === undefined || vendors === undefined ? (
           <TableSkeleton rows={3} />
-        ) : weeklyDrafts.length === 0 ? (
+        ) : shownWeeklyDrafts.length === 0 ? (
           <div className="document-empty">
             <p>No weekly drafts yet</p>
             <span>
@@ -562,7 +569,7 @@ export function PurchasingPage() {
                 </tr>
               </thead>
               <tbody>
-                {weeklyDrafts.map((order) => (
+                {shownWeeklyDrafts.map((order) => (
                   <tr key={order._id}>
                     <td>
                       <strong>
@@ -609,7 +616,7 @@ export function PurchasingPage() {
           lines === undefined ||
           demandLinks === undefined
         }
-        activeNeeds={activeNeeds}
+        activeNeeds={shownNeeds}
         activeVendors={rankedVendors}
         vendorPerformance={vendorPerformance}
         vendorsLoading={vendors === undefined}
@@ -623,6 +630,9 @@ export function PurchasingPage() {
         ingredientName={ingredientName}
         ingredients={ingredients}
         eventName={eventName}
+        scopedEventName={
+          scopedEventId == null ? undefined : eventName(scopedEventId)
+        }
         onNeedAction={needAction}
         onOnboardVendor={() => setForm("vendor")}
         vendorContacts={(vendorContacts ?? []).filter(
@@ -634,7 +644,19 @@ export function PurchasingPage() {
         }}
       />
 
-      <WorkingEventScopeNote scope={eventScope} noun="purchase orders" />
+      {linkedEventId ? (
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-ink-2">
+          <span>
+            Showing purchase work for{" "}
+            <strong className="text-ink">{eventName(linkedEventId)}</strong>.
+          </span>
+          <button type="button" className="text-link" onClick={showAllEvents}>
+            Show all events
+          </button>
+        </p>
+      ) : (
+        <WorkingEventScopeNote scope={eventScope} noun="purchase orders" />
+      )}
       <section className="working-ledger mt-10">
         <div className="ledger-heading">
           <div>

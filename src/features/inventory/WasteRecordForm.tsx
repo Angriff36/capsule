@@ -7,6 +7,8 @@ import {
 } from "../../lib/manifest-convex-react";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { useWorkingEventId } from "../events/workingEvent";
+import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
+import { useSuccessToast } from "../../ui/useSuccessToast";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
 
@@ -27,6 +29,7 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
   const locations = useListStorageLocation();
   const events = usePickerAndNamedEvents([workingId]);
   const createWasteRecord = useCreateWasteRecord();
+  const { notifySuccess } = useSuccessToast();
   const [inventoryItemId, setInventoryItemId] = useState("");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
@@ -51,17 +54,25 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
     setBusy(true);
     void (async () => {
       try {
+        const quantity = Number(data.get("quantity"));
+        const inventoryItemId = selectedItem._id;
+        const unit = selectedItem.unit;
         await createWasteRecord({
           ingredientId: selectedItem.ingredientId,
           locationId: selectedItem.locationId,
-          inventoryItemId: selectedItem._id,
-          quantity: Number(data.get("quantity")),
-          unit: selectedItem.unit,
+          inventoryItemId,
+          quantity,
+          unit,
           reason: String(data.get("reason")),
           eventId: eventId || undefined,
           unitCost: selectedItem.unitCost,
           notes: notes || undefined,
         });
+        new AutomationCascadeFeedbackManager(notifySuccess).wasteRecorded(
+          inventoryItemId,
+          quantity,
+          unit,
+        );
         element.reset();
         setInventoryItemId("");
         onClose();
