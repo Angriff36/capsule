@@ -342,7 +342,8 @@ export function StockBookPage() {
             name: "quantity",
             label:
               action === "receive" ? "Quantity received" : "Actual quantity",
-            inputType: "number",
+            unit: unitFor(item),
+            allowZero: action === "recount",
             required: true,
           },
         ],
@@ -522,7 +523,9 @@ export function StockBookPage() {
             name: "quantity",
             label: "Amount that came back",
             defaultValue: String(unusedLeft(reservation)),
-            inputType: "number",
+            ...(item
+              ? { unit: unitFor(item) }
+              : { inputType: "number" as const }),
             required: true,
           },
           {

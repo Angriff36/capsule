@@ -17,6 +17,11 @@ const units: Record<string, readonly [string, number]> = {
   gallon: ["volume", 3785.411784],
 };
 
+/** "mass" or "volume" for a convertible unit; null for counts and batches. */
+export function recipeUnitDimension(unit: string): string | null {
+  return units[unit]?.[0] ?? null;
+}
+
 export function recipeUnitRatio(from: string, to: string): number | null {
   if (from === to) return 1;
   const source = units[from];

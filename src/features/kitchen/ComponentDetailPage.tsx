@@ -60,6 +60,7 @@ import {
   UNIT_OF_MEASURE,
   unitOptionsFor,
 } from "./import/UnitOfMeasureMapper";
+import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
 import { ComponentImportSourcePanel } from "./import/ComponentImportSourcePanel";
 import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
@@ -165,6 +166,7 @@ export function ComponentDetailPage() {
     value: string;
   } | null>(null);
   const [showLineForm, setShowLineForm] = useState(false);
+  const [lineFormKey, setLineFormKey] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [snapshotWarning, setSnapshotWarning] = useState<string | null>(null);
@@ -382,6 +384,7 @@ export function ComponentDetailPage() {
       });
       await reconcileEvents(component._id);
       form.reset();
+      setLineFormKey((key) => key + 1);
     });
   };
 
@@ -676,7 +679,7 @@ export function ComponentDetailPage() {
                               {
                                 name: "quantity",
                                 label: "Quantity",
-                                inputType: "number",
+                                unit: String(line.unit),
                                 defaultValue: String(line.quantity),
                                 required: true,
                               },
@@ -784,23 +787,16 @@ export function ComponentDetailPage() {
               </label>
               <label className="field-label">
                 Quantity
-                <input
+                {/* The line keeps the unit the cook enters; the hint shows
+                    the same amount in other units. */}
+                <UnitQuantityInput
+                  key={lineFormKey}
                   name="quantity"
-                  type="number"
-                  min={0.01}
-                  step="0.01"
-                  defaultValue={1}
-                  className="input"
-                  required
+                  unitName="unit"
+                  storeUnit="each"
+                  units={SELECTABLE_UNITS}
+                  defaultAmount={1}
                 />
-              </label>
-              <label className="field-label">
-                Unit
-                <select name="unit" className="input">
-                  {SELECTABLE_UNITS.map((unit) => (
-                    <option key={unit}>{unit}</option>
-                  ))}
-                </select>
               </label>
               <label className="field-label">
                 Preparation note

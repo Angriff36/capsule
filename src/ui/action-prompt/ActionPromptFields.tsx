@@ -5,6 +5,7 @@ import type {
 } from "./ActionPromptTypes";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
 import { FieldHelp } from "../FieldHelp";
+import { UnitQuantityInput } from "../UnitQuantityInput";
 
 interface ActionPromptFieldsProps {
   request: ActionPromptRequest;
@@ -100,7 +101,18 @@ function PromptField({
           {field.helper}
         </p>
       ) : null}
-      {field.options ? (
+      {field.unit ? (
+        <UnitQuantityInput
+          id={fieldId}
+          entryName={field.name}
+          storeUnit={field.unit}
+          defaultAmount={field.defaultValue}
+          allowZero={field.allowZero}
+          required={field.required ?? true}
+          aria-describedby={helperId}
+          onChange={(amount) => onChange(amount == null ? "" : String(amount))}
+        />
+      ) : field.options ? (
         <select
           {...common}
           className="input"

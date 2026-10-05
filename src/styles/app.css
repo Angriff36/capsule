@@ -243,6 +243,22 @@
   .field-label {
     @apply grid gap-1 text-xs font-semibold text-ink-2;
   }
+  /* Unit-aware quantity (src/ui/UnitQuantityInput.tsx). */
+  .unit-quantity {
+    @apply grid gap-1;
+  }
+  .unit-quantity-row {
+    @apply flex gap-1;
+  }
+  .unit-quantity-unit {
+    @apply w-auto shrink-0;
+  }
+  .unit-quantity-suffix {
+    @apply inline-flex shrink-0 items-center px-1 text-xs font-normal text-ink-3;
+  }
+  .unit-quantity-hint {
+    @apply min-h-4 text-xs font-normal text-ink-3 tabular-nums;
+  }
   /* Field help (src/ui/FieldHelp.tsx): label text plus its info icon. */
   .field-label-row {
     @apply inline-flex items-center gap-1;
