@@ -8,6 +8,8 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
+import { classifyCommandFailure } from "../events/CommandFailure";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { RolePermissionAudit } from "./RolePermissionAuditPanel";
 import { TeamRolesPanel } from "./TeamRolesPanel";
@@ -43,11 +45,14 @@ export function PermissionsPage() {
     () => new Map((rows ?? []).map((row) => [row.capability, row])),
     [rows],
   );
+  const { loadingTooLong } = useSlowQuery(
+    authStatus === undefined ? undefined : rows,
+  );
 
   if (authStatus === undefined || rows === undefined) {
     return (
       <QueryLoadState
-        loadingTooLong={false}
+        loadingTooLong={loadingTooLong}
         title="Loading permissions"
         detail="Reading organization settings."
       />
@@ -66,9 +71,8 @@ export function PermissionsPage() {
       if (existing) await setEnabled({ docId: existing._id, enabled });
       else await createSetting({ capability, enabled });
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Could not save this setting.",
-      );
+      const failure = classifyCommandFailure(cause);
+      setError(`${failure.title}: ${failure.detail}`);
     } finally {
       setSaving(null);
     }

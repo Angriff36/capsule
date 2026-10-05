@@ -1,35 +1,56 @@
 import { query } from "../_generated/server";
+import { getAuthContext } from "../lib/authContext";
+import { canRead } from "../search";
 import {
   OPTION_ROW_LIMIT,
   isLiveTenantRow,
   requireReportTenant,
 } from "./shared";
 
+// Generated read policies (convex/queries.ts) of the records each picker
+// lists. A picker stays empty for a caller who may not read its records.
+const EVENT_READ = ["staffAccess"];
+const CLIENT_READ = ["salesAccess", "financeAccess"];
+const PERSON_READ = ["staffAccess"];
+const VENDOR_READ = ["procurementAccess"];
+const VENUE_READ = ["eventAccess"];
+
 export const list = query({
   args: {},
   handler: async (ctx) => {
     const tenantId = await requireReportTenant(ctx);
+    const auth = await getAuthContext(ctx);
     const [events, clients, people, vendors, venues] = await Promise.all([
-      ctx.db
-        .query("events")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(OPTION_ROW_LIMIT),
-      ctx.db
-        .query("clients")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(OPTION_ROW_LIMIT),
-      ctx.db
-        .query("people")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(OPTION_ROW_LIMIT),
-      ctx.db
-        .query("vendors")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(OPTION_ROW_LIMIT),
-      ctx.db
-        .query("venues")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(OPTION_ROW_LIMIT),
+      canRead(auth, EVENT_READ)
+        ? ctx.db
+            .query("events")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .take(OPTION_ROW_LIMIT)
+        : [],
+      canRead(auth, CLIENT_READ)
+        ? ctx.db
+            .query("clients")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .take(OPTION_ROW_LIMIT)
+        : [],
+      canRead(auth, PERSON_READ)
+        ? ctx.db
+            .query("people")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .take(OPTION_ROW_LIMIT)
+        : [],
+      canRead(auth, VENDOR_READ)
+        ? ctx.db
+            .query("vendors")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .take(OPTION_ROW_LIMIT)
+        : [],
+      canRead(auth, VENUE_READ)
+        ? ctx.db
+            .query("venues")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .take(OPTION_ROW_LIMIT)
+        : [],
     ]);
     const byLabel = <T extends { label: string }>(a: T, b: T) =>
       a.label.localeCompare(b.label);

@@ -32,6 +32,7 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useCreateQualityCheck: () => manifest.command,
   useCreatePrepTaskComment: () => manifest.command,
   usePrepTaskCancel: () => manifest.command,
+  usePrepTaskDependencyDropLink: () => manifest.command,
   usePrepTaskClaim: () => manifest.command,
   usePrepTaskComplete: () => manifest.command,
   usePrepTaskMarkBlocked: () => manifest.command,
@@ -41,6 +42,19 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useQualityCheckFail: () => manifest.command,
   useQualityCheckPass: () => manifest.command,
   useQualityCheckReinspect: () => manifest.command,
+}));
+
+vi.mock("../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => manifest.events,
+  useEventsInRange: () => manifest.events,
+}));
+
+vi.mock("../src/features/facilities/useMenuLinesFor", () => ({
+  useMenuLinesForEvents: () => manifest.eventDishes,
+}));
+
+vi.mock("../src/lib/useDishesByIds", () => ({
+  useDishesByIds: () => manifest.dishes,
 }));
 
 vi.mock("../src/features/kitchen/KitchenBookNav", () => ({

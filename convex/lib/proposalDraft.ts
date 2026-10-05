@@ -7,7 +7,7 @@
 // raw-writes AND references Client/Venue/Event/EventGuest; draftProposalWithLines
 // references clients/events (its args) but writes nothing directly, so it must
 // not share a file with the recompute seam (which does raw-patch line items +
-// proposal totals). See scripts/check-event-manifest-integration.ts.
+// proposal totals). See scripts/check-manifest-integration.ts (event guard).
 //
 // Creates a draft proposal AND all its priced lines in ONE transaction: the
 // central calc derives authoritative totals + every line amount up front, so an
@@ -20,7 +20,7 @@ import { v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
 import { getAuthContext, requireTenant } from "./authContext";
-import { assertValidCatalogLink } from "./proposalPricing";
+import { assertValidCatalogLink, assertValidRentalLink } from "./proposalPricing";
 
 export const draftProposalWithLines = mutation({
   args: {
@@ -42,6 +42,7 @@ export const draftProposalWithLines = mutation({
     notes: v.optional(v.string()),
     terms: v.optional(v.string()),
     visibleSections: v.optional(v.array(v.string())),
+    sectionOrder: v.optional(v.array(v.string())),
     eventId: v.optional(v.id("events")),
     lines: v.array(
       v.object({
@@ -52,10 +53,18 @@ export const draftProposalWithLines = mutation({
         unit: v.optional(v.string()),
         menuDishId: v.optional(v.id("menuDishes")),
         overrideReason: v.optional(v.string()),
+        equipmentId: v.optional(v.id("equipments")),
       }),
     ),
   },
-  handler: async (ctx, args): Promise<void> => {
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    docId: Id<"proposals">;
+    outcome: "created";
+    version: number;
+  }> => {
     // The created proposal's tenant is the caller's tenant (TenantScoped
     // creation sources tenantId from auth). Validate every catalog link against
     // it up front (codex review finding 3) — same-tenant published priced dish.
@@ -88,6 +97,7 @@ export const draftProposalWithLines = mutation({
       notes: args.notes,
       terms: args.terms,
       visibleSections: args.visibleSections,
+      sectionOrder: args.sectionOrder,
       eventId: args.eventId,
     });
     const proposalId = created.docId as Id<"proposals">;
@@ -97,6 +107,7 @@ export const draftProposalWithLines = mutation({
     for (let i = 0; i < args.lines.length; i++) {
       const line = args.lines[i];
       await assertValidCatalogLink(ctx, line.menuDishId, tenantId);
+      await assertValidRentalLink(ctx, line.equipmentId, tenantId);
       await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
         proposalId,
         description: line.description,
@@ -108,11 +119,12 @@ export const draftProposalWithLines = mutation({
         sortOrder: i,
         menuDishId: line.menuDishId,
         overrideReason: line.overrideReason,
+        equipmentId: line.equipmentId,
       });
     }
-    // No return: an untyped `any` return here would cascade through the `api`
-    // composite and re-introduce the app-wide TS7006 cascade (the quoteBuilder/
-    // proposalRevision lesson). The proposal list is reactive; the UI needs no
-    // created-id back.
+    // Explicitly typed (an untyped return cascades TS7006 through `api`):
+    // the new proposal id and version, so a screen can open it (BE-18.4).
+    const saved = await ctx.db.get(proposalId);
+    return { docId: proposalId, outcome: "created", version: saved?.version ?? 1 };
   },
 });

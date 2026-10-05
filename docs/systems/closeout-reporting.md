@@ -114,7 +114,7 @@ Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. P
 - Payroll runtime: `tests/proofs/payroll-input-lifecycle.runtime.test.ts`
 - Reports runtime: `tests/proofs/saved-report-definition-lifecycle.runtime.test.ts`
 - Routes/lifecycle: `tests/finance-routes.test.ts`, `tests/reports-routes.test.ts`
-- Guards: `bun run check:closeout-manifest`, `bun run check:payroll-manifest`
+- Guards: ~~`bun run check:closeout-manifest`~~ `bun run check:manifest-integration` (2026-09-25), ~~`bun run check:payroll-manifest`~~ `bun run check:manifest-integration` (2026-09-25)
 
 ## References
 

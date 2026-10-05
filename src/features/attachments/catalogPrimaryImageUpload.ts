@@ -1,4 +1,4 @@
-export type CatalogImageParentType = "dish" | "ingredient";
+export type CatalogImageParentType = "dish" | "ingredient" | "equipment";
 
 type UploadDeps = {
   generateUploadUrl: () => Promise<string>;

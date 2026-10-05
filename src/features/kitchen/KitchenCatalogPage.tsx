@@ -11,7 +11,6 @@ import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
 import type { Id } from "../../lib/api";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import {
-  useCreateDish,
   useCreateIngredient,
   useCreateMenu,
   useCreateComponent,
@@ -22,7 +21,6 @@ import {
   useDishReinstate,
   useIngredientPurge,
   useIngredientReinstate,
-  useListDish,
   useListIngredient,
   useListMenu,
   useListComponent,
@@ -32,22 +30,24 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
+import { mainDishRows } from "./dishVersions";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards, type CatalogItem } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
+import { NewDishPanel } from "./NewDishPanel";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   KITCHEN_SECTIONS,
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
-  dishPath,
   componentPath,
   ingredientPath,
   type KitchenSection,
@@ -66,14 +66,6 @@ const UNITS = UNIT_OF_MEASURE;
 function optional(value: FormDataEntryValue | null) {
   const result = String(value ?? "").trim();
   return result || undefined;
-}
-
-function csv(value: FormDataEntryValue | null) {
-  const result = String(value ?? "")
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return result.length ? result : undefined;
 }
 
 export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
@@ -104,11 +96,13 @@ function ComponentCatalogPage() {
 }
 
 function DishCatalogPage() {
-  const data = useListDish();
+  const data = useWholeDishList();
+  // Versions show as tabs on their main dish, not as rows of their own.
+  const mains = useMemo(() => (data ? mainDishRows(data) : undefined), [data]);
   return (
     <KitchenCatalogPageContent
       section="dishes"
-      data={data as CatalogItem[] | undefined}
+      data={mains as CatalogItem[] | undefined}
     />
   );
 }
@@ -134,7 +128,6 @@ function KitchenCatalogPageContent({
   const navigate = useNavigate();
   const createIngredient = useCreateIngredient();
   const createComponent = useCreateComponent();
-  const createDish = useCreateDish();
   const createMenu = useCreateMenu();
   const generateUploadUrl = useGenerateUploadUrl();
   const createAttachment = useCreateAttachment();
@@ -222,6 +215,7 @@ function KitchenCatalogPageContent({
           item.description,
           item.cuisine,
           item.course,
+          item.versionNames,
         ].some((value) =>
           String(value ?? "")
             .toLowerCase()
@@ -411,38 +405,6 @@ function KitchenCatalogPageContent({
         });
         navigate(componentPath(created.docId));
         return;
-      } else if (section === "dishes") {
-        const name = String(data.get("name") ?? "").trim();
-        const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
-          visibleRows,
-          name,
-        );
-        if (
-          duplicate &&
-          !(await prompt.askConfirm({
-            title: "Possible duplicate dish",
-            description: `A dish named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Use dish detail → Create new edition for a versioned edition.`,
-            confirmLabel: "Create anyway",
-          }))
-        ) {
-          return;
-        }
-        const created = await createDish({
-          name,
-          portionSize: Number(data.get("portionSize")),
-          portionUnit: String(
-            data.get("portionUnit"),
-          ) as (typeof UNITS)[number],
-          description: optional(data.get("description")),
-          category: optional(data.get("category")),
-          course: optional(data.get("course")),
-          serviceStyle: optional(data.get("serviceStyle")),
-          dietaryTags: csv(data.get("dietaryTags")),
-        });
-        // Prep templates, containers and components all live on the detail page,
-        // and adding them is always the next step. Land there like components do.
-        navigate(dishPath(created.docId));
-        return;
       } else {
         const name = String(data.get("name") ?? "").trim();
         const minGuests = Number(data.get("minGuests"));
@@ -451,7 +413,7 @@ function KitchenCatalogPageContent({
         // Validate guest range before submission (matches Manifest constraint wording)
         if (minGuests > 0 && maxGuests > 0 && minGuests > maxGuests) {
           throw new Error(
-            "Menu max guests must be zero (unlimited) or at least min guests",
+            "This menu's max guests can't be less than min guests. Set it to zero for no limit, or raise it to match min guests.",
           );
         }
 
@@ -521,7 +483,9 @@ function KitchenCatalogPageContent({
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
-      {showCreate ? (
+      {showCreate && section === "dishes" ? (
+        <NewDishPanel onClose={() => setShowCreate(false)} />
+      ) : showCreate ? (
         <KitchenCatalogCreateForm
           section={section}
           busy={busy === "create"}
@@ -601,7 +565,11 @@ function KitchenCatalogPageContent({
             </div>
           ) : (
             <div className="component-empty-state">
-              <div className="component-book-mark" aria-hidden="true">
+              <div
+                className="component-book-mark"
+                aria-hidden="true"
+                data-label={`HOUSE\n${sectionLabel.toUpperCase()}`}
+              >
                 <span />
               </div>
               <div>

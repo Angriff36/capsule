@@ -17,7 +17,7 @@ entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   property metadataJson: string?
   property observationsJson: string?
   property contextJson: string?
-  constraint packetArtifactSize: self.byteSize >= 0 "Source byte size cannot be negative"
+  constraint packetArtifactSize: self.byteSize >= 0 "This file's size can't be negative. Use zero or more."
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "The original packet files stay behind the scenes"
   default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the source files"
@@ -51,6 +51,10 @@ entity EventPacketResolution mixin TenantScoped {
   property decidedAt: datetime
   property decisionJson: string
   property verificationJson: string?
+  // A decision is saved once and never edited, so its version is always 1
+  // (rows saved before this field existed read as 1 too). A Final Lock
+  // answer names this version with the sign-off it was read from.
+  property version: int?
   constraint packetDecisionActor: length(trim(self.actor)) > 0 "A decision needs its authenticated actor"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetResolutionRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private approvals remain behind manager review"
@@ -70,6 +74,12 @@ entity EventPacketRevision mixin TenantScoped {
   property stage: string
   property createdBy: string
   property supersededBy: string?
+  // Final Lock answers this print showed: policy version + one fingerprint
+  // per question, so a later change names the stale questions and sections.
+  property answersJson: string?
+  // One fingerprint per packet part (worksheet, menu, pack views, forms,
+  // staff, pull sheet, route), so a later change names the stale parts.
+  property sectionsJson: string?
   constraint packetRevisionFingerprint: length(trim(self.snapshotFingerprint)) > 0 "A print needs its exact input fingerprint"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetRevisionRead read: roleAllows(user.role, "eventPacketSeamOnly") "PDF and source snapshots need scoped manager access"

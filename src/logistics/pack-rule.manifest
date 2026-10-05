@@ -1,0 +1,274 @@
+// PackRule — what an event fact puts on the pack list (spec §13.2).
+//
+// The service style kit (operations/service-style-kit.manifest) and the dish
+// containers (culinary/dish-container.manifest) cover the two oldest sources.
+// A pack rule covers the rest of the event: a dish needs tongs and a garnish
+// kit, "fries in cones" on a dish note needs cones, 150 guests need napkins
+// plus 10% spare, a grass venue with a rain plan needs flooring and tarps, a
+// bar needs the bar kit.
+//
+// The pack-rule planner (src/lib/packRules.ts) reads every active rule, and
+// the event reconciliation seam (convex/lib/packRuleReconciliation.ts) keeps
+// one pack line per item, owner and return need, with every source that asked
+// for it. A rule change bumps ruleVersion so a pack line can say which version
+// of the rule set its amount.
+
+use "../foundation/base.manifest"
+
+enum PackRuleTrigger {
+  dish
+  production_note
+  service_style
+  guest_count
+  event_fact
+}
+
+// What the amount grows with. fixed = only the base amount.
+enum PackRuleScale {
+  fixed
+  servings
+  guests
+}
+
+// Who owns the item on the truck: our own, rented from a vendor, or the
+// client's. Lines with a different owner never merge.
+enum PackOwnership {
+  owned
+  rented
+  client
+}
+
+enum PackCategory {
+  serving_vessel
+  utensil
+  holding
+  transport
+  garnish
+  portioning
+  disposable
+  place_setting
+  linen
+  table_setup
+  power
+  water
+  handwashing
+  tent
+  flooring
+  weather
+  bar
+  glassware
+  ice
+  decor
+  rental
+  other
+}
+
+enum PackRuleStatus {
+  active
+  retired
+}
+
+entity PackRule mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required trigger: PackRuleTrigger = "guest_count"
+  // dish: this dish is on the menu. production_note: optional, limits the
+  // note rule to one dish.
+  property dishId: uuid?
+  property serviceStyleId: uuid?
+  // event_fact: which answer on the event to read (see src/lib/packRules.ts).
+  property matchFact: string?
+  // production_note / event_fact: words the note or answer must contain.
+  // Empty on an event_fact rule = any answer that is not "No".
+  property matchText: string?
+  property required searchable description: string = ""
+  property required category: PackCategory = "other"
+  property required unit: UnitOfMeasure = "each"
+  // Always sent when the rule applies.
+  property required baseQuantity: int = 0
+  property required scaleBy: PackRuleScale = "fixed"
+  // One more for each N servings or guests.
+  property perUnits: int?
+  // Extra on the part that grows with servings or guests (10 = 10% spare).
+  property required sparePercent: int = 0
+  property required ownership: PackOwnership = "owned"
+  property required returnRequired: boolean = true
+  // Who takes it back, or where it goes after ("Back to Party Rentals Friday").
+  property returnNote: string?
+  // A must-have: leaving it off needs a stand-in or someone else covering it.
+  property required requiredCapability: boolean = false
+  property note: string?
+  property required ruleVersion: int = 1
+  property required status: PackRuleStatus = "active"
+  property definedAt: datetime?
+  property retiredAt: datetime?
+
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
+
+  constraint packRuleDescription: self.definedAt == null or length(trim(self.description)) > 0 "Say what goes on the pack list."
+  constraint packRuleBase: self.baseQuantity >= 0 "The base amount can't be negative. Use zero or more."
+  constraint packRuleSpare: self.sparePercent >= 0 "Spare can't be negative. Use zero or more."
+  constraint packRulePerUnits: self.perUnits == null or self.perUnits >= 1 "Use 1 or more for how many servings or guests each one covers."
+  constraint packRuleAmount: self.definedAt == null or self.baseQuantity > 0 or (self.scaleBy != "fixed" and self.perUnits != null) "Give a base amount, or say how many servings or guests each one covers."
+  constraint packRuleDish: self.definedAt == null or self.trigger != "dish" or self.dishId != null "Pick the dish this rule is for."
+  constraint packRuleStyle: self.definedAt == null or self.trigger != "service_style" or self.serviceStyleId != null "Pick the service style this rule is for."
+  constraint packRuleNote: self.definedAt == null or self.trigger != "production_note" or (self.matchText != null and length(trim(self.matchText)) > 0) "Type the words to look for in the dish note, like: in cones."
+  constraint packRuleFact: self.definedAt == null or self.trigger != "event_fact" or (self.matchFact != null and length(trim(self.matchFact)) > 0) "Pick which event answer this rule reads."
+  constraint packRuleServingsScale: self.definedAt == null or self.scaleBy != "servings" or self.trigger == "dish" or self.trigger == "production_note" "Only dish rules grow with servings. Use guests instead."
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  // The crew reads the rules (they explain the pack list). The people who run
+  // events and logistics keep them up to date - the same as the kit.
+  default policy packRuleRead read: roleAllows(user.role, "staffAccess") "Staff may see pack rules"
+  default policy packRuleWrite write: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may update pack rules"
+  default policy packRuleExecute execute: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may change pack rules"
+
+  command define(
+    trigger: PackRuleTrigger,
+    description: string,
+    category: PackCategory,
+    optional dishId: uuid,
+    optional serviceStyleId: uuid,
+    optional matchFact: string,
+    optional matchText: string,
+    optional unit: UnitOfMeasure,
+    optional baseQuantity: int,
+    optional scaleBy: PackRuleScale,
+    optional perUnits: int,
+    optional sparePercent: int,
+    optional ownership: PackOwnership,
+    optional returnRequired: boolean,
+    optional returnNote: string,
+    optional requiredCapability: boolean,
+    optional note: string
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    constraint definePackRuleDescription: length(trim(description)) > 0 "Say what goes on the pack list."
+    mutate trigger = trigger
+    mutate description = trim(description)
+    mutate category = category
+    mutate dishId = dishId
+    mutate serviceStyleId = serviceStyleId
+    mutate matchFact = matchFact
+    mutate matchText = matchText
+    mutate unit = unit != null ? unit : "each"
+    mutate baseQuantity = baseQuantity != null ? baseQuantity : (perUnits != null ? 0 : 1)
+    mutate scaleBy = scaleBy != null ? scaleBy : "fixed"
+    mutate perUnits = perUnits
+    mutate sparePercent = sparePercent != null ? sparePercent : 0
+    mutate ownership = ownership != null ? ownership : "owned"
+    mutate returnRequired = returnRequired != null ? returnRequired : true
+    mutate returnNote = returnNote
+    mutate requiredCapability = requiredCapability != null ? requiredCapability : false
+    mutate note = note
+    mutate ruleVersion = 1
+    mutate definedAt = now()
+    emit PackRuleDefined {
+      packRuleId: self.id
+      tenantId: self.tenantId
+      trigger: trigger
+      description: trim(description)
+    }
+  }
+
+  // Every field is sent; the new amounts reach live pack lists that still
+  // follow their sources the next time the event's pack list is refreshed.
+  command revise(
+    description: string,
+    category: PackCategory,
+    optional dishId: uuid,
+    optional serviceStyleId: uuid,
+    optional matchFact: string,
+    optional matchText: string,
+    unit: UnitOfMeasure,
+    baseQuantity: int,
+    scaleBy: PackRuleScale,
+    optional perUnits: int,
+    sparePercent: int,
+    ownership: PackOwnership,
+    returnRequired: boolean,
+    optional returnNote: string,
+    requiredCapability: boolean,
+    optional note: string
+  ) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint revisePackRuleDescription: length(trim(description)) > 0 "Say what goes on the pack list."
+    mutate description = trim(description)
+    mutate category = category
+    mutate dishId = dishId
+    mutate serviceStyleId = serviceStyleId
+    mutate matchFact = matchFact
+    mutate matchText = matchText
+    mutate unit = unit
+    mutate baseQuantity = baseQuantity
+    mutate scaleBy = scaleBy
+    mutate perUnits = perUnits
+    mutate sparePercent = sparePercent
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote
+    mutate requiredCapability = requiredCapability
+    mutate note = note
+    mutate ruleVersion = self.ruleVersion + 1
+    emit PackRuleRevised {
+      packRuleId: self.id
+      tenantId: self.tenantId
+      ruleVersion: self.ruleVersion
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    mutate status = "retired"
+    mutate retiredAt = now()
+    emit PackRuleRetired {
+      packRuleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate retiredAt = null
+    emit PackRuleReinstated {
+      packRuleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store PackRule in durable
+}
+
+event PackRuleDefined: "pack_rule.defined" {
+  packRuleId: string
+  tenantId: string
+  trigger: PackRuleTrigger
+  description: string
+}
+
+event PackRuleRevised: "pack_rule.revised" {
+  packRuleId: string
+  tenantId: string
+  ruleVersion: int
+}
+
+event PackRuleRetired: "pack_rule.retired" {
+  packRuleId: string
+  tenantId: string
+}
+
+event PackRuleReinstated: "pack_rule.reinstated" {
+  packRuleId: string
+  tenantId: string
+}

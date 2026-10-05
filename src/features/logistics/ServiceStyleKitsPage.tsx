@@ -93,6 +93,7 @@ export function ServiceStyleKitsPage() {
         description: draft.description.trim(),
         baseQuantity: wholeNumber(draft.baseQuantity) ?? 0,
         guestsPerUnit: wholeNumber(draft.guestsPerUnit),
+        sparePercent: wholeNumber(draft.sparePercent),
         unit: draft.unit,
         note: draft.note.trim() || undefined,
         sortOrder: linesFor(styleId).length,
@@ -114,6 +115,7 @@ export function ServiceStyleKitsPage() {
         description: target.description,
         baseQuantity: target.baseQuantity,
         guestsPerUnit: target.guestsPerUnit ?? undefined,
+        sparePercent: target.sparePercent ?? undefined,
         unit: target.unit,
         note: target.note ?? undefined,
         sortOrder,
@@ -136,6 +138,7 @@ export function ServiceStyleKitsPage() {
         description: draft.description.trim(),
         baseQuantity: wholeNumber(draft.baseQuantity) ?? 0,
         guestsPerUnit: wholeNumber(draft.guestsPerUnit),
+        sparePercent: wholeNumber(draft.sparePercent) ?? 0,
         unit: draft.unit,
         note: draft.note.trim() || undefined,
       });
@@ -220,6 +223,10 @@ export function ServiceStyleKitsPage() {
                           guestsPerUnit:
                             line.guestsPerUnit != null
                               ? String(line.guestsPerUnit)
+                              : "",
+                          sparePercent:
+                            line.sparePercent != null
+                              ? String(line.sparePercent)
                               : "",
                           unit: line.unit,
                           note: line.note ?? "",

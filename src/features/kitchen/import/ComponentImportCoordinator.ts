@@ -1,16 +1,21 @@
 import { ComponentCsvParser } from "./ComponentCsvParser";
 import { IngredientCatalogMatcher } from "./IngredientCatalogMatcher";
 import { ComponentTextParser } from "./ComponentTextParser";
-import type {
-  CatalogIngredient,
-  ComponentImportReviewState,
-  ComponentImportSourceKind,
-  ReviewIngredientLine,
+import { isRecipeSheet, parseRecipeSheet } from "./RecipeSheetParser";
+import {
+  isLineResolved,
+  type CatalogIngredient,
+  type CatalogRecipe,
+  type ComponentImportReviewState,
+  type ComponentImportSourceKind,
+  type ReviewIngredientLine,
 } from "./ComponentImportTypes";
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 
 /**
  * Owns parse → match → editable review state for the import workbench.
+ * `recipes` is the recipe book: lines naming one of them become sub-recipe
+ * lines instead of ingredients.
  */
 export class ComponentImportCoordinator {
   private readonly parser = new ComponentTextParser();
@@ -22,18 +27,24 @@ export class ComponentImportCoordinator {
     catalog: readonly CatalogIngredient[],
     sourceKind: ComponentImportSourceKind = "pasted_text",
     sourceFilename?: string,
+    recipes: readonly CatalogRecipe[] = [],
   ): ComponentImportReviewState {
-    const parsed = this.parser.parse(source);
-    return this.toReview(parsed, catalog, sourceKind, sourceFilename);
+    const parsed = isRecipeSheet(source)
+      ? parseRecipeSheet(source, sourceFilename).draft
+      : this.parser.parse(source);
+    return this.toReview(parsed, catalog, sourceKind, sourceFilename, recipes);
   }
 
   parseTextFile(
     source: string,
     filename: string,
     catalog: readonly CatalogIngredient[],
+    recipes: readonly CatalogRecipe[] = [],
   ): ComponentImportReviewState {
-    const parsed = this.csvParser.parseTextFile(source, filename);
-    return this.toReview(parsed, catalog, "text_file", filename);
+    const parsed = isRecipeSheet(source)
+      ? parseRecipeSheet(source, filename).draft
+      : this.csvParser.parseTextFile(source, filename);
+    return this.toReview(parsed, catalog, "text_file", filename, recipes);
   }
 
   parseCsvBundle(
@@ -42,6 +53,7 @@ export class ComponentImportCoordinator {
     catalog: readonly CatalogIngredient[],
     sheetFilename = "component_sheet.csv",
     linesFilename = "component_lines.csv",
+    recipes: readonly CatalogRecipe[] = [],
   ): ComponentImportReviewState {
     const bundle = this.csvParser.parseBundle(
       sheetCsv,
@@ -54,6 +66,7 @@ export class ComponentImportCoordinator {
       catalog,
       bundle.sourceKind,
       `${sheetFilename} + ${linesFilename}`,
+      recipes,
     );
     review.errors = bundle.errors.map(
       (error) => `${error.file} row ${error.row}: ${error.message}`,
@@ -82,6 +95,23 @@ export class ComponentImportCoordinator {
     };
   }
 
+  /**
+   * The line is a step of the method, not something to measure: it leaves
+   * the line list and is added to the end of the method text.
+   */
+  moveLineToMethod(
+    review: ComponentImportReviewState,
+    index: number,
+  ): ComponentImportReviewState {
+    const line = review.lines[index];
+    if (!line) return review;
+    const method = review.instructions?.trim();
+    return {
+      ...this.removeLine(review, index),
+      instructions: method ? `${method}\n${line.raw}` : line.raw,
+    };
+  }
+
   bindCatalogIngredient(
     review: ComponentImportReviewState,
     index: number,
@@ -92,6 +122,8 @@ export class ComponentImportCoordinator {
         matchStatus: "new",
         matchedIngredientId: undefined,
         matchedIngredientName: undefined,
+        matchedComponentId: undefined,
+        matchedComponentName: undefined,
         possibleMatchIds: [],
         possibleMatchNames: [],
         createNew: true,
@@ -101,9 +133,43 @@ export class ComponentImportCoordinator {
       matchStatus: "confirmed_existing",
       matchedIngredientId: ingredient.id,
       matchedIngredientName: ingredient.name,
+      matchedComponentId: undefined,
+      matchedComponentName: undefined,
       name: ingredient.name,
       possibleMatchIds: [],
       possibleMatchNames: [],
+      createNew: false,
+    });
+  }
+
+  /**
+   * Links the line to a recipe from the recipe book (a sub-recipe), or with
+   * null turns it back into an ingredient line that still needs a match.
+   */
+  bindSubrecipe(
+    review: ComponentImportReviewState,
+    index: number,
+    recipe: CatalogRecipe | null,
+  ): ComponentImportReviewState {
+    if (!recipe) {
+      return this.updateLine(review, index, {
+        matchStatus: "unresolved",
+        matchedComponentId: undefined,
+        matchedComponentName: undefined,
+        subrecipeHint: false,
+        createNew: false,
+      });
+    }
+    return this.updateLine(review, index, {
+      matchStatus: "subrecipe",
+      matchedComponentId: recipe.id,
+      matchedComponentName: recipe.name,
+      matchedIngredientId: undefined,
+      matchedIngredientName: undefined,
+      name: recipe.name,
+      possibleMatchIds: [],
+      possibleMatchNames: [],
+      subrecipeHint: true,
       createNew: false,
     });
   }
@@ -145,10 +211,7 @@ export class ComponentImportCoordinator {
 
   firstUnresolvedIndex(review: ComponentImportReviewState): number {
     return review.lines.findIndex(
-      (line) =>
-        line.matchStatus !== "exact" &&
-        line.matchStatus !== "confirmed_existing" &&
-        line.matchStatus !== "confirmed_new",
+      (line) => line.matchStatus !== "exact" && !isLineResolved(line),
     );
   }
 
@@ -156,7 +219,8 @@ export class ComponentImportCoordinator {
     parsed: ReturnType<ComponentTextParser["parse"]>,
     catalog: readonly CatalogIngredient[],
     sourceKind: ComponentImportSourceKind,
-    sourceFilename?: string,
+    sourceFilename: string | undefined,
+    recipes: readonly CatalogRecipe[],
   ): ComponentImportReviewState {
     return {
       sourceKind,
@@ -171,7 +235,7 @@ export class ComponentImportCoordinator {
       instructions: parsed.instructions,
       warnings: parsed.warnings,
       errors: [],
-      lines: this.matcher.matchAll(parsed.lines, catalog),
+      lines: this.matcher.matchAll(parsed.lines, catalog, recipes),
     };
   }
 }

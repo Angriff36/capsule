@@ -873,18 +873,20 @@ describe("accepted proposal → create event (issue #141)", () => {
       docId: proposal.docId,
     });
 
-    // A malformed id cannot even be staged — the schema validator rejects it
-    // before any write (pendingEventId is a real v.id("events") column).
+    // A malformed id cannot even be staged — the own-workspace link check
+    // rejects it before any write (pendingEventId is a real v.id("events")
+    // column).
     await expect(
       proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
         docId: proposal.docId,
         eventId: "evt_does_not_exist",
       }),
-    ).rejects.toThrow(/Validator/);
+    ).rejects.toThrow("A linked record was not found");
 
     // A well-formed id that does not exist in THIS tenant (another tenant's
-    // event) stages, but linkEvent's tenant-bound pendingEvent resolve comes
-    // back null → guard rejects. Nothing links.
+    // event) is refused when staged. One staged before that check (older
+    // data) still fails linkEvent's tenant-bound pendingEvent resolve →
+    // guard rejects. Nothing links.
     const foreignOwner = proof.asRole({
       subject: "owner-foreign",
       role: "owner",
@@ -900,10 +902,20 @@ describe("accepted proposal → create event (issue #141)", () => {
       api.mutations.Event_createViaPlanEngagement,
       { clientId: foreignClient.docId, ...EVENT_ARGS },
     )) as { docId: string };
-    await proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
-      docId: proposal.docId,
-      eventId: foreignEvent.docId,
-    });
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+        docId: proposal.docId,
+        eventId: foreignEvent.docId,
+      }),
+    ).rejects.toThrow(/linked record was not found/);
+    await owner.run((ctx) =>
+      ctx.db.patch(
+        proposal.docId as never,
+        {
+          pendingEventId: foreignEvent.docId,
+        } as never,
+      ),
+    );
     await expect(
       proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
         docId: proposal.docId,

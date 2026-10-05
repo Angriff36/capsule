@@ -352,7 +352,7 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
             ),
             status: String((row as { status?: string }).status ?? ""),
           })),
-          vendorOrderNumbers: [],
+          vendorOrders: [],
         },
       };
     });

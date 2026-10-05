@@ -1,8 +1,21 @@
 import {
   NUTRIENTS,
   formatNutrient,
+  type NutrientCoverage,
+  type NutrientDescriptor,
   type NutrientTotals,
 } from "./ComponentNutrition";
+
+function nutrientText(
+  totals: NutrientTotals,
+  nutrient: NutrientDescriptor,
+  coverage: NutrientCoverage | undefined,
+): string {
+  const state = coverage?.[nutrient.key] ?? "complete";
+  if (state === "unknown") return "Unknown";
+  const value = formatNutrient(totals[nutrient.key], nutrient);
+  return state === "partial" ? `at least ${value}` : value;
+}
 
 /**
  * Per-portion / per-guest nutrition grid. Reused on component detail, menu detail,
@@ -13,6 +26,7 @@ export function ComponentNutritionPanel({
   heading = "Nutrition",
   portionLabel,
   totals,
+  coverage,
   coverageNote,
   loading = false,
 }: Readonly<{
@@ -20,6 +34,8 @@ export function ComponentNutritionPanel({
   heading?: string;
   portionLabel: string;
   totals: NutrientTotals | null;
+  /** Per nutrient: unknown shows "Unknown", partial shows "at least". */
+  coverage?: NutrientCoverage;
   coverageNote?: string;
   loading?: boolean;
 }>) {
@@ -40,7 +56,7 @@ export function ComponentNutritionPanel({
       <p className="max-w-160 text-base text-ink-2">
         Aggregated from each ingredient's per-unit values, converted into the
         ingredient's catalog unit. Ingredients without nutrition on file are not
-        counted.
+        counted. A value no ingredient has on file shows as Unknown, never zero.
       </p>
 
       <dl
@@ -61,7 +77,7 @@ export function ComponentNutritionPanel({
             >
               {loading || totals == null
                 ? "—"
-                : formatNutrient(totals[nutrient.key], nutrient)}
+                : nutrientText(totals, nutrient, coverage)}
             </dd>
           </div>
         ))}

@@ -44,6 +44,7 @@ export const FINANCE_ROUTES = {
   revenue: "/finance/revenue",
   foodCost: "/finance/food-cost",
   profitMargins: "/finance/profit-margins",
+  reconciliation: "/finance/money-check",
   closeout: "/finance/closeout",
   payroll: "/finance/payroll",
   tips: "/finance/tips",

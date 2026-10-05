@@ -3,6 +3,7 @@ import { useMyReviews } from "../../lib/staffSelfReviews";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { ReviewFeedback } from "./ReviewFeedback";
 
 // Staff self-service view of their OWN recorded reviews (spec §9.4). Read-only
 // projection from the authored `staffSelfReviews.listMyReviews` seam — only the
@@ -54,6 +55,7 @@ export function MyReviewsPage() {
                   <th>Quality</th>
                   <th>Teamwork</th>
                   <th>Average</th>
+                  <th>Feedback</th>
                 </tr>
               </thead>
               <tbody>
@@ -83,6 +85,9 @@ export function MyReviewsPage() {
                           row.teamworkRating) /
                         3
                       ).toFixed(1)}
+                    </td>
+                    <td>
+                      <ReviewFeedback review={row} />
                     </td>
                   </tr>
                 ))}

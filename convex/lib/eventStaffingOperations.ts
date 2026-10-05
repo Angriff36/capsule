@@ -4,6 +4,10 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { getAuthContext } from "./authContext";
 import { readEventTimingPlan } from "./eventTimingOperations";
+import { readEventRouteLegs } from "./eventRouteLegRead";
+import { crewWindowForLeg, type CrewLegChoice } from "../../src/lib/eventRouteLegs";
+import { qualificationMeets } from "../../src/lib/staffingTemplates";
+import { proposeShiftChange, publishedNoticeFor } from "./shiftTimingProposals";
 
 type StaffingSource = {
   id: string;
@@ -70,7 +74,11 @@ function storedStaffingSources(rows: Awaited<ReturnType<typeof readStaffingRows>
   ];
 }
 
-async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">) {
+/**
+ * The window of the run this person travels with (PL-ROUTE-LEGS): a truck on
+ * the event, straight to the venue, or (no choice) the main crew timeline.
+ */
+export async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">, choice?: CrewLegChoice) {
   const timing = await readEventTimingPlan(ctx, eventId);
   const crewTime = (key: "staff_on" | "staff_off") => {
     const milestone = timing.milestones.find((row) => row.key === key)!;
@@ -78,7 +86,12 @@ async function readCrewWindow(ctx: MutationCtx, eventId: Id<"events">) {
     return time(milestone.row && (milestone.manual || milestone.performed)
       ? milestone.row.startsAt : milestone.startsAt);
   };
-  return { startsAt: crewTime("staff_on"), endsAt: crewTime("staff_off") };
+  const main = { startsAt: crewTime("staff_on"), endsAt: crewTime("staff_off") };
+  if (!choice?.rideVehicleAssignmentId && choice?.meetsAtVenue !== true) return main;
+  const legs = await readEventRouteLegs(ctx, eventId, timing.event.tenantId);
+  if (!legs) return main;
+  const { startsAt, endsAt } = crewWindowForLeg(legs, choice, main);
+  return { startsAt, endsAt };
 }
 
 function shiftPreservesWork(shift: Doc<"shifts">, workedShiftIds: Set<string>) {
@@ -141,7 +154,7 @@ export async function validateEventStaffingTiming(
     shift.startedAt != null || shift.completedAt != null || shift.noShowAt != null))
     throw new ConvexError("Recorded work keeps its staffing window.");
   if (row.followsEventTiming === true) {
-    const crew = await readCrewWindow(ctx, row.eventId);
+    const crew = await readCrewWindow(ctx, row.eventId, row);
     if (!sameTime(row.startsAt, crew.startsAt) || !sameTime(row.endsAt, crew.endsAt) ||
       linked.some((shift) => shift.eventStaffingManagedAt == null))
       throw new ConvexError("Calculated staffing must match the event crew timeline.");
@@ -455,9 +468,9 @@ async function resolveCoverageCredentials(
   const certification = certifications[0];
   if (certification) {
     const records = await ctx.db.query("qualifications").withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
-    requiredQualificationId = records.find((row) => row.tenantId === tenantId && row.deletedAt == null && row.status === "active" &&
-      row.name === certification.qualificationName && (row.certificationType ?? null) === certification.certificationType &&
-      (row.expiresAt == null || row.expiresAt >= (endsAt ?? Date.now())))?._id;
+    requiredQualificationId = records.find((row) => row.tenantId === tenantId &&
+      qualificationMeets(row, { name: certification.qualificationName!, certificationType: certification.certificationType },
+        endsAt, Date.now()))?._id;
     if (!requiredQualificationId) throw new ConvexError(`Replacement staff need a valid ${certification.qualificationName} certification for this coverage.`);
   }
   if (moduleId) {
@@ -488,14 +501,21 @@ export async function validateFilledCoverageCredentials(ctx: MutationCtx, id: Id
   const need = await ctx.db.get(id);
   if (!need?.filledByPersonId || !need.previousStaffNeedId) return;
   const requirements = await inheritedCoverageRequirements(ctx, need);
-  const end = followsTiming(need) ? (await readCrewWindow(ctx, need.eventId)).endsAt : time(need.endsAt);
+  const end = followsTiming(need) ? (await readCrewWindow(ctx, need.eventId, need)).endsAt : time(need.endsAt);
   await resolveCoverageCredentials(ctx, need.tenantId, need.filledByPersonId, end, requirements);
+}
+
+/** The certificate a need asks for itself (AC-504); carried onto its shift. */
+function ownNeedRequirement(need: Doc<"eventStaffNeeds">): CoverageRequirement[] {
+  const name = need.qualificationName?.trim();
+  return name ? [{ shiftTypeId: null, qualificationName: name,
+    certificationType: need.certificationType?.trim() || null, trainingModuleId: null }] : [];
 }
 
 async function staffingCoverageRequirements(ctx: MutationCtx, needs: Doc<"eventStaffNeeds">[], sources: readonly StaffingSource[]) {
   const ids = new Set(sources.map((source) => source.id));
   return uniqueRequirements((await Promise.all(needs.filter((need) => ids.has(need._id))
-    .map((need) => inheritedCoverageRequirements(ctx, need)))).flat());
+    .map(async (need) => [...ownNeedRequirement(need), ...await inheritedCoverageRequirements(ctx, need)]))).flat());
 }
 
 async function shiftMeetsCoverageRequirements(ctx: MutationCtx, shift: Doc<"shifts">, requirements: CoverageRequirement[]) {
@@ -508,8 +528,9 @@ async function shiftMeetsCoverageRequirements(ctx: MutationCtx, shift: Doc<"shif
   // validate active credentials and expiry through the new coverage window.
   return requirements.every((item) => (!item.shiftTypeId || shift.shiftTypeId === item.shiftTypeId) &&
     (item.qualificationName == null || (qualification?.tenantId === shift.tenantId &&
-      qualification.personId === shift.personId && qualification.name === item.qualificationName &&
-      (qualification.certificationType ?? null) === item.certificationType)) &&
+      qualification.personId === shift.personId &&
+      qualificationMeets({ ...qualification, status: "active", deletedAt: null, expiresAt: null },
+        { name: item.qualificationName, certificationType: item.certificationType }, null, 0))) &&
     (!item.trainingModuleId || (training?.tenantId === shift.tenantId && training.personId === shift.personId &&
       training.trainingModuleId === item.trainingModuleId)));
 }
@@ -550,7 +571,7 @@ async function coverageChangeWindows(ctx: MutationCtx, need: Doc<"eventStaffNeed
   }
   for (const window of windows) {
     if (window.startsAt != null && window.endsAt != null && window.endsAt <= window.startsAt)
-      throw new ConvexError("Coverage end must be after its start.");
+      throw new ConvexError("Set the coverage end after its start.");
     const sourceShifts = relevant.filter((shift) => window.followsEventTiming || need.coverageStartsAt != null || need.coverageEndsAt != null ||
       window.startsAt == null || window.endsAt == null || shift.startsAt == null || shift.endsAt == null ||
       (shift.startsAt < window.endsAt && shift.endsAt > window.startsAt));
@@ -595,6 +616,11 @@ async function finishStaffNeedCoverageChange(ctx: MutationCtx, id: Id<"eventStaf
       eventId: need.eventId, role: need.role, description: need.description ?? undefined, notes: need.notes ?? undefined,
       previousStaffNeedId: id, continuationSlot: slot, followsEventTiming: window.followsEventTiming,
       startsAt: window.startsAt ?? undefined, endsAt: window.endsAt ?? undefined,
+      // The replacement keeps what the work needs (AC-499).
+      skills: need.skills ?? undefined, qualificationName: need.qualificationName ?? undefined,
+      certificationType: need.certificationType ?? undefined, uniform: need.uniform ?? undefined,
+      workLocation: need.workLocation ?? undefined, payBasis: need.payBasis ?? undefined,
+      budgetHourlyRate: need.budgetHourlyRate ?? undefined,
     });
     // The posted callback fills this row and completes the remaining windows.
     return;
@@ -618,6 +644,8 @@ export async function finishPostedStaffNeedContinuation(ctx: MutationCtx, id: Id
   const historicalNeeds = await ctx.db.query("eventStaffNeeds").withIndex("by_eventId", (q) => q.eq("eventId", need.eventId)).collect();
   if (!window || row.tenantId !== need.tenantId || row.eventId !== need.eventId || row.role !== need.role ||
     (row.description ?? null) !== (need.description ?? null) || (row.notes ?? null) !== (need.notes ?? null) ||
+    (row.qualificationName ?? null) !== (need.qualificationName ?? null) ||
+    (row.certificationType ?? null) !== (need.certificationType ?? null) ||
     row.followsEventTiming !== window.followsEventTiming || !sameTime(row.startsAt, window.startsAt) || !sameTime(row.endsAt, window.endsAt) ||
     historicalNeeds.some((other) => other.tenantId === need.tenantId && other._id !== id && other.previousStaffNeedId === need._id && other.continuationSlot === slot))
     throw new ConvexError("Replacement coverage must reuse its planned role, instructions and window exactly once.");
@@ -652,7 +680,10 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
     return;
   }
 
-  const { startsAt: crewStartsAt, endsAt: crewEndsAt } = await readCrewWindow(ctx, eventId);
+  const crewWindow = await readCrewWindow(ctx, eventId);
+  const windowFor = (row: CrewLegChoice) =>
+    row.rideVehicleAssignmentId || row.meetsAtVenue === true
+      ? readCrewWindow(ctx, eventId, row) : crewWindow;
   const preservedIds = preservedStaffingSourceIds({
     assignments: local(assignments), needs: local(needs), shifts: local(shifts), records: local(records),
   });
@@ -662,8 +693,9 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
     const performed = row.checkedInAt != null || row.checkedOutAt != null || row.noShowAt != null ||
       preservedIds.has(row._id);
     const followsEventTiming = followsTiming(row);
-    const startsAt = followsEventTiming && !performed ? crewStartsAt : time(row.startsAt);
-    const endsAt = followsEventTiming && !performed ? crewEndsAt : time(row.endsAt);
+    const crew = followsEventTiming && !performed ? await windowFor(row) : null;
+    const startsAt = crew ? crew.startsAt : time(row.startsAt);
+    const endsAt = crew ? crew.endsAt : time(row.endsAt);
     if (followsEventTiming && !performed && (!sameTime(row.startsAt, startsAt) ||
       !sameTime(row.endsAt, endsAt) || row.followsEventTiming !== true)) {
       await ctx.runMutation(api.mutations.EventAssignment_planTiming, {
@@ -678,8 +710,9 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
     if (row.status === "cancelled") continue;
     const followsEventTiming = followsTiming(row);
     const performed = preservedIds.has(row._id);
-    const startsAt = followsEventTiming && !performed ? crewStartsAt : time(row.startsAt);
-    const endsAt = followsEventTiming && !performed ? crewEndsAt : time(row.endsAt);
+    const crew = followsEventTiming && !performed ? await windowFor(row) : null;
+    const startsAt = crew ? crew.startsAt : time(row.startsAt);
+    const endsAt = crew ? crew.endsAt : time(row.endsAt);
     if (followsEventTiming && !performed && (!sameTime(row.startsAt, startsAt) ||
       !sameTime(row.endsAt, endsAt) || row.followsEventTiming !== true)) {
       await ctx.runMutation(api.mutations.EventStaffNeed_planTiming, {
@@ -717,7 +750,16 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
       requirements.push(...existingRequirements);
       if (current && await shiftMeetsCoverageRequirements(ctx, current, requirements)) {
         used.add(current._id);
-        if (!sameTime(current.startsAt, interval.startsAt) || !sameTime(current.endsAt, interval.endsAt) ||
+        const moves = !sameTime(current.startsAt, interval.startsAt) || !sameTime(current.endsAt, interval.endsAt);
+        // A published shift was already told to the person: propose the new
+        // time for a manager to send, never move it silently (spec §8.4).
+        const notice = moves ? await publishedNoticeFor(ctx, current) : null;
+        if (notice) {
+          await proposeShiftChange(ctx, current, notice, {
+            startsAt: interval.startsAt, endsAt: interval.endsAt,
+            sourceIds: ids, role: sourceRoles(interval.sources),
+          });
+        } else if (moves ||
           JSON.stringify(current.eventStaffingSourceIds ?? []) !== JSON.stringify(ids) || current.role !== sourceRoles(interval.sources)) {
           await ctx.runMutation(api.mutations.Shift_planEventTiming, {
             docId: current._id, version: current.version, startsAt: interval.startsAt,
@@ -746,7 +788,13 @@ export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"even
         shift.eventStaffingSourceIds?.includes(source.id));
       if (incomplete.length) {
         // Keep the same planning record, but remove obsolete calculated dates.
-        if (shift.startsAt != null || shift.endsAt != null || shift.scheduledAt != null) {
+        const notice = await publishedNoticeFor(ctx, shift);
+        if (notice) {
+          await proposeShiftChange(ctx, shift, notice, {
+            startsAt: null, endsAt: null,
+            sourceIds: sourceIds(incomplete), role: sourceRoles(incomplete),
+          });
+        } else if (shift.startsAt != null || shift.endsAt != null || shift.scheduledAt != null) {
           await ctx.runMutation(api.mutations.Shift_planEventTiming, {
             docId: shift._id, version: shift.version, eventStaffingSourceIds: sourceIds(incomplete), role: sourceRoles(incomplete),
           });

@@ -1,3 +1,5 @@
+import { freeStock } from "../../lib/stockBalance";
+
 export type SubstitutionIngredient = {
   id: string;
   name: string;
@@ -50,17 +52,11 @@ function availableQuantity(
         item.stockedAt != null &&
         item.deletedAt == null,
     )
-    .reduce((total, item) => {
-      const reserved = reservations
-        .filter(
-          (reservation) =>
-            reservation.inventoryItemId === item.id &&
-            reservation.status === "active" &&
-            reservation.deletedAt == null,
-        )
-        .reduce((sum, reservation) => sum + reservation.quantity, 0);
-      return total + Math.max(0, item.quantityOnHand - reserved);
-    }, 0);
+    .reduce(
+      (total, item) =>
+        total + freeStock(item.id, item.quantityOnHand, reservations),
+      0,
+    );
 }
 
 /**

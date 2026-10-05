@@ -340,7 +340,6 @@ export function EventGuestPanel({
         <EventGuestSidebar
           summary={summary}
           expectedHeadcount={expectedHeadcount}
-          briefingPath={`/events/${eventId}/allergen-briefing`}
         />
       ) : null}
     </div>

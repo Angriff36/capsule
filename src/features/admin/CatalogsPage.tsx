@@ -50,7 +50,7 @@ export function CatalogsPage() {
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Catalogs"
-        lead="Manage the reference lists behind event and lead dropdowns. Changes reach every selector immediately."
+        lead="Manage the lists behind event and lead dropdowns. Changes reach every selector immediately."
       />
       <AdminWorkspaceNav />
       <CatalogsSection

@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   useGetMenu,
-  useListDish,
   useListDishComponent,
   useListDishIngredient,
   useListIngredient,
@@ -17,6 +16,7 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -27,9 +27,11 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
+import { dishRecipeLinks, shareRecipeLines } from "./dishVersions";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
+import { MenuPriceChangePlanner } from "./MenuPriceChangePlanner";
 import {
   calculateComponentNutrition,
   sumPerGuestNutrition,
@@ -61,10 +63,25 @@ export function MenuDetailPage() {
   const navigate = useNavigate();
   const menu = useRouteRecord(useGetMenu, id);
   useTrackRecent("Menu", menu?.name);
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   const menuDishes = useListMenuDish();
-  const dishComponents = useListDishComponent();
-  const dishIngredients = useListDishIngredient();
+  // A version that shares its main dish's recipe shows those lines as its own.
+  const rawDishComponents = useListDishComponent();
+  const rawDishIngredients = useListDishIngredient();
+  const dishComponents = useMemo(
+    () =>
+      rawDishComponents && dishes
+        ? shareRecipeLines(rawDishComponents, dishRecipeLinks(dishes))
+        : undefined,
+    [dishes, rawDishComponents],
+  );
+  const dishIngredients = useMemo(
+    () =>
+      rawDishIngredients && dishes
+        ? shareRecipeLines(rawDishIngredients, dishRecipeLinks(dishes))
+        : undefined,
+    [dishes, rawDishIngredients],
+  );
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
@@ -89,6 +106,26 @@ export function MenuDetailPage() {
       ),
     [id, menuDishes],
   );
+  // Course names in menu order, as the public menu groups them.
+  const menuCourses = useMemo(() => {
+    const dishCourse = new Map(
+      (dishes ?? []).map((dish) => [String(dish._id), dish.course]),
+    );
+    const names: string[] = [];
+    for (const selection of [...selectedMenuDishes].sort(
+      (a, b) => a.sortOrder - b.sortOrder,
+    )) {
+      const course = (
+        selection.course ?? dishCourse.get(String(selection.dishId))
+      )?.trim();
+      if (
+        course &&
+        !names.some((n) => n.toLowerCase() === course.toLowerCase())
+      )
+        names.push(course);
+    }
+    return names;
+  }, [dishes, selectedMenuDishes]);
   const allergensByDish = useMemo(() => {
     const rows = deriveAllergenRows({
       dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
@@ -97,6 +134,7 @@ export function MenuDetailPage() {
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
+      components: components ?? [],
     });
     const map = new Map<string, string[]>();
     for (const { dish, sources } of rows) {
@@ -110,6 +148,7 @@ export function MenuDetailPage() {
     dishComponents,
     componentIngredients,
     ingredients,
+    components,
   ]);
   const profitability = useMemo(
     () =>
@@ -508,7 +547,12 @@ export function MenuDetailPage() {
           minGuests: Number(menu.minGuests),
           maxGuests: Number(menu.maxGuests),
           status: String(menu.status),
+          availableFrom: menu.availableFrom,
+          availableUntil: menu.availableUntil,
+          guestsPerServer: menu.guestsPerServer,
+          pickOneCourses: menu.pickOneCourses,
         }}
+        courses={menuCourses}
         onFailure={setFailure}
       />
 
@@ -520,15 +564,35 @@ export function MenuDetailPage() {
           _id: dish._id,
           name: dish.name,
           description: dish.description,
-          allergenSummary: dish.allergenSummary,
+          allergenSummary:
+            allergensByDish.get(String(dish._id)) ?? dish.allergenSummary,
           primaryImageStorageId: dish.primaryImageStorageId,
           editionNumber: dish.editionNumber,
           deletedAt: dish.deletedAt,
           status: String(dish.status),
           mergedIntoDishId: dish.mergedIntoDishId,
           canonicalDishId: dish.canonicalDishId,
+          versionOfDishId: dish.versionOfDishId,
+          versionLabel: dish.versionLabel,
         }))}
         onError={setFailure}
+      />
+
+      <MenuPriceChangePlanner
+        lines={selectedMenuDishes.map((selection) => ({
+          _id: selection._id,
+          version: selection.version,
+          dishName: String(
+            (dishes ?? []).find((dish) => dish._id === selection.dishId)
+              ?.name ?? "Dish",
+          ),
+          sellingPrice: selection.sellingPrice,
+          scheduledSellingPrice: selection.scheduledSellingPrice,
+          scheduledPriceEffectiveAt: selection.scheduledPriceEffectiveAt,
+        }))}
+        canEdit={menu.status === "draft" || menu.status === "published"}
+        onFailure={setFailure}
+        onDone={setNotice}
       />
 
       <MenuProfitabilityPanel
@@ -564,6 +628,7 @@ export function MenuDetailPage() {
         totals={
           menuNutrition.componentCount > 0 ? menuNutrition.perGuest : null
         }
+        coverage={menuNutrition.coverage}
         coverageNote={menuNutritionNote}
         loading={nutritionLoading}
       />

@@ -459,8 +459,7 @@
   overflow-wrap: anywhere;
 }
 .my-day-prep-dish-meta,
-.my-day-prep-progress,
-.my-day-prep-task-meta {
+.my-day-prep-progress {
   font-size: 13px;
   color: var(--color-ink-2);
 }
@@ -483,41 +482,12 @@
   padding: 0;
   margin: 0;
 }
-.my-day-prep-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 16px;
-  padding: 14px 20px;
-}
-.my-day-prep-row + .my-day-prep-row {
-  border-top: 1px solid var(--color-line);
-}
-.my-day-prep-instruction {
-  flex: 1 1 240px;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.my-day-prep-task-name {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.45;
-}
-.my-day-prep-task-meta {
-  margin-top: 4px;
-}
 .my-day-prep-note {
-  margin-top: 6px;
   font-size: 15px;
   color: var(--color-ink-2);
+  overflow-wrap: anywhere;
 }
-.my-day-prep-row-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.my-day-prep-row-actions .btn {
+.my-day-prep-action.btn {
   min-height: 44px;
 }
 .my-day-secondary-grid {

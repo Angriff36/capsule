@@ -31,7 +31,7 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 | Maker | GLM/MiniMax, in-tick | One fix per round, inside `.loop-worktrees/<run-id>` only. Commits there, writes a hand-off file, stops. NEVER checks or lands its own work. Runs with permission checks ON + deny list `.claude/loop-maker-settings.json` |
 | Checker + lander | `.claude/loop-land.ps1` (plain code) + a reviewer from a DIFFERENT PROVIDER: Codex gpt-5.6-sol (OpenAI); fallback grok via Cursor CLI (xAI) | Reruns typecheck itself, gets the review, and on APPROVE pushes the fix onto `dev`. Anything else: records why, deletes the attempt. The pre-push hook refuses loop-worktree pushes that do not come from the lander |
 | Circuit breaker             | loop-context                                          | `loop-ledger.json`; 3× same error / 5 fails → escalate                                                                                                                                                                                                   |
-| Release gate | Human (Ryan) says "release" | Nothing reaches production until then. Escalations (3 failures on an item) are listed in STATE.md |
+| Release gate | The daily review, or Ryan saying "release" | When the daily review APPROVES the batch, `.claude/loop-land.ps1` releases it to production (Ryan, 2026-09-28: "once the reviewer clears it it should go to production"). Escalations (3 failures on an item) are listed in STATE.md |
 
 ## Active loops
 
@@ -84,6 +84,8 @@ commit subject, listed for the release review) — they are not human-only.
   (Builder never deploys Convex either — `bun run codegen` / `bun run dev:convex`
   are human steps after apply)
 - The maker never pushes; only the lander pushes, and only onto `dev`.
-  Production ships only when the owner says "release"
+  Production ships when the daily review approves the batch (the lander
+  releases it; Ryan, 2026-09-28: "once the reviewer clears it it should go
+  to production") or when the owner says "release"
   (`bash scripts/deploy-production.sh`). The loop never opens, merges, or
   closes PRs.

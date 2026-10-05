@@ -19,23 +19,45 @@ import {
 } from "./_generated/server";
 import { storageReferencedByTenant } from "./fileStorage";
 import { blobReferenced } from "./lib/blobs";
+import {
+  pickLivePerson,
+  tenantIdFromIdentityClaims,
+} from "./lib/personAuthPick";
+
+/** The workspace the sign-in's claims name — a hint that outlives a removal. */
+function claimedTenant(identity: unknown): string {
+  return tenantIdFromIdentityClaims(
+    identity as Record<string, unknown> | null | undefined,
+  );
+}
 
 async function personTenantId(
   ctx: QueryCtx,
   subject: string,
+  tenantHint?: string,
 ): Promise<string | null> {
   const people = await ctx.db
     .query("people")
     .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
     .collect();
-  const person = people.find((p) => p.deletedAt == null);
-  return person?.tenantId ?? null;
+  // Same live-person rule as sign-in: a removed (inactive) profile has no
+  // access, and a live profile in another workspace does not answer the
+  // workspace the sign-in's claims name (the claims outlive a removal).
+  const hint = tenantHint?.trim() ?? "";
+  const person = pickLivePerson(people, { subject, tenantId: hint || null });
+  if (!person) return null;
+  if (hint && person.tenantId !== hint) return null;
+  return person.tenantId ?? null;
 }
 
 async function authContext(ctx: MutationCtx | QueryCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) throw new Error("Sign in first.");
-  const tenantId = await personTenantId(ctx, identity.subject);
+  const tenantId = await personTenantId(
+    ctx,
+    identity.subject,
+    claimedTenant(identity),
+  );
   if (!tenantId) throw new Error("No staff profile is linked to your account.");
   return { subject: identity.subject, tenantId };
 }
@@ -45,7 +67,11 @@ export const forCaller = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return { configured: false as const };
-    const tenantId = await personTenantId(ctx, identity.subject);
+    const tenantId = await personTenantId(
+      ctx,
+      identity.subject,
+      claimedTenant(identity),
+    );
     if (tenantId == null) return { configured: false as const };
     const rows = await ctx.db
       .query("assistantLlmConfigs")
@@ -64,17 +90,28 @@ export const forCaller = query({
 });
 
 export const readForSubject = internalQuery({
-  args: { subject: v.string() },
-  handler: async (ctx, { subject }) => {
-    const tenantId = await personTenantId(ctx, subject);
-    if (tenantId == null) return null;
+  args: {
+    subject: v.string(),
+    // The workspace the caller's sign-in claims — a live profile in another
+    // workspace must not answer it (the claims outlive a removal).
+    tenantId: v.optional(v.string()),
+  },
+  handler: async (ctx, { subject, tenantId }) => {
+    // `staff: false` (no live staff profile) must stop the turn; only live
+    // staff without company settings may fall back to the deployment key.
+    const resolved = await personTenantId(ctx, subject, tenantId);
+    if (resolved == null) return { staff: false as const };
     const rows = await ctx.db
       .query("assistantLlmConfigs")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", resolved))
       .collect();
     const row = rows.find((r) => r.deletedAt == null);
-    if (!row) return null;
-    return { baseUrl: row.baseUrl, apiKey: row.apiKey, model: row.model };
+    return {
+      staff: true as const,
+      settings: row
+        ? { baseUrl: row.baseUrl, apiKey: row.apiKey, model: row.model }
+        : null,
+    };
   },
 });
 
@@ -128,6 +165,7 @@ export interface ResolvedAssistantFile {
 export const resolveFiles = internalQuery({
   args: {
     subject: v.string(),
+    tenantId: v.optional(v.string()),
     files: v.array(
       v.object({
         storageId: v.string(),
@@ -137,9 +175,9 @@ export const resolveFiles = internalQuery({
   },
   handler: async (
     ctx,
-    { subject, files },
+    { subject, files, tenantId: claimed },
   ): Promise<ResolvedAssistantFile[]> => {
-    const tenantId = await personTenantId(ctx, subject);
+    const tenantId = await personTenantId(ctx, subject, claimed);
     if (tenantId == null)
       return files.map((f) => ({ storageId: f.storageId, url: null }));
     return Promise.all(

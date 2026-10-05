@@ -75,10 +75,18 @@ import {
 
 type Props = {
   dishId: string;
+  /** The dish whose recipe this line cooks from (a version may share its main dish's). */
+  recipeDishId?: string | null;
   servings: number;
 };
 
-export function EventMenuRecipeEditor({ dishId, servings }: Props) {
+export function EventMenuRecipeEditor({
+  dishId,
+  recipeDishId,
+  servings,
+}: Props) {
+  // Recipe lines live on the recipe dish; pans stay this dish's own.
+  const recipeId = recipeDishId ?? dishId;
   const lines = useListDishIngredient();
   const ingredients = useListIngredient();
   const containers = useListDishContainer();
@@ -228,7 +236,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   }, [ingredientQuery, createName]);
 
   const rows = (lines ?? [])
-    .filter((line) => line.deletedAt == null && line.dishId === dishId)
+    .filter((line) => line.deletedAt == null && line.dishId === recipeId)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const liveIngredients = useMemo(
     () =>
@@ -271,7 +279,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
 
   async function addIngredientLine(ingredientId: string, quantity: number) {
     await addLine({
-      dishId,
+      dishId: recipeId,
       ingredientId,
       quantity,
       unit: unit as (typeof UNIT_OF_MEASURE)[number],
@@ -347,7 +355,9 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       });
       const ingredientId = createdIngredientId(created);
       if (!ingredientId) {
-        setError("Ingredient was created but no id came back.");
+        setError(
+          "The ingredient was saved but didn't show up yet. Search for it and add it again.",
+        );
         return;
       }
       applySearchState(
@@ -357,7 +367,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       setUnit(parsed.value.unit);
       if (quantity > 0) {
         await addLine({
-          dishId,
+          dishId: recipeId,
           ingredientId,
           quantity,
           unit: parsed.value.unit,
@@ -386,7 +396,9 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     const name = String(data.get("containerName") ?? "").trim();
     const servingsPerContainer = Number(data.get("servingsPerContainer") ?? 0);
     if (!name || servingsPerContainer < 1) {
-      setError("Container name and servings per pan are required.");
+      setError(
+        "Give this container a name and say how many servings fit in one pan.",
+      );
       return;
     }
     setBusy("add-container");
@@ -417,6 +429,12 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       {error ? <p className="text-base text-danger">{error}</p> : null}
       <div>
         <p className="text-sm font-semibold text-ink">Recipe (per serving)</p>
+        {recipeId !== dishId ? (
+          <p className="text-sm text-ink-3">
+            This version uses the main dish&apos;s recipe — changes here change
+            the main dish too.
+          </p>
+        ) : null}
         {rows.length === 0 ? (
           <p className="text-sm text-ink-3">
             No ingredients yet. Add them here — you do not need to leave the

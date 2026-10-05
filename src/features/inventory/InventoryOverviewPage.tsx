@@ -40,9 +40,9 @@ type AttentionRow = {
 };
 
 const URGENCY_CHIP: Record<Urgency, string> = {
-  now: "border-danger/30 bg-danger-soft text-danger",
-  soon: "border-warn/30 bg-warn-soft text-warn",
-  watch: "border-info/30 bg-info-soft text-info",
+  now: "chip-tone-danger",
+  soon: "chip-tone-warn",
+  watch: "chip-tone-info",
 };
 
 export function InventoryOverviewPage() {
@@ -153,7 +153,7 @@ export function InventoryOverviewPage() {
     {
       label: "Open vendor orders",
       value: formatCount(openOrders.length),
-      hint: "Drafts plus orders sent to vendors",
+      hint: "Drafts plus orders marked sent",
       tone: "neutral",
       to: "/inventory/purchasing",
     },

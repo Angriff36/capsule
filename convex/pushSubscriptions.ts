@@ -12,6 +12,7 @@ import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { type MutationCtx, mutation, query } from "./_generated/server";
 import { chatAuth } from "./lib/teamChatRead";
+import { insertStepEvent } from "./lib/commandAudit";
 
 /** Live devices one sign-in may keep; more is a bug or a very old account. */
 const DEVICES_CAP = 20;
@@ -96,9 +97,10 @@ export const register = mutation({
       );
     }
     const endpoint = args.endpoint.trim();
-    if (endpoint.length === 0) throw new Error("Endpoint is required");
+    if (endpoint.length === 0)
+      throw new Error("This device couldn't turn on notifications. Try again.");
     if (args.p256dh.trim().length === 0 || args.auth.trim().length === 0) {
-      throw new Error("Push keys are required");
+      throw new Error("This device couldn't turn on notifications. Try again.");
     }
     const now = Date.now();
     const userAgent = args.userAgent?.slice(0, 200);
@@ -133,7 +135,7 @@ export const register = mutation({
       for (const duplicate of existing) {
         if (duplicate._id !== keep._id) await ctx.db.delete(duplicate._id);
       }
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "PushSubscriptionRegistered",
         entity: "PushSubscription",
         entityId: keep._id,
@@ -159,7 +161,7 @@ export const register = mutation({
       updatedAt: now,
       version: 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "PushSubscriptionRegistered",
       entity: "PushSubscription",
       entityId: subscriptionId,
@@ -195,7 +197,7 @@ export const releaseByEndpoint = mutation({
         updatedAt: now,
         version: row.version + 1,
       });
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "PushSubscriptionRemoved",
         entity: "PushSubscription",
         entityId: row._id,
@@ -232,7 +234,7 @@ export const unregister = mutation({
         updatedAt: now,
         version: row.version + 1,
       });
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "PushSubscriptionRemoved",
         entity: "PushSubscription",
         entityId: row._id,

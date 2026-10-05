@@ -9,7 +9,6 @@ import {
   useCreateContract,
   useListClient,
   useListContract,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -21,6 +20,7 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -28,7 +28,7 @@ export function ContractsPage() {
   const workingId = useWorkingEventId();
   const contracts = useListContract();
   const clients = useListClient();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
   const send = useContractSend();
   const markViewed = useContractMarkViewed();
@@ -297,7 +297,7 @@ export function ContractsPage() {
             <p>No open contracts.</p>
           </div>
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Title</th>
@@ -310,8 +310,10 @@ export function ContractsPage() {
               {visibleRows.map((row) => (
                 <tr key={row._id}>
                   <td>{row.title}</td>
-                  <td>{clientDisplayName(row.clientId, clients)}</td>
-                  <td>
+                  <td data-label="Client">
+                    {clientDisplayName(row.clientId, clients)}
+                  </td>
+                  <td data-label="Status">
                     <StatusChip status={String(row.status)} />
                   </td>
                   <td className="supply-row-actions">

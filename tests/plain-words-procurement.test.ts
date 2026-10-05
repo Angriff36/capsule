@@ -127,8 +127,8 @@ describe("plain words on leftover procurement manifests", () => {
       "Procurement and managers may see order demand links",
       "Procurement and managers may see weekly purchasing config",
       "Inventory and managers may see event ingredient contributions",
-      "Procurement staff may see vendors",
-      "Procurement staff may see vendor contacts",
+      "Procurement staff and event managers may see vendors",
+      "Procurement staff and event managers may see vendor contacts",
       "Procurement staff may see vendor contracts",
       "Procurement staff may see contract price tiers",
     ]) {
@@ -166,10 +166,10 @@ describe("plain words on leftover procurement manifests", () => {
       "Recorded inventory lots require a supplier lot number and positive receipt quantities",
     );
     expect(visible).toContain(
-      "Receipt lots require a supplier lot number and positive receipt quantities",
+      "Give this receipt a supplier lot number and a receipt quantity greater than zero.",
     );
     expectPlain(
-      "Receipt lots require a supplier lot number and positive receipt quantities",
+      "Give this receipt a supplier lot number and a receipt quantity greater than zero.",
     );
 
     // already-landed write/read leftovers must stay put
@@ -184,6 +184,8 @@ describe("plain words on leftover procurement manifests", () => {
     );
 
     // later leftover, unchanged
-    expect(visible).toContain("Inventory lot unit cost cannot be negative");
+    expect(visible).toContain(
+      "This receipt's cost per unit can't be negative. Use zero or more.",
+    );
   });
 });

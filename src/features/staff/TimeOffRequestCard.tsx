@@ -74,7 +74,7 @@ export function TimeOffRequestCard({
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-2">
               Send the dates and a short reason. Your manager will review it
-              here; approved dates cannot be assigned a shift.
+              here; approved dates can't be assigned a shift.
             </p>
           </div>
           <button

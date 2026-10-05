@@ -196,8 +196,9 @@ export function PackListTemplatesPage() {
     if (!trimmed) {
       setFailure({
         category: "validation",
+        code: "VALIDATION_FAILED",
         title: "Check the entered details",
-        detail: "Template name is required.",
+        detail: "Give this template a name.",
       });
       return;
     }
@@ -206,8 +207,9 @@ export function PackListTemplatesPage() {
     if (min != null && max != null && max < min) {
       setFailure({
         category: "validation",
+        code: "VALIDATION_FAILED",
         title: "Check the entered details",
-        detail: "Guest-count band max must be greater than or equal to min.",
+        detail: "Guests to has to be the same as or higher than guests from.",
       });
       return;
     }
@@ -518,7 +520,7 @@ export function PackListTemplatesPage() {
         />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="phone-cards w-full text-xs">
             <thead className="text-left text-sm uppercase text-ink-3">
               <tr>
                 <th className="py-2 pr-3">Name</th>
@@ -548,7 +550,10 @@ export function PackListTemplatesPage() {
                         </div>
                       ) : null}
                     </td>
-                    <td className="py-2 pr-3 text-sm text-ink-2">
+                    <td
+                      className="py-2 pr-3 text-sm text-ink-2"
+                      data-label="Scope"
+                    >
                       {template.serviceStyleId
                         ? `Style: ${styleName(template.serviceStyleId)}`
                         : null}
@@ -566,8 +571,10 @@ export function PackListTemplatesPage() {
                         ? "Any event"
                         : null}
                     </td>
-                    <td className="py-2 pr-3 text-ink-2">{count}</td>
-                    <td className="py-2 pr-3">
+                    <td className="py-2 pr-3 text-ink-2" data-label="Items">
+                      {count}
+                    </td>
+                    <td className="py-2 pr-3" data-label="Status">
                       <StatusChip
                         status={template.status}
                         color={

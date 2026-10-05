@@ -7,10 +7,11 @@ import {
   useEventTemplateReactivate,
   useEventTemplateRevise,
   useListClient,
-  useListEvent,
+  useGetEvent,
   useListEventTemplate,
   useListMenu,
 } from "../../lib/manifest-convex-react";
+import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { ArrowLeftIcon, PlusIcon } from "../../ui/icons";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
@@ -22,6 +23,8 @@ import {
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { FailureBanner } from "./FailureBanner";
+
+const DAY_MS = 86_400_000;
 
 type TemplateDoc = {
   _id: string;
@@ -56,7 +59,25 @@ export function EventTemplatesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("fromEvent")?.trim() || "";
   const templates = useListEventTemplate();
-  const events = useListEvent();
+  // The "start from an event" picker offers events from two years back to one
+  // year ahead (and undated ones). The window moves once a day.
+  const today = Math.floor(Date.now() / DAY_MS) * DAY_MS;
+  const eventWindow = useMemo(
+    () => ({
+      from: today - 731 * DAY_MS,
+      to: today + 366 * DAY_MS,
+      withUndated: true,
+    }),
+    [today],
+  );
+  const events = useEventRecordsInRange(eventWindow);
+  // An event opened from its own page (?fromEvent=) may be older than the
+  // window; read it on its own then.
+  const linkedEvent = useGetEvent(
+    fromEventId && events && !events.some((e) => e._id === fromEventId)
+      ? fromEventId
+      : "skip",
+  );
   const clients = useListClient();
   const menus = useListMenu();
   const createTemplate = useCreateEventTemplate();
@@ -80,9 +101,10 @@ export function EventTemplatesPage() {
   const availableMenus = (menus ?? []).filter(
     (menu) => menu.deletedAt == null && menu.status !== "archived",
   );
-  const sourceEvents = (events ?? []).filter(
-    (event) => event.deletedAt == null && event.plannedAt != null,
-  );
+  const sourceEvents = [
+    ...(events ?? []),
+    ...(linkedEvent ? [linkedEvent] : []),
+  ].filter((event) => event.deletedAt == null && event.plannedAt != null);
   const sourceEvent = sourceEvents.find((e) => e._id === sourceEventId);
   const sourceClient = (clients ?? []).find(
     (c) => c._id === sourceEvent?.clientId,
@@ -346,7 +368,7 @@ export function EventTemplatesPage() {
             hint="Save a fully-configured event as a template to bootstrap the next one."
           />
         ) : (
-          <table className="w-full">
+          <table className="phone-cards w-full">
             <thead>
               <tr>
                 <th className="th w-full">Template</th>
@@ -368,24 +390,29 @@ export function EventTemplatesPage() {
                       {template.eventType}
                     </span>
                   </td>
-                  <td className="td text-ink-2">{template.clientType}</td>
-                  <td className="td text-right font-mono">
+                  <td className="td text-ink-2" data-label="Client type">
+                    {template.clientType}
+                  </td>
+                  <td
+                    className="td text-right font-mono"
+                    data-label="Headcount"
+                  >
                     {formatCount(template.defaultHeadcount)}
                   </td>
-                  <td className="td text-ink-2">
+                  <td className="td text-ink-2" data-label="Menu">
                     {menuName(template.menuId) ?? "—"}
                   </td>
-                  <td className="td text-ink-2">
+                  <td className="td text-ink-2" data-label="Staff roles">
                     {template.defaultStaffRoles?.length
                       ? template.defaultStaffRoles.join(", ")
                       : "—"}
                   </td>
-                  <td className="td text-ink-2">
+                  <td className="td text-ink-2" data-label="Equipment">
                     {template.typicalEquipment?.length
                       ? template.typicalEquipment.join(", ")
                       : "—"}
                   </td>
-                  <td className="td">
+                  <td className="td" data-label="Status">
                     <StatusChip status={String(template.status)} />
                   </td>
                   <td className="td">

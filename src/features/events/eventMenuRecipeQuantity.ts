@@ -9,7 +9,7 @@ export const RECIPE_QUANTITY_SCALE = 4;
 export const RECIPE_QUANTITY_INPUT_TYPE = "text" as const;
 export const RECIPE_QUANTITY_INPUT_MODE = "decimal" as const;
 export const RECIPE_QUANTITY_COMMIT_ERROR =
-  "Recipe quantity must be greater than 0.";
+  "This recipe quantity has to be more than zero. Enter how much it takes.";
 
 const TYPED_DECIMAL = /^(?:\d+|\d+\.\d*|\.\d+)$/;
 const SCALE = 10 ** RECIPE_QUANTITY_SCALE;

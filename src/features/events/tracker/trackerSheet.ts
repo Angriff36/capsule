@@ -86,7 +86,7 @@ function dayKey(ms: number): string {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
-function packStateOf(
+export function packStateOf(
   stage: string,
   lists: Doc<"packLists">[],
   openFlags: number,

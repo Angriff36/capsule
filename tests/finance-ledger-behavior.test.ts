@@ -34,10 +34,10 @@ it("excludes zero-balance rows from individual and bulk sends while sending each
   expect(rows).toHaveLength(4);
   for (const index of [0, 2]) {
     expect(rows[index].querySelector('input[type="checkbox"]')).toBeNull();
-    expect(rows[index].textContent).not.toContain("Record sent");
+    expect(rows[index].textContent).not.toContain("Mark sent");
     expect(rows[index].textContent).toContain("Void");
   }
-  await click(button("Record sent", rows[1]));
+  await click(button("Mark sent", rows[1]));
   expect(send).toHaveBeenCalledExactlyOnceWith({
     docId: "invoice-1",
     version: 2,
@@ -51,7 +51,7 @@ it("excludes zero-balance rows from individual and bulk sends while sending each
       '[aria-label="Select all sendable invoices"]',
     )!,
   );
-  await click(button("Record 2 sent"));
+  await click(button("Mark 2 sent"));
   expect(send.mock.calls).toEqual([
     [{ docId: "invoice-1", version: 2 }],
     [{ docId: "invoice-3", version: 4 }],
@@ -102,7 +102,7 @@ it("updates invoice-detail send eligibility with the live balance and links to t
   ).toContain("Spring banquet");
   expect(
     [...container.querySelectorAll("button")].some(
-      (node) => node.textContent === "Record sent",
+      (node) => node.textContent === "Mark sent",
     ),
   ).toBe(false);
   backend.values.set("useGetInvoice", {
@@ -112,7 +112,7 @@ it("updates invoice-detail send eligibility with the live balance and links to t
     version: 8,
   });
   await mount(page());
-  await click(button("Record sent"));
+  await click(button("Mark sent"));
   expect(send).toHaveBeenCalledExactlyOnceWith({
     docId: invoiceId,
     version: 8,

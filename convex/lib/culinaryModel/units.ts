@@ -303,7 +303,14 @@ export const resolveTppUnit = (label: string): UnitAliasResult => {
     : { unit: null, status: "unresolved_ambiguous_source", sourceLabel: trimmed };
 };
 
+/**
+ * Round for storage and display without losing tiny amounts: a pinch of
+ * saffron in pounds keeps at least four significant digits instead of
+ * rounding to zero.
+ */
 export const roundTo = (value: number, places = 4) => {
-  const f = 10 ** places;
+  if (!Number.isFinite(value) || value === 0) return value;
+  const magnitude = Math.floor(Math.log10(Math.abs(value)));
+  const f = 10 ** Math.min(15, Math.max(places, 3 - magnitude));
   return Math.round(value * f) / f;
 };

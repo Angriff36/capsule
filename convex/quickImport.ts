@@ -26,11 +26,27 @@ import { getAuthContext } from "./lib/authContext";
 import type { Id } from "./_generated/dataModel";
 import type { CommitResult } from "./importCommit";
 
+/**
+ * PL-IMPORT-RESUME (AC-269): every run records which source version it read.
+ * The browser sends the SHA-256 of the file it read; without one, the run
+ * keeps the SHA-256 of the rows it was given.
+ */
+async function rowsChecksum(rows: unknown[]): Promise<string> {
+  const bytes = new TextEncoder().encode(JSON.stringify(rows));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  const hex = Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `rows-sha256:${hex}`;
+}
+
 export const importFile = action({
   args: {
     datasetType: v.string(),
     sourceSystem: v.string(),
     rows: v.array(v.any()),
+    /** SHA-256 of the source file, from the browser. */
+    checksum: v.optional(v.string()),
   },
   handler: async (
     ctx,
@@ -53,6 +69,7 @@ export const importFile = action({
     const started = await ctx.runMutation(api.importCoordinator.startImport, {
       sourceSystem: args.sourceSystem,
       datasetType: args.datasetType,
+      checksum: args.checksum?.trim() || (await rowsChecksum(args.rows)),
     });
     const runId = started.importRunId;
 

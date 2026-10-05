@@ -1,13 +1,17 @@
 import { mutation, type MutationCtx } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+import { parseTemplateLines } from "../../src/lib/packTemplateLines";
+import { parseLayoutTemplateSections } from "../../src/lib/layoutTemplateSections";
+import { PACK_LIST_UNITS } from "../../src/features/logistics/packListUnits";
 import { getAuthContext, requireTenant } from "./authContext";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
+import { canWritePackLists, reconcileEventPackRules } from "./packRuleReconciliation";
 
 const DRAFTABLE_EVENT_STAGES = new Set(["planning", "quote", "sales_lock"]);
 const LOGISTICS_ROLES = new Set([
@@ -55,11 +59,35 @@ async function ownedLive<Table extends "packLists" | "events" | "vendors" | "ven
   return row;
 }
 
+/** A live, active venue layout template of this company, as copied now. */
+async function templateSource(
+  ctx: MutationCtx,
+  templateId: Id<"venueLayoutTemplates">,
+  tenantId: string,
+) {
+  const template = await ctx.db.get(templateId);
+  if (!template || template.deletedAt != null || template.tenantId !== tenantId ||
+    template.definedAt == null) {
+    throw new ConvexError("That layout template is gone. Pick another one.");
+  }
+  if (template.status !== "active") {
+    throw new ConvexError("That layout template is archived. Bring it back first, or pick another one.");
+  }
+  return {
+    templateId: template._id,
+    version: Number(template.version),
+    sections: parseLayoutTemplateSections(template.sections),
+  };
+}
 
 export const applyPackTemplate = mutation({
   args: {
     packListId: v.id("packLists"),
     operationKey: v.string(),
+    // With a template id the lines come from the saved template and carry its
+    // lineage: one list line per template line, a re-apply updates lines
+    // nobody set by hand and never duplicates (AC-132/AC-340).
+    packListTemplateId: v.optional(v.id("packListTemplates")),
     items: v.array(v.object({
       description: v.string(),
       requiredQuantity: v.number(),
@@ -70,9 +98,14 @@ export const applyPackTemplate = mutation({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
     requireRole(auth, "logisticsAccess");
-    await ownedLive(ctx, args.packListId, tenantId, "PackList");
+    const list = await ownedLive(ctx, args.packListId, tenantId, "PackList");
     const prior = await readMaterializationReceipt<{ itemCount: number }>(ctx, tenantId, "pack", args.operationKey, args);
     if (prior) return { ...prior, recovered: true };
+    if (args.packListTemplateId) {
+      const output = await applyTemplateLines(ctx, list, args.packListTemplateId, tenantId);
+      await writeMaterializationReceipt(ctx, tenantId, "pack", args.operationKey, args, output);
+      return { ...output, recovered: false };
+    }
     for (let index = 0; index < args.items.length; index++) {
       const item = args.items[index];
       await ctx.runMutation(api.mutations.PackListItem_createViaAddItem, {
@@ -88,6 +121,63 @@ export const applyPackTemplate = mutation({
   },
 });
 
+async function applyTemplateLines(
+  ctx: MutationCtx,
+  list: Doc<"packLists">,
+  templateId: Id<"packListTemplates">,
+  tenantId: string,
+): Promise<{ itemCount: number }> {
+  const template = await ctx.db.get(templateId);
+  if (!template || template.tenantId !== tenantId || template.deletedAt != null || template.status !== "active")
+    throw new ConvexError("This template is not available. Pick an active template.");
+  // A packed, loaded or sent list is the record of what went; a later
+  // template edit never rewrites it.
+  if (list.status !== "draft" && list.status !== "packing")
+    throw new ConvexError("This pack list is already packed. A template only changes a list that is still being packed.");
+  const lines = parseTemplateLines(template.items, PACK_LIST_UNITS);
+  if (lines.length === 0) throw new ConvexError("This template has no lines to add.");
+  const existing = (await ctx.db.query("packListItems")
+    .withIndex("by_packListId", (q) => q.eq("packListId", list._id)).collect())
+    .filter((row) => row.tenantId === tenantId && row.deletedAt == null && row.packListTemplateId === templateId);
+  const byKey = new Map(existing.map((row) => [row.templateLineKey ?? "", row]));
+  for (const line of lines) {
+    const row = byKey.get(line.key);
+    if (row && Number(row.requiredQuantity) === line.requiredQuantity && row.templateVersion === template.version)
+      continue;
+    const docId = row?._id ?? ((await ctx.runMutation(api.mutations.PackListItem_createViaAddItem, {
+      packListId: list._id,
+      description: line.description,
+      requiredQuantity: line.requiredQuantity,
+      unit: line.unit,
+    })) as { docId: Id<"packListItems"> }).docId;
+    await ctx.runMutation(api.mutations.PackListItem_ensureTemplateLine, {
+      docId,
+      packListId: list._id,
+      packListTemplateId: templateId,
+      templateLineKey: line.key,
+      templateVersion: template.version,
+      requiredQuantity: line.requiredQuantity,
+    });
+  }
+  return { itemCount: lines.length };
+}
+
+/** "Update from the event": bring the pack list in step with the event's
+ * facts and the current pack rules (after a rule change, for example). */
+export const refreshPackRules = mutation({
+  args: { packListId: v.id("packLists") },
+  handler: async (ctx, args): Promise<{ refreshed: boolean }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    // The same people who may change pack lines may refresh them.
+    if (!canWritePackLists(auth.role))
+      throw new ConvexError("Kitchen, logistics, event or sales staff, or a manager, can update a pack list.");
+    const list = await ownedLive(ctx, args.packListId, tenantId, "PackList");
+    await reconcileEventPackRules(ctx, list.eventId as Id<"events">);
+    return { refreshed: true };
+  },
+});
+
 export const applyLayoutTemplate = mutation({
   args: {
     eventId: v.id("events"),
@@ -97,6 +187,10 @@ export const applyLayoutTemplate = mutation({
       type: v.string(),
       instructions: v.optional(v.string()),
     })),
+    // PL-VENUE-LAYOUT: copy the saved template itself (its sections as stored
+    // now), and stamp each row with the template and version it came from.
+    // `sections` is then ignored.
+    templateId: v.optional(v.id("venueLayoutTemplates")),
   },
   handler: async (ctx, args): Promise<{ sectionCount: number; recovered: boolean }> => {
     const auth = await getAuthContext(ctx);
@@ -105,16 +199,23 @@ export const applyLayoutTemplate = mutation({
     await ownedLive(ctx, args.eventId, tenantId, "Event");
     const prior = await readMaterializationReceipt<{ sectionCount: number }>(ctx, tenantId, "layout", args.operationKey, args);
     if (prior) return { ...prior, recovered: true };
-    for (let index = 0; index < args.sections.length; index++) {
-      const section = args.sections[index];
+    const source = args.templateId
+      ? await templateSource(ctx, args.templateId, tenantId)
+      : null;
+    const sections = source ? source.sections : args.sections;
+    if (source && sections.length === 0) throw new ConvexError("That template has no sections to copy.");
+    for (let index = 0; index < sections.length; index++) {
+      const section = sections[index];
       await ctx.runMutation(api.mutations.EventLayoutSection_createViaAdd, {
         eventId: args.eventId,
         type: section.type,
         instructions: section.instructions,
         sortOrder: args.baseSortOrder + index,
+        sourceTemplateId: source?.templateId,
+        sourceTemplateVersion: source?.version,
       });
     }
-    const output = { sectionCount: args.sections.length };
+    const output = { sectionCount: sections.length };
     await writeMaterializationReceipt(ctx, tenantId, "layout", args.operationKey, args, output);
     return { ...output, recovered: false };
   },

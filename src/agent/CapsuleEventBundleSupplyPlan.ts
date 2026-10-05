@@ -183,18 +183,12 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
     const orderNumber = `TPP-${invoice}-${key}`;
     const orderRef = `order:${key}`;
     // An order a prior run opened resumes: only lines it never got to are
-    // added. Without line detail from the loader there is nothing to compare.
+    // added. The directory reads every order with its lines.
     let orderedIngredientIds: ReadonlySet<string> | undefined;
-    if (directory.vendorOrderNumbers.includes(orderNumber)) {
-      const known = directory.vendorOrders?.find(
-        (row) => row.orderNumber === orderNumber,
-      );
-      if (!known) {
-        warnings.push(
-          `Vendor order ${orderNumber} already exists; its lines were left as they are.`,
-        );
-        continue;
-      }
+    const known = directory.vendorOrders.find(
+      (row) => row.orderNumber === orderNumber,
+    );
+    if (known) {
       if (known.status !== "draft") {
         warnings.push(
           `Vendor order ${orderNumber} is ${known.status}; its ${group.lines.length} line(s) from the reports were not entered because lines can only be added while the order is a draft.`,

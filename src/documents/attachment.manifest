@@ -1,5 +1,6 @@
-// Capsule documents — file attachments on Event, Client, Contract, Vendor,
-// Delivery, Closeout, Dish, Ingredient, and StaffMessage (team chat) records.
+// Capsule documents — file attachments on Event, Client, Contract, Vendor, Venue,
+// Delivery, Closeout, Dish, Ingredient, Equipment, and StaffMessage (team
+// chat) records.
 // Binary content lives in Convex file storage (authored seam
 // convex/fileStorage.ts issues upload URLs and resolves download URLs);
 // this entity records the metadata, uploader identity, and timestamp.
@@ -21,8 +22,14 @@ enum AttachmentParentType {
   dish
   // Culinary ingredient catalog image (Ingredient.setPrimaryImage).
   ingredient
+  // Equipment catalog photo (Equipment.setPrimaryImage).
+  equipment
+  // Recipe photo (Component.setPrimaryImage).
+  component
   // Team chat photo or file; parentId is the StaffMessage id.
   staffMessage
+  // Venue photos, floor plans and insurance papers (spec §8.1).
+  venue
 }
 
 enum AttachmentEvidenceType {
@@ -99,9 +106,9 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     // verified; the public command never creates one.
     constraint attachNotChat: parentType != "staffMessage" "Chat files are attached through their message"
     constraint attachParent: length(trim(parentId)) > 0 "This file needs something to attach to"
-    constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
-    constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"
-    constraint attachSize: fileSize >= 0 "File size cannot be negative"
+    constraint attachFileName: length(trim(fileName)) > 0 "Give this file a name."
+    constraint attachStorage: length(trim(storageId)) > 0 "This file hasn't finished uploading yet."
+    constraint attachSize: fileSize >= 0 "This file's size can't be negative. Use zero or more."
     mutate parentType = parentType
     mutate parentId = parentId
     mutate fileName = fileName
@@ -123,6 +130,10 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   command setSurveySelection(included: boolean) {
     guard self.deletedAt == null
     mutate inFeedbackSurvey = included
+    emit AttachmentSurveySelectionSet {
+      attachmentId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command remove() {
@@ -135,4 +146,10 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   }
 
   store Attachment in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event AttachmentSurveySelectionSet: "attachment.survey.selection.set" {
+  attachmentId: string
+  tenantId: string
 }

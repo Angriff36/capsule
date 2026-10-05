@@ -227,7 +227,7 @@ export function QualificationsPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Person</th>
@@ -245,13 +245,15 @@ export function QualificationsPage() {
                     <td>
                       <strong>{personName(row.personId)}</strong>
                     </td>
-                    <td>
+                    <td data-label="Qualification">
                       {row.name}
                       <small>{row.certificationType || "Unclassified"}</small>
                     </td>
-                    <td>{row.issuingBody || "—"}</td>
-                    <td>{row.issuedAt ? formatDate(row.issuedAt) : "—"}</td>
-                    <td>
+                    <td data-label="Issuing body">{row.issuingBody || "—"}</td>
+                    <td data-label="Issued">
+                      {row.issuedAt ? formatDate(row.issuedAt) : "—"}
+                    </td>
+                    <td data-label="Expires">
                       {row.expiresAt ? formatDate(row.expiresAt) : "—"}
                       {(() => {
                         const expiry = expiryLabel(row.expiresAt, now);
@@ -262,7 +264,7 @@ export function QualificationsPage() {
                         ) : null;
                       })()}
                     </td>
-                    <td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                     </td>
                     <td>

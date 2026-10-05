@@ -16,6 +16,7 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { insertStepEvent } from "./lib/commandAudit";
 
 function canSetEmployeeNumber(role: string): boolean {
   return (
@@ -40,7 +41,7 @@ export const setEmployeeNumber = mutation({
     }
     const employeeNumber = args.employeeNumber.trim();
     if (!employeeNumber) {
-      throw new Error("Employee number is required.");
+      throw new Error("Enter an employee number.");
     }
     const stored = await ctx.db.get(args.docId);
     if (!stored || String(stored.tenantId) !== auth.tenantId) {
@@ -62,7 +63,7 @@ export const setEmployeeNumber = mutation({
       employeeNumber,
       version: (stored.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "PersonEmployeeNumberSet",
       entity: "Person",
       entityId: String(args.docId),

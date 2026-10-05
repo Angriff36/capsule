@@ -11,6 +11,11 @@ import { KitchenDisplayPage } from "../../../src/features/production/KitchenDisp
 
 const harness = vi.hoisted(() => ({ complete: vi.fn<() => Promise<void>>() }));
 
+vi.mock("../../../src/features/facilities/useEventsById", () => ({
+  useEventsById: () => [],
+  usePickerEvents: () => [],
+}));
+
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListProductionBatch: () => [
     {
@@ -27,9 +32,13 @@ vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListPrepTask: () => [],
   useListPrepTaskDependency: () => [],
   useListEvent: () => [],
+  useListPerson: () => [],
   useProductionBatchComplete: () => harness.complete,
   useProductionBatchStart: () => vi.fn(async () => undefined),
   useProductionBatchCancel: () => vi.fn(async () => undefined),
+  useCreateProductionBatch: () => vi.fn(async () => undefined),
+  useProductionBatchCorrectYield: () => vi.fn(async () => undefined),
+  useProductionBatchResolveShortfall: () => vi.fn(async () => undefined),
   useListProductionBatchAllocation: () => [],
   useProductionBatchAllocationMarkPortioned: () => vi.fn(async () => undefined),
   usePrepTaskClaim: () => vi.fn(async () => undefined),

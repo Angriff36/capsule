@@ -1,0 +1,103 @@
+// Capsule workforce — waiting list for a taken staffing need (spec §12.2
+// "offer/claim ... waitlist", AC-507). When a need is held or filled, other
+// crew can join its waiting list. If the spot opens again (hold released,
+// coverage reopened), the need shows who is waiting in order and the first
+// person can take it. Taking or being given the spot marks the entry placed
+// (server callback); a person can leave the list any time.
+
+use "./assignment.manifest"
+
+enum StaffNeedWaitlistStatus {
+  waiting
+  placed
+  left
+}
+
+entity StaffNeedWaitlistEntry mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required staffNeedId: uuid
+  property required personId: uuid
+  property required status: StaffNeedWaitlistStatus = "waiting"
+  property joinedAt: datetime?
+  property placedAt: datetime?
+  property leftAt: datetime?
+
+  belongsTo staffNeed: EventStaffNeed fields [tenantId, staffNeedId] references [tenantId, id]
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  transition status from "waiting" to ["placed", "left"]
+  transition status from "placed" to []
+  transition status from "left" to []
+
+  default policy staffNeedWaitlistRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may see who is waiting for event shifts"
+  default policy staffNeedWaitlistWrite write: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may join or leave event shift waiting lists"
+  default policy staffNeedWaitlistExecute execute: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may join or leave event shift waiting lists"
+
+  command join(staffNeedId: uuid, personId: uuid) {
+    guard self.joinedAt == null
+    guard self.deletedAt == null
+    guard (user.personId != null and personId == user.personId) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    guard self.staffNeed != null and self.staffNeed.deletedAt == null
+    constraint waitlistNeedMatch: staffNeedId == self.staffNeedId "This waiting list is for a different shift."
+    constraint waitlistPersonMatch: personId == self.personId "This waiting list entry is for a different person."
+    constraint waitlistNeedTaken: self.staffNeed.status == "claimed" or self.staffNeed.status == "filled" "This shift is still open - take it instead of joining the waiting list."
+    constraint waitlistNotHolder: self.staffNeed.claimedByPersonId != personId and self.staffNeed.filledByPersonId != personId "You already have this shift."
+    mutate staffNeedId = staffNeedId
+    mutate personId = personId
+    mutate status = "waiting"
+    mutate joinedAt = now()
+    emit StaffNeedWaitlistJoined {
+      waitlistEntryId: self.id
+      tenantId: self.tenantId
+      staffNeedId: staffNeedId
+      personId: personId
+    }
+  }
+
+  command leave() {
+    guard self.status == "waiting"
+    guard self.deletedAt == null
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    mutate status = "left"
+    mutate leftAt = now()
+    emit StaffNeedWaitlistLeft {
+      waitlistEntryId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Run by the server when this person takes or is given the spot.
+  command place() {
+    guard self.status == "waiting"
+    guard self.deletedAt == null
+    guard (user.personId != null and self.personId == user.personId) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    mutate status = "placed"
+    mutate placedAt = now()
+    emit StaffNeedWaitlistPlaced {
+      waitlistEntryId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store StaffNeedWaitlistEntry in durable
+}
+
+event StaffNeedWaitlistJoined: "staff_need_waitlist.joined" {
+  waitlistEntryId: string
+  tenantId: string
+  staffNeedId: string
+  personId: string
+}
+
+event StaffNeedWaitlistLeft: "staff_need_waitlist.left" {
+  waitlistEntryId: string
+  tenantId: string
+}
+
+event StaffNeedWaitlistPlaced: "staff_need_waitlist.placed" {
+  waitlistEntryId: string
+  tenantId: string
+}

@@ -25,6 +25,12 @@ export const NAV_AREAS: NavArea[] = [
   { path: "/", label: "Home", group: "Operate", icon: HomeIcon },
   { path: "/events", label: "Events", group: "Operate", icon: CalendarIcon },
   {
+    path: "/events/tracker",
+    label: "Event Tracker",
+    group: "Operate",
+    icon: ChartIcon,
+  },
+  {
     path: "/workbooks",
     label: "Event Workbooks",
     group: "Operate",

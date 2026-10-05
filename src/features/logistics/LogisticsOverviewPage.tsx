@@ -1,10 +1,11 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   useListDelivery,
-  useListEvent,
   useListPackList,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   EmptyState,
@@ -30,7 +31,14 @@ export function LogisticsOverviewPage() {
   const deliveries = useListDelivery();
   const packLists = useListPackList();
   const vehicles = useListVehicle();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      deliveries === undefined || packLists === undefined
+        ? undefined
+        : [...deliveries, ...packLists].map((row) => row.eventId),
+    [deliveries, packLists],
+  );
+  const events = useEventsById(eventIds);
 
   const loading =
     deliveries === undefined ||

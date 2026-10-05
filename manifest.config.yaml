@@ -16,6 +16,9 @@ projections:
       authContextImport: ./lib/authContext
       encryptionImport: ./lib/encryption
       eventHandlerImport: ./lib/operationalEvents
+      # Org capability kill-switches: generated checkRole asks this seam
+      # before the role hierarchy (roleAllows(user.role, ...) only).
+      roleGateImport: ./lib/orgCapabilityGate
       policyMode: enforce
       includeTenantFilter: true
       # Fold resolved computeds into list/get returns (documented helpers|inline).
@@ -74,9 +77,65 @@ projections:
         # Invoice numbers are unique per tenant; the numbering seam
         # (convex/lib/invoiceNumbering.ts) checks a proposed number with a point
         # lookup instead of reading the tenant's invoice history.
+        # The Today page (convex/todayDesk.ts) counts open invoices, prep,
+        # pack lists and draft closeouts by status instead of reading every
+        # row of each table (PL-SCALE, AC-172).
         Invoice:
           - fields: [tenantId, invoiceNumber]
             name: by_tenantId_and_invoiceNumber
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        PrepTask:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        PackList:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        EventCloseout:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        # One outside payment id is used by one payment, and one Capsule
+        # payment is matched by one imported payment row (BE-15.2-01/04). The
+        # seam (convex/lib/paymentAccounting.ts) checks with point lookups.
+        Payment:
+          - fields: [tenantId, externalPaymentId]
+            name: by_tenantId_and_externalPaymentId
+          - fields: [tenantId, matchedExternalId]
+            name: by_tenantId_and_matchedExternalId
+        ExternalRecordLink:
+          - fields: [tenantId, capsuleId]
+            name: by_tenantId_and_capsuleId
+        # Ingredient totals per event: every contribution reaction sums one
+        # ingredient's rows in one event. Reading the whole event 13 times per
+        # contribution passed Convex's 16 MB read limit on a 15-dish BEO
+        # import (2026-09-24). Manifest reads each sum through the declared
+        # index covering the most equality predicates, i.e. this one.
+        # Public quote dedup: one point read per submit instead of scanning the
+        # tenant's submissions (convex/quoteBuilder.ts ingressQuoteSubmission).
+        QuoteSubmission:
+          - fields: [tenantId, dedupKey]
+            name: by_tenantId_and_dedupKey
         EventIngredientContribution:
           - fields: [eventId, ingredientId]
             name: by_eventId_and_ingredientId
+        # The events ledger (convex/eventLedger.ts) reads one date-ordered
+        # window at a time instead of every event with its menu tree
+        # (PL-SCALE, AC-172: 10,000 events per tenant).
+        Event:
+          - fields: [tenantId, startsAt]
+            name: by_tenantId_and_startsAt
+          - fields: [tenantId, stage, startsAt]
+            name: by_tenantId_and_stage_and_startsAt
+          # The notification bell (convex/notifications.ts) reads only the
+          # events whose stage changed in the last seven days, not every
+          # event (13 s at 10,000 events held up every screen).
+          - fields: [tenantId, approvedAt]
+            name: by_tenantId_and_approvedAt
+          - fields: [tenantId, executionStartedAt]
+            name: by_tenantId_and_executionStartedAt
+          - fields: [tenantId, completedAt]
+            name: by_tenantId_and_completedAt
+          - fields: [tenantId, cancelledAt]
+            name: by_tenantId_and_cancelledAt
+          - fields: [tenantId, closedOutAt]
+            name: by_tenantId_and_closedOutAt

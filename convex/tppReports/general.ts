@@ -6,8 +6,12 @@ import type {
   TppRow,
 } from "../../src/features/reports/tpp/types";
 import { query } from "../_generated/server";
+import { getAuthContext } from "../lib/authContext";
+import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -17,6 +21,41 @@ import {
 
 const REPORT_IDS = new Set(TPP_GENERAL_REPORTS.map((report) => report.id));
 type Parameters = Record<string, string | string[] | boolean | number>;
+
+// Generated read policies (convex/queries.ts) of the records these reports
+// show. A report opens only for a caller who may read its main records; data
+// joined in from other records shows only when the caller may read those too.
+const CLIENT_READ = ["salesAccess", "financeAccess"];
+const FOLLOW_UP_READ = ["salesAccess"];
+const LEAD_READ = ["salesAccess"];
+const EVENT_READ = ["staffAccess"];
+const VENUE_READ = ["eventAccess"];
+const STOCK_ITEM_READ = ["inventoryAccess", "manageAccess"];
+const INGREDIENT_READ = ["kitchenAccess", "inventoryAccess", "manageAccess"];
+const STORAGE_LOCATION_READ = ["inventoryAccess"];
+const DISH_READ = ["kitchenAccess", "salesAccess", "manageAccess"];
+const MENU_READ = ["kitchenAccess", "salesAccess"];
+const EVENT_DISH_READ = ["staffAccess"];
+const CLOSEOUT_READ = ["financeAccess", "eventManageAccess"];
+const PERSON_READ = ["staffAccess"];
+const VENDOR_READ = ["procurementAccess"];
+
+/** Every read policy the report's main records need (all must pass). */
+const REPORT_READS: Record<string, string[][]> = {
+  "contact-task-notes": [FOLLOW_UP_READ],
+  "contact-lead-opportunities": [LEAD_READ],
+  "events-pending-final-confirmation": [EVENT_READ],
+  "inventory-in-stock": [STOCK_ITEM_READ],
+  "mailing-labels": [CLIENT_READ],
+  "menu-item-listing-report": [DISH_READ],
+  "menu-item-packages": [MENU_READ, DISH_READ],
+  "menu-item-popularity": [EVENT_DISH_READ, EVENT_READ, DISH_READ],
+  "post-event-notes": [CLOSEOUT_READ, EVENT_READ],
+  "staff-address-phone-list": [PERSON_READ],
+  "vendor-phone-list": [VENDOR_READ],
+  "venue-detail": [VENUE_READ],
+  "venue-listing": [VENUE_READ],
+};
 
 function title(reportId: string): string {
   return (
@@ -61,10 +100,16 @@ function range(parameters: Parameters): [number, number] {
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown TPP General report");
+    const auth = await getAuthContext(ctx);
+    const reads = REPORT_READS[args.reportId];
+    if (!reads || !reads.every((read) => canRead(auth, read)))
+      throw new Error(
+        "Your role can't open this report. Ask someone who works with these records to run it.",
+      );
     const parameters = (args.parameters ?? {}) as Parameters;
 
     if (args.reportId === "contact-task-notes") {
@@ -72,14 +117,20 @@ export const run = query({
         ctx.db
           .query("clientOutreachTasks")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("clients")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "contact tasks")),
+        canRead(auth, CLIENT_READ)
+          ? ctx.db
+              .query("clients")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "clients"))
+          : [],
       ]);
       const clientsById = new Map(
-        clients.map((client) => [String(client._id), name(client)]),
+        clients
+          .filter((client) => isLiveTenantRow(client, tenantId))
+          .map((client) => [String(client._id), name(client)]),
       );
       const [start, end] = range(parameters);
       return table(
@@ -94,7 +145,7 @@ export const run = query({
         tasks
           .filter(
             (row) =>
-              row.tenantId === tenantId &&
+              isLiveTenantRow(row, tenantId) &&
               inDateRange(row.openedAt ?? row.createdAt, start, end),
           )
           .map((row) => ({
@@ -114,7 +165,8 @@ export const run = query({
       const leads = await ctx.db
         .query("leads")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "leads"));
       const [start, end] = range(parameters);
       return table(
         args.reportId,
@@ -148,8 +200,12 @@ export const run = query({
       const events = await ctx.db
         .query("events")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "events"));
       const [start, end] = range(parameters);
+      // The event's own venue snapshot is event data; filling it from the
+      // Venue record follows the venue read policy.
+      const seeVenues = canRead(auth, VENUE_READ);
       const resolvedEvents = await Promise.all(
         events
           .filter(
@@ -163,19 +219,17 @@ export const run = query({
               ].includes(row.stage) &&
               inDateRange(row.startsAt, start, end),
           )
-          .map(async (event) =>
-            resolveReportEventVenue(
+          .map(async (event) => {
+            const plain = await decryptReportFields(
               ctx,
-              tenantId,
-              await decryptReportFields(
-                ctx,
-                "Event",
-                ["primaryContactName"],
-                event,
-              ),
-              false,
-            ),
-          ),
+              "Event",
+              ["primaryContactName"],
+              event,
+            );
+            return seeVenues
+              ? resolveReportEventVenue(ctx, tenantId, plain, false)
+              : plain;
+          }),
       );
       return table(
         args.reportId,
@@ -204,21 +258,32 @@ export const run = query({
         ctx.db
           .query("inventoryItems")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("ingredients")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
-        ctx.db
-          .query("storageLocations")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "stock items")),
+        canRead(auth, INGREDIENT_READ)
+          ? ctx.db
+              .query("ingredients")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "ingredients"))
+          : [],
+        canRead(auth, STORAGE_LOCATION_READ)
+          ? ctx.db
+              .query("storageLocations")
+              .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "storage places"))
+          : [],
       ]);
       const ingredientsById = new Map(
-        ingredients.map((row) => [String(row._id), row]),
+        ingredients
+          .filter((row) => isLiveTenantRow(row, tenantId))
+          .map((row) => [String(row._id), row]),
       );
       const locationsById = new Map(
-        locations.map((row) => [String(row._id), row.name]),
+        locations
+          .filter((row) => isLiveTenantRow(row, tenantId))
+          .map((row) => [String(row._id), row.name]),
       );
       const rows = items
         .filter(
@@ -267,7 +332,8 @@ export const run = query({
       const rawClients = await ctx.db
         .query("clients")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "clients"));
       const clients = await Promise.all(
         rawClients.map((client) =>
           decryptReportFields(
@@ -317,26 +383,40 @@ export const run = query({
           ctx.db
             .query("dishes")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "dishes")),
           ctx.db
             .query("menuDishes")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "menu dishes")),
           ctx.db
             .query("menus")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "menus")),
           ctx.db
             .query("eventDishes")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "event dishes")),
           ctx.db
             .query("events")
             .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "events")),
         ]);
-      const dishById = new Map(dishes.map((row) => [String(row._id), row]));
-      const menuById = new Map(menus.map((row) => [String(row._id), row.name]));
+      // Removed dishes, menus and events never show.
+      const dishById = new Map(
+        dishes
+          .filter((row) => isLiveTenantRow(row, tenantId))
+          .map((row) => [String(row._id), row]),
+      );
+      const menuById = new Map(
+        menus
+          .filter((row) => isLiveTenantRow(row, tenantId))
+          .map((row) => [String(row._id), row.name]),
+      );
       if (args.reportId === "menu-item-packages") {
         return table(
           args.reportId,
@@ -348,7 +428,11 @@ export const run = query({
           ],
           menuDishes
             .filter(
-              (row) => isLiveTenantRow(row, tenantId) && row.removedAt == null,
+              (row) =>
+                isLiveTenantRow(row, tenantId) &&
+                row.removedAt == null &&
+                menuById.has(String(row.menuId)) &&
+                dishById.has(String(row.dishId)),
             )
             .map((row) => ({
               id: row._id,
@@ -363,7 +447,11 @@ export const run = query({
       }
       if (args.reportId === "menu-item-popularity") {
         const [start, end] = range(parameters);
-        const eventById = new Map(events.map((row) => [String(row._id), row]));
+        const eventById = new Map(
+          events
+            .filter((row) => isLiveTenantRow(row, tenantId))
+            .map((row) => [String(row._id), row]),
+        );
         const counts = new Map<
           string,
           { events: Set<string>; servings: number }
@@ -373,7 +461,9 @@ export const run = query({
           if (
             !event ||
             !inDateRange(event.startsAt, start, end) ||
-            !isLiveTenantRow(item, tenantId)
+            !isLiveTenantRow(item, tenantId) ||
+            item.removedAt != null ||
+            !dishById.has(String(item.dishId))
           )
             continue;
           const current = counts.get(String(item.dishId)) ?? {
@@ -436,13 +526,20 @@ export const run = query({
         ctx.db
           .query("eventCloseouts")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "event closeouts")),
         ctx.db
           .query("events")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "events")),
       ]);
-      const eventById = new Map(events.map((row) => [String(row._id), row]));
+      // Notes on a removed event never show.
+      const eventById = new Map(
+        events
+          .filter((row) => isLiveTenantRow(row, tenantId))
+          .map((row) => [String(row._id), row]),
+      );
       const [start, end] = range(parameters);
       return table(
         args.reportId,
@@ -478,7 +575,8 @@ export const run = query({
       const rawPeople = await ctx.db
         .query("people")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "staff"));
       const people = await Promise.all(
         rawPeople.map((person) =>
           decryptReportFields(
@@ -535,7 +633,8 @@ export const run = query({
       const rawVendors = await ctx.db
         .query("vendors")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "vendors"));
       const vendors = await Promise.all(
         rawVendors.map((vendor) =>
           decryptReportFields(
@@ -580,7 +679,8 @@ export const run = query({
       const rawVenues = await ctx.db
         .query("venues")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "venues"));
       const venues = await Promise.all(
         rawVenues.map((venue) =>
           decryptReportFields(
@@ -672,5 +772,5 @@ export const run = query({
       );
     }
     throw new Error(`No TPP General resolver for ${args.reportId}`);
-  },
+  }),
 });

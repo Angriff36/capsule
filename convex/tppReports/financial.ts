@@ -9,8 +9,11 @@ import type {
 } from "../../src/features/reports/tpp/types";
 import { query } from "../_generated/server";
 import { getAuthContext } from "../lib/authContext";
+import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
+  keepReportRows,
+  reportHandler,
   decryptReportFields,
   inDateRange,
   isLiveTenantRow,
@@ -26,14 +29,46 @@ const BILLED_STATUSES = new Set([
   "partial",
   "paid",
 ]);
-const EARNINGS_ROLES = new Set([
-  "owner",
-  "admin",
-  "manager",
-  "finance_manager",
-  "workforce_manager",
-]);
 type Parameters = Record<string, string | string[] | boolean | number>;
+
+// Generated read policies (convex/queries.ts) of the records these reports
+// show. A report opens only for a caller who may read its main records; names
+// joined in from other records show only when the caller may read those too,
+// and removed records never show.
+const INVOICE_READ = ["financeAccess", "manageAccess"];
+const PAYMENT_READ = ["financeAccess"];
+const PROPOSAL_READ = ["salesAccess"];
+const PRICE_OBSERVATION_READ = [
+  "kitchenAccess",
+  "procurementAccess",
+  "manageAccess",
+];
+const CLOSEOUT_READ = ["financeAccess", "eventManageAccess"];
+const PAYROLL_READ = ["financeManageAccess"];
+const EVENT_READ = ["staffAccess"];
+const VENUE_READ = ["eventAccess"];
+const CLIENT_READ = ["salesAccess", "financeAccess"];
+const PERSON_READ = ["staffAccess"];
+const INGREDIENT_READ = ["kitchenAccess", "inventoryAccess", "manageAccess"];
+const VENDOR_READ = ["procurementAccess"];
+const PAYMENT_REPORTS = new Set([
+  "contact-payments",
+  "credit-card-transactions",
+  "payment-totals",
+]);
+const CLOSEOUT_REPORTS = new Set([
+  "profit-summary",
+  "event-food-costing-summary",
+]);
+function reportRead(reportId: string): string[] {
+  if (PAYMENT_REPORTS.has(reportId)) return PAYMENT_READ;
+  if (CLOSEOUT_REPORTS.has(reportId)) return CLOSEOUT_READ;
+  if (reportId === "outstanding-proposals") return PROPOSAL_READ;
+  if (reportId === "inventory-cost-changes") return PRICE_OBSERVATION_READ;
+  if (reportId === "staff-earnings") return PAYROLL_READ;
+  if (reportId === "lost-revenue-by-cancellation-reason") return EVENT_READ;
+  return INVOICE_READ;
+}
 
 function reportTitle(reportId: string): string {
   return (
@@ -130,43 +165,50 @@ function invoiceLines(value: unknown): {
 
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
-  handler: async (ctx, args): Promise<TppReportResult> => {
+  handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
     const tenantId = await requireReportTenant(ctx);
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown Financial report");
+    const auth = await getAuthContext(ctx);
+    if (!canRead(auth, reportRead(args.reportId)))
+      throw new Error(
+        "Your role can't open this money report. Ask someone who works with these records to run it.",
+      );
+    const seeEvents = canRead(auth, EVENT_READ);
+    const seeVenues = canRead(auth, VENUE_READ);
+    const seeClients = canRead(auth, CLIENT_READ);
     const parameters = (args.parameters ?? {}) as Parameters;
     const [rawEvents, invoices, clients] = await Promise.all([
       ctx.db
         .query("events")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "events")),
       ctx.db
         .query("invoices")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "invoices")),
       ctx.db
         .query("clients")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT),
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "clients")),
     ]);
+    // The event's own venue snapshot follows eventRead; filling it from the
+    // Venue record follows venueRead.
     const events = await Promise.all(
-      rawEvents.map(async (event) =>
-        resolveReportEventVenue(
+      rawEvents.map(async (event) => {
+        const plain = await decryptReportFields(
           ctx,
-          tenantId,
-          await decryptReportFields(
-            ctx,
-            "Event",
-            [
-              "primaryContactName",
-              "primaryContactEmail",
-              "primaryContactPhone",
-            ],
-            event,
-          ),
-          false,
-        ),
-      ),
+          "Event",
+          ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+          event,
+        );
+        return seeVenues
+          ? resolveReportEventVenue(ctx, tenantId, plain, false)
+          : plain;
+      }),
     );
     const eventById = new Map(
       events
@@ -178,6 +220,11 @@ export const run = query({
         .filter((row) => isLiveTenantRow(row, tenantId))
         .map((row) => [String(row._id), row]),
     );
+    // Joined names: blank when the caller may not read the joined record.
+    const contactOf = (clientId: unknown) =>
+      seeClients ? clientName(clientById.get(String(clientId))) : "";
+    const shownEvent = (eventId: unknown) =>
+      seeEvents && eventId ? eventById.get(String(eventId)) : undefined;
     const [start, end] = range(parameters);
     const billed = invoices.filter(
       (row) =>
@@ -225,7 +272,7 @@ export const run = query({
           return {
             id: row._id,
             values: {
-              contact: clientName(clientById.get(String(row.clientId))),
+              contact: contactOf(row.clientId),
               invoice: row.invoiceNumber ?? "",
               issued: row.issuedAt ?? null,
               due: row.dueDate ?? null,
@@ -265,7 +312,8 @@ export const run = query({
       const payments = await ctx.db
         .query("payments")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "payments"));
       let settled = payments.filter(
         (row) =>
           isLiveTenantRow(row, tenantId) &&
@@ -299,7 +347,7 @@ export const run = query({
         id: row._id,
         values: {
           date: row.settledAt ?? row.recordedAt ?? null,
-          contact: clientName(clientById.get(String(row.clientId))),
+          contact: contactOf(row.clientId),
           method: row.method,
           amount: row.amount,
           source: row.externalSource ?? "",
@@ -332,13 +380,9 @@ export const run = query({
         .map((row) => ({
           id: row._id,
           values: {
-            event: row.eventId
-              ? (eventById.get(String(row.eventId))?.title ?? "")
-              : "",
-            contact: clientName(clientById.get(String(row.clientId))),
-            date: row.eventId
-              ? (eventById.get(String(row.eventId))?.startsAt ?? null)
-              : null,
+            event: shownEvent(row.eventId)?.title ?? "",
+            contact: contactOf(row.clientId),
+            date: shownEvent(row.eventId)?.startsAt ?? null,
             deposit: row.depositAmount ?? 0,
             due: row.dueDate ?? null,
             status: row.status,
@@ -363,7 +407,8 @@ export const run = query({
       const proposals = await ctx.db
         .query("proposals")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "proposals"));
       const rows = proposals
         .filter(
           (row) =>
@@ -375,7 +420,7 @@ export const run = query({
           id: row._id,
           values: {
             proposal: row.proposalNumber ?? row.title,
-            contact: clientName(clientById.get(String(row.clientId))),
+            contact: contactOf(row.clientId),
             date: row.eventDate ?? null,
             guests: row.guestCount,
             total: row.total,
@@ -404,21 +449,32 @@ export const run = query({
         ctx.db
           .query("ingredientPriceObservations")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "ingredient prices")),
         ctx.db
           .query("ingredients")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "ingredients")),
         ctx.db
           .query("vendors")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "vendors")),
       ]);
       const ingredientById = new Map(
-        ingredients.map((row) => [String(row._id), row.name]),
+        canRead(auth, INGREDIENT_READ)
+          ? ingredients
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row.name])
+          : [],
       );
       const vendorById = new Map(
-        vendors.map((row) => [String(row._id), row.name]),
+        canRead(auth, VENDOR_READ)
+          ? vendors
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row.name])
+          : [],
       );
       const grouped = new Map<string, typeof observations>();
       for (const item of observations.filter(
@@ -470,7 +526,8 @@ export const run = query({
       const closeouts = await ctx.db
         .query("eventCloseouts")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "event closeouts"));
       const rows = closeouts
         .filter(
           (row) =>
@@ -485,8 +542,8 @@ export const run = query({
         .map((row) => ({
           id: row._id,
           values: {
-            event: eventById.get(String(row.eventId))?.title ?? "",
-            date: eventById.get(String(row.eventId))?.startsAt ?? null,
+            event: shownEvent(row.eventId)?.title ?? "",
+            date: shownEvent(row.eventId)?.startsAt ?? null,
             revenue: row.actualRevenue,
             foodCost: row.actualIngredientCost,
             wasteCost: row.actualWasteCost,
@@ -557,28 +614,36 @@ export const run = query({
     }
 
     if (args.reportId === "staff-earnings") {
-      const auth = await getAuthContext(ctx);
-      if (!EARNINGS_ROLES.has(auth.role))
-        throw new Error(
-          "Staff earnings are available to workforce and finance managers",
-        );
       const [payroll, people, eventRows] = await Promise.all([
         ctx.db
           .query("payrollInputs")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "pay records")),
         ctx.db
           .query("people")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "staff")),
         ctx.db
           .query("events")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .take(REPORT_ROW_LIMIT),
+          .take(REPORT_ROW_LIMIT + 1)
+          .then(keepReportRows(ctx, "events")),
       ]);
-      const peopleById = new Map(people.map((row) => [String(row._id), row]));
+      const peopleById = new Map(
+        canRead(auth, PERSON_READ)
+          ? people
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row])
+          : [],
+      );
       const eventsById = new Map(
-        eventRows.map((row) => [String(row._id), row.title]),
+        seeEvents
+          ? eventRows
+              .filter((row) => isLiveTenantRow(row, tenantId))
+              .map((row) => [String(row._id), row.title])
+          : [],
       );
       const rows = payroll
         .filter(
@@ -650,14 +715,35 @@ export const run = query({
                 : args.reportId === "event-other-fees"
                   ? /other fee|service fee|delivery fee|fee/i
                   : null;
-      let rows = rangedInvoices.flatMap((invoice) =>
-        invoiceLines(invoice.lineItems).map((line, index) => ({
+      // #426: the invoice discount is shared across its lines by line amount
+      // (cents, the leftover cent on the last line), so the lines add back
+      // to the invoice discount instead of repeating it on every line.
+      const lineDiscounts = (
+        lines: ReturnType<typeof invoiceLines>,
+        discount: number,
+      ): number[] => {
+        const cents = Math.round(discount * 100);
+        const base = lines.reduce((sum, line) => sum + line.amount, 0);
+        const shares = lines.map((line, index) =>
+          base === 0
+            ? index === 0
+              ? cents
+              : 0
+            : Math.round((cents * line.amount) / base),
+        );
+        if (shares.length > 0)
+          shares[shares.length - 1]! +=
+            cents - shares.reduce((sum, share) => sum + share, 0);
+        return shares.map((share) => share / 100);
+      };
+      let rows = rangedInvoices.flatMap((invoice) => {
+        const lines = invoiceLines(invoice.lineItems);
+        const discounts = lineDiscounts(lines, invoice.discountAmount);
+        return lines.map((line, index) => ({
           id: `${invoice._id}-${index}`,
           values: {
-            event: invoice.eventId
-              ? (eventById.get(String(invoice.eventId))?.title ?? "")
-              : "",
-            contact: clientName(clientById.get(String(invoice.clientId))),
+            event: shownEvent(invoice.eventId)?.title ?? "",
+            contact: contactOf(invoice.clientId),
             invoice: invoice.invoiceNumber ?? "",
             date: invoice.issuedAt ?? null,
             item: line.description,
@@ -668,11 +754,11 @@ export const run = query({
             profit: line.amount - line.cost,
             margin: percent(line.amount - line.cost, line.amount),
             tax: line.tax,
-            discount: invoice.discountAmount,
+            discount: discounts[index] ?? 0,
             total: line.amount + line.tax,
           },
-        })),
-      );
+        }));
+      });
       if (matcher)
         rows = rows.filter(
           (row) =>
@@ -685,10 +771,8 @@ export const run = query({
           .map((invoice) => ({
             id: invoice._id,
             values: {
-              event: invoice.eventId
-                ? (eventById.get(String(invoice.eventId))?.title ?? "")
-                : "",
-              contact: clientName(clientById.get(String(invoice.clientId))),
+              event: shownEvent(invoice.eventId)?.title ?? "",
+              contact: contactOf(invoice.clientId),
               invoice: invoice.invoiceNumber ?? "",
               date: invoice.issuedAt ?? null,
               item: "Discount",
@@ -774,16 +858,28 @@ export const run = query({
       );
     }
 
-    const revenueRows: TppRow[] = rangedInvoices.map((invoice) => {
-      const event = invoice.eventId
-        ? eventById.get(String(invoice.eventId))
-        : undefined;
+    // Venue Sales for one venue (PL-VENUE-PROFILE, AC-323): the event's own
+    // venue link, so a renamed venue still finds its events.
+    const venueFilter =
+      typeof parameters.venueId === "string" && parameters.venueId
+        ? parameters.venueId
+        : null;
+    const venueInvoices = venueFilter
+      ? rangedInvoices.filter(
+          (invoice) =>
+            invoice.eventId != null &&
+            String(eventById.get(String(invoice.eventId))?.venueId ?? "") ===
+              venueFilter,
+        )
+      : rangedInvoices;
+    const revenueRows: TppRow[] = venueInvoices.map((invoice) => {
+      const event = shownEvent(invoice.eventId);
       return {
         id: invoice._id,
         values: {
           date: invoice.issuedAt ?? event?.startsAt ?? null,
           event: event?.title ?? "",
-          contact: clientName(clientById.get(String(invoice.clientId))),
+          contact: contactOf(invoice.clientId),
           venue: event?.venueName ?? "",
           referral: event?.referralSourceId
             ? String(event.referralSourceId)
@@ -810,15 +906,13 @@ export const run = query({
         ...billed
           .filter((row) => (row.issuedAt ?? row.createdAt ?? 0) <= asOf)
           .map((invoice) => {
-            const event = invoice.eventId
-              ? eventById.get(String(invoice.eventId))
-              : undefined;
+            const event = shownEvent(invoice.eventId);
             return {
               id: invoice._id,
               values: {
                 date: invoice.issuedAt ?? null,
                 event: event?.title ?? "",
-                contact: clientName(clientById.get(String(invoice.clientId))),
+                contact: contactOf(invoice.clientId),
                 venue: event?.venueName ?? "",
                 referral: event?.referralSourceId
                   ? String(event.referralSourceId)
@@ -844,6 +938,7 @@ export const run = query({
         ...events
           .filter(
             (event) =>
+              seeEvents &&
               isLiveTenantRow(event, tenantId) &&
               !["cancelled", "closed_out"].includes(event.stage) &&
               inDateRange(event.startsAt, start, end) &&
@@ -913,5 +1008,5 @@ export const run = query({
       );
     }
     throw new Error(`No Financial resolver for ${args.reportId}`);
-  },
+  }),
 });

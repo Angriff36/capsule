@@ -1,13 +1,13 @@
 import { useState, type FormEvent } from "react";
 import {
   useCreateWasteRecord,
-  useListEvent,
   useListIngredient,
   useListInventoryItem,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 export const WASTE_REASON_LABELS: Record<string, string> = {
   spoilage: "Spoilage",
@@ -24,7 +24,7 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
   const items = useListInventoryItem();
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([workingId]);
   const createWasteRecord = useCreateWasteRecord();
   const [inventoryItemId, setInventoryItemId] = useState("");
   const [busy, setBusy] = useState(false);

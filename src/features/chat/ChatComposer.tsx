@@ -221,7 +221,7 @@ export function ChatComposer({
   }
 
   const helper = coarse
-    ? "@ to mention · # to link a record"
+    ? "@ to mention · # to link something"
     : "Enter to send · Shift+Enter for a new line · @ to mention · # to link an event, dish, menu or client";
 
   return (
@@ -281,7 +281,7 @@ export function ChatComposer({
                 <input
                   className="input text-base"
                   type="text"
-                  aria-label="Search records"
+                  aria-label="Search"
                   placeholder="Search events, dishes, menus, clients…"
                   autoFocus
                   value={pickers.toolbarTerm}

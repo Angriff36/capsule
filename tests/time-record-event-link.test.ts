@@ -19,6 +19,8 @@ import {
   CLOCK_OUT_PROMPT_FIELDS,
   HIDDEN_PRIMARY_CORRECT_VERSION,
   HIDDEN_PRIMARY_PERSIST_SEAM_AT,
+  TYPED_CLOCK_OUT_REASON,
+  TYPED_WINDOW_REASON,
   buildClockInCreateArgs,
   currentShiftFor,
   hiddenPrimaryPersistLedgerRow,
@@ -172,6 +174,7 @@ describe("event association is not dropped on create", () => {
       version: 2,
       clockInAt: FIVE_PM,
       clockOutAt: TEN_PM,
+      reason: TYPED_WINDOW_REASON,
     });
   });
 
@@ -220,6 +223,7 @@ describe("window parsing and clock-out", () => {
       version: 2,
       clockInAt: FIVE_PM,
       clockOutAt: TEN_PM,
+      reason: TYPED_CLOCK_OUT_REASON,
     });
   });
 
@@ -241,6 +245,50 @@ describe("window parsing and clock-out", () => {
     );
     expect(shift?._id).toBe(SHIFT_ID);
     expect(shift?.eventId).toBe(EVENT_ID);
+  });
+
+  const eveningShift = {
+    _id: SHIFT_ID,
+    personId: PERSON_ID,
+    status: "scheduled",
+    startsAt: FIVE_PM,
+    endsAt: TEN_PM,
+    eventId: EVENT_ID,
+  };
+
+  it("falls back to a same-day shift when none covers the clock-in", () => {
+    // 9:00 AM prep before a 5:00 PM service: no covering window, same day.
+    const nineAm = Date.parse("2026-07-31T09:00:00");
+    const shift = currentShiftFor(PERSON_ID, [eveningShift], nineAm);
+    expect(shift?.eventId).toBe(EVENT_ID);
+    expect(
+      buildClockInCreateArgs({ personId: PERSON_ID, eventId: "", shift }),
+    ).toEqual({ personId: PERSON_ID, shiftId: SHIFT_ID, eventId: EVENT_ID });
+  });
+
+  it("does not link a shift on another day or another person", () => {
+    const nextDayNine = Date.parse("2026-08-01T09:00:00");
+    expect(currentShiftFor(PERSON_ID, [eveningShift], nextDayNine)).toBe(
+      undefined,
+    );
+    expect(
+      currentShiftFor("per_other", [eveningShift], FIVE_PM),
+    ).toBeUndefined();
+    expect(
+      currentShiftFor(
+        PERSON_ID,
+        [{ ...eveningShift, deletedAt: FIVE_PM }],
+        FIVE_PM,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("matches at the typed clock-in time, not the moment of saving", () => {
+    // Hours typed in a day later still find that evening's shift.
+    const typedIn = Date.parse("2026-07-31T17:05");
+    expect(currentShiftFor(PERSON_ID, [eveningShift], typedIn)?._id).toBe(
+      SHIFT_ID,
+    );
   });
 });
 

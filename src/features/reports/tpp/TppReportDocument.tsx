@@ -22,6 +22,13 @@ export function TppReportDocument({
               {section.printContext}
             </p>
           ) : null}
+          {section.logoUrl ? (
+            <img
+              src={section.logoUrl}
+              alt="Company logo"
+              className="tpp-document-logo"
+            />
+          ) : null}
           {section.heading ? (
             section.headingLevel === 4 ? (
               <h4 className="py-2 text-base font-semibold">

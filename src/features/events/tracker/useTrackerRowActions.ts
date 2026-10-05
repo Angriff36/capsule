@@ -10,6 +10,7 @@ import {
   useEventVehicleAssignmentMarkPreloaded,
   useEventVehicleAssignmentRelease,
 } from "../../../lib/manifest-convex-react";
+import { runBulkItems } from "../../../ui/bulk-select";
 import { useSuccessToast } from "../../../ui/useSuccessToast";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import type { TrackerRowActions } from "./TrackerSheetRow";
@@ -149,13 +150,15 @@ export function useTrackerRowActions() {
       const ordered = [...rows].sort(
         (x, y) => Number(y.eventNumber !== "") - Number(x.eventNumber !== ""),
       );
-      for (const row of ordered) {
+      // A stop part way says how many were numbered; numbered rows leave
+      // the list, so pressing again finishes the rest.
+      await runBulkItems(ordered, async (row) => {
         await setEventNumber({
           docId: row.id,
           version: row.version,
           eventNumber: row.eventNumber || undefined,
         });
-      }
+      });
       notifySuccess(
         `${rows.length} ${rows.length === 1 ? "event" : "events"} numbered`,
       );

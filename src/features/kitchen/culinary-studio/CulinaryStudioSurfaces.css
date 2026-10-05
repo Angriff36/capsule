@@ -115,6 +115,15 @@
   vertical-align: top;
 }
 
+/* Phone cards (app.css) stack each cell; the studio's cell padding above
+   would put a wide gap between every line of the card. */
+@media (max-width: 767px) {
+  .culinary-studio table.phone-cards tbody td {
+    padding: 0.1rem 0;
+    border-bottom: 0;
+  }
+}
+
 .culinary-studio table tbody tr:last-child td {
   border-bottom: 0;
 }

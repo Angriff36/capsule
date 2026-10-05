@@ -75,18 +75,18 @@ export async function repairComponentRecipe(
     const referenceTables = ["menuDishes", "proposalDishSelections", "eventDishes", "dishTasks", "dishIngredients", "dishComponents", "dishContainers", "prepTasks", "packListItems", "ingredientDemands", "eventAllergenChecks"] as const;
     for (const table of referenceTables) {
       const reference = await ctx.db.query(table).withIndex("by_dishId", q => q.eq("dishId", dish._id)).first();
-      if (reference) throw new Error(`Reconcile ${table} references before reclassifying this dish`);
+      if (reference) throw new Error("This dish is still used on menus, events, prep or pack lists. Sort those out first, then try again.");
     }
     for (const table of ["eventIngredientContributions", "eventDishComponentSeeds"] as const) {
       const reference = await ctx.db.query(table)
         .withIndex("by_tenantId", q => q.eq("tenantId", tenantId))
         .filter(q => q.eq(q.field("dishId"), dish._id)).first();
-      if (reference) throw new Error(`Reconcile ${table} references before reclassifying this dish`);
+      if (reference) throw new Error("This dish is still used on menus, events, prep or pack lists. Sort those out first, then try again.");
     }
     const edition = await ctx.db.query("dishes").withIndex("by_canonicalDishId", q => q.eq("canonicalDishId", dish._id)).first();
     const merged = await ctx.db.query("dishes").withIndex("by_mergedIntoDishId", q => q.eq("mergedIntoDishId", dish._id)).first();
     if (edition || merged || dish.canonicalDishId || dish.mergedIntoDishId)
-      throw new Error("Reconcile dish editions and merges before reclassifying this dish");
+      throw new Error("This dish has other versions or was merged with another dish. Sort those out first, then try again.");
   }
   if (!recipe.name.trim() || !recipe.key.trim() || !args.source.trim() ||
       !recipe.instructions.trim() || !recipe.ingredients.length ||

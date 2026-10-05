@@ -38,9 +38,9 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
 
   belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
 
-  constraint vendorContractPeriod: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "Contract end must be after the start"
-  constraint vendorContractPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
-  constraint vendorContractLeadTime: self.deliveryLeadTimeDays >= 0 and self.deliveryLeadTimeDays <= 365 "Delivery lead time must be between 0 and 365 days"
+  constraint vendorContractPeriod: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "This contract's end has to be after its start."
+  constraint vendorContractPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Set payment terms between 0 and 365 days."
+  constraint vendorContractLeadTime: self.deliveryLeadTimeDays >= 0 and self.deliveryLeadTimeDays <= 365 "Set delivery lead time between 0 and 365 days."
 
   transition status from "draft" to ["active", "terminated"]
   transition status from "active" to ["expired", "terminated"]
@@ -65,11 +65,11 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
     guard self.draftedAt == null
     guard self.deletedAt == null
     guard self.vendor != null and self.vendor.deletedAt == null
-    constraint draftContractVendorMatch: vendorId == self.vendorId "Draft vendorId must match the seeded vendor reference"
-    constraint draftContractTitle: length(trim(title)) > 0 "Contract title is required"
-    constraint draftContractPeriod: endsAt > startsAt "Contract end must be after the start"
-    constraint draftContractPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
-    constraint draftContractLeadTime: deliveryLeadTimeDays == null or (deliveryLeadTimeDays >= 0 and deliveryLeadTimeDays <= 365) "Delivery lead time must be between 0 and 365 days"
+    constraint draftContractVendorMatch: vendorId == self.vendorId "This contract is for a different vendor. Pick the vendor already on this contract."
+    constraint draftContractTitle: length(trim(title)) > 0 "Give this contract a title."
+    constraint draftContractPeriod: endsAt > startsAt "This contract's end has to be after its start."
+    constraint draftContractPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Set payment terms between 0 and 365 days."
+    constraint draftContractLeadTime: deliveryLeadTimeDays == null or (deliveryLeadTimeDays >= 0 and deliveryLeadTimeDays <= 365) "Set delivery lead time between 0 and 365 days."
     mutate vendorId = vendorId
     mutate title = title
     mutate startsAt = startsAt
@@ -103,10 +103,10 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
     guard self.draftedAt != null
     guard self.status == "draft"
     guard self.deletedAt == null
-    constraint updateContractTitle: length(trim(title)) > 0 "Contract title is required"
-    constraint updateContractPeriod: endsAt > startsAt "Contract end must be after the start"
-    constraint updateContractPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
-    constraint updateContractLeadTime: deliveryLeadTimeDays == null or (deliveryLeadTimeDays >= 0 and deliveryLeadTimeDays <= 365) "Delivery lead time must be between 0 and 365 days"
+    constraint updateContractTitle: length(trim(title)) > 0 "Give this contract a title."
+    constraint updateContractPeriod: endsAt > startsAt "This contract's end has to be after its start."
+    constraint updateContractPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Set payment terms between 0 and 365 days."
+    constraint updateContractLeadTime: deliveryLeadTimeDays == null or (deliveryLeadTimeDays >= 0 and deliveryLeadTimeDays <= 365) "Set delivery lead time between 0 and 365 days."
     mutate title = title
     mutate startsAt = startsAt
     mutate endsAt = endsAt
@@ -128,7 +128,7 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.startsAt != null and self.endsAt != null
-    constraint activateContractNotEnded: self.endsAt > now() "Cannot activate a contract whose period has already ended"
+    constraint activateContractNotEnded: self.endsAt > now() "You can't activate a contract whose period has already ended."
     mutate status = "active"
     mutate activatedAt = now()
     emit VendorContractActivated {
@@ -157,7 +157,7 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
   command terminate(reason: string) {
     guard self.status == "draft" or self.status == "active"
     guard self.deletedAt == null
-    constraint terminateContractReason: length(trim(reason)) > 0 "Termination reason is required"
+    constraint terminateContractReason: length(trim(reason)) > 0 "Say why you're terminating this contract."
     mutate status = "terminated"
     mutate terminatedAt = now()
     mutate terminationReason = reason
@@ -190,8 +190,8 @@ entity VendorContractPriceTier mixin TenantScoped, SoftDeletable {
 
   belongsTo contract: VendorContract fields [tenantId, contractId] references [tenantId, id]
 
-  constraint tierMinQuantity: self.minQuantity >= 0 "Minimum quantity cannot be negative"
-  constraint tierUnitPrice: self.unitPrice >= 0 "Unit price cannot be negative"
+  constraint tierMinQuantity: self.minQuantity >= 0 "Minimum quantity can't be negative. Use zero or more."
+  constraint tierUnitPrice: self.unitPrice >= 0 "Unit price can't be negative. Use zero or more."
 
   default policy vendorContractTierRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may see contract price tiers"
   default policy vendorContractTierWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update contract price tiers"
@@ -209,10 +209,10 @@ entity VendorContractPriceTier mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.contract != null and self.contract.deletedAt == null
     guard self.contract.status == "draft"
-    constraint addTierContractMatch: contractId == self.contractId "Add tier contractId must match the seeded contract reference"
-    constraint addTierItemName: length(trim(itemName)) > 0 "Item name is required"
-    constraint addTierMinQuantity: minQuantity == null or minQuantity >= 0 "Minimum quantity cannot be negative"
-    constraint addTierUnitPrice: unitPrice >= 0 "Unit price cannot be negative"
+    constraint addTierContractMatch: contractId == self.contractId "This price tier is for a different contract. Pick the contract already on this price tier."
+    constraint addTierItemName: length(trim(itemName)) > 0 "Give this item a name."
+    constraint addTierMinQuantity: minQuantity == null or minQuantity >= 0 "Minimum quantity can't be negative. Use zero or more."
+    constraint addTierUnitPrice: unitPrice >= 0 "Unit price can't be negative. Use zero or more."
     mutate contractId = contractId
     mutate itemName = itemName
     mutate unit = unit != null ? unit : "each"
@@ -238,9 +238,9 @@ entity VendorContractPriceTier mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     guard self.contract != null and self.contract.status == "draft"
-    constraint updateTierItemName: length(trim(itemName)) > 0 "Item name is required"
-    constraint updateTierMinQuantity: minQuantity == null or minQuantity >= 0 "Minimum quantity cannot be negative"
-    constraint updateTierUnitPrice: unitPrice >= 0 "Unit price cannot be negative"
+    constraint updateTierItemName: length(trim(itemName)) > 0 "Give this item a name."
+    constraint updateTierMinQuantity: minQuantity == null or minQuantity >= 0 "Minimum quantity can't be negative. Use zero or more."
+    constraint updateTierUnitPrice: unitPrice >= 0 "Unit price can't be negative. Use zero or more."
     mutate itemName = itemName
     mutate unit = unit != null ? unit : self.unit
     mutate minQuantity = minQuantity != null ? minQuantity : self.minQuantity

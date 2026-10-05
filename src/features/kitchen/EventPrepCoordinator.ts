@@ -75,6 +75,8 @@ export type EventPrepDish = {
   id: string;
   eventId: string;
   dishId: string;
+  /** The dish whose recipe this line cooks from; null = dishId. */
+  recipeDishId?: string | null;
   quantityServings: number;
   specialInstructions?: string | null;
 };

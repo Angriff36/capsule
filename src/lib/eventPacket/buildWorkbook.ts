@@ -7,6 +7,8 @@ import type {
 import { readiness } from "./reconcile";
 import { canMarkNotApplicable, requirements } from "./requirements";
 import forms from "./fixtures/event-workbook.form-definitions.json";
+import type { FinalLockPrintLine } from "./finalLock/evaluate";
+import { nativePartBlocks } from "./nativePacket";
 /** A value drawn on top of an original form page at its fixed source anchor. */
 export interface WorkbookOverlay {
   /** Original-page anchor: "header" for the Event Number/Date line, or a form row label prefix for Y/N answers. */
@@ -39,6 +41,8 @@ export interface Workbook {
   generatedAt: string;
   status: "READY" | "NEEDS ATTENTION";
   sections: WorkbookSection[];
+  /** The Final Lock answers the server adds as the last pages. */
+  finalLock?: FinalLockPrintLine[];
   completeness: {
     formPages: number;
     fieldForms: number;
@@ -48,7 +52,16 @@ export interface Workbook {
 }
 export function buildWorkbook(
   snapshot: EventPacketSnapshot,
-  options: { revision?: number; generatedAt?: string } = {},
+  options: {
+    revision?: number;
+    generatedAt?: string;
+    /**
+     * Final Lock answers this print shows, exactly as the revision stores
+     * them. The server draws them as the last pages; the workbook counts
+     * those pages in its page numbers.
+     */
+    finalLock?: FinalLockPrintLine[];
+  } = {},
 ): Workbook {
   const sources = new Map(
     snapshot.artifacts.map((a, i) => [a.fingerprint, `S${i + 1}`]),
@@ -180,6 +193,7 @@ export function buildWorkbook(
         ]
       : [];
   };
+  const native = snapshot.native ? nativePartBlocks(snapshot.native) : null;
   const status = readiness(snapshot) ? "READY" : "NEEDS ATTENTION";
   const revision = String(options.revision ?? snapshot.revisions.length + 1);
   const generatedAt =
@@ -193,7 +207,7 @@ export function buildWorkbook(
     "Time not recorded";
   add("cover", "Event workbook / action sheet", [
     text(
-      `${status}\nInvoice ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate}\n${field("eventTitle")}`,
+      `${status}\nEvent ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate}\n${field("eventTitle")}`,
     ),
     text(
       `Revision ${revision} | Inputs current through ${generatedAt}\n${open.length} required open pre-print actions. Known values are printed from native data and imported sources; blanks are unresolved; field forms stay blank for their named owner.`,
@@ -230,6 +244,7 @@ export function buildWorkbook(
       .map((k) => text(`${human(k)}: ${field(k)}`, k.startsWith("notes.")))
       .concat(
         markers((i) => ["serviceStyle", "guestCount"].includes(i.fieldKey)),
+        native?.worksheet ?? [],
       ),
   );
   add("timeline", "Timeline / both visits", [
@@ -522,10 +537,20 @@ export function buildWorkbook(
       );
     add(id, title, blocks);
   }
+  // Capsule's own records print in their packet part below; their raw
+  // fingerprint facts and duplicated menu facts never print as lines.
+  const nativeFact = (k: string) =>
+    k.includes(".native-") ||
+    (!!native &&
+      snapshot.facts.some(
+        (f) => f.fieldKey === k && f.authority === "native_finalized",
+      ) &&
+      !snapshot.observations.some((o) => o.fieldKey === k));
   const fields = (prefix: string | readonly string[]) =>
     keys
       .filter(
         (k) =>
+          !nativeFact(k) &&
           (typeof prefix === "string" ? [prefix] : prefix).some((p) =>
             k.startsWith(p),
           ) &&
@@ -545,6 +570,15 @@ export function buildWorkbook(
           /check.menu|check.production/.test(i.key)),
       false,
     ),
+    ...(native
+      ? [
+          {
+            kind: "heading" as const,
+            text: "Event menu in service order",
+          },
+          ...native.menu,
+        ]
+      : []),
     ...fields("menu."),
     ...fields("components."),
     ...fields("production."),
@@ -620,9 +654,22 @@ export function buildWorkbook(
           : "REFERENCE - real event rows by item type with original quantities, units and dish associations. Does not substitute for a missing TPP item-type report.",
       ),
       ...markers((i) => i.section === "packlist"),
+      ...(native
+        ? native[sort === "category" ? "pack-by-category" : "pack-by-type"]
+        : []),
       ...itemBlocks,
     ]);
   }
+  add("forms", "Office planning answers and field forms", [
+    text(
+      options.finalLock?.length
+        ? `Office planning answers: the ${options.finalLock.length} Final Lock answers print on the last pages of this packet, as recorded for revision ${revision}.`
+        : "Office planning answers: the Final Lock answers print on the last pages of this packet.",
+    ),
+    text(
+      "Field forms follow blank. The named person fills each one in on the day; the office never answers them ahead.",
+    ),
+  ]);
   for (const [id, title, prefix] of [
     [
       "staffing",
@@ -634,13 +681,22 @@ export function buildWorkbook(
       "Vehicle and trailer assignments",
       ["vehicle", "trailer", "assignment.vehicle", "assignment.trailer"],
     ],
-    ["equipment", "Rentals and decor / live checks", "equipment"],
-    ["venue", "Venue assets and layouts", "venue"],
+    ["equipment", "Rental and decor pull sheet", "equipment"],
+    ["venue", "Route, map, load-in and setup diagrams", "venue"],
   ] as const)
     add(id, title, [
       ...markers(
         (i) => i.section === id || (id === "venue" && i.section === "layouts"),
       ),
+      ...(native
+        ? id === "staffing"
+          ? native.staff
+          : id === "equipment"
+            ? native["pull-sheet"]
+            : id === "venue"
+              ? native.route
+              : []
+        : []),
       ...fields(prefix),
       ...currentVerifications
         .filter((v) =>
@@ -669,12 +725,36 @@ export function buildWorkbook(
       ),
     ),
   ]);
+  // Binder order (spec §14.1): worksheet, menu, pack by item type, pack by
+  // category, office answers + field forms, staff, pull sheet, route; the
+  // source appendix closes the packet.
+  const order = [
+    /^cover$/,
+    /^brief$/,
+    /^timeline$/,
+    /^menu$/,
+    /^sourceContent\./,
+    /^packlist-item$/,
+    /^packlist-category$/,
+    /^forms$/,
+    /^final-lock$/,
+    /^quartermaster\./,
+    /^field\./,
+    /^staffing$/,
+    /^equipment$/,
+    /^vehicles$/,
+    /^venue$/,
+    /^sources$/,
+  ];
+  const rank = (id: string) => order.findIndex((pattern) => pattern.test(id));
+  sections.sort((a, b) => rank(a.id) - rank(b.id));
   return {
     identity: snapshot.identity,
     revision,
     generatedAt,
     status,
     sections,
+    ...(options.finalLock?.length ? { finalLock: options.finalLock } : {}),
     completeness: {
       formPages: pages.size,
       fieldForms: sections.filter((s) => s.id.startsWith("field.")).length,

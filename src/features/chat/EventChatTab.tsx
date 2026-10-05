@@ -6,6 +6,8 @@ import { ChatAppearanceMenu } from "./ChatAppearanceMenu";
 import { ChatComposer, type ChatComposerSubmit } from "./ChatComposer";
 import { ChatThread } from "./ChatThread";
 import { ChatUnsentDrafts } from "./ChatUnsentDrafts";
+import { ChatWalkieBar } from "./ChatWalkieBar";
+import type { VoiceTake } from "./useVoiceRecorder";
 import {
   CHAT_UNLINKED_REASON,
   type ChatChannel,
@@ -88,6 +90,36 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
     }
   };
 
+  /** Walkie transmission: the recorded take as a voice attachment. */
+  const onWalkieSend = async (take: VoiceTake) => {
+    const sentFrom = channel;
+    const sentBy = identity.sender;
+    if (!sentBy) return;
+    const seconds = Math.max(1, Math.round(take.durationMs / 1000));
+    // No catch: a failure must propagate so ChatWalkieBar's "Didn't send"
+    // surface fires (MessagesPage's send behaves the same way).
+    await sendMessage(
+      sentFrom,
+      {
+        body: "",
+        files: [
+          new File([take.blob], `Voice message (${seconds}s).webm`, {
+            type: take.blob.type || "audio/webm",
+          }),
+        ],
+        mentionedPersonIds: [],
+        draft: { text: "", files: [], links: [], mentions: [] },
+        idempotencyKey: `walkie-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 10)}`,
+      },
+      sentBy,
+    );
+    if (channelRef.current === chatChannelKey(sentFrom)) {
+      setPinSignal((n) => n + 1);
+    }
+  };
+
   const countLabel =
     summary && summary.count > 0
       ? `${summary.count}${summary.countCapped ? "+" : ""} ${
@@ -146,6 +178,9 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
             identity={identity.identityKey}
             onSent={() => setPinSignal((n) => n + 1)}
           />
+          {identity.personId ? (
+            <ChatWalkieBar onSend={onWalkieSend} disabled={sending} />
+          ) : null}
           <ChatComposer
             key={channelKey}
             placeholder={`Message the “${eventTitle}” crew…`}

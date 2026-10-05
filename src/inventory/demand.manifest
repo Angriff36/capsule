@@ -68,12 +68,15 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   property supersededAt: datetime?
   property supersedeReason: string?
   property lastRecalculationReason: string?
+  // Set when some recipe amounts could not be turned into the buying unit
+  // (AC-468). Purchasing shows it on the order line; null when all converted.
+  property unitReviewReason: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
+  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity >= 0 "The required amount can't be negative. Use zero or more."
 
   transition status from "pending" to ["calculated"]
   transition status from "calculated" to ["confirmed", "superseded"]
@@ -110,25 +113,40 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.status == "pending" or self.status == "calculated" or self.status == "confirmed"
     // A removed/86'd dish leaves no demand, rather than a fictitious purchase.
-    // Normalize compatible contributions before adding their quantities.
-    // Unknown cross-dimension amounts retain the existing unresolved unit path.
+    // Amounts are added only inside one kind of unit (weight, volume, or
+    // count). AC-468: amounts that do not turn into the item's buying unit are
+    // never added to it (kilograms + cups once read "1012 cups"). The demand
+    // keeps the part in the buying unit and names what it left out; an event
+    // whose amounts are all in another unit keeps them in that unit, named.
     compute catalogUnit = self.ingredient != null ? self.ingredient.unit : unit
     compute targetMass = catalogUnit == "gram" ? 1 : catalogUnit == "kilogram" ? 1000 : catalogUnit == "ounce" ? 28.349523125 : catalogUnit == "pound" ? 453.59237 : 0
     compute targetVolume = catalogUnit == "milliliter" ? 1 : catalogUnit == "liter" ? 1000 : catalogUnit == "teaspoon" ? 4.92892159375 : catalogUnit == "tablespoon" ? 14.78676478125 : catalogUnit == "cup" ? 236.5882365 : catalogUnit == "pint" ? 473.176473 : catalogUnit == "quart" ? 946.352946 : catalogUnit == "gallon" ? 3785.411784 : 0
+    compute unitMass = unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0
+    compute unitVolume = unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0
     compute massRaw = (total_gram != null ? total_gram : 0) + (total_kilogram != null ? total_kilogram : 0) + (total_ounce != null ? total_ounce : 0) + (total_pound != null ? total_pound : 0)
     compute massBase = (total_gram != null ? total_gram : 0) * 1 + (total_kilogram != null ? total_kilogram : 0) * 1000 + (total_ounce != null ? total_ounce : 0) * 28.349523125 + (total_pound != null ? total_pound : 0) * 453.59237
     compute volumeRaw = (total_milliliter != null ? total_milliliter : 0) + (total_liter != null ? total_liter : 0) + (total_teaspoon != null ? total_teaspoon : 0) + (total_tablespoon != null ? total_tablespoon : 0) + (total_cup != null ? total_cup : 0) + (total_pint != null ? total_pint : 0) + (total_quart != null ? total_quart : 0) + (total_gallon != null ? total_gallon : 0)
     compute volumeBase = (total_milliliter != null ? total_milliliter : 0) * 1 + (total_liter != null ? total_liter : 0) * 1000 + (total_teaspoon != null ? total_teaspoon : 0) * 4.92892159375 + (total_tablespoon != null ? total_tablespoon : 0) * 14.78676478125 + (total_cup != null ? total_cup : 0) * 236.5882365 + (total_pint != null ? total_pint : 0) * 473.176473 + (total_quart != null ? total_quart : 0) * 946.352946 + (total_gallon != null ? total_gallon : 0) * 3785.411784
-    compute compatibleMass = targetMass > 0 and abs(massRaw - requiredQuantity) < 0.00000001
-    compute compatibleVolume = targetVolume > 0 and abs(volumeRaw - requiredQuantity) < 0.00000001
-    compute demandUnit = compatibleMass or compatibleVolume ? catalogUnit : unit
-    compute nextQuantity = max(0, compatibleMass ? massBase / targetMass : (compatibleVolume ? volumeBase / targetVolume : requiredQuantity))
+    // Count units (each, can, bunch...) are neither weight nor volume.
+    compute otherRaw = max(0, requiredQuantity - massRaw - volumeRaw)
+    compute catalogIsCount = targetMass == 0 and targetVolume == 0
+    compute catalogPart = targetMass > 0 ? massBase / targetMass : (targetVolume > 0 ? volumeBase / targetVolume : otherRaw)
+    compute leftOutAmount = targetMass > 0 ? volumeRaw + otherRaw : (targetVolume > 0 ? massRaw + otherRaw : massRaw + volumeRaw)
+    compute unitInBuyingKind = targetMass > 0 ? unitMass > 0 : (targetVolume > 0 ? unitVolume > 0 : (unitMass == 0 and unitVolume == 0))
+    compute useBuyingKind = catalogPart > 0.00000001 or leftOutAmount <= 0.00000001 or unitInBuyingKind
+    // A count item keeps the recipe's own count unit (a can is not an each).
+    compute buyingKindUnit = (catalogIsCount and unitMass == 0 and unitVolume == 0) ? unit : catalogUnit
+    compute otherKindQuantity = unitMass > 0 ? massBase / unitMass : (unitVolume > 0 ? volumeBase / unitVolume : otherRaw)
+    compute demandUnit = useBuyingKind ? buyingKindUnit : unit
+    compute nextQuantity = max(0, useBuyingKind ? catalogPart : otherKindQuantity)
+    compute unitIssue = leftOutAmount <= 0.00000001 ? null : (useBuyingKind ? "Some recipe amounts for this item are in units that don't turn into " + catalogUnit + ", so they are left out of this amount. Record how the units convert, or fix the recipe unit." : "This amount is in " + unit + ", but the item is bought by the " + catalogUnit + ". Record how the units convert, or fix the recipe unit.")
     compute previousStatus = self.status
     mutate eventId = eventId
     mutate ingredientId = ingredientId
     mutate preferredVendorId = self.ingredient.preferredVendorId
     mutate requiredQuantity = nextQuantity
     mutate unit = demandUnit
+    mutate unitReviewReason = unitIssue
     mutate purchasingWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.purchasingWeekStart
     mutate status = previousStatus == "pending" ? "calculated" : previousStatus
     mutate calculatedAt = self.calculatedAt == null ? now() : self.calculatedAt
@@ -161,13 +179,13 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard self.ingredient != null and self.ingredient.status == "active"
-    constraint calculateEventMatch: eventId == self.eventId "Calculate eventId must match the seeded event reference"
-    constraint calculateIngredientMatch: ingredientId == self.ingredientId "Calculate ingredientId must match the seeded ingredient reference"
-    constraint calculateQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
-    constraint calculateServingsNonnegative: servings == null or servings >= 0 "Servings cannot be negative"
-    constraint calculateComponentLineNonnegative: sourceComponentLineQuantity == null or sourceComponentLineQuantity >= 0 "Source component line quantity cannot be negative"
-    constraint calculateBatchNonnegative: sourceBatchMultiplier == null or sourceBatchMultiplier >= 0 "Source batch multiplier cannot be negative"
-    constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "Source yield quantity must be positive when provided"
+    constraint calculateEventMatch: eventId == self.eventId "This demand is for a different event. Pick the event already on this demand."
+    constraint calculateIngredientMatch: ingredientId == self.ingredientId "This demand is for a different ingredient. Pick the ingredient already on this demand."
+    constraint calculateQuantityPositive: requiredQuantity > 0 "Enter a required amount more than zero."
+    constraint calculateServingsNonnegative: servings == null or servings >= 0 "Servings can't be negative. Use zero or more."
+    constraint calculateComponentLineNonnegative: sourceComponentLineQuantity == null or sourceComponentLineQuantity >= 0 "The recipe line amount can't be negative. Use zero or more."
+    constraint calculateBatchNonnegative: sourceBatchMultiplier == null or sourceBatchMultiplier >= 0 "The batch multiplier can't be negative. Use zero or more."
+    constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "If you enter a yield amount, it has to be more than zero."
     mutate eventId = eventId
     mutate ingredientId = ingredientId
     mutate preferredVendorId = self.ingredient.preferredVendorId
@@ -248,6 +266,10 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     // Runs before PurchaseNeed.create in the approve transaction, so needs open
     // on the event's current week even after a reschedule (#328).
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit IngredientDemandPurchaseEligibilityEnsured {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Reschedule moves live demand onto the event's week. Fulfilled and
@@ -258,14 +280,18 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.event != null
     guard self.event.purchasingWeekStart != null
     mutate purchasingWeekStart = self.event.purchasingWeekStart
+    emit IngredientDemandPurchasingWeekAligned {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command recalculate(newQuantity: decimal(12, 4), reason: string) {
     guard self.status == "calculated" or self.status == "confirmed"
     guard self.calculatedAt != null
     guard self.deletedAt == null
-    constraint recalculateQuantityPositive: newQuantity > 0 "Recalculated quantity must be positive"
-    constraint recalculateReasonRequired: length(trim(reason)) > 0 "Recalculation reason is required"
+    constraint recalculateQuantityPositive: newQuantity > 0 "Enter a recalculated amount more than zero."
+    constraint recalculateReasonRequired: length(trim(reason)) > 0 "Say why you're recalculating this."
     compute previousQuantity = self.requiredQuantity
     mutate requiredQuantity = newQuantity
     mutate lastRecalculationReason = reason
@@ -303,7 +329,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.calculatedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint supersedeReasonRequired: length(trim(reason)) > 0 "Supersede reason is required"
+    constraint supersedeReasonRequired: length(trim(reason)) > 0 "Say why you're replacing this."
     compute previousQuantity = self.requiredQuantity
     mutate status = "superseded"
     mutate supersededAt = now()
@@ -345,6 +371,10 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   property recordedAt: datetime?
   property voidedAt: datetime?
   property voidReason: string?
+  // Who recorded and who voided (PL-BATCH, 2026-09-28): the signed-in staff
+  // profile, never a name the caller sends.
+  property recordedById: uuid?
+  property voidedById: uuid?
 
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
@@ -353,8 +383,8 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
 
   computed costImpact: money(12, 2) = self.quantity * self.unitCost
 
-  constraint wasteQuantityPositive: self.recordedAt == null or self.quantity > 0 "Waste quantity must be positive once recorded"
-  constraint wasteCostNonnegative: self.unitCost >= 0 "Waste unit cost cannot be negative"
+  constraint wasteQuantityPositive: self.recordedAt == null or self.quantity > 0 "Enter a waste amount more than zero before you save it."
+  constraint wasteCostNonnegative: self.unitCost >= 0 "The waste unit cost can't be negative. Use zero or more."
 
   transition status from "pending" to ["recorded"]
   transition status from "recorded" to ["voided"]
@@ -380,11 +410,11 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.ingredient != null and self.ingredient.status == "active"
     guard self.location != null and self.location.status == "active"
-    constraint recordIngredientMatch: ingredientId == self.ingredientId "Record ingredientId must match the seeded ingredient reference"
-    constraint recordLocationMatch: locationId == self.locationId "Record locationId must match the seeded location reference"
-    constraint recordStockMatch: inventoryItemId == null or self.inventoryItemId == null or inventoryItemId == self.inventoryItemId "Record inventoryItemId must match the seeded stock reference when provided"
-    constraint recordQuantityPositive: quantity > 0 "Waste quantity must be positive"
-    constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "Waste unit cost cannot be negative"
+    constraint recordIngredientMatch: ingredientId == self.ingredientId "This waste entry is for a different ingredient. Pick the ingredient already on this entry."
+    constraint recordLocationMatch: locationId == self.locationId "This waste entry is for a different location. Pick the location already on this entry."
+    constraint recordStockMatch: inventoryItemId == null or self.inventoryItemId == null or inventoryItemId == self.inventoryItemId "This waste entry is for a different stock item. Pick the stock item already on this entry, or leave it blank."
+    constraint recordQuantityPositive: quantity > 0 "Enter a waste amount more than zero."
+    constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "The waste unit cost can't be negative. Use zero or more."
     mutate ingredientId = ingredientId
     mutate locationId = locationId
     mutate eventId = eventId != null ? eventId : self.eventId
@@ -396,6 +426,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     mutate notes = notes != null ? notes : self.notes
     mutate status = "recorded"
     mutate recordedAt = now()
+    mutate recordedById = user.personId
     emit WasteRecorded {
       wasteRecordId: self.id
       tenantId: self.tenantId
@@ -415,10 +446,11 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     guard self.recordedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
-    constraint voidReasonRequired: length(trim(reason)) > 0 "Void reason is required"
+    constraint voidReasonRequired: length(trim(reason)) > 0 "Say why you're voiding this."
     mutate status = "voided"
     mutate voidedAt = now()
     mutate voidReason = reason
+    mutate voidedById = user.personId
     emit WasteVoided {
       wasteRecordId: self.id
       tenantId: self.tenantId
@@ -538,3 +570,14 @@ on WasteVoided run InventoryItem.adjustQuantity
     delta: payload.quantity,
     reason: payload.reason
   }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event IngredientDemandPurchasingWeekAligned: "ingredient.demand.purchasing.week.aligned" {
+  ingredientDemandId: string
+  tenantId: string
+}
+
+event IngredientDemandPurchaseEligibilityEnsured: "ingredient.demand.purchase.eligibility.ensured" {
+  ingredientDemandId: string
+  tenantId: string
+}

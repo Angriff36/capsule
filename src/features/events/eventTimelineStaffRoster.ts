@@ -251,6 +251,47 @@ export class EventTimelineStaffRoster {
           : entry.endsAt,
       };
     });
+    // One person working two roles in one merged shift is ONE roster row
+    // (AC-514): "Bartender / Captain", both sources, never counted twice.
+    for (let index = scheduledEntries.length - 1; index > 0; index--) {
+      const entry = scheduledEntries[index]!;
+      const ids = new Set(entry.shiftWindows.map((shift) => shift._id));
+      const target = scheduledEntries.findIndex(
+        (other, at) =>
+          at < index &&
+          other.personId === entry.personId &&
+          other.shiftWindows.some((shift) => ids.has(shift._id)),
+      );
+      if (target < 0) continue;
+      const into = scheduledEntries[target]!;
+      const windows = [...into.shiftWindows];
+      for (const shift of entry.shiftWindows)
+        if (!windows.some((row) => row._id === shift._id)) windows.push(shift);
+      windows.sort(
+        (left, right) =>
+          Number(left.startsAt ?? 0) - Number(right.startsAt ?? 0),
+      );
+      scheduledEntries[target] = {
+        ...into,
+        role: [...new Set([into.role, entry.role].filter(Boolean))]
+          .sort()
+          .join(" / "),
+        sources: [
+          ...new Set([...(into.sources ?? []), ...(entry.sources ?? [])]),
+        ],
+        notes: [...new Set([...(into.notes ?? []), ...(entry.notes ?? [])])],
+        sourceIds: [...(into.sourceIds ?? []), ...(entry.sourceIds ?? [])],
+        plannedWindows: [
+          ...(into.plannedWindows ?? []),
+          ...(entry.plannedWindows ?? []),
+        ],
+        shiftWindows: windows,
+        unassign: into.unassign ?? entry.unassign,
+        startsAt: windows[0]?.startsAt ?? into.startsAt,
+        endsAt: windows[windows.length - 1]?.endsAt ?? into.endsAt,
+      };
+      scheduledEntries.splice(index, 1);
+    }
     // Manual-only and historical shifts are real work in their own right.
     // They never supply an unrelated Assignment's role or window.
     for (const shift of shifts) {

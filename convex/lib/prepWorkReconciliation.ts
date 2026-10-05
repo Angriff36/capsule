@@ -187,7 +187,10 @@ async function planEventPrepWork(
         )
         .collect();
       for (const record of records) {
-        if (record.tenantId !== tenantId) continue;
+        // A released link (dropped by a person or retired with its recipe
+        // step) no longer holds work back and is never copied to new work.
+        if (record.tenantId !== tenantId || record.requirementReleasedAt != null)
+          continue;
         const predecessor = await ctx.db.get(record.predecessorTaskId);
         dependencies.push({ record, predecessor });
       }

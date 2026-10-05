@@ -1,6 +1,16 @@
 // Capsule sales/billing — Payment against Invoice.
 // Settlement applies to Invoice via reaction (replaces capsule-pro middleware).
-// Chargeback / partial-refund / accepted-not-applied are not modeled yet (OD040).
+//
+// Money meaning (PL-ACCOUNTING, BE-15.2): `amount` is what the client paid
+// toward the invoice. At settle it splits into `appliedAmount` (lowers the
+// invoice) and `unappliedAmount` (paid beyond what was owed, held for the
+// client, never lost). A processing fee (`feeAmount`) and a tip
+// (`gratuityAmount`) ride along but are never invoice principal. Refunds,
+// chargebacks and returned bank (ACH) payments are separate totals: each takes
+// from the held part first, then from the applied part, which raises the
+// invoice balance again. So applied + unapplied + refunded + chargedBack +
+// returned always equals amount, and every change keeps its reason and
+// effective date on the ledger.
 
 use "./invoice-core.manifest"
 
@@ -10,6 +20,14 @@ enum PaymentStatus {
   completed
   failed
   refunded
+  charged_back
+  returned
+}
+
+enum PaymentReversalKind {
+  refund
+  chargeback
+  ach_return
 }
 
 enum PaymentMethodKind {
@@ -58,6 +76,25 @@ entity Payment mixin TenantScoped, SoftDeletable {
   property failureReason: string?
   property refundReason: string?
 
+  // Accounting meaning (BE-15.2-03). Null on rows settled before these fields.
+  property feeAmount: money(12, 2)?
+  property gratuityAmount: money(12, 2)?
+  property appliedAmount: money(12, 2)?
+  property unappliedAmount: money(12, 2)?
+  property refundedAmount: money(12, 2)?
+  property chargedBackAmount: money(12, 2)?
+  property returnedAmount: money(12, 2)?
+  // When the money really moved, and the date it counts in the books.
+  // recordedAt stays the time it was entered or imported (PR05-09).
+  property occurredAt: datetime?
+  property effectiveAt: datetime?
+  // Provider account the external id belongs to (for example a Stripe
+  // connected account). One provider payment id is used once per account.
+  property providerAccount: string?
+  // The outside payment this one is matched to in reconciliation (markMatched).
+  property matchedSource: PaymentExternalSource?
+  property matchedExternalId: string?
+
   // Reconciliation fields for TPP/QuickBooks/Nowsta payment matching per spec §6.4
   property required reconciliationStatus: PaymentReconciliationStatus = "unreconciled"
   property externalSource: PaymentExternalSource?
@@ -74,13 +111,16 @@ entity Payment mixin TenantScoped, SoftDeletable {
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref paymentMethod: PaymentMethod fields [tenantId, paymentMethodId] references [tenantId, id]
 
-  constraint paymentAmountPositive: self.recordedAt == null or self.amount > 0 "Payment amount must be positive"
+  constraint paymentAmountPositive: self.recordedAt == null or self.amount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
+  constraint paymentSplitAddsUp: self.appliedAmount == null or round(((self.appliedAmount) + (self.unappliedAmount != null ? self.unappliedAmount : 0) + (self.refundedAmount != null ? self.refundedAmount : 0) + (self.chargedBackAmount != null ? self.chargedBackAmount : 0) + (self.returnedAmount != null ? self.returnedAmount : 0)) * 100) / 100 == round((self.amount) * 100) / 100 "This payment's applied, held, refunded and returned parts must add up to the amount paid"
 
   transition status from "pending" to ["processing", "completed", "failed"]
   transition status from "processing" to ["completed", "failed"]
-  transition status from "completed" to ["refunded"]
+  transition status from "completed" to ["refunded", "charged_back", "returned"]
   transition status from "failed" to []
   transition status from "refunded" to []
+  transition status from "charged_back" to []
+  transition status from "returned" to []
 
   default policy paymentRead read: roleAllows(user.role, "financeAccess") "Finance staff may see payments"
   default policy paymentWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update payments"
@@ -93,16 +133,26 @@ entity Payment mixin TenantScoped, SoftDeletable {
     method: PaymentMethodKind,
     optional eventId: uuid,
     optional paymentMethodId: uuid,
-    optional notes: string
+    optional notes: string,
+    optional feeAmount: money(12, 2),
+    optional gratuityAmount: money(12, 2),
+    optional occurredAt: datetime,
+    optional effectiveAt: datetime,
+    optional externalSource: PaymentExternalSource,
+    optional externalPaymentId: string,
+    optional providerAccount: string
   ) {
     guard self.recordedAt == null
     guard self.status == "pending"
     guard self.deletedAt == null
     guard self.invoice != null
     guard self.client != null
-    constraint recordInvoiceMatch: invoiceId == self.invoiceId "Record invoiceId must match the seeded invoice reference"
-    constraint recordClientMatch: clientId == self.clientId "Record clientId must match the seeded client reference"
-    constraint recordPositive: amount > 0 "Payment amount must be positive"
+    constraint recordInvoiceMatch: invoiceId == self.invoiceId "This payment is for a different invoice. Use the invoice already on this payment."
+    constraint recordClientMatch: clientId == self.clientId "This payment is for a different client. Use the client already on this payment."
+    constraint recordPositive: amount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
+    constraint recordFeeNonnegative: feeAmount == null or feeAmount >= 0 "A processing fee can't be negative. Use zero or more."
+    constraint recordGratuityNonnegative: gratuityAmount == null or gratuityAmount >= 0 "A tip can't be negative. Use zero or more."
+    constraint recordExternalIdHasSource: externalPaymentId == null or externalSource != null "Say which system this payment id comes from"
     mutate invoiceId = invoiceId
     mutate clientId = clientId
     mutate eventId = eventId != null ? eventId : self.eventId
@@ -110,6 +160,13 @@ entity Payment mixin TenantScoped, SoftDeletable {
     mutate method = method
     mutate paymentMethodId = paymentMethodId
     mutate notes = notes
+    mutate feeAmount = feeAmount
+    mutate gratuityAmount = gratuityAmount
+    mutate occurredAt = occurredAt != null ? occurredAt : now()
+    mutate effectiveAt = effectiveAt != null ? effectiveAt : (occurredAt != null ? occurredAt : now())
+    mutate externalSource = externalSource
+    mutate externalPaymentId = externalPaymentId != null and length(trim(externalPaymentId)) > 0 ? trim(externalPaymentId) : null
+    mutate providerAccount = providerAccount
     mutate recordedAt = now()
     emit PaymentRecorded {
       paymentId: self.id
@@ -135,12 +192,20 @@ entity Payment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Applies what is still owed on an open invoice; anything paid beyond that
+  // is held on the payment for the client (overpayment), never rejected.
   command settle() {
     guard self.status == "pending" or self.status == "processing"
     guard self.recordedAt != null
     guard self.deletedAt == null
+    compute invoiceOpen = self.invoice != null and self.invoice.deletedAt == null and (self.invoice.status == "sent" or self.invoice.status == "viewed" or self.invoice.status == "overdue" or self.invoice.status == "partial")
+    compute owed = invoiceOpen ? max(0, self.invoice.amountDue) : 0
+    compute applied = round((min(self.amount, owed)) * 100) / 100
+    compute unapplied = round((self.amount - applied) * 100) / 100
     mutate status = "completed"
     mutate settledAt = now()
+    mutate appliedAmount = applied
+    mutate unappliedAmount = unapplied
     emit PaymentSettled {
       paymentId: self.id
       tenantId: self.tenantId
@@ -149,6 +214,9 @@ entity Payment mixin TenantScoped, SoftDeletable {
       eventId: self.eventId
       amount: self.amount
       method: self.method
+      appliedAmount: applied
+      unappliedAmount: unapplied
+      applyToInvoiceId: applied > 0 ? self.invoiceId : null
     }
   }
 
@@ -156,7 +224,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "processing"
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint failReasonPresent: length(trim(reason)) > 0 "Failure reason is required"
+    constraint failReasonPresent: length(trim(reason)) > 0 "Give a reason this payment failed"
     mutate status = "failed"
     mutate failedAt = now()
     mutate failureReason = reason
@@ -169,20 +237,90 @@ entity Payment mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command refund(reason: string) {
+  // Refunds everything still on this payment. The applied part goes back on
+  // the invoice balance (it used to stay "paid"); the held part leaves too.
+  command refund(reason: string, optional effectiveAt: datetime) {
     guard self.status == "completed"
     guard self.deletedAt == null
-    constraint refundReasonPresent: length(trim(reason)) > 0 "Refund reason is required"
+    constraint refundReasonPresent: length(trim(reason)) > 0 "Give a reason for this refund"
+    compute appliedBefore = self.appliedAmount != null ? self.appliedAmount : self.amount
+    compute heldBefore = self.unappliedAmount != null ? self.unappliedAmount : 0
+    compute refunded = round((appliedBefore + heldBefore) * 100) / 100
     mutate status = "refunded"
     mutate refundedAt = now()
     mutate refundReason = reason
+    mutate appliedAmount = 0
+    mutate unappliedAmount = 0
+    mutate refundedAmount = round(((self.refundedAmount != null ? self.refundedAmount : 0) + refunded) * 100) / 100
     emit PaymentRefunded {
       paymentId: self.id
       tenantId: self.tenantId
       invoiceId: self.invoiceId
       clientId: self.clientId
-      amount: self.amount
+      amount: refunded
       reason: reason
+    }
+    emit PaymentReversed {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      clientId: self.clientId
+      kind: "refund"
+      amount: refunded
+      fromApplied: appliedBefore
+      fromHeld: heldBefore
+      reason: reason
+      effectiveAt: effectiveAt != null ? effectiveAt : now()
+      providerReversalId: null
+      applyToInvoiceId: appliedBefore > 0 ? self.invoiceId : null
+    }
+  }
+
+  // A refund of part of a payment, a card chargeback, or a returned bank
+  // (ACH) payment. Takes from the held (overpaid) part first, then from the
+  // applied part, which puts that much back on the invoice balance. The
+  // original payment and its amount stay as they were.
+  command reverse(
+    kind: PaymentReversalKind,
+    amount: money(12, 2),
+    reason: string,
+    optional effectiveAt: datetime,
+    optional providerReversalId: string
+  ) {
+    guard self.status == "completed"
+    guard self.deletedAt == null
+    compute appliedBefore = self.appliedAmount != null ? self.appliedAmount : self.amount
+    compute heldBefore = self.unappliedAmount != null ? self.unappliedAmount : 0
+    constraint reversePositive: amount > 0 "The amount taken back has to be more than zero"
+    constraint reverseReasonPresent: length(trim(reason)) > 0 "Give a reason money is being taken back"
+    // Constraints run before computes, so this one spells the remainder out.
+    constraint reverseWithinPayment: round((amount) * 100) / 100 <= round(((self.appliedAmount != null ? self.appliedAmount : self.amount) + (self.unappliedAmount != null ? self.unappliedAmount : 0)) * 100) / 100 "You can't take back more than is left on this payment"
+    compute fromHeld = round((min(amount, heldBefore)) * 100) / 100
+    compute fromApplied = round((amount - fromHeld) * 100) / 100
+    compute appliedAfter = round((appliedBefore - fromApplied) * 100) / 100
+    compute heldAfter = round((heldBefore - fromHeld) * 100) / 100
+    compute nothingLeft = appliedAfter + heldAfter == 0
+    mutate appliedAmount = appliedAfter
+    mutate unappliedAmount = heldAfter
+    mutate refundedAmount = kind == "refund" ? round(((self.refundedAmount != null ? self.refundedAmount : 0) + amount) * 100) / 100 : self.refundedAmount
+    mutate chargedBackAmount = kind == "chargeback" ? round(((self.chargedBackAmount != null ? self.chargedBackAmount : 0) + amount) * 100) / 100 : self.chargedBackAmount
+    mutate returnedAmount = kind == "ach_return" ? round(((self.returnedAmount != null ? self.returnedAmount : 0) + amount) * 100) / 100 : self.returnedAmount
+    mutate refundedAt = kind == "refund" ? now() : self.refundedAt
+    mutate refundReason = kind == "refund" ? reason : self.refundReason
+    mutate status = nothingLeft ? (kind == "refund" ? "refunded" : (kind == "chargeback" ? "charged_back" : "returned")) : self.status
+    emit PaymentReversed {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      clientId: self.clientId
+      kind: kind
+      amount: amount
+      fromApplied: fromApplied
+      fromHeld: fromHeld
+      reason: reason
+      effectiveAt: effectiveAt != null ? effectiveAt : now()
+      providerReversalId: providerReversalId
+      applyToInvoiceId: fromApplied > 0 ? self.invoiceId : null
     }
   }
 
@@ -228,10 +366,17 @@ entity Payment mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "financeAccess")
-    constraint matchRequiresExternalId: length(trim(externalPaymentId)) > 0 "External payment ID is required for matching"
+    constraint matchRequiresExternalId: length(trim(externalPaymentId)) > 0 "Give the external payment ID to match this to"
+    // One payment, one outside transaction (BE-15.2-04): a payment already
+    // matched to another outside id is not matched again. Unmatch it first by
+    // disputing the match. The payment's own provider id (for example the
+    // Stripe checkout it was paid by) is kept; the match id is stored beside it.
+    constraint matchNotAlreadyAllocated: self.matchedExternalId == null or self.reconciliationStatus == "disputed" or (self.matchedExternalId == trim(externalPaymentId) and self.matchedSource == source) "This payment is already matched to another outside payment. Dispute that match first."
     mutate reconciliationStatus = "matched"
-    mutate externalSource = source
-    mutate externalPaymentId = externalPaymentId
+    mutate matchedSource = source
+    mutate matchedExternalId = trim(externalPaymentId)
+    mutate externalSource = self.externalPaymentId != null ? self.externalSource : source
+    mutate externalPaymentId = self.externalPaymentId != null ? self.externalPaymentId : trim(externalPaymentId)
     mutate providerTransactionIds = providerTransactionIds != null ? providerTransactionIds : self.providerTransactionIds
     mutate reconciliationDetails = notes != null ? notes : self.reconciliationDetails
     emit PaymentMatched {
@@ -264,7 +409,7 @@ entity Payment mixin TenantScoped, SoftDeletable {
   command disputeReconciliation(reason: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "financeAccess")
-    constraint disputeRequiresReason: length(trim(reason)) > 0 "Dispute reason is required"
+    constraint disputeRequiresReason: length(trim(reason)) > 0 "Give a reason for this dispute"
     mutate reconciliationStatus = "disputed"
     mutate reconciliationDetails = reason
     emit PaymentReconciliationDisputed {
@@ -325,6 +470,24 @@ event PaymentSettled: "payment.settled" {
   eventId: string?
   amount: money(12, 2)
   method: PaymentMethodKind
+  appliedAmount: money(12, 2)
+  unappliedAmount: money(12, 2)
+  applyToInvoiceId: string?
+}
+
+event PaymentReversed: "payment.reversed" {
+  paymentId: string
+  tenantId: string
+  invoiceId: string
+  clientId: string
+  kind: PaymentReversalKind
+  amount: money(12, 2)
+  fromApplied: money(12, 2)
+  fromHeld: money(12, 2)
+  reason: string
+  effectiveAt: datetime
+  providerReversalId: string?
+  applyToInvoiceId: string?
 }
 
 event PaymentFailed: "payment.failed" {
@@ -371,9 +534,18 @@ event PaymentProviderIdsUpdated: "payment.provider_ids_updated" {
 }
 
 // Settled payments apply to the invoice (replaces capsule-pro middleware).
+// Only the applied part; nothing is applied when the invoice owed nothing.
 on PaymentSettled run Invoice.applyPayment
-  resolve payload.invoiceId
+  resolve payload.applyToInvoiceId
   params {
-    paymentAmount: payload.amount
+    paymentAmount: payload.appliedAmount
+    paymentId: payload.paymentId
+  }
+
+// Money taken back from the applied part goes back on the invoice balance.
+on PaymentReversed run Invoice.recordRefund
+  resolve payload.applyToInvoiceId
+  params {
+    refundAmount: payload.fromApplied
     paymentId: payload.paymentId
   }

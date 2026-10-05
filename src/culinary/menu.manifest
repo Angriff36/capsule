@@ -29,12 +29,20 @@ entity Menu mixin TenantScoped, SoftDeletable {
   property publishedAt: datetime?
   property archivedAt: datetime?
   property archiveReason: string?
+  // Season: the event dates this menu can be booked for. Empty = all year.
+  property availableFrom: datetime?
+  property availableUntil: datetime?
+  // Service, as the printed menu book shows it: "1:12 server ratio" = one
+  // server for every 12 guests (empty = not stated), and the courses where
+  // each guest picks one dish ("Guests select one entrée", "or").
+  property guestsPerServer: int?
+  property pickOneCourses: list<string> = []
 
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
 
-  constraint menuIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted menus require a name"
-  constraint menuPricingNonnegative: self.basePrice >= 0 and self.pricePerPerson >= 0 "Menu pricing cannot be negative"
+  constraint menuIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Give this menu a name."
+  constraint menuPricingNonnegative: self.basePrice >= 0 and self.pricePerPerson >= 0 "This menu's pricing can't be negative. Use zero or more."
   constraint menuGuestBounds: self.minGuests >= 0 and self.maxGuests >= 0 and (self.maxGuests == 0 or self.maxGuests >= self.minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
 
   transition status from "draft" to ["published", "archived"]
@@ -59,8 +67,8 @@ entity Menu mixin TenantScoped, SoftDeletable {
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
-    constraint draftMenuName: length(trim(name)) > 0 "Menu name is required"
-    constraint draftMenuPricing: (basePrice == null or basePrice >= 0) and (pricePerPerson == null or pricePerPerson >= 0) "Menu pricing cannot be negative"
+    constraint draftMenuName: length(trim(name)) > 0 "Give this menu a name."
+    constraint draftMenuPricing: (basePrice == null or basePrice >= 0) and (pricePerPerson == null or pricePerPerson >= 0) "This menu's pricing can't be negative. Use zero or more."
     constraint draftMenuGuests: (minGuests == null or minGuests >= 0) and (maxGuests == null or maxGuests >= 0) and (minGuests == null or maxGuests == null or maxGuests == 0 or maxGuests >= minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
     mutate name = name
     mutate description = description
@@ -87,7 +95,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "draft"
     guard self.deletedAt == null
-    constraint reviseMenuName: length(trim(name)) > 0 "Menu name is required"
+    constraint reviseMenuName: length(trim(name)) > 0 "Give this menu a name."
     mutate name = name
     mutate description = description
     mutate category = category
@@ -108,7 +116,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint pricingMenuNonnegative: basePrice >= 0 and pricePerPerson >= 0 "Menu pricing cannot be negative"
+    constraint pricingMenuNonnegative: basePrice >= 0 and pricePerPerson >= 0 "This menu's pricing can't be negative. Use zero or more."
     constraint pricingMenuGuests: minGuests >= 0 and maxGuests >= 0 and (maxGuests == 0 or maxGuests >= minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
     mutate basePrice = basePrice
     mutate pricePerPerson = pricePerPerson
@@ -121,6 +129,39 @@ entity Menu mixin TenantScoped, SoftDeletable {
       pricePerPerson: pricePerPerson
       minGuests: minGuests
       maxGuests: maxGuests
+    }
+  }
+
+  // Set or clear the season. Leave both empty for an all-year menu.
+  command setSeason(optional availableFrom: datetime, optional availableUntil: datetime) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint seasonOrder: availableFrom == null or availableUntil == null or availableUntil >= availableFrom "The season has to end on or after the day it starts."
+    mutate availableFrom = availableFrom
+    mutate availableUntil = availableUntil
+    emit MenuSeasonSet {
+      menuId: self.id
+      tenantId: self.tenantId
+      availableFrom: availableFrom
+      availableUntil: availableUntil
+    }
+  }
+
+  // Set the server ratio and the pick-one courses. Leave guestsPerServer
+  // empty to not state a ratio; send every pick-one course each time.
+  command setService(optional guestsPerServer: number, pickOneCourses: list<string>) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint serviceRatioPositive: guestsPerServer == null or guestsPerServer >= 1 "Guests per server has to be 1 or more. Leave it empty to not show a ratio."
+    mutate guestsPerServer = guestsPerServer
+    mutate pickOneCourses = pickOneCourses
+    emit MenuServiceSet {
+      menuId: self.id
+      tenantId: self.tenantId
+      guestsPerServer: guestsPerServer
+      pickOneCourses: pickOneCourses
     }
   }
 
@@ -142,7 +183,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
     guard self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint unpublishMenuReason: length(trim(reason)) > 0 "Unpublish reason is required"
+    constraint unpublishMenuReason: length(trim(reason)) > 0 "Say why you're unpublishing this menu."
     mutate status = "draft"
     mutate publishedAt = null
     emit MenuUnpublished {
@@ -156,7 +197,7 @@ entity Menu mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint archiveMenuReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveMenuReason: length(trim(reason)) > 0 "Say why you're archiving this menu."
     mutate status = "archived"
     mutate archivedAt = now()
     mutate archiveReason = reason
@@ -206,7 +247,21 @@ event MenuPricingUpdated: "menu.pricing_updated" {
   maxGuests: number
 }
 
-event MenuPublished: "menu.published" {
+event MenuSeasonSet: "menu.season_set" {
+  menuId: string
+  tenantId: string
+  availableFrom: datetime?
+  availableUntil: datetime?
+}
+
+event MenuServiceSet: "menu.service_set" {
+  menuId: string
+  tenantId: string
+  guestsPerServer: number?
+  pickOneCourses: list<string>
+}
+
+event MenuPublished:"menu.published" {
   menuId: string
   tenantId: string
   name: string

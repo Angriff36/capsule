@@ -67,6 +67,8 @@ const DATASET_TYPES = [
   "venues",
   "payments",
   "pack_list",
+  "stock",
+  "history",
 ] as const;
 type DatasetType = (typeof DATASET_TYPES)[number];
 
@@ -165,14 +167,7 @@ export const startImport = mutation({
       tenantId,
       sourceSystem: args.sourceSystem as
         "tpp_legacy" | "csv_export" | "api_sync",
-      datasetType: args.datasetType as
-        | "events"
-        | "contacts"
-        | "leads"
-        | "menus"
-        | "venues"
-        | "payments"
-        | "pack_list",
+      datasetType: args.datasetType as DatasetType,
       status: "started" as const,
       startTime: Date.now(),
       recordCounts: "{}",
@@ -205,8 +200,16 @@ export const getImportRunStatus = query({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
 
+    // Same outcome as the ImportRun read policy (importAccess) and the
+    // generated getImportRun: no access, another workspace or a removed run
+    // all answer not found.
     const importRun = await ctx.db.get(args.importRunId);
-    if (!importRun || importRun.tenantId !== tenantId) {
+    if (
+      !canImport(auth.role) ||
+      !importRun ||
+      importRun.tenantId !== tenantId ||
+      importRun.deletedAt != null
+    ) {
       throw new ConvexError("Import run not found");
     }
 
@@ -266,13 +269,25 @@ export const listImportRuns = query({
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
+    // Same outcome as the ImportRun read policy (importAccess) and the
+    // generated listImportRunByTenantId: no access reads nothing, removed
+    // runs are left out.
+    if (!canImport(auth.role)) return [];
 
     const query = ctx.db
       .query("importRuns")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId));
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("deletedAt"), undefined),
+          q.eq(q.field("deletedAt"), null),
+        ),
+      );
 
     const results = await (
-      args.status ? query.filter((q) => q.eq("status", args.status)) : query
+      args.status
+        ? query.filter((q) => q.eq(q.field("status"), args.status))
+        : query
     )
       .order("desc")
       .take(args.limit ?? 50);
@@ -753,21 +768,14 @@ export const commitImport = internalAction({
       };
     }
 
-    // TODO: Implement actual commit logic:
-    // 1. Create ExternalRecordLink entries for each imported record
-    // 2. Insert/update target entity records
-    // 3. Handle conflicts and duplicates
-    // 4. Track committed records
-
-    // Progress to completed stage
-    await ctx.runMutation(internal.importCoordinator.progressImportStage, {
-      importRunId: args.importRunId,
-      toStage: "completed",
-    });
-
+    // This step has no file rows, so it cannot save records. The real commit
+    // is importCommit.commitImportRun (it reads the rows and links each
+    // record). Refuse instead of marking the run completed with nothing saved.
     return {
-      success: true,
-      stage: "completed",
+      success: false,
+      stage: "committing",
+      failureReason:
+        "Nothing was saved. Finish the import from the import page, which reads the file rows.",
     };
   },
 });
@@ -861,18 +869,10 @@ export const revertImport = mutation({
       );
     }
 
-    // TODO: Implement revert logic:
-    // 1. Find all ExternalRecordLinks with sourceImportRunId
-    // 2. Delete or mark as reverted the linked Capsule entities
-    // 3. Mark links as superseded
-
-    await ctx.db.patch(args.importRunId, {
-      status: "reverted",
-      revertedAt: Date.now(),
-      endTime: Date.now(),
-      updatedAt: Date.now(),
-    });
-
-    return { success: true };
+    // The real undo is importCommit.revertImportRun (it supersedes the run's
+    // links). Marking the run "reverted" here would undo nothing.
+    throw new ConvexError(
+      "Nothing was undone. Undo the import from the import page.",
+    );
   },
 });

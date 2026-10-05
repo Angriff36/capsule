@@ -37,6 +37,7 @@ const fiveHourRecord = {
   clockOutAt: jan9End,
   breakMinutes: 0,
   status: "closed",
+  approvedAt: jan9End,
 };
 
 const zeroMinutePrepared = {
@@ -83,6 +84,7 @@ describe("payroll export identity", () => {
           clockOutAt: new Date("2026-01-09T09:15:00").getTime(),
           breakMinutes: 0,
           status: "closed",
+          approvedAt: jan9End,
         },
       ],
       payrollInputs: [],

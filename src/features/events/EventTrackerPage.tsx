@@ -19,7 +19,6 @@ import {
   useEventSubmitForApproval,
   useListClient,
   useListDelivery,
-  useListEvent,
   useListEventNumberAssignment,
   useListEventVehicleAssignment,
   useListInvoice,
@@ -30,6 +29,7 @@ import {
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
+import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -50,6 +50,8 @@ import { FailureBanner } from "./FailureBanner";
 import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
 
 const LANE_DAYS = 14;
+const TRACKER_DAYS_BACK = 60;
+const TRACKER_DAYS_AHEAD = 731;
 // Mirrors the Event command guards in src/operations/event.manifest so a card
 // never offers an edit the command would refuse: reschedule / changeVenue /
 // changePrimaryContact / changeRequirements run through sales_lock;
@@ -150,7 +152,18 @@ type StageMove = {
  */
 export function EventTrackerPage() {
   const authStatus = useAuthStatus();
-  const events = useListEvent();
+  const today = startOfDay(Date.now());
+  // Events from 60 days back (so a job still running shows on Today) to two
+  // years ahead, plus undated ones. The window moves once a day.
+  const eventWindow = useMemo(
+    () => ({
+      from: addDays(today, -TRACKER_DAYS_BACK),
+      to: addDays(today, TRACKER_DAYS_AHEAD),
+      withUndated: true,
+    }),
+    [today],
+  );
+  const events = useEventRecordsInRange(eventWindow);
   const clients = useListClient();
   const venues = useListVenue();
   const deliveries = useListDelivery();
@@ -197,7 +210,6 @@ export function EventTrackerPage() {
   ].some((value) => value === undefined);
   const { loadingTooLong } = useSlowQuery(loading ? undefined : true);
 
-  const today = startOfDay(Date.now());
   const facts = useMemo(
     () =>
       loading
@@ -355,7 +367,7 @@ export function EventTrackerPage() {
         return canLock ? { label: "Lock sales", run: lockForSales } : null;
       case "sales_lock":
         return canLock
-          ? { label: "Confirm lock & start execution", run: confirmSalesLock }
+          ? { label: "Confirm lock & start the event", run: confirmSalesLock }
           : null;
       default:
         return null;

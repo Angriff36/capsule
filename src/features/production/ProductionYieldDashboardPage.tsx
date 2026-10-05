@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   useListProductionBatch,
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
+import { componentPath } from "../kitchen/kitchenRoutes";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   buildProductionYieldReport,
@@ -121,7 +123,7 @@ export function ProductionYieldDashboard({
             {reportDate.format(report.rangeStart)} —{" "}
             {reportDate.format(report.rangeEnd)}
           </strong>
-          <small>completed batches with recorded actual yield</small>
+          <small>completed batches with an actual yield on file</small>
         </div>
       </header>
 
@@ -163,7 +165,7 @@ export function ProductionYieldDashboard({
           <div className="document-empty">
             <p>No completed production yields in this window.</p>
             <span>
-              Complete a production batch and record its actual yield to begin
+              Complete a production batch and enter its actual yield to begin
               comparing component performance.
             </span>
           </div>
@@ -258,6 +260,19 @@ export function ProductionYieldDashboard({
                         <span className="production-yield-component">
                           <strong>{row.componentName}</strong>
                           <small>{varianceSignal(row)}</small>
+                          {row.suggestion ? (
+                            <Link
+                              to={componentPath(row.componentId)}
+                              className="production-yield-suggestion"
+                              data-testid="yield-suggestion"
+                            >
+                              Recipe says{" "}
+                              {quantity.format(row.suggestion.currentYield)}{" "}
+                              {row.suggestion.yieldUnit}; these batches suggest{" "}
+                              {quantity.format(row.suggestion.suggestedYield)}.
+                              Check the recipe
+                            </Link>
+                          ) : null}
                         </span>
                       </td>
                       <td>
@@ -296,7 +311,7 @@ export function ProductionYieldDashboard({
           catalog yield. Cancelled, active, deleted, or incomplete batches are
           excluded. Different yield units remain separate so portions are never
           added to weight or volume. Older completed batches may contain a
-          planned yield copied into the recorded actual-yield field; new KDS
+          planned yield copied into the actual-yield field; new kitchen display
           completions require an operator-entered measurement.
         </p>
       </aside>

@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePayrollInput,
-  useListEvent,
   useListEventAssignment,
   useListPerson,
   useListShift,
@@ -17,6 +16,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { setWorkingEvent, workingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   distributeTipPool,
   formatTipPayrollNote,
@@ -47,12 +47,12 @@ const durationHours = (start: unknown, end: unknown) => {
 };
 
 export function TipDistributionPage() {
-  const events = useListEvent();
   const assignments = useListEventAssignment();
   const people = useListPerson();
   const shifts = useListShift();
   const createPayrollInput = useCreatePayrollInput();
   const [eventId, setEventId] = useState(() => workingEventId() ?? "");
+  const events = usePickerAndNamedEvents([eventId]);
   const [total, setTotal] = useState("0.00");
   const [method, setMethod] = useState<TipPoolingMethod>("equal");
   const [excluded, setExcluded] = useState<Record<string, boolean>>({});
@@ -548,7 +548,7 @@ export function TipDistributionPage() {
           <p className="tip-bridge-note tip-no-print">
             Each share is created as a prepared payroll input for review — no
             pay goes out until you finalize it in Payroll. The gratuity amount
-            is recorded on the payroll note and carried into the payroll export.
+            goes on the payroll note and carries into the payroll export.
           </p>
         </>
       )}

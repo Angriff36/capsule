@@ -1,0 +1,230 @@
+// EquipmentIssue — one problem with equipment that someone has to deal with
+// (PL-RETURNS: spec §13.3 "damage, missing-item, cleaning, late-return, and
+// vendor-return exceptions that flow into billing and closeout"; CF-11.4
+// maintenance "issue, severity, item, opened/due/completed dates,
+// owner/vendor, cost, notes, and out-of-service state").
+//
+// A return check opens one automatically for damaged, dirty or missing units
+// (convex/lib/equipmentReturns.ts); a short vendor return opens one for what
+// the rental company will bill. Anyone can open one by hand for a repair.
+//
+// holdsUnits = "out of use until fixed": while the issue is open, its units
+// are not free to book (convex/lib/equipmentReservationAvailability.ts).
+// Resolving it puts them back. The issue itself is never deleted; it stays as
+// the history of what happened and who paid.
+
+use "../foundation/base.manifest"
+
+enum EquipmentIssueKind {
+  damaged
+  missing
+  cleaning
+  repair
+  late_return
+  vendor_return
+}
+
+enum EquipmentIssueSeverity {
+  low
+  medium
+  high
+}
+
+// Who pays for it. undecided until the office says.
+enum EquipmentIssuePayer {
+  undecided
+  company
+  client
+  vendor
+}
+
+enum EquipmentIssueStatus {
+  open
+  resolved
+}
+
+entity EquipmentIssue mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed equipmentId: uuid?
+  property indexed eventId: uuid?
+  property equipmentReservationId: uuid?
+  property rentalOrderLineId: uuid?
+  property required kind: EquipmentIssueKind = "repair"
+  property required severity: EquipmentIssueSeverity = "medium"
+  property required quantity: int = 1
+  property required holdsUnits: boolean = false
+  property required searchable description: string = ""
+  property required status: EquipmentIssueStatus = "open"
+  property raisedAt: datetime?
+  property issueRaisedById: uuid?
+  property dueAt: datetime?
+  // Who is dealing with it: a staff name, or the repair vendor below.
+  property ownerName: string?
+  property vendorId: uuid?
+  // What fixing or replacing it costs us.
+  property cost: money(12, 2)?
+  property required payer: EquipmentIssuePayer = "undecided"
+  // What we charge the payer (client or vendor).
+  property chargeAmount: money(12, 2)?
+  property notes: string?
+  property resolvedAt: datetime?
+  property issueSettledById: uuid?
+  property resolution: string?
+
+  belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+
+  constraint equipmentIssueAmount: self.quantity > 0 "An equipment problem has to cover at least 1."
+  constraint equipmentIssueMoney: (self.cost == null or self.cost >= 0) and (self.chargeAmount == null or self.chargeAmount >= 0) "Cost and charge can't be negative. Use zero or more."
+
+  transition status from "open" to ["resolved"]
+
+  // Finance reads and settles who pays at closeout.
+  default policy equipmentIssueRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "financeAccess") "Inventory, logistics, event or finance staff may see equipment problems"
+  default policy equipmentIssueWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "financeAccess") "Inventory, logistics, event or finance staff may update equipment problems"
+  default policy equipmentIssueExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "financeAccess") "Inventory, logistics, event or finance staff may change equipment problems"
+
+  command raise(
+    kind: EquipmentIssueKind,
+    description: string,
+    optional equipmentId: uuid,
+    optional eventId: uuid,
+    optional equipmentReservationId: uuid,
+    optional rentalOrderLineId: uuid,
+    optional quantity: int,
+    optional severity: EquipmentIssueSeverity,
+    optional holdsUnits: boolean,
+    optional dueAt: datetime,
+    optional ownerName: string,
+    optional vendorId: uuid,
+    optional cost: money(12, 2),
+    optional payer: EquipmentIssuePayer,
+    optional chargeAmount: money(12, 2),
+    optional notes: string
+  ) {
+    guard self.raisedAt == null
+    guard self.deletedAt == null
+    constraint raiseIssueDescription: length(trim(description)) > 0 "Say what is wrong."
+    constraint raiseIssueSubject: equipmentId != null or rentalOrderLineId != null "Pick the equipment this is about."
+    constraint raiseIssueEquipment: equipmentId == null or self.equipment != null "That equipment isn't in your list. Pick one of your items."
+    constraint raiseIssueEvent: eventId == null or self.event != null "That event isn't in your list. Pick one of your events."
+    constraint raiseIssueVendor: vendorId == null or self.vendor != null "That vendor isn't in your vendor list. Pick one of your vendors."
+    constraint raiseIssueAmount: quantity == null or quantity > 0 "An equipment problem has to cover at least 1."
+    constraint raiseIssueMoney: (cost == null or cost >= 0) and (chargeAmount == null or chargeAmount >= 0) "Cost and charge can't be negative. Use zero or more."
+    mutate kind = kind
+    mutate description = description
+    mutate equipmentId = equipmentId
+    mutate eventId = eventId
+    mutate equipmentReservationId = equipmentReservationId
+    mutate rentalOrderLineId = rentalOrderLineId
+    mutate quantity = quantity != null ? quantity : 1
+    mutate severity = severity != null ? severity : "medium"
+    mutate holdsUnits = holdsUnits != null ? holdsUnits : false
+    mutate dueAt = dueAt
+    mutate ownerName = ownerName
+    mutate vendorId = vendorId
+    mutate cost = cost
+    mutate payer = payer != null ? payer : "undecided"
+    mutate chargeAmount = chargeAmount
+    mutate notes = notes
+    mutate status = "open"
+    mutate raisedAt = now()
+    mutate issueRaisedById = user.personId
+    emit EquipmentIssueRaised {
+      equipmentIssueId: self.id
+      tenantId: self.tenantId
+      equipmentId: equipmentId
+      eventId: eventId
+      kind: kind
+      quantity: quantity != null ? quantity : 1
+      holdsUnits: holdsUnits != null ? holdsUnits : false
+    }
+  }
+
+  // Change the details while it is open: who handles it, when, what it costs
+  // and who pays. Anything left out stays as it was.
+  command revise(
+    optional severity: EquipmentIssueSeverity,
+    optional holdsUnits: boolean,
+    optional dueAt: datetime,
+    optional ownerName: string,
+    optional vendorId: uuid,
+    optional cost: money(12, 2),
+    optional payer: EquipmentIssuePayer,
+    optional chargeAmount: money(12, 2),
+    optional notes: string
+  ) {
+    guard self.raisedAt != null
+    guard self.deletedAt == null
+    constraint reviseIssueOpen: self.status == "open" "This problem is already sorted out. Open a new one if something else is wrong."
+    constraint reviseIssueMoney: (cost == null or cost >= 0) and (chargeAmount == null or chargeAmount >= 0) "Cost and charge can't be negative. Use zero or more."
+    mutate severity = severity != null ? severity : self.severity
+    mutate holdsUnits = holdsUnits != null ? holdsUnits : self.holdsUnits
+    mutate dueAt = dueAt != null ? dueAt : self.dueAt
+    mutate ownerName = ownerName != null ? ownerName : self.ownerName
+    // convex/lib/ownWorkspaceLinks.ts refuses another company's vendor id.
+    mutate vendorId = vendorId != null ? vendorId : self.vendorId
+    mutate cost = cost != null ? cost : self.cost
+    mutate payer = payer != null ? payer : self.payer
+    mutate chargeAmount = chargeAmount != null ? chargeAmount : self.chargeAmount
+    mutate notes = notes != null ? notes : self.notes
+    emit EquipmentIssueRevised {
+      equipmentIssueId: self.id
+      tenantId: self.tenantId
+      equipmentId: self.equipmentId
+    }
+  }
+
+  // Fixed, cleaned, found, billed or written off. The units go back into use.
+  command settle(resolution: string, optional cost: money(12, 2), optional payer: EquipmentIssuePayer, optional chargeAmount: money(12, 2)) {
+    guard self.raisedAt != null
+    guard self.deletedAt == null
+    constraint resolveIssueOpen: self.status == "open" "This problem is already sorted out."
+    constraint resolveIssueNote: length(trim(resolution)) > 0 "Say how it was sorted out."
+    constraint resolveIssueMoney: (cost == null or cost >= 0) and (chargeAmount == null or chargeAmount >= 0) "Cost and charge can't be negative. Use zero or more."
+    mutate status = "resolved"
+    mutate resolution = resolution
+    mutate cost = cost != null ? cost : self.cost
+    mutate payer = payer != null ? payer : self.payer
+    mutate chargeAmount = chargeAmount != null ? chargeAmount : self.chargeAmount
+    mutate resolvedAt = now()
+    mutate issueSettledById = user.personId
+    emit EquipmentIssueResolved {
+      equipmentIssueId: self.id
+      tenantId: self.tenantId
+      equipmentId: self.equipmentId
+      eventId: self.eventId
+      resolution: resolution
+    }
+  }
+
+  store EquipmentIssue in durable
+}
+
+event EquipmentIssueRaised: "equipment.issue_raised" {
+  equipmentIssueId: string
+  tenantId: string
+  equipmentId: string?
+  eventId: string?
+  kind: EquipmentIssueKind
+  quantity: int
+  holdsUnits: boolean
+}
+
+event EquipmentIssueRevised: "equipment.issue_revised" {
+  equipmentIssueId: string
+  tenantId: string
+  equipmentId: string?
+}
+
+event EquipmentIssueResolved: "equipment.issue_resolved" {
+  equipmentIssueId: string
+  tenantId: string
+  equipmentId: string?
+  eventId: string?
+  resolution: string
+}

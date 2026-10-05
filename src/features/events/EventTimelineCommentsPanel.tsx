@@ -5,15 +5,16 @@ import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEventTimelineComment,
   useEventTimelineCommentRemove,
-  useListEventTimelineComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { useEventTimelineComments } from "../../lib/useEventRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventTabPanel } from "./EventTabPanel";
 import { eventDetailPath } from "./eventRoutes";
 import { FailureBanner } from "./FailureBanner";
+import { authorLabel } from "./timelineCommentAuthor";
 
 // Roles carrying adminAccess (base.manifest: admin → owner → system).
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
@@ -28,7 +29,7 @@ type Props = {
  */
 export function EventTimelineCommentsPanel({ eventId }: Props) {
   const authStatus = useAuthStatus();
-  const comments = useListEventTimelineComment();
+  const comments = useEventTimelineComments(eventId);
   const people = useListPerson();
   const postComment = useCreateEventTimelineComment();
   const removeComment = useEventTimelineCommentRemove();
@@ -105,8 +106,6 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
             void run("comment", async () => {
               await postComment({
                 eventId,
-                authorPersonId: me._id,
-                authorName: myName,
                 body: commentBody.trim(),
               });
               setCommentBody("");
@@ -139,7 +138,7 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
           <li key={comment._id} className="px-3 py-2.5">
             <p className="text-base text-ink">{comment.body}</p>
             <p className="mt-1 font-mono text-xs text-ink-3">
-              {comment.authorName}
+              {authorLabel(people, comment)}
               {comment.postedAt
                 ? ` · ${formatDate(comment.postedAt)} ${formatTime(comment.postedAt)}`
                 : ""}

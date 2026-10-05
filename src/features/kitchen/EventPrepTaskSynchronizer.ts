@@ -1,4 +1,5 @@
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
+import { eventLineRecipeDishId } from "./dishVersions";
 import { quantityForDishTask } from "./prepTaskQuantity";
 import { recipeUnitRatio } from "../../lib/recipeUnitConversion";
 import { prepWorkBalance } from "../../lib/prepWorkBalance";
@@ -111,7 +112,7 @@ export class EventPrepTaskSynchronizer {
       .filter(
         (template) =>
           template.status === "active" &&
-          template.dishId === input.eventDish.dishId,
+          template.dishId === eventLineRecipeDishId(input.eventDish),
       )
       .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0));
     const eventTasks = input.tasks.filter(
@@ -211,7 +212,7 @@ export class EventPrepTaskSynchronizer {
             .filter(
               (line) =>
                 line.deletedAt == null &&
-                line.dishId === input.eventDish.dishId &&
+                line.dishId === eventLineRecipeDishId(input.eventDish) &&
                 line.quantity > 0,
             )
             .map((line) => {

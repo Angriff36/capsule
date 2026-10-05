@@ -3,6 +3,7 @@ import {
   EventAssignmentCheckInLifecycle,
   EventAssignmentCheckOutLifecycle,
   EventAssignmentConfirmLifecycle,
+  EventAssignmentDeclineLifecycle,
   EventAssignmentMarkNoShowLifecycle,
   EventAssignmentUnassignLifecycle,
   QualificationExpireLifecycle,
@@ -67,6 +68,11 @@ const ASSIGNMENT_ACTIONS = [
     key: "markNoShow",
     label: "No-show",
     lifecycle: EventAssignmentMarkNoShowLifecycle,
+  },
+  {
+    key: "decline",
+    label: "Can't make it",
+    lifecycle: EventAssignmentDeclineLifecycle,
   },
   {
     key: "unassign",

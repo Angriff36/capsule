@@ -6,8 +6,8 @@ import {
   useListClient,
   useListClientCommunication,
   useListClientContact,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate, formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -50,7 +50,7 @@ export function ClientsPage() {
   const navigate = useNavigate();
   const clients = useListClient();
   const contacts = useListClientContact();
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const communications = useListClientCommunication();
   const createClient = useCreateClient();
   const createClientMerge = useCreateClientMerge();
@@ -137,6 +137,7 @@ export function ClientsPage() {
     );
     const communicationCount = (communications ?? []).filter(
       (communication) =>
+        String(communication.clientId) === clientId ||
         (communication.clientContactId != null &&
           contactIds.has(communication.clientContactId)) ||
         (communication.eventId != null && eventIds.has(communication.eventId)),
@@ -272,7 +273,7 @@ export function ClientsPage() {
       ) : null}
       {dataLoaded && duplicateCandidates.length > 0 ? (
         <div className="flex items-center gap-2 text-sm text-ink-2">
-          <span className="chip border-warn/30 bg-warn-soft text-warn">
+          <span className="chip chip-tone-warn">
             {duplicateCandidates.length} possible duplicate
             {duplicateCandidates.length === 1 ? "" : "s"}
           </span>

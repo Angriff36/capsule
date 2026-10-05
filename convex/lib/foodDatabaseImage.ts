@@ -23,12 +23,15 @@ function normalizeBarcode(raw?: string | null): string | undefined {
   return digits.length >= 8 ? digits : undefined;
 }
 
-export function isTrustedCatalogImageUrl(url: string): boolean {
+export function isTrustedCatalogImageUrl(
+  url: string,
+  hostSuffixes: ReadonlyArray<string> = TRUSTED_IMAGE_HOST_SUFFIXES,
+): boolean {
   try {
     const parsed = new URL(url.trim());
     if (parsed.protocol !== "https:") return false;
     const host = parsed.hostname.toLowerCase();
-    return TRUSTED_IMAGE_HOST_SUFFIXES.some(
+    return hostSuffixes.some(
       (suffix) => host === suffix.slice(1) || host.endsWith(suffix),
     );
   } catch {
@@ -100,8 +103,9 @@ async function readLimitedBody(
 
 async function fetchTrustedImageResponse(
   url: string,
+  hostSuffixes: ReadonlyArray<string>,
 ): Promise<Response | null> {
-  if (!isTrustedCatalogImageUrl(url)) return null;
+  if (!isTrustedCatalogImageUrl(url, hostSuffixes)) return null;
 
   let current = url.trim();
   for (let hop = 0; hop < 3; hop += 1) {
@@ -114,7 +118,7 @@ async function fetchTrustedImageResponse(
       const location = response.headers.get("location");
       if (!location) return null;
       const next = new URL(location, current).toString();
-      if (!isTrustedCatalogImageUrl(next)) return null;
+      if (!isTrustedCatalogImageUrl(next, hostSuffixes)) return null;
       current = next;
       continue;
     }
@@ -129,8 +133,9 @@ async function fetchTrustedImageResponse(
 /** Download an external product image for Convex storage import. */
 export async function fetchCatalogImage(
   url: string,
+  hostSuffixes: ReadonlyArray<string> = TRUSTED_IMAGE_HOST_SUFFIXES,
 ): Promise<FetchedCatalogImage | null> {
-  const response = await fetchTrustedImageResponse(url);
+  const response = await fetchTrustedImageResponse(url, hostSuffixes);
   if (!response) return null;
 
   const contentType = response.headers

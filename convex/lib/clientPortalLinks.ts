@@ -4,7 +4,8 @@
  * A link's id is the public address. Copying a new link turns the previous
  * one off. Each link stops working 90 days after it is copied. Staff can
  * turn the current link off sooner. Older signed links (no saved row) keep
- * working until the first saved link exists for that event.
+ * working until the first saved link exists for that event, and never later
+ * than 90 days after the event.
  */
 import { ConvexError, v } from "convex/values";
 import { api } from "../_generated/api";
@@ -16,6 +17,7 @@ import {
 } from "../_generated/server";
 import { getAuthContext } from "./authContext";
 import { verifyClientPortalToken } from "./clientPortalToken";
+import { clockNow } from "./clockNow";
 
 export const CLIENT_PORTAL_LINK_LIFETIME_MS = 90 * 24 * 60 * 60 * 1000;
 
@@ -26,10 +28,12 @@ type CreatedLink = { _id: Id<"clientPortalLinks">; version?: number };
 export async function resolveClientPortalAccess(
   ctx: QueryCtx,
   token: string,
+  clock?: number,
 ): Promise<PortalAccess | null> {
   if (!token || token.length > 2048) return null;
-  if (!token.includes(".")) return accessFromSavedLink(ctx, token);
-  return accessFromLegacyToken(ctx, token);
+  const now = clockNow(clock);
+  if (!token.includes(".")) return accessFromSavedLink(ctx, token, now);
+  return accessFromLegacyToken(ctx, token, now);
 }
 
 export const issueClientPortalLink = mutation({
@@ -64,35 +68,43 @@ export const turnOffClientPortalLinks = mutation({
 async function accessFromSavedLink(
   ctx: QueryCtx,
   token: string,
+  now: number,
 ): Promise<PortalAccess | null> {
   const linkId = ctx.db.normalizeId("clientPortalLinks", token);
   if (!linkId) return null;
   const link = await ctx.db.get(linkId);
-  if (!isOpenLink(link)) return null;
+  if (!isOpenLink(link, now)) return null;
   return { eventId: String(link.eventId), tenantId: link.tenantId };
 }
 
 async function accessFromLegacyToken(
   ctx: QueryCtx,
   token: string,
+  now: number,
 ): Promise<PortalAccess | null> {
   const legacy = await verifyClientPortalToken(token);
   if (!legacy) return null;
   const eventId = ctx.db.normalizeId("events", legacy.eventId);
   if (!eventId) return null;
   if ((await linksForEvent(ctx, eventId)).length > 0) return null;
+  // Signed links carry no end date, so they stop 90 days after the event.
+  const event = await ctx.db.get(eventId);
+  if (!event) return null;
+  const eventDay = event.endsAt ?? event.startsAt ?? event._creationTime;
+  if (eventDay + CLIENT_PORTAL_LINK_LIFETIME_MS <= now) return null;
   return legacy;
 }
 
 function isOpenLink(
   link: Doc<"clientPortalLinks"> | null,
+  now: number = Date.now(),
 ): link is Doc<"clientPortalLinks"> {
   if (!link || link.deletedAt != null) return false;
   if (link.status !== "active") return false;
   // Same read-time check as proposal share links. Turning a link off updates
   // the row, so an open page drops the event. A visit after the end date
   // sees nothing.
-  return link.expiresAt > Date.now();
+  return link.expiresAt > now;
 }
 
 async function linksForEvent(

@@ -20,40 +20,17 @@ import {
   layoutAccessibilityText,
   layoutCategoryCounts,
   layoutHasInstructions,
-  trimLayoutField,
 } from "./layoutTrim";
 import { useApplyLayoutTemplate } from "../../lib/safeMaterialization";
+import { parseLayoutTemplateSections } from "../../lib/layoutTemplateSections";
+import {
+  LayoutTemplateLinks,
+  LayoutTemplatePreview,
+} from "./EventLayoutTemplateLinks";
 import {
   beginPendingOperation,
   confirmPendingOperation,
 } from "../../lib/pendingOperationKey";
-
-// Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
-// is the editable shape of an EventLayoutSection, copied verbatim into the
-// event's setup snapshot.
-type LayoutSection = {
-  type: string;
-  instructions: string | null;
-  sortOrder: number;
-};
-
-const parseSections = (raw: string | null | undefined): LayoutSection[] => {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(
-        (s): s is LayoutSection =>
-          typeof s === "object" &&
-          s !== null &&
-          typeof (s as LayoutSection).type === "string",
-      )
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-  } catch {
-    return [];
-  }
-};
 
 type Props = {
   readonly eventId: Id<"events">;
@@ -152,8 +129,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const copyFromTemplate = () => {
     const template = copyable.find((t) => t._id === copyTemplateId);
     if (!template) return;
-    const templateSections = parseSections(template.sections);
-    if (templateSections.length === 0) {
+    if (parseLayoutTemplateSections(template.sections).length === 0) {
       setFailure(
         classifyCommandFailure(
           new Error("That template has no sections to copy."),
@@ -161,31 +137,16 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       );
       return;
     }
-    // Validate every section BEFORE any mutation so a bad template (e.g. a
-    // blank type from a hand-edit) fails fast instead of leaving a partial copy.
-    const invalidIndex = templateSections.findIndex(
-      (s) => !trimLayoutField(s.type),
-    );
-    if (invalidIndex >= 0) {
-      setFailure(
-        classifyCommandFailure(
-          new Error(
-            `Section ${invalidIndex + 1} has a blank type. Fix the template before copying.`,
-          ),
-        ),
-      );
-      return;
-    }
     const base = eventSections.length;
     void run("copy", async () => {
+      // The server copies the saved template itself and stamps each row
+      // with the template and version it came from.
       const scope = `layout-template:${eventId}:${template._id}`;
       const pending = beginPendingOperation(scope, {
         eventId,
         baseSortOrder: base,
-        sections: templateSections.map((section) => ({
-          type: section.type,
-          instructions: section.instructions ?? "",
-        })),
+        sections: [],
+        templateId: template._id,
       });
       const result = await applyLayoutTemplate({
         ...pending.payload,
@@ -260,8 +221,17 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
               >
                 Copy sections
               </button>
+              <LayoutTemplatePreview
+                template={copyable.find((t) => t._id === copyTemplateId)}
+              />
             </div>
           ) : null}
+          <div className="mt-3">
+            <LayoutTemplateLinks
+              rows={eventSections}
+              templates={templates ?? []}
+            />
+          </div>
         </section>
 
         {failure ? <FailureBanner failure={failure} /> : null}

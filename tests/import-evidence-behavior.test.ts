@@ -94,7 +94,7 @@ it("renders source coordinates and raw/normalized evidence separately on the act
     "UTC",
     "abcdef123456",
     "2,048 bytes",
-    "Provenance not recorded yet",
+    "Provenance not on file yet",
     "Workbook unreadable: Invalid ZIP",
     "100 cells / 2 KiB",
     "120 cells",
@@ -129,7 +129,7 @@ it("shows each disposition count and warns about unaccounted workbooks without c
   const card = heading.closest(".card")!;
   for (const [label, count] of [
     ["Normalized", 11],
-    ["Linked reference", 12],
+    ["Linked to existing", 12],
     ["Duplicate view", 13],
     ["Needs a match", 14],
     ["Unsupported", 15],

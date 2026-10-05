@@ -127,6 +127,24 @@ export function hasNutrition(fields: IngredientNutritionFields): boolean {
   });
 }
 
+/**
+ * How much of a nutrient total is backed by recorded values. "unknown" = no line
+ * recorded it (never shown as zero); "partial" = some lines recorded it, so the
+ * total is a floor; "complete" = every line recorded it.
+ */
+export type NutrientCoverageState = "complete" | "partial" | "unknown";
+export type NutrientCoverage = Record<NutrientKey, NutrientCoverageState>;
+
+function allCoverage(state: NutrientCoverageState): NutrientCoverage {
+  return Object.fromEntries(
+    NUTRIENTS.map((nutrient) => [nutrient.key, state]),
+  ) as NutrientCoverage;
+}
+
+function isRecorded(value: number | null | undefined): boolean {
+  return value != null && Number.isFinite(Number(value)) && Number(value) >= 0;
+}
+
 export function formatNutrient(
   value: number,
   descriptor: NutrientDescriptor,
@@ -185,6 +203,8 @@ export interface ComponentNutritionSummary {
   measuredLineCount: number;
   totalLineCount: number;
   isComplete: boolean;
+  /** Per nutrient: whether the total is recorded, partly recorded, or unknown. */
+  coverage: NutrientCoverage;
   lines: ComponentNutritionLineResult[];
 }
 
@@ -211,6 +231,9 @@ export function calculateComponentNutrition({
   );
   const batch = emptyTotals();
   let measuredLineCount = 0;
+  const recordedLines = Object.fromEntries(
+    NUTRIENTS.map((nutrient) => [nutrient.key, 0]),
+  ) as Record<NutrientKey, number>;
 
   const resultLines = lines.map<ComponentNutritionLineResult>((line) => {
     const ingredient = ingredientsById.get(line.ingredientId);
@@ -230,10 +253,10 @@ export function calculateComponentNutrition({
     if (!hasNutrition(ingredient)) return { ...base, status: "no_nutrition" };
 
     for (const nutrient of NUTRIENTS) {
-      const perUnit = Number(ingredient[nutrient.field] ?? 0);
-      if (Number.isFinite(perUnit) && perUnit > 0) {
-        batch[nutrient.key] += quantity * perUnit;
-      }
+      const value = ingredient[nutrient.field];
+      if (!isRecorded(value)) continue;
+      recordedLines[nutrient.key] += 1;
+      batch[nutrient.key] += quantity * Number(value);
     }
     measuredLineCount += 1;
     return { ...base, status: "measured" };
@@ -249,6 +272,19 @@ export function calculateComponentNutrition({
         ) as NutrientTotals)
       : null;
 
+  const coverage = Object.fromEntries(
+    NUTRIENTS.map((nutrient) => {
+      const recorded = recordedLines[nutrient.key];
+      const state: NutrientCoverageState =
+        recorded === 0
+          ? "unknown"
+          : recorded === lines.length
+            ? "complete"
+            : "partial";
+      return [nutrient.key, state];
+    }),
+  ) as NutrientCoverage;
+
   return {
     batch,
     perPortion,
@@ -256,6 +292,7 @@ export function calculateComponentNutrition({
     measuredLineCount,
     totalLineCount: lines.length,
     isComplete: lines.length > 0 && measuredLineCount === lines.length,
+    coverage,
     lines: resultLines,
   };
 }
@@ -265,6 +302,7 @@ export interface AggregatedPerGuestNutrition {
   componentCount: number;
   measuredComponentCount: number;
   isComplete: boolean;
+  coverage: NutrientCoverage;
 }
 
 /**
@@ -278,12 +316,24 @@ export function sumPerGuestNutrition(
 ): AggregatedPerGuestNutrition {
   const perGuest = emptyTotals();
   let measuredComponentCount = 0;
+  const coverage = allCoverage(summaries.length > 0 ? "complete" : "unknown");
+  const anyRecorded = new Set<NutrientKey>();
   for (const summary of summaries) {
-    if (summary.perPortion == null) continue;
+    const portion = summary.perPortion;
     for (const nutrient of NUTRIENTS) {
-      perGuest[nutrient.key] += summary.perPortion[nutrient.key];
+      const state =
+        portion == null ? "unknown" : summary.coverage[nutrient.key];
+      if (state !== "complete") coverage[nutrient.key] = "partial";
+      if (portion == null || state === "unknown") continue;
+      anyRecorded.add(nutrient.key);
+      perGuest[nutrient.key] += portion[nutrient.key];
     }
-    if (summary.measuredLineCount > 0) measuredComponentCount += 1;
+    if (portion != null && summary.measuredLineCount > 0) {
+      measuredComponentCount += 1;
+    }
+  }
+  for (const nutrient of NUTRIENTS) {
+    if (!anyRecorded.has(nutrient.key)) coverage[nutrient.key] = "unknown";
   }
   return {
     perGuest,
@@ -291,5 +341,6 @@ export function sumPerGuestNutrition(
     measuredComponentCount,
     isComplete:
       summaries.length > 0 && measuredComponentCount === summaries.length,
+    coverage,
   };
 }

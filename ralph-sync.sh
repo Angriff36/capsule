@@ -2,7 +2,8 @@
 # Sourced by loop.sh. Keep synchronization on the feature branch; never push trunk.
 ralph_refresh_base() {
     RALPH_REMOTE=${RALPH_REMOTE:-origin}
-    RALPH_BASE_BRANCH=${RALPH_BASE_BRANCH:-main}
+    # The shared branch is dev (owner rule, 2026-09-20).
+    RALPH_BASE_BRANCH=${RALPH_BASE_BRANCH:-dev}
     RALPH_BASE_REF="refs/remotes/$RALPH_REMOTE/$RALPH_BASE_BRANCH"
     git fetch --no-tags "$RALPH_REMOTE" "+refs/heads/$RALPH_BASE_BRANCH:$RALPH_BASE_REF" || return 1
     RALPH_BASE_SHA=$(git rev-parse "$RALPH_BASE_REF") || return 1
@@ -10,10 +11,13 @@ ralph_refresh_base() {
 
 ralph_sync_base() {
     ralph_refresh_base || return 1
+    echo "Ralph: this copy is $(git branch --show-current) at $(git rev-parse HEAD)."
     if git merge-base --is-ancestor "$RALPH_BASE_SHA" HEAD; then
         echo "Ralph: current with $RALPH_REMOTE/$RALPH_BASE_BRANCH (${RALPH_BASE_SHA:0:8})."
         return 0
     fi
+    echo "Ralph: missing $(git rev-list --count HEAD.."$RALPH_BASE_SHA") commit(s) from $RALPH_REMOTE/$RALPH_BASE_BRANCH:"
+    git log --oneline -n 20 HEAD.."$RALPH_BASE_SHA"
     echo "Ralph: integrating newer $RALPH_REMOTE/$RALPH_BASE_BRANCH changes into $(git branch --show-current)."
     # Preserve user work. The agent handles dirty trees and conflicts explicitly.
     if [ -z "$(git status --porcelain)" ] && ! git rev-parse -q --verify MERGE_HEAD >/dev/null; then
