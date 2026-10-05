@@ -5017,3 +5017,107 @@
     height: auto;
   }
 }
+
+/* Compact record context stays above its document but below the shell rail,
+   dialogs, and high-priority overlays. It is fixed against the app's one real
+   scroll container, so showing it never changes document layout. */
+.sticky-record-header {
+  position: fixed;
+  z-index: 30;
+  top: var(--sticky-record-header-top);
+  left: var(--sticky-record-header-left);
+  display: flex;
+  width: var(--sticky-record-header-width);
+  min-height: 56px;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-line-2);
+  padding: 8px 24px;
+  background: color-mix(in srgb, var(--color-panel) 96%, transparent);
+  box-shadow: 0 14px 30px -26px
+    color-mix(in srgb, var(--color-ink) 72%, transparent);
+  backdrop-filter: blur(10px);
+}
+.sticky-record-header-title {
+  min-width: 0;
+  max-width: 28rem;
+  overflow: hidden;
+  color: var(--color-ink);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sticky-record-header-facts {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: baseline;
+  gap: 0.85rem;
+  overflow: hidden;
+}
+.sticky-record-header-facts > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+.sticky-record-header-facts dt {
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.sticky-record-header-facts dd {
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+}
+.sticky-record-header-controls,
+.sticky-record-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.45rem;
+}
+.sticky-record-header-mobile-actions {
+  display: none;
+}
+.sticky-record-header .action-menu-list button.is-active {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+@media (max-width: 767px) {
+  .sticky-record-header {
+    gap: 0.5rem;
+    padding: 6px 10px;
+  }
+  .sticky-record-header-title {
+    max-width: 9rem;
+    font-size: var(--text-base);
+  }
+  .sticky-record-header-facts {
+    gap: 0.45rem;
+  }
+  .sticky-record-header-facts > div:not(:first-child) {
+    display: none;
+  }
+  .sticky-record-header-facts dt {
+    display: none;
+  }
+  .sticky-record-header-controls {
+    margin-left: auto;
+  }
+  .sticky-record-header-actions,
+  .sticky-record-header-desktop-only {
+    display: none;
+  }
+  .sticky-record-header-mobile-actions {
+    display: block;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -57,6 +57,7 @@ import { InvoiceNumberEditor } from "./InvoiceNumberEditor";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { useActionNotice } from "../../ui/action-result";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import "./taxWorkspace.css";
 
 const policy = new CommercialLifecyclePolicy();
@@ -70,6 +71,8 @@ type ReminderScheduleView = {
 
 export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
   const invoice = useRouteRecord(useGetInvoice, id);
   useTrackRecent(
     "Invoice",
@@ -568,7 +571,41 @@ export function InvoiceDetailPage() {
   };
 
   return (
-    <div className="operations-stage supply-stage">
+    <div ref={sectionScopeRef} className="operations-stage supply-stage">
+      <StickyRecordHeader
+        title={
+          formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ||
+          "Untitled invoice"
+        }
+        facts={[
+          { label: "Status", value: formatStatusLabel(String(invoice.status)) },
+          { label: "Total", value: usd(invoice.total) },
+          { label: "Due", value: formatDate(dueDate) },
+        ]}
+        actions={
+          <>
+            {invoice.status === "paid" ? (
+              <button
+                className="btn btn-ghost"
+                type="button"
+                disabled={busy != null || !canIssueCreditMemo}
+                onClick={() => setShowCreditMemo((visible) => !visible)}
+              >
+                Issue credit memo
+              </button>
+            ) : null}
+            <button className="btn btn-ghost" onClick={downloadPdf}>
+              Download PDF
+            </button>
+            <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
+              Record payment
+            </Link>
+          </>
+        }
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        headingId="invoice-detail-title"
+      />
       <header className="supply-masthead invoice-doc-masthead">
         <div>
           <p className="eyebrow">
@@ -577,7 +614,11 @@ export function InvoiceDetailPage() {
             </Link>{" "}
             · Detail
           </p>
-          <h1 className="display-title mt-2">
+          <h1
+            id="invoice-detail-title"
+            tabIndex={-1}
+            className="display-title mt-2"
+          >
             {formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ||
               "Untitled invoice"}
           </h1>
@@ -660,6 +701,7 @@ export function InvoiceDetailPage() {
           ) : null}
         </aside>
       </header>
+      <div ref={headerSentinelRef} aria-hidden="true" />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (

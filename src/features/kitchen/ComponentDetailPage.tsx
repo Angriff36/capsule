@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -73,6 +73,7 @@ import {
 import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
 import { componentRestoreOutcome } from "./culinaryRecovery";
 import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -84,6 +85,8 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLElement>(null);
   const [searchParams] = useSearchParams();
   const prepTaskId = searchParams.get("prepTask") || undefined;
   const component = useRouteRecord(useGetComponent, id);
@@ -373,7 +376,56 @@ export function ComponentDetailPage() {
   };
 
   return (
-    <article className="culinary-document culinary-document-compact culinary-studio">
+    <article
+      ref={sectionScopeRef}
+      className="culinary-document culinary-document-compact culinary-studio"
+    >
+      <StickyRecordHeader
+        title={component.name}
+        facts={[
+          {
+            label: "Yield",
+            value: `${component.yieldQuantity} ${String(component.yieldUnit)}`,
+          },
+          {
+            label: "Status",
+            value: formatStatusLabel(String(component.status)),
+          },
+          {
+            label: "Serves",
+            value: `${servesPerYield} guests`,
+          },
+        ]}
+        actions={
+          <>
+            {component.status === "draft" ? (
+              <button
+                className="btn btn-ghost"
+                onClick={() => setEditing((value) => !value)}
+              >
+                {editing ? "Close editor" : "Edit draft"}
+              </button>
+            ) : null}
+            {actions.map((action) => (
+              <button
+                key={action.key}
+                className={
+                  action.key === "publishVersion"
+                    ? "btn btn-primary"
+                    : "btn btn-ghost"
+                }
+                disabled={busy != null}
+                onClick={() => invokeLifecycle(action.key)}
+              >
+                {busy === action.key ? "Working." : action.label}
+              </button>
+            ))}
+          </>
+        }
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        headingId="recipe-detail-title"
+      />
       <Link to="/kitchen/components" className="culinary-studio-back">
         ← Recipes
       </Link>
@@ -396,7 +448,13 @@ export function ComponentDetailPage() {
               Recipe · Edition {component.versionNumber} ·{" "}
               {formatStatusLabel(String(component.status))}
             </p>
-            <h1 className="culinary-title-compact">{component.name}</h1>
+            <h1
+              id="recipe-detail-title"
+              tabIndex={-1}
+              className="culinary-title-compact"
+            >
+              {component.name}
+            </h1>
           </div>
           <div className="flex flex-wrap gap-2">
             {component.status === "draft" ? (
@@ -467,6 +525,7 @@ export function ComponentDetailPage() {
           />
         ) : null}
       </header>
+      <div ref={headerSentinelRef} aria-hidden="true" />
 
       <ComponentRecipeStatusPanel componentId={component._id} />
 

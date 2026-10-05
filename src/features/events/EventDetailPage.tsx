@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import {
@@ -66,6 +66,7 @@ import {
 } from "../../ui/primitives";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
@@ -157,6 +158,8 @@ function EventDetailContent({
   event: Doc<"events">;
   id: string | undefined;
 }) {
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
@@ -458,7 +461,23 @@ function EventDetailContent({
   ];
 
   return (
-    <div className="space-y-5">
+    <div ref={sectionScopeRef} className="space-y-5">
+      <StickyRecordHeader
+        title={event.title}
+        facts={[
+          { label: "Date", value: formatDate(event.startsAt) },
+          {
+            label: "Headcount",
+            value: `${formatCount(event.expectedHeadcount)} guests`,
+          },
+          { label: "Status", value: formatStatusLabel(String(event.stage)) },
+        ]}
+        actions={headerActions}
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        sectionKey={activeTab}
+        headingId="event-detail-title"
+      />
       {mobile ? (
         <section
           className="card px-4 py-4"
@@ -473,7 +492,11 @@ function EventDetailContent({
               <ArrowLeftIcon width={18} height={18} />
             </Link>
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl leading-tight font-bold text-ink">
+              <h1
+                id="event-detail-title"
+                tabIndex={-1}
+                className="text-xl leading-tight font-bold text-ink"
+              >
                 {event.title}
               </h1>
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
@@ -525,7 +548,11 @@ function EventDetailContent({
                 <ArrowLeftIcon width={13} height={13} /> All events
               </Link>
               <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-bold tracking-tight text-ink">
+                <h1
+                  id="event-detail-title"
+                  tabIndex={-1}
+                  className="text-3xl font-bold tracking-tight text-ink"
+                >
                   {event.title}
                 </h1>
                 <StatusChip status={String(event.stage)} />
@@ -594,6 +621,7 @@ function EventDetailContent({
           </div>
         </section>
       )}
+      <div ref={headerSentinelRef} aria-hidden="true" />
 
       {savedToast}
       {pdfNotice ? (
