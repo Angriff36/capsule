@@ -37,7 +37,7 @@ describe("eventReadinessSummary", () => {
     expect(eventReadinessRows(undefined)).toEqual([]);
   });
 
-  it("formats a commercial warning as reason · severity · resolvingAction", () => {
+  it("shows a commercial warning as its plain reason, no code words", () => {
     expect(
       eventReadinessIssueLine({
         code: "commercial.quoted_price_missing",
@@ -46,9 +46,7 @@ describe("eventReadinessSummary", () => {
         reason: "This event has no quoted price to seed billing.",
         resolvingAction: "Event.changePricing",
       }),
-    ).toBe(
-      "This event has no quoted price to seed billing. · warning · Event.changePricing",
-    );
+    ).toBe("This event has no quoted price to seed billing.");
   });
 
   it("counts open issues across all domains", () => {

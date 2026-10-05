@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "manifest-integration-guard/v1",
+  "versions": {
+    "manifestVersion": "3.6.58",
+    "projection": "convex",
+    "preset": {
+      "id": "convex-application",
+      "version": "1.3.5"
+    }
+  },
+  "featureRoots": [
+    "src/features/kitchen"
+  ],
+  "convexLibRoot": "convex/lib",
+  "ownedTables": [
+    "componentImportLines",
+    "componentImports",
+    "componentIngredients",
+    "components",
+    "dishes",
+    "eventDishes",
+    "ingredients",
+    "menus"
+  ],
+  "forbidDirectConvexHooks": true,
+  "forbiddenImportPatterns": [
+    "(?:^|/)convex/(?:queries|mutations)(?:\\.|$|/)",
+    "(?:^|/)convex/_generated(?:/|$)",
+    "^convex/react$"
+  ],
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|published|retired|active|discontinued|archived)[\"']",
+  "lifecyclePolicies": [
+    {
+      "pathSuffix": "/CulinaryLifecyclePolicy.ts",
+      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
+      "requiredSymbols": [
+        "ComponentPublishVersionLifecycle",
+        "MenuMarkPublishedLifecycle"
+      ]
+    }
+  ],
+  "exceptions": []
+}

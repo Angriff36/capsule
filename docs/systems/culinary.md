@@ -96,9 +96,13 @@ Use a **culinary book** rather than a dashboard:
 
 ### Catering book packages
 
-The event Menu tab offers **Add catering package** with 52 offerings from the
+The event Menu tab offers **Add catering package** with 75 offerings from the
 2026 Full Service Wedding Catering Book, 2026 Full Service Hors d'oeuvres Menu,
-Holiday Catering Book 2025, and 2026 Wedding Pizza Book. The authored catalog is
+Holiday Catering Book 2025, 2026 Wedding Pizza Book, and the Drop Off / Limited
+Service books (2026 Limited Service Catering Book "Express Menu" and 2026 Limited
+Service Wedding Catering Book "Wedding Express Menu"). The 2026 Full Service
+Catering Book and 2026 Pizza Catering Book repeat menus already in the wedding and
+wedding pizza books, so they add no separate entries. The authored catalog is
 `src/data/catering-packages.json`; every dish and package retains its book/page.
 Package choices and servings are editable before adding. Pizza varieties share
 the selected guest portions; duet entrees each serve the selected headcount.

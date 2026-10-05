@@ -4,6 +4,14 @@ import { describe, it, expect } from "vitest";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
 import { fingerprintBytes } from "../../src/lib/eventPacket/model";
+import { PDFDocument } from "pdf-lib";
+
+/** A real PDF; the server adds the Final Lock answer pages itself. */
+async function workbookPdf() {
+  const doc = await PDFDocument.create();
+  doc.addPage();
+  return doc.save();
+}
 const api = anyApi.lib.eventPacket.commands;
 async function setup() {
   const t = convexTest(schema, modules);
@@ -211,15 +219,18 @@ describe("event packet native commands", () => {
     const p = await manager.query(api.getPacket, { eventId });
     const pdf = await manager.action(api.uploadPacketFile, {
       eventId,
-      bytes: new TextEncoder().encode("%PDF-test").buffer,
+      bytes: (await workbookPdf()).buffer,
       name: "workbook.pdf",
       mimeType: "application/pdf",
       purpose: "pdf",
       inputFingerprint: p.currentFingerprint,
+      finalLockFingerprint: p.finalLockFingerprint,
     });
     const snap = await manager.action(api.uploadPacketFile, {
       eventId,
-      bytes: new TextEncoder().encode(JSON.stringify(p.snapshot)).buffer,
+      bytes: new TextEncoder().encode(
+        JSON.stringify({ ...p.snapshot, finalLock: p.finalLock }),
+      ).buffer,
       name: "snapshot.json",
       mimeType: "application/json",
       purpose: "snapshot",
@@ -227,6 +238,7 @@ describe("event packet native commands", () => {
     const args = {
       eventId,
       inputFingerprint: p.currentFingerprint,
+      finalLockFingerprint: p.finalLockFingerprint,
       pdfStorageId: pdf.storageId,
       snapshotStorageId: snap.storageId,
     };

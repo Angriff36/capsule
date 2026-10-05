@@ -1,13 +1,41 @@
 // Proposal Revision Capture - Authored seam for proposal revision snapshotting
 
-import { internalMutation, mutation } from "../_generated/server";
+import { internalMutation, mutation, type QueryCtx } from "../_generated/server";
+import { storageNotOwnedElsewhere } from "../fileStorage";
 import { api, internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext } from "./authContext";
+import {
+  liveVenue,
+  venueFactsSnapshot,
+  type VenueFactsSnapshot,
+} from "./venueFactsSnapshot";
+import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
+import { proposalPictureRefs, type ProposalPictureRef } from "./proposalPictures";
 
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+// AC-547: the rental item a line names, same company and still in use; the
+// same rule proposalPricing.resolveRentalItem enforces at write. Kept local
+// for the reason given on resolveCatalogPrice below.
+async function resolveRentalItem(
+  ctx: { db: any },
+  equipmentId: string,
+  tenantId: string,
+): Promise<{ name: string; ownership: string } | null> {
+  const item: any = await ctx.db.get(equipmentId as Id<"equipments">);
+  if (
+    !item ||
+    item.deletedAt != null ||
+    item.tenantId !== tenantId ||
+    String(item.status) !== "active"
+  ) {
+    return null;
+  }
+  return { name: item.name, ownership: String(item.ownership) };
+}
 
 // Resolve a catalog link's validated sellingPrice, or null if invalid (spec
 // §5.4 L276; codex review findings 3/C): same-tenant, non-removed MenuDish
@@ -27,18 +55,20 @@ async function resolveCatalogPrice(
     !md ||
     md.deletedAt != null ||
     md.addedAt == null ||
-    md.tenantId !== tenantId ||
-    md.sellingPrice == null
+    md.tenantId !== tenantId
   ) {
     return null;
   }
+  // The price in force today — a dated price change applies from its day on.
+  const price = effectiveSellingPrice(md, Date.now());
+  if (price == null) return null;
   const menu: any = await ctx.db.get(md.menuId);
   if (!menu || menu.deletedAt != null || String(menu.status) !== "published") {
     return null;
   }
   const dish: any = await ctx.db.get(md.dishId);
   if (!dish || String(dish.status) !== "active") return null;
-  return Number(md.sellingPrice);
+  return price;
 }
 
 // Snapshot data structure for proposal revisions
@@ -60,6 +90,8 @@ export interface ProposalRevisionSnapshot {
     notes: string | null;
     terms: string | null;
     visibleSections: string[];
+    // AC-259: staff section order; [] = standard order (and older revisions).
+    sectionOrder: string[];
     status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded";
     draftedAt: number | null;
     sentAt: number | null;
@@ -68,6 +100,14 @@ export interface ProposalRevisionSnapshot {
     id: string;
     name: string;
   };
+  // AC-378/AC-420: a change to an accepted proposal names the proposal and
+  // the exact revision the client accepted, and the event. Null on an
+  // ordinary proposal; absent on revisions made before this field existed.
+  changeOf?: {
+    proposalId: string;
+    acceptedRevisionId: string | null;
+    eventId: string | null;
+  } | null;
   // §8.2 / §5.2 (spec L263 "Venue logistics snapshot" required section, L376
   // "snapshot the venue information needed to reproduce the client and
   // operations plan"): the venue's logistics frozen into the immutable
@@ -75,25 +115,15 @@ export interface ProposalRevisionSnapshot {
   // venue edits (§5.5 L284). Null when the proposal isn't linked through an
   // event to a venue (Proposal.eventId → Event.venueId → Venue); the free-text
   // proposal.venueName/venueAddress remain the always-present fallback then.
-  venue: {
+  // PL-VENUE-PROFILE operating facts are optional: absent on older revisions.
+  venue: VenueFactsSnapshot | null;
+  // Venue Partner Playbook section 06: the partner venue whose logo shows
+  // next to the company's. Null when the venue is not a partner; absent on
+  // revisions made before co-branding.
+  partnerVenue?: {
     name: string;
-    venueType: string;
-    capacity: number;
-    onPremise: boolean | null;
-    kitchenAccess: string | null;
-    parkingAvailable: boolean | null;
-    hasFreightElevator: boolean | null;
-    storageAvailable: boolean | null;
-    logisticsNotes: string | null;
-    loadInInstructions: string | null;
-    powerAvailable: boolean | null;
-    waterAccess: boolean | null;
-    hasStairs: boolean | null;
-    wasteRules: string | null;
-    permitsInsuranceNotes: string | null;
-    restrictions: string | null;
-    accessNotes: string | null;
-    cateringNotes: string | null;
+    logoStorageId: string | null;
+    brandColor: string | null;
   } | null;
   dishSelections: Array<{
     id: string;
@@ -133,6 +163,10 @@ export interface ProposalRevisionSnapshot {
     menuDishId: string | null;
     catalogPrice: number | null;
     overrideReason: string | null;
+    // AC-547: the rental/decor item this line prices (same company only), with
+    // its name as it was when the proposal went out. Null on other lines and
+    // on revisions made before rental lines existed.
+    rentalItem: { id: string; name: string; ownership: string } | null;
   }>;
   // Optional upgrades offered separately from priced lines. Active rows only
   // (deletedAt null, addedAt set) are frozen into the revision at send.
@@ -142,8 +176,12 @@ export interface ProposalRevisionSnapshot {
     price: number;
     sortOrder: number;
   }>;
+  // AC-654: the pictures of the dishes on the proposal when it went out.
+  // Absent on revisions made before pictures were frozen.
+  pictures?: ProposalPictureRef[];
   tenant: {
-    name: string;
+    /** Null when the company has no name on record (AC-096). */
+    name: string | null;
   };
 }
 
@@ -153,38 +191,55 @@ export interface ProposalRevisionSnapshot {
 // venue — the free-text proposal.venueName/venueAddress remain the venue
 // identity in that case. Same-tenant guard is belt-and-braces; the FK
 // `references` already enforce tenant scoping.
-async function resolveVenueLogistics(
+async function linkedVenue(
   ctx: { db: any },
   proposal: Doc<"proposals">,
-): Promise<ProposalRevisionSnapshot["venue"]> {
+): Promise<Doc<"venues"> | null> {
   if (!proposal.eventId) return null;
   const event: any = await ctx.db.get(proposal.eventId);
   if (!event || event.tenantId !== proposal.tenantId) return null;
   if (!event.venueId) return null;
-  const venue: any = await ctx.db.get(event.venueId);
-  if (!venue || venue.deletedAt != null || venue.tenantId !== proposal.tenantId) {
-    return null;
-  }
+  return await liveVenue(ctx, proposal.tenantId, event.venueId);
+}
+
+// Venue Partner Playbook section 06: a proposal for an event at a partner
+// venue carries the venue's name, logo and brand colour, frozen at send.
+// A logo file another company owns is never frozen (knowing a storage id
+// grants nothing).
+async function partnerVenueBrand(
+  ctx: { db: any },
+  venue: Doc<"venues"> | null,
+): Promise<ProposalRevisionSnapshot["partnerVenue"]> {
+  if (!venue || !venue.partnerTier) return null;
+  const logo = venue.logoStorageId;
   return {
     name: venue.name,
-    venueType: venue.venueType,
-    capacity: venue.capacity,
-    onPremise: venue.onPremise ?? null,
-    kitchenAccess: venue.kitchenAccess ?? null,
-    parkingAvailable: venue.parkingAvailable ?? null,
-    hasFreightElevator: venue.hasFreightElevator ?? null,
-    storageAvailable: venue.storageAvailable ?? null,
-    logisticsNotes: venue.logisticsNotes ?? null,
-    loadInInstructions: venue.loadInInstructions ?? null,
-    powerAvailable: venue.powerAvailable ?? null,
-    waterAccess: venue.waterAccess ?? null,
-    hasStairs: venue.hasStairs ?? null,
-    wasteRules: venue.wasteRules ?? null,
-    permitsInsuranceNotes: venue.permitsInsuranceNotes ?? null,
-    restrictions: venue.restrictions ?? null,
-    accessNotes: venue.accessNotes ?? null,
-    cateringNotes: venue.cateringNotes ?? null,
+    logoStorageId:
+      logo && (await storageNotOwnedElsewhere(ctx as QueryCtx, venue.tenantId, logo))
+        ? logo
+        : null,
+    brandColor: venue.brandColor ?? null,
   };
+}
+
+// The tenant's customer-facing name from its live organization record (the
+// Branding row) — same resolution as convex/authProvision.ts
+// companyNameForProvision: active row first, any live row second,
+// brandDisplayName (the name the PDF masthead shows) before the legal name.
+// Null when the tenant has no name at all (AC-096).
+export async function resolveTenantBrandName(
+  ctx: { db: any },
+  tenantId: string,
+): Promise<string | null> {
+  const organizations = await ctx.db
+    .query("organizations")
+    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+    .collect();
+  const organization =
+    organizations.find(
+      (row: any) => row.deletedAt == null && String(row.status) === "active",
+    ) ?? organizations.find((row: any) => row.deletedAt == null);
+  return organization?.brandDisplayName?.trim() || organization?.name?.trim() || null;
 }
 
 // Build proposal revision snapshot from live proposal data
@@ -235,20 +290,10 @@ export async function buildProposalRevisionSnapshot(
   // row) — same resolution as convex/authProvision.ts companyNameForProvision:
   // active row first, any live row second, brandDisplayName (the
   // customer-facing name the PDF masthead shows) before the legal name. The
-  // revision is immutable, so a placeholder would be frozen into it forever;
-  // "Tenant" survives only when the tenant has no organization record (R2-13).
-  const organizations = await ctx.db
-    .query("organizations")
-    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", proposal.tenantId))
-    .collect();
-  const organization =
-    organizations.find(
-      (row: any) => row.deletedAt == null && String(row.status) === "active",
-    ) ?? organizations.find((row: any) => row.deletedAt == null);
-  const tenantName =
-    organization?.brandDisplayName?.trim() ||
-    organization?.name?.trim() ||
-    "Tenant";
+  // revision is immutable, so a placeholder would be frozen into it forever.
+  // AC-096: with no organization name the revision stores null, never a
+  // made-up "Tenant"; the draft report asks the office to add the name.
+  const tenantName = await resolveTenantBrandName(ctx, proposal.tenantId);
 
   // Get priced line items (spec §5.4) — effective prices snapshotted here.
   // JS loose-equality filter (not the Convex DSL .eq) because governed-creation
@@ -272,6 +317,9 @@ export async function buildProposalRevisionSnapshot(
         const catalogPrice = line.menuDishId
           ? await resolveCatalogPrice(ctx, line.menuDishId, proposal.tenantId)
           : null;
+        const rental = line.equipmentId
+          ? await resolveRentalItem(ctx, line.equipmentId, proposal.tenantId)
+          : null;
         return {
           id: line._id.toString(),
           description: line.description,
@@ -285,6 +333,9 @@ export async function buildProposalRevisionSnapshot(
           menuDishId: line.menuDishId ? line.menuDishId.toString() : null,
           catalogPrice,
           overrideReason: line.overrideReason ?? null,
+          rentalItem: rental
+            ? { id: line.equipmentId.toString(), ...rental }
+            : null,
         };
       }),
     )
@@ -333,6 +384,7 @@ export async function buildProposalRevisionSnapshot(
         }))
     : [];
 
+  const venue = await linkedVenue(ctx, proposal);
   const snapshot: ProposalRevisionSnapshot = {
     proposal: {
       id: proposal._id.toString(),
@@ -353,6 +405,9 @@ export async function buildProposalRevisionSnapshot(
       visibleSections: (proposal.visibleSections ?? []).filter(
         (section): section is string => typeof section === "string",
       ),
+      sectionOrder: (proposal.sectionOrder ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
       status: proposal.status,
       draftedAt: proposal.draftedAt ?? null,
       sentAt: proposal.sentAt ?? null,
@@ -361,17 +416,71 @@ export async function buildProposalRevisionSnapshot(
       id: client._id.toString(),
       name: client.clientType === "company" ? (client.companyName ?? "Unknown Company") : `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim() || "Unknown Client",
     },
-    venue: await resolveVenueLogistics(ctx, proposal),
+    changeOf: await acceptedChangeSource(ctx, proposal),
+    venue: venue ? venueFactsSnapshot(venue) : null,
+    partnerVenue: await partnerVenueBrand(ctx, venue),
     dishSelections: dishSelectionsData,
     timeline: timelineData,
     lineItems: lineItemsData,
     enhancements: enhancementsData,
+    pictures: await proposalPictureRefs(ctx, proposal),
     tenant: {
       name: tenantName,
     },
   };
 
   return JSON.stringify(snapshot);
+}
+
+/** The accepted proposal this one changes, with its accepted revision. */
+async function acceptedChangeSource(
+  ctx: { db: any },
+  proposal: Doc<"proposals">,
+): Promise<ProposalRevisionSnapshot["changeOf"]> {
+  if (!proposal.replacesProposalId) return null;
+  const source: Doc<"proposals"> | null = await ctx.db.get(
+    proposal.replacesProposalId as Id<"proposals">,
+  );
+  if (!source || source.tenantId !== proposal.tenantId || source.status !== "accepted") {
+    return null;
+  }
+  return {
+    proposalId: String(source._id),
+    acceptedRevisionId: source.acceptedRevisionId ? String(source.acceptedRevisionId) : null,
+    eventId: proposal.eventId
+      ? String(proposal.eventId)
+      : source.eventId
+        ? String(source.eventId)
+        : null,
+  };
+}
+
+/** Highest revision number along the proposals this one replaces. */
+async function earlierRevisionNumber(
+  ctx: { db: any },
+  proposal: Doc<"proposals">,
+): Promise<number> {
+  let highest = 0;
+  const seen = new Set<string>([String(proposal._id)]);
+  let previousId = proposal.replacesProposalId;
+  while (previousId && !seen.has(String(previousId))) {
+    seen.add(String(previousId));
+    const previous: Doc<"proposals"> | null = await ctx.db.get(
+      previousId as Id<"proposals">,
+    );
+    if (!previous || previous.tenantId !== proposal.tenantId) break;
+    const revisions = (
+      await ctx.db
+        .query("proposalRevisions")
+        .withIndex("by_proposalId", (q: any) => q.eq("proposalId", previous._id))
+        .collect()
+    ).filter((row: any) => row.deletedAt == null);
+    for (const revision of revisions) {
+      highest = Math.max(highest, revision.revisionNumber);
+    }
+    previousId = previous.replacesProposalId;
+  }
+  return highest;
 }
 
 // Capture a proposal revision (internal mutation, called after proposal send)
@@ -401,14 +510,14 @@ export const captureProposalRevision = internalMutation({
         .collect()
     ).filter((row: any) => row.deletedAt == null);
 
-    let nextRevisionNumber = 1;
-    if (existingRevisions.length > 0) {
-      const maxRevision = existingRevisions.reduce(
-        (max, rev) => (rev.revisionNumber > max ? rev.revisionNumber : max),
-        0
-      );
-      nextRevisionNumber = maxRevision + 1;
-    }
+    // AC-256: a new version of a proposal carries on its numbering, so the
+    // client sees Revision 2 after Revision 1 of the proposal it replaces.
+    const maxRevision = Math.max(
+      0,
+      ...existingRevisions.map((rev) => rev.revisionNumber),
+      await earlierRevisionNumber(ctx, proposal),
+    );
+    const nextRevisionNumber = maxRevision + 1;
 
     // Build the snapshot
     const snapshot = await buildProposalRevisionSnapshot(ctx, proposal);
@@ -530,6 +639,25 @@ export const sendProposalWithRevisionCapture = mutation({
             : "Proposal sent to client",
       },
     );
+    // AC-256/AC-257: sending a new version replaces the sent, unanswered
+    // proposal it was made from, in the same transaction. An accepted source
+    // stays accepted (a change never rewrites a signed agreement).
+    const replaces = proposal.replacesProposalId
+      ? await ctx.db.get(proposal.replacesProposalId as Id<"proposals">)
+      : null;
+    if (
+      replaces &&
+      replaces.tenantId === tenantId &&
+      replaces.deletedAt == null &&
+      (replaces.status === "sent" || replaces.status === "viewed")
+    ) {
+      await ctx.runMutation(api.mutations.Proposal_supersede, {
+        docId: replaces._id,
+        version: replaces.version,
+        revisedById: args.docId,
+        reason: "Replaced by a newer version",
+      });
+    }
     return sent;
   },
 });

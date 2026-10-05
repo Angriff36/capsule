@@ -7,7 +7,9 @@ export type IngredientMatchStatus =
   | "possible"
   | "new"
   | "confirmed_existing"
-  | "confirmed_new";
+  | "confirmed_new"
+  /** The line uses another recipe from the recipe book (a sub-recipe). */
+  | "subrecipe";
 
 export type ComponentImportSourceKind =
   "pasted_text" | "text_file" | "csv_bundle";
@@ -21,6 +23,8 @@ export interface ParsedIngredientLine {
   unit: UnitOfMeasure | null;
   unitRaw: string;
   prepNotes?: string;
+  /** The source marks this line as another recipe ("see recipe", "sub-recipe"). */
+  subrecipeHint?: boolean;
 }
 
 export interface ParsedComponentDraft {
@@ -42,6 +46,9 @@ export interface ReviewIngredientLine extends ParsedIngredientLine {
   matchedIngredientName?: string;
   possibleMatchIds: string[];
   possibleMatchNames: string[];
+  /** Sub-recipe lines: the recipe-book recipe this line uses. */
+  matchedComponentId?: string;
+  matchedComponentName?: string;
   /** When true, finalize will call Ingredient_createViaIntroduce. */
   createNew: boolean;
   /** Set when a durable ComponentImportLine row exists. */
@@ -82,7 +89,17 @@ export interface CatalogIngredient {
   deletedAt?: number | null;
 }
 
+/** A recipe already in the recipe book, offered for sub-recipe lines. */
+export interface CatalogRecipe {
+  id: string;
+  name: string;
+  deletedAt?: number | null;
+}
+
 export function isLineResolved(line: ReviewIngredientLine): boolean {
+  if (line.matchStatus === "subrecipe") {
+    return Boolean(line.matchedComponentId);
+  }
   if (
     line.matchStatus === "exact" ||
     line.matchStatus === "confirmed_existing"

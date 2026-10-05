@@ -4,6 +4,7 @@
 use "../identity/person.manifest"
 use "./service-style.manifest"
 use "./occasion.manifest"
+use "../facilities/operating-location.manifest"
 
 // ---------------------------------------------------------------------------
 // Closed vocabularies
@@ -17,6 +18,14 @@ enum ClientType {
 enum ClientStatus {
   active
   archived
+}
+
+// Which emails Capsule sends a client (PL-CONSENT). Read at the moment of
+// sending, so a change also stops reminders already scheduled.
+enum ClientEmailPreference {
+  every_email
+  no_reminders
+  none
 }
 
 enum EventStage {
@@ -49,6 +58,12 @@ enum EventTimingMilestone {
   staff_off
 }
 
+// Who set an event's setup or load time (PL-TIMING).
+enum EventTimingSource {
+  company_rule
+  person
+}
+
 enum EventRecurrenceEndCondition {
   on_date
   after_occurrences
@@ -66,6 +81,23 @@ enum VenueType {
 enum VenueStatus {
   active
   inactive
+}
+
+// Venue partner program tiers (Mangia Venue Partner Playbook, section 01).
+enum VenuePartnerTier {
+  catering_only
+  catering_rentals
+  full_event
+}
+
+// The venue looks of the playbook's Food Presentation Alignment Guide.
+enum VenueVibe {
+  rustic
+  modern_industrial
+  garden_outdoor
+  grand_ballroom
+  brewery_winery
+  warehouse_raw
 }
 
 enum RsvpStatus {
@@ -110,6 +142,11 @@ entity Client mixin TenantScoped, SoftDeletable {
   property registeredAt: datetime?
   property archivedAt: datetime?
   property mergedAt: datetime?
+  // Unset = every_email. no_reminders stops automatic payment reminders;
+  // none stops every email Capsule sends this client.
+  property emailPreference: ClientEmailPreference?
+  property emailPreferenceNote: string?
+  property emailPreferenceSetAt: datetime?
 
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -249,6 +286,20 @@ entity Client mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The client's own choice about email (for example "asked us to stop
+  // reminders on the phone"). Works on archived clients too.
+  command setEmailPreference(preference: ClientEmailPreference, optional note: string) {
+    guard self.deletedAt == null
+    mutate emailPreference = preference
+    mutate emailPreferenceNote = note
+    mutate emailPreferenceSetAt = now()
+    emit ClientEmailPreferenceSet {
+      clientId: self.id
+      tenantId: self.tenantId
+      preference: preference
+    }
+  }
+
   command assignOwner(optional assignedToId: uuid) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -264,7 +315,7 @@ entity Client mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "salesManageAccess")
-    constraint archiveReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveReason: length(trim(reason)) > 0 "Say why you're archiving this client."
     mutate status = "archived"
     mutate archivedAt = now()
     emit ClientArchived {
@@ -348,6 +399,9 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // trailhead (#368 item 9). Decimal degrees; north/east positive.
   property latitude: float?
   property longitude: float?
+  // IANA time zone name, for example America/New_York. Unset: the drive-time
+  // read uses the kitchen's zone and says so (PL-ROUTES).
+  property timeZone: string?
   property encrypted contactName: string?
   property encrypted contactEmail: string?
   property encrypted contactPhone: string?
@@ -364,27 +418,79 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property powerAvailable: boolean?
   property waterAccess: boolean?
   property hasStairs: boolean?
+  // Structured operating facts (PL-VENUE-PROFILE, spec §8.1): they drive the
+  // venue filter, pack rules, the proposal snapshot and the event-day sheet.
+  // Set by setSiteFacts only, so the details form never clears them.
+  property seatedCapacity: int?
+  property standingCapacity: int?
+  property hasOven: boolean?
+  property hasRefrigeration: boolean?
+  // Earliest load-in and latest load-out, "HH:MM" in the venue's own time.
+  property loadInFrom: string?
+  property loadOutBy: string?
   property wasteRules: string?
   property permitsInsuranceNotes: string?
   property restrictions: string?
+  // Venue partner program (Mangia Venue Partner Playbook): the partnership
+  // tier, the one person who owns the relationship, when it started, and the
+  // owner's 1-10 ratings for ease of work and relationship health. No tier =
+  // not a partner. Set by setPartnership only.
+  property partnerTier: VenuePartnerTier?
+  property partnerOwnerPersonId: uuid?
+  property partnerSince: datetime?
+  property opsEaseScore: int?
+  property relationshipScore: int?
+  // Co-branded proposals (playbook section 06): the venue's logo (Convex
+  // storage id) and its brand colour, shown next to the company's on a
+  // proposal for an event at a partner venue. Set by setBrand only.
+  property logoStorageId: string?
+  property brandColor: string?
+  // The venue's social media handle, without "@" (playbook section 06: tag
+  // the venue in every post about an event there). Set by setSocialHandle.
+  property socialHandle: string?
+  // Shared event gallery (playbook section 06): the secret part of the
+  // link the venue opens to see and save our photos from events there.
+  // Blank = not shared. Read by convex/venueGallery.ts. Set by
+  // setGalleryToken only.
+  property indexed galleryToken: string?
+  // Venue selling profile (playbook section 09): the venue's look, what
+  // makes it special, who books it, and what to photograph there. The look
+  // picks the food presentation and serve style from the playbook's
+  // alignment guide. Set by setSellingProfile only.
+  property vibe: VenueVibe?
+  property vibeWords: string?
+  property topFeature: string?
+  property otherFeatures: string?
+  property targetClient: string?
+  property competitivePosition: string?
+  property photoFocus: string?
+  property exclusiveItemIdea: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
   property deactivationReason: string?
 
   hasMany events: Event
+  ref partnerOwner: Person fields [tenantId, partnerOwnerPersonId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
 
   constraint venueIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered venues require a name"
-  constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity cannot be negative"
+  constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity can't be negative. Use zero or more."
+  constraint venueSeatedNonnegative: self.seatedCapacity == null or self.seatedCapacity >= 0 "Seated capacity can't be negative. Use zero or more."
+  constraint venueStandingNonnegative: self.standingCapacity == null or self.standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
   constraint venueLatitudeRange: self.latitude == null or (self.latitude >= -90 and self.latitude <= 90) "Latitude must be between -90 and 90"
   constraint venueLongitudeRange: self.longitude == null or (self.longitude >= -180 and self.longitude <= 180) "Longitude must be between -180 and 180"
+  constraint venueOpsEaseRange: self.opsEaseScore == null or (self.opsEaseScore >= 1 and self.opsEaseScore <= 10) "Rate ease of work from 1 to 10"
+  constraint venueRelationshipRange: self.relationshipScore == null or (self.relationshipScore >= 1 and self.relationshipScore <= 10) "Rate the relationship from 1 to 10"
 
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may see venues"
+  // Venues are shared operational context like the event plan itself (read
+  // by every staff role): finance reports group revenue by venue, sales quote
+  // for a venue, drivers need the address (#124).
+  default policy venueRead read: roleAllows(user.role, "staffAccess") "Staff may see venues"
   default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venues"
   default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venues"
 
@@ -422,8 +528,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
     guard self.registeredAt == null
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint registerVenueName: length(trim(name)) > 0 "Venue name is required"
-    constraint registerVenueCapacity: capacity >= 0 "Venue capacity cannot be negative"
+    constraint registerVenueName: length(trim(name)) > 0 "Give this venue a name."
+    constraint registerVenueCapacity: capacity >= 0 "Venue capacity can't be negative. Use zero or more."
     mutate name = name
     mutate venueType = venueType
     mutate capacity = capacity
@@ -496,7 +602,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint updateVenueName: length(trim(name)) > 0 "Venue name is required"
+    constraint updateVenueName: length(trim(name)) > 0 "Give this venue a name."
     mutate name = name
     mutate venueType = venueType
     mutate onPremise = onPremise
@@ -534,7 +640,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   command changeCapacity(capacity: number) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint changeVenueCapacity: capacity >= 0 "Venue capacity cannot be negative"
+    constraint changeVenueCapacity: capacity >= 0 "Venue capacity can't be negative. Use zero or more."
     compute previousCapacity = self.capacity
     mutate capacity = capacity
     emit VenueCapacityChanged {
@@ -545,11 +651,130 @@ entity Venue mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Separate from updateDetails so existing venue forms never clear it.
+  command setTimeZone(optional timeZone: string) {
+    guard self.deletedAt == null
+    mutate timeZone = timeZone != null and length(trim(timeZone)) > 0 ? trim(timeZone) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Seated / standing capacity, oven, fridge and the load-in window. Each
+  // call states all six; a blank clears that fact.
+  command setSiteFacts(
+    optional seatedCapacity: number,
+    optional standingCapacity: number,
+    optional hasOven: boolean,
+    optional hasRefrigeration: boolean,
+    optional loadInFrom: string,
+    optional loadOutBy: string
+  ) {
+    guard self.deletedAt == null
+    constraint setVenueSeatedCapacity: seatedCapacity == null or seatedCapacity >= 0 "Seated capacity can't be negative. Use zero or more."
+    constraint setVenueStandingCapacity: standingCapacity == null or standingCapacity >= 0 "Standing capacity can't be negative. Use zero or more."
+    mutate seatedCapacity = seatedCapacity
+    mutate standingCapacity = standingCapacity
+    mutate hasOven = hasOven
+    mutate hasRefrigeration = hasRefrigeration
+    mutate loadInFrom = loadInFrom != null and length(trim(loadInFrom)) > 0 ? trim(loadInFrom) : null
+    mutate loadOutBy = loadOutBy != null and length(trim(loadOutBy)) > 0 ? trim(loadOutBy) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Partner tier, relationship owner and ratings. Each call states all four;
+  // a blank clears that one. Clearing the tier ends the partnership.
+  command setPartnership(
+    optional partnerTier: VenuePartnerTier,
+    optional partnerOwnerPersonId: uuid,
+    optional opsEaseScore: number,
+    optional relationshipScore: number
+  ) {
+    guard self.deletedAt == null
+    constraint setVenueOpsEase: opsEaseScore == null or (opsEaseScore >= 1 and opsEaseScore <= 10) "Rate ease of work from 1 to 10"
+    constraint setVenueRelationship: relationshipScore == null or (relationshipScore >= 1 and relationshipScore <= 10) "Rate the relationship from 1 to 10"
+    mutate partnerSince = partnerTier == null ? null : (self.partnerSince != null ? self.partnerSince : now())
+    mutate partnerTier = partnerTier
+    mutate partnerOwnerPersonId = partnerOwnerPersonId
+    mutate opsEaseScore = opsEaseScore
+    mutate relationshipScore = relationshipScore
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Venue logo and brand colour for co-branded proposals. Each call states
+  // both; a blank clears that one. A replaced logo file is kept, because
+  // proposals already sent still show it.
+  command setBrand(optional logoStorageId: string, optional brandColor: string) {
+    guard self.deletedAt == null
+    mutate logoStorageId = logoStorageId != null and length(trim(logoStorageId)) > 0 ? trim(logoStorageId) : null
+    mutate brandColor = brandColor != null and length(trim(brandColor)) > 0 ? trim(brandColor) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setSocialHandle(optional socialHandle: string) {
+    guard self.deletedAt == null
+    mutate socialHandle = socialHandle != null and length(trim(socialHandle)) > 0 ? trim(socialHandle) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // A new token makes a new gallery link (the old link stops working); a
+  // blank stops sharing. Short tokens are refused so a link cannot be
+  // guessed.
+  command setGalleryToken(optional galleryToken: string) {
+    guard self.deletedAt == null
+    constraint galleryTokenLength: galleryToken == null or length(trim(galleryToken)) == 0 or length(trim(galleryToken)) >= 24 "This gallery link is too short. Make a new link."
+    mutate galleryToken = galleryToken != null and length(trim(galleryToken)) > 0 ? trim(galleryToken) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The whole selling profile is stated on each save; a blank clears that
+  // line.
+  command setSellingProfile(
+    optional vibe: VenueVibe,
+    optional vibeWords: string,
+    optional topFeature: string,
+    optional otherFeatures: string,
+    optional targetClient: string,
+    optional competitivePosition: string,
+    optional photoFocus: string,
+    optional exclusiveItemIdea: string
+  ) {
+    guard self.deletedAt == null
+    mutate vibe = vibe
+    mutate vibeWords = vibeWords != null and length(trim(vibeWords)) > 0 ? trim(vibeWords) : null
+    mutate topFeature = topFeature != null and length(trim(topFeature)) > 0 ? trim(topFeature) : null
+    mutate otherFeatures = otherFeatures != null and length(trim(otherFeatures)) > 0 ? trim(otherFeatures) : null
+    mutate targetClient = targetClient != null and length(trim(targetClient)) > 0 ? trim(targetClient) : null
+    mutate competitivePosition = competitivePosition != null and length(trim(competitivePosition)) > 0 ? trim(competitivePosition) : null
+    mutate photoFocus = photoFocus != null and length(trim(photoFocus)) > 0 ? trim(photoFocus) : null
+    mutate exclusiveItemIdea = exclusiveItemIdea != null and length(trim(exclusiveItemIdea)) > 0 ? trim(exclusiveItemIdea) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command deactivate(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint deactivateVenueReason: length(trim(reason)) > 0 "Venue deactivation reason is required"
+    constraint deactivateVenueReason: length(trim(reason)) > 0 "Say why you're taking this venue out of service."
     mutate status = "inactive"
     mutate deactivatedAt = now()
     mutate deactivationReason = reason
@@ -603,6 +828,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   property occasionName: string?
   property referralSourceId: uuid?
   property venueId: uuid?
+  // The kitchen the crew leaves from (PL-ROUTES). Unset: the company's only
+  // active kitchen, when it has exactly one.
+  property operatingLocationId: uuid?
   property assignedToId: uuid?
   // Printed owner/salesperson name at plan / assign time. A later catalog
   // Person.correctIdentity rename must not rewrite this Event. assignedToId
@@ -626,6 +854,26 @@ entity Event mixin TenantScoped, SoftDeletable {
   property timingReturnTravelMinutes: float?
   property timingUnloadMinutes: float?
   property timingConfiguredAt: datetime?
+  // Company timing rules copied onto the event (PL-TIMING, spec §8.4): spare
+  // minutes before the shop departure and the crew briefing before loading.
+  // Unset counts as zero.
+  property timingSafetyBufferMinutes: float?
+  property timingBriefingMinutes: float?
+  // Where setup and load came from: the company rule, or a person. A person's
+  // value stays until they hand it back to the rule; the reason and who
+  // changed it are kept.
+  property timingSetupSource: EventTimingSource?
+  property timingSetupOverrideReason: string?
+  property timingSetupOverrideByPersonId: uuid?
+  property timingSetupOverrideAt: datetime?
+  property timingLoadSource: EventTimingSource?
+  property timingLoadOverrideReason: string?
+  property timingLoadOverrideByPersonId: uuid?
+  property timingLoadOverrideAt: datetime?
+  // The company load rule used; unset with source company_rule = no rule
+  // matched, so the baseline was used and needs a look.
+  property timingLoadRuleId: string?
+  property timingLoadNeedsReview: boolean?
   // Purchasing week bucket key for weekly VendorOrder draft consolidation.
   // Normalized from startsAt on plan/reschedule to the Monday 08:00 UTC that
   // starts the event's week (Monday 00:00 US Pacific / 04:00 US Eastern —
@@ -639,10 +887,17 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Snapshot the selected venue limit so historical event planning does not
   // silently change when the reusable Venue record is revised later.
   property venueCapacity: int?
+  // Venue facts frozen when the event is finalized (spec §8.2, AC-315): a
+  // JSON copy written once by convex/lib/venueFactsSnapshot.ts, so later venue
+  // edits never change what the finished event says the venue was.
+  property finalVenueFacts: string?
   property expectedHeadcount: int?
   property encrypted primaryContactName: string?
-  property encrypted primaryContactEmail: string?
-  property encrypted primaryContactPhone: string?
+  // Client contact PII: every staff role reads events, but only event/sales
+  // staff work with the client; others see a masked value (day-of sheets
+  // read the raw number through convex/eventDayBriefing.ts).
+  property encrypted masked(email) primaryContactEmail: string? unmask when roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess")
+  property encrypted masked(phone) primaryContactPhone: string? unmask when roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess")
   property accessibilityNeeds: list<string> = []
   property serviceRequirements: string?
   property operationalRequirements: string?
@@ -712,6 +967,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   property decorKit: string?
   property rainPlan: string?
   property setupDiagram: string?
+  // Weather and site setup the Final Lock answers need for an outdoor or
+  // unknown venue ("Grass", "20x40 tent, no floor, tarps", "Station packed").
+  property venueSurface: string?
+  property tentAndFlooring: string?
+  property handwashing: string?
   // Event Task Breakdown lines (Event Forms One Print, tab 1) that the day
   // sheet above does not hold. One free-text value each ("Plasticware",
   // "Rented", "Client provided", "Yes", "No", "Serve", "Self-serve").
@@ -727,6 +987,12 @@ entity Event mixin TenantScoped, SoftDeletable {
   // The event binder is built (Ops Final Lock, Part 4). Built or not built:
   // "fully packed" and "ready" describe the load, which the pack list holds.
   property binderBuiltAt: datetime?
+  // The event's channel in an outside team chat (Slack), when the team mirrors
+  // the event chat there. Named event-number-event-name; Final Lock checks
+  // the name still matches the event.
+  property externalChannelName: string?
+  property externalChannelId: string?
+  property externalChannelUrl: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -734,6 +1000,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
   ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
+  ref operatingLocation: OperatingLocation fields [tenantId, operatingLocationId] references [tenantId, id]
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
   ref recurrenceTemplateEvent: Event fields [tenantId, recurrenceTemplateEventId] references [tenantId, id]
@@ -759,19 +1026,19 @@ entity Event mixin TenantScoped, SoftDeletable {
   computed timingCanRecalculate: boolean = self.deletedAt == null and self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled"
   // Same authority as the staffing commands, evaluated for the current reader.
   computed staffingCanManage: boolean = roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
-  // Mangia Ops Final Lock Training p4. Unknown durations stay unknown.
-  // Suggested setup is presented for explicit acceptance, never silently saved.
-  computed timingSuggestedSetupMinutes: float? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? 180 : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? 90 : null)
+  // Spec §8.4 (PL-TIMING). Unknown durations stay unknown. Setup and load
+  // defaults come from the company timing rules (convex/lib/eventTimingPolicy.ts).
+  // onsite = serve - setup; depart = onsite - drive - safety buffer;
+  // load start = depart - load; staff on = load start - briefing.
   computed timingOnsiteAt: datetime? = self.serviceStartsAt != null and self.timingSetupMinutes != null ? self.serviceStartsAt - self.timingSetupMinutes * 60000 : null
-  computed timingDepartShopAt: datetime? = self.timingOnsiteAt != null and self.timingOutboundTravelMinutes != null ? self.timingOnsiteAt - self.timingOutboundTravelMinutes * 60000 : null
-  computed timingStaffOnAt: datetime? = self.timingDepartShopAt != null and self.timingLoadMinutes != null ? self.timingDepartShopAt - self.timingLoadMinutes * 60000 : null
+  computed timingDepartShopAt: datetime? = self.timingOnsiteAt != null and self.timingOutboundTravelMinutes != null ? self.timingOnsiteAt - (self.timingOutboundTravelMinutes + (self.timingSafetyBufferMinutes != null ? self.timingSafetyBufferMinutes : 0)) * 60000 : null
+  computed timingLoadStartAt: datetime? = self.timingDepartShopAt != null and self.timingLoadMinutes != null ? self.timingDepartShopAt - self.timingLoadMinutes * 60000 : null
+  computed timingStaffOnAt: datetime? = self.timingLoadStartAt != null ? self.timingLoadStartAt - (self.timingBriefingMinutes != null ? self.timingBriefingMinutes : 0) * 60000 : null
   computed timingDepartVenueAt: datetime? = self.endsAt != null and self.timingCleanupMinutes != null ? self.endsAt + self.timingCleanupMinutes * 60000 : null
   computed timingReturnShopAt: datetime? = self.timingDepartVenueAt != null and self.timingReturnTravelMinutes != null ? self.timingDepartVenueAt + self.timingReturnTravelMinutes * 60000 : null
   computed timingStaffOffAt: datetime? = self.timingReturnShopAt != null and self.timingUnloadMinutes != null ? self.timingReturnShopAt + self.timingUnloadMinutes * 60000 : null
-  // Mangia Ops Final Lock Training p4: back out 1 hour to load (more for a
-  // large event) and allow 1 hour after event end for cleanup and reload.
-  // Suggestions only, like timingSuggestedSetupMinutes — never silently saved.
-  computed timingSuggestedLoadMinutes: float = 60
+  // Mangia Ops Final Lock Training p4: allow 1 hour after event end for
+  // cleanup and reload. A suggestion only - never silently saved.
   computed timingSuggestedCleanupMinutes: float = 60
   // Binder color code (training part 4): red = cooked on site (full service),
   // green = limited service, blue = drop-off clipboard.
@@ -802,14 +1069,14 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // plannedAt gates full engagement invariants while planEngagement mutates fields.
   constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"
-  constraint validEventVenueCapacity: self.venueCapacity == null or self.venueCapacity >= 0 "Venue capacity cannot be negative"
-  constraint validEventPricing: (self.budgetAmount == null or self.budgetAmount >= 0) and (self.quotedPrice == null or self.quotedPrice >= 0) "Event pricing cannot be negative"
-  constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "Recurring event generated count cannot be below one"
+  constraint validEventVenueCapacity: self.venueCapacity == null or self.venueCapacity >= 0 "Venue capacity can't be negative. Use zero or more."
+  constraint validEventPricing: (self.budgetAmount == null or self.budgetAmount >= 0) and (self.quotedPrice == null or self.quotedPrice >= 0) "This event's pricing can't be negative. Use zero or more."
+  constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "The recurring count can't be below one. Use one or more."
   constraint validRecurrenceSequence: self.recurrenceSequence == null or self.recurrenceSequence >= 2 "Recurring event instances must follow the source event"
 
   // Quote → Planning → Pending Approval → Approved → Sales Lock → Executing → Final → Complete → Close Out lifecycle
   transition stage from "quote" to ["planning", "cancelled"]
-  transition stage from "planning" to ["pending_approval", "cancelled"]
+  transition stage from "planning" to ["pending_approval", "completed", "cancelled"]
   transition stage from "pending_approval" to ["planning", "approved", "cancelled"]
   transition stage from "approved" to ["sales_lock", "cancelled"]
   transition stage from "sales_lock" to ["executing", "cancelled"]
@@ -856,13 +1123,13 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "planning"
     guard self.plannedAt == null
     guard self.deletedAt == null
-    constraint planTitle: length(trim(title)) > 0 "Event title is required"
-    constraint planType: length(trim(eventType)) > 0 "Event type is required"
+    constraint planTitle: length(trim(title)) > 0 "Give this event a title."
+    constraint planType: length(trim(eventType)) > 0 "Pick an event type."
     constraint planDates: endsAt > startsAt "Event end must be after its start"
     constraint planHeadcount: expectedHeadcount >= 1 and expectedHeadcount <= 100000 "Headcount must be between 1 and 100000"
-    constraint planVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
-    constraint planContact: length(trim(primaryContactName)) > 0 "Primary contact name is required"
-    constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    constraint planVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity can't be negative. Use zero or more."
+    constraint planContact: length(trim(primaryContactName)) > 0 "Give this event a primary contact name."
+    constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "This event's pricing can't be negative. Use zero or more."
     mutate clientId = clientId
     mutate clientName = clientName
     mutate title = title
@@ -937,9 +1204,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.plannedAt == null
     guard self.deletedAt == null
     guard self.draftCapturedAt == null
-    constraint draftTitle: length(trim(title)) > 0 "Draft title is required"
+    constraint draftTitle: length(trim(title)) > 0 "Give this draft a title."
     constraint draftHeadcount: expectedHeadcount == null or (expectedHeadcount >= 0 and expectedHeadcount <= 100000) "Headcount must be between 0 and 100000 when known"
-    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "Event pricing cannot be negative"
+    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "This event's pricing can't be negative. Use zero or more."
     mutate title = title
     mutate clientId = clientId != null ? clientId : null
     mutate eventType = eventType != null ? eventType : ""
@@ -1006,7 +1273,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.plannedAt == null
     guard self.deletedAt == null
     constraint draftHeadcount: expectedHeadcount == null or (expectedHeadcount >= 0 and expectedHeadcount <= 100000) "Headcount must be between 0 and 100000 when known"
-    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "Event pricing cannot be negative"
+    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "This event's pricing can't be negative. Use zero or more."
     mutate title = title != null ? title : self.title
     mutate clientId = clientId != null ? clientId : self.clientId
     mutate eventType = eventType != null ? eventType : self.eventType
@@ -1093,17 +1360,28 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional outboundTravelMinutes: number,
     optional cleanupMinutes: number,
     optional returnTravelMinutes: number,
-    optional unloadMinutes: number
+    optional unloadMinutes: number,
+    optional setupOverrideReason: string,
+    optional loadOverrideReason: string
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    // A setup or load time that differs from the saved one is the person's
+    // own value (PL-TIMING); company rules no longer move it. A reason is
+    // welcome but never required.
+    compute setupChanged = setupMinutes != self.timingSetupMinutes
+    compute loadChanged = loadMinutes != self.timingLoadMinutes
+    compute setupReasonGiven = setupOverrideReason != null and length(trim(setupOverrideReason)) > 0
+    compute loadReasonGiven = loadOverrideReason != null and length(trim(loadOverrideReason)) > 0
+    compute setupByPerson = setupMinutes != null and (setupChanged or self.timingSetupSource != "company_rule" or setupReasonGiven)
+    compute loadByPerson = loadMinutes != null and (loadChanged or self.timingLoadSource != "company_rule" or loadReasonGiven)
     constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
-    constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup minutes cannot be negative"
-    constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load minutes cannot be negative"
-    constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel minutes cannot be negative"
-    constraint timingCleanupNonnegative: cleanupMinutes == null or cleanupMinutes >= 0 "Cleanup minutes cannot be negative"
-    constraint timingReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel minutes cannot be negative"
-    constraint timingUnloadNonnegative: unloadMinutes == null or unloadMinutes >= 0 "Unload minutes cannot be negative"
+    constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup time can't be negative. Use zero or more."
+    constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load time can't be negative. Use zero or more."
+    constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel time can't be negative. Use zero or more."
+    constraint timingCleanupNonnegative: cleanupMinutes == null or cleanupMinutes >= 0 "Cleanup time can't be negative. Use zero or more."
+    constraint timingReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel time can't be negative. Use zero or more."
+    constraint timingUnloadNonnegative: unloadMinutes == null or unloadMinutes >= 0 "Unload time can't be negative. Use zero or more."
     mutate serviceStartsAt = serviceStartsAt
     mutate timingSetupMinutes = setupMinutes
     mutate timingLoadMinutes = loadMinutes
@@ -1112,6 +1390,102 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate timingReturnTravelMinutes = returnTravelMinutes
     mutate timingUnloadMinutes = unloadMinutes
     mutate timingConfiguredAt = now()
+    mutate timingSetupSource = setupMinutes == null ? null : (setupByPerson ? "person" : "company_rule")
+    mutate timingSetupOverrideReason = setupByPerson ? (setupReasonGiven ? setupOverrideReason : (setupChanged ? null : self.timingSetupOverrideReason)) : null
+    mutate timingSetupOverrideByPersonId = setupByPerson ? (setupChanged or setupReasonGiven ? user.personId : self.timingSetupOverrideByPersonId) : null
+    mutate timingSetupOverrideAt = setupByPerson ? (setupChanged or setupReasonGiven ? now() : self.timingSetupOverrideAt) : null
+    mutate timingLoadSource = loadMinutes == null ? null : (loadByPerson ? "person" : "company_rule")
+    mutate timingLoadOverrideReason = loadByPerson ? (loadReasonGiven ? loadOverrideReason : (loadChanged ? null : self.timingLoadOverrideReason)) : null
+    mutate timingLoadOverrideByPersonId = loadByPerson ? (loadChanged or loadReasonGiven ? user.personId : self.timingLoadOverrideByPersonId) : null
+    mutate timingLoadOverrideAt = loadByPerson ? (loadChanged or loadReasonGiven ? now() : self.timingLoadOverrideAt) : null
+    mutate timingLoadRuleId = loadByPerson ? null : self.timingLoadRuleId
+    mutate timingLoadNeedsReview = loadByPerson ? false : self.timingLoadNeedsReview
+    emit EventTimingConfigured {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Hand setup and/or load back to the company timing rule (PL-TIMING); the
+  // follow-up re-applies the rule and the timeline follows.
+  command useCompanyTimingRule(setup: boolean, load: boolean) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    constraint activeRuleTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
+    mutate timingSetupSource = setup ? "company_rule" : self.timingSetupSource
+    mutate timingSetupOverrideReason = setup ? null : self.timingSetupOverrideReason
+    mutate timingSetupOverrideByPersonId = setup ? null : self.timingSetupOverrideByPersonId
+    mutate timingSetupOverrideAt = setup ? null : self.timingSetupOverrideAt
+    mutate timingLoadSource = load ? "company_rule" : self.timingLoadSource
+    mutate timingLoadOverrideReason = load ? null : self.timingLoadOverrideReason
+    mutate timingLoadOverrideByPersonId = load ? null : self.timingLoadOverrideByPersonId
+    mutate timingLoadOverrideAt = load ? null : self.timingLoadOverrideAt
+    emit EventTimingRuleRestored {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Server-only (PL-TIMING, AC-428): company setup/load/briefing/buffer rules
+  // applied by convex/lib/eventTimingPolicy.ts. A person's setup or load
+  // value is never replaced; an omitted value clears only a rule value.
+  private command applyTimingPolicy(
+    optional setupMinutes: number,
+    optional loadMinutes: number,
+    optional loadRuleId: string,
+    loadNeedsReview: boolean,
+    briefingMinutes: number,
+    safetyBufferMinutes: number
+  ) {
+    guard self.deletedAt == null
+    constraint activePolicyTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
+    compute setupFollowsRule = self.timingSetupSource == "company_rule" or (self.timingSetupSource == null and self.timingSetupMinutes == null)
+    compute loadFollowsRule = self.timingLoadSource == "company_rule" or (self.timingLoadSource == null and self.timingLoadMinutes == null)
+    mutate timingSetupMinutes = setupFollowsRule ? setupMinutes : self.timingSetupMinutes
+    mutate timingSetupSource = setupFollowsRule ? (setupMinutes != null ? "company_rule" : null) : self.timingSetupSource
+    mutate timingLoadMinutes = loadFollowsRule ? loadMinutes : self.timingLoadMinutes
+    mutate timingLoadSource = loadFollowsRule ? (loadMinutes != null ? "company_rule" : null) : self.timingLoadSource
+    mutate timingLoadRuleId = loadFollowsRule ? loadRuleId : self.timingLoadRuleId
+    mutate timingLoadNeedsReview = loadFollowsRule ? loadNeedsReview : self.timingLoadNeedsReview
+    mutate timingBriefingMinutes = briefingMinutes
+    mutate timingSafetyBufferMinutes = safetyBufferMinutes
+    emit EventTimingConfigured {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Which kitchen the crew leaves from; omit to go back to the company's
+  // only kitchen. Allowed at any stage: live plans stay correctable.
+  command chooseOperatingLocation(optional operatingLocationId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    mutate operatingLocationId = operatingLocationId
+    emit EventOperatingLocationChosen {
+      eventId: self.id
+      tenantId: self.tenantId
+      operatingLocationId: operatingLocationId
+    }
+  }
+
+  // Server-only (PL-ROUTES, AC-382): the drive time comes from a stored route
+  // fact, never from the browser. Travel is the road time only; the company
+  // safety buffer is kept apart (timingSafetyBufferMinutes). An omitted value
+  // keeps its current value. Emits the same event as configureTiming so the
+  // timeline and shifts follow.
+  private command applyRouteTravel(
+    optional outboundTravelMinutes: number,
+    optional returnTravelMinutes: number,
+    optional safetyBufferMinutes: number
+  ) {
+    guard self.deletedAt == null
+    constraint activeRouteTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
+    constraint routeOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel time can't be negative. Use zero or more."
+    constraint routeReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel time can't be negative. Use zero or more."
+    mutate timingOutboundTravelMinutes = outboundTravelMinutes != null ? outboundTravelMinutes : self.timingOutboundTravelMinutes
+    mutate timingReturnTravelMinutes = returnTravelMinutes != null ? returnTravelMinutes : self.timingReturnTravelMinutes
+    mutate timingSafetyBufferMinutes = safetyBufferMinutes != null ? safetyBufferMinutes : self.timingSafetyBufferMinutes
+    mutate timingConfiguredAt = self.timingConfiguredAt != null ? self.timingConfiguredAt : now()
     emit EventTimingConfigured {
       eventId: self.id
       tenantId: self.tenantId
@@ -1132,7 +1506,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.endsAt != null
     guard self.deletedAt == null
     guard self.recurrenceTemplateEventId == null
-    constraint recurrenceSeriesIdPresent: length(trim(seriesId)) > 0 "Recurring series id is required"
+    constraint recurrenceSeriesIdPresent: length(trim(seriesId)) > 0 "Give this recurring series an id."
     constraint recurrenceNextAfterSource: nextStartsAt > self.startsAt "The first recurring instance must start after the source event"
     constraint recurrenceEndShape: (endCondition == "on_date" and recurrenceEndsAt != null and recurrenceEndsAt >= nextStartsAt and occurrenceLimit == null) or (endCondition == "after_occurrences" and recurrenceEndsAt == null and occurrenceLimit != null and occurrenceLimit >= 2 and occurrenceLimit <= 1000) "Choose an end date that includes another event or a total occurrence count from 2 to 1000"
     mutate recurrenceFrequency = frequency
@@ -1179,7 +1553,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
-    constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
+    constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity can't be negative. Use zero or more."
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
@@ -1213,7 +1587,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   command changeServiceStyle(serviceStyleId: uuid, optional serviceStyleName: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Events must reference a service style"
+    constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Pick a service style for this event."
+    // The target must be one of this tenant's live, active styles (tenant and
+    // soft-delete scoping come with the read).
+    constraint serviceStyleActive: count(ServiceStyle where id == serviceStyleId, status == "active") > 0 "Pick a service style that is still offered."
     mutate serviceStyleId = serviceStyleId
     mutate serviceStyleName = serviceStyleName != null ? serviceStyleName : self.serviceStyleName
     emit EventServiceStyleChanged {
@@ -1231,7 +1608,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
-    constraint contactName: length(trim(primaryContactName)) > 0 "Primary contact name is required"
+    constraint contactName: length(trim(primaryContactName)) > 0 "Give this event a primary contact name."
     mutate primaryContactName = primaryContactName
     mutate primaryContactEmail = primaryContactEmail
     mutate primaryContactPhone = primaryContactPhone
@@ -1271,6 +1648,35 @@ entity Event mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       previousClientId: previousClientId
       clientId: self.mergeTargetClientId
+    }
+  }
+
+  // Move the event to a different client (#378): booked under the wrong
+  // client, or a planner company replaced by the end client. Allowed in every
+  // stage so a wrong booking stays correctable. Sales access, because the
+  // proposals and contracts that follow the event are sales records. They follow
+  // the event (reactions in proposal.manifest / contract.manifest). Invoices
+  // and payments stay with the client they were billed to.
+  command moveToClient(
+    clientId: uuid,
+    optional primaryContactName: string,
+    optional primaryContactEmail: string,
+    optional primaryContactPhone: string
+  ) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesAccess")
+    constraint moveDistinctClient: clientId != self.clientId "This event already belongs to that client."
+    constraint moveClientActive: count(Client where id == clientId, status == "active") > 0 "Pick a client that is still active."
+    compute previousClientId = self.clientId
+    mutate clientId = clientId
+    mutate primaryContactName = primaryContactName != null and length(trim(primaryContactName)) > 0 ? primaryContactName : self.primaryContactName
+    mutate primaryContactEmail = primaryContactName != null and length(trim(primaryContactName)) > 0 ? primaryContactEmail : self.primaryContactEmail
+    mutate primaryContactPhone = primaryContactName != null and length(trim(primaryContactName)) > 0 ? primaryContactPhone : self.primaryContactPhone
+    emit EventClientChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: clientId
     }
   }
 
@@ -1347,7 +1753,10 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional servingwareKit: string,
     optional decorKit: string,
     optional rainPlan: string,
-    optional setupDiagram: string
+    optional setupDiagram: string,
+    optional venueSurface: string,
+    optional tentAndFlooring: string,
+    optional handwashing: string
   ) {
     guard self.deletedAt == null
     mutate linenColorTables = linenColorTables != null ? linenColorTables : self.linenColorTables
@@ -1356,6 +1765,9 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate decorKit = decorKit != null ? decorKit : self.decorKit
     mutate rainPlan = rainPlan != null ? rainPlan : self.rainPlan
     mutate setupDiagram = setupDiagram != null ? setupDiagram : self.setupDiagram
+    mutate venueSurface = venueSurface != null ? venueSurface : self.venueSurface
+    mutate tentAndFlooring = tentAndFlooring != null ? tentAndFlooring : self.tentAndFlooring
+    mutate handwashing = handwashing != null ? handwashing : self.handwashing
     emit EventSetupNotesUpdated {
       eventId: self.id
       tenantId: self.tenantId
@@ -1422,11 +1834,38 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Records the event's channel in an outside team chat. Staff who can change
+  // the event can record, correct or clear it at any time.
+  command linkExternalChannel(channelName: string, channelId: string, optional channelUrl: string) {
+    guard self.deletedAt == null
+    constraint externalChannelNamed: length(trim(channelName)) > 0 and length(trim(channelId)) > 0 "Give the channel's name and its id"
+    mutate externalChannelName = trim(channelName)
+    mutate externalChannelId = trim(channelId)
+    mutate externalChannelUrl = channelUrl != null ? trim(channelUrl) : null
+    emit EventExternalChannelLinked {
+      eventId: self.id
+      tenantId: self.tenantId
+      channelName: channelName
+      channelId: channelId
+    }
+  }
+
+  command unlinkExternalChannel() {
+    guard self.deletedAt == null
+    mutate externalChannelName = null
+    mutate externalChannelId = null
+    mutate externalChannelUrl = null
+    emit EventExternalChannelUnlinked {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command changePricing(budgetAmount: money(12, 2), quotedPrice: money(12, 2)) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
-    constraint pricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    constraint pricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "This event's pricing can't be negative. Use zero or more."
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     emit EventPricingChanged {
@@ -1446,8 +1885,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "completed" or self.stage == "closed_out"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
-    constraint correctionReasonPresent: length(trim(reason)) > 0 "Correction reason is required"
-    constraint correctionPricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    constraint correctionReasonPresent: length(trim(reason)) > 0 "Say why you're correcting this event."
+    constraint correctionPricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "This event's pricing can't be negative. Use zero or more."
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     emit EventCommercialCorrected {
@@ -1490,7 +1929,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "quote" or self.stage == "pending_approval"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint returnReason: length(trim(reason)) > 0 "Return reason is required"
+    constraint returnReason: length(trim(reason)) > 0 "Say why you're sending this event back."
     mutate stage = "planning"
     mutate approvedAt = null
     emit EventReturnedToPlanning {
@@ -1544,11 +1983,28 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // An event that already happened (the old system says Complete or Closed
+  // Out) is recorded as completed straight from planning. It never goes
+  // through approval here, so no invoice, staffing, pack list or purchasing
+  // work is drafted for an event that is over.
+  command recordPastCompletion() {
+    guard self.stage == "planning"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint pastEventOnly: self.endsAt < now() "Only an event that has already happened can be marked finished from planning."
+    mutate stage = "completed"
+    mutate completedAt = self.endsAt
+    emit EventCompleted {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command cancel(reason: string) {
     guard self.stage == "quote" or self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing" or self.stage == "final"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint cancellationReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancellationReasonPresent: length(trim(reason)) > 0 "Say why you're cancelling this event."
     mutate stage = "cancelled"
     mutate cancellationReason = reason
     mutate cancelledAt = now()
@@ -1583,7 +2039,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.archivedAt == null
     guard roleAllows(user.role, "eventManageAccess")
-    constraint archiveReasonPresent: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveReasonPresent: length(trim(reason)) > 0 "Say why you're archiving this event."
     mutate archivedAt = now()
     mutate archiveReason = reason
     emit EventArchived {
@@ -1616,6 +2072,12 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.startsAt != null
     guard self.endsAt != null
     guard self.expectedHeadcount > 0
+    // AC-227 (decided 2026-09-28, issue #397): the kitchen, staff and pack
+    // lists cannot be planned without a name, a place and a service style.
+    // Only this office step checks them; later stages show warnings only.
+    constraint lockTitle: length(trim(self.title)) > 0 "Give this event a name before you lock it for sales."
+    constraint lockVenue: self.venueId != null or (self.venueName != null and length(trim(self.venueName)) > 0) "Pick a venue before you lock this event for sales."
+    constraint lockServiceStyle: self.serviceStyleId != null or (self.serviceStyleName != null and length(trim(self.serviceStyleName)) > 0) "Pick a service style before you lock this event for sales."
     mutate stage = "sales_lock"
     mutate salesLockedAt = now()
     emit EventSalesLocked {
@@ -1656,6 +2118,21 @@ entity Event mixin TenantScoped, SoftDeletable {
       clientId: self.clientId
       expectedHeadcount: self.expectedHeadcount
       quotedPrice: self.quotedPrice
+    }
+  }
+
+  // Run by the finalize follow-up (convex/lib/venueFactsSnapshot.ts) with the
+  // venue facts as JSON. Written once: a second call is refused.
+  command recordFinalVenueFacts(facts: string) {
+    guard self.deletedAt == null
+    guard self.finalizedAt != null
+    guard self.finalVenueFacts == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint finalVenueFactsPresent: length(trim(facts)) > 0 "No venue facts to keep."
+    mutate finalVenueFacts = facts
+    emit EventFinalVenueFactsRecorded {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -1713,7 +2190,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   ) {
     guard self.invitedAt == null
     guard self.deletedAt == null
-    constraint inviteGuestName: length(trim(name)) > 0 "Guest name is required"
+    constraint inviteGuestName: length(trim(name)) > 0 "Give this guest a name."
     mutate eventId = eventId
     mutate name = name
     mutate email = email
@@ -1776,7 +2253,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   command assignTable(tableAssignment: string) {
     guard self.rsvpStatus != "declined"
     guard self.deletedAt == null
-    constraint tableAssignmentPresent: length(trim(tableAssignment)) > 0 "Table assignment is required"
+    constraint tableAssignmentPresent: length(trim(tableAssignment)) > 0 "Pick a table for this guest."
     mutate tableAssignment = tableAssignment
     emit EventGuestTableAssigned {
       guestId: self.id
@@ -1788,7 +2265,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
 
   command withdraw(reason: string) {
     guard self.deletedAt == null
-    constraint withdrawReasonPresent: length(trim(reason)) > 0 "Withdrawal reason is required"
+    constraint withdrawReasonPresent: length(trim(reason)) > 0 "Say why this guest is withdrawing."
     mutate deletedAt = now()
     emit EventGuestWithdrawn {
       guestId: self.id
@@ -1846,7 +2323,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
 
   constraint timelineActivityNameComplete: self.scheduledAt == null or length(trim(self.name)) > 0 "Timeline activities require a name once scheduled"
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
-  constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
+  constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Sort order can't be negative. Use zero or more."
 
   default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may see the shared event timeline"
   default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may add timeline work"
@@ -1867,11 +2344,11 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   ) {
     guard self.scheduledAt == null
     guard self.deletedAt == null
-    constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
+    constraint scheduleActivityName: length(trim(name)) > 0 "Give this activity a name."
     // Preserve the planning access boundary while crew can mark work done.
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may schedule the event timeline"
     constraint scheduleActivityWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
-    constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
+    constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate name = name
     mutate startsAt = startsAt
@@ -1911,7 +2388,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may adjust the event timeline"
-    constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
+    constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     compute nextStartsAt = clearStartsAt == true ? null : (startsAt != null ? startsAt : self.startsAt)
     compute nextEndsAt = clearEndsAt == true ? null : (endsAt != null ? endsAt : self.endsAt)
     compute manualTimingChanged = (clearStartsAt == true and self.startsAt != null) or (clearEndsAt == true and self.endsAt != null) or (startsAt != null and startsAt != self.startsAt) or (endsAt != null and endsAt != self.endsAt)
@@ -2033,28 +2510,28 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
 
-  constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Timeline comment text is required"
+  constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Write something in this comment."
 
   default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may see timeline comments"
   default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may add timeline comments"
   default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change timeline comments"
 
+  // The author and the author's name come from the signed-in person's staff
+  // profile, never from the caller.
   command post(
     eventId: uuid,
-    authorPersonId: uuid,
-    authorName: string,
     body: string,
     optional activityId: string
   ) {
     guard self.postedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint postTimelineCommentBody: length(trim(body)) > 0 "Comment text is required"
-    constraint postTimelineCommentAuthor: length(trim(authorName)) > 0 "Author name is required"
+    guard user.personId != null
+    constraint postTimelineCommentBody: length(trim(body)) > 0 "Write something in this comment."
     mutate eventId = eventId
     mutate activityId = activityId
-    mutate authorPersonId = authorPersonId
-    mutate authorName = authorName
+    mutate authorPersonId = user.personId
+    mutate authorName = user.personName != null ? user.personName : ""
     mutate authorAuthSubjectId = user.id
     mutate body = body
     mutate postedAt = now()
@@ -2062,7 +2539,7 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
       commentId: self.id
       tenantId: self.tenantId
       eventId: eventId
-      authorPersonId: authorPersonId
+      authorPersonId: user.personId
     }
   }
 
@@ -2095,11 +2572,16 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   property instructions: string?
   property required sortOrder: int = 0
   property addedAt: datetime?
+  // The venue layout template (and its version) this row was copied from
+  // (PL-VENUE-LAYOUT, spec §8.2). Unset = typed on the event. Editing the row
+  // never touches the template.
+  property sourceTemplateId: uuid?
+  property sourceTemplateVersion: int?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Layout section type is required once added"
-  constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Layout section sort order cannot be negative"
+  constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Pick a layout section type."
+  constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Sort order can't be negative. Use zero or more."
 
   default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may see event layout sections"
   default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the floor plan"
@@ -2109,16 +2591,20 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     type: string,
     optional instructions: string,
-    optional sortOrder: number
+    optional sortOrder: number,
+    optional sourceTemplateId: uuid,
+    optional sourceTemplateVersion: number
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
-    constraint addLayoutType: length(trim(type)) > 0 "Layout section type is required"
-    constraint addLayoutSort: sortOrder == null or sortOrder >= 0 "Layout section sort order cannot be negative"
+    constraint addLayoutType: length(trim(type)) > 0 "Pick a layout section type."
+    constraint addLayoutSort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate type = type
     mutate instructions = instructions
     mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate sourceTemplateId = sourceTemplateId
+    mutate sourceTemplateVersion = sourceTemplateVersion
     mutate addedAt = now()
     emit EventLayoutSectionAdded {
       sectionId: self.id
@@ -2137,7 +2623,7 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     guard self.addedAt != null
     guard self.deletedAt == null
     constraint updateLayoutType: type == null or length(trim(type)) > 0 "Layout section type cannot be blanked"
-    constraint updateLayoutSort: sortOrder == null or sortOrder >= 0 "Layout section sort order cannot be negative"
+    constraint updateLayoutSort: sortOrder == null or sortOrder >= 0 "Sort order can't be negative. Use zero or more."
     mutate type = type != null ? type : self.type
     mutate instructions = instructions != null ? instructions : self.instructions
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
@@ -2206,6 +2692,12 @@ event ClientContactChanged: "client.contact_changed" {
 event ClientBirthdaySet: "client.birthday_set" {
   clientId: string
   tenantId: string
+}
+
+event ClientEmailPreferenceSet: "client.email_preference_set" {
+  clientId: string
+  tenantId: string
+  preference: string
 }
 
 event ClientBillingProfileChanged: "client.billing_profile_changed" {
@@ -2295,6 +2787,13 @@ event EventClientReassigned: "event.client_reassigned" {
   eventId: string
   tenantId: string
   previousClientId: string
+  clientId: string
+}
+
+event EventClientChanged: "event.client_changed" {
+  eventId: string
+  tenantId: string
+  previousClientId: string?
   clientId: string
 }
 
@@ -2467,6 +2966,17 @@ event EventTimingConfigured: "event.timing_configured" {
   tenantId: string
 }
 
+event EventTimingRuleRestored: "event.timing_rule_restored" {
+  eventId: string
+  tenantId: string
+}
+
+event EventOperatingLocationChosen: "event.operating_location_chosen" {
+  eventId: string
+  tenantId: string
+  operatingLocationId: string?
+}
+
 event EventTimelineTimingPlanned: "event_timeline_activity.timing_planned" {
   activityId: string
   eventId: string
@@ -2538,6 +3048,18 @@ event EventBinderBuilt: "event_binder.built" {
 }
 
 event EventBinderBuiltCleared: "event_binder.built_cleared" {
+  eventId: string
+  tenantId: string
+}
+
+event EventExternalChannelLinked: "event_external_channel.linked" {
+  eventId: string
+  tenantId: string
+  channelName: string
+  channelId: string
+}
+
+event EventExternalChannelUnlinked: "event_external_channel.unlinked" {
   eventId: string
   tenantId: string
 }

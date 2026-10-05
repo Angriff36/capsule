@@ -15,6 +15,8 @@ import {
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { ContactDetailsSection } from "./ContactDetailsSection";
+import { EmailSenderSection } from "./EmailSenderSection";
 import { useBrandLogoManager } from "./brandLogoUpload";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
@@ -102,7 +104,7 @@ export function BrandingPage() {
     const accentColor = String(data.get("accentColor") ?? "").trim();
 
     if (!displayName || !address) {
-      setError("Display name and business address are required.");
+      setError("Give this business a display name and an address.");
       return;
     }
     if (!isValidBrandColor(primaryColor) || !isValidBrandColor(accentColor)) {
@@ -114,7 +116,7 @@ export function BrandingPage() {
       return;
     }
     if (logoFile && logoFile.size > MAX_LOGO_BYTES) {
-      setError("The logo must be 10 MB or smaller.");
+      setError("This logo has to be 10 MB or smaller. Pick a smaller file.");
       return;
     }
 
@@ -190,7 +192,7 @@ export function BrandingPage() {
     }
     if (!record) {
       setCurrencyError(
-        "Save branding first so the organization record exists before setting a currency.",
+        "Save branding first so this business is on file before setting a currency.",
       );
       return;
     }
@@ -243,7 +245,7 @@ export function BrandingPage() {
         </p>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)]">
         <Section title="Document identity">
           <form
             key={`${record?._id ?? "new"}:${record?.version ?? 0}`}
@@ -460,6 +462,14 @@ export function BrandingPage() {
             </div>
           </form>
         </Section>
+
+        <EmailSenderSection
+          record={record}
+          displayName={branding.displayName}
+          canEdit={canEdit}
+        />
+
+        <ContactDetailsSection record={record} canEdit={canEdit} />
 
         <section aria-label="Document preview" className="min-w-0">
           <p className="eyebrow">Live preview</p>

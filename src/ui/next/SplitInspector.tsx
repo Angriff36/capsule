@@ -55,7 +55,7 @@ export function SplitInspector({
             <Kbd>j</Kbd> <Kbd>k</Kbd> move through the queue
           </span>
           <span>
-            <Kbd>↵</Kbd> act on the open record
+            <Kbd>↵</Kbd> act on the open item
           </span>
           <span style={{ marginLeft: "auto" }}>
             {items.length} in queue{focused ? " · list focused" : ""}

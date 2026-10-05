@@ -1,8 +1,6 @@
-import {
-  useListDish,
-  useListMenu,
-  useListMenuDish,
-} from "../../lib/manifest-convex-react";
+import { useListMenu, useListMenuDish } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
+import { effectiveSellingPrice } from "../../lib/catalogEligibility";
 
 // A catalog dish a proposal pricing line can be linked to (spec §5.4 L276). A
 // published menu's active dishes, each carrying its `sellingPrice` — the
@@ -26,7 +24,7 @@ export function useCatalogDishes(): {
 } {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
 
   if (menus === undefined || menuDishes === undefined || dishes === undefined) {
     return { loading: true, lines: [] };
@@ -57,7 +55,7 @@ export function useCatalogDishes(): {
       menuDishId: md._id,
       dishId: md.dishId,
       menuId: md.menuId,
-      sellingPrice: md.sellingPrice == null ? null : Number(md.sellingPrice),
+      sellingPrice: effectiveSellingPrice(md, Date.now()),
       name: dishName(md.dishId),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  useListEvent,
   useListEventCloseout,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById } from "../facilities/useEventsById";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
@@ -499,7 +499,12 @@ function FoodCostReportBody({
 
 export function FoodCostPercentagePage() {
   const closeouts = useListEventCloseout();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      closeouts === undefined ? undefined : closeouts.map((c) => c.eventId),
+    [closeouts],
+  );
+  const events = useEventsById(eventIds);
   const venues = useListVenue();
   const now = useMemo(() => new Date(), []);
 

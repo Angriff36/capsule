@@ -242,10 +242,18 @@ export function KitchenCatalogCleanupPage() {
         setProgress(
           `${RECLASSIFY_KIND_LABEL[group.kind]}: ${done}/${ids.length}`,
         );
-        const result = await apply({
-          operationKey: `cleanup:${group.kind}:${stamp}:${i}`,
-          linkIds: ids.slice(i, i + batch),
-        });
+        let result: Awaited<ReturnType<typeof apply>>;
+        try {
+          result = await apply({
+            operationKey: `cleanup:${group.kind}:${stamp}:${i}`,
+            linkIds: ids.slice(i, i + batch),
+          });
+        } catch (cause) {
+          // Earlier batches are saved; press Apply again for the rest.
+          throw new Error(
+            `${done} applied${failed ? `, ${failed} failed` : ""} before it stopped; ${ids.length - i} not tried yet. Press Apply again to finish. ${cause instanceof Error ? cause.message : ""}`.trim(),
+          );
+        }
         done += result.outcomes.filter((o) => !o.error).length;
         failed += result.outcomes.filter((o) => o.error).length;
       }

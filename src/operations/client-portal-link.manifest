@@ -40,10 +40,18 @@ entity ClientPortalLink mixin TenantScoped, SoftDeletable {
   ) {
     guard user.id != null
     constraint clientPortalExpiresFuture: expiresAt > now() "The client link must stay open until a later time"
+    // Same 90-day limit the copy button sets, so a direct command call cannot
+    // make a link that stays open longer.
+    constraint clientPortalExpiresWithin90Days: expiresAt <= now() + (90 * 24 * 60 * 60 * 1000) "A client link can stay open for 90 days at most"
     mutate eventId = eventId
     mutate status = "active"
     mutate expiresAt = expiresAt
     mutate issuedBySubject = user.id
+    mutate revokedAt = null
+    emit ClientPortalLinkCreated {
+      clientPortalLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command revoke() {
@@ -51,7 +59,22 @@ entity ClientPortalLink mixin TenantScoped, SoftDeletable {
     guard self.status == "active" "This client link is already off"
     mutate status = "revoked"
     mutate revokedAt = now()
+    emit ClientPortalLinkRevoked {
+      clientPortalLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   store ClientPortalLink in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ClientPortalLinkCreated: "client.portal.link.created" {
+  clientPortalLinkId: string
+  tenantId: string
+}
+
+event ClientPortalLinkRevoked: "client.portal.link.revoked" {
+  clientPortalLinkId: string
+  tenantId: string
 }

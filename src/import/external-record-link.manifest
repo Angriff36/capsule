@@ -51,6 +51,10 @@ enum CapsuleEntityType {
   unit
   event_dish
   prep_task
+  // An old-system service style matched to a Capsule service style (AC-064).
+  service_style
+  // Old-system message or task brought in as client history (PL-SOURCE-HISTORY).
+  client_communication
 }
 
 // Revision-2: whether a link is a machine suggestion, an approved identity, or
@@ -136,11 +140,11 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   ref sourceImportRun: ImportRun fields [tenantId, sourceImportRunId] references [tenantId, id]
 
   // Constraints
-  constraint linkSourceSystemPresent: self.sourceSystem != null "Source system is required"
-  constraint linkExternalIdPresent: length(trim(self.externalId)) > 0 "External ID is required"
-  constraint linkDatesOrdered: self.effectiveStartDate == null or self.effectiveEndDate == null or self.effectiveStartDate <= self.effectiveEndDate "Effective start date must be before or equal to end date"
-  constraint linkVerifiedRequiresUser: self.verified == false or self.verifiedByUserId != null "Verified status requires a verifying user"
-  constraint linkResolvedRequiresUser: self.conflictStatus == "resolved" or self.resolvedByUserId == null "Resolved status requires a resolving user"
+  constraint linkSourceSystemPresent: self.sourceSystem != null "Pick a source system for this match."
+  constraint linkExternalIdPresent: length(trim(self.externalId)) > 0 "Give this match an external ID."
+  constraint linkDatesOrdered: self.effectiveStartDate == null or self.effectiveEndDate == null or self.effectiveStartDate <= self.effectiveEndDate "This match's start date has to be on or before its end date."
+  constraint linkVerifiedRequiresUser: self.verified == false or self.verifiedByUserId != null "This match can't be marked verified without picking who verified it."
+  constraint linkResolvedRequiresUser: self.conflictStatus == "resolved" or self.resolvedByUserId == null "This match can't be marked resolved without picking who resolved it."
 
   // Policies
   default policy externalRecordLinkRead read: roleAllows(user.role, "importAccess") "Staff may see import matches"
@@ -155,7 +159,6 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     capsuleEntity: CapsuleEntityType,
     capsuleId: string,
     optional verified: boolean,
-    optional verifiedByUserId: string,
     optional sourceImportRunId: string,
     optional effectiveStartDate: datetime,
     optional effectiveEndDate: datetime,
@@ -172,18 +175,17 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     // No `self.createdAt == null` guard: timestamps fill createdAt into the
     // draft before guards run, so that guard failed on every create (#371).
     guard self.deletedAt == null
-    constraint linkSourceSystemPresent: sourceSystem != null "Source system is required"
-    constraint linkExternalIdPresent: length(trim(externalId)) > 0 "External ID is required"
-    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
-    constraint linkVerifiedRequiresUser: verified == null or verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "Verified status requires a verifying user"
-    constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "Effective start date must be before or equal to end date"
+    constraint linkSourceSystemPresent: sourceSystem != null "Pick a source system for this match."
+    constraint linkExternalIdPresent: length(trim(externalId)) > 0 "Give this match an external ID."
+    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
+    constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "This match's start date has to be on or before its end date."
     mutate sourceSystem = sourceSystem
     mutate recordType = recordType != null ? recordType : ""
     mutate externalId = externalId
     mutate capsuleEntity = capsuleEntity
     mutate capsuleId = capsuleId
     mutate verified = verified != null ? verified : false
-    mutate verifiedByUserId = verifiedByUserId
+    mutate verifiedByUserId = verified != null and verified ? user.id : null
     mutate lastVerifiedAt = verified != null and verified ? now() : null
     mutate sourceImportRunId = sourceImportRunId
     mutate effectiveStartDate = effectiveStartDate
@@ -223,6 +225,10 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate rawSourceData = rawSourceData != null ? rawSourceData : self.rawSourceData
     mutate lastSeenAt = now()
     mutate lastSeenImportRunId = importRunId != null ? importRunId : self.lastSeenImportRunId
+    emit ExternalRecordLinkObserved {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Revision-2: import wrote these field values into Capsule. Advances the
@@ -235,64 +241,68 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate appliedSourceVersion = appliedSourceVersion != null ? appliedSourceVersion : self.sourceVersion
     mutate appliedAt = now()
     mutate appliedImportRunId = importRunId != null ? importRunId : self.lastSeenImportRunId
+    emit ExternalRecordLinkAppliedRecorded {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Revision-2: approve or reject a suggested identity. Approval is what makes
   // the link an identity; a display name never is.
-  command decide(decision: LinkDecision, decidedByUserId: string) {
+  // The person who decides is the signed-in person (spec CF-15).
+  command decide(decision: LinkDecision) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint decideUserPresent: length(trim(decidedByUserId)) > 0 "Deciding user is required"
     mutate decision = decision
-    mutate decidedByUserId = decidedByUserId
+    mutate decidedByUserId = user.id
     mutate decidedAt = now()
     mutate verified = decision == "approved"
-    mutate verifiedByUserId = decision == "approved" ? decidedByUserId : self.verifiedByUserId
+    mutate verifiedByUserId = decision == "approved" ? user.id : self.verifiedByUserId
     mutate lastVerifiedAt = now()
     mutate conflictStatus = decision == "approved" ? "resolved" : self.conflictStatus
-    mutate resolvedByUserId = decision == "approved" ? decidedByUserId : self.resolvedByUserId
+    mutate resolvedByUserId = decision == "approved" ? user.id : self.resolvedByUserId
+    emit ExternalRecordLinkDecided {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+    }
   }
 
-  // verifyLink - Mark a link as verified (e.g., after user confirmation)
+  // verifyLink - Mark a link as verified (e.g., after user confirmation).
+  // The person who checks it is the signed-in person (spec CF-15).
   command verifyLink(
-    verifiedByUserId: string,
     optional verified: boolean,
     optional metadata: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint verifyUserPresent: length(trim(verifiedByUserId)) > 0 "Verifying user is required"
     mutate verified = verified != null ? verified : true
-    mutate verifiedByUserId = verifiedByUserId
+    mutate verifiedByUserId = user.id
     mutate lastVerifiedAt = now()
     mutate metadata = metadata != null ? metadata : self.metadata
     mutate conflictStatus = verified != null and verified ? "resolved" : self.conflictStatus
-    mutate resolvedByUserId = verified != null and verified ? verifiedByUserId : self.resolvedByUserId
+    mutate resolvedByUserId = verified != null and verified ? user.id : self.resolvedByUserId
     emit ExternalRecordVerified {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       verified: verified != null ? verified : true
-      verifiedByUserId: verifiedByUserId
+      verifiedByUserId: user.id
       capsuleEntity: self.capsuleEntity
       capsuleId: self.capsuleId
     }
   }
 
   // unlinkExternalRecord - Remove a link (soft delete via discard)
-  command unlinkExternalRecord(
-    reason: string,
-    optional unlinkedByUserId: string
-  ) {
+  command unlinkExternalRecord(reason: string) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint unlinkReasonPresent: length(trim(reason)) > 0 "Unlink reason is required"
+    constraint unlinkReasonPresent: length(trim(reason)) > 0 "Say why you're taking this match off."
     mutate deletedAt = now()
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
     emit ExternalRecordUnlinked {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       reason: reason
-      unlinkedByUserId: unlinkedByUserId != null ? unlinkedByUserId : ""
+      unlinkedByUserId: user.id
       capsuleEntity: self.capsuleEntity
       capsuleId: self.capsuleId
       externalId: self.externalId
@@ -304,7 +314,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   command updateCapsuleId(capsuleId: string) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint updateCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
+    constraint updateCapsuleIdPresent: length(trim(capsuleId)) > 0 "Give this match a Capsule ID."
     compute previousCapsuleId = self.capsuleId
     mutate capsuleId = capsuleId
     mutate lastVerifiedAt = now()
@@ -318,24 +328,23 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // resolveConflict - Mark a conflict as resolved
+  // resolveConflict - Mark a conflict as resolved. The person who resolves it
+  // is the signed-in person (spec CF-15).
   command resolveConflict(
     conflictStatus: ConflictStatus,
-    resolvedByUserId: string,
     optional resolutionNote: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint resolveUserPresent: length(trim(resolvedByUserId)) > 0 "Resolving user is required"
     mutate conflictStatus = conflictStatus
-    mutate resolvedByUserId = resolvedByUserId
+    mutate resolvedByUserId = user.id
     mutate resolutionNote = resolutionNote
     mutate lastVerifiedAt = now()
     emit ExternalRecordConflictResolved {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
       conflictStatus: conflictStatus
-      resolvedByUserId: resolvedByUserId
+      resolvedByUserId: user.id
     }
   }
 
@@ -357,7 +366,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   // discard - Soft delete a link
   command discard(reason: string) {
     guard self.deletedAt == null
-    constraint discardReasonPresent: length(trim(reason)) > 0 "Discard reason is required"
+    constraint discardReasonPresent: length(trim(reason)) > 0 "Say why you're deleting this match."
     mutate deletedAt = now()
     mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
     emit ExternalRecordDiscarded {
@@ -533,7 +542,7 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
 
   belongsTo externalRecordLink: ExternalRecordLink fields [tenantId, externalRecordLinkId] references [tenantId, id]
 
-  constraint conflictFieldPresent: self.raisedAt == null or length(trim(self.field)) > 0 "Conflict field is required"
+  constraint conflictFieldPresent: self.raisedAt == null or length(trim(self.field)) > 0 "Say which field is in conflict."
 
   transition status from "pending" to ["keep_capsule", "take_source", "manual"]
   transition status from "keep_capsule" to ["pending"]
@@ -554,7 +563,7 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
   ) {
     guard self.raisedAt == null
     guard self.deletedAt == null
-    constraint raiseFieldPresent: length(trim(field)) > 0 "Conflict field is required"
+    constraint raiseFieldPresent: length(trim(field)) > 0 "Say which field is in conflict."
     mutate externalRecordLinkId = externalRecordLinkId
     mutate field = field
     mutate appliedValue = appliedValue
@@ -579,16 +588,20 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
     mutate sourceVersion = sourceVersion != null ? sourceVersion : self.sourceVersion
     mutate capsuleValue = capsuleValue != null ? capsuleValue : self.capsuleValue
     mutate status = "pending"
+    emit ImportConflictSourceUpdated {
+      importConflictId: self.id
+      tenantId: self.tenantId
+    }
   }
 
-  command settle(resolution: ImportConflictStatus, resolvedByUserId: string) {
+  // The person who settles it is the signed-in person (spec CF-15).
+  command settle(resolution: ImportConflictStatus) {
     guard self.raisedAt != null
     guard self.deletedAt == null
     guard self.status == "pending"
-    constraint settleUserPresent: length(trim(resolvedByUserId)) > 0 "Resolving user is required"
-    constraint settleNotPending: resolution != "pending" "Resolution must pick keep_capsule, take_source or manual"
+    constraint settleNotPending: resolution != "pending" "Pick how you resolved this: keep the current value, use the new value, or fix it another way."
     mutate status = resolution
-    mutate resolvedByUserId = resolvedByUserId
+    mutate resolvedByUserId = user.id
     mutate resolvedAt = now()
     mutate resolvedOnSourceVersion = self.sourceVersion
     emit ImportConflictResolved {
@@ -616,4 +629,25 @@ event ImportConflictResolved: "import_conflict.resolved" {
   externalRecordLinkId: string
   field: string
   status: ImportConflictStatus
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event ExternalRecordLinkDecided: "external.record.link.decided" {
+  externalRecordLinkId: string
+  tenantId: string
+}
+
+event ExternalRecordLinkObserved: "external.record.link.observed" {
+  externalRecordLinkId: string
+  tenantId: string
+}
+
+event ExternalRecordLinkAppliedRecorded: "external.record.link.applied.recorded" {
+  externalRecordLinkId: string
+  tenantId: string
+}
+
+event ImportConflictSourceUpdated: "import.conflict.source.updated" {
+  importConflictId: string
+  tenantId: string
 }

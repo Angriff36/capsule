@@ -347,6 +347,9 @@
 @media (max-width: 519px) {
   .culinary-studio .component-toolbar {
     align-items: stretch;
+    /* Stacked on a phone: wrapping would size every row to the widest
+       dropdown and push the filters past the box edge. */
+    flex-wrap: nowrap;
   }
 
   .culinary-toolbar-field {

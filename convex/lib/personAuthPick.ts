@@ -13,6 +13,10 @@
  *   4. Prefer the oldest live row (createdAt, else Convex _creationTime).
  *   5. Stable _id tie-break.
  */
+import { ConvexError } from "convex/values";
+import type { Id } from "../_generated/dataModel";
+import type { MutationCtx } from "../_generated/server";
+
 export type LivePersonCandidate = {
   _id: { toString(): string } | string;
   tenantId?: string;
@@ -95,6 +99,34 @@ export function pickLivePerson<T extends LivePersonCandidate>(
 
     return idKey(a._id).localeCompare(idKey(b._id));
   })[0]!;
+}
+
+/**
+ * One sign-in, one live Person per workspace (spec §12.1): hiring or linking
+ * a sign-in that another live staff profile already holds would fork the
+ * worker's identity, so it is refused inside the same transaction.
+ */
+export async function assertSignInUnclaimed(
+  ctx: MutationCtx,
+  personId: Id<"people">,
+): Promise<void> {
+  const person = await ctx.db.get(personId);
+  const subject = person?.authSubjectId?.trim();
+  if (!person || !subject || !isLivePerson(person)) return;
+  const holders = await ctx.db
+    .query("people")
+    .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
+    .collect();
+  const other = holders.find(
+    (row) =>
+      row._id !== personId &&
+      row.tenantId === person.tenantId &&
+      isLivePerson(row),
+  );
+  if (other)
+    throw new ConvexError(
+      `This sign-in already belongs to ${other.givenName} ${other.familyName}. Unlink it there first, or use their staff profile.`,
+    );
 }
 
 export type PersonEmailLinkDecision<T extends LivePersonCandidate> =

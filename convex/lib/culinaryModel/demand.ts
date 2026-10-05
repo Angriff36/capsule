@@ -168,6 +168,8 @@ export interface RecipeNeed {
   batchesExact: number | null;
   contentStatus: ContentStatus;
   unitStatus: UnitStatus;
+  /** Recipe edition the need was worked out from (set by the event review). */
+  editionVersion?: number | null;
 }
 
 export type UnresolvedKind =
@@ -186,6 +188,8 @@ export interface UnresolvedItem {
   refId: string;
   label: string;
   detail: string;
+  /** Plain kitchen sentence for screens (unresolvedText.ts), set by the read queries. */
+  text?: string;
 }
 
 export interface EventDishDemand {

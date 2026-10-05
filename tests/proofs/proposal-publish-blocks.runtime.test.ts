@@ -19,7 +19,8 @@ const M = api.mutations;
 
 const OVERRIDE_MESSAGE =
   "One or more catalog-linked lines have an unapproved price override. Add an override reason to each before sending (spec §5.4).";
-const NEGATIVE_QUANTITY_MESSAGE = "Line quantity cannot be negative";
+const NEGATIVE_QUANTITY_MESSAGE =
+  "This line's quantity can't be negative. Use zero or more.";
 
 const CATALOG_PRICE = 48;
 const DIVERGENT_PRICE = 60;

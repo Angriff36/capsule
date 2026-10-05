@@ -97,7 +97,8 @@ export interface CalendarSources {
   vehicles: Doc<"vehicles">[];
   serviceStyles: Doc<"serviceStyles">[];
   people: Doc<"people">[];
-  invoices: Doc<"invoices">[];
+  /** Only the number is used: the calendar shows no invoice amounts. */
+  invoices: Pick<Doc<"invoices">, "deletedAt" | "eventId" | "invoiceNumber">[];
   /** Trucks and trailers attached to the event on the tracker sheet. */
   assignments?: Doc<"eventVehicleAssignments">[];
   trailers?: Doc<"trailers">[];

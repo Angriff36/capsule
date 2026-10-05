@@ -60,10 +60,10 @@ describe("plain words on leftover admin manifests", () => {
       "Managers and admins may update assistant configuration",
       "Managers and admins may change assistant configuration",
       "Staff may change assistant uploads",
-      "Authenticated staff may update capability settings",
-      "Authenticated staff may change capability settings",
-      "Authenticated staff may update cutover decisions",
-      "Authenticated staff may change cutover decisions",
+      "Signed-in staff may update capability settings",
+      "Signed-in staff may change capability settings",
+      "Signed-in staff may update cutover decisions",
+      "Signed-in staff may change cutover decisions",
       "Workforce managers may update people",
       "Workforce managers may change people",
       "Users may update only their own email subscriptions",
@@ -96,8 +96,8 @@ describe("plain words on leftover admin manifests", () => {
       "Staff may read announcements",
       "Staff may read announcement dismissals",
       "Managers and admins may read assistant configuration",
-      "Authenticated staff may read capability settings",
-      "Authenticated staff may read cutover decisions",
+      "Signed-in staff may read capability settings",
+      "Signed-in staff may read cutover decisions",
     ]) {
       expect(visible).not.toContain(old);
     }
@@ -106,8 +106,8 @@ describe("plain words on leftover admin manifests", () => {
       "Staff may see announcements",
       "Staff may see announcement dismissals",
       "Managers and admins may see assistant configuration",
-      "Authenticated staff may see capability settings",
-      "Authenticated staff may see cutover decisions",
+      "Signed-in staff may see capability settings",
+      "Signed-in staff may see cutover decisions",
     ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);
@@ -125,18 +125,10 @@ describe("plain words on leftover admin manifests", () => {
     expect(visible).toContain(
       "Managers and admins may change assistant configuration",
     );
-    expect(visible).toContain(
-      "Authenticated staff may update capability settings",
-    );
-    expect(visible).toContain(
-      "Authenticated staff may change capability settings",
-    );
-    expect(visible).toContain(
-      "Authenticated staff may update cutover decisions",
-    );
-    expect(visible).toContain(
-      "Authenticated staff may change cutover decisions",
-    );
+    expect(visible).toContain("Signed-in staff may update capability settings");
+    expect(visible).toContain("Signed-in staff may change capability settings");
+    expect(visible).toContain("Signed-in staff may update cutover decisions");
+    expect(visible).toContain("Signed-in staff may change cutover decisions");
     expect(visible).toContain("Staff may see assistant upload registrations");
   });
 

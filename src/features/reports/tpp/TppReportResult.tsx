@@ -1,25 +1,38 @@
-import { formatTppMoney, formatTppQuantity } from "./formatters";
+import {
+  formatTppMoney,
+  formatTppPercent,
+  formatTppQuantity,
+} from "./formatters";
 import { TppReportDocument } from "./TppReportDocument";
 import { TppReportLabels } from "./TppReportLabels";
+import { TppReportSummary } from "./TppReportSummary";
+import { tppRowCount, type TppReportSummary as Summary } from "./reportSummary";
 import { TppReportTable } from "./TppReportTable";
 import type { TppReportResult as Result } from "./types";
 
-export function TppReportResult({ result }: { result: Result }) {
-  const count =
-    result.kind === "document"
-      ? result.sections.length
-      : result.kind === "labels"
-        ? result.labels.length
-        : result.rows.length;
-  if (count === 0)
+export function TppReportResult({
+  result,
+  summary,
+}: {
+  result: Result;
+  summary?: Summary;
+}) {
+  const header = (
+    <TppReportSummary summary={summary} notices={result.notices ?? []} />
+  );
+  if (tppRowCount(result) === 0)
     return (
-      <div className="document-empty tpp-result-empty">
-        <p>No matching records.</p>
-        <span>Try another event, contact, or date range.</span>
-      </div>
+      <>
+        {header}
+        <div className="document-empty tpp-result-empty">
+          <p>Nothing matches.</p>
+          <span>Try another event, contact, or date range.</span>
+        </div>
+      </>
     );
   return (
     <div className="tpp-print-area print-sheet">
+      {header}
       {result.kind === "financial" && result.measures.length ? (
         <dl className="tpp-measures">
           {result.measures.map((measure) => (
@@ -29,7 +42,7 @@ export function TppReportResult({ result }: { result: Result }) {
                 {measure.kind === "money"
                   ? formatTppMoney(measure.value)
                   : measure.kind === "percentage"
-                    ? `${formatTppQuantity(measure.value)}%`
+                    ? formatTppPercent(measure.value)
                     : formatTppQuantity(measure.value)}
               </dd>
             </div>

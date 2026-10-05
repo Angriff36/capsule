@@ -33,27 +33,27 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       {
         id: "palette",
-        label: "Open command palette",
+        label: "Open search",
         description:
-          "Jump to any section, create a record, or trigger a common action.",
+          "Jump to any section, add something new, or run a quick action.",
         keys: ["Mod", "K"],
       },
       {
         id: "shortcuts",
         label: "Show keyboard shortcuts",
-        description: "Open this searchable reference overlay.",
+        description: "Open this list of shortcuts you can search.",
         keys: ["?"],
       },
       {
         id: "escape",
         label: "Close dialog or overlay",
-        description: "Dismiss the palette, this overlay, or any open dialog.",
+        description: "Dismiss search, this overlay, or any open dialog.",
         keys: ["Esc"],
       },
     ],
   },
   {
-    group: "Command palette",
+    group: "Search",
     shortcuts: [
       {
         id: "palette-up",
@@ -67,15 +67,15 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
       },
       {
         id: "palette-enter",
-        label: "Run selected command",
-        description: "Open the highlighted result or trigger its action.",
+        label: "Open the highlighted result",
+        description: "Open the highlighted result or run its action.",
         keys: ["Enter"],
       },
       {
         id: "palette-search",
         label: "Search as you type",
         description:
-          "Filter sections and records, or ask in natural language (e.g. “unpaid invoices over 30 days”).",
+          "Filter sections and items, or type a plain question (e.g. “unpaid invoices over 30 days”).",
         keys: [],
       },
     ],

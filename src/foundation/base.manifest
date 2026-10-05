@@ -154,6 +154,13 @@ enum OrganizationStatus {
   deactivated
 }
 
+// How a route fetch treats traffic: expected traffic at the departure time,
+// or plain road time.
+enum RouteTrafficPolicy {
+  traffic_aware
+  no_traffic
+}
+
 entity Organization mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -174,13 +181,50 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // exchangeRate so reports can fold the issued total back into this code.
   property defaultCurrencyCode: string?
   property defaultExchangeRateScale: int = 6
+  // Drive-time rules (spec §8.4, PL-ROUTES): extra minutes added before the
+  // shop departure time, whether the route uses expected traffic, and how many
+  // hours a fetched route stays current. Unset reads as 15 / traffic / 24.
+  property routeSafetyBufferMinutes: int?
+  property routeTrafficPolicy: RouteTrafficPolicy?
+  property routeRefreshHours: int?
+  // Event timing rules (spec §8.4, PL-TIMING): on-site setup before serve
+  // for full and limited service, crew briefing before loading, the load
+  // time used when no load rule matches, and the load rules themselves (JSON
+  // list read by src/lib/eventTimingPolicy.ts). Unset reads as 180 / 90 / 0 /
+  // 60 and no rules.
+  property timingFullServiceSetupMinutes: int?
+  property timingLimitedServiceSetupMinutes: int?
+  property timingBriefingMinutes: int?
+  property timingLoadBaselineMinutes: int?
+  property timingLoadRulesJson: string?
+  // Planning board: how loud each check is (JSON map of check to
+  // fix | look | off, read by src/lib/planningChecks.ts). Unset = defaults.
+  property planningChecksJson: string?
+  // Event stages a person moves an event into (JSON list read by
+  // src/lib/eventStageMoves.ts). Every other stage moves on by itself when
+  // its conditions are met. Unset = only the sales lock is by hand.
+  property stageMovesByHandJson: string?
+
+  // The fields each equipment category asks for: {"Ovens": ["Fuel", "Burners"]}.
+  property equipmentFieldsJson: string?
+
+  // Client email sender (PL-OUTBOUND): the name clients see on Capsule's
+  // emails and the address their replies go to. Unset = the display name and
+  // Capsule's sending address.
+  property emailSenderName: string?
+  property emailReplyTo: string?
+
+  // Phone and website clients see at the foot of the public menu and other
+  // client papers (the printed menu book: "844-4-MANGIA · mangiacateringco.com").
+  property brandPhone: string?
+  property brandWebsite: string?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
   // tenants without a configured default continue to report in USD.
   computed functionalCurrencyCode: string = self.defaultCurrencyCode != null and length(trim(self.defaultCurrencyCode)) == 3 ? self.defaultCurrencyCode : "USD"
 
-  constraint namePresent: length(trim(self.name)) > 0 "Organization name is required"
+  constraint namePresent: length(trim(self.name)) > 0 "Give your company a name."
 
   transition status from "active" to ["suspended", "deactivated"]
   transition status from "suspended" to ["active", "deactivated"]
@@ -202,7 +246,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
-    constraint registerName: length(trim(name)) > 0 "Organization name is required"
+    constraint registerName: length(trim(name)) > 0 "Give your company a name."
     mutate name = name
     mutate brandDisplayName = brandDisplayName
     mutate brandAddress = brandAddress
@@ -222,7 +266,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   command rename(name: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint renameName: length(trim(name)) > 0 "Organization name is required"
+    constraint renameName: length(trim(name)) > 0 "Give your company a name."
     mutate name = name
     emit OrganizationRenamed {
       organizationId: self.id
@@ -271,13 +315,109 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // uppercase codes only — the same code is reused by financial reports.
   command setDefaultCurrency(currencyCode: string) {
     guard self.deletedAt == null
-    constraint setDefaultCurrencyCodeFormat: length(trim(currencyCode)) == 3 "Currency code must be a three-letter ISO 4217 code"
+    constraint setDefaultCurrencyCodeFormat: length(trim(currencyCode)) == 3 "Enter a three-letter currency code, like USD."
     compute normalizedCode = toUpperCase(currencyCode)
     mutate defaultCurrencyCode = normalizedCode
     emit OrganizationDefaultCurrencySet {
       organizationId: self.id
       tenantId: self.tenantId
       currencyCode: normalizedCode
+    }
+  }
+
+  // Company drive-time rules; the event route read and refresh use them.
+  command configureRoutePolicy(
+    safetyBufferMinutes: int,
+    trafficPolicy: RouteTrafficPolicy,
+    refreshHours: int
+  ) {
+    guard self.deletedAt == null
+    constraint routeBufferRange: safetyBufferMinutes >= 0 and safetyBufferMinutes <= 240 "Use a safety buffer from 0 to 240 minutes."
+    constraint routeRefreshRange: refreshHours >= 1 and refreshHours <= 720 "Refresh drive times every 1 to 720 hours."
+    mutate routeSafetyBufferMinutes = safetyBufferMinutes
+    mutate routeTrafficPolicy = trafficPolicy
+    mutate routeRefreshHours = refreshHours
+    emit OrganizationRoutePolicyConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+      safetyBufferMinutes: safetyBufferMinutes
+      refreshHours: refreshHours
+    }
+  }
+
+  // Company event timing rules; open events that follow them are re-planned.
+  command configureTimingPolicy(
+    fullServiceSetupMinutes: int,
+    limitedServiceSetupMinutes: int,
+    briefingMinutes: int,
+    loadBaselineMinutes: int,
+    optional loadRulesJson: string
+  ) {
+    guard self.deletedAt == null
+    constraint timingFullSetupRange: fullServiceSetupMinutes >= 0 and fullServiceSetupMinutes <= 720 "Use a full service setup time from 0 to 720 minutes."
+    constraint timingLimitedSetupRange: limitedServiceSetupMinutes >= 0 and limitedServiceSetupMinutes <= 720 "Use a limited service setup time from 0 to 720 minutes."
+    constraint timingBriefingRange: briefingMinutes >= 0 and briefingMinutes <= 240 "Use a briefing time from 0 to 240 minutes."
+    constraint timingLoadBaselineRange: loadBaselineMinutes >= 0 and loadBaselineMinutes <= 480 "Use a standard load time from 0 to 480 minutes."
+    mutate timingFullServiceSetupMinutes = fullServiceSetupMinutes
+    mutate timingLimitedServiceSetupMinutes = limitedServiceSetupMinutes
+    mutate timingBriefingMinutes = briefingMinutes
+    mutate timingLoadBaselineMinutes = loadBaselineMinutes
+    mutate timingLoadRulesJson = loadRulesJson
+    emit OrganizationTimingPolicyConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // How the planning board treats each check. Empty goes back to the defaults.
+  command configurePlanningChecks(optional checksJson: string) {
+    guard self.deletedAt == null
+    mutate planningChecksJson = checksJson
+    emit OrganizationPlanningChecksConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Which event stages stay a person's step. Empty goes back to the default.
+  command configureStageMoves(optional byHandJson: string) {
+    guard self.deletedAt == null
+    mutate stageMovesByHandJson = byHandJson
+    emit OrganizationStageMovesConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command configureEquipmentFields(optional fieldsJson: string) {
+    guard self.deletedAt == null
+    mutate equipmentFieldsJson = fieldsJson
+    emit OrganizationEquipmentFieldsConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Who client emails come from. Empty values go back to the defaults.
+  command configureEmailSender(optional senderName: string, optional replyTo: string) {
+    guard self.deletedAt == null
+    constraint configureEmailSenderReplyTo: replyTo == null or length(trim(replyTo)) == 0 or indexOf(replyTo, "@") > 0 "Enter a full email address for replies, like events@yourcompany.com."
+    mutate emailSenderName = senderName
+    mutate emailReplyTo = replyTo
+    emit OrganizationEmailSenderConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Phone and website for client papers. Empty values clear them.
+  command configureContactDetails(optional phone: string, optional website: string) {
+    guard self.deletedAt == null
+    mutate brandPhone = phone
+    mutate brandWebsite = website
+    emit OrganizationContactDetailsConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -362,6 +502,43 @@ event OrganizationDefaultCurrencySet: "organization.default_currency_set" {
   organizationId: string
   tenantId: string
   currencyCode: string
+}
+
+event OrganizationRoutePolicyConfigured: "organization.route_policy_configured" {
+  organizationId: string
+  tenantId: string
+  safetyBufferMinutes: int
+  refreshHours: int
+}
+
+event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationEquipmentFieldsConfigured: "organization.equipment_fields_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationPlanningChecksConfigured: "organization.planning_checks_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationStageMovesConfigured: "organization.stage_moves_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationEmailSenderConfigured: "organization.email_sender_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationContactDetailsConfigured: "organization.contact_details_configured" {
+  organizationId: string
+  tenantId: string
 }
 
 event OrganizationDeactivated: "organization.deactivated" {

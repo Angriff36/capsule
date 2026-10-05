@@ -34,7 +34,7 @@ entity EventTemplate mixin TenantScoped, SoftDeletable {
 
   computed isActive: boolean = self.status == "active"
 
-  constraint templateComplete: self.definedAt == null or (length(trim(self.name)) > 0 and length(trim(self.eventType)) > 0) "Defined templates require a name and event type"
+  constraint templateComplete: self.definedAt == null or (length(trim(self.name)) > 0 and length(trim(self.eventType)) > 0) "Give this template a name and an event type."
   constraint templateHeadcountRange: self.defaultHeadcount >= 1 and self.defaultHeadcount <= 100000 "Default headcount must be between 1 and 100000"
 
   transition status from "active" to ["archived"]
@@ -57,8 +57,8 @@ entity EventTemplate mixin TenantScoped, SoftDeletable {
   ) {
     guard self.definedAt == null
     guard self.deletedAt == null
-    constraint defineTemplateName: length(trim(name)) > 0 "Template name is required"
-    constraint defineTemplateEventType: length(trim(eventType)) > 0 "Event type is required"
+    constraint defineTemplateName: length(trim(name)) > 0 "Give this template a name."
+    constraint defineTemplateEventType: length(trim(eventType)) > 0 "Pick an event type."
     constraint defineTemplateHeadcount: defaultHeadcount >= 1 and defaultHeadcount <= 100000 "Default headcount must be between 1 and 100000"
     mutate name = name
     mutate clientType = clientType
@@ -92,8 +92,8 @@ entity EventTemplate mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint reviseTemplateName: length(trim(name)) > 0 "Template name is required"
-    constraint reviseTemplateEventType: length(trim(eventType)) > 0 "Event type is required"
+    constraint reviseTemplateName: length(trim(name)) > 0 "Give this template a name."
+    constraint reviseTemplateEventType: length(trim(eventType)) > 0 "Pick an event type."
     constraint reviseTemplateHeadcount: defaultHeadcount >= 1 and defaultHeadcount <= 100000 "Default headcount must be between 1 and 100000"
     mutate name = name
     mutate clientType = clientType
@@ -115,7 +115,7 @@ entity EventTemplate mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.definedAt != null
     guard self.deletedAt == null
-    constraint archiveTemplateReason: length(trim(reason)) > 0 "Archive reason is required"
+    constraint archiveTemplateReason: length(trim(reason)) > 0 "Say why you're archiving this template."
     mutate status = "archived"
     mutate archivedAt = now()
     mutate archiveReason = reason

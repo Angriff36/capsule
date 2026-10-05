@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
+  canReadCulinaryDemand,
+  unresolvedItemText,
   unresolvedKindLabel,
   useEventDemandReview,
   useReconcileEventDemand,
@@ -31,11 +33,16 @@ export function EventUnresolvedMaterialsNotice({
 }: {
   eventId: string;
 }) {
-  const review = useEventDemandReview(eventId);
+  const authStatus = useAuthStatus();
+  // Roles the server does not let read demand see nothing here rather than
+  // a refused read breaking the screen.
+  const review = useEventDemandReview(
+    eventId,
+    canReadCulinaryDemand(authStatus?.role),
+  );
   const reconcile = useReconcileEventDemand();
   // Recalculating writes purchasing rows, which need inventory or manager
   // access; only offer the button to roles the commands will accept.
-  const authStatus = useAuthStatus();
   const canRecalculate = RECALCULATE_ROLES.has(authStatus?.role ?? "");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -127,7 +134,7 @@ export function EventUnresolvedMaterialsNotice({
                 key={`${item.kind}:${item.eventDishId}:${item.refId}`}
                 className="text-base text-ink-2"
               >
-                {item.label} — {item.detail}
+                {unresolvedItemText(item)}
               </li>
             ))}
           </ul>

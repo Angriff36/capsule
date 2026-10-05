@@ -63,15 +63,26 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
   property required status: EventCloseoutStatus = "draft"
   property capturedAt: datetime?
   property finalizedAt: datetime?
+  // PL-CLOSEOUT (BE-15.3, AC-625/626): the records behind each number, as
+  // JSON from convex/closeoutSources.ts (ids, versions, amounts, and which
+  // lines are still incomplete). Frozen with the numbers at finalize.
+  property sourceSnapshot: string?
+  // 0 = draft, 1 = first finalized result, +1 per audited correction. Each
+  // result stays in the event ledger (EventCloseoutFinalized /
+  // EventCloseoutCorrected carry the full numbers and sources). Optional so
+  // closeouts saved before this field read as 0 / 1 without a backfill.
+  property revision: int?
+  property correctionReason: string?
+  property correctedAt: datetime?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint closeoutCapturedMoneyNonnegative: self.capturedAt == null or (self.actualRevenue >= 0 and self.budgetedRevenue >= 0 and self.actualIngredientCost >= 0 and self.actualWasteCost >= 0 and self.actualLaborCost >= 0 and self.actualVendorCost >= 0 and self.budgetedCost >= 0 and self.totalActualCost >= 0) "Captured closeout money amounts cannot be negative"
-  constraint closeoutTotalCostConsistent: self.capturedAt == null or self.totalActualCost == self.actualIngredientCost + self.actualWasteCost + self.actualLaborCost + self.actualVendorCost "Total actual cost must equal ingredient plus waste plus labor plus vendor costs"
-  constraint closeoutRevenueVarianceConsistent: self.capturedAt == null or self.revenueVariance == self.budgetedRevenue - self.actualRevenue "Revenue variance must equal budgeted revenue minus actual revenue"
-  constraint closeoutCostVarianceConsistent: self.capturedAt == null or self.costVariance == self.budgetedCost - self.totalActualCost "Cost variance must equal budgeted cost minus total actual cost"
-  constraint closeoutGrossProfitConsistent: self.capturedAt == null or self.grossProfit == self.actualRevenue - self.totalActualCost "Gross profit must equal actual revenue minus total actual cost"
-  constraint closeoutHeadcountNonnegative: self.capturedAt == null or (self.expectedHeadcount >= 0 and self.actualHeadcount >= 0) "Headcount values cannot be negative"
+  constraint closeoutCapturedMoneyNonnegative: self.capturedAt == null or (self.actualRevenue >= 0 and self.budgetedRevenue >= 0 and self.actualIngredientCost >= 0 and self.actualWasteCost >= 0 and self.actualLaborCost >= 0 and self.actualVendorCost >= 0 and self.budgetedCost >= 0 and self.totalActualCost >= 0) "This closeout's money amounts can't be negative. Use zero or more."
+  constraint closeoutTotalCostConsistent: self.capturedAt == null or self.totalActualCost == self.actualIngredientCost + self.actualWasteCost + self.actualLaborCost + self.actualVendorCost "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
+  constraint closeoutRevenueVarianceConsistent: self.capturedAt == null or self.revenueVariance == self.budgetedRevenue - self.actualRevenue "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
+  constraint closeoutCostVarianceConsistent: self.capturedAt == null or self.costVariance == self.budgetedCost - self.totalActualCost "This closeout's cost variance has to equal budgeted cost minus total actual cost."
+  constraint closeoutGrossProfitConsistent: self.capturedAt == null or self.grossProfit == self.actualRevenue - self.totalActualCost "This closeout's gross profit has to equal actual revenue minus total actual cost."
+  constraint closeoutHeadcountNonnegative: self.capturedAt == null or (self.expectedHeadcount >= 0 and self.actualHeadcount >= 0) "This closeout's headcount numbers can't be negative. Use zero or more."
 
   transition status from "draft" to ["finalized"]
   transition status from "finalized" to []
@@ -97,19 +108,20 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     actualHeadcount: number,
     optional unresolvedIssues: string,
     optional performanceNotes: string,
-    optional notes: string
+    optional notes: string,
+    optional sourceSnapshot: string
   ) {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.event != null
     guard self.event.stage == "closed_out"
-    constraint captureEventMatch: eventId == self.eventId "Capture eventId must match the seeded event reference"
-    constraint captureMoneyNonnegative: actualRevenue >= 0 and budgetedRevenue >= 0 and actualIngredientCost >= 0 and actualWasteCost >= 0 and actualLaborCost >= 0 and actualVendorCost >= 0 and budgetedCost >= 0 and totalActualCost >= 0 "Closeout money amounts cannot be negative"
-    constraint captureTotalCost: totalActualCost == actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost "Total actual cost must equal ingredient plus waste plus labor plus vendor costs"
-    constraint captureRevenueVariance: revenueVariance == budgetedRevenue - actualRevenue "Revenue variance must equal budgeted revenue minus actual revenue"
-    constraint captureCostVariance: costVariance == budgetedCost - totalActualCost "Cost variance must equal budgeted cost minus total actual cost"
-    constraint captureGrossProfit: grossProfit == actualRevenue - totalActualCost "Gross profit must equal actual revenue minus total actual cost"
-    constraint captureHeadcountNonnegative: expectedHeadcount >= 0 and actualHeadcount >= 0 "Headcount values cannot be negative"
+    constraint captureEventMatch: eventId == self.eventId "This closeout is for a different event. Pick the event already on this closeout."
+    constraint captureMoneyNonnegative: actualRevenue >= 0 and budgetedRevenue >= 0 and actualIngredientCost >= 0 and actualWasteCost >= 0 and actualLaborCost >= 0 and actualVendorCost >= 0 and budgetedCost >= 0 and totalActualCost >= 0 "This closeout's money amounts can't be negative. Use zero or more."
+    constraint captureTotalCost: totalActualCost == actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
+    constraint captureRevenueVariance: revenueVariance == budgetedRevenue - actualRevenue "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
+    constraint captureCostVariance: costVariance == budgetedCost - totalActualCost "This closeout's cost variance has to equal budgeted cost minus total actual cost."
+    constraint captureGrossProfit: grossProfit == actualRevenue - totalActualCost "This closeout's gross profit has to equal actual revenue minus total actual cost."
+    constraint captureHeadcountNonnegative: expectedHeadcount >= 0 and actualHeadcount >= 0 "This closeout's headcount numbers can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate actualRevenue = actualRevenue
     mutate budgetedRevenue = budgetedRevenue
@@ -127,6 +139,7 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     mutate unresolvedIssues = unresolvedIssues
     mutate performanceNotes = performanceNotes
     mutate notes = notes
+    mutate sourceSnapshot = sourceSnapshot
     mutate capturedAt = now()
     emit EventCloseoutCaptured {
       closeoutId: self.id
@@ -140,6 +153,33 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // AC-388 closeout draft slice: Event.correctCommercial restates the budget
+  // after closeOut. A draft still in the zero-actual shape the EventClosedOut
+  // reaction seeded follows the corrected budget; a draft finance already
+  // captured, and a finalized closeout, are never rewritten here.
+  // Server-only (private): the seam runs it as the tenant system (AC-372).
+  private command followEventCommercial(budgetedRevenue: money(12, 2), budgetedCost: money(12, 2)) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.actualRevenue == 0 and self.totalActualCost == 0 and self.actualHeadcount == 0
+    constraint followCommercialNonnegative: budgetedRevenue >= 0 and budgetedCost >= 0 "This closeout's money amounts can't be negative. Use zero or more."
+    compute previousBudgetedRevenue = self.budgetedRevenue
+    compute previousBudgetedCost = self.budgetedCost
+    mutate budgetedRevenue = budgetedRevenue
+    mutate revenueVariance = budgetedRevenue
+    mutate budgetedCost = budgetedCost
+    mutate costVariance = budgetedCost
+    emit EventCloseoutCommercialFollowed {
+      closeoutId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      previousBudgetedRevenue: previousBudgetedRevenue
+      budgetedRevenue: budgetedRevenue
+      previousBudgetedCost: previousBudgetedCost
+      budgetedCost: budgetedCost
+    }
+  }
+
   command finalize() {
     guard self.status == "draft"
     guard self.capturedAt != null
@@ -147,6 +187,7 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "financeManageAccess")
     mutate status = "finalized"
     mutate finalizedAt = now()
+    mutate revision = 1
     emit EventCloseoutFinalized {
       closeoutId: self.id
       tenantId: self.tenantId
@@ -157,6 +198,99 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
       revenueVariance: self.revenueVariance
       costVariance: self.costVariance
       status: "finalized"
+      revision: 1
+      budgetedRevenue: self.budgetedRevenue
+      budgetedCost: self.budgetedCost
+      actualIngredientCost: self.actualIngredientCost
+      actualWasteCost: self.actualWasteCost
+      actualLaborCost: self.actualLaborCost
+      actualVendorCost: self.actualVendorCost
+      expectedHeadcount: self.expectedHeadcount
+      actualHeadcount: self.actualHeadcount
+      sourceSnapshot: self.sourceSnapshot
+    }
+  }
+
+  // PL-CLOSEOUT (BE-15.3, AC-626): an audited correction of a finalized
+  // closeout. It needs a reason and a finance manager, gives the next
+  // revision number, and its ledger event carries both the numbers it
+  // replaced and the new ones, so every earlier result stays readable
+  // (convex/closeoutSources.ts closeoutResults).
+  command correct(
+    reason: string,
+    actualRevenue: money(12, 2),
+    budgetedRevenue: money(12, 2),
+    revenueVariance: money(12, 2),
+    actualIngredientCost: money(12, 2),
+    actualWasteCost: money(12, 2),
+    actualLaborCost: money(12, 2),
+    actualVendorCost: money(12, 2),
+    budgetedCost: money(12, 2),
+    totalActualCost: money(12, 2),
+    costVariance: money(12, 2),
+    grossProfit: money(12, 2),
+    expectedHeadcount: number,
+    actualHeadcount: number,
+    optional sourceSnapshot: string
+  ) {
+    guard self.status == "finalized"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "financeManageAccess")
+    constraint correctReasonRequired: length(trim(reason)) > 0 "Say why this closeout is being corrected."
+    constraint correctMoneyNonnegative: actualRevenue >= 0 and budgetedRevenue >= 0 and actualIngredientCost >= 0 and actualWasteCost >= 0 and actualLaborCost >= 0 and actualVendorCost >= 0 and budgetedCost >= 0 and totalActualCost >= 0 "This closeout's money amounts can't be negative. Use zero or more."
+    constraint correctTotalCost: totalActualCost == actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
+    constraint correctRevenueVariance: revenueVariance == budgetedRevenue - actualRevenue "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
+    constraint correctCostVariance: costVariance == budgetedCost - totalActualCost "This closeout's cost variance has to equal budgeted cost minus total actual cost."
+    constraint correctGrossProfit: grossProfit == actualRevenue - totalActualCost "This closeout's gross profit has to equal actual revenue minus total actual cost."
+    constraint correctHeadcountNonnegative: expectedHeadcount >= 0 and actualHeadcount >= 0 "This closeout's headcount numbers can't be negative. Use zero or more."
+    compute nextRevision = (self.revision != null ? self.revision : 1) + 1
+    compute previousActualRevenue = self.actualRevenue
+    compute previousTotalActualCost = self.totalActualCost
+    compute previousGrossProfit = self.grossProfit
+    compute previousActualHeadcount = self.actualHeadcount
+    compute previousSourceSnapshot = self.sourceSnapshot
+    mutate actualRevenue = actualRevenue
+    mutate budgetedRevenue = budgetedRevenue
+    mutate revenueVariance = revenueVariance
+    mutate actualIngredientCost = actualIngredientCost
+    mutate actualWasteCost = actualWasteCost
+    mutate actualLaborCost = actualLaborCost
+    mutate actualVendorCost = actualVendorCost
+    mutate budgetedCost = budgetedCost
+    mutate totalActualCost = totalActualCost
+    mutate costVariance = costVariance
+    mutate grossProfit = grossProfit
+    mutate expectedHeadcount = expectedHeadcount
+    mutate actualHeadcount = actualHeadcount
+    mutate sourceSnapshot = sourceSnapshot
+    mutate revision = nextRevision
+    mutate correctionReason = reason
+    mutate correctedAt = now()
+    emit EventCloseoutCorrected {
+      closeoutId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      revision: nextRevision
+      reason: reason
+      previousActualRevenue: previousActualRevenue
+      previousTotalActualCost: previousTotalActualCost
+      previousGrossProfit: previousGrossProfit
+      previousActualHeadcount: previousActualHeadcount
+      previousSourceSnapshot: previousSourceSnapshot
+      actualRevenue: actualRevenue
+      budgetedRevenue: budgetedRevenue
+      budgetedCost: budgetedCost
+      actualIngredientCost: actualIngredientCost
+      actualWasteCost: actualWasteCost
+      actualLaborCost: actualLaborCost
+      actualVendorCost: actualVendorCost
+      totalActualCost: totalActualCost
+      revenueVariance: revenueVariance
+      costVariance: costVariance
+      grossProfit: grossProfit
+      expectedHeadcount: expectedHeadcount
+      actualHeadcount: actualHeadcount
+      sourceSnapshot: sourceSnapshot
     }
   }
 
@@ -174,6 +308,16 @@ event EventCloseoutCaptured: "event_closeout.captured" {
   status: string
 }
 
+event EventCloseoutCommercialFollowed: "event_closeout.commercial_followed" {
+  closeoutId: string
+  tenantId: string
+  eventId: string
+  previousBudgetedRevenue: money(12, 2)
+  budgetedRevenue: money(12, 2)
+  previousBudgetedCost: money(12, 2)
+  budgetedCost: money(12, 2)
+}
+
 event EventCloseoutFinalized: "event_closeout.finalized" {
   closeoutId: string
   tenantId: string
@@ -184,4 +328,41 @@ event EventCloseoutFinalized: "event_closeout.finalized" {
   revenueVariance: money(12, 2)
   costVariance: money(12, 2)
   status: string
+  revision: number
+  budgetedRevenue: money(12, 2)
+  budgetedCost: money(12, 2)
+  actualIngredientCost: money(12, 2)
+  actualWasteCost: money(12, 2)
+  actualLaborCost: money(12, 2)
+  actualVendorCost: money(12, 2)
+  expectedHeadcount: number
+  actualHeadcount: number
+  sourceSnapshot: string?
+}
+
+event EventCloseoutCorrected: "event_closeout.corrected" {
+  closeoutId: string
+  tenantId: string
+  eventId: string
+  revision: number
+  reason: string
+  previousActualRevenue: money(12, 2)
+  previousTotalActualCost: money(12, 2)
+  previousGrossProfit: money(12, 2)
+  previousActualHeadcount: number
+  previousSourceSnapshot: string?
+  actualRevenue: money(12, 2)
+  budgetedRevenue: money(12, 2)
+  budgetedCost: money(12, 2)
+  actualIngredientCost: money(12, 2)
+  actualWasteCost: money(12, 2)
+  actualLaborCost: money(12, 2)
+  actualVendorCost: money(12, 2)
+  totalActualCost: money(12, 2)
+  revenueVariance: money(12, 2)
+  costVariance: money(12, 2)
+  grossProfit: money(12, 2)
+  expectedHeadcount: number
+  actualHeadcount: number
+  sourceSnapshot: string?
 }

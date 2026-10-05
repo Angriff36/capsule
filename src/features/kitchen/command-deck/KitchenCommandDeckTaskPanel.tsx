@@ -6,6 +6,7 @@ import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
 import { eventDetailMenuPath, componentPath } from "../kitchenRoutes";
 import { displayEventMenuNotes } from "../../events/eventMenuLineFields";
 import { prepQuantityLabel } from "../prepQuantityLabel";
+import { NO_PREP_TIME } from "../prepTiming";
 import {
   commandDeckFilterNoun,
   type KitchenCommandDeckModel,
@@ -385,7 +386,7 @@ function TaskRow({
           <dd>
             {task.dueAt != null
               ? `${formatDate(task.dueAt)} ${formatTime(task.dueAt)}`
-              : "—"}
+              : NO_PREP_TIME}
           </dd>
         </div>
         <div>

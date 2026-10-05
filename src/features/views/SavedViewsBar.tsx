@@ -36,15 +36,19 @@ export function SavedViewsBar<S>({
   const appliedDefault = useRef(false);
 
   // Run a saved-view mutation, surfacing failures instead of a silent no-op.
-  // (Persistence currently depends on the SavedReportDefinition.ownerId fix,
-  // issue #24 — until it lands, saves report a clear error rather than vanish.)
-  const guardedRun = async (work: () => Promise<void>) => {
+  // The message names the action that failed and gives the reason.
+  const guardedRun = async (
+    work: () => Promise<void>,
+    failed = "Couldn't save your view.",
+  ) => {
     setError(null);
     setBusy(true);
     try {
       await work();
-    } catch {
-      setError("Couldn't save your view. Please try again.");
+    } catch (cause) {
+      setError(
+        `${failed} ${cause instanceof Error ? cause.message : "Please try again."}`,
+      );
     } finally {
       setBusy(false);
     }
@@ -116,7 +120,12 @@ export function SavedViewsBar<S>({
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() => guardedRun(() => setDefault(current.id))}
+              onClick={() =>
+                guardedRun(
+                  () => setDefault(current.id),
+                  "Couldn't make this your default view.",
+                )
+              }
               disabled={busy}
             >
               Set default
@@ -137,7 +146,7 @@ export function SavedViewsBar<S>({
                 await guardedRun(async () => {
                   await remove(current.id);
                   setSelected("");
-                });
+                }, "Couldn't delete this view.");
               })();
             }}
             disabled={busy}

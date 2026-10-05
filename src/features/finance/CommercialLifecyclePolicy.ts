@@ -71,7 +71,14 @@ const PAYMENT_ACTIONS = [
   },
   { key: "settle", label: "Settle", lifecycle: PaymentSettleLifecycle },
   { key: "fail", label: "Mark failed", lifecycle: PaymentFailLifecycle },
-  { key: "refund", label: "Refund", lifecycle: PaymentRefundLifecycle },
+  { key: "refund", label: "Refund all", lifecycle: PaymentRefundLifecycle },
+  // Part refund, card dispute or bounced bank payment: offered on the same
+  // settled payments as a full refund.
+  {
+    key: "reverse",
+    label: "Take money back",
+    lifecycle: PaymentRefundLifecycle,
+  },
 ] as const;
 
 export class CommercialLifecyclePolicy {

@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import {
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
 } from "../../lib/manifest-convex-react";
+import {
+  useAllEventReportRows,
+  type EventLookupRow,
+} from "../facilities/useEventsById";
 import { TableSkeleton } from "../../ui/primitives";
 
 const TOP_N = 12;
@@ -37,7 +40,9 @@ export type SeasonalForecast = {
 // summing pounds into liters.
 export function computeSeasonalForecast(
   demands: ReturnType<typeof useListIngredientDemand>,
-  events: ReturnType<typeof useListEvent>,
+  events:
+    | ReadonlyArray<Pick<EventLookupRow, "_id" | "startsAt" | "deletedAt">>
+    | undefined,
   ingredients: ReturnType<typeof useListIngredient>,
   now: number,
 ): SeasonalForecast {
@@ -114,7 +119,7 @@ function formatQuantity(value: number): string {
 
 export function SeasonalDemandForecast() {
   const demands = useListIngredientDemand();
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const ingredients = useListIngredient();
   const [open, setOpen] = useState(false);
 

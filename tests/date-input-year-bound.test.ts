@@ -9,6 +9,8 @@
  * bounded components stop capping at a 4-digit year, or because a bare native
  * date input reappears in authored UI without the bound.
  */
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -46,6 +48,25 @@ describe("bounded date inputs (issue #148)", () => {
       createElement(BoundedDateInput, { name: "rangeStart", max: "" }),
     );
     expect(html).toContain(`max="${MAX_DATE_INPUT_VALUE}"`);
+  });
+});
+
+describe("no screen renders an unbounded date box (AC-052)", () => {
+  it("every date and date-time box in src/features goes through the bounded inputs or carries its own max", () => {
+    const root = join(__dirname, "../src/features");
+    const files = readdirSync(root, { recursive: true, encoding: "utf8" })
+      .filter((file) => file.endsWith(".tsx"))
+      .map((file) => join(root, file));
+    const bare: string[] = [];
+    for (const file of files) {
+      const text = readFileSync(file, "utf8");
+      for (const match of text.matchAll(
+        /<input\b[^>]*?type="(?:date|datetime-local)"[^>]*?\/?>/gs,
+      )) {
+        if (!/\bmax=/.test(match[0])) bare.push(file);
+      }
+    }
+    expect(bare).toEqual([]);
   });
 });
 

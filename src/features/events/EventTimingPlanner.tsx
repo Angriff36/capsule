@@ -9,6 +9,9 @@ import {
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { EventDriveTimePanel } from "./EventDriveTimePanel";
+import { EventRouteLegsPanel } from "./EventRouteLegsPanel";
+import { EventTimingRulesPanel } from "./EventTimingRulesPanel";
 import {
   durationFields,
   startDraft,
@@ -82,12 +85,16 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
         : draft.serviceStartsAt
           ? new Date(draft.serviceStartsAt).getTime()
           : undefined;
+    const reason = (value: string | undefined) =>
+      value && value.trim() ? value.trim() : undefined;
     const ok = await run(() =>
       save({
         docId: eventId,
         version: draft.version,
         serviceStartsAt: startsAt,
         ...durations,
+        setupOverrideReason: reason(draft.setupOverrideReason),
+        loadOverrideReason: reason(draft.loadOverrideReason),
       }),
     );
     if (ok) {
@@ -144,6 +151,17 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
           available for corrections.
         </p>
       )}
+      <EventDriveTimePanel
+        eventId={eventId}
+        operatingLocationId={plan.event.operatingLocationId ?? null}
+        version={plan.event.version}
+        canChange={plan.event.timingCanRecalculate}
+      />
+      <EventTimingRulesPanel
+        eventId={eventId}
+        version={plan.event.version}
+        canChange={plan.event.timingCanRecalculate}
+      />
       {failure && (
         <div className="mt-3">
           <FailureBanner failure={failure} />
@@ -201,6 +219,44 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
                 </span>
               </label>
             ))}
+            {(
+              [
+                [
+                  "setupMinutes",
+                  "setupOverrideReason",
+                  plan.event.timingSetupMinutes,
+                  "setup",
+                ],
+                [
+                  "loadMinutes",
+                  "loadOverrideReason",
+                  plan.event.timingLoadMinutes,
+                  "load",
+                ],
+              ] as const
+            )
+              .filter(
+                ([field, , stored]) =>
+                  draft[field].trim() !== "" &&
+                  draft[field].trim() !== String(stored ?? ""),
+              )
+              .map(([, reasonKey, , label]) => (
+                <label
+                  className="field-label sm:col-span-2 lg:col-span-3"
+                  key={reasonKey}
+                >
+                  <span>Why a different {label} time? (optional)</span>
+                  <input
+                    className="input min-h-10 w-full"
+                    name={reasonKey}
+                    value={draft[reasonKey] ?? ""}
+                    onChange={(e) =>
+                      setDraft({ ...draft, [reasonKey]: e.target.value })
+                    }
+                    placeholder="For example: tent goes up on site"
+                  />
+                </label>
+              ))}
             <div className="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-3">
               <button type="submit" className="btn btn-primary">
                 {busy ? "Saving…" : "Save timing"}
@@ -313,6 +369,10 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
               );
             })}
           </ul>
+          <EventRouteLegsPanel
+            eventId={eventId}
+            canChange={plan.event.timingCanRecalculate}
+          />
         </>
       )}
     </section>

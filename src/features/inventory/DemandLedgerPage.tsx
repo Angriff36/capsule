@@ -1,11 +1,10 @@
 import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
   useIngredientDemandSupersede,
-  useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListPurchaseNeed,
@@ -25,6 +24,7 @@ import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { useWorkingEventId } from "../events/workingEvent";
 import { IngredientDemandProvenancePanel } from "./IngredientDemandProvenancePanel";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const UNITS = [
   "each",
@@ -48,7 +48,9 @@ const policy = new SupplyLifecyclePolicy();
 export function DemandLedgerPage() {
   const workingId = useWorkingEventId();
   const demands = useListIngredientDemand();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    demands ? [workingId, ...demands.map((row) => row.eventId)] : undefined,
+  );
   const ingredients = useListIngredient();
   const purchaseNeeds = useListPurchaseNeed();
   const createDemand = useCreateIngredientDemand();
@@ -63,9 +65,18 @@ export function DemandLedgerPage() {
   const [expandedDemandId, setExpandedDemandId] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const activeDemands = (demands ?? []).filter(
-    (demand) => demand.deletedAt == null,
-  );
+  const eventStart = (id: string) =>
+    events?.find((event) => event._id === id)?.startsAt ?? null;
+  // Grouped by event, soonest event first, so each block reads as
+  // "this event needs these ingredients".
+  const activeDemands = (demands ?? [])
+    .filter((demand) => demand.deletedAt == null)
+    .sort(
+      (a, b) =>
+        Number(eventStart(a.eventId) ?? Infinity) -
+          Number(eventStart(b.eventId) ?? Infinity) ||
+        a.eventId.localeCompare(b.eventId),
+    );
   const anomalies = useMemo(
     () => computeDemandAnomalies(demands, events, thresholdPct / 100),
     [demands, events, thresholdPct],
@@ -146,7 +157,7 @@ export function DemandLedgerPage() {
         </div>
         <div className="supply-masthead-actions">
           <label className="field-label" style={{ marginBottom: 0 }}>
-            Anomaly threshold
+            Flag amounts off from past events by
             <select
               className="input"
               value={thresholdPct}
@@ -296,7 +307,7 @@ export function DemandLedgerPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Event</th>
@@ -308,16 +319,37 @@ export function DemandLedgerPage() {
                 </tr>
               </thead>
               <tbody>
-                {activeDemands.map((demand) => {
+                {activeDemands.map((demand, index) => {
                   const need = existingNeed(demand._id);
                   const actions = policy.demandActions(String(demand.status));
                   const expanded = expandedDemandId === demand._id;
+                  const firstOfEvent =
+                    index === 0 ||
+                    activeDemands[index - 1].eventId !== demand.eventId;
+                  const lineCount = activeDemands.filter(
+                    (line) => line.eventId === demand.eventId,
+                  ).length;
                   return (
                     <Fragment key={demand._id}>
+                      {firstOfEvent ? (
+                        <tr className="bg-inset">
+                          <td colSpan={6}>
+                            <Link
+                              to={`/events/${demand.eventId}`}
+                              className="font-semibold text-ink hover:underline"
+                            >
+                              {eventName(demand.eventId)}
+                            </Link>{" "}
+                            <span className="text-ink-2">
+                              · {formatDate(eventStart(demand.eventId))} ·{" "}
+                              {formatCountNoun(lineCount, "ingredient")} needed
+                            </span>
+                          </td>
+                        </tr>
+                      ) : null}
                       <tr>
-                        <td>
+                        <td className="phone-hide">
                           <strong>{eventName(demand.eventId)}</strong>
-                          <small>{demand.eventId.slice(-8)}</small>
                         </td>
                         <td>
                           {(() => {
@@ -343,14 +375,14 @@ export function DemandLedgerPage() {
                             );
                           })()}
                         </td>
-                        <td className="supply-number">
+                        <td className="supply-number" data-label="Required">
                           {demand.requiredQuantity} {demand.unit}
                           {(() => {
                             const anomaly = anomalies.get(demand._id);
                             if (!anomaly) return null;
                             return (
                               <span
-                                className="chip ml-2 border-warn/40 bg-warn-soft text-warn"
+                                className="chip ml-2 chip-tone-warn"
                                 data-testid="demand-anomaly-flag"
                                 title={`Historical avg ${anomaly.expectedQuantity.toFixed(
                                   2,
@@ -366,10 +398,10 @@ export function DemandLedgerPage() {
                             );
                           })()}
                         </td>
-                        <td>
+                        <td data-label="State">
                           <StatusChip status={String(demand.status)} />
                         </td>
-                        <td>
+                        <td data-label="Purchase">
                           {need ? (
                             <StatusChip status={String(need.status)} />
                           ) : (

@@ -29,10 +29,12 @@ import {
 } from "./IngredientPriceHistory";
 import { IngredientPriceTrendPanel } from "./IngredientPriceTrendPanel";
 import { VendorPriceComparisonPanel } from "./VendorPriceComparisonPanel";
+import { VendorItemsPanel } from "./VendorItemsPanel";
 import { IngredientCostingEditor } from "./IngredientCostingEditor";
 import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
 import { IngredientMergeControl } from "./IngredientMergeControl";
 import { IngredientNutritionEditor } from "./IngredientNutritionEditor";
+import { IngredientStorageEditor } from "./IngredientStorageEditor";
 import { IngredientSubstitutionEditor } from "./IngredientSubstitutionEditor";
 import { ItemUnitMappingsPanel } from "./ItemUnitMappingsPanel";
 import { kitchenCatalogPath } from "./kitchenRoutes";
@@ -539,9 +541,7 @@ export function IngredientDetailPage() {
             <dt>Allergens</dt>
             <dd>
               {ingredient.isGlutenFree ? (
-                <span className="chip border-ok/40 bg-ok-soft text-ok mr-2">
-                  Gluten free
-                </span>
+                <span className="chip chip-tone-ok mr-2">Gluten free</span>
               ) : null}
               {(ingredient.allergens ?? []).length
                 ? (ingredient.allergens ?? []).join(", ")
@@ -581,6 +581,12 @@ export function IngredientDetailPage() {
         onFailure={setFailure}
       />
 
+      <IngredientStorageEditor
+        key={`storage:${ingredient._id}:${ingredient.version}`}
+        ingredient={ingredient}
+        onFailure={setFailure}
+      />
+
       <IngredientNutritionEditor
         key={`nutrition:${ingredient._id}:${ingredient.version}`}
         ingredient={ingredient}
@@ -600,6 +606,13 @@ export function IngredientDetailPage() {
         version={ingredient.version}
         preferredVendorIds={ingredient.preferredVendorIds}
         legacyPreferredVendorId={ingredient.preferredVendorId}
+        vendors={vendors}
+        onFailure={setFailure}
+      />
+
+      <VendorItemsPanel
+        ingredientId={ingredient._id}
+        ingredientUnit={String(ingredient.unit)}
         vendors={vendors}
         onFailure={setFailure}
       />

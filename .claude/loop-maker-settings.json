@@ -1,10 +1,50 @@
 {
-  "attribution": { "commit": "", "pr": "" },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
-    "allow": ["Bash(git fetch *)", "Bash(bash scripts/loop-worktree-sweep.sh)"],
+    "allow": [
+      "Bash(git fetch *)",
+      "Bash(git worktree add .loop-worktrees/batch-* -b loop/batch-* origin/dev)",
+      "Bash(bash scripts/loop-worktree-sweep.sh)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**)",
+      "Edit(//c/Projects/capsule/STATE.md)",
+      "Edit(//c/Projects/capsule/loop-run-log.md)",
+      "Edit(//c/Projects/capsule/loop-ledger.json)",
+      "Bash(git mv *)",
+      "Bash(git rm *)",
+      "Read(//c/Projects/capsule/.loop-worktrees/**)",
+      "Bash(git -C *.loop-worktrees* status*)",
+      "Bash(git -C *.loop-worktrees* log*)",
+      "Bash(git -C *.loop-worktrees* diff*)",
+      "Bash(git -C *.loop-worktrees* show*)",
+      "Bash(git -C *.loop-worktrees* rev-parse*)",
+      "Bash(git -C *.loop-worktrees* add *)",
+      "Bash(git -C *.loop-worktrees* commit *)",
+      "Bash(git -C *.loop-worktrees* merge *)",
+      "Bash(git -C *.loop-worktrees* mv *)",
+      "Bash(git -C *.loop-worktrees* rm *)",
+      "Bash(bunx vitest *)",
+      "Bash(bunx tsc *)",
+      "Bash(bunx prettier *)",
+      "Bash(bun run --cwd *.loop-worktrees* *)",
+      "Bash(bash scripts/loop-rm.sh *)"
+    ],
     "deny": [
       "Bash(git push *)",
       "Bash(git -C * push *)",
+      "Bash(git -C *../*)",
+      "Bash(git -C *..\\*)",
+      "Bash(git -C *.. *)",
+      "Bash(rm *../*)",
+      "Bash(rm *..\\*)",
+      "Bash(rm *..)",
+      "Bash(rm *.. *)",
+      "Bash(bun run --cwd *../*)",
+      "Bash(bun run --cwd *..\\*)",
+      "Bash(bun run --cwd *.. *)",
+      "Bash(bun run --cwd * deploy*)",
       "Bash(gh pr create *)",
       "Bash(gh pr merge *)",
       "Bash(gh pr ready *)",
@@ -14,11 +54,13 @@
       "Bash(bash scripts/deploy*)",
       "Bash(bunx convex deploy*)",
       "Bash(bun run deploy*)",
-      "Edit(.claude/**)",
-      "Edit(.githooks/**)",
-      "Edit(.loop-worktrees/**/.githooks/**)",
-      "Edit(.loop-worktrees/**/.claude/**)",
-      "Edit(loop-constraints.md)"
+      "Edit(//c/Projects/capsule/.claude/**)",
+      "Edit(//c/Projects/capsule/.githooks/**)",
+      "Edit(//c/Projects/capsule/loop-constraints.md)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.claude/**)",
+      "Edit(//c/Projects/capsule/.loop-worktrees/**/.githooks/**)",
+      "Bash(*loop-repair-apply*)",
+      "Bash(*LOOP_REPAIR*)"
     ]
   }
 }

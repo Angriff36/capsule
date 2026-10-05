@@ -107,7 +107,7 @@ export function ClientContactsPanel({
             <p>No active contacts.</p>
           </div>
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Name</th>

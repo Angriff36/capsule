@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { formatMoney } from "../../lib/format";
-import type { MarginCostBucket } from "./EventMarginBreakdown";
+import { marginLabel, type MarginCostBucket } from "./EventMarginBreakdown";
 
 function AsideCard({
   title,
@@ -61,6 +61,7 @@ export function EventMarginSummaryAside({
   totalCost,
   grossProfit,
   marginPct,
+  costsIncomplete = false,
   headcount,
   buckets,
   budget,
@@ -70,6 +71,7 @@ export function EventMarginSummaryAside({
   totalCost: number;
   grossProfit: number | null;
   marginPct: number | null;
+  costsIncomplete?: boolean;
   headcount: number | null;
   buckets: readonly MarginCostBucket[];
   budget: number | null;
@@ -79,7 +81,7 @@ export function EventMarginSummaryAside({
     .filter((bucket) => bucket.amount > 0)
     .sort((left, right) => right.amount - left.amount);
   const profitTone =
-    grossProfit == null
+    grossProfit == null || (costsIncomplete && grossProfit >= 0)
       ? "text-ink-3"
       : grossProfit < 0
         ? "text-danger"
@@ -101,9 +103,7 @@ export function EventMarginSummaryAside({
               </span>
             </div>
             <p className={`mt-0.5 text-right font-mono text-xs ${profitTone}`}>
-              {marginPct == null
-                ? "Margin needs revenue"
-                : `${marginPct.toFixed(1)}% margin`}
+              {marginLabel(marginPct, costsIncomplete)}
             </p>
           </div>
         </div>

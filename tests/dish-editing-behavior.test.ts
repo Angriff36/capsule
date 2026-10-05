@@ -130,3 +130,92 @@ it("converts a batch prep quantity to per-guest storage and retains only the int
   await submit(container.querySelector("form")!);
   expect(add).toHaveBeenCalledTimes(1);
 });
+
+function kitchenStations() {
+  backend.values.set("useListStation", [
+    {
+      _id: "station-kitchen",
+      name: "Finish at Kitchen",
+      aliases: ["FAK", null],
+      sortOrder: 1,
+      status: "active",
+      definedAt: 1,
+    },
+    {
+      _id: "station-old",
+      name: "Old Grill",
+      aliases: [],
+      sortOrder: 0,
+      status: "retired",
+      definedAt: 1,
+    },
+  ]);
+}
+
+it("offers the kitchen stations and saves another spelling as the station's own name", async () => {
+  kitchenStations();
+  const add = command("useCreateDishTask");
+  await mount(createElement(DishPrepTasksPanel, { dishId: "dish-a" }));
+  const offered = [
+    ...container.querySelectorAll("#kitchen-station-names option"),
+  ].map((option) => option.getAttribute("value"));
+  expect(offered).toEqual(["Finish at Kitchen"]);
+  expect(field("station").getAttribute("list")).toBe("kitchen-station-names");
+  input("name", "Sear steaks");
+  input("station", "  fak ");
+  await submit(field("name").closest("form")!);
+  expect(add).toHaveBeenCalledWith(
+    expect.objectContaining({ station: "Finish at Kitchen" }),
+  );
+  input("name", "Grill corn");
+  input("station", "old grill");
+  await submit(field("name").closest("form")!);
+  expect(add).toHaveBeenLastCalledWith(
+    expect.objectContaining({ station: "old grill" }),
+  );
+});
+
+it("changes a saved step's station and passes its other stored values back unchanged", async () => {
+  kitchenStations();
+  backend.values.set("useListDishTask", [
+    {
+      _id: "step-a",
+      dishId: "dish-a",
+      name: "Brine chicken",
+      category: "Finish at Kitchen",
+      taskType: "manual",
+      sortOrder: 2,
+      defaultQuantity: 0.25,
+      defaultUnit: "pound",
+      station: "Prep table",
+      componentId: "component-a",
+      instructions: "Overnight",
+      status: "active",
+      version: 4,
+    },
+  ]);
+  const revise = command("useDishTaskRevise");
+  await mount(createElement(DishPrepTasksPanel, { dishId: "dish-a" }));
+  const row = container.querySelector(
+    '[data-testid="dish-prep-template-row"]',
+  )!;
+  expect(field("stepStation", row).value).toBe("Prep table");
+  await submit(field("stepStation", row).closest("form")!);
+  expect(revise).not.toHaveBeenCalled();
+  input("stepStation", "Fak", row);
+  await submit(field("stepStation", row).closest("form")!);
+  expect(revise).toHaveBeenCalledExactlyOnceWith({
+    docId: "step-a",
+    version: 4,
+    name: "Brine chicken",
+    category: "Finish at Kitchen",
+    taskType: "manual",
+    sortOrder: 2,
+    defaultQuantity: 0.25,
+    defaultUnit: "pound",
+    station: "Finish at Kitchen",
+    componentId: "component-a",
+    instructions: "Overnight",
+  });
+  expect(container.textContent).toContain("Station saved: Finish at Kitchen.");
+});

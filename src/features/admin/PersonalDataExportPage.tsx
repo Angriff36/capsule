@@ -11,6 +11,10 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { useActionNotice } from "../../ui/action-result";
 import {
+  PersonalDataErasureHistory,
+  PersonalDataErasurePanel,
+} from "./PersonalDataErasurePanel";
+import {
   createPersonalDataExportDocument,
   type PersonalDataExportFormat,
   type PersonalDataPackage,
@@ -119,7 +123,7 @@ export function PersonalDataExportView({
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Personal data exports"
-        lead="Prepare a complete, portable record for a client contact or staff person without database access."
+        lead="Prepare a complete, portable copy of everything on file for a client contact or staff person, without database access, or erase their details when they ask."
       />
       <AdminWorkspaceNav />
 
@@ -138,7 +142,7 @@ export function PersonalDataExportView({
       ) : null}
 
       {canExport ? (
-        <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.2fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(320px,0.8fr)_minmax(0,1.2fr)]">
           <Section title="Find an individual" count={filteredSubjects.length}>
             <div className="border-b border-line p-3">
               <label className="field-label" htmlFor="personal-data-search">
@@ -166,7 +170,7 @@ export function PersonalDataExportView({
                 hint="Try another name, email, role, or status."
               />
             ) : (
-              <fieldset className="max-h-[32rem] divide-y divide-line overflow-y-auto">
+              <fieldset className="max-h-[32rem] min-w-0 divide-y divide-line overflow-y-auto">
                 <legend className="sr-only">Choose a person to export</legend>
                 {filteredSubjects.map((subject) => {
                   const key = subjectKey(subject);
@@ -189,12 +193,12 @@ export function PersonalDataExportView({
                         }}
                         className="mt-1"
                       />
-                      <span className="min-w-0 flex-1">
+                      <span className="min-w-0 flex-1 wrap-anywhere">
                         <span className="flex flex-wrap items-center gap-2">
                           <strong className="text-ink">
                             {subject.displayName}
                           </strong>
-                          <span className="chip border-line-2 bg-inset text-ink-2">
+                          <span className="chip chip-tone-mute">
                             {subject.type === "staff"
                               ? "Staff"
                               : "Client contact"}
@@ -217,13 +221,13 @@ export function PersonalDataExportView({
             {!selected ? (
               <EmptyState
                 title="Choose a person"
-                hint="Their available records and download formats will appear here."
+                hint="What's on file for them, and the download formats, will appear here."
               />
             ) : dataPackage === undefined ? (
               <QueryLoadState
                 loadingTooLong={false}
                 title="Preparing package"
-                detail={`Collecting records associated with ${selected.displayName}.`}
+                detail={`Collecting what's on file for ${selected.displayName}.`}
               />
             ) : dataPackage === null ? (
               <ErrorState
@@ -238,8 +242,8 @@ export function PersonalDataExportView({
                     {dataPackage.subject.displayName}
                   </h3>
                   <p className="mt-1 text-sm text-ink-3">
-                    {recordCount} {recordCount === 1 ? "record" : "records"}{" "}
-                    across {sections.length}{" "}
+                    {recordCount} {recordCount === 1 ? "item" : "items"} across{" "}
+                    {sections.length}{" "}
                     {sections.length === 1 ? "section" : "sections"}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -281,14 +285,18 @@ export function PersonalDataExportView({
 
                 <p className="mt-4 text-xs leading-relaxed text-ink-3">
                   JSON preserves the complete nested structure. CSV uses
-                  section, record, field, and value columns so mixed record
-                  types stay in one spreadsheet-safe file.
+                  section, row ID, field, and value columns so mixed row types
+                  stay in one spreadsheet-safe file.
                 </p>
               </div>
             )}
           </Section>
         </div>
       ) : null}
+      {canExport && selected ? (
+        <PersonalDataErasurePanel key={selectedKey} subject={selected} />
+      ) : null}
+      {canExport ? <PersonalDataErasureHistory /> : null}
     </div>
   );
 }

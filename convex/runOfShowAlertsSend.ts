@@ -63,6 +63,8 @@ export const deliver = internalAction({
       id: import("./_generated/dataModel").Id<"pushSubscriptions">;
       version: number;
     }[] = [];
+    const failed: import("./_generated/dataModel").Id<"pushSubscriptions">[] =
+      [];
     results.forEach((result, index) => {
       const target = args.targets[index];
       if (!target) return;
@@ -75,6 +77,7 @@ export const deliver = internalAction({
       if (statusCode === 404 || statusCode === 410) {
         gone.push({ id: target.id, version: target.version });
       } else {
+        failed.push(target.id);
         console.warn(
           `run alerts: delivery failed (${statusCode ?? "no status"}) for one device`,
         );
@@ -84,6 +87,7 @@ export const deliver = internalAction({
       alertKey: { activityId: args.activityId, kind: args.kind },
       used,
       gone,
+      failed,
       now: Date.now(),
     });
   },

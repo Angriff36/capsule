@@ -101,10 +101,13 @@ export function AssistantPanel({
   const acceptFiles = async (list: FileList | null) => {
     if (!list || list.length === 0) return;
     setUploadError(null);
+    // Every file that could not be added is named, not just the last one.
+    const problems: string[] = [];
     for (const file of Array.from(list)) {
       const verdict = classifyFile(file);
       if (!verdict.ok) {
-        setUploadError(verdict.reason);
+        problems.push(verdict.reason);
+        setUploadError(problems.join(" "));
         continue;
       }
       setUploading((n) => n + 1);
@@ -112,7 +115,10 @@ export function AssistantPanel({
         const uploaded = await uploadAssistantFile(convex, file, verdict.kind);
         setPendingFiles((f) => [...f, uploaded]);
       } catch (err) {
-        setUploadError(err instanceof Error ? err.message : String(err));
+        problems.push(
+          `${file.name}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+        setUploadError(problems.join(" "));
       } finally {
         setUploading((n) => n - 1);
       }

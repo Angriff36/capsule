@@ -226,6 +226,13 @@ export default defineConfig(({ mode }) => ({
     port: 7811,
     strictPort: true,
   },
+  // The running page knows its own commit (same value as version.json), so it
+  // can tell when a newer Capsule is live (src/app/shell/NewVersionBanner.tsx).
+  define: {
+    __CAPSULE_BUILD__: JSON.stringify(
+      process.env.VERCEL_GIT_COMMIT_SHA ?? null,
+    ),
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -233,7 +240,9 @@ export default defineConfig(({ mode }) => ({
     markItDownDev(),
     // The build says which commit it is: <site>/version.json. A Vercel build
     // has VERCEL_GIT_COMMIT_SHA; scripts/verify-vercel-release.ts reads this
-    // file from the production address to prove a release is live.
+    // file from the production address to prove a release is live. It also
+    // names the backend this build calls (VITE_CONVEX_URL, already public in
+    // the page code) for the release receipt (scripts/release-receipt.ts).
     {
       name: "capsule-version-json",
       apply: "build",
@@ -241,7 +250,11 @@ export default defineConfig(({ mode }) => ({
         this.emitFile({
           type: "asset",
           fileName: "version.json",
-          source: `${JSON.stringify({ commit: process.env.VERCEL_GIT_COMMIT_SHA ?? null })}\n`,
+          source: `${JSON.stringify({
+            commit: process.env.VERCEL_GIT_COMMIT_SHA ?? null,
+            convexUrl:
+              loadEnv(mode, process.cwd(), "VITE_").VITE_CONVEX_URL ?? null,
+          })}\n`,
         });
       },
     },
@@ -253,12 +266,26 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: "node",
+    // Node >=25 ships an experimental webstorage whose `localStorage` is
+    // undefined unless --localstorage-file is set; that broken global
+    // shadows jsdom's inside worker threads and killed every DOM test with
+    // "Cannot read properties of undefined (reading 'clear')". Turning it
+    // off here (not via NODE_OPTIONS in the test script — Builder owns that
+    // script) lets jsdom provide the real implementation.
+    poolOptions: {
+      forks: { execArgv: ["--no-experimental-webstorage"] },
+      threads: { execArgv: ["--no-experimental-webstorage"] },
+    },
     // Runtime proofs nominally take 3-5s; on this shared multi-session box
     // they blow past vitest's 5s default and the gate flakes (#398).
     testTimeout: 30_000,
     // Each worker loads the generated Convex runtime. Oversubscribing large
     // machines adds contention and makes otherwise fast proofs time out.
-    maxWorkers: Math.min(8, availableParallelism()),
+    // CAPSULE_TEST_WORKERS lowers it on a busy machine: on 2026-10-01 a
+    // release check lost a test worker to low memory with eight running.
+    maxWorkers:
+      Number(process.env.CAPSULE_TEST_WORKERS) ||
+      Math.min(8, availableParallelism()),
     include: ["tests/**/*.test.ts"],
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },

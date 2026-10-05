@@ -4,6 +4,17 @@ import { describe, expect, it } from "vitest";
 const FORBIDDEN =
   /\b(idempotency|tenant|seam|projection|canonical|hydrate|mapped|reaction|guard|policy|constraint|manifest|convex|builder|directory|record)\b/i;
 
+// PL-CUTOVER moved the checks into convex/lib; the server copy is all three.
+function serverSource() {
+  return [
+    "convex/cutover.ts",
+    "convex/lib/cutoverGate.ts",
+    "convex/lib/cutoverProviders.ts",
+  ]
+    .map((file) => readFileSync(file, "utf8"))
+    .join("\n");
+}
+
 function expectPlain(text: string) {
   expect(text).not.toMatch(FORBIDDEN);
   expect(text).not.toContain("CONVEX_FIELD_ENCRYPTION_KEY");
@@ -76,7 +87,7 @@ describe("plain words on leftover cutover screen", () => {
   });
 
   it("keeps leftover cutover server copy free of record run and mapping jargon", () => {
-    const source = readFileSync("convex/cutover.ts", "utf8");
+    const source = serverSource();
     // strip // comments so developer notes are not treated as user copy
     const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
 
@@ -87,6 +98,8 @@ describe("plain words on leftover cutover screen", () => {
       "Latest import run has status",
       "Run a final delta import",
       "Latest import run is more than 7 days old",
+      // AC-287: no fixed age rule stands in for the source's as-of evidence
+      "more than 7 days old",
       "All critical mappings verified",
       "unresolved TPP mappings",
       "critical TPP record mappings",
@@ -110,19 +123,19 @@ describe("plain words on leftover cutover screen", () => {
       "No imports found",
       "At least one finished import is required",
       "No imports have been finished",
-      "Latest import has status",
-      "Do one last import.",
-      "Latest import is more than 7 days old",
+      "Latest import is",
+      "Import ${words} once more.",
+      "Say when TPP stopped taking new entries",
       "Every leftover TPP item is matched up",
       "leftover TPP items still need matching",
       "Use the match-up page to finish leftover TPP items",
       "Only admins can save the switch sign-off.",
       "Switch sign-off saved",
       "Only admins can approve or stop this switch.",
-      "Can't switch yet: someone still needs to sign off.",
-      "Can't switch yet: write the switch-back plan first.",
-      "Can't switch yet: finish one last import first.",
-      "Fix the connections, or choose Don't switch yet.",
+      "Say what you checked before you sign off",
+      "Confirm the opening stock date and count",
+      "Say where the backup is and when a restore was tried",
+      "Fix these, or choose Don't switch yet.",
       "Switch decision saved",
       "Only admins can undo the switch.",
       "Switch undone. TPP writes are back on.",
@@ -133,9 +146,8 @@ describe("plain words on leftover cutover screen", () => {
   });
 
   it("keeps leftover cutover check-status copy free of validation jargon", () => {
-    const serverSource = readFileSync("convex/cutover.ts", "utf8");
     // strip // comments so developer notes are not treated as user copy
-    const serverVisible = serverSource.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    const serverVisible = serverSource().replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const page = readFileSync(
       "src/features/admin/import/CutoverPage.tsx",
       "utf8",
@@ -164,7 +176,8 @@ describe("plain words on leftover cutover screen", () => {
     }
 
     for (const fresh of [
-      "Waiting for a manager to sign off",
+      "Save sign-off and plan",
+      "What you checked",
       "No switch-back plan written yet",
       "A manager has signed off",
       "A manager still needs to sign off",
@@ -230,7 +243,7 @@ describe("plain words on leftover cutover screen", () => {
   });
 
   it("keeps leftover evaluateProviderReadiness strings in catering English", () => {
-    const source = readFileSync("convex/cutover.ts", "utf8");
+    const source = serverSource();
     // strip // comments so developer notes are not treated as user copy
     const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
 
@@ -271,7 +284,7 @@ describe("plain words on leftover cutover screen", () => {
   });
 
   it("keeps leftover never-synced status line in catering English", () => {
-    const source = readFileSync("convex/cutover.ts", "utf8");
+    const source = serverSource();
     // strip // comments so developer notes are not treated as user copy
     const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
 

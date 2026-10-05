@@ -20,6 +20,7 @@
 import { mutation } from "../_generated/server";
 import { api } from "../_generated/api";
 import { v } from "convex/values";
+import type { Id } from "../_generated/dataModel";
 import { getAuthContext } from "./authContext";
 import { EventDuplicatePlanning } from "./eventDuplicatePlanning";
 
@@ -30,7 +31,12 @@ export const duplicateEvent = mutation({
   handler: async (
     ctx,
     args,
-  ): Promise<{ docId: string; dishCount: number }> => {
+  ): Promise<{
+    docId: string;
+    dishCount: number;
+    outcome: "created";
+    version: number;
+  }> => {
     // A foreign or soft-deleted source id must look exactly like a missing
     // one (non-disclosing tenant check, same shape as proposalEventCreation).
     const source = await ctx.db.get(args.sourceEventId);
@@ -75,6 +81,12 @@ export const duplicateEvent = mutation({
       });
     }
 
-    return { docId: String(created.docId), dishCount: liveLines.length };
+    const copy = await ctx.db.get(created.docId as Id<"events">);
+    return {
+      docId: String(created.docId),
+      dishCount: liveLines.length,
+      outcome: "created",
+      version: copy?.version ?? 1,
+    };
   },
 });

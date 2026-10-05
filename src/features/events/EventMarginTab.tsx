@@ -9,7 +9,6 @@ import {
   useListDishIngredient,
   useListEquipment,
   useListEquipmentReservation,
-  useListEventDish,
   useListIngredient,
   useListIngredientDemand,
   useListIngredientPriceObservation,
@@ -20,7 +19,14 @@ import {
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { buildEventMenuCost } from "./eventMenuCost";
+import {
+  canReadEventFoodCost,
+  useEventFoodCost,
+} from "../../lib/culinaryDemandClient";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { EventFoodCostPanel } from "../finance/EventFoodCostPanel";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { TableSkeleton } from "../../ui/primitives";
 import {
@@ -40,7 +46,7 @@ type Props = {
 
 export function EventMarginTab({ eventId }: Props) {
   const event = useGetEvent(eventId);
-  const eventDishes = useListEventDish();
+  const eventDishes = useEventMenuLines(eventId);
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();
@@ -60,10 +66,10 @@ export function EventMarginTab({ eventId }: Props) {
   // inputs are only the fallback — their rate fields are encrypted-stripped.
   const clockedLabor = useEventLaborSummary(eventId);
 
-  const estimatedFoodCost = Number(
-    (event as { estimatedFoodCost?: number } | null | undefined)
-      ?.estimatedFoodCost ?? 0,
-  );
+  // The one food-cost read: menu priced at the event date, gaps counted.
+  const authStatus = useAuthStatus();
+  const canReadFoodCost = canReadEventFoodCost(authStatus?.role);
+  const foodCostReport = useEventFoodCost(eventId, canReadFoodCost);
   const quoted = event?.quotedPrice ?? null;
   const budget = event?.budgetAmount ?? null;
 
@@ -78,6 +84,7 @@ export function EventMarginTab({ eventId }: Props) {
             id: row._id,
             eventId: row.eventId,
             dishId: row.dishId,
+            recipeDishId: row.recipeDishId,
             quantityServings: Number(row.quantityServings),
             headcountOverride: Number(
               (row as { headcountOverride?: number }).headcountOverride ?? 0,
@@ -139,12 +146,11 @@ export function EventMarginTab({ eventId }: Props) {
     ],
   );
 
-  const foodCost =
-    recipeRollup.foodCost > 0
-      ? recipeRollup.foodCost
-      : Number.isFinite(estimatedFoodCost) && estimatedFoodCost > 0
-        ? estimatedFoodCost
-        : 0;
+  // Never fall back to a total that prices unconvertible or unpriced lines
+  // at $0: the server estimate, else the same-rules browser rollup.
+  const foodCost = foodCostReport
+    ? foodCostReport.estimated.knownCost
+    : recipeRollup.foodCost;
 
   const live = useMemo(
     () =>
@@ -159,7 +165,7 @@ export function EventMarginTab({ eventId }: Props) {
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
         clockedLabor,
-        recipeEstimatedFoodCost: recipeRollup.foodCost,
+        recipeEstimatedFoodCost: foodCost,
       }),
     [
       clockedLabor,
@@ -172,10 +178,16 @@ export function EventMarginTab({ eventId }: Props) {
       lines,
       orders,
       payroll,
-      recipeRollup.foodCost,
+      foodCost,
     ],
   );
 
+  // Some food has no price: costs shown are only the known part.
+  const costsIncomplete = foodCostReport
+    ? !foodCostReport.estimated.complete
+    : recipeRollup.dishes.some(
+        (dish) => dish.incompleteLineCount > 0 || dish.pricedLineCount === 0,
+      );
   const laborCost = live.laborCost;
   const equipmentCost = live.equipmentCost;
   const revenue = live.invoiceCount > 0 ? live.confirmedRevenue : quoted;
@@ -192,7 +204,14 @@ export function EventMarginTab({ eventId }: Props) {
       ? quoted / headcount
       : null;
   const costBuckets: MarginCostBucket[] = [
-    { key: "food", label: "Food & ingredients", amount: foodCost },
+    {
+      key: "food",
+      label:
+        foodCostReport && !foodCostReport.estimated.complete
+          ? "Food & ingredients (not all priced)"
+          : "Food & ingredients",
+      amount: foodCost,
+    },
     { key: "labor", label: "Labor & staffing", amount: laborCost },
     { key: "equipment", label: "Equipment & rentals", amount: equipmentCost },
   ];
@@ -237,9 +256,10 @@ export function EventMarginTab({ eventId }: Props) {
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line pb-3">
         <h2 className="font-display text-2xl leading-none text-ink">Margin</h2>
         <p className="max-w-xl text-base text-ink-3">
-          Food cost uses the recipe × catalog (or receipt) estimate when no
-          submitted PO exists. Labor and equipment use live committed figures
-          when available.
+          Food cost is the menu priced at the event date from receipt (or
+          catalog) prices. Anything without a price is listed, not counted as
+          free. Labor and equipment use the current booked costs when there are
+          any.
         </p>
       </header>
 
@@ -250,37 +270,42 @@ export function EventMarginTab({ eventId }: Props) {
             totalCost={totalCost}
             grossProfit={grossProfit}
             marginPct={marginPct}
+            costsIncomplete={costsIncomplete}
           />
           <EventMarginRevenueBreakdown lines={revenueLines} total={revenue} />
           <EventMarginCostBreakdown buckets={costBuckets} total={totalCost} />
 
-          {recipeRollup.foodCost === 0 && recipeRollup.mismatches.length > 0 ? (
+          <EventFoodCostPanel eventId={eventId} enabled={canReadFoodCost} />
+
+          {foodCostReport ? null : recipeRollup.foodCost === 0 &&
+            recipeRollup.mismatches.length > 0 ? (
             <p
               className="banner banner-danger"
               data-testid="event-margin-recipe-unpriced"
             >
-              Recipe estimate is $0 because recipe units do not match catalog.
-              These units are not converted. Food cost still uses the recipe
-              estimate (no submitted PO).
+              Recipe estimate is $0 because the recipe units don't match how
+              these ingredients are priced, so they can't be costed. Food cost
+              still uses the recipe estimate until a PO is submitted.
             </p>
           ) : recipeRollup.foodCost === 0 ? (
             <p
               className="banner border-line bg-inset text-ink-3"
               data-testid="event-margin-recipe-zero"
             >
-              Recipe estimate is $0 — no same-unit priced ingredient lines. Food
-              cost still uses the recipe estimate until a submitted PO exists.
+              Recipe estimate is $0 — no ingredient has a price in the unit the
+              recipe uses. Food cost still uses the recipe estimate until a PO
+              is submitted.
             </p>
           ) : null}
 
           <LiveEventProfitabilityWidget
             eventId={eventId}
-            recipeEstimatedFoodCost={recipeRollup.foodCost}
+            recipeEstimatedFoodCost={foodCost}
             recipeUnpricedReason={
-              recipeRollup.foodCost === 0 && recipeRollup.mismatches.length > 0
-                ? "Recipe estimate is $0 because recipe units do not match catalog. These units are not converted."
-                : recipeRollup.foodCost === 0
-                  ? "Recipe estimate is $0 — no same-unit priced ingredient lines."
+              foodCost === 0 && recipeRollup.mismatches.length > 0
+                ? "Recipe estimate is $0 because the recipe units don't match how these ingredients are priced."
+                : foodCost === 0
+                  ? "Recipe estimate is $0 — no ingredient has a price in the unit the recipe uses."
                   : undefined
             }
           />
@@ -291,6 +316,7 @@ export function EventMarginTab({ eventId }: Props) {
           totalCost={totalCost}
           grossProfit={grossProfit}
           marginPct={marginPct}
+          costsIncomplete={costsIncomplete}
           headcount={headcount}
           buckets={costBuckets}
           budget={budget}

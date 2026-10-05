@@ -632,14 +632,10 @@ for (const d of decisions) {
   d.note = grams
     ? `per ${d.unit} = ${grams.grams.toFixed(1)} g (${grams.basis})`
     : `unit ${d.unit} could not be turned into grams`;
-  const guessed =
-    grams &&
-    (grams.basis === "household_cup" ||
-      grams.basis === "usda_basis" ||
-      grams.basis === "bottle_typical");
-  if (guessed) d.note += " — GUESS, not written";
-  d.scaled = scaled != null && !guessed;
-  if (DRY_RUN || !scaled || guessed) continue;
+  // CatalogUnitGrams never guesses a count-unit weight, so every resolved
+  // basis here is a recorded one.
+  d.scaled = scaled != null;
+  if (DRY_RUN || !scaled) continue;
   const fresh = (await client.query(
     (api.queries as { getIngredient: never }).getIngredient,
     { id: d.id },

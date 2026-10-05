@@ -1,0 +1,11 @@
+Goodshuffle Pro Inventory Export
+05/14/2026 @ 02:07 PM PDT
+Product ID,Title,Type,Tags,Primary Category,Sub Category,Qty Posted,SKU,SKU::ClientVisible,SKU::Pullsheet,Location,Location::ClientVisible,Location::Pullsheet,Contract Description
+357096633,Setup and Teardown,Service,,Logistics,Labor,0.0,,,,,,,
+357095532,Standard Delivery Fee,Delivery Logistics,,Logistics,Delivery,0.0,,,,,,,For delivery to area within 35 miles of Liberty Lake office
+454264687,Modern White Furniture - Bench Ottoman,Product,,Furniture,Ottomans,4.0,,,,,,,
+442859378,Metal Ball #4,Product,,Decor,Props,0.0,TBD,true,true,TBD,true,true,
+358984365,Part for ModBar - Standard Support,Product,Barbox,Furniture,Bars & Buffets,4.0,,,,,,,
+283283512,Gold Metal Ball,Product,,Decor,Props,5.0,155,false,true,4D,false,true,
+283294937,Charger - Gold,Product,,Decor,Props,11.0,151,true,true,5E,true,true,
+331555978,Coffee Urn,Product,,Food & Beverage,Coffee Dispensers,2.0,,,,Warehouse,true,true,12 qt.

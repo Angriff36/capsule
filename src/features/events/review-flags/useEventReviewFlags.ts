@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import {
   useCreateReviewFlag,
-  useListReviewFlag,
   useReviewFlagDismiss,
   useReviewFlagMarkResolved,
   useReviewFlagReopen,
 } from "../../../lib/manifest-convex-react";
+import { useEventReviewFlagRows } from "../../../lib/useEventRows";
 
 export type ReviewFlagTargetKind =
   | "whole_event"
@@ -54,7 +54,7 @@ export function reviewFlagTargetKey(
  * `flagsFor` answers "does this row have an open question?" per row.
  */
 export function useEventReviewFlags(eventId: string) {
-  const all = useListReviewFlag() as ReviewFlagRow[] | undefined;
+  const all = useEventReviewFlagRows(eventId) as ReviewFlagRow[] | undefined;
   const raise = useCreateReviewFlag();
   const markResolved = useReviewFlagMarkResolved();
   const dismiss = useReviewFlagDismiss();

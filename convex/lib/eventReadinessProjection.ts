@@ -56,9 +56,155 @@ export type EventReadinessFacts = {
   inFlightDeliveryIds: string[];
   openPurchaseNeedIds: string[];
   openPacketIssueIds: string[];
+  /** The newest printed packet revision when the event changed after it was
+   * printed (no revision holds the current snapshot); null otherwise. */
+  packetOutOfDateRevisionId?: string | null;
+  /** The Final Lock answer engine's outcome for the event as it is now,
+   * summarized without answer values (readiness is readable by any staff
+   * member, so nothing here may carry a price). */
+  finalLock?: FinalLockReadinessSummary | null;
+  /** Kitchen-to-venue drive time (PL-ROUTES); null when the event has no
+   * venue yet or is finished. */
+  route?: {
+    required: boolean;
+    stale: boolean;
+    /** The first leg's problem or out-of-date reason, plain words. */
+    reason: string | null;
+  } | null;
   closeoutId: string | null;
   closeoutStatus: "draft" | "finalized" | null;
+  /** Open change flags from the invoice, proposal and closeout
+   * reconciliations (convex/lib/reconciliationFlags.ts). */
+  reconciliationFlags?: EventReconciliationFlag[];
 };
+
+export type EventReconciliationFlag = {
+  domain: "invoice" | "proposal" | "closeout";
+  code: string;
+  recordId: string;
+  /** The flagged record status now. */
+  status: string;
+  /** Invoices only: Invoice.followEventPrice may run on this draft. */
+  canFollowPrice?: boolean;
+};
+
+/** The Final Lock answer engine's outcome (spec §14.2), carried as question
+ * keys and counts only — never answer values. */
+export type FinalLockReadinessSummary = {
+  outcome: "clear" | "needs_review" | "field_work_pending" | "stale";
+  /** Office questions with no answer or a contradiction yet. */
+  unresolvedQuestionKeys: string[];
+  /** Questions whose printed words no longer match the facts now. */
+  staleQuestionKeys: string[];
+  /** Day-of forms nobody has confirmed yet. */
+  openFieldWorkCount: number;
+};
+
+type FlagText = {
+  domain: EventReadinessDomain;
+  reason: string;
+  /** The command that settles the flag, legal in the record status now. */
+  resolvingAction: string;
+};
+
+const flagText = (
+  domain: EventReadinessDomain,
+  reason: string,
+  resolvingAction: string,
+): FlagText => ({ domain, reason, resolvingAction });
+
+/** Plain words for each reconciliation flag code in the status the record
+ * has now, and the command a person uses to settle it in that status. A code
+ * and status with no entry is skipped, never guessed. */
+function reconciliationFlagText(flag: EventReconciliationFlag): FlagText | null {
+  const code = flag.code;
+  const status = flag.status;
+  const billReason =
+    "The event price changed after this bill went to the client. The bill was not changed.";
+  switch (code) {
+    case "invoice_review":
+      if (status !== "draft") return null;
+      // A draft with only a deposit or lines can still take the new price.
+      if (flag.canFollowPrice)
+        return flagText(
+          "commercial",
+          "The event price changed, but this draft bill was changed by hand, so it kept its old amount. Check it, or move it to the new price.",
+          "Invoice.followEventPrice",
+        );
+      return flagText(
+        "commercial",
+        "The event price changed, but this draft bill has tax, a discount, a payment or a credit, so it kept its old amount. Check it, or cancel it and make a new bill.",
+        "Invoice.markVoided",
+      );
+    case "invoice_change_required":
+      if (status === "sent" || status === "viewed" || status === "overdue")
+        return flagText(
+          "commercial",
+          billReason + " Cancel it and send a new bill.",
+          "Invoice.markVoided",
+        );
+      if (status === "partial")
+        return flagText(
+          "commercial",
+          billReason + " Part of it is paid, so correct it with a credit.",
+          // A credit reaches the bill only through a credit memo (AC-372).
+          "CreditMemo.issue",
+        );
+      if (status === "paid")
+        return flagText(
+          "commercial",
+          billReason + " It is paid, so correct it with a credit memo.",
+          "CreditMemo.issue",
+        );
+      return null;
+    case "proposal_review":
+      // Open on every unsent drafted proposal linked to the event.
+      if (status === "draft")
+        return flagText(
+          "commercial",
+          "The guest count changed, but this draft proposal was set to another count by hand, so it kept its count. Check it, or move it to the event count.",
+          "Proposal.followEventHeadcount",
+        );
+      return null;
+    case "proposal_change_required":
+      if (status === "sent" || status === "viewed")
+        return flagText(
+          "commercial",
+          "The guest count changed after the client saw this proposal. The proposal was not changed. Replace it with a new proposal.",
+          "Proposal.supersede",
+        );
+      // An accepted proposal is final; a change draft (Proposal.draft with
+      // replacesProposalId) is the way to change it.
+      if (status === "accepted")
+        return flagText(
+          "commercial",
+          "The guest count changed after the client accepted this proposal. The proposal was not changed. Start a change to it.",
+          "Proposal.draft",
+        );
+      return null;
+    case "closeout_review":
+      if (status === "draft")
+        return flagText(
+          "closeout",
+          "The event budget changed after actuals went on this closeout, so it kept its old budget. Check it and save the closeout again.",
+          "EventCloseout.capture",
+        );
+      return null;
+    case "closeout_change_required":
+      // No command changes a finalized closeout; the difference can only be
+      // settled on the event itself.
+      if (status === "finalized")
+        return flagText(
+          "closeout",
+          "The event budget changed after this closeout was finalized. A finalized closeout cannot be changed. If the budget change was a mistake, set the event budget back.",
+          "Event.correctCommercial",
+        );
+      return null;
+    default:
+      return null;
+  }
+}
+
 
 /** An id is present only when it is a non-empty, non-blank string. */
 function hasId(id: unknown): id is string {
@@ -151,6 +297,29 @@ export function projectEventReadiness(
     );
   }
 
+  // Drive time (spec §8.4): ROUTE_REQUIRED when a leg has no drive time from
+  // the route service; out of date when a kept one no longer matches.
+  const route = facts.route;
+  if (route?.required) {
+    add(
+      "planning",
+      "planning.route_required",
+      [facts.eventId],
+      "warning",
+      `No drive time yet. ${route.reason ?? ""}`.trim(),
+      "refreshEventRoute",
+    );
+  } else if (route?.stale) {
+    add(
+      "planning",
+      "planning.route_stale",
+      [facts.eventId],
+      "warning",
+      `The drive time is out of date. ${route.reason ?? ""}`.trim(),
+      "refreshEventRoute",
+    );
+  }
+
   // kitchen
   if (!facts.hasMenuDishes) {
     add(
@@ -230,6 +399,69 @@ export function projectEventReadiness(
       "EventPacketIssue.resolve",
     );
   }
+  // The printed packet is history (§14.1): it is never rewritten, so the
+  // office prepares a new revision from the event as it is now.
+  if (hasId(facts.packetOutOfDateRevisionId)) {
+    add(
+      "packet",
+      "packet.out_of_date",
+      [facts.packetOutOfDateRevisionId],
+      "warning",
+      "The event changed after its packet was printed. The printed packet was not changed. Prepare the packet again.",
+      "EventPacket.recordPacketRevision",
+    );
+  }
+  // Final Lock answers (spec §14.2): the answer engine's outcome reaches the
+  // office here. An out-of-date packet warning already covers a fingerprint
+  // miss, so the stale issue fires only while the packet itself still
+  // matches but an answer changed behind it — facts the packet fingerprint
+  // never saw (the event conversation, an accepted proposal, a recipe cost).
+  const finalLock = facts.finalLock;
+  if (
+    finalLock &&
+    finalLock.outcome === "needs_review" &&
+    finalLock.unresolvedQuestionKeys.length > 0
+  ) {
+    add(
+      "packet",
+      "packet.final_lock_needs_review",
+      finalLock.unresolvedQuestionKeys,
+      "warning",
+      `${finalLock.unresolvedQuestionKeys.length} Final Lock question${
+        finalLock.unresolvedQuestionKeys.length === 1 ? "" : "s"
+      } still need an answer or a manager decision.`,
+      "overrideFinalLockAnswer",
+    );
+  }
+  if (
+    finalLock &&
+    finalLock.outcome === "stale" &&
+    !hasId(facts.packetOutOfDateRevisionId) &&
+    finalLock.staleQuestionKeys.length > 0
+  ) {
+    add(
+      "packet",
+      "packet.final_lock_stale",
+      finalLock.staleQuestionKeys,
+      "warning",
+      "The facts behind the Final Lock answers changed after they were printed. The printed answers were not changed. Prepare the packet again.",
+      "EventPacket.recordPacketRevision",
+    );
+  }
+  if (
+    finalLock &&
+    finalLock.outcome === "field_work_pending" &&
+    finalLock.openFieldWorkCount > 0
+  ) {
+    add(
+      "packet",
+      "packet.final_lock_field_work",
+      [],
+      "info",
+      "Office planning is done; the day-of Final Lock confirmations are still open.",
+      "resolveOperationalIssue",
+    );
+  }
 
   // execution — structured view of the same facts isReadyForExecution reads,
   // but NEVER blocking: beginExecution is not gated on readiness.
@@ -285,6 +517,20 @@ export function projectEventReadiness(
       "warning",
       "This event's closeout is still a draft.",
       "EventCloseout.finalize",
+    );
+  }
+
+  // change flags — a record the reconciliation kept instead of rewriting.
+  for (const flag of facts.reconciliationFlags ?? []) {
+    const text = reconciliationFlagText(flag);
+    if (!text) continue;
+    add(
+      text.domain,
+      text.domain + "." + flag.code,
+      [flag.recordId],
+      "warning",
+      text.reason,
+      text.resolvingAction,
     );
   }
 

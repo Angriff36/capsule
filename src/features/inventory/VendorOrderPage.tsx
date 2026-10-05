@@ -1,15 +1,17 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import { useEventsById } from "../facilities/useEventsById";
 import { formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateStorageLocation,
   useCreateVendorOrderLine,
   useGetVendorOrder,
-  useListEvent,
   useListIngredient,
+  useListIngredientDemand,
   useListInventoryLot,
+  useListItemUnitMapping,
   useListPurchaseNeed,
   useListStorageLocation,
   useListVendor,
@@ -35,11 +37,15 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { VendorOrderBillMatch } from "./VendorOrderBillMatch";
+import { VendorOrderEmailSection } from "./VendorOrderEmailSection";
 import { VendorOrderReceiptCorrection } from "./VendorOrderReceiptCorrection";
 import {
+  activeLocations,
   NEW_LOCATION_FIELD,
   ReceiptLocationField,
 } from "./ReceiptLocationField";
+import { findByName } from "./inlineCatalogChoice";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
@@ -49,6 +55,8 @@ import {
   canCancelVendorOrderLine,
   cancelVendorOrderLine,
 } from "./VendorOrderLineCancel";
+import { orderLineUnitIssues } from "./orderLineUnitIssues";
+import { VendorOrderLinePacks } from "./VendorOrderLinePacks";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -60,9 +68,18 @@ export function VendorOrderPage() {
   const lines = useListVendorOrderLine();
   const demandLinks = useListVendorOrderLineDemand();
   const needs = useListPurchaseNeed();
-  const events = useListEvent();
+  const demands = useListIngredientDemand();
+  const eventIds = useMemo(
+    () =>
+      needs === undefined || demands === undefined
+        ? undefined
+        : [...needs, ...demands].map((row) => row.eventId),
+    [needs, demands],
+  );
+  const events = useEventsById(eventIds);
   const ingredients = useListIngredient();
   const inventoryLots = useListInventoryLot();
+  const unitMappings = useListItemUnitMapping();
   const locations = useListStorageLocation();
   const createLocation = useCreateStorageLocation();
   const createLine = useCreateVendorOrderLine();
@@ -120,6 +137,11 @@ export function VendorOrderPage() {
   const openNeeds = (needs ?? []).filter(
     (need) => need.deletedAt == null && need.status === "open",
   );
+  const unitIssues = orderLineUnitIssues({
+    lines: orderLines,
+    links: demandLinks ?? [],
+    demands: demands ?? [],
+  });
   const vendor = vendors?.find((item) => item._id === order.vendorId);
   const orderContacts = (vendorContacts ?? []).filter(
     (contact) =>
@@ -231,17 +253,21 @@ export function VendorOrderPage() {
     const discrepancy = String(data.get("discrepancyQuantity") ?? "").trim();
     const newLocationName = String(data.get(NEW_LOCATION_FIELD) ?? "").trim();
     void run(`${line._id}:receipt`, async () => {
-      // Fresh workspace: the field was a name box, so register the location
-      // first and receive into it (#143).
-      const locationId = newLocationName
-        ? String(
-            (
-              (await createLocation({ name: newLocationName })) as {
-                docId: string;
-              }
-            ).docId,
-          )
-        : String(data.get("locationId"));
+      // The field was a name box, so register the location first and receive
+      // into it (#143). A retry after a failed receipt reuses the location
+      // the first try made.
+      const existing = findByName(activeLocations(locations), newLocationName);
+      const locationId = !newLocationName
+        ? String(data.get("locationId"))
+        : existing
+          ? existing._id
+          : String(
+              (
+                (await createLocation({ name: newLocationName })) as {
+                  docId: string;
+                }
+              ).docId,
+            );
       await recordReceipt({
         docId: line._id,
         version: line.version,
@@ -252,6 +278,8 @@ export function VendorOrderPage() {
         discrepancyQuantity: discrepancy ? Number(discrepancy) : undefined,
         discrepancyNotes:
           String(data.get("discrepancyNotes") ?? "").trim() || undefined,
+        deliveryReference:
+          String(data.get("deliveryReference") ?? "").trim() || undefined,
       });
       setReceivingLineId(null);
     });
@@ -302,15 +330,9 @@ export function VendorOrderPage() {
     void (async () => {
       const values = await prompt.askFields({
         title: "Revise order totals",
-        description: "Update subtotal, tax, and shipping for this order.",
+        description:
+          "Update tax and shipping for this order. The subtotal is the sum of the order lines.",
         fields: [
-          {
-            name: "subtotal",
-            label: "Subtotal",
-            defaultValue: String(order.subtotal),
-            inputType: "number",
-            required: true,
-          },
           {
             name: "taxAmount",
             label: "Tax",
@@ -329,11 +351,10 @@ export function VendorOrderPage() {
         confirmLabel: "Save totals",
       });
       if (!values) return;
-      const subtotal = Number(values.subtotal);
       const taxAmount = Number(values.taxAmount);
       const shippingAmount = Number(values.shippingAmount);
       if (
-        ![subtotal, taxAmount, shippingAmount].every(
+        ![taxAmount, shippingAmount].every(
           (value) => Number.isFinite(value) && value >= 0,
         )
       )
@@ -342,7 +363,6 @@ export function VendorOrderPage() {
         await updateTotals({
           docId: order._id,
           version: order.version,
-          subtotal,
           taxAmount,
           shippingAmount,
         });
@@ -468,6 +488,11 @@ export function VendorOrderPage() {
           </button>
         </div>
       </section>
+
+      <VendorOrderEmailSection
+        vendorOrderId={order._id}
+        status={String(order.status)}
+      />
 
       {showLineForm ? (
         <form className="supply-form" onSubmit={submitLine}>
@@ -609,6 +634,11 @@ export function VendorOrderPage() {
                               : ""}
                         </small>
                       ))}
+                      {(unitIssues.get(line._id) ?? []).map((issue) => (
+                        <small key={`unit-${issue.eventId}`} role="status">
+                          {eventName(issue.eventId)}: {issue.reason}
+                        </small>
+                      ))}
                     </div>
                     <div className="order-line-quantity">
                       <strong>
@@ -639,6 +669,21 @@ export function VendorOrderPage() {
                       {isDraft && line.quantityReviewReason ? (
                         <small role="status">{line.quantityReviewReason}</small>
                       ) : null}
+                      <VendorOrderLinePacks
+                        line={line}
+                        mappings={unitMappings ?? []}
+                        canEdit={isDraft && line.status === "added"}
+                        busy={busy != null}
+                        onOrderPacks={(quantity) =>
+                          void run(`${line._id}:quantity`, async () => {
+                            await reviseLine({
+                              docId: line._id,
+                              version: line.version,
+                              orderedQuantity: quantity,
+                            });
+                          })
+                        }
+                      />
                     </div>
                     <div>
                       <StatusChip status={String(line.status)} />
@@ -736,6 +781,9 @@ export function VendorOrderPage() {
                             <span>
                               {lot.receiptQuantity} {lot.unit} ·{" "}
                               {ingredientName(line.ingredientId)}
+                              {lot.deliveryReference
+                                ? ` · slip ${lot.deliveryReference}`
+                                : ""}
                             </span>
                           </li>
                         ))}
@@ -749,6 +797,7 @@ export function VendorOrderPage() {
                     busy={busy}
                     run={run}
                   />
+                  <VendorOrderBillMatch line={line} busy={busy} run={run} />
                   {receivingLineId === line._id ? (
                     <form
                       className="receipt-form"
@@ -788,6 +837,14 @@ export function VendorOrderPage() {
                           className="input"
                           autoComplete="off"
                           required
+                        />
+                      </label>
+                      <label className="field-label">
+                        Delivery slip number (optional)
+                        <input
+                          name="deliveryReference"
+                          className="input"
+                          autoComplete="off"
                         />
                       </label>
                       <label className="field-label">

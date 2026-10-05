@@ -176,7 +176,7 @@ export function EventStaffingSummaryAside({
             No conflicts found
           </h3>
           <p className="mt-1 text-base text-ink-2">
-            No overlapping shifts or approved time off were found in the records
+            No overlapping shifts or approved time off were found in what's
             visible to you.
           </p>
         </section>

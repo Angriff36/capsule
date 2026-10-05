@@ -38,7 +38,7 @@ export function CatalogStandardListButton({
       className="card flex flex-wrap items-center justify-between gap-3 border-line px-4 py-3"
       data-testid="catalog-standard-list"
     >
-      <p className="min-w-0 flex-1 text-sm text-ink-2">
+      <p className="min-w-0 flex-1 basis-48 text-sm text-ink-2">
         <span className="font-semibold text-ink">
           {missing.length} standard {singular}
           {missing.length === 1 ? "" : "s"} not added yet

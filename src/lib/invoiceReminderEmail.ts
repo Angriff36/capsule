@@ -13,6 +13,13 @@ export interface InvoiceReminderEmailInput {
   paymentUrl: string;
 }
 
+/** Named on every send record. Raise the version when the wording or layout
+ * of the email or its PDF changes, so a record says which one a client got. */
+export const INVOICE_REMINDER_TEMPLATE = {
+  id: "invoice_reminder",
+  version: 1,
+} as const;
+
 export interface RenderedInvoiceReminderEmail {
   subject: string;
   html: string;

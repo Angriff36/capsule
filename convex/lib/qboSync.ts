@@ -32,6 +32,8 @@ export interface QboTokenResponse {
   accessToken: string;
   refreshToken?: string;
   expiresIn?: number;
+  /** Seconds until the refresh token itself stops working (x_refresh_token_expires_in). */
+  refreshTokenExpiresIn?: number;
 }
 
 export interface QboClient {
@@ -354,6 +356,9 @@ async function requestToken(
       : {}),
     ...(typeof data.expires_in === "number"
       ? { expiresIn: data.expires_in }
+      : {}),
+    ...(typeof data.x_refresh_token_expires_in === "number"
+      ? { refreshTokenExpiresIn: data.x_refresh_token_expires_in }
       : {}),
   };
 }

@@ -17,12 +17,17 @@ it("submits entered start and end times as distinct local timestamps", async () 
     serviceStyles: [],
     occasions: [],
     available: true,
+    company: { name: "Harbor Catering", address: "12 Pier Road, Seattle" },
   });
   const send = command("quoteBuilder:submitQuote", {
     submissionId: "quote-1",
     message: "Request received",
   });
   await mount(createElement(QuoteSubmissionPage));
+  // The visitor sees who they are asking (#125).
+  expect(container.textContent).toContain(
+    "Harbor Catering · 12 Pier Road, Seattle",
+  );
   input("clientName", "Pat Client");
   input("email", "pat@example.com");
   input("eventDate", "2099-10-12");

@@ -81,7 +81,7 @@ export const invoiceLifecycle = {
   ] satisfies readonly InvoiceStatus[],
   sideStates: ["voided", "written_off"] satisfies readonly InvoiceStatus[],
   actions: [
-    { key: "send", label: "Record sent", to: "sent" },
+    { key: "send", label: "Mark sent", to: "sent" },
     { key: "markViewed", label: "Mark viewed", to: "viewed" },
     { key: "markOverdue", label: "Mark overdue", to: "overdue" },
     { key: "void", label: "Void", to: "voided", needsInput: true },

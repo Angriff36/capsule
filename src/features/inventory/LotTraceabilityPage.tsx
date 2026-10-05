@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListClient,
-  useListEvent,
   useListIngredient,
   useListInventoryItem,
   useListInventoryLot,
@@ -12,6 +11,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById } from "../facilities/useEventsById";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { endOfDay, startOfDay } from "./PurchasingFormHelpers";
 import {
@@ -28,7 +28,14 @@ const quantity = new Intl.NumberFormat(undefined, {
 export function LotTraceabilityPage() {
   const lots = useListInventoryLot();
   const reservations = useListInventoryReservation();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      reservations === undefined
+        ? undefined
+        : reservations.map((row) => row.eventId),
+    [reservations],
+  );
+  const events = useEventsById(eventIds);
   const clients = useListClient();
   const ingredients = useListIngredient();
   const vendors = useListVendor();
@@ -303,9 +310,9 @@ export function LotTraceabilityPage() {
       <aside className="lot-trace-method" role="note">
         <strong>Evidence boundary</strong>
         <span>
-          This register uses consumed InventoryReservation facts carrying an
-          InventoryLot reference. It never infers a lot from ingredient,
-          location, or timing alone.
+          This register only uses stock that was used up with a lot attached to
+          it. It never guesses a lot from the ingredient, location, or timing
+          alone.
         </span>
         {unattributed > 0 ? (
           <span className="lot-trace-unattributed">

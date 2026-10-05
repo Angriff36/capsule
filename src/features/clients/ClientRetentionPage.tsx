@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useClientOutreachTaskComplete,
   useClientOutreachTaskDismiss,
   useListClient,
   useListClientOutreachTask,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
@@ -91,7 +91,24 @@ export function computeRetention(
 
 export function ClientRetentionPage() {
   const clients = useListClient();
-  const events = useListEvent();
+  // Retention only looks at bookings in the prior year and the current year.
+  const currentYear = new Date().getFullYear();
+  const priorYear = currentYear - 1;
+  const priorYearEvents = useEventsInRange({
+    from: new Date(priorYear, 0, 1).getTime(),
+    to: new Date(currentYear, 0, 1).getTime(),
+  });
+  const currentYearEvents = useEventsInRange({
+    from: new Date(currentYear, 0, 1).getTime(),
+    to: new Date(currentYear + 1, 0, 1).getTime(),
+  });
+  const events = useMemo(
+    () =>
+      priorYearEvents && currentYearEvents
+        ? [...priorYearEvents, ...currentYearEvents]
+        : undefined,
+    [priorYearEvents, currentYearEvents],
+  );
   const outreachTasks = useListClientOutreachTask();
   const ensureOpenOutreachTask = useEnsureOpenClientOutreach();
   const completeOutreachTask = useClientOutreachTaskComplete();
@@ -104,8 +121,6 @@ export function ClientRetentionPage() {
     clients === undefined ||
     events === undefined ||
     outreachTasks === undefined;
-  const currentYear = new Date().getFullYear();
-  const priorYear = currentYear - 1;
 
   const { rows, rebookedCount, rateLabel } = computeRetention(
     clients ?? [],

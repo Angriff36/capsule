@@ -23,6 +23,11 @@ const financeNavigation = [
     path: FINANCE_ROUTES.profitMargins,
   },
   {
+    key: "reconciliation",
+    label: "Money check",
+    path: FINANCE_ROUTES.reconciliation,
+  },
+  {
     key: "salesDashboard",
     label: "Sales dashboard",
     path: FINANCE_ROUTES.salesDashboard,

@@ -104,7 +104,7 @@ export async function runGenerateConvexCommand({
     return 2;
   }
   if (applyMode === "apply") {
-    await live.apply(result);
+    const applied = await live.apply(result);
     const installed = await installProjectDependencies(plan, {
       enabled: hasFlag(argv, "--install"),
       allowLifecycleScripts: hasFlag(argv, "--allow-lifecycle-scripts"),
@@ -114,6 +114,11 @@ export async function runGenerateConvexCommand({
         ? "Applied project update and installed dependencies."
         : "Applied project update without installing dependencies.",
     );
+    if (applied.prunedBaselineDigests.length > 0) {
+      console.log(
+        `Pruned ${String(applied.prunedBaselineDigests.length)} unreferenced baseline blob(s) from .builder/baselines.`,
+      );
+    }
   }
   return 0;
 }

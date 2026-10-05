@@ -167,7 +167,7 @@ export function KitchenStationsPage() {
         </div>
       ) : (
         <div className="supply-table-wrap mt-4">
-          <table className="supply-table">
+          <table className="supply-table phone-cards">
             <thead>
               <tr>
                 <th>Station</th>
@@ -183,9 +183,11 @@ export function KitchenStationsPage() {
                   <td>
                     <strong>{station.name}</strong>
                   </td>
-                  <td>{(station.aliases ?? []).join(", ") || "—"}</td>
-                  <td>{station.sortOrder}</td>
-                  <td>
+                  <td data-label="Other spellings">
+                    {(station.aliases ?? []).join(", ") || "—"}
+                  </td>
+                  <td data-label="Sheet order">{station.sortOrder}</td>
+                  <td data-label="State">
                     <StatusChip status={String(station.status)} />
                   </td>
                   <td>

@@ -398,7 +398,8 @@ export function StockReceiptScanner({
     ) {
       setFeedback({
         tone: "warn",
-        message: "Unit cost cannot be negative.",
+        message:
+          "This receipt's unit cost can't be negative. Use zero or more.",
       });
       return;
     }
@@ -482,8 +483,7 @@ export function StockReceiptScanner({
             </button>
           </div>
           <span className="stock-receipt-hint">
-            Accepted labels contain an InventoryItem or IngredientDemand
-            reference.
+            Accepted labels are for a stock line or a demand.
           </span>
           {cameraOpen ? (
             <div

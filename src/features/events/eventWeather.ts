@@ -13,6 +13,9 @@ export type VenueLocation = {
   city?: string | null;
   region?: string | null;
   countryCode?: string | null;
+  /** Stored venue coordinates — used directly, no geocode round-trip. */
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export type WeatherDay = {
@@ -29,6 +32,11 @@ export function locationQuery(venue: VenueLocation): string {
     .map((part) => part?.trim())
     .filter((part): part is string => Boolean(part))
     .join(", ");
+}
+
+export function hasLocation(venue: VenueLocation): boolean {
+  if (venue.latitude != null && venue.longitude != null) return true;
+  return locationQuery(venue) !== "";
 }
 
 // A day is flagged when rain is likely OR winds are high — either forces a
@@ -49,14 +57,18 @@ type OpenMeteoDaily = {
 };
 
 // Returns 7 days of forecast, or null when the venue can't be located or the
-// forecast APIs are unreachable. Callers render a graceful fallback on null.
+// forecast APIs are unreachable. Stored coordinates are used directly (the
+// Singh Campsite class of venue has no address to geocode); otherwise the
+// address is geocoded through the shared Nominatim helper. Callers render a
+// graceful fallback on null.
 export async function fetchVenueForecast(
   venue: VenueLocation,
 ): Promise<WeatherDay[] | null> {
-  const query = locationQuery(venue);
-  if (!query) return null;
-
-  const point = await geocodeDestination(query);
+  const stored =
+    venue.latitude != null && venue.longitude != null
+      ? { lat: venue.latitude, lon: venue.longitude }
+      : null;
+  const point = stored ?? (await geocodeDestination(locationQuery(venue)));
   if (!point) return null;
 
   const url =

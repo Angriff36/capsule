@@ -104,7 +104,7 @@ describe("receipt correction unit conversion", () => {
           reason: "This would take more than is on the shelf",
         },
       ),
-    ).rejects.toThrow(/cannot be negative/i);
+    ).rejects.toThrow(/can't be negative/);
 
     const afterRefusal = await inventory.run(async (ctx) =>
       ctx.db.get(opened.docId as never),

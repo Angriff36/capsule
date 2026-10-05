@@ -488,6 +488,69 @@
   font-size: 10px;
 }
 
+.client-portal-payments {
+  background: color-mix(in srgb, var(--portal-primary) 88%, black);
+}
+
+.client-portal-payments .client-portal-document-card {
+  min-height: 0;
+}
+
+.client-portal-pay-actions,
+.client-portal-pay-offline {
+  grid-column: 2;
+  margin: 1.1rem 0 0 1rem;
+  border-top: 1px solid rgb(255 255 255 / 0.16);
+  padding-top: 0.9rem;
+}
+
+.client-portal-pay-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.client-portal-pay-actions button,
+.client-portal-pay-status button {
+  min-height: 44px;
+  border: 1px solid color-mix(in srgb, var(--portal-accent) 70%, white);
+  padding: 0 1rem;
+  background: var(--portal-accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.client-portal-pay-actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.client-portal-pay-actions button:focus-visible,
+.client-portal-pay-status button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+
+.client-portal-pay-offline {
+  color: rgb(255 255 255 / 0.7);
+  font-size: 13px;
+}
+
+.client-portal-pay-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.client-portal-pay-status[data-tone="ok"] {
+  color: white;
+}
+
 .client-portal-section-heading h2 {
   margin-top: 0.6rem;
   font-family: var(--font-display);

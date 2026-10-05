@@ -27,7 +27,7 @@ export function CompleteDraftPlanningPanel({
     const number = (key: string) => {
       const value = text(key);
       if (!value || !Number.isFinite(Number(value)))
-        throw new Error("Enter each required planning amount and guest count.");
+        throw new Error("Enter each planning amount and the guest count.");
       return Number(value);
     };
     const time = (key: "startsAt" | "endsAt") =>
@@ -82,9 +82,9 @@ export function CompleteDraftPlanningPanel({
         <i aria-hidden="true" />
       </h2>
       <p className="text-ink-2">
-        This imported draft is saved. Complete the planning facts below to
-        enable submission for approval on this same event. You can continue
-        working on the draft until these facts are known.
+        This imported draft is saved. Fill in the planning details below so this
+        event can go up for approval. You can keep working on the draft until
+        these details are known.
       </p>
       <form
         onSubmit={(submission) => void submit(submission)}
@@ -205,7 +205,7 @@ export function CompleteDraftPlanningPanel({
           className="btn btn-primary"
           disabled={busy || clients === undefined}
         >
-          {busy ? "Saving planning facts…" : "Complete planning"}
+          {busy ? "Saving planning details…" : "Complete planning"}
         </button>
       </form>
     </section>
