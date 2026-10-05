@@ -126,7 +126,6 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     // A seed may not be pointed at other records: the links sent must be the
     // seed's own (checked above). Automatic seeds always send the same links.
     guard eventId == self.eventId and eventDishId == self.eventDishId and dishId == self.dishId and componentId == self.componentId
-    guard self.seededAt == null
     guard self.deletedAt == null
     mutate eventId = eventId
     mutate eventDishId = eventDishId
@@ -134,12 +133,15 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     mutate componentId = componentId
     mutate recipeSyncComponentId = componentId
     mutate servings = servings
-    mutate yieldQuantity = yieldQuantity
-    mutate batchMultiplier = batchMultiplier
+    // A dish listing the same recipe twice (repeated imports) reaches an
+    // already-seeded row; it keeps the first line's amounts instead of failing
+    // the whole menu change or multiplying the purchase.
+    mutate yieldQuantity = self.seededAt == null ? yieldQuantity : self.yieldQuantity
+    mutate batchMultiplier = self.seededAt == null ? batchMultiplier : self.batchMultiplier
     // The event owns the purchasing week; a reschedule (#328) must not leave
     // recipe-driven reseeds on the week the dish was first added.
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
-    mutate seededAt = now()
+    mutate seededAt = self.seededAt == null ? now() : self.seededAt
     emit EventDishComponentSeeded {
       seedId: self.id
       tenantId: self.tenantId
@@ -148,8 +150,8 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
       dishId: dishId
       componentId: componentId
       servings: servings
-      yieldQuantity: yieldQuantity
-      batchMultiplier: batchMultiplier
+      yieldQuantity: self.yieldQuantity
+      batchMultiplier: self.batchMultiplier
       purchasingWeekStart: self.purchasingWeekStart
     }
   }

@@ -21212,8 +21212,7 @@ async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventI
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Guard 0 failed");
     if (!((((__rel_event != null) && (__rel_eventDish != null)) && (__rel_component != null)))) throw new Error("Guard 1 failed");
     if (!(((((eventId === doc.eventId) && (eventDishId === doc.eventDishId)) && (dishId === doc.dishId)) && (componentId === doc.componentId)))) throw new Error("Guard 2 failed");
-    if (!((doc.seededAt == null))) throw new Error("Guard 3 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 4 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -21224,16 +21223,16 @@ async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventI
       componentId: componentId,
       recipeSyncComponentId: componentId,
       servings: servings,
-      yieldQuantity: yieldQuantity,
-      batchMultiplier: batchMultiplier,
+      yieldQuantity: ((doc.seededAt == null) ? yieldQuantity : doc.yieldQuantity),
+      batchMultiplier: ((doc.seededAt == null) ? batchMultiplier : doc.batchMultiplier),
       purchasingWeekStart: (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : purchasingWeekStart),
-      seededAt: Date.now(),
+      seededAt: ((doc.seededAt == null) ? Date.now() : doc.seededAt),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, seedId: docId, tenantId: __after.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: yieldQuantity, batchMultiplier: batchMultiplier, purchasingWeekStart: __after.purchasingWeekStart, _subject: { entity: "EventDishComponentSeed", command: "seed", id: docId } };
-    const __manifestEvent0 = { type: "EventDishComponentSeeded", entity: "EventDishComponentSeed", entityId: docId, payload: { seedId: docId, tenantId: __after.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: yieldQuantity, batchMultiplier: batchMultiplier, purchasingWeekStart: __after.purchasingWeekStart }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, seedId: docId, tenantId: __after.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: __after.yieldQuantity, batchMultiplier: __after.batchMultiplier, purchasingWeekStart: __after.purchasingWeekStart, _subject: { entity: "EventDishComponentSeed", command: "seed", id: docId } };
+    const __manifestEvent0 = { type: "EventDishComponentSeeded", entity: "EventDishComponentSeed", entityId: docId, payload: { seedId: docId, tenantId: __after.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: __after.yieldQuantity, batchMultiplier: __after.batchMultiplier, purchasingWeekStart: __after.purchasingWeekStart }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const fanRows0 = (await ctx.db.query("componentIngredients").withIndex("by_componentId", (q) => q.eq("componentId", payload.componentId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -21339,8 +21338,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Guard 0 failed");
     if (!((((__rel_event != null) && (__rel_eventDish != null)) && (__rel_component != null)))) throw new Error("Guard 1 failed");
     if (!(((((eventId === __draft.eventId) && (eventDishId === __draft.eventDishId)) && (dishId === __draft.dishId)) && (componentId === __draft.componentId)))) throw new Error("Guard 2 failed");
-    if (!((__draft.seededAt == null))) throw new Error("Guard 3 failed");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 4 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 3 failed");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -21351,13 +21349,13 @@ export const EventDishComponentSeed_createViaSeed = mutation({
     doc.componentId = componentId;
     doc.recipeSyncComponentId = componentId;
     doc.servings = servings;
-    doc.yieldQuantity = yieldQuantity;
-    doc.batchMultiplier = batchMultiplier;
+    doc.yieldQuantity = ((doc.seededAt == null) ? yieldQuantity : doc.yieldQuantity);
+    doc.batchMultiplier = ((doc.seededAt == null) ? batchMultiplier : doc.batchMultiplier);
     doc.purchasingWeekStart = (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : purchasingWeekStart);
-    doc.seededAt = Date.now();
+    doc.seededAt = ((doc.seededAt == null) ? Date.now() : doc.seededAt);
     const docId = await ctx.db.insert("eventDishComponentSeeds", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, seedId: docId, tenantId: doc.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: yieldQuantity, batchMultiplier: batchMultiplier, purchasingWeekStart: doc.purchasingWeekStart, _subject: { entity: "EventDishComponentSeed", command: "seed", id: docId } };
-    const __manifestEvent0 = { type: "EventDishComponentSeeded", entity: "EventDishComponentSeed", entityId: docId, payload: { seedId: docId, tenantId: doc.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: yieldQuantity, batchMultiplier: batchMultiplier, purchasingWeekStart: doc.purchasingWeekStart }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, seedId: docId, tenantId: doc.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: doc.yieldQuantity, batchMultiplier: doc.batchMultiplier, purchasingWeekStart: doc.purchasingWeekStart, _subject: { entity: "EventDishComponentSeed", command: "seed", id: docId } };
+    const __manifestEvent0 = { type: "EventDishComponentSeeded", entity: "EventDishComponentSeed", entityId: docId, payload: { seedId: docId, tenantId: doc.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, componentId: componentId, servings: servings, yieldQuantity: doc.yieldQuantity, batchMultiplier: doc.batchMultiplier, purchasingWeekStart: doc.purchasingWeekStart }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const fanRows0 = (await ctx.db.query("componentIngredients").withIndex("by_componentId", (q) => q.eq("componentId", payload.componentId)).collect()).filter((d) => (d as any).deletedAt == null);
