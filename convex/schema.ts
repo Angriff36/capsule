@@ -1333,12 +1333,16 @@ export default defineSchema({
     declineReason: v.optional(v.union(v.string(), v.null())),
     checkedInAt: v.optional(v.union(v.number(), v.null())),
     tableAssignment: v.optional(v.union(v.string(), v.null())),
+    entreeEventDishId: v.optional(v.union(v.id("eventDishes"), v.null())),
+    seatNumber: v.optional(v.union(v.number(), v.null())),
+    placeCardName: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
+    .index("by_entreeEventDishId", ["entreeEventDishId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   eventIngredientContributions: defineTable({
     tenantId: v.string(),
