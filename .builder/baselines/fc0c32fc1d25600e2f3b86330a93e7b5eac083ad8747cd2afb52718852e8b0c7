@@ -2470,6 +2470,8 @@ export default defineSchema({
     equipmentFieldsJson: v.optional(v.union(v.string(), v.null())),
     emailSenderName: v.optional(v.union(v.string(), v.null())),
     emailReplyTo: v.optional(v.union(v.string(), v.null())),
+    brandPhone: v.optional(v.union(v.string(), v.null())),
+    brandWebsite: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

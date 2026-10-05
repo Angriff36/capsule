@@ -214,6 +214,11 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property emailSenderName: string?
   property emailReplyTo: string?
 
+  // Phone and website clients see at the foot of the public menu and other
+  // client papers (the printed menu book: "844-4-MANGIA · mangiacateringco.com").
+  property brandPhone: string?
+  property brandWebsite: string?
+
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
   // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
   // tenants without a configured default continue to report in USD.
@@ -405,6 +410,17 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Phone and website for client papers. Empty values clear them.
+  command configureContactDetails(optional phone: string, optional website: string) {
+    guard self.deletedAt == null
+    mutate brandPhone = phone
+    mutate brandWebsite = website
+    emit OrganizationContactDetailsConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -516,6 +532,11 @@ event OrganizationStageMovesConfigured: "organization.stage_moves_configured" {
 }
 
 event OrganizationEmailSenderConfigured: "organization.email_sender_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationContactDetailsConfigured: "organization.contact_details_configured" {
   organizationId: string
   tenantId: string
 }

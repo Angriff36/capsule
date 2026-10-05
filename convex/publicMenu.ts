@@ -151,12 +151,15 @@ export const getPublicMenu = query({
 export type PublicMenuCompany = {
   name: string;
   address: string | null;
+  phone: string | null;
+  website: string | null;
   logoUrl: string | null;
 };
 
 /**
- * The company head and foot of the printed menu: the Branding name, address
- * and logo of the same organization getPublicMenu serves. Nothing else.
+ * The company head and foot of the printed menu: the Branding name, address,
+ * phone, website and logo of the same organization getPublicMenu serves.
+ * Nothing else.
  */
 export const getPublicMenuCompany = query({
   args: {},
@@ -173,6 +176,8 @@ export const getPublicMenuCompany = query({
     return {
       name: org.brandDisplayName?.trim() || org.name,
       address: org.brandAddress?.trim() || null,
+      phone: org.brandPhone?.trim() || null,
+      website: org.brandWebsite?.trim() || null,
       logoUrl: logoId ? await ctx.storage.getUrl(logoId) : null,
     };
   },

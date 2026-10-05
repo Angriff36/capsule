@@ -212,6 +212,13 @@ export function PublicMenuPage() {
                 {company.address ? (
                   <p className="text-xs text-ink-3">{company.address}</p>
                 ) : null}
+                {company.phone || company.website ? (
+                  <p className="text-ink">
+                    {[company.phone, company.website]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </section>

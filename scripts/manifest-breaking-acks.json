@@ -2892,6 +2892,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Venue selling profile: optional only-here dish idea; existing venues stay valid with none."
+    },
+    {
+      "path": "Organization.brandPhone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Company phone for the public menu foot: optional; existing companies stay valid with none."
+    },
+    {
+      "path": "Organization.brandWebsite",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Company website for the public menu foot: optional; existing companies stay valid with none."
     }
   ]
 }

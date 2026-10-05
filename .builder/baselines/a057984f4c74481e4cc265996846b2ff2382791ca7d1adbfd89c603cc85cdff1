@@ -2672,6 +2672,8 @@ export const OrganizationSchema = z.object({
   equipmentFieldsJson: z.string().nullable().optional(),
   emailSenderName: z.string().nullable().optional(),
   emailReplyTo: z.string().nullable().optional(),
+  brandPhone: z.string().nullable().optional(),
+  brandWebsite: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -9468,6 +9470,14 @@ export const OrganizationConfigureBrandingParamsSchema = z.object({
 });
 
 export type OrganizationConfigureBrandingParams = z.infer<typeof OrganizationConfigureBrandingParamsSchema>;
+
+// Command: configureContactDetails on Organization
+export const OrganizationConfigureContactDetailsParamsSchema = z.object({
+  phone: z.string().optional(),
+  website: z.string().optional(),
+});
+
+export type OrganizationConfigureContactDetailsParams = z.infer<typeof OrganizationConfigureContactDetailsParamsSchema>;
 
 // Command: configureEmailSender on Organization
 export const OrganizationConfigureEmailSenderParamsSchema = z.object({

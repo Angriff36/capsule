@@ -501,6 +501,7 @@ import {
   OrganizationCapabilitySettingRegisterParamsSchema,
   OrganizationCapabilitySettingSetEnabledParamsSchema,
   OrganizationConfigureBrandingParamsSchema,
+  OrganizationConfigureContactDetailsParamsSchema,
   OrganizationConfigureEmailSenderParamsSchema,
   OrganizationConfigureEquipmentFieldsParamsSchema,
   OrganizationConfigurePlanningChecksParamsSchema,
@@ -7810,6 +7811,16 @@ export function useOrganizationConfigureBranding() {
   };
 }
 
+/** Mutation hook for Organization.configureContactDetails. */
+export function useOrganizationConfigureContactDetails() {
+  const mutate = useMutation(api.mutations.Organization_configureContactDetails);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureContactDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.configureEmailSender. */
 export function useOrganizationConfigureEmailSender() {
   const mutate = useMutation(api.mutations.Organization_configureEmailSender);
@@ -14196,4 +14207,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1500 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1501 as const;

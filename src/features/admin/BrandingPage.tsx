@@ -15,6 +15,7 @@ import {
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { ContactDetailsSection } from "./ContactDetailsSection";
 import { EmailSenderSection } from "./EmailSenderSection";
 import { useBrandLogoManager } from "./brandLogoUpload";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
@@ -467,6 +468,8 @@ export function BrandingPage() {
           displayName={branding.displayName}
           canEdit={canEdit}
         />
+
+        <ContactDetailsSection record={record} canEdit={canEdit} />
 
         <section aria-label="Document preview" className="min-w-0">
           <p className="eyebrow">Live preview</p>
