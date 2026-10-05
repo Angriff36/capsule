@@ -66,7 +66,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property recipeDishId: uuid?
   // Venue-exclusive menu item (Mangia Venue Partner Playbook section 07): a
   // dish offered only at one partner venue. Null = offered anywhere.
-  property exclusiveVenueId: uuid?
+  property indexed exclusiveVenueId: uuid?
 
   hasMany ingredientLines: DishIngredient
   hasMany componentLines: DishComponent

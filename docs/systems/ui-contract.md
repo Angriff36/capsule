@@ -509,6 +509,7 @@ Screens (30): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
@@ -1146,7 +1147,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Event and sales staff may see referral sources"; "Sales managers may update referral sources"; "Sales managers may change referral sources"; "Guard 0 failed"; "Guard 1 failed"; "Give this referral source a name"; and 2 more
   - effects: ReferralSourceRegistered
-  - refresh: live reads update by themselves; reads affected: ReferralSource.list, ReferralSource.get, Event.list, Event.get, Lead.list, Lead.get, QuoteSubmission.list, QuoteSubmission.get and 2 more
+  - refresh: live reads update by themselves; reads affected: ReferralSource.list, ReferralSource.get, Event.list, Event.get, Lead.list, Lead.get, QuoteSubmission.list, QuoteSubmission.get and 4 more
 - `mutations.ReviewFlag_createViaRaise` (ReviewFlag.raise)
   - inputs from the screen: eventId, targetKind, question, targetId, targetLabel; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -1209,13 +1210,14 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see venues"; "Event staff may update venues"; "Event staff may change venues"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: VenueRegistered
-  - refresh: live reads update by themselves; reads affected: Venue.list, Venue.get, Event.list, Event.get, RevenueAttribution.list, RevenueAttribution.get, VenueCommissionTerm.list, VenueCommissionTerm.get and 8 more
+  - refresh: live reads update by themselves; reads affected: Venue.list, Venue.get, Dish.list, Dish.get, Event.list, Event.get, Person.list, Person.get and 14 more
 
 ### Authored reads and steps
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
 - `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
 - `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
@@ -1270,7 +1272,7 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 ## 4. Menu and kitchen
 
-Screens (170): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicker.tsx`, `events/ComponentStockSuggestions.tsx`, `events/EventAllergenBriefingBody.tsx`, `events/EventAllergenBriefingPage.tsx`, `events/EventDraftPoButton.tsx`, `events/EventDraftPoCoordinator.ts`, `events/EventMenuDietaryCard.tsx`, `events/EventMenuDietaryConflictsCard.tsx`, `events/EventMenuLineKitchen.tsx`, `events/EventMenuLineNote.tsx`, `events/EventMenuLineOverrides.tsx`, `events/EventMenuNotesCard.tsx`, `events/EventMenuRecipeEditor.tsx`, `events/EventMenuSidebar.tsx`, `events/EventMenuStatsCard.tsx`, `events/EventMenuTab.tsx`, `events/EventMenuTemplateCard.tsx`, `events/EventPrepList.tsx`, `events/EventPrepTab.tsx`, `events/EventPrepWorkNotice.tsx`, `events/EventStockIssueCoordinator.ts`, `events/EventStockReservationCoordinator.ts`, `events/EventUnresolvedMaterialsNotice.tsx`, `events/useEventMenuNutrition.ts`, `kitchen/AllergenIconRow.tsx`, `kitchen/AllergenMatrixPage.tsx`, `kitchen/command-deck/KitchenCommandDeckCrewRail.tsx`, `kitchen/command-deck/KitchenCommandDeckEventRail.tsx`, `kitchen/command-deck/KitchenCommandDeckFilters.tsx`, `kitchen/command-deck/KitchenCommandDeckHorizon.ts`, `kitchen/command-deck/KitchenCommandDeckModel.ts`, `kitchen/command-deck/KitchenCommandDeckPersonLabel.ts`, `kitchen/command-deck/KitchenCommandDeckTaskPanel.tsx`, `kitchen/command-deck/KitchenCommandDeckTypes.ts`, `kitchen/command-deck/KitchenPrepAssignManager.ts`, `kitchen/ComponentCostCalculator.ts`, `kitchen/ComponentCostPanel.tsx`, `kitchen/ComponentDetailPage.tsx`, `kitchen/ComponentIngredientWasteButton.tsx`, `kitchen/ComponentKitchenStandardsPanel.tsx`, `kitchen/ComponentMethodStepsPanel.tsx`, `kitchen/ComponentNutrition.ts`, `kitchen/ComponentNutritionPanel.tsx`, `kitchen/ComponentPortionSpecsPanel.tsx`, `kitchen/ComponentPrepContext.tsx`, `kitchen/ComponentRecipeStatusPanel.tsx`, `kitchen/componentSnapshot.ts`, `kitchen/componentSnapshotCapture.ts`, `kitchen/ComponentSubRecipesPanel.tsx`, `kitchen/ComponentVersionHistoryPanel.tsx`, `kitchen/ComponentYieldStoragePanel.tsx`, `kitchen/culinary-studio/CulinaryCatalogCardCopy.ts`, `kitchen/culinary-studio/CulinaryCatalogCardTone.ts`, `kitchen/CulinaryAllergenVocabulary.ts`, `kitchen/CulinaryCanonicalMatcher.ts`, `kitchen/CulinaryCatalogVisibility.ts`, `kitchen/CulinaryEntityLink.tsx`, `kitchen/CulinaryFailureBanner.tsx`, `kitchen/CulinaryLifecyclePolicy.ts`, `kitchen/CulinaryRecordPicker.tsx`, `kitchen/culinaryRecovery.ts`, `kitchen/dishAllergens.ts`, `kitchen/DishComponentPortionSpecPanel.tsx`, `kitchen/DishComponentsPanel.tsx`, `kitchen/DishContainerEditForm.tsx`, `kitchen/DishContainersPanel.tsx`, `kitchen/DishDetailPage.tsx`, `kitchen/DishDetailsEditor.tsx`, `kitchen/dishIngredientRemoval.ts`, `kitchen/DishIngredientsPanel.tsx`, `kitchen/DishPlateCostFact.tsx`, `kitchen/DishPrepTasksPanel.tsx`, `kitchen/DishPrepTaskWorkControls.tsx`, `kitchen/DishVersionRecipeSwitch.tsx`, `kitchen/dishVersions.ts`, `kitchen/EventMenuReservationSync.ts`, `kitchen/EventMenuStockShortageBanner.tsx`, `kitchen/EventMenuSyncController.ts`, `kitchen/EventPrepCoordinator.ts`, `kitchen/EventPrepTaskSynchronizer.ts`, `kitchen/import/ComponentCsvParser.ts`, `kitchen/import/ComponentImportCoordinator.ts`, `kitchen/import/ComponentImportFinalizer.ts`, `kitchen/import/ComponentImportLineKind.tsx`, `kitchen/import/ComponentImportPage.tsx`, `kitchen/import/ComponentImportPanes.tsx`, `kitchen/import/ComponentImportRepository.ts`, `kitchen/import/ComponentImportSourcePanel.tsx`, `kitchen/import/ComponentImportTypes.ts`, `kitchen/import/ComponentTextParser.ts`, `kitchen/import/ImportSourceReadiness.ts`, `kitchen/import/IngredientCatalogMatcher.ts`, `kitchen/import/RecipeSheetParser.ts`, `kitchen/import/SourceFingerprint.ts`, `kitchen/import/UnitOfMeasureMapper.ts`, `kitchen/IngredientAllergenFieldset.tsx`, `kitchen/IngredientCatalogLabel.tsx`, `kitchen/IngredientCostingEditor.tsx`, `kitchen/IngredientDetailPage.tsx`, `kitchen/IngredientDetailsEditor.tsx`, `kitchen/IngredientMergeControl.tsx`, `kitchen/IngredientNutritionEditor.tsx`, `kitchen/IngredientOptionPicker.tsx`, `kitchen/IngredientPreviewCard.tsx`, `kitchen/IngredientPriceHistory.ts`, `kitchen/IngredientPriceTrendPanel.tsx`, `kitchen/IngredientStorageEditor.tsx`, `kitchen/IngredientSubstitution.ts`, `kitchen/IngredientSubstitutionEditor.tsx`, `kitchen/ItemUnitMappingsPanel.tsx`, `kitchen/KitchenBookNav.tsx`, `kitchen/KitchenCatalogCards.tsx`, `kitchen/KitchenCatalogCleanupPage.tsx`, `kitchen/KitchenCatalogCreateForm.tsx`, `kitchen/KitchenCatalogDisplayCache.ts`, `kitchen/KitchenCatalogLifecycleButtons.tsx`, `kitchen/KitchenCatalogPage.tsx`, `kitchen/KitchenDashboardPage.tsx`, `kitchen/kitchenRoutes.ts`, `kitchen/kitchenStationName.ts`, `kitchen/KitchenStationsPage.tsx`, `kitchen/KitchenUnresolvedWorkPage.tsx`, `kitchen/lookup/ExternalIngredientProfile.ts`, `kitchen/lookup/IngredientDatabaseLookup.tsx`, `kitchen/lookup/parseIngredientNutritionFromForm.ts`, `kitchen/MenuDetailPage.tsx`, `kitchen/MenuDetailsEditor.tsx`, `kitchen/MenuDishManager.tsx`, `kitchen/menuPdf.ts`, `kitchen/MenuPriceChangePlanner.tsx`, `kitchen/MenuProfitabilityAnalysis.ts`, `kitchen/MenuProfitabilityPanel.tsx`, `kitchen/menuTemplates.ts`, `kitchen/newDishMatch.ts`, `kitchen/NewDishPanel.tsx`, `kitchen/prepQuantityLabel.ts`, `kitchen/prepTaskCheck.ts`, `kitchen/prepTaskQuantity.ts`, `kitchen/PrepTaskRow.tsx`, `kitchen/PrepTemplateQuantityCoordinator.ts`, `kitchen/prepTiming.ts`, `kitchen/PublishedMethodPanel.tsx`, `kitchen/RecipeAllergenMarks.tsx`, `kitchen/RecipeEditionNotice.tsx`, `kitchen/recipeEquipment.ts`, `kitchen/RecipeNotes.tsx`, `kitchen/RecipeTimesEquipmentPanel.tsx`, `kitchen/stylePackaging.ts`, `kitchen/StylePackagingPanel.tsx`, `kitchen/useEventMenuSync.ts`, `kitchen/VendorItemsPanel.tsx`, `kitchen/VendorPriceComparisonPanel.tsx`, `production/BatchAllocationsPanel.tsx`, `production/batchCompletion.ts`, `production/BatchCompletionFields.tsx`, `production/BatchShortfallPanel.tsx`, `production/KitchenDisplayPage.tsx`, `production/KitchenDisplayTaskFacts.tsx`, `production/PrepActionReasonForm.tsx`, `production/PrepBoardPage.tsx`, `production/PrepTaskCommentThread.tsx`, `production/PrepTaskDependencies.ts`, `production/ProductionFailureBanner.tsx`, `production/ProductionLifecyclePolicy.ts`, `production/ProductionPlanPage.tsx`, `production/productionRoutes.ts`, `production/ProductionWorkspaceNav.tsx`, `production/productionYield.ts`, `production/ProductionYieldDashboardPage.tsx`
+Screens (171): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicker.tsx`, `events/ComponentStockSuggestions.tsx`, `events/EventAllergenBriefingBody.tsx`, `events/EventAllergenBriefingPage.tsx`, `events/EventDraftPoButton.tsx`, `events/EventDraftPoCoordinator.ts`, `events/EventMenuDietaryCard.tsx`, `events/EventMenuDietaryConflictsCard.tsx`, `events/EventMenuLineKitchen.tsx`, `events/EventMenuLineNote.tsx`, `events/EventMenuLineOverrides.tsx`, `events/EventMenuNotesCard.tsx`, `events/EventMenuRecipeEditor.tsx`, `events/EventMenuSidebar.tsx`, `events/EventMenuStatsCard.tsx`, `events/EventMenuTab.tsx`, `events/EventMenuTemplateCard.tsx`, `events/EventPrepList.tsx`, `events/EventPrepTab.tsx`, `events/EventPrepWorkNotice.tsx`, `events/EventStockIssueCoordinator.ts`, `events/EventStockReservationCoordinator.ts`, `events/EventUnresolvedMaterialsNotice.tsx`, `events/useEventMenuNutrition.ts`, `kitchen/AllergenIconRow.tsx`, `kitchen/AllergenMatrixPage.tsx`, `kitchen/command-deck/KitchenCommandDeckCrewRail.tsx`, `kitchen/command-deck/KitchenCommandDeckEventRail.tsx`, `kitchen/command-deck/KitchenCommandDeckFilters.tsx`, `kitchen/command-deck/KitchenCommandDeckHorizon.ts`, `kitchen/command-deck/KitchenCommandDeckModel.ts`, `kitchen/command-deck/KitchenCommandDeckPersonLabel.ts`, `kitchen/command-deck/KitchenCommandDeckTaskPanel.tsx`, `kitchen/command-deck/KitchenCommandDeckTypes.ts`, `kitchen/command-deck/KitchenPrepAssignManager.ts`, `kitchen/ComponentCostCalculator.ts`, `kitchen/ComponentCostPanel.tsx`, `kitchen/ComponentDetailPage.tsx`, `kitchen/ComponentIngredientWasteButton.tsx`, `kitchen/ComponentKitchenStandardsPanel.tsx`, `kitchen/ComponentMethodStepsPanel.tsx`, `kitchen/ComponentNutrition.ts`, `kitchen/ComponentNutritionPanel.tsx`, `kitchen/ComponentPortionSpecsPanel.tsx`, `kitchen/ComponentPrepContext.tsx`, `kitchen/ComponentRecipeStatusPanel.tsx`, `kitchen/componentSnapshot.ts`, `kitchen/componentSnapshotCapture.ts`, `kitchen/ComponentSubRecipesPanel.tsx`, `kitchen/ComponentVersionHistoryPanel.tsx`, `kitchen/ComponentYieldStoragePanel.tsx`, `kitchen/culinary-studio/CulinaryCatalogCardCopy.ts`, `kitchen/culinary-studio/CulinaryCatalogCardTone.ts`, `kitchen/CulinaryAllergenVocabulary.ts`, `kitchen/CulinaryCanonicalMatcher.ts`, `kitchen/CulinaryCatalogVisibility.ts`, `kitchen/CulinaryEntityLink.tsx`, `kitchen/CulinaryFailureBanner.tsx`, `kitchen/CulinaryLifecyclePolicy.ts`, `kitchen/CulinaryRecordPicker.tsx`, `kitchen/culinaryRecovery.ts`, `kitchen/dishAllergens.ts`, `kitchen/DishComponentPortionSpecPanel.tsx`, `kitchen/DishComponentsPanel.tsx`, `kitchen/DishContainerEditForm.tsx`, `kitchen/DishContainersPanel.tsx`, `kitchen/DishDetailPage.tsx`, `kitchen/DishDetailsEditor.tsx`, `kitchen/DishExclusiveVenueField.tsx`, `kitchen/dishIngredientRemoval.ts`, `kitchen/DishIngredientsPanel.tsx`, `kitchen/DishPlateCostFact.tsx`, `kitchen/DishPrepTasksPanel.tsx`, `kitchen/DishPrepTaskWorkControls.tsx`, `kitchen/DishVersionRecipeSwitch.tsx`, `kitchen/dishVersions.ts`, `kitchen/EventMenuReservationSync.ts`, `kitchen/EventMenuStockShortageBanner.tsx`, `kitchen/EventMenuSyncController.ts`, `kitchen/EventPrepCoordinator.ts`, `kitchen/EventPrepTaskSynchronizer.ts`, `kitchen/import/ComponentCsvParser.ts`, `kitchen/import/ComponentImportCoordinator.ts`, `kitchen/import/ComponentImportFinalizer.ts`, `kitchen/import/ComponentImportLineKind.tsx`, `kitchen/import/ComponentImportPage.tsx`, `kitchen/import/ComponentImportPanes.tsx`, `kitchen/import/ComponentImportRepository.ts`, `kitchen/import/ComponentImportSourcePanel.tsx`, `kitchen/import/ComponentImportTypes.ts`, `kitchen/import/ComponentTextParser.ts`, `kitchen/import/ImportSourceReadiness.ts`, `kitchen/import/IngredientCatalogMatcher.ts`, `kitchen/import/RecipeSheetParser.ts`, `kitchen/import/SourceFingerprint.ts`, `kitchen/import/UnitOfMeasureMapper.ts`, `kitchen/IngredientAllergenFieldset.tsx`, `kitchen/IngredientCatalogLabel.tsx`, `kitchen/IngredientCostingEditor.tsx`, `kitchen/IngredientDetailPage.tsx`, `kitchen/IngredientDetailsEditor.tsx`, `kitchen/IngredientMergeControl.tsx`, `kitchen/IngredientNutritionEditor.tsx`, `kitchen/IngredientOptionPicker.tsx`, `kitchen/IngredientPreviewCard.tsx`, `kitchen/IngredientPriceHistory.ts`, `kitchen/IngredientPriceTrendPanel.tsx`, `kitchen/IngredientStorageEditor.tsx`, `kitchen/IngredientSubstitution.ts`, `kitchen/IngredientSubstitutionEditor.tsx`, `kitchen/ItemUnitMappingsPanel.tsx`, `kitchen/KitchenBookNav.tsx`, `kitchen/KitchenCatalogCards.tsx`, `kitchen/KitchenCatalogCleanupPage.tsx`, `kitchen/KitchenCatalogCreateForm.tsx`, `kitchen/KitchenCatalogDisplayCache.ts`, `kitchen/KitchenCatalogLifecycleButtons.tsx`, `kitchen/KitchenCatalogPage.tsx`, `kitchen/KitchenDashboardPage.tsx`, `kitchen/kitchenRoutes.ts`, `kitchen/kitchenStationName.ts`, `kitchen/KitchenStationsPage.tsx`, `kitchen/KitchenUnresolvedWorkPage.tsx`, `kitchen/lookup/ExternalIngredientProfile.ts`, `kitchen/lookup/IngredientDatabaseLookup.tsx`, `kitchen/lookup/parseIngredientNutritionFromForm.ts`, `kitchen/MenuDetailPage.tsx`, `kitchen/MenuDetailsEditor.tsx`, `kitchen/MenuDishManager.tsx`, `kitchen/menuPdf.ts`, `kitchen/MenuPriceChangePlanner.tsx`, `kitchen/MenuProfitabilityAnalysis.ts`, `kitchen/MenuProfitabilityPanel.tsx`, `kitchen/menuTemplates.ts`, `kitchen/newDishMatch.ts`, `kitchen/NewDishPanel.tsx`, `kitchen/prepQuantityLabel.ts`, `kitchen/prepTaskCheck.ts`, `kitchen/prepTaskQuantity.ts`, `kitchen/PrepTaskRow.tsx`, `kitchen/PrepTemplateQuantityCoordinator.ts`, `kitchen/prepTiming.ts`, `kitchen/PublishedMethodPanel.tsx`, `kitchen/RecipeAllergenMarks.tsx`, `kitchen/RecipeEditionNotice.tsx`, `kitchen/recipeEquipment.ts`, `kitchen/RecipeNotes.tsx`, `kitchen/RecipeTimesEquipmentPanel.tsx`, `kitchen/stylePackaging.ts`, `kitchen/StylePackagingPanel.tsx`, `kitchen/useEventMenuSync.ts`, `kitchen/VendorItemsPanel.tsx`, `kitchen/VendorPriceComparisonPanel.tsx`, `production/BatchAllocationsPanel.tsx`, `production/batchCompletion.ts`, `production/BatchCompletionFields.tsx`, `production/BatchShortfallPanel.tsx`, `production/KitchenDisplayPage.tsx`, `production/KitchenDisplayTaskFacts.tsx`, `production/PrepActionReasonForm.tsx`, `production/PrepBoardPage.tsx`, `production/PrepTaskCommentThread.tsx`, `production/PrepTaskDependencies.ts`, `production/ProductionFailureBanner.tsx`, `production/ProductionLifecyclePolicy.ts`, `production/ProductionPlanPage.tsx`, `production/productionRoutes.ts`, `production/ProductionWorkspaceNav.tsx`, `production/productionYield.ts`, `production/ProductionYieldDashboardPage.tsx`
 
 ### Generated reads
 
@@ -1644,112 +1646,119 @@ Screens (170): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: DishAllergensClassified
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_classifyKind` (Dish.classifyKind)
   - inputs from the screen: kind; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
   - effects: DishKindClassified
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_clearFinishTiming` (Dish.clearFinishTiming)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
   - effects: DishFinishTimingSet
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_createViaIntroduce` (Dish.introduce)
   - inputs from the screen: name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Give this dish a name."; and 1 more
   - effects: DishIntroduced
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_detachVersion` (Dish.detachVersion)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
   - effects: DishVersionUnlinked
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_labelVersion` (Dish.labelVersion)
   - inputs from the screen: label; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
   - effects: DishVersionLabeled
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_linkAsEdition` (Dish.linkAsEdition)
   - inputs from the screen: sourceDishId, editionNumber; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: DishEditionCreated
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_makeVersionOf` (Dish.makeVersionOf)
   - inputs from the screen: mainDishId, label; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "A dish cannot be a version of itself."; and 3 more
   - effects: DishVersionLinked
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_mergeInto` (Dish.mergeInto)
   - inputs from the screen: targetDishId, reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: DishMerged
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_purge` (Dish.purge)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: DishPurged
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_reinstate` (Dish.reinstate)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: DishReinstated
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_reviseDetails` (Dish.reviseDetails)
   - inputs from the screen: name, description, category, course, serviceStyle, dietaryTags; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Give this dish a name."; and 2 more
   - effects: DishDetailsRevised
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_saveServiceInstructions` (Dish.saveServiceInstructions)
   - inputs from the screen: instructions, source; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Say where these serving instructions came from."; and 2 more
   - effects: DishServiceInstructionsSaved
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
+- `mutations.Dish_setExclusiveVenue` (Dish.setExclusiveVenue)
+  - inputs from the screen: venueId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishExclusiveVenueSet
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_setFinishTiming` (Dish.setFinishTiming)
   - inputs from the screen: timing; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
   - effects: DishFinishTimingSet
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_updatePortioning` (Dish.updatePortioning)
   - inputs from the screen: portionSize, portionUnit; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "This dish's portion size has to be more than zero."; and 2 more
   - effects: DishPortioningUpdated
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.Dish_useMainRecipe` (Dish.useMainRecipe)
   - inputs from the screen: shared; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Kitchen, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: DishRecipeSourceChanged
-  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 20 more
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 22 more
 - `mutations.EventDishLineOverride_createViaApply` (EventDishLineOverride.apply)
   - inputs from the screen: eventDishId, eventId, kind, portionsAffected, reason, targetDishIngredientId, targetDishComponentId, targetDishContainerId, targetDishTaskId, ingredientId, componentId, quantity, unit; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -2335,6 +2344,7 @@ Screens (170): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
 - `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
 - `eventDayBriefing.getBriefing` - query; live read, updates by itself
 - `eventDayBriefing.listEvents` - query; live read, updates by itself
@@ -2861,35 +2871,35 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "This person's hourly rate can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
   - effects: PersonPayRateSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 80 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 82 more
 - `mutations.Person_setSchedulingHold` (Person.setSchedulingHold)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonSchedulingHoldSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 80 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 82 more
 - `mutations.Person_setSmsAlerts` (Person.setSmsAlerts)
   - inputs from the screen: optIn; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonSmsAlertsChanged
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 80 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 82 more
 - `mutations.Person_setStaffingVendor` (Person.setStaffingVendor)
   - inputs from the screen: vendorName; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonStaffingVendorSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 80 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 82 more
 - `mutations.Person_setWorkPreferences` (Person.setWorkPreferences)
   - inputs from the screen: preferredRoles, approvedWorkLocations; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonWorkPreferencesSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 80 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 82 more
 - `mutations.PrepTask_claim` (PrepTask.claim)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -3242,6 +3252,7 @@ Screens (68): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `candidateHireRevocation.revokeHire` - mutation; authored step; live reads update by themselves
 - `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
@@ -3742,6 +3753,7 @@ Screens (29): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
 - `driverAssignment.assign` - mutation; authored step; live reads update by themselves
 - `driverAssignment.unassign` - mutation; authored step; live reads update by themselves

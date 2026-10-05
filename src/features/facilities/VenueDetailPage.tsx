@@ -25,6 +25,7 @@ import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
 import { VenuePartnershipPanel } from "./VenuePartnershipPanel";
+import { VenueExclusiveDishesPanel } from "./VenueExclusiveDishesPanel";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
 import { VenueOperatingFactsPanel } from "./VenueOperatingFactsPanel";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
@@ -878,6 +879,8 @@ export function VenueDetailPage() {
       <VenueScorecardPanel venueId={venue._id} />
 
       <VenuePartnershipPanel venue={venue} />
+
+      <VenueExclusiveDishesPanel venueId={String(venue._id)} />
 
       <VenueRoomsPanel venueId={venue._id} />
 

@@ -3234,6 +3234,22 @@ export const listDishByVersionOfDishId = query({
   },
 });
 
+export const listDishByExclusiveVenueId = query({
+  args: { exclusiveVenueId: v.optional(v.union(v.id("venues"), v.null())) },
+  handler: async (ctx, { exclusiveVenueId }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    if (!__allowsRead("dishRead", "Dish", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) return [];
+    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
+    if (__tenant == null) return [];
+    let rows = await ctx.db.query("dishes").withIndex("by_exclusiveVenueId", (q) => q.eq("exclusiveVenueId", exclusiveVenueId)).collect();
+    rows = rows.filter((d) => (d as any).tenantId === __tenant);
+    rows = rows.filter((d) => (d as any).deletedAt == null);
+    const __plainRows = rows;
+    return (__plainRows).map((__row) => { (__row as any).isActive = ((__row as any).status === "active"); (__row as any).isRetired = ((__row as any).status === "retired"); (__row as any).isCanonicalRoot = (((__row as any).canonicalDishId == null) && ((__row as any).mergedIntoDishId == null)); return { ...(__row as any), isActive: (__row as any).isActive, isRetired: (__row as any).isRetired, isCanonicalRoot: (__row as any).isCanonicalRoot }; });
+  },
+});
+
 export const listDishByCanonicalDishId = query({
   args: { canonicalDishId: v.optional(v.union(v.id("dishes"), v.null())) },
   handler: async (ctx, { canonicalDishId }) => {
@@ -3259,22 +3275,6 @@ export const listDishByMergedIntoDishId = query({
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("dishes").withIndex("by_mergedIntoDishId", (q) => q.eq("mergedIntoDishId", mergedIntoDishId)).collect();
-    rows = rows.filter((d) => (d as any).tenantId === __tenant);
-    rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).isActive = ((__row as any).status === "active"); (__row as any).isRetired = ((__row as any).status === "retired"); (__row as any).isCanonicalRoot = (((__row as any).canonicalDishId == null) && ((__row as any).mergedIntoDishId == null)); return { ...(__row as any), isActive: (__row as any).isActive, isRetired: (__row as any).isRetired, isCanonicalRoot: (__row as any).isCanonicalRoot }; });
-  },
-});
-
-export const listDishByExclusiveVenueId = query({
-  args: { exclusiveVenueId: v.optional(v.union(v.id("venues"), v.null())) },
-  handler: async (ctx, { exclusiveVenueId }) => {
-    const __auth = (await getAuthContext(ctx)) as any;
-    const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("dishRead", "Dish", () => ((checkRole(user, "kitchenAccess") || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) return [];
-    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    if (__tenant == null) return [];
-    let rows = await ctx.db.query("dishes").withIndex("by_exclusiveVenueId", (q) => q.eq("exclusiveVenueId", exclusiveVenueId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;

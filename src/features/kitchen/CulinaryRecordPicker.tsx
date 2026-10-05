@@ -14,6 +14,8 @@ export type PickerDish = CanonicalLike & {
   editionNumber?: number | null;
   versionOfDishId?: string | null;
   versionLabel?: string | null;
+  /** A short line under the name, for example "Only at Kindred + Co.". */
+  note?: string | null;
 };
 
 type Props = {
@@ -114,6 +116,9 @@ export function CulinaryRecordPicker({
                 Edition {row.editionNumber ?? 1}
                 {row.description ? ` · ${row.description.slice(0, 80)}` : ""}
               </p>
+              {row.note ? (
+                <p className="text-xs font-semibold text-ink-2">{row.note}</p>
+              ) : null}
               {kind === "dish" ? (
                 <AllergenIconRow codes={row.allergenSummary} className="mt-1" />
               ) : null}

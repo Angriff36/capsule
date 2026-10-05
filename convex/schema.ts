@@ -703,9 +703,9 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_versionOfDishId", ["versionOfDishId"])
+    .index("by_exclusiveVenueId", ["exclusiveVenueId"])
     .index("by_canonicalDishId", ["canonicalDishId"])
     .index("by_mergedIntoDishId", ["mergedIntoDishId"])
-    .index("by_exclusiveVenueId", ["exclusiveVenueId"])
     .index("by_primaryImageStorageId", ["primaryImageStorageId"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   dishComponents: defineTable({

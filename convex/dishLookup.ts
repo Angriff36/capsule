@@ -49,6 +49,24 @@ export const byIds = query({
   },
 });
 
+/** Live dishes offered only at this venue (venue-exclusive menu items). */
+export const exclusiveToVenue = query({
+  args: { venueId: v.string() },
+  handler: async (ctx, { venueId }): Promise<DishRow[] | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, DISH_READERS)) return null;
+    const id = ctx.db.normalizeId("venues", venueId);
+    if (!id) return [];
+    const dishes = await ctx.db
+      .query("dishes")
+      .withIndex("by_exclusiveVenueId", (q) => q.eq("exclusiveVenueId", id))
+      .take(200);
+    return dishes
+      .filter((d) => d.tenantId === auth.tenantId && d.deletedAt == null)
+      .map(dishRow);
+  },
+});
+
 /**
  * The company's dishes one page at a time, in the generated list's order.
  * Each page is its own read, so a dish change re-reads only the page that

@@ -9,7 +9,9 @@ import {
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
+import { venueExclusiveNote } from "./venueExclusiveNote";
 import { useEventGuests } from "../../lib/useEventRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
@@ -147,6 +149,11 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const pickerDishes = useWholeDishList(showPicker);
+  const venues = useListVenue();
+  const venueNames = useMemo(
+    () => new Map((venues ?? []).map((v) => [String(v._id), v.name])),
+    [venues],
+  );
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
   );
@@ -801,6 +808,11 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             canonicalDishId: dish.canonicalDishId,
             versionOfDishId: dish.versionOfDishId,
             versionLabel: dish.versionLabel,
+            note: venueExclusiveNote(
+              dish.exclusiveVenueId,
+              event?.venueId,
+              venueNames,
+            ),
           }))}
           excludeIds={existingDishIds}
           onSelect={(dishId) =>
