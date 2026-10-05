@@ -9,6 +9,7 @@ import { useVendorItemPriceHistory } from "../facilities/vendorPriceList";
 import { formatMoneyExact } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { SELECTABLE_UNITS } from "./import/UnitOfMeasureMapper";
 
 type VendorOption = {
@@ -254,16 +255,17 @@ export function VendorItemsPanel({
         ) : (
           <label className="field-label">
             Vendor
-            <select name="vendorId" className="input" required defaultValue="">
-              <option value="" disabled>
-                Pick a vendor
-              </option>
-              {liveVendors.map((vendor) => (
-                <option key={vendor._id} value={vendor._id}>
-                  {vendor.name}
-                </option>
-              ))}
-            </select>
+            <SearchSelect
+              name="vendorId"
+              required
+              recentsKey="vendor"
+              placeholder="Pick a vendor"
+              defaultValue=""
+              options={liveVendors.map((vendor) => ({
+                id: vendor._id,
+                label: vendor.name,
+              }))}
+            />
           </label>
         )}
         <label className="field-label">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
+import { SearchSelect } from "../../ui/SearchSelect";
 import {
   useListClient,
   useListDish,
@@ -331,19 +332,17 @@ function ClientStep({
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="field-label sm:col-span-2">
         Client
-        <select
-          className="field-input"
+        <SearchSelect
           value={draft.clientId}
           disabled={locked}
-          onChange={(event) => update({ clientId: event.target.value })}
-        >
-          <option value="">Select a client</option>
-          {clients.map((client) => (
-            <option key={client._id} value={client._id}>
-              {clientName(client)}
-            </option>
-          ))}
-        </select>
+          onChange={(id) => update({ clientId: id })}
+          recentsKey="client"
+          placeholder="Search clients…"
+          options={clients.map((client) => ({
+            id: client._id,
+            label: clientName(client),
+          }))}
+        />
       </label>
       <label className="field-label">
         Event title
@@ -457,18 +456,16 @@ function DishStep({
     <div className="space-y-3">
       <label className="field-label">
         Add a catalog dish
-        <select
-          className="field-input"
+        <SearchSelect
           value=""
-          onChange={(event) => add(event.target.value)}
-        >
-          <option value="">Select a dish</option>
-          {dishes.map((dish) => (
-            <option key={dish._id} value={dish._id}>
-              {dish.name}
-            </option>
-          ))}
-        </select>
+          onChange={(id) => add(id)}
+          recentsKey="dish"
+          placeholder="Search dishes…"
+          options={dishes.map((dish) => ({
+            id: dish._id,
+            label: dish.name,
+          }))}
+        />
       </label>
       {draft.dishes.length ? (
         <ul className="divide-y divide-line">
@@ -562,18 +559,16 @@ function StaffStep({
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="field-label">
           Person
-          <select
-            className="field-input"
+          <SearchSelect
             value={personId}
-            onChange={(event) => setPersonId(event.target.value)}
-          >
-            <option value="">Select a person</option>
-            {people.map((person) => (
-              <option key={person._id} value={person._id}>
-                {personName(person)}
-              </option>
-            ))}
-          </select>
+            onChange={(id) => setPersonId(id)}
+            recentsKey="staff"
+            placeholder="Search people…"
+            options={people.map((person) => ({
+              id: person._id,
+              label: personName(person),
+            }))}
+          />
         </label>
         <label className="field-label">
           Role

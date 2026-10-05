@@ -11,6 +11,7 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { ReviewFeedback } from "./ReviewFeedback";
