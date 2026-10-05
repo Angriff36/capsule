@@ -133,8 +133,7 @@ describe("recipe book sub-recipes", () => {
     await render(createElement(ComponentSubRecipesPanel, { componentId: MAC }));
     const form = container.querySelector("form.culinary-line-form")!;
     setValue(form.querySelector("select[name=childComponentId]")!, ALFREDO);
-    setValue(form.querySelector("input[name=quantity]")!, "2");
-    setValue(form.querySelector("select[name=unit]")!, "gallon");
+    setValue(form.querySelector("input[name=quantity]")!, "2 gallon");
     await act(async () => {
       form.dispatchEvent(
         new Event("submit", { bubbles: true, cancelable: true }),

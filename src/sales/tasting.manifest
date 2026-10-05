@@ -37,6 +37,11 @@ entity Tasting mixin TenantScoped, SoftDeletable {
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref createdBy: Person fields [tenantId, createdByPersonId] references [tenantId, id]
 
+  transition status from "scheduled" to ["completed", "cancelled", "selectionsApplied"]
+  transition status from "completed" to ["selectionsApplied"]
+  transition status from "selectionsApplied" to ["selectionsApplied"]
+  transition status from "cancelled" to []
+
   constraint tastingSchedule: self.scheduledAt > 0 and self.durationMinutes > 0 and self.guestCount > 0 "Choose a date and time, a positive duration, and at least one tasting guest"
   constraint tastingSalesLink: self.leadId != null or self.proposalId != null "Attach this tasting to a lead or proposal"
 

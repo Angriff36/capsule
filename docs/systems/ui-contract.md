@@ -616,13 +616,6 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 ### Generated actions
 
-- `mutations.Client_createViaRegister` (Client.register)
-  - inputs from the screen: clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId; filled by the server: none
-  - version: not used; retry key: accepted (same key = same result)
-  - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Company clients require a company name; person clients require a given name"; and 2 more
-  - effects: ClientRegistered
-  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
 - `mutations.CorrectiveAction_close` (CorrectiveAction.close)
   - inputs from the screen: resolutionNotes; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -1225,13 +1218,6 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Cargo space can't be negative. Use zero or more, or leave it empty."; and 3 more
   - effects: TrailerCargoFactsSet
   - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
-- `mutations.Venue_createViaRegister` (Venue.register)
-  - inputs from the screen: name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes; filled by the server: none
-  - version: not used; retry key: accepted (same key = same result)
-  - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Staff may see venues"; "Event staff may update venues"; "Event staff may change venues"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
-  - effects: VenueRegistered
-  - refresh: live reads update by themselves; reads affected: Venue.list, Venue.get, DateHold.list, DateHold.get, Dish.list, Dish.get, Event.list, Event.get and 16 more
 
 ### Authored reads and steps
 
@@ -3291,7 +3277,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
-  - effects: none
+  - effects: TrainingDocSet
   - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
 - `mutations.TrainingSignOff_createViaBeginTraining` (TrainingSignOff.beginTraining)
   - inputs from the screen: personId, trainingModuleId, startedAt, trainerPersonId; filled by the server: none
@@ -3312,14 +3298,14 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
-  - effects: none
+  - effects: TrainingStepsInitialled
   - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
 - `mutations.TrainingSignOff_reopenTraining` (TrainingSignOff.reopenTraining)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
-  - effects: none
+  - effects: TrainingSignOffReopened
   - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
 - `mutations.WeeklyScheduleNotice_acknowledge` (WeeklyScheduleNotice.acknowledge)
   - inputs from the screen: none; filled by the server: none

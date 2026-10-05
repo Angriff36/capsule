@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { Doc } from "../../lib/api";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { clientDisplayName } from "../events/clientName";
 import { DateHoldCollisionNotice } from "./DateHoldCollisionNotice";
 import { DEFAULT_HOLD_DAYS } from "./dateHolds";
@@ -68,8 +69,7 @@ export function DateHoldForm({
       <div className="grid gap-3 sm:grid-cols-4">
         <label className="field-label">
           Date *
-          <input
-            type="date"
+          <BoundedDateInput
             className="input"
             required
             value={dateKey}

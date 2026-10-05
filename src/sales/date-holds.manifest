@@ -71,6 +71,7 @@ entity DateHold mixin TenantScoped, SoftDeletable {
     mutate ownerPersonId = user.personId
     mutate status = "held"
     mutate placedAt = now()
+    emit DateHoldPlaced { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   command extend(expiresAt: int) {
@@ -78,6 +79,7 @@ entity DateHold mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint dateHoldExtendFuture: expiresAt > now() "Pick a hold expiry in the future."
     mutate expiresAt = expiresAt
+    emit DateHoldExtended { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   command release() {
@@ -85,6 +87,7 @@ entity DateHold mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "released"
     mutate releasedAt = now()
+    emit DateHoldReleased { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   // Records a hold whose expiry already passed; the UI treats it as expired
@@ -94,6 +97,7 @@ entity DateHold mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.expiresAt <= now()
     mutate status = "expired"
+    emit DateHoldExpired { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   command convert(eventId: uuid) {
@@ -102,6 +106,7 @@ entity DateHold mixin TenantScoped, SoftDeletable {
     mutate eventId = eventId
     mutate status = "converted"
     mutate convertedAt = now()
+    emit DateHoldConverted { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   store DateHold in durable
@@ -150,6 +155,7 @@ entity DateWaitlistEntry mixin TenantScoped, SoftDeletable {
     mutate ownerPersonId = user.personId
     mutate status = "waiting"
     mutate queuedAt = now()
+    emit DateWaitlistJoined { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   // Sales reached the client after the date opened.
@@ -158,6 +164,7 @@ entity DateWaitlistEntry mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "offered"
     mutate offeredAt = now()
+    emit DateWaitlistOffered { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   // The client took the date (a hold or booking follows).
@@ -166,6 +173,7 @@ entity DateWaitlistEntry mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "promoted"
     mutate promotedAt = now()
+    emit DateWaitlistPromoted { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   command withdraw() {
@@ -173,7 +181,18 @@ entity DateWaitlistEntry mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "withdrawn"
     mutate withdrawnAt = now()
+    emit DateWaitlistWithdrawn { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
   }
 
   store DateWaitlistEntry in durable
 }
+
+event DateHoldPlaced: "date_hold.placed" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldExtended: "date_hold.extended" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldReleased: "date_hold.released" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldExpired: "date_hold.expired" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldConverted: "date_hold.converted" { dateHoldId: string tenantId: string holdDate: string }
+event DateWaitlistJoined: "date_waitlist.joined" { dateWaitlistEntryId: string tenantId: string holdDate: string }
+event DateWaitlistOffered: "date_waitlist.offered" { dateWaitlistEntryId: string tenantId: string holdDate: string }
+event DateWaitlistPromoted: "date_waitlist.promoted" { dateWaitlistEntryId: string tenantId: string holdDate: string }
+event DateWaitlistWithdrawn: "date_waitlist.withdrawn" { dateWaitlistEntryId: string tenantId: string holdDate: string }

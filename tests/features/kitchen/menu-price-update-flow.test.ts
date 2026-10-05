@@ -54,6 +54,8 @@ function setValue(
   Object.getOwnPropertyDescriptor(proto, "value")!.set!.call(element, value);
   element.dispatchEvent(new Event("input", { bubbles: true }));
   element.dispatchEvent(new Event("change", { bubbles: true }));
+  // Leaving the box commits a typed date (BoundedDateInput resolves on blur).
+  element.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
 }
 
 const labelled = (text: string) => {

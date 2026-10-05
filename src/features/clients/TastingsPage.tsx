@@ -6,6 +6,7 @@ import {
   useListTasting,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -141,9 +142,8 @@ export function TastingsPage() {
           </label>
           <label className="field-label">
             Date and time
-            <input
+            <BoundedDateTimeLocalInput
               name="scheduledAt"
-              type="datetime-local"
               className="input"
               required
             />

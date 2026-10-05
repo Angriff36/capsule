@@ -66,6 +66,18 @@ function NaturalDateInput({
     if (value !== undefined) setText(String(value ?? ""));
   }, [value]);
 
+  const writeNative = (next: string) => {
+    if (nativeRef.current && nativeRef.current.value !== next) {
+      // The prototype setter bypasses React's value tracker, so the dispatched
+      // input event reaches the picker's onChange (and the caller's state).
+      Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set?.call(nativeRef.current, next);
+      nativeRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  };
+
   const commit = () => {
     const parsed = parseNaturalDate(text, {
       kind,
@@ -80,15 +92,7 @@ function NaturalDateInput({
       return false;
     }
     setText(parsed.value);
-    if (nativeRef.current && nativeRef.current.value !== parsed.value) {
-      // The prototype setter bypasses React's value tracker, so the dispatched
-      // input event reaches the picker's onChange (and the caller's state).
-      Object.getOwnPropertyDescriptor(
-        HTMLInputElement.prototype,
-        "value",
-      )?.set?.call(nativeRef.current, parsed.value);
-      nativeRef.current.dispatchEvent(new Event("input", { bubbles: true }));
-    }
+    writeNative(parsed.value);
     setMessage(`→ ${parsed.echo}`);
     return true;
   };
@@ -120,7 +124,9 @@ function NaturalDateInput({
           onKeyDown?.(event);
         }}
         onBlur={(event) => {
+          // A cleared box clears the picker too, so the form saves no date.
           if (text.trim()) commit();
+          else writeNative("");
           onBlur?.(event);
         }}
       />

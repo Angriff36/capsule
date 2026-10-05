@@ -39,7 +39,8 @@ export function useStuckHeader(sentinelRef: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const sentinel = sentinelRef.current;
     const root = getScroller();
-    if (!sentinel || !root) return;
+    if (!sentinel || !root || typeof IntersectionObserver === "undefined")
+      return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -106,7 +107,12 @@ export function useSectionNav(
 
   useEffect(() => {
     const root = getScroller();
-    if (!root || sections.length === 0) return;
+    if (
+      !root ||
+      sections.length === 0 ||
+      typeof IntersectionObserver === "undefined"
+    )
+      return;
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries

@@ -9206,6 +9206,11 @@ async function __runDateHoldConvert(ctx: MutationCtx, { docId, eventId, version 
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateHold", command: "convert", id: docId } };
+    const __manifestEvent0 = { type: "DateHoldConverted", entity: "DateHold", entityId: docId, payload: { dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "convert", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9264,6 +9269,11 @@ async function __runDateHoldExpire(ctx: MutationCtx, { docId, version }: any, __
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateHold", command: "expire", id: docId } };
+    const __manifestEvent0 = { type: "DateHoldExpired", entity: "DateHold", entityId: docId, payload: { dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "expire", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9309,6 +9319,11 @@ async function __runDateHoldExtend(ctx: MutationCtx, { docId, expiresAt, version
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateHold", command: "extend", id: docId } };
+    const __manifestEvent0 = { type: "DateHoldExtended", entity: "DateHold", entityId: docId, payload: { dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "extend", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9375,6 +9390,11 @@ async function __runDateHoldPlace(ctx: MutationCtx, { docId, holdDate, expiresAt
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateHold", command: "place", id: docId } };
+    const __manifestEvent0 = { type: "DateHoldPlaced", entity: "DateHold", entityId: docId, payload: { dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "place", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9459,6 +9479,10 @@ export const DateHold_createViaPlace = mutation({
     doc.status = "held";
     doc.placedAt = Date.now();
     const docId = await ctx.db.insert("dateHolds", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, dateHoldId: docId, tenantId: doc.tenantId, holdDate: doc.holdDate, _subject: { entity: "DateHold", command: "place", id: docId } };
+    const __manifestEvent0 = { type: "DateHoldPlaced", entity: "DateHold", entityId: docId, payload: { dateHoldId: docId, tenantId: doc.tenantId, holdDate: doc.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "place", emitIndex: 0 });
     const __result = { docId };
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -9499,6 +9523,11 @@ async function __runDateHoldRelease(ctx: MutationCtx, { docId, version }: any, _
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateHold", command: "release", id: docId } };
+    const __manifestEvent0 = { type: "DateHoldReleased", entity: "DateHold", entityId: docId, payload: { dateHoldId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "release", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9561,6 +9590,11 @@ async function __runDateWaitlistEntryJoin(ctx: MutationCtx, { docId, holdDate, c
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateWaitlistEntry", command: "join", id: docId } };
+    const __manifestEvent0 = { type: "DateWaitlistJoined", entity: "DateWaitlistEntry", entityId: docId, payload: { dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "join", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9636,6 +9670,10 @@ export const DateWaitlistEntry_createViaJoin = mutation({
     doc.status = "waiting";
     doc.queuedAt = Date.now();
     const docId = await ctx.db.insert("dateWaitlistEntries", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, dateWaitlistEntryId: docId, tenantId: doc.tenantId, holdDate: doc.holdDate, _subject: { entity: "DateWaitlistEntry", command: "join", id: docId } };
+    const __manifestEvent0 = { type: "DateWaitlistJoined", entity: "DateWaitlistEntry", entityId: docId, payload: { dateWaitlistEntryId: docId, tenantId: doc.tenantId, holdDate: doc.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "join", emitIndex: 0 });
     const __result = { docId };
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -9676,6 +9714,11 @@ async function __runDateWaitlistEntryOffer(ctx: MutationCtx, { docId, version }:
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateWaitlistEntry", command: "offer", id: docId } };
+    const __manifestEvent0 = { type: "DateWaitlistOffered", entity: "DateWaitlistEntry", entityId: docId, payload: { dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "offer", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9733,6 +9776,11 @@ async function __runDateWaitlistEntryPromote(ctx: MutationCtx, { docId, version 
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateWaitlistEntry", command: "promote", id: docId } };
+    const __manifestEvent0 = { type: "DateWaitlistPromoted", entity: "DateWaitlistEntry", entityId: docId, payload: { dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "promote", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -9790,6 +9838,11 @@ async function __runDateWaitlistEntryWithdraw(ctx: MutationCtx, { docId, version
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate, _subject: { entity: "DateWaitlistEntry", command: "withdraw", id: docId } };
+    const __manifestEvent0 = { type: "DateWaitlistWithdrawn", entity: "DateWaitlistEntry", entityId: docId, payload: { dateWaitlistEntryId: docId, tenantId: __after.tenantId, holdDate: __after.holdDate }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "withdraw", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -65616,6 +65669,18 @@ async function __runTastingCancel(ctx: MutationCtx, { docId, version }: any, __c
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may manage tastings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
+    {
+      const __cur = doc.status;
+      if (__cur !== undefined) {
+        const __from = String(__cur);
+        const __to = "cancelled";
+        const __allowed: Record<string, string[]> = { "scheduled": ["completed", "cancelled", "selectionsApplied"], "completed": ["selectionsApplied"], "selectionsApplied": ["selectionsApplied"], "cancelled": [] };
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
+          throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
+        }
+      }
+    }
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -65666,6 +65731,18 @@ async function __runTastingMarkSelectionsApplied(ctx: MutationCtx, { docId, prop
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may manage tastings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status !== "cancelled"))) throw new Error("Guard 1 failed");
+    {
+      const __cur = doc.status;
+      if (__cur !== undefined) {
+        const __from = String(__cur);
+        const __to = "selectionsApplied";
+        const __allowed: Record<string, string[]> = { "scheduled": ["completed", "cancelled", "selectionsApplied"], "completed": ["selectionsApplied"], "selectionsApplied": ["selectionsApplied"], "cancelled": [] };
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
+          throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
+        }
+      }
+    }
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -65718,6 +65795,18 @@ async function __runTastingMarkTasted(ctx: MutationCtx, { docId, version }: any,
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may manage tastings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
+    {
+      const __cur = doc.status;
+      if (__cur !== undefined) {
+        const __from = String(__cur);
+        const __to = "completed";
+        const __allowed: Record<string, string[]> = { "scheduled": ["completed", "cancelled", "selectionsApplied"], "completed": ["selectionsApplied"], "selectionsApplied": ["selectionsApplied"], "cancelled": [] };
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
+          throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
+        }
+      }
+    }
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -67898,6 +67987,11 @@ async function __runTrainingModuleSetTrainingDoc(ctx: MutationCtx, { docId, step
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, trainingModuleId: docId, tenantId: __after.tenantId, _subject: { entity: "TrainingModule", command: "setTrainingDoc", id: docId } };
+    const __manifestEvent0 = { type: "TrainingDocSet", entity: "TrainingModule", entityId: docId, payload: { trainingModuleId: docId, tenantId: __after.tenantId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "setTrainingDoc", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -68126,6 +68220,11 @@ async function __runTrainingSignOffInitialTrainingSteps(ctx: MutationCtx, { docI
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, trainingSignOffId: docId, tenantId: __after.tenantId, personId: __after.personId, _subject: { entity: "TrainingSignOff", command: "initialTrainingSteps", id: docId } };
+    const __manifestEvent0 = { type: "TrainingStepsInitialled", entity: "TrainingSignOff", entityId: docId, payload: { trainingSignOffId: docId, tenantId: __after.tenantId, personId: __after.personId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "initialTrainingSteps", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -68172,6 +68271,11 @@ async function __runTrainingSignOffReopenTraining(ctx: MutationCtx, { docId, ver
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, trainingSignOffId: docId, tenantId: __after.tenantId, personId: __after.personId, _subject: { entity: "TrainingSignOff", command: "reopenTraining", id: docId } };
+    const __manifestEvent0 = { type: "TrainingSignOffReopened", entity: "TrainingSignOff", entityId: docId, payload: { trainingSignOffId: docId, tenantId: __after.tenantId, personId: __after.personId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "reopenTraining", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
