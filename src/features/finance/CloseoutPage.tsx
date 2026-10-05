@@ -11,7 +11,11 @@ import {
   useListInvoice,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatCountNoun, formatMoneyExact } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
@@ -373,6 +377,13 @@ export function CloseoutPage() {
                           >
                             <strong>{eventTitle(String(row.eventId))}</strong>
                           </Link>
+                          {eventFor(String(row.eventId))?.startsAt ? (
+                            <span className="ml-2 text-sm text-ink-2">
+                              {formatDate(
+                                Number(eventFor(String(row.eventId))?.startsAt),
+                              )}
+                            </span>
+                          ) : null}
                           <CloseoutRevenueNote row={row} billing={billing} />
                         </td>
                         <td>{formatMoneyExact(billing.billedTotal)}</td>
