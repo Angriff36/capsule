@@ -5,6 +5,7 @@ import {
 } from "./beoNoteSections";
 import type {
   BundleMenuItem,
+  BundlePerson,
   BundleStaffAssignment,
   BundleTimelineEntry,
   EventBundlePart,
@@ -537,14 +538,37 @@ interface Body {
   timeline: BundleTimelineEntry[];
   menu: BundleMenuItem[];
   staff: BundleStaffAssignment[];
+  otherContacts: BundlePerson[];
   noteLines: string[];
+}
+
+/**
+ * "Venue Manager - Trish Eason (509) 818-7553" under Staffing is the
+ * on-site person to reach, not a crew member.
+ */
+function readStaffingContact(text: string): BundlePerson | undefined {
+  const match = text.match(
+    /^(.+?)\s+[-–]\s+(.+?)\s*(\(?\d{3}\)?[\s.-]*\d{3}[\s.-]*\d{4})/,
+  );
+  if (!match) return undefined;
+  return {
+    role: match[1]!.trim(),
+    name: match[2]!.trim(),
+    phone: parsePhone(match[3]),
+  };
 }
 
 function readBody(
   lines: ReadLine[],
   eventWindow: { start?: number; end?: number } = {},
 ): Body {
-  const body: Body = { timeline: [], menu: [], staff: [], noteLines: [] };
+  const body: Body = {
+    timeline: [],
+    menu: [],
+    staff: [],
+    otherContacts: [],
+    noteLines: [],
+  };
   let section: Section = "header";
   let course: string | undefined;
 
@@ -570,6 +594,11 @@ function readBody(
       continue;
     }
     if (section === "staff") {
+      const contact = readStaffingContact(line.text);
+      if (contact) {
+        body.otherContacts.push(contact);
+        continue;
+      }
       const member = readStaffLine(line.text);
       if (member) body.staff.push(member);
       continue;
@@ -787,6 +816,7 @@ export function parseBeoText(text: string): EventBundlePart {
     timeline: body.timeline,
     menu: body.menu,
     staff: body.staff,
+    otherContacts: body.otherContacts,
     notes,
     warnings,
   };

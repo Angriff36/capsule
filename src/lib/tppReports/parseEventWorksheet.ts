@@ -186,7 +186,7 @@ export function parseEventWorksheet(rows: string[][]): EventBundlePart {
     menu: readMenu(rows),
     packList: readEquipment(rows),
     staff: readStaff(rows),
-    notes: readSetupNotes(rows),
+    notes: withLaborNote(readSetupNotes(rows), readLaborNote(rows)),
   };
 }
 
@@ -303,7 +303,11 @@ function readStaff(rows: readonly string[][]): BundleStaffAssignment[] {
     const cells = row.map((cell) => cell.trim());
     const filled = cells.filter(Boolean);
     if (filled.length === 0 || /^Staff Phone/i.test(filled[0]!)) continue;
-    if (filled.length === 1) {
+    // "Notes: …" under Event Labor is the labor note (readLaborNote).
+    if (LABOR_NOTE.test(cells[0]!)) continue;
+    // A person row with no shift times ("[2] * Unassigned *") is still a
+    // person, not the next role.
+    if (filled.length === 1 && !UNASSIGNED_ROW.test(filled[0]!)) {
       role = filled[0];
       continue;
     }
@@ -322,6 +326,42 @@ function readStaff(rows: readonly string[][]): BundleStaffAssignment[] {
     staff.push(entry);
   }
   return staff;
+}
+
+function withLaborNote(
+  notes: BundleNotes,
+  laborNote: string | undefined,
+): BundleNotes {
+  if (!laborNote) return notes;
+  return {
+    ...notes,
+    operationsNotes: notes.operationsNotes
+      ? `${notes.operationsNotes}\n\n${laborNote}`
+      : laborNote,
+  };
+}
+
+const LABOR_NOTE = /^notes\s*:$/i;
+const UNASSIGNED_ROW = /^(?:\[\d+\]\s*)?\*\s*unassigned\s*\*$/i;
+
+/**
+ * "Notes: This will be sent out as a bring hot … but is DROP OFF service."
+ * printed under Event Labor: how the crew runs the event.
+ */
+function readLaborNote(rows: readonly string[][]): string | undefined {
+  let active = false;
+  for (const row of rows) {
+    if (sectionOf(row) === "event labor") {
+      active = true;
+      continue;
+    }
+    if (!active) continue;
+    const cells = row.map((cell) => cell.trim()).filter(Boolean);
+    if (cells.length > 1 && LABOR_NOTE.test(cells[0]!)) {
+      return cells.slice(1).join(" ");
+    }
+  }
+  return undefined;
 }
 
 /** "46291.6770833333" → minutes into that day (0.677 × 1440 = 4:15 PM). */

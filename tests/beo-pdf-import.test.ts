@@ -86,6 +86,8 @@ const PAGE_TWO: Run[] = [
   [184, 758, "Grilled Tri Tip Steak"],
   [184, 746, "Sirloin tri tip, rubbed with spices and"],
   [184, 738, "marinated in garlic."],
+  [56, 600, "Staffing"],
+  [56, 585, "Venue Manager - Sam Host (509) 555-0100"],
 ];
 
 const pdf = buildPdf([PAGE_ONE, PAGE_TWO]);
@@ -100,7 +102,7 @@ describe("TPP BEO printed to PDF", () => {
       "Date:",
       "Saturday 10/10/2026",
     ]);
-    expect(lines.at(-1)?.text).toBe("marinated in garlic.");
+    expect(lines.at(-1)?.text).toBe("Venue Manager - Sam Host (509) 555-0100");
   });
 
   it("is imported as the BEO with its header, venue, client and menu", () => {
@@ -135,5 +137,10 @@ describe("TPP BEO printed to PDF", () => {
         "Sirloin tri tip, rubbed with spices and marinated in garlic.",
     });
     expect(bundle.notes.eventOverview).toContain("A buffet with apps");
+    // The venue manager under Staffing is a contact, not crew.
+    expect(bundle.otherContacts).toEqual([
+      { role: "Venue Manager", name: "Sam Host", phone: "5095550100" },
+    ]);
+    expect(bundle.staff).toEqual([]);
   });
 });
