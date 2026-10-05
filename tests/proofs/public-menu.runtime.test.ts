@@ -281,6 +281,29 @@ describe("public menu shows effective sell prices and nothing private (AC-240)",
     expect(tart.allergens).toEqual(["milk", "tree_nuts"]);
   });
 
+  it("heads the printed menu with the Branding name and address only", async () => {
+    const proof = harness();
+    const { owner } = await seedCatalog(proof, "tenant-menu-f");
+    expect(
+      await proof.anonymous.query(api.publicMenu.getPublicMenuCompany, {}),
+    ).toEqual({ name: "Harvest Catering", address: null, logoUrl: null });
+    await owner.run(async (ctx) => {
+      const [org] = await ctx.db.query("organizations").collect();
+      await ctx.db.patch(org!._id as never, {
+        brandDisplayName: "Harvest Co.",
+        brandAddress: "1 Main St, Spokane",
+        emailReplyTo: "PRIVATE-REPLY@example.com",
+      });
+    });
+    expect(
+      await proof.anonymous.query(api.publicMenu.getPublicMenuCompany, {}),
+    ).toEqual({
+      name: "Harvest Co.",
+      address: "1 Main St, Spokane",
+      logoUrl: null,
+    });
+  });
+
   it("shows another company nothing", async () => {
     const proof = harness();
     await seedCatalog(proof, "tenant-menu-d");

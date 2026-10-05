@@ -148,6 +148,36 @@ export const getPublicMenu = query({
   },
 });
 
+export type PublicMenuCompany = {
+  name: string;
+  address: string | null;
+  logoUrl: string | null;
+};
+
+/**
+ * The company head and foot of the printed menu: the Branding name, address
+ * and logo of the same organization getPublicMenu serves. Nothing else.
+ */
+export const getPublicMenuCompany = query({
+  args: {},
+  handler: async (ctx): Promise<PublicMenuCompany | null> => {
+    const org = await ctx.db
+      .query("organizations")
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .first();
+    if (!org) return null;
+    const logoId =
+      typeof org.brandLogoStorageId === "string"
+        ? ctx.db.system.normalizeId("_storage", org.brandLogoStorageId)
+        : null;
+    return {
+      name: org.brandDisplayName?.trim() || org.name,
+      address: org.brandAddress?.trim() || null,
+      logoUrl: logoId ? await ctx.storage.getUrl(logoId) : null,
+    };
+  },
+});
+
 /** One dish's allergen codes from its recipe, read through indexes. */
 async function recipeAllergens(
   ctx: QueryCtx,

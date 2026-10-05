@@ -538,6 +538,7 @@ Screens (31): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `proposalEmail.getHistory` - action; one-time call (not live); the live reads it changes update by themselves
 - `proposalEmail.send` - action; one-time call (not live); the live reads it changes update by themselves
 - `publicMenu.getPublicMenu` - query; live read, updates by itself
+- `publicMenu.getPublicMenuCompany` - query; live read, updates by itself
 - `quoteBuilder.getEventBookingDetails` - query; live read, updates by itself
 - `shareLinks.getSharedProposal` - query; live read, updates by itself
 - `shareLinks.recordShareView` - mutation; authored step; live reads update by themselves
