@@ -33,6 +33,8 @@ import {
   type PrepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { productionBatchLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import { NO_PREP_TIME, prepMadeSoFarLabel } from "../kitchen/prepTiming";
 import {
   KitchenDisplayTaskFacts,
@@ -393,6 +395,13 @@ export function KitchenDisplayPage() {
                         [item.id]: entry,
                       }))
                     }
+                  />
+                ) : null}
+                {item.kind === "batch" ? (
+                  <LifecycleStepper
+                    definition={productionBatchLifecycle}
+                    status={item.status}
+                    actions={[]}
                   />
                 ) : null}
                 {bumpAction ? (

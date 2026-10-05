@@ -80,6 +80,7 @@ import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperati
 import { componentRestoreOutcome } from "./culinaryRecovery";
 import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
 import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -963,7 +964,10 @@ function ComponentEditForm({
           />
         </label>
         <label className="field-label">
-          Yield
+          <span className="field-label-row">
+            Yield
+            <FieldHelp term="yield" />
+          </span>
           <input
             name="yieldQuantity"
             type="number"
@@ -987,7 +991,10 @@ function ComponentEditForm({
           </select>
         </label>
         <label className="field-label">
-          Batch multiplier
+          <span className="field-label-row">
+            Batch multiplier
+            <FieldHelp term="batchMultiplier" />
+          </span>
           <input
             name="batchMultiplier"
             type="number"

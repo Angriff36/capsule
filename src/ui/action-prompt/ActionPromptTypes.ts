@@ -1,3 +1,5 @@
+import type { FieldHelpTerm } from "../fieldHelpTerms";
+
 export type ActionPromptTone = "default" | "danger";
 
 export interface ActionPromptField {
@@ -14,6 +16,8 @@ export interface ActionPromptField {
   suggestions?: string[];
   required?: boolean;
   helper?: string;
+  /** Domain term explained by an info icon beside the label. */
+  help?: FieldHelpTerm;
 }
 
 export interface ReasonPromptRequest {

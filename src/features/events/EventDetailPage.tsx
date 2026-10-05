@@ -15,7 +15,6 @@ import {
   useEventArchive,
   useEventBeginExecution,
   useEventCancel,
-  useEventChangeHeadcount,
   useEventChangePricing,
   useEventChangePrimaryContact,
   useEventChangeRequirements,
@@ -34,6 +33,7 @@ import {
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventTimelineActivities } from "../../lib/useEventRows";
@@ -80,6 +80,7 @@ import {
 } from "./EventLifecyclePolicy";
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
 import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
@@ -195,7 +196,7 @@ function EventDetailContent({
   const cancel = useEventCancel();
   const archive = useEventArchive();
   const returnToPlanning = useEventReturnToPlanning();
-  const changeHeadcount = useEventChangeHeadcount();
+  const applyDemandHeadcount = useApplyDemandHeadcount();
   const changePricing = useEventChangePricing();
   const changePrimaryContact = useEventChangePrimaryContact();
   const changeRequirements = useEventChangeRequirements();
@@ -208,6 +209,10 @@ function EventDetailContent({
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
+  const [headcountPreview, setHeadcountPreview] = useState<{
+    newHeadcount: number;
+    version?: number;
+  } | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
@@ -497,7 +502,13 @@ function EventDetailContent({
     timelineCount: timelineCount,
     run: run,
     onReschedule: reschedule,
-    onChangeHeadcount: changeHeadcount,
+    onPreviewHeadcount: ({
+      newHeadcount,
+      version: nextVersion,
+    }: {
+      newHeadcount: number;
+      version: number | undefined;
+    }) => setHeadcountPreview({ newHeadcount, version: nextVersion }),
     onChangeVenue: changeVenue,
     onChangePricing: changePricing,
     onChangePrimaryContact: changePrimaryContact,
@@ -770,6 +781,24 @@ function EventDetailContent({
       >
         {otherTabs}
       </EventDashboard>
+      {headcountPreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: event._id,
+            kind: "headcount",
+            newHeadcount: headcountPreview.newHeadcount,
+          }}
+          onClose={() => setHeadcountPreview(null)}
+          onApply={(expectedFingerprint) =>
+            applyDemandHeadcount({
+              eventId: event._id,
+              newHeadcount: headcountPreview.newHeadcount,
+              version: headcountPreview.version,
+              expectedFingerprint,
+            })
+          }
+        />
+      ) : null}
     </div>
   );
 }

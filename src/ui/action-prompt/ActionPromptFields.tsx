@@ -4,6 +4,7 @@ import type {
   ActionPromptRequest,
 } from "./ActionPromptTypes";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
+import { FieldHelp } from "../FieldHelp";
 
 interface ActionPromptFieldsProps {
   request: ActionPromptRequest;
@@ -85,7 +86,14 @@ function PromptField({
   return (
     <div className="grid gap-1">
       <label className="field-label" htmlFor={fieldId}>
-        {field.label}
+        {field.help ? (
+          <span className="field-label-row">
+            {field.label}
+            <FieldHelp term={field.help} />
+          </span>
+        ) : (
+          field.label
+        )}
       </label>
       {field.helper ? (
         <p id={helperId} className="text-xs text-ink-3">

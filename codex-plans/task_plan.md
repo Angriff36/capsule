@@ -1,16 +1,40 @@
-# Demand calculation provenance repair
+# Task Plan: Field-level domain-term help
 
 ## Goal
-Implement a truthful, policy-enforcing expandable provenance panel for ingredient demand rows, preserving existing work and generated ownership.
+Add reusable, accessible, plain-language help for each real editable batch multiplier, yield, par-level, and purchase-eligibility field, with worked-example links.
+
+## Current Phase
+Phase 1 - Requirements and discovery
 
 ## Phases
-- [complete] Inspect current implementation, required docs, and missing references.
-- [complete] Repair authored Manifest and Convex provenance data/history/query seams.
-- [complete] Repair ledger UI, extracted view model, and styles.
-- [blocked] Regenerate owned output and run focused/static gates (the commit-required drift gate cannot pass on the pre-existing uncommitted diff).
-- [blocked] Run disposable Playwright verification and remove it (the temporary test was removed, but the worktree has neither a configured local app nor an isolated Playwright runner).
 
-## Errors
-- Initial inventory command failed due to PowerShell `$_:` interpolation; rerun with `${_}`.
-- `bun run check` stops at `check:wiring-drift` because owned generated files are intentionally uncommitted; `manifest:regen:check` reports the same commit-required condition.
-- The disposable Playwright invocation resolved conflicting parent-checkout Playwright packages and found no runnable tests; the temporary spec was deleted.
+### Phase 1: Requirements and discovery
+- [x] Read project and UI constraints.
+- [x] Locate domain definitions and all authored entry surfaces.
+- [x] Record findings.
+- **Status:** complete
+
+### Phase 2: Design and implementation
+- [ ] Reuse or add the smallest appropriate shared UI pattern.
+- [ ] Add a single source of help copy and a linked in-app example surface.
+- [ ] Add help at every identified editable field.
+- **Status:** in_progress
+
+### Phase 3: Verification and handoff
+- [ ] Run targeted static checks and required repository gate.
+- [ ] Run a temporary Playwright verification and remove it.
+- [ ] Inspect diff for independent review readiness.
+- **Status:** pending
+
+## Decisions Made
+| Decision | Rationale |
+|---|---|
+| No backend, Manifest, or generated-file changes unless discovery proves required | The requested behavior is presentation-only. |
+| Add an additive `help` slot to ActionPrompt fields | The Par-level edit dialog is an authored entry path and needs the same help affordance. |
+| Explain purchase eligibility on the Demand Ledger Purchase heading | It is a computed, non-editable condition; a new control would be misleading. |
+
+## Errors Encountered
+| Error | Attempt | Resolution |
+|---|---:|---|
+| None | 0 | — |
+| PowerShell interpolation failed in a targeted line viewer | 1 | Use `${path}` to delimit the variable before a colon. |

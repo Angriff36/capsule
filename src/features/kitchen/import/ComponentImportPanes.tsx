@@ -11,6 +11,7 @@ import {
   isSubrecipeLine,
 } from "./ComponentImportLineKind";
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
+import { FieldHelp } from "../../../ui/FieldHelp";
 
 const UNIT_CHOICES = [
   "each",
@@ -354,7 +355,10 @@ export function ComponentImportReviewPane({
 
       <div className="component-import-yield">
         <label className="field-label">
-          Yield
+          <span className="field-label-row">
+            Yield
+            <FieldHelp term="yield" />
+          </span>
           <input
             type="number"
             min={0.01}

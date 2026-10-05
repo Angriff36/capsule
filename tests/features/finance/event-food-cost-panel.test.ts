@@ -50,7 +50,7 @@ const contribution = (ingredientId: string, quantity: number): Contribution =>
     calculationSnapshot: {
       version: 1,
       kind: "direct_dish",
-      recipeLineQuantity: quantity,
+      recipeLineQuantity: quantity / 40,
       wasteFactor: 1,
       batchMultiplier: 1,
       servings: 40,

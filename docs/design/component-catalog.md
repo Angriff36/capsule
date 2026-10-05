@@ -18,6 +18,7 @@ the Storybook build; this checks compilation, not visual or interaction behavior
 | Empty state with action or next steps | `src/ui/EmptyState.tsx` | `src/ui/EmptyState.stories.tsx` |
 | Working tables | `src/styles/app.css` (`.th` / `.td`, `.data-table`) | `src/ui/LedgerTable.stories.tsx` |
 | Stat tile with optional real trend | `src/ui/charts/StatCard.tsx` | `src/ui/charts/StatCard.stories.tsx` |
+| Info icon explaining a domain field (yield, batch multiplier, PAR, purchase) | `src/ui/FieldHelp.tsx` (terms in `src/ui/fieldHelpTerms.ts`) | `src/ui/FieldHelp.stories.tsx` |
 | Confirmation or reason dialog | `src/ui/action-prompt/useActionPrompt.tsx` | `src/ui/action-prompt/ActionPrompt.stories.tsx` |
 | Action result notice | `src/ui/action-result/ActionResultHost.tsx` | `src/ui/action-result/ActionResultHost.stories.tsx` |
 | Event stage and readiness checks | `src/features/events/dashboard/EventStageRail.tsx` | Colocated `EventStageRail.stories.tsx` |

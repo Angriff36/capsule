@@ -59,6 +59,8 @@ import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { ReminderHistoryList } from "./ReminderHistoryList";
 import { useActionNotice } from "../../ui/action-result";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { invoiceLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -862,23 +864,18 @@ export function InvoiceDetailPage() {
             <h2>Actions</h2>
           </div>
         </div>
+        <LifecycleStepper
+          definition={invoiceLifecycle}
+          status={String(invoice.status)}
+          actions={invoiceLifecycle.actions.filter((candidate) =>
+            policy
+              .invoiceActions(String(invoice.status), invoice)
+              .some((action) => action.key === candidate.key),
+          )}
+          busy={busy != null}
+          onAction={invoke}
+        />
         <div className="supply-row-actions">
-          {policy
-            .invoiceActions(String(invoice.status), invoice)
-            .map((action) => (
-              <button
-                key={action.key}
-                className="btn btn-ghost"
-                disabled={busy != null}
-                onClick={() => invoke(action.key)}
-              >
-                {busy === action.key
-                  ? "Working…"
-                  : action.key === "send"
-                    ? "Mark sent"
-                    : action.label}
-              </button>
-            ))}
           <button
             type="button"
             className="btn btn-ghost"

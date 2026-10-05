@@ -13,7 +13,9 @@ import { EventOverviewRail } from "../EventOverviewRail";
 import { EventReadinessCard } from "../EventReadinessCard";
 import { EventAutomaticWhyCard } from "../EventAutomaticWhyCard";
 import { EventSetupProgress } from "../EventSetupProgress";
-import { EventStageActionsCard } from "../EventStageActionsCard";
+import { EventOverviewCard } from "../EventOverviewCard";
+import { LifecycleStepper } from "../../../ui/LifecycleStepper";
+import { eventLifecycle } from "../../../lib/lifecycle/lifecycleDefinitions";
 import { EventTimelineCommentsPanel } from "../EventTimelineCommentsPanel";
 import { EventWeatherChip } from "../EventWeatherChip";
 import { eventDetailPath } from "../eventRoutes";
@@ -301,11 +303,27 @@ export function EventDashSheetBody({
             }
           />
           <div className="evd-sheet-body">
-            <EventStageActionsCard
-              actions={lifecycleActions}
-              busy={reviseProps.busy}
-              onAction={onAction}
-            />
+            <EventOverviewCard
+              title="Stage actions"
+              testId="event-stage-actions"
+            >
+              <LifecycleStepper
+                definition={eventLifecycle}
+                status={stage}
+                actions={eventLifecycle.actions.filter((action) =>
+                  lifecycleActions.some(
+                    (available) => available.key === action.key,
+                  ),
+                )}
+                busy={reviseProps.busy}
+                onAction={(key) => {
+                  const action = lifecycleActions.find(
+                    (item) => item.key === key,
+                  );
+                  if (action) onAction(action.key);
+                }}
+              />
+            </EventOverviewCard>
             <EventReviewFlagsSection eventId={eventId} />
             <EventChangeHistoryCard eventId={eventId} />
           </div>
