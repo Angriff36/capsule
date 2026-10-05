@@ -3,6 +3,14 @@
 // Vehicle + Return/loss deferred. Delivery lives in delivery.manifest.
 
 use "../workforce/assignment.manifest"
+use "./pack-rule.manifest"
+
+// Who covers a must-have item that is not going on the truck.
+enum PackCoverage {
+  equivalent
+  client
+  vendor
+}
 
 enum PackListStatus {
   draft
@@ -41,17 +49,27 @@ entity PackList mixin TenantScoped, SoftDeletable {
   property packedAt: datetime?
   property loadedAt: datetime?
   property dispatchedAt: datetime?
+  // Who said it is loaded and who sent it out, and where it went (PL-DELIVERY,
+  // AC-135). Missing person = that account is not linked to a staff profile.
+  property loadedByPersonId: uuid?
+  property dispatchedByPersonId: uuid?
+  property dispatchDestination: string?
   property cancelledAt: datetime?
   property cancellationReason: string?
   // Event Tracker call-out: the packer is stuck and needs a hand. Shown as
   // "Needs assistance" on the tracker until someone resolves it.
   property assistanceRequestedAt: datetime?
   property assistanceNote: string?
+  // Bin sheet (Mangia "Memo - Perfect Packing"): JSON list of the numbered
+  // black bins on this event, [{"bin":12,"color":"green","dirty":false}].
+  // Lid colour says where the bin goes onsite; "dirty" is circled on the way
+  // back so the bin goes to the dish room. Empty = no bin sheet yet.
+  property binSheet: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany items: PackListItem
 
-  constraint packListOpenedNamed: self.openedAt == null or length(trim(self.name)) > 0 "Opened pack lists require a name"
+  constraint packListOpenedNamed: self.openedAt == null or length(trim(self.name)) > 0 "Give this pack list a name."
 
   transition status from "draft" to ["packing", "cancelled"]
   transition status from "packing" to ["packed", "cancelled"]
@@ -85,8 +103,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
     // The service style kit lands once, on the first open. A re-open (the
     // EventApproved cascade) must not put back a line the packer removed.
     compute wasOpen = self.openedAt != null
-    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Pack list name is required"
+    constraint openEventMatch: eventId == self.eventId "This pack list is for a different event. Pick the event already on this pack list."
+    constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Give this pack list a name."
     mutate eventId = eventId
     mutate activeEventId = eventId
     mutate name = length(trim(self.name)) > 0 ? self.name : name
@@ -135,6 +153,18 @@ entity PackList mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Save the whole bin sheet. Kept open after dispatch: dirty bins are
+  // marked when the event comes back.
+  command setBinSheet(binSheet: string) {
+    guard self.deletedAt == null
+    mutate binSheet = length(trim(binSheet)) > 0 ? binSheet : null
+    emit PackListBinSheetSet {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
   command resolveAssistance() {
     guard self.assistanceRequestedAt != null
     guard self.deletedAt == null
@@ -163,6 +193,10 @@ entity PackList mixin TenantScoped, SoftDeletable {
   // Earlier packing/loading timestamps are facts; new requirements reopen work.
   command acknowledgePackingRequirement(additionalRequired: boolean) {
     mutate status = self.deletedAt == null and additionalRequired and (self.status == "packed" or self.status == "loaded") ? "packing" : self.status
+    emit PackListPackingRequirementAcknowledged {
+      packListId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command startPacking() {
@@ -210,6 +244,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "loaded"
     mutate loadedAt = now()
+    mutate loadedByPersonId = user.personId
     emit PackListLoaded {
       packListId: self.id
       tenantId: self.tenantId
@@ -218,6 +253,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "loaded"
       loadedAt: self.loadedAt
+      loadedByPersonId: user.personId
     }
   }
 
@@ -226,9 +262,12 @@ entity PackList mixin TenantScoped, SoftDeletable {
     guard self.loadedAt != null
     guard self.deletedAt == null
     compute previousStatus = self.status
+    compute destination = self.event != null and self.event.venueAddress != null and length(trim(self.event.venueAddress)) > 0 ? self.event.venueAddress : (self.event != null and self.event.venueName != null and length(trim(self.event.venueName)) > 0 ? self.event.venueName : "Event site")
     mutate status = "dispatched"
     mutate activeEventId = null
     mutate dispatchedAt = now()
+    mutate dispatchedByPersonId = user.personId
+    mutate dispatchDestination = destination
     emit PackListDispatched {
       packListId: self.id
       tenantId: self.tenantId
@@ -237,6 +276,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "dispatched"
       dispatchedAt: self.dispatchedAt
+      dispatchedByPersonId: user.personId
+      destination: destination
     }
   }
 
@@ -244,7 +285,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "packing" or self.status == "packed" or self.status == "loaded"
     guard self.deletedAt == null
     guard roleAllows(user.role, "logisticsManageAccess")
-    constraint cancelPackListReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    constraint cancelPackListReason: length(trim(reason)) > 0 "Say why you're cancelling this pack list."
     compute previousStatus = self.status
     mutate status = "cancelled"
     mutate activeEventId = null
@@ -315,11 +356,50 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // What actually went out when it was not the listed item. The listed
   // description, quantity, and status stay. Empty clears it.
   property sentInstead: string?
+  // Number of the black bin this line is packed in, written to the right of
+  // the item (Mangia "Perfect Packing Process"). Empty = not in a bin.
+  property binNumber: int?
   // Set on a line that came from the service style kit; the idempotency key of
   // the kit cascade.
   property indexed serviceStyleKitItemId: uuid?
   property unitCorrectionSource: string?
   property associationSource: string?
+  // Pack-rule line (src/lib/packRules.ts): the stable key of the merged item
+  // (item + unit + owner + return need), every source that asked for it with
+  // its rule version and amount (JSON), and the amount the rules give now.
+  // requiredQuantity follows generatedQuantity until someone sets the amount
+  // by hand (followsDishServings = false).
+  property generationKey: string?
+  property sourcesJson: string?
+  property generatedQuantity: decimal(12, 4)?
+  // No source asks for this line any more and nothing was packed. The line
+  // keeps its identity so it comes back if a source returns.
+  property retiredAt: datetime?
+  property category: PackCategory?
+  property ownership: PackOwnership?
+  property returnRequired: boolean?
+  property returnNote: string?
+  property requiredCapability: boolean?
+  // Pack list template lineage: which template, which line of it, and the
+  // template version that set the amount.
+  property packListTemplateId: uuid?
+  property templateLineKey: string?
+  property templateVersion: int?
+  // Not going on the truck, on purpose. A must-have item also says what
+  // stands in for it or who covers it.
+  property excludedAt: datetime?
+  property exclusionReason: string?
+  property replacementDescription: string?
+  property coveredBy: PackCoverage?
+  // Which truck, trailer or vendor drop on the event carries this line (the
+  // truck-load view). Empty = not placed; with one truck on the event it
+  // rides on that one.
+  property loadAssignmentId: uuid?
+  // About how heavy one unit is, so a truck is not loaded past what it can
+  // carry (PL-DELIVERY). Empty = not known; not counted.
+  property unitWeightKg: float?
+  // Space one unit takes in a truck, in cubic metres.
+  property unitVolumeM3: float?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -330,15 +410,40 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // account is not linked to a profile. Saving a count is never blocked for that.
   property packedByPersonId: uuid?
   property missingAt: datetime?
+  // Who marked it missing, recorded what went instead, and left it off
+  // (AC-134). Missing when the account is not linked to a staff profile.
+  property missingByPersonId: uuid?
+  property sentInsteadByPersonId: uuid?
+  property excludedByPersonId: uuid?
+  // Second count of what is packed, by whoever looks it over before it
+  // loads. Empty = nobody has counted it a second time.
+  property checkedQuantity: decimal(12, 4)?
+  property checkedAt: datetime?
+  property checkedByPersonId: uuid?
+  // How much of this line is on the truck. Empty = not counted onto a truck;
+  // the list's own "loaded" step still covers the whole list.
+  property loadedQuantity: decimal(12, 4)?
+  property lineLoadedAt: datetime?
+  property lineLoadedByPersonId: uuid?
+  // After the event: what came back, what was used up, what was lost and
+  // what came back broken. Empty = nobody has counted the return yet.
+  property returnedQuantity: decimal(12, 4)?
+  property usedQuantity: decimal(12, 4)?
+  property lostQuantity: decimal(12, 4)?
+  property damagedQuantity: decimal(12, 4)?
+  property returnFinding: string?
+  property returnCountedAt: datetime?
+  property returnCountedByPersonId: uuid?
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
+  belongsTo loadAssignment: EventVehicleAssignment fields [tenantId, loadAssignmentId] references [tenantId, id]
 
-  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Listed pack items require a description and nonnegative required quantity"
-  constraint itemPackedNonnegative: self.packedQuantity >= 0 "Packed quantity cannot be negative"
+  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Give this pack item a description, and make sure the amount needed isn't negative."
+  constraint itemPackedNonnegative: self.packedQuantity >= 0 "This item's packed amount can't be negative. Use zero or more."
   // Packed is an observed fact; a later plan reduction can leave surplus.
   computed surplusQuantity: decimal(12, 4) = max(0, self.packedQuantity - self.requiredQuantity)
 
@@ -368,8 +473,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint addItemPackListMatch: packListId == self.packListId "This pack item is for a different pack list. Pick the pack list already on this pack item."
     constraint addItemDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "This pack item is for a different dish. Pick the dish already on this pack item."
     constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "This pack item is for a different batch. Pick the batch already on this pack item."
-    constraint addItemDescriptionPresent: length(trim(description)) > 0 "Pack item description is required"
-    constraint addItemQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint addItemDescriptionPresent: length(trim(description)) > 0 "Give this pack item a description."
+    constraint addItemQuantityPositive: requiredQuantity > 0 "This pack item's required amount has to be more than zero. Enter how much is needed."
     mutate packListId = packListId
     mutate description = description
     mutate dishId = dishId != null ? dishId : self.dishId
@@ -395,9 +500,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   command ensureContainer(packListId: uuid, dishContainerId: uuid, eventDishId: uuid, dishId: uuid, description: string, quantityServings: number, unit: UnitOfMeasure) {
     guard self.deletedAt == null
     // Generated lines must retain their original event and container references.
-    constraint containerReferencesMatch: self.packListId == packListId and self.dishContainerId == dishContainerId and self.eventDishId == eventDishId and self.dishId == dishId "Container references must match the packing line"
+    constraint containerReferencesMatch: self.packListId == packListId and self.dishContainerId == dishContainerId and self.eventDishId == eventDishId and self.dishId == dishId "This container's details don't match this line anymore. Refresh and try again."
     guard self.packList != null and self.dishContainer != null and self.eventDish != null
-    constraint containerEventMatch: self.packList.eventId == self.eventDish.eventId and self.eventDish.dishId == dishId and self.dishContainer.dishId == dishId "Container and menu line must belong to this event and dish"
+    constraint containerEventMatch: self.packList.eventId == self.eventDish.eventId and self.eventDish.dishId == dishId and self.dishContainer.dishId == dishId "This container and menu line have to be for the same event and dish."
     compute eligible = self.packList.status != "dispatched" and self.packList.status != "cancelled"
     compute planned = quantityServings > 0 ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate description = self.listedAt == null ? description : self.description
@@ -424,16 +529,20 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.dishContainer.deletedAt == null
     // Apply only the records reviewed for this repair, preserving intervening staff edits.
     guard self.version == expectedItemVersion and self.packList.version == expectedPackListVersion and self.dishContainer.version == expectedContainerVersion
-    constraint adoptionKeepsEventDish: self.eventDishId == null or self.eventDishId == eventDishId "Packing line already belongs to a different event dish"
-    constraint adoptionServingsValid: containerServings >= 0 "Servings cannot be negative"
-    constraint adoptionDishMatches: self.dishContainer.dishId == self.dishId "Container must match the packing dish"
-    constraint adoptionUnitMatches: followsDishServings == false or self.unit == self.dishContainer.unit "Automatic packing requires the container template unit"
+    constraint adoptionKeepsEventDish: self.eventDishId == null or self.eventDishId == eventDishId "This packing line is for a different menu line. Pick the menu line already on this packing line."
+    constraint adoptionServingsValid: containerServings >= 0 "Servings can't be negative. Use zero or more."
+    constraint adoptionDishMatches: self.dishContainer.dishId == self.dishId "This container has to be for the same dish as this packing line."
+    constraint adoptionUnitMatches: followsDishServings == false or self.unit == self.dishContainer.unit "Automatic packing needs the unit from the container template. Turn off automatic packing to use a different unit."
     guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == self.dishId and item.deletedAt == null and item.quantityServings == containerServings and item.version == expectedEventDishVersion)) == 1
     // One menu line and container must not become two packing requirements.
     guard count_of(filter(self.packList.items, (item) => item.id != self.id and item.deletedAt == null and item.eventDishId == eventDishId and item.dishContainerId == self.dishContainerId)) == 0
     mutate eventDishId = eventDishId
     mutate followsDishServings = followsDishServings
     mutate containerServings = containerServings
+    emit PackListItemContainerLinkAdopted {
+      packListItemId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Restore a reviewed menu association without inventing container capacity.
@@ -447,11 +556,15 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
     guard self.dishId == null and self.eventDishId == null and self.dishContainerId == null and self.followsDishServings != true and self.associationSource == null
     guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == dishId and item.deletedAt == null and item.removedAt == null and item.version == expectedEventDishVersion)) == 1
-    constraint associationSourceRequired: length(trim(sourceReference)) > 0 "The original packing association source is required"
-    constraint associationDescriptionMatches: self.description == expectedDescription "Packing description changed since source review"
+    constraint associationSourceRequired: length(trim(sourceReference)) > 0 "Say where this packing link came from."
+    constraint associationDescriptionMatches: self.description == expectedDescription "This line's description changed since it was reviewed. Check it before continuing."
     mutate dishId = dishId
     mutate eventDishId = eventDishId
     mutate associationSource = sourceReference
+    emit PackListItemImportedAssociationRestored {
+      packListItemId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Legacy TPP Oz - Fld was imported as the mass unit ounce. This repair is
@@ -468,19 +581,34 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     // Template-driven lines must be repaired at their source instead.
     guard self.dishContainerId == null and self.followsDishServings != true
     guard self.unit == "ounce" and self.unitCorrectionSource == null
-    constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "The original fluid-ounce source is required"
+    constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "Say where this fluid-ounce fix came from."
     mutate requiredQuantity = self.requiredQuantity / 8
     mutate packedQuantity = self.packedQuantity / 8
+    // The second check and the on-truck count are in the same unit as the
+    // packed amount, so they change with it. No return is counted yet: the
+    // list has not left.
+    mutate checkedQuantity = self.checkedQuantity != null ? self.checkedQuantity / 8 : null
+    mutate loadedQuantity = self.loadedQuantity != null ? self.loadedQuantity / 8 : null
     mutate unit = "cup"
     mutate unitCorrectionSource = sourceReference
+    emit PackListItemImportedFluidOuncesCorrected {
+      packListItemId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command syncContainerServings(quantityServings: number) {
     // Active planning only: list not terminal, line still follows, EventDish still live. Event.changeHeadcount already refuses completed/closed_out/cancelled — do not use self.packList.event (generator never loads that hop).
-    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
-    compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    compute live = self.deletedAt == null and self.followsDishServings == true and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    // A removed dish zeroes its following container line (AC-524).
+    compute dishGone = self.eventDish == null or self.eventDish.deletedAt != null or self.eventDish.removedAt != null
+    compute eligible = live and (dishGone or self.dishContainer != null)
+    compute planned = not dishGone and quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
-    mutate containerServings = eligible ? quantityServings : self.containerServings
+    mutate containerServings = eligible and not dishGone ? quantityServings : self.containerServings
+    // A dish taken off the menu retires its unpacked container line; a packed
+    // count keeps the line so the packer sees what to bring back.
+    mutate retiredAt = eligible ? (planned == 0 and self.packedQuantity == 0 ? (self.retiredAt != null ? self.retiredAt : now()) : null) : self.retiredAt
     mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
     emit PackListItemRequirementSynced {
       packListId: self.packListId
@@ -496,9 +624,13 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.listedAt != null
     guard self.deletedAt == null
     guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
-    constraint recordPackedCountPositive: packedQuantity > 0 "Packed quantity must be positive"
+    constraint recordPackedCountPositive: packedQuantity > 0 "Enter a packed amount more than zero."
     constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
     compute previousPacked = self.packedQuantity
+    // A saved return count stays true: what went out can't drop below it.
+    constraint packedCoversReturn: self.returnCountedAt == null or self.loadedQuantity != null or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    // A packed amount can't drop below what was already checked or put on the truck.
+    constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
     mutate packedByPersonId = user.personId != null ? user.personId : self.packedByPersonId
     emit PackListItemCountRecorded {
@@ -522,11 +654,15 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     // Stragglers stay packable after the list moves on (packed/loaded/dispatched):
     // the record of what physically went out matters more than state purity (#118).
     guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
-    constraint markPackedQuantityPositive: packedQuantity > 0 "Packed quantity must be positive"
-    constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+    constraint markPackedQuantityPositive: packedQuantity > 0 "Enter a packed amount more than zero."
+    constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "You can't pack more than what's required. Enter a smaller amount."
     constraint markPackedComplete: packedQuantity == self.requiredQuantity "Save a short count on this line until you have the full amount"
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
+    // A saved return count stays true: what went out can't drop below it.
+    constraint packedCoversReturn: self.returnCountedAt == null or self.loadedQuantity != null or packedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    // A packed amount can't drop below what was already checked or put on the truck.
+    constraint packedCoversCounts: packedQuantity >= (self.checkedQuantity != null ? self.checkedQuantity : 0) and packedQuantity >= (self.loadedQuantity != null ? self.loadedQuantity : 0) "That is less than what is already checked or on the truck. Correct those counts first."
     mutate packedQuantity = packedQuantity
     mutate status = "packed"
     mutate packedAt = now()
@@ -555,6 +691,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate status = "missing"
     mutate missingAt = now()
+    mutate missingByPersonId = user.personId
     emit PackListItemMissing {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -574,8 +711,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.listedAt != null
     guard self.deletedAt == null
     guard self.packList != null and (self.packList.status == "draft" or self.packList.status == "packing")
-    constraint adjustQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
-    constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "Required quantity cannot be below packed quantity"
+    constraint adjustQuantityPositive: requiredQuantity > 0 "Enter a required amount more than zero."
+    constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "You can't set the required amount below what's already packed."
     compute previousRequired = self.requiredQuantity
     mutate requiredQuantity = requiredQuantity
     mutate followsDishServings = false
@@ -598,7 +735,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // changed on this event.
   command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
     guard self.deletedAt == null
-    constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "Kit references must match the packing line"
+    constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "This kit line doesn't match this packing line anymore."
     guard self.packList != null
     compute wasListed = self.listedAt != null
     mutate description = self.listedAt == null ? description : self.description
@@ -647,15 +784,280 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Which numbered bin the line went in. Empty clears it.
+  command setBin(optional binNumber: int) {
+    guard self.deletedAt == null
+    constraint binNumberPositive: binNumber == null or binNumber > 0 "Use a bin number above zero."
+    mutate binNumber = binNumber
+    emit PackListItemBinSet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+    }
+  }
+
+  // PL-ASSET-CATALOG (AC-548): say who supplies a hand-added line - ours,
+  // rented from a vendor, or the client's - and whether it must come back.
+  // Pack-rule lines take this from their rule, so they are changed there.
+  command setResponsibility(ownership: PackOwnership, returnRequired: boolean, optional returnNote: string) {
+    guard self.deletedAt == null and self.listedAt != null
+    constraint responsibilityManualLine: self.generationKey == null "This line comes from a pack rule. Change who supplies it on the rule."
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote != null and length(trim(returnNote)) > 0 ? trim(returnNote) : null
+    emit PackListItemResponsibilitySet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      ownership: ownership
+      returnRequired: returnRequired
+    }
+  }
+
   // Record a stand-in without rewriting the listed item. A blank entry clears it.
   command recordSentInstead(optional sentInstead: string) {
     guard self.deletedAt == null
     mutate sentInstead = sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    mutate sentInsteadByPersonId = user.personId
     emit PackListItemSentInsteadRecorded {
       packListItemId: self.id
       tenantId: self.tenantId
       packListId: self.packListId
       sentInstead: sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    }
+  }
+
+  // Pack-rule line (convex/lib/packRuleReconciliation.ts). The seam lists a
+  // new line with addItem, then this stamps and keeps it in step. A line
+  // whose amount was set by hand keeps it; a line with no source left and
+  // nothing packed retires; a packed count never changes. Update-only, so
+  // addItem stays the one way to create a pack line.
+  command applyGenerated(
+    packListId: uuid,
+    generationKey: string,
+    category: PackCategory,
+    ownership: PackOwnership,
+    returnRequired: boolean,
+    optional returnNote: string,
+    requiredCapability: boolean,
+    generatedQuantity: decimal(12, 4),
+    sourcesJson: string
+  ) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    constraint generatedReferencesMatch: self.packListId == packListId and (self.generationKey == null or self.generationKey == generationKey) "This packing line is for a different item. Refresh and try again."
+    constraint generatedQuantityValid: generatedQuantity >= 0 "A pack amount can't be negative."
+    compute follows = self.followsDishServings != false
+    compute nothingPacked = self.packedQuantity == 0
+    mutate generationKey = generationKey
+    mutate category = category
+    mutate ownership = ownership
+    mutate returnRequired = returnRequired
+    mutate returnNote = returnNote
+    mutate requiredCapability = requiredCapability
+    mutate generatedQuantity = generatedQuantity
+    mutate sourcesJson = sourcesJson
+    mutate requiredQuantity = follows ? generatedQuantity : self.requiredQuantity
+    mutate retiredAt = generatedQuantity == 0 and follows and nothingPacked ? (self.retiredAt != null ? self.retiredAt : now()) : null
+    mutate status = follows and self.status == "packed" and generatedQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: packListId
+      tenantId: self.tenantId
+      additionalRequired: self.excludedAt == null and self.retiredAt == null and self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Kit line that grows with guests: the seam sends the new amount after a
+  // guest count or kit change. A hand-set amount stays.
+  command syncKitGuests(requiredQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.serviceStyleKitItemId != null
+    compute eligible = self.followsDishServings != false and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate requiredQuantity = eligible ? requiredQuantity : self.requiredQuantity
+    mutate status = eligible and self.status == "packed" and requiredQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: eligible and requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Template line, applied through convex/lib/safeMaterialization.ts: the
+  // seam lists a new line with addItem, then this stamps its lineage. The
+  // same template line on the same list stays one pack line: a retry or a
+  // second apply updates it, and only while nobody set its amount by hand.
+  command ensureTemplateLine(packListId: uuid, packListTemplateId: uuid, templateLineKey: string, templateVersion: int, requiredQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and (self.packList.status == "draft" or self.packList.status == "packing")
+    constraint templateReferencesMatch: self.packListId == packListId and (self.packListTemplateId == null or (self.packListTemplateId == packListTemplateId and self.templateLineKey == templateLineKey)) "This packing line came from a different template line. Refresh and try again."
+    constraint templateLineAmount: requiredQuantity > 0 "A template line needs an amount more than zero."
+    compute follows = self.followsDishServings != false
+    mutate packListTemplateId = packListTemplateId
+    mutate templateLineKey = templateLineKey
+    mutate requiredQuantity = follows ? requiredQuantity : self.requiredQuantity
+    mutate templateVersion = follows or self.templateVersion == null ? templateVersion : self.templateVersion
+    mutate status = follows and self.status == "packed" and requiredQuantity > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  // Not going on the truck, on purpose (spec §13.2): the line stays on the
+  // list with the reason. A must-have item also names its stand-in or who
+  // covers it; without one, the list cannot be marked packed.
+  command exclude(reason: string, optional replacementDescription: string, optional coveredBy: PackCoverage) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint excludeReasonPresent: length(trim(reason)) > 0 "Say why this item is not going."
+    mutate excludedAt = now()
+    mutate exclusionReason = trim(reason)
+    mutate replacementDescription = replacementDescription != null and length(trim(replacementDescription)) > 0 ? trim(replacementDescription) : null
+    mutate coveredBy = coveredBy
+    mutate excludedByPersonId = user.personId
+    emit PackListItemExcluded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      description: self.description
+      reason: trim(reason)
+    }
+  }
+
+  // Put this line on a truck of its event, or take it off (empty). The seam
+  // (convex/lib/packRuleReconciliation.ts) checks the truck is on the same
+  // event. Correctable up to and during the event.
+  command assignLoad(optional loadAssignmentId: uuid) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    mutate loadAssignmentId = loadAssignmentId
+    emit PackListItemLoadAssigned {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      loadAssignmentId: loadAssignmentId
+    }
+  }
+
+  // Weight of one unit. Empty clears it. The seam checks the truck it rides on
+  // can still carry the load.
+  command setUnitWeight(optional unitWeightKg: float) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint unitWeightNotNegative: unitWeightKg == null or unitWeightKg >= 0 "Weight cannot be negative."
+    mutate unitWeightKg = unitWeightKg
+    emit PackListItemWeightSet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      unitWeightKg: unitWeightKg
+    }
+  }
+
+  // Space one unit takes. Empty clears it.
+  command setUnitVolume(optional unitVolumeM3: float) {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint unitVolumeNotNegative: unitVolumeM3 == null or unitVolumeM3 >= 0 "Size cannot be negative."
+    mutate unitVolumeM3 = unitVolumeM3
+    emit PackListItemVolumeSet {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+    }
+  }
+
+  // Second count before loading. The packer may check their own line: a small
+  // crew has nobody else, and the name of who checked is kept. Zero clears it.
+  command recordChecked(checkedQuantity: decimal(12, 4)) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint checkedNotNegative: checkedQuantity >= 0 "The checked amount can't be negative. Use zero or more."
+    constraint checkedNotOverPacked: checkedQuantity <= self.packedQuantity "You can't check more than what is packed. Save the packed amount first."
+    mutate checkedQuantity = checkedQuantity > 0 ? checkedQuantity : null
+    mutate checkedAt = checkedQuantity > 0 ? now() : null
+    mutate checkedByPersonId = checkedQuantity > 0 ? user.personId : null
+    emit PackListItemChecked {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      checkedQuantity: checkedQuantity
+    }
+  }
+
+  // How much of this line is on the truck. Zero is kept: it says nothing of
+  // this line went out, which is not the same as "not counted". A truck given
+  // here puts the line on that truck in the same step (the scan's "Truck being
+  // loaded"); left out, the line keeps the truck it has. The seam
+  // (convex/lib/operationalEvents.ts) checks the truck is on the event.
+  command recordLoaded(loadedQuantity: decimal(12, 4), optional loadAssignmentId: uuid) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status != "cancelled"
+    constraint loadedNotNegative: loadedQuantity >= 0 "The loaded amount can't be negative. Use zero or more."
+    constraint loadedNotOverPacked: loadedQuantity <= self.packedQuantity "You can't load more than what is packed. Save the packed amount first."
+    // A saved return count stays true: what went out can't drop below it.
+    constraint loadedCoversReturn: self.returnCountedAt == null or loadedQuantity >= ((self.returnedQuantity != null ? self.returnedQuantity : 0) + (self.usedQuantity != null ? self.usedQuantity : 0) + (self.lostQuantity != null ? self.lostQuantity : 0) + (self.damagedQuantity != null ? self.damagedQuantity : 0)) "That is less than the return already counted on this line. Correct the return count first."
+    mutate loadedQuantity = loadedQuantity
+    mutate loadAssignmentId = loadAssignmentId != null ? loadAssignmentId : self.loadAssignmentId
+    mutate lineLoadedAt = now()
+    mutate lineLoadedByPersonId = user.personId
+    emit PackListItemLoaded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      loadedQuantity: loadedQuantity
+      loadAssignmentId: loadAssignmentId
+    }
+  }
+
+  // The return count after the event. It can be saved again: a crate turns up
+  // the next morning. The four amounts together can't be more than what
+  // went out. Only a list that has left can have a return: a count saved before
+  // that would make the returns page show the list as already counted.
+  command recordReturn(
+    returnedQuantity: decimal(12, 4),
+    usedQuantity: decimal(12, 4),
+    lostQuantity: decimal(12, 4),
+    damagedQuantity: decimal(12, 4),
+    optional finding: string
+  ) {
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.packList != null and self.packList.status == "dispatched"
+    // Same rule as the "Coming back" view: marked to come back, or not
+    // marked and not a throwaway.
+    constraint returnLineComesBack: self.excludedAt == null and (self.returnRequired != null ? self.returnRequired == true : self.category != "disposable") "This line does not come back, so there is no return to count."
+    constraint returnAmountsNotNegative: returnedQuantity >= 0 and usedQuantity >= 0 and lostQuantity >= 0 and damagedQuantity >= 0 "A return amount can't be negative. Use zero or more."
+    // What went out is the on-truck count when one was taken (zero included), else what was packed.
+    constraint returnNotOverWentOut: returnedQuantity + usedQuantity + lostQuantity + damagedQuantity <= (self.loadedQuantity != null ? self.loadedQuantity : self.packedQuantity) "That is more than what went out. Check the amounts."
+    mutate returnedQuantity = returnedQuantity
+    mutate usedQuantity = usedQuantity
+    mutate lostQuantity = lostQuantity
+    mutate damagedQuantity = damagedQuantity
+    mutate returnFinding = finding != null and length(trim(finding)) > 0 ? trim(finding) : null
+    mutate returnCountedAt = now()
+    mutate returnCountedByPersonId = user.personId
+    emit PackListItemReturnCounted {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      returnedQuantity: returnedQuantity
+      usedQuantity: usedQuantity
+      lostQuantity: lostQuantity
+      damagedQuantity: damagedQuantity
+    }
+  }
+
+  command restoreExcluded() {
+    guard self.deletedAt == null and self.excludedAt != null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate excludedAt = null
+    mutate exclusionReason = null
+    mutate replacementDescription = null
+    mutate coveredBy = null
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
     }
   }
 
@@ -701,6 +1103,7 @@ event PackListLoaded: "pack_list.loaded" {
   previousStatus: PackListStatus
   status: PackListStatus
   loadedAt: datetime?
+  loadedByPersonId: string?
 }
 
 event PackListDispatched: "pack_list.dispatched" {
@@ -711,6 +1114,8 @@ event PackListDispatched: "pack_list.dispatched" {
   previousStatus: PackListStatus
   status: PackListStatus
   dispatchedAt: datetime?
+  dispatchedByPersonId: string?
+  destination: string?
 }
 
 event PackListCancelled: "pack_list.cancelled" {
@@ -804,11 +1209,45 @@ event PackListItemKitEnsured: "pack_list_item.kit_ensured" {
   serviceStyleKitItemId: string
 }
 
+event PackListItemLoadAssigned: "pack_list_item.load_assigned" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  loadAssignmentId: string?
+}
+
+event PackListItemWeightSet: "pack_list_item.weight_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  unitWeightKg: float?
+}
+
+event PackListItemExcluded: "pack_list_item.excluded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  description: string
+  reason: string
+}
+
 event PackListItemRemoved: "pack_list_item.removed" {
   packListItemId: string
   tenantId: string
   packListId: string
   description: string
+}
+
+event PackListBinSheetSet: "pack_list.bin_sheet_set" {
+  packListId: string
+  tenantId: string
+  eventId: string
+}
+
+event PackListItemBinSet: "pack_list_item.bin_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
 }
 
 event PackListItemAnnotated: "pack_list_item.annotated" {
@@ -817,11 +1256,44 @@ event PackListItemAnnotated: "pack_list_item.annotated" {
   packListId: string
 }
 
+event PackListItemResponsibilitySet: "pack_list_item.responsibility_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  ownership: PackOwnership
+  returnRequired: boolean
+}
+
 event PackListItemSentInsteadRecorded: "pack_list_item.sent_instead_recorded" {
   packListItemId: string
   tenantId: string
   packListId: string
   sentInstead: string?
+}
+
+event PackListItemChecked: "pack_list_item.checked" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  checkedQuantity: decimal(12, 4)
+}
+
+event PackListItemLoaded: "pack_list_item.loaded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  loadedQuantity: decimal(12, 4)
+  loadAssignmentId: string?
+}
+
+event PackListItemReturnCounted: "pack_list_item.return_counted" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  returnedQuantity: decimal(12, 4)
+  usedQuantity: decimal(12, 4)
+  lostQuantity: decimal(12, 4)
+  damagedQuantity: decimal(12, 4)
 }
 
 event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
@@ -858,7 +1330,8 @@ on PackListKitRequested fanOut ServiceStyleKitItem where activeKitKey = payload.
     packListId: payload.packListId
     serviceStyleKitItemId: self.id
     description: self.description
-    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(payload.expectedHeadcount / self.guestsPerUnit) : 0)
+    // Same formula as kitLineQuantity in src/lib/packRules.ts.
+    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(ceil(payload.expectedHeadcount / self.guestsPerUnit) * (100 + (self.sparePercent != null ? self.sparePercent : 0)) / 100) : 0)
     unit: self.unit
     note: self.note
   }
@@ -907,3 +1380,30 @@ event PackListItemRequirementSynced: "pack_list_item.requirement_synced" {
 on PackListItemRequirementSynced run PackList.acknowledgePackingRequirement
   resolve payload.packListId
   params { additionalRequired: payload.additionalRequired }
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event PackListPackingRequirementAcknowledged: "pack.list.packing.requirement.acknowledged" {
+  packListId: string
+  tenantId: string
+}
+
+event PackListItemContainerLinkAdopted: "pack.list.item.container.link.adopted" {
+  packListItemId: string
+  tenantId: string
+}
+
+event PackListItemImportedFluidOuncesCorrected: "pack.list.item.imported.fluid.ounces.corrected" {
+  packListItemId: string
+  tenantId: string
+}
+
+event PackListItemImportedAssociationRestored: "pack.list.item.imported.association.restored" {
+  packListItemId: string
+  tenantId: string
+}
+
+event PackListItemVolumeSet: "pack_list_item.volume_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+}

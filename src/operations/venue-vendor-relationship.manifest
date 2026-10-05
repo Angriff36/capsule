@@ -106,7 +106,7 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
   constraint uniqueVenueVendor: self.venueId != null and self.vendorId != null and self.category != null "Venue, vendor, and category are required"
   constraint effectiveDateOrder: self.effectiveFrom == null or self.effectiveUntil == null or self.effectiveFrom <= self.effectiveUntil "Effective from must be before effective until"
   constraint discountRange: self.discountPercent == null or (self.discountPercent >= 0 and self.discountPercent <= 100) "Discount percent must be between 0 and 100"
-  constraint positiveMinimum: self.minimumOrder == null or self.minimumOrder >= 0 "Minimum order cannot be negative"
+  constraint positiveMinimum: self.minimumOrder == null or self.minimumOrder >= 0 "Minimum order can't be negative. Use zero or more."
 
   // Status transitions: bidirectional between all states
   transition status from "preferred" to ["approved", "restricted", "banned"]
@@ -114,12 +114,13 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
   transition status from "restricted" to ["preferred", "approved", "banned"]
   transition status from "banned" to ["preferred", "approved", "restricted"]
 
-  // Read: facility staff can read relationships
-  default policy venueVendorRelationshipRead read: roleAllows(user.role, "facilityAccess") "Facility staff may see venue vendor relationships"
-  // Write: facility managers can establish/revise relationships
-  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "facilityManageAccess") "Facility managers may update venue vendor relationships"
-  // Execute: facility managers can change status
-  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "facilityManageAccess") "Facility managers may change venue vendor relationships"
+  // No role was ever given facilityAccess / facilityManageAccess, so these
+  // records could not be seen or set up by anyone. They follow the venue
+  // itself: event staff see them; event managers (and admins, owners) set up
+  // and change the supplier terms.
+  default policy venueVendorRelationshipRead read: roleAllows(user.role, "eventAccess") "Event staff may see venue suppliers"
+  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may update venue suppliers"
+  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may change venue suppliers"
 
   command establish(
     venueId: string,
@@ -135,16 +136,20 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     optional discountPercent: float,
     optional paymentTerms: string,
     optional minimumOrder: money,
-    optional notes: string,
-    optional establishedByPersonId: string
+    optional notes: string
   ) {
     // No `guard self.createdAt == null`: createdAt is auto-populated by the
     // `timestamps` mixin, so that guard always threw in the creation path and
     // made every establish fail. deletedAt is null on create, so its guard
     // still passes.
     guard self.deletedAt == null
-    constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Venue is required"
-    constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Vendor is required"
+    // Only a sign-in linked to a staff profile can set one up, so the record
+    // always names who did it.
+    guard user.personId != null
+    constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Pick a venue."
+    constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Pick a vendor."
+    constraint establishEffectiveDates: effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil "Effective from must be before effective until"
+    constraint establishDiscount: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "Discount percent must be between 0 and 100"
     mutate venueId = venueId
     mutate vendorId = vendorId
     mutate category = category
@@ -159,7 +164,9 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     mutate paymentTerms = paymentTerms
     mutate minimumOrder = minimumOrder
     mutate notes = notes
-    mutate establishedByPersonId = establishedByPersonId
+    // Who set this up is the signed-in person's staff profile, never a
+    // caller-sent id.
+    mutate establishedByPersonId = user.personId
     emit VenueVendorRelationshipEstablished {
       relationshipId: self.id
       tenantId: self.tenantId
@@ -174,7 +181,10 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     status: VenueVendorStatus
   ) {
     guard self.deletedAt == null
+    guard user.personId != null
     mutate status = status
+    mutate revisedByPersonId = user.personId
+    mutate revisedAt = now()
     emit VenueVendorRelationshipStatusChanged {
       relationshipId: self.id
       tenantId: self.tenantId
@@ -196,11 +206,13 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     optional discountPercent: float,
     optional paymentTerms: string,
     optional minimumOrder: money,
-    optional notes: string,
-    optional revisedByPersonId: string
+    optional notes: string
   ) {
     guard self.deletedAt == null
-    constraint reviseEffectiveDates: (effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil) "Effective from must be before effective until"
+    guard user.personId != null
+    // Compare the dates as they will be after the change: a new end date is
+    // checked against the start already saved, and the other way round.
+    constraint reviseEffectiveDates: (effectiveFrom != null ? effectiveFrom : self.effectiveFrom) == null or (effectiveUntil != null ? effectiveUntil : self.effectiveUntil) == null or (effectiveFrom != null ? effectiveFrom : self.effectiveFrom) <= (effectiveUntil != null ? effectiveUntil : self.effectiveUntil) "Effective from must be before effective until"
     constraint reviseDiscount: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "Discount percent must be between 0 and 100"
     mutate category = category != null ? category : self.category
     mutate effectiveFrom = effectiveFrom != null ? effectiveFrom : self.effectiveFrom
@@ -213,14 +225,16 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     mutate paymentTerms = paymentTerms != null ? paymentTerms : self.paymentTerms
     mutate minimumOrder = minimumOrder != null ? minimumOrder : self.minimumOrder
     mutate notes = notes != null ? notes : self.notes
-    mutate revisedByPersonId = revisedByPersonId != null ? revisedByPersonId : self.revisedByPersonId
+    // Who changed it is the signed-in person's staff profile, never a
+    // caller-sent id.
+    mutate revisedByPersonId = user.personId
     mutate revisedAt = now()
     emit VenueVendorRelationshipRevised {
       relationshipId: self.id
       tenantId: self.tenantId
       venueId: self.venueId
       vendorId: self.vendorId
-      revisedBy: revisedByPersonId != null ? revisedByPersonId : self.revisedByPersonId
+      revisedBy: user.personId
     }
   }
 
@@ -228,8 +242,11 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     reason: string
   ) {
     guard self.deletedAt == null
-    constraint retireReason: length(trim(reason)) > 0 "Retirement reason is required"
+    guard user.personId != null
+    constraint retireReason: length(trim(reason)) > 0 "Say why you're retiring this."
     mutate deletedAt = now()
+    mutate revisedByPersonId = user.personId
+    mutate revisedAt = now()
     emit VenueVendorRelationshipRetired {
       relationshipId: self.id
       tenantId: self.tenantId

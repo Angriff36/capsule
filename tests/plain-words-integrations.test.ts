@@ -29,8 +29,8 @@ describe("plain words on leftover integrations manifests", () => {
     }
 
     for (const fresh of [
-      "Admins may update integration connections",
-      "Admins may change integration connections",
+      "Admins may update outside-service connections",
+      "Admins may change outside-service connections",
     ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);
@@ -49,8 +49,8 @@ describe("plain words on leftover integrations manifests", () => {
     expect(visible).toContain("Managers may see outside-service connections");
     expectPlain("Managers may see outside-service connections");
 
-    // write/execute leftovers stay for a later slice
-    expect(visible).toContain("Admins may update integration connections");
-    expect(visible).toContain("Admins may change integration connections");
+    // write/execute leftovers now read in plain words too
+    expect(visible).toContain("Admins may update outside-service connections");
+    expect(visible).toContain("Admins may change outside-service connections");
   });
 });

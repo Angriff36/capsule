@@ -11,7 +11,12 @@
 // tenantId is trusted.
 import { query, type QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
-import { getAuthContext, requireTenant } from "./lib/authContext";
+import {
+  getAuthContext,
+  requireTenant,
+  type AppAuthContext,
+} from "./lib/authContext";
+import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
 import {
   invoiceSearchLabel,
   invoiceStatusFilter,
@@ -22,6 +27,125 @@ import {
 } from "./lib/parseSearchQuery";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+const ALL_READS = [
+  "eventAccess",
+  "eventManageAccess",
+  "financeAccess",
+  "financeManageAccess",
+  "importAccess",
+  "inventoryAccess",
+  "kitchenAccess",
+  "logisticsAccess",
+  "manageAccess",
+  "procurementAccess",
+  "salesAccess",
+  "staffAccess",
+  "workforceAccess",
+  "workforceSelfAccess",
+];
+
+// A hit shows a record's name (and an invoice's amount), so each kind follows
+// its generated read policy in convex/queries.ts: search never shows a record
+// the caller could not open. checkRole / ROLE_PERMISSIONS are generated as
+// non-exported locals, so the role grants the policies below consult are
+// mirrored here (same pattern as convex/notifications.ts). Keep in sync with
+// src/foundation/base.manifest if a role grant moves.
+const ROLE_READS: Record<string, readonly string[]> = {
+  admin: ALL_READS,
+  owner: ALL_READS,
+  system: ALL_READS,
+  manager: [
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  staff: ["staffAccess", "workforceSelfAccess"],
+  driver: ["logisticsAccess", "staffAccess", "workforceSelfAccess"],
+  event_manager: [
+    "eventAccess",
+    "eventManageAccess",
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  event_staff: ["eventAccess", "staffAccess", "workforceSelfAccess"],
+  finance_manager: [
+    "financeAccess",
+    "financeManageAccess",
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  finance_staff: ["financeAccess", "staffAccess", "workforceSelfAccess"],
+  inventory_manager: [
+    "inventoryAccess",
+    "importAccess",
+    "manageAccess",
+    "procurementAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  inventory_staff: ["inventoryAccess", "staffAccess", "workforceSelfAccess"],
+  kitchen_lead: ["kitchenAccess", "staffAccess", "workforceSelfAccess"],
+  kitchen_manager: [
+    "kitchenAccess",
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  kitchen_staff: ["kitchenAccess", "staffAccess", "workforceSelfAccess"],
+  logistics_manager: [
+    "logisticsAccess",
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  logistics_staff: ["logisticsAccess", "staffAccess", "workforceSelfAccess"],
+  procurement_staff: [
+    "inventoryAccess",
+    "procurementAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  sales_manager: [
+    "importAccess",
+    "manageAccess",
+    "salesAccess",
+    "staffAccess",
+    "workforceSelfAccess",
+  ],
+  sales_staff: ["salesAccess", "staffAccess", "workforceSelfAccess"],
+  workforce_manager: [
+    "importAccess",
+    "manageAccess",
+    "staffAccess",
+    "workforceAccess",
+    "workforceSelfAccess",
+  ],
+  workforce_staff: ["staffAccess", "workforceAccess", "workforceSelfAccess"],
+};
+
+/** Invoice read policy (invoiceRead): financeAccess or manageAccess. */
+const INVOICE_READ = ["financeAccess", "manageAccess"] as const;
+
+/** True when the caller passes any one of the read capabilities. */
+export function canRead(
+  auth: AppAuthContext,
+  read: readonly string[],
+): boolean {
+  const granted = ROLE_READS[auth.role] ?? [];
+  return read.some(
+    (capability) =>
+      granted.includes(capability) &&
+      !orgCapabilityDeniesAction(capability, auth.disabledCapabilities),
+  );
+}
 
 export interface SearchHit {
   kind: string;
@@ -38,6 +162,8 @@ export interface SearchTarget {
   index: string;
   field: string;
   hint: string;
+  /** Read capabilities (any one) of the kind's generated read policy. */
+  read: readonly string[];
   /** Build the route path for a hit. */
   path: (doc: any) => string;
   /** Human label for a hit. */
@@ -48,6 +174,7 @@ export interface SearchTarget {
 export const TEXT_TARGETS: SearchTarget[] = [
   {
     kind: "event",
+    read: ["staffAccess"],
     table: "events",
     index: "search_title",
     field: "title",
@@ -57,6 +184,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "client",
+    read: ["salesAccess", "financeAccess"],
     table: "clients",
     index: "search_companyName",
     field: "companyName",
@@ -70,6 +198,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "client",
+    read: ["salesAccess", "financeAccess"],
     table: "clients",
     index: "search_givenName",
     field: "givenName",
@@ -80,6 +209,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "client",
+    read: ["salesAccess", "financeAccess"],
     table: "clients",
     index: "search_familyName",
     field: "familyName",
@@ -90,6 +220,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "vendor",
+    read: ["procurementAccess"],
     table: "vendors",
     index: "search_name",
     field: "name",
@@ -99,6 +230,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "dish",
+    read: ["kitchenAccess", "salesAccess", "manageAccess"],
     table: "dishes",
     index: "search_name",
     field: "name",
@@ -108,6 +240,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "menu",
+    read: ["kitchenAccess", "salesAccess"],
     table: "menus",
     index: "search_name",
     field: "name",
@@ -119,6 +252,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
     // Recipes became Components; there is no `recipes` table. Querying a
     // nonexistent table throws server-side and killed every text search (#133).
     kind: "component",
+    read: ["kitchenAccess"],
     table: "components",
     index: "search_name",
     field: "name",
@@ -128,6 +262,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "ingredient",
+    read: ["kitchenAccess", "inventoryAccess", "manageAccess"],
     table: "ingredients",
     index: "search_name",
     field: "name",
@@ -137,6 +272,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "proposal",
+    read: ["salesAccess"],
     table: "proposals",
     index: "search_title",
     field: "title",
@@ -146,6 +282,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "contract",
+    read: ["salesAccess"],
     table: "contracts",
     index: "search_title",
     field: "title",
@@ -155,6 +292,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "lead",
+    read: ["salesAccess"],
     table: "leads",
     index: "search_companyName",
     field: "companyName",
@@ -168,6 +306,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "person",
+    read: ["staffAccess"],
     table: "people",
     index: "search_givenName",
     field: "givenName",
@@ -178,6 +317,7 @@ export const TEXT_TARGETS: SearchTarget[] = [
   },
   {
     kind: "person",
+    read: ["staffAccess"],
     table: "people",
     index: "search_familyName",
     field: "familyName",
@@ -228,7 +368,7 @@ export const searchAll = query({
 
     if (wantsText) {
       const targets = TEXT_TARGETS.filter(
-        (t) => !kindFilter || kindFilter.has(t.kind),
+        (t) => (!kindFilter || kindFilter.has(t.kind)) && canRead(auth, t.read),
       );
       // Fan out across targets in parallel. Each search is tenant-scoped via
       // the index filterFields.
@@ -250,7 +390,8 @@ export const searchAll = query({
     // Structured invoice intent — invoices have no full-text index, so honor
     // status / age / "unpaid" intent and INV-* numbers via the tenant index.
     // Skip only when the caller named other kinds explicitly (invoice excluded).
-    const invoiceAllowed = !kindFilter || kindFilter.has("invoice");
+    const invoiceAllowed =
+      (!kindFilter || kindFilter.has("invoice")) && canRead(auth, INVOICE_READ);
     if (invoiceAllowed && shouldQueryInvoices(parsed)) {
       const invoiceHits = await queryInvoices(ctx, tenantId, parsed, args.now);
       for (const h of invoiceHits) {
@@ -267,6 +408,7 @@ export const searchAll = query({
     // the tenant index and filter by startsAt.
     if (
       parsed.kinds.has("event") &&
+      canRead(auth, ["staffAccess"]) &&
       !wantsText &&
       (parsed.startAfter !== null || parsed.startBefore !== null)
     ) {

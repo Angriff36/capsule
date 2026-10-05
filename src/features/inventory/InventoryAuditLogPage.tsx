@@ -14,6 +14,7 @@ import {
   INVENTORY_AUDIT_GENESIS_HASH,
   type ChainedInventoryAuditEntry,
 } from "./inventoryAuditIntegrity";
+import { checkStockLedger } from "../../lib/stockBalance";
 import "./InventoryAuditLogPage.css";
 
 export function InventoryAuditLogPage() {
@@ -106,6 +107,10 @@ export function InventoryAuditLogPage() {
     (entry) => entry.measure === "on_hand",
   ).length;
   const reservationChanges = entries.length - physicalChanges;
+  const ledgerCheck =
+    selectedItem && entries.length > 0 && !loading
+      ? checkStockLedger(entries, Number(selectedItem.quantityOnHand))
+      : null;
 
   const copyRoot = () => {
     void navigator.clipboard.writeText(rootHash).then(() => {
@@ -213,6 +218,22 @@ export function InventoryAuditLogPage() {
         </button>
       </section>
 
+      {ledgerCheck && !ledgerCheck.matches ? (
+        <div className="inventory-audit-error" role="alert">
+          <strong>This history does not add up to what is on hand.</strong>
+          <span>
+            The moves below come to {formatQuantity(ledgerCheck.ledgerOnHand)}{" "}
+            {selectedItem?.unit}, but the stock line says{" "}
+            {formatQuantity(Number(selectedItem?.quantityOnHand))}. Count the
+            shelf and save a recount to set it straight.
+          </span>
+        </div>
+      ) : ledgerCheck ? (
+        <p className="text-ink-2" data-testid="inventory-audit-balanced">
+          Every move below adds up to the amount on hand.
+        </p>
+      ) : null}
+
       <div className="inventory-audit-stats" aria-live="polite">
         <AuditStat label="Ledger entries" value={entries.length} />
         <AuditStat label="On-hand changes" value={physicalChanges} />
@@ -243,7 +264,9 @@ export function InventoryAuditLogPage() {
         ) : !selectedItem ? (
           <div className="document-empty">
             <p>Open a stock line first.</p>
-            <span>The audit ledger appears after an InventoryItem exists.</span>
+            <span>
+              The audit ledger appears once this item has a stock line.
+            </span>
           </div>
         ) : newestFirst.length === 0 ? (
           <div className="document-empty">

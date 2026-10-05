@@ -71,7 +71,14 @@ const PAYMENT_ACTIONS = [
   },
   { key: "settle", label: "Settle", lifecycle: PaymentSettleLifecycle },
   { key: "fail", label: "Mark failed", lifecycle: PaymentFailLifecycle },
-  { key: "refund", label: "Refund", lifecycle: PaymentRefundLifecycle },
+  { key: "refund", label: "Refund all", lifecycle: PaymentRefundLifecycle },
+  // Part refund, card dispute or bounced bank payment: offered on the same
+  // settled payments as a full refund.
+  {
+    key: "reverse",
+    label: "Take money back",
+    lifecycle: PaymentRefundLifecycle,
+  },
 ] as const;
 
 export class CommercialLifecyclePolicy {
@@ -79,6 +86,22 @@ export class CommercialLifecyclePolicy {
     const actions = available(status, INVOICE_ACTIONS);
     if (hasBalanceDue(invoice)) return actions;
     return actions.filter((action) => action.key !== "send");
+  }
+
+  /** Lifecycle-legal invoice moves the record cannot make yet, with why. */
+  invoiceBlockedActions(status: string, invoice: InvoiceBalanceContext) {
+    const canSend = available(status, INVOICE_ACTIONS).some(
+      (action) => action.key === "send",
+    );
+    return canSend && !hasBalanceDue(invoice)
+      ? [
+          {
+            key: "send",
+            reason:
+              "Nothing is due on this invoice, so there is nothing to send.",
+          },
+        ]
+      : [];
   }
 
   paymentActions(status: string) {

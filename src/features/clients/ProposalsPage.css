@@ -1,0 +1,37 @@
+/* Phone: the proposals ledger becomes one card per proposal. As a 760px
+   table the action buttons stacked into a tall row and an opened proposal
+   ran past the right edge of the screen. The selectors outrank the shared
+   phone rule that keeps every table on one scrolling line. */
+@media (max-width: 767px) {
+  .supply-table-wrap table.proposal-table {
+    min-width: 0;
+    overflow-x: visible;
+    white-space: normal;
+  }
+  .supply-table-wrap table.proposal-table thead {
+    display: none;
+  }
+  .supply-table-wrap table.proposal-table tbody,
+  .supply-table-wrap table.proposal-table tr,
+  .supply-table-wrap table.proposal-table td {
+    display: block;
+    width: 100%;
+  }
+  .supply-table-wrap table.proposal-table td {
+    padding: 0.25rem 0;
+    border-top: 0;
+  }
+  .supply-table-wrap table.proposal-table tbody tr[id^="proposal-"] {
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-line);
+  }
+  .supply-table-wrap table.proposal-table tbody tr:first-child {
+    border-top: 0;
+  }
+  .supply-table-wrap table.proposal-table td.supply-number {
+    text-align: left;
+  }
+  .supply-table-wrap table.proposal-table .supply-row-actions {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "recordedAt": "2026-10-04T08:26:27.577Z",
+  "data": {
+    "clients": 20,
+    "dishes": 30,
+    "events": 100,
+    "menuLines": 200,
+    "pictures": 3
+  },
+  "backup": {
+    "exportAndEncryptMs": 2245,
+    "bytes": 112361,
+    "settingNames": 2
+  },
+  "restore": {
+    "decryptAndImportMs": 41738,
+    "emptyBackendToRestoredMs": 66363
+  },
+  "lossWindow": "Everything written after the newest backup. With the daily schedule in the runbook that is up to 24 hours; the drill proves a write made after the backup is not in the restore.",
+  "checks": [
+    {
+      "check": "source company filled",
+      "ok": true,
+      "detail": "20 clients, 30 dishes, 100 events, 200 menu lines, 3 pictures"
+    },
+    {
+      "check": "only the newest two backups are kept",
+      "ok": true,
+      "detail": "capsule-2026-10-04T08-25-15-030Z.capsule-backup, capsule-2026-10-04T08-25-19-188Z.capsule-backup"
+    },
+    {
+      "check": "backup file is encrypted (no readable table names inside)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "receipt lists setting names, never their values",
+      "ok": true,
+      "detail": "CLERK_JWT_ISSUER_DOMAIN, CONVEX_FIELD_ENCRYPTION_KEY"
+    },
+    {
+      "check": "a client written after the backup exists on the source",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "restore target starts empty",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "a wrong key fails and imports nothing",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "same record ids and counts",
+      "ok": true,
+      "detail": "20 clients, 30 dishes, 100 events, 200 menu lines"
+    },
+    {
+      "check": "every event still names its client, every menu line its event and dish",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "each picture opens through the app with the same bytes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the owner's sign-in reaches the company again (no claims, people row only)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "a stranger's sign-in still reaches nothing",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the client written after the backup is not restored",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

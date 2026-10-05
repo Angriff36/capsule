@@ -387,3 +387,13 @@
 - Why: `EventCreatePage`'s `proposalLinkable` ternary generic-created unlinked Events for loading/missing/draft/already-linked proposal routes. Only no-proposal routes should offer generic creation, and every proposal context needs a truthful next step instead of a misleading create CTA.
 - Fixed: generic creation stays only on no-proposal routes; accepted-unlinked books through the existing canonical seam with the returned Event id; a live linked proposal gets one primary Open event action; loading/missing/draft/nonaccepted/stale-deleted contexts expose no create path; seam failure keeps the entered input and never generic-falls back. First review (gpt-5.6-sol, REJECT, `review-1-verdict.txt`) caught the linked branch still showing "pick or create [venue] in the Venue panel" — a create-form panel that cannot attach a venue to a saved Event; the hint is now gated on `proposalLinkable`, and mounted cases use an unmatched venue to prove both sides. UI-only: no backend, Manifest or design-token change.
 - Proof: 14 mounted page tests in `tests/event-create-behavior.test.ts` (original 3 retained; first RED `red.log` 5 failed/6 passed — not all initial cases were invalid, worker 217 had already fixed client/venue selection). Final gates: `focused-final.log` 6 files/53 GATE_EXIT=0, `test-final.log` 197 files/929 GATE_EXIT=0, `check.log` GATE_EXIT=0, begun at shared HEAD `3a4217c6` and completed with shared HEAD `a8a2d0c8` (shared history advanced while it ran; this increment's diff was unchanged throughout — local dirty-working-tree evidence, not clean-commit proof), `release-test-orchestrator.log` 5/5 (the stale release-argv correction is shared commit `3a4217c6`, not this diff), review `review-verdict.txt` APPROVE + perceptual PASS. Receipt: codex-plans/whole-spec-audit-2026-09-20/proposal-route-evidence-2026-09-22.md. AC-411 → PASS (53 PASS / 674 PENDING). Issue #393 (duplicate-name venue auto-selection) stays open under AC-410.
+
+# Fixes log (resolved issues)
+
+## 2026-10-05
+- Issue: List scroll was saved in passive cleanup after an incoming route could restore the persistent shell scroller.
+  Fix: Persist scroll in layout cleanup and observe workspace-sheet content while retaining a pending target during loading.
+  Commands: `bun run typecheck`
+- Issue: Detail returns treated any saved URL as proof that browser Back was safe and broke modified-anchor behavior.
+  Fix: Added entry-key/history-index origin tracking and `ReturnToListLink`, which only consumes Back when the immediate predecessor matches.
+  Commands: `bun run typecheck`

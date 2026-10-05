@@ -8,6 +8,17 @@ export type VehicleDeliveryWindow = {
   destination: string;
 };
 
+/**
+ * Plain words for a truck or trailer that cannot go out, or null when it can
+ * (PL-DELIVERY, AC-542). "In use" is fine: the window check handles clashes.
+ */
+export function vehicleStatusProblem(status: string): string | null {
+  if (status === "maintenance") return "in the shop for maintenance";
+  if (status === "out_of_service") return "out of service";
+  if (status === "retired") return "retired";
+  return null;
+}
+
 /** Half-open ranges: a window ending at 10:00 permits the next run at 10:00. */
 export function conflictingVehicleDeliveries(
   deliveries: readonly VehicleDeliveryWindow[],

@@ -23,8 +23,14 @@ import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
-import { deleteBlobIfOrphan } from "./lib/blobs";
+import {
+  blobReferenced,
+  deleteBlobIfOrphan,
+  firstAttachmentFor,
+} from "./lib/blobs";
+import { commandIdempotencyScope } from "./lib/commandIdempotency";
 import { chatAuth, encryptField, live } from "./lib/teamChatRead";
+import { insertStepEvent } from "./lib/commandAudit";
 
 /** Files per message; mirrors src/features/chat/chatTypes.ts CHAT_MAX_FILES. */
 const MAX_FILES = 20;
@@ -71,7 +77,7 @@ export const sendWithFiles = mutation({
     if (draftKey.length === 0) throw new Error("Idempotency key is required");
     const text = args.body.trim();
     if (text.length === 0 && args.files.length === 0) {
-      throw new Error("Message text or a file is required");
+      throw new Error("Type a message or add a file before sending.");
     }
     // Every file must be a real, uploaded blob before anything is written:
     // a message must never claim a file that does not exist, and a wrong-table
@@ -79,10 +85,10 @@ export const sendWithFiles = mutation({
     for (const file of args.files) {
       // The same invariants Attachment.attach enforces for every other file.
       if (file.fileName.trim().length === 0) {
-        throw new Error("File name is required");
+        throw new Error("This file has no name. Rename it and try again.");
       }
       if (!(file.fileSize >= 0)) {
-        throw new Error("File size cannot be negative");
+        throw new Error("This file looks broken. Try adding it again.");
       }
       const storageId = ctx.db.system.normalizeId("_storage", file.storageId);
       const blob = storageId ? await ctx.db.system.get(storageId) : null;
@@ -98,10 +104,19 @@ export const sendWithFiles = mutation({
     // BEFORE the caller's key and the key is last, so a draft key that happens
     // to end in ":file:0" can never collide with another message's file key.
     const messageKey = `${auth.tenantId}:${auth.id}:teamChat:message:${draftKey}`;
+    // The generated step claims its reservation under the workspace-stable
+    // key and replays its answer only for this caller scope; existence here
+    // only decides whether this retry may still attach files.
+    const idemScope = await commandIdempotencyScope(
+      ctx,
+      "StaffMessage_createViaSend",
+      messageKey,
+    );
     const replay =
+      idemScope !== null &&
       (await ctx.db
         .query("commandIdempotencyKeys")
-        .withIndex("by_key", (q) => q.eq("key", messageKey))
+        .withIndex("by_key", (q) => q.eq("key", idemScope.reservationKey))
         .first()) !== null;
 
     const created = (await ctx.runMutation(
@@ -151,6 +166,19 @@ export const sendWithFiles = mutation({
     // Same shape and audit event as the generated command. A replay never
     // inserts — the first attempt's rows are the message's files.
     if (!replay) {
+      // A chat file is always a fresh upload. A storage id some record
+      // already uses (another message's photo, another company's file) is
+      // refused: knowing the id must not copy the file into this chat.
+      for (const file of args.files) {
+        if (
+          (await firstAttachmentFor(ctx, file.storageId)) !== null ||
+          (await blobReferenced(ctx, file.storageId))
+        ) {
+          throw new Error(
+            `${file.fileName} is already used somewhere else. Add the file again.`,
+          );
+        }
+      }
       const now = Date.now();
       for (const file of args.files) {
         const attachmentId = await ctx.db.insert("attachments", {
@@ -167,7 +195,7 @@ export const sendWithFiles = mutation({
           uploadedAt: now,
           version: 1,
         });
-        await ctx.db.insert("manifestEvents", {
+        await insertStepEvent(ctx, {
           type: "AttachmentAdded",
           entity: "Attachment",
           entityId: attachmentId,

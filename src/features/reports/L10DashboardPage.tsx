@@ -1,8 +1,11 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
-  useListEvent,
   useListLead,
   useListEventCloseout,
+  useListLeadershipItem,
+  useListPerson,
+  useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
 import {
   DashboardGrid,
@@ -10,21 +13,105 @@ import {
 } from "@/ui/charts/DashboardGrid";
 import { StatCard } from "@/ui/charts/StatCard";
 import { PageHeader, Section, EmptyState } from "@/ui/primitives";
-import { formatMoney } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
+import { FINANCE_ROUTES } from "../finance/financeRoutes";
+import {
+  NOT_KNOWN,
+  foodCostPercent,
+  isBookedEvent,
+  isCompletedEvent,
+  percentText,
+} from "./dashboardRecordSets";
+import { MetricDefinitionList } from "./MetricDefinitionList";
+import {
+  SCORECARD_STATUS_LABEL,
+  formatScorecardValue,
+  scorecardRows,
+  type ScorecardTargetRow,
+} from "./scorecardMeasures";
+import {
+  weekStartOf,
+  weeklyHistory,
+  type LeadershipItemRow,
+} from "./leadershipHistory";
+import { useEventsInRange } from "../facilities/useEventsById";
+import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
+import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
 /**
  * L10 Dashboard (Priority 40)
  *
- * Weekly leadership meeting board: this week's wins and the company
- * scorecard, all derived live from events, leads, and closeouts.
- * Rocks, issues, and to-dos are not tracked in Capsule, so those
- * sections show an honest empty state instead of placeholder data.
+ * Weekly leadership meeting board: this week's wins, the company scorecard
+ * against its targets and owners, the priorities (rocks), issues and to-dos
+ * (LeadershipItem), and eight weeks of meeting history, all live.
  */
 
 export function L10DashboardPage() {
-  const events = useListEvent();
+  const now = useMemo(() => new Date(), []);
+  // Every figure here is this month or one of the last eight weeks.
+  const eventWindow = useMemo(() => {
+    const week = weekStartOf(now);
+    const from = Math.min(
+      new Date(now.getFullYear(), now.getMonth(), 1).getTime(),
+      new Date(
+        week.getFullYear(),
+        week.getMonth(),
+        week.getDate() - 49,
+      ).getTime(),
+    );
+    const to = Math.max(
+      new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime(),
+      new Date(
+        week.getFullYear(),
+        week.getMonth(),
+        week.getDate() + 7,
+      ).getTime(),
+    );
+    return { from, to };
+  }, [now]);
+  const events = useEventsInRange(eventWindow);
   const leads = useListLead();
   const closeouts = useListEventCloseout();
+  const items = useListLeadershipItem();
+  const targets = useListScorecardTarget();
+  const people = useListPerson();
+
+  const activePeople: ScorecardPerson[] = (people ?? []).filter(
+    (row) => row.deletedAt == null && row.status === "active",
+  );
+  const personName = (id: string | null | undefined) => {
+    const person = id ? people?.find((row) => row._id === id) : undefined;
+    return person
+      ? `${person.givenName} ${person.familyName}`.trim()
+      : "No owner";
+  };
+
+  const scorecard = useMemo(
+    () =>
+      scorecardRows(
+        {
+          events: events ?? [],
+          closeouts: closeouts ?? [],
+          leads: leads ?? [],
+        },
+        (targets ?? []) as ScorecardTargetRow[],
+        now,
+      ),
+    [events, closeouts, leads, targets, now],
+  );
+
+  const history = useMemo(
+    () =>
+      weeklyHistory(
+        {
+          items: (items ?? []) as LeadershipItemRow[],
+          events: events ?? [],
+          leads: leads ?? [],
+        },
+        now,
+      ),
+    [items, events, leads, now],
+  );
 
   // This week's wins
   const weeklyWins = useMemo(() => {
@@ -32,9 +119,9 @@ export function L10DashboardPage() {
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     const recentCompleted = (events || []).filter((e) => {
-      if (!e.updatedAt) return false;
-      const updated = new Date(e.updatedAt);
-      return e.stage === "completed" && updated >= weekAgo && updated <= now;
+      if (!e.startsAt || !isCompletedEvent(e)) return false;
+      const starts = new Date(e.startsAt);
+      return starts >= weekAgo && starts <= now;
     });
 
     const revenueWin = recentCompleted.reduce(
@@ -68,7 +155,7 @@ export function L10DashboardPage() {
     const currentYear = now.getFullYear();
 
     const monthEvents = (events || []).filter((e) => {
-      if (!e.startsAt) return false;
+      if (!e.startsAt || !isBookedEvent(e)) return false;
       const date = new Date(e.startsAt);
       return (
         date.getMonth() === currentMonth && date.getFullYear() === currentYear
@@ -89,15 +176,7 @@ export function L10DashboardPage() {
       );
     });
 
-    const totalCost = monthCloseouts.reduce(
-      (sum, c) => sum + (c.actualIngredientCost || 0),
-      0,
-    );
-    const totalRev = monthCloseouts.reduce(
-      (sum, c) => sum + c.grossProfit + (c.actualIngredientCost || 0),
-      0,
-    );
-    const foodCostPct = totalRev > 0 ? (totalCost / totalRev) * 100 : 0;
+    const foodCostPct = foodCostPercent(monthCloseouts);
 
     const monthLeads = (leads || []).filter((l) => {
       if (!l.createdAt) return false;
@@ -139,7 +218,7 @@ export function L10DashboardPage() {
               <p className="text-xl font-bold text-ok">
                 {formatMoney(weeklyWins.revenue)}
               </p>
-              <p className="text-xs text-ok">Revenue Booked</p>
+              <p className="text-xs text-ok">Completed revenue</p>
             </div>
             <div>
               <p className="text-xl font-bold text-ok">{weeklyWins.newLeads}</p>
@@ -185,8 +264,7 @@ export function L10DashboardPage() {
         <StatCard
           title="Food Cost %"
           main={{
-            value: scorecardMetrics.foodCostPct,
-            format: "percent" as const,
+            value: percentText(scorecardMetrics.foodCostPct),
           }}
           isLive
         />
@@ -210,17 +288,103 @@ export function L10DashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="L10 Meeting Dashboard"
-        lead="Live numbers for your weekly leadership meeting: this week's wins and the company scorecard, straight from your events, leads, and closeouts."
+        lead="Your weekly leadership meeting: this week's wins, the scorecard against its targets, priorities, issues, to-dos, and the last eight weeks."
       />
+
+      {events?.length === 0 ? (
+        <div data-testid="dashboard-empty">
+          <EmptyState
+            title="No events yet"
+            hint="The figures fill in as events are booked and completed."
+          />
+        </div>
+      ) : null}
 
       <DashboardGrid items={dashboardItems} />
 
       <div className="mt-6">
-        <Section title="Rocks, issues, and to-dos">
-          <EmptyState
-            title="Rocks, issues, and to-dos aren't tracked in Capsule."
-            hint="This board shows only live numbers from your events, leads, and closeouts. Keep your 90-day priorities, issues list, and meeting to-dos in your meeting notes for now."
-          />
+        <Section title="Scorecard">
+          <div className="supply-table-wrap">
+            <table className="supply-table" data-testid="l10-scorecard">
+              <thead>
+                <tr>
+                  <th>Number</th>
+                  <th>Target</th>
+                  <th>This month</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scorecard.map((row) => (
+                  <tr key={row.measure.key}>
+                    <td>{row.measure.name}</td>
+                    <td>
+                      {row.target
+                        ? formatScorecardValue(
+                            row.target.target,
+                            row.measure.unit,
+                          )
+                        : "Not set"}
+                    </td>
+                    <td>
+                      {row.actual == null
+                        ? NOT_KNOWN
+                        : formatScorecardValue(row.actual, row.measure.unit)}
+                    </td>
+                    <td>{personName(row.target?.ownerPersonId)}</td>
+                    <td>{SCORECARD_STATUS_LABEL[row.status]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-ink-2">
+            Set targets and owners on the{" "}
+            <Link to={FINANCE_ROUTES.scorecard} className="btn-link">
+              Company Scorecard
+            </Link>
+            .
+          </p>
+        </Section>
+      </div>
+
+      <LeadershipItemsPanel
+        items={(items ?? []) as LeadershipItemRow[]}
+        people={activePeople}
+        now={now}
+      />
+
+      <div className="mt-6">
+        <Section title="Meeting history (last 8 weeks)">
+          <div className="supply-table-wrap">
+            <table className="supply-table" data-testid="l10-history">
+              <thead>
+                <tr>
+                  <th>Week of</th>
+                  <th>Added</th>
+                  <th>Done</th>
+                  <th>Dropped</th>
+                  <th>Events completed</th>
+                  <th>Completed revenue</th>
+                  <th>New leads</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((week) => (
+                  <tr key={week.weekStart}>
+                    <td>{formatDate(week.weekStart)}</td>
+                    <td>{week.opened}</td>
+                    <td>{week.done}</td>
+                    <td>{week.dropped}</td>
+                    <td>{week.completedEvents}</td>
+                    <td>{formatMoney(week.completedRevenue)}</td>
+                    <td>{week.newLeads}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Section>
       </div>
 
@@ -234,6 +398,17 @@ export function L10DashboardPage() {
           right this week.
         </p>
       </div>
+
+      <MetricDefinitionList
+        metricIds={[
+          "dashboard.events_completed_week",
+          "dashboard.leads",
+          "dashboard.leads_converted_week",
+          "dashboard.booked_revenue",
+          "dashboard.booked_events",
+          "dashboard.food_cost_percent",
+        ]}
+      />
     </div>
   );
 }

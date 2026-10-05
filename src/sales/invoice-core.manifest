@@ -27,6 +27,11 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property eventId: uuid?
+  // The commercial source the money came from: the accepted proposal and the
+  // revision it accepted (AC-618). Null when the event's own quoted price is
+  // the source. Checked against the workspace by the issue seam.
+  property proposalId: uuid?
+  property proposalRevisionId: uuid?
   property unique invoiceNumber: string?
   property required subtotal: money(12, 2) = 0
   property required taxAmount: money(12, 2) = 0
@@ -83,7 +88,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany payments: Payment
 
-  constraint invoiceIssuedComplete: self.issuedAt == null or (length(trim(self.invoiceNumber)) > 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0 and self.amountPaid >= 0 and self.amountDue >= 0) "Issued invoices require a number and non-negative money amounts"
+  constraint invoiceIssuedComplete: self.issuedAt == null or (length(trim(self.invoiceNumber)) > 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0 and self.amountPaid >= 0 and self.amountDue >= 0) "Give this invoice a number, and make sure the money amounts are zero or more, before you issue it"
   constraint invoiceTotalsConsistent: self.issuedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Invoice total must equal subtotal plus tax minus discount"
   constraint invoiceBalanceConsistent: self.issuedAt == null or (self.amountCredited == null and self.amountDue == self.total - self.amountPaid) or (self.amountCredited != null and self.amountDue == self.total - self.amountPaid - self.amountCredited) "Invoice amount due must equal total minus payments and applied credits"
 
@@ -101,7 +106,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change invoices"
 
   // invoiceNumber is what finance typed. When it is absent the number is
-  // "INV-<invoiceSequence + 1>" — the EventApproved cascade passes
+  // "INV-<invoiceSequence + 1>" — the event approval seam passes
   // invoiceSequence: 0, so the row is written as the placeholder "INV-1" and
   // InvoiceIssued carries autoNumbered: true; the authored numbering seam
   // replaces it in the same transaction with the tenant's persisted sequence
@@ -122,20 +127,22 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     optional lineItems: json,
     optional taxBreakdown: json,
     optional currencyCode: string,
-    optional exchangeRate: decimal(18, 8)
+    optional exchangeRate: decimal(18, 8),
+    optional proposalId: uuid,
+    optional proposalRevisionId: uuid
   ) {
-    // Idempotent issue: EventApproved match may re-run; do not fail or remint.
+    // Idempotent issue: a repeated issue neither fails nor remints.
     guard self.issuedAt == null or self.eventId == eventId
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.client != null
-    constraint issueClientMatch: clientId == self.clientId "Issue clientId must match the seeded client reference"
-    constraint issueEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Issue eventId must match the seeded event reference when both are set"
-    constraint issueNumber: (invoiceNumber != null and length(trim(invoiceNumber)) > 0) or invoiceSequence != null "Invoice number is required"
-    constraint issueMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Invoice money amounts cannot be negative"
+    constraint issueClientMatch: clientId == self.clientId "This invoice is for a different client. Use the client already on this invoice."
+    constraint issueEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This invoice already has a different event. Use the same event, or leave it blank."
+    constraint issueNumber: (invoiceNumber != null and length(trim(invoiceNumber)) > 0) or invoiceSequence != null "Give this invoice a number"
+    constraint issueMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "This invoice's money amounts can't be negative. Use zero or more."
     constraint issueTotalMatch: total == subtotal + taxAmount - discountAmount "Invoice total must equal subtotal plus tax minus discount"
-    constraint issueCurrencyCode: currencyCode == null or length(trim(currencyCode)) == 3 "Currency code must be a three-letter ISO 4217 code"
-    constraint issueExchangeRate: exchangeRate == null or exchangeRate > 0 "Exchange rate must be greater than zero"
+    constraint issueCurrencyCode: currencyCode == null or length(trim(currencyCode)) == 3 "Use a three-letter currency code, such as USD."
+    constraint issueExchangeRate: exchangeRate == null or exchangeRate > 0 "This invoice's exchange rate has to be more than zero"
     compute normalizedCurrencyCode = currencyCode != null ? toUpperCase(currencyCode) : null
     compute resolvedExchangeRate = exchangeRate != null ? exchangeRate : 1.0
     compute resolvedInvoiceNumber = invoiceNumber != null ? invoiceNumber : "INV-" + (invoiceSequence + 1)
@@ -158,6 +165,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate notes = alreadyIssued ? self.notes : notes
     mutate currencyCode = alreadyIssued ? self.currencyCode : normalizedCurrencyCode
     mutate exchangeRate = alreadyIssued ? self.exchangeRate : resolvedExchangeRate
+    mutate proposalId = alreadyIssued ? self.proposalId : proposalId
+    mutate proposalRevisionId = alreadyIssued ? self.proposalRevisionId : proposalRevisionId
     mutate issuedAt = alreadyIssued ? self.issuedAt : now()
     emit InvoiceIssued {
       invoiceId: self.id
@@ -166,6 +175,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
       eventId: eventId != null ? eventId : self.eventId
       invoiceNumber: alreadyIssued ? self.invoiceNumber : resolvedInvoiceNumber
       autoNumbered: alreadyIssued ? false : (invoiceNumber == null)
+      newlyIssued: alreadyIssued ? false : true
       total: alreadyIssued ? self.total : total
       amountDue: alreadyIssued ? self.amountDue : total
       currencyCode: normalizedCurrencyCode
@@ -187,7 +197,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.issuedAt != null
     guard self.sentAt == null
-    constraint assignNumberPresent: length(trim(invoiceNumber)) > 0 "Invoice number is required"
+    constraint assignNumberPresent: length(trim(invoiceNumber)) > 0 "Give this invoice a number"
     mutate invoiceNumber = invoiceNumber
     emit InvoiceNumberAssigned {
       invoiceId: self.id
@@ -227,10 +237,12 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command applyPayment(paymentAmount: money(12, 2), optional paymentId: string) {
+  // Server-only (private): run by the PaymentSettled reaction; no person may
+  // lower a balance without a settled payment behind it (AC-372).
+  private command applyPayment(paymentAmount: money(12, 2), optional paymentId: string) {
     guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
-    constraint applyPositive: paymentAmount > 0 "Payment amount must be positive"
+    constraint applyPositive: paymentAmount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
     constraint applyWithinDue: paymentAmount <= self.amountDue "Payment amount cannot exceed amount due"
     compute nextPaid = self.amountPaid + paymentAmount
     compute nextDue = self.amountDue - paymentAmount
@@ -238,6 +250,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate amountDue = nextDue
     mutate status = nextDue == 0 ? "paid" : "partial"
     mutate paidAt = nextDue == 0 ? now() : self.paidAt
+    // A card payment that covers the deposit marks the deposit paid, so no
+    // one records it a second time with markDepositPaid.
+    mutate depositPaidAt = self.depositPaidAt == null and self.depositAmount != null and self.depositAmount > 0 and nextPaid >= self.depositAmount ? now() : self.depositPaidAt
     emit InvoicePaymentApplied {
       invoiceId: self.id
       tenantId: self.tenantId
@@ -254,9 +269,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   command setDeposit(depositAmount: money(12, 2), optional balanceReminderLeadDays: number) {
     guard self.deletedAt == null
     guard self.depositPaidAt == null
-    constraint depositNonnegative: depositAmount >= 0 "Deposit amount cannot be negative"
+    constraint depositNonnegative: depositAmount >= 0 "This deposit amount can't be negative. Use zero or more."
     constraint depositWithinTotal: self.total == 0 or depositAmount <= self.total "Deposit amount cannot exceed the invoice total"
-    constraint depositLeadDays: balanceReminderLeadDays == null or balanceReminderLeadDays >= 0 "Reminder lead days cannot be negative"
+    constraint depositLeadDays: balanceReminderLeadDays == null or balanceReminderLeadDays >= 0 "The reminder lead days can't be negative. Use zero or more."
     mutate depositAmount = depositAmount
     mutate balanceReminderLeadDays = balanceReminderLeadDays != null ? balanceReminderLeadDays : self.balanceReminderLeadDays
     emit InvoiceDepositSet {
@@ -311,17 +326,21 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   }
 
   command recordRefund(refundAmount: money(12, 2), paymentId: string) {
-    guard self.status == "paid" or self.status == "partial"
+    // An overdue invoice with money on it can still have that money taken back.
+    guard self.status == "paid" or self.status == "partial" or self.status == "overdue"
     guard self.deletedAt == null
-    constraint refundPositive: refundAmount > 0 "Refund amount must be positive"
+    constraint refundPositive: refundAmount > 0 "This refund amount has to be more than zero. Enter how much to refund."
     constraint refundWithinPaid: refundAmount <= self.amountPaid "Refund amount cannot exceed amount paid"
-    constraint refundPaymentId: length(trim(paymentId)) > 0 "Payment id is required for refund"
+    constraint refundPaymentId: length(trim(paymentId)) > 0 "Say which payment this refund is for"
     compute nextPaid = self.amountPaid - refundAmount
     compute nextDue = self.amountDue + refundAmount
     mutate amountPaid = nextPaid
     mutate amountDue = nextDue
-    mutate status = "partial"
+    mutate status = self.status == "overdue" ? "overdue" : "partial"
     mutate paidAt = null
+    // A refund, chargeback or bank return that leaves less paid than the
+    // deposit reopens the deposit, so the client can pay it again.
+    mutate depositPaidAt = self.depositAmount != null and self.depositAmount > 0 and nextPaid < self.depositAmount ? null : self.depositPaidAt
     emit InvoiceRefundRecorded {
       invoiceId: self.id
       tenantId: self.tenantId
@@ -336,11 +355,12 @@ entity Invoice mixin TenantScoped, SoftDeletable {
 
   // Records total credit memos issued against this paid source invoice without
   // rewriting its payment history or reopening its settled balance.
-  command recordCreditMemo(creditAmount: money(12, 2), creditMemoId: string) {
+  // Server-only (private): run by the CreditMemoIssued reaction (AC-372).
+  private command recordCreditMemo(creditAmount: money(12, 2), creditMemoId: string) {
     guard self.status == "paid"
     guard self.deletedAt == null
-    constraint creditMemoPositive: creditAmount > 0 "Credit memo amount must be positive"
-    constraint creditMemoIdPresent: length(trim(creditMemoId)) > 0 "Credit memo id is required"
+    constraint creditMemoPositive: creditAmount > 0 "This credit memo's amount has to be more than zero. Enter how much to credit."
+    constraint creditMemoIdPresent: length(trim(creditMemoId)) > 0 "Say which credit memo this is for"
     compute priorCreditMemoAmount = self.creditMemoAmount != null ? self.creditMemoAmount : 0
     constraint creditMemoWithinPaid: creditAmount <= self.amountPaid - (self.creditMemoAmount != null ? self.creditMemoAmount : 0) "Credit memos cannot exceed the amount paid on the source invoice"
     compute nextCreditMemoAmount = priorCreditMemoAmount + creditAmount
@@ -358,12 +378,13 @@ entity Invoice mixin TenantScoped, SoftDeletable {
 
   // Applies a credit memo to an open target invoice. Payment totals remain
   // untouched so finance can distinguish cash received from account credit.
-  command applyCredit(creditAmount: money(12, 2), creditMemoId: string) {
+  // Server-only (private): run by the CreditMemoIssued fan-out (AC-372).
+  private command applyCredit(creditAmount: money(12, 2), creditMemoId: string) {
     guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
-    constraint creditPositive: creditAmount > 0 "Applied credit must be positive"
+    constraint creditPositive: creditAmount > 0 "The credit applied has to be more than zero"
     constraint creditWithinDue: creditAmount <= self.amountDue "Applied credit cannot exceed the target invoice balance"
-    constraint appliedCreditMemoIdPresent: length(trim(creditMemoId)) > 0 "Credit memo id is required"
+    constraint appliedCreditMemoIdPresent: length(trim(creditMemoId)) > 0 "Say which credit memo this is for"
     compute priorAmountCredited = self.amountCredited != null ? self.amountCredited : 0
     compute nextAmountCredited = priorAmountCredited + creditAmount
     compute nextDue = self.amountDue - creditAmount
@@ -402,7 +423,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     guard self.status == "draft" or self.status == "sent" or self.status == "viewed" or self.status == "overdue"
     guard self.deletedAt == null
     guard self.amountPaid == 0
-    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Give a reason for voiding this invoice"
     mutate status = "voided"
     mutate voidReason = reason
     mutate voidedAt = now()
@@ -415,11 +436,42 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Event.changePricing keeps the unsent auto-made draft on the event's new
+  // price (AC-388 invoice slice). The pricing reconciliation seam
+  // (convex/lib/invoicePricingReconciliation.ts) only calls this for a draft
+  // still in its auto-made shape; a draft finance changed (tax, discount,
+  // deposit, payment, credit) is left as it is and flagged on the receipt.
+  // The new amount is the event's own quoted price, never a caller's number
+  // (AC-372); finance may also run it from the readiness list.
+  command followEventPrice() {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.sentAt == null
+    guard self.amountPaid == 0
+    guard self.taxAmount == 0 and self.discountAmount == 0
+    guard self.amountCredited == null or self.amountCredited == 0
+    constraint followEventPriceEvent: self.event != null and self.event.quotedPrice != null "This bill has no event price to follow."
+    compute total = self.event.quotedPrice
+    constraint followEventPriceNonnegative: total >= 0 "This invoice's money amounts can't be negative. Use zero or more."
+    compute previousTotal = self.total
+    mutate subtotal = total
+    mutate total = total
+    mutate amountDue = total
+    emit InvoiceEventPriceFollowed {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      previousTotal: previousTotal
+      total: total
+    }
+  }
+
   command writeOff(reason: string, writeOffAmount: money(12, 2)) {
     guard self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
-    constraint writeOffReasonPresent: length(trim(reason)) > 0 "Write-off reason is required"
-    constraint writeOffPositive: writeOffAmount > 0 "Write-off amount must be positive"
+    constraint writeOffReasonPresent: length(trim(reason)) > 0 "Give a reason for writing this off"
+    constraint writeOffPositive: writeOffAmount > 0 "This write-off amount has to be more than zero"
     constraint writeOffWithinDue: writeOffAmount <= self.amountDue "Write-off amount cannot exceed amount due"
     mutate status = "written_off"
     mutate amountDue = 0
@@ -491,10 +543,22 @@ event InvoiceIssued: "invoice.issued" {
   invoiceNumber: string
   // True when the number came from invoiceSequence rather than the caller.
   autoNumbered: boolean
+  // True only on the first issue; the invoice line check runs then
+  // (convex/lib/invoiceIssueTotals.ts), never on an idempotent re-issue.
+  newlyIssued: boolean?
   total: money(12, 2)
   amountDue: money(12, 2)
   currencyCode: string?
   exchangeRate: decimal(18, 8)?
+}
+
+event InvoiceEventPriceFollowed: "invoice.event_price_followed" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  previousTotal: money(12, 2)
+  total: money(12, 2)
 }
 
 event InvoiceNumberAssigned: "invoice.number_assigned" {

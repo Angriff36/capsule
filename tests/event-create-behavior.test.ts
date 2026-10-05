@@ -33,7 +33,7 @@ it("explains a missing client, then enforces the required contact before sending
   await mount(createElement(EventCreatePage));
   const save = button("Create event");
   expect(save.disabled).toBe(true);
-  expect(container.textContent).toContain("Client is required");
+  expect(container.textContent).toContain("Pick a client for this event.");
   await chooseAccountOrVenue("clientId", "Client A");
   await chooseAccountOrVenue("venueId", "Garden");
   input("title", "Summer dinner");
@@ -64,10 +64,19 @@ it("explains a missing client, then enforces the required contact before sending
 it("renders empty catalog recovery links and updates the selectors when live catalog rows change", async () => {
   await mount(createElement(EventCreatePage));
   expect(container.textContent).toContain("No occasions yet");
-  expect(button("Add the standard list").disabled).toBe(false);
+  // Service style, occasion and referral source each offer the standard
+  // list right on the form (#368 item 5).
+  const standardButtons = () =>
+    [...container.querySelectorAll("button")].filter(
+      (node) => node.textContent === "Add the standard list",
+    );
+  expect(standardButtons()).toHaveLength(3);
+  expect(standardButtons().every((node) => !node.disabled)).toBe(true);
+  // Occasions and referral sources each point to Admin → Catalogs.
   expect(container.querySelectorAll('a[href="/admin/catalogs"]')).toHaveLength(
-    1,
+    2,
   );
+  expect(container.textContent).toContain("No referral sources yet.");
   expect(selectWith("Full Service").required).toBe(false);
   expect(selectWith("Select an occasion").required).toBe(false);
   backend.values.set("useListServiceStyle", [
@@ -83,7 +92,9 @@ it("renders empty catalog recovery links and updates the selectors when live cat
   ).toEqual(["Select a service style", "Chef's table"]);
   expect(selectWith("Anniversary")).toBeDefined();
   expect(container.textContent).not.toContain("No occasions yet");
-  expect(container.textContent).not.toContain("Add the standard list");
+  // Only the still-empty referral source list keeps its button.
+  expect(standardButtons()).toHaveLength(1);
+  expect(container.textContent).toContain("standard referral sources");
 });
 
 it("books an accepted unlinked proposal through the canonical seam and navigates to the returned event", async () => {

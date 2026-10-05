@@ -15,6 +15,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { linkStaffProfile } from "./reconciliation-failure-isolation.runtime.helpers";
 import {
   computeProposalPricing,
   type PricingBasis,
@@ -151,6 +152,7 @@ describe("proposal central-path snapshot identity (AC-264)", () => {
       role: "owner",
       tenantId: "tenant-ac264",
     });
+    await linkStaffProfile(proof, "tenant-ac264", "o-ac264");
 
     // Preview — the exact function the draft form uses for its live total.
     const preview = computeProposalPricing({
@@ -248,6 +250,7 @@ describe("proposal central-path snapshot identity (AC-264)", () => {
       role: "owner",
       tenantId: "tenant-ac264-b",
     });
+    await linkStaffProfile(proof, "tenant-ac264-b", "o-ac264b");
 
     const proposalId = await seedDraftedProposal(
       proof,

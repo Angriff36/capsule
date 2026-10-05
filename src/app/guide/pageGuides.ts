@@ -155,10 +155,21 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/kitchen/prep",
     title: "Kitchen dashboard",
     purpose:
-      "The command view for a service day — prep progress, blockers, and quality checks.",
+      "The main view for a service day — prep progress, blockers, and quality checks.",
     steps: [
       "Watch for blocked tasks and clear what's blocking them.",
       "Use it on a wall screen during busy days.",
+    ],
+  },
+  {
+    prefix: "/kitchen/plan",
+    title: "Production plan",
+    purpose:
+      "What the kitchen makes each day across all events, by station, recipe and batch.",
+    steps: [
+      "Read one day at a time; work for the same step is pooled and each event keeps its own amount.",
+      "Check Make ahead and Waits for before you start a row.",
+      "Set a step's make-ahead days on the dish's prep steps.",
     ],
   },
   {
@@ -232,6 +243,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Start a count session.",
       "Enter real quantities; differences get logged automatically.",
+    ],
+  },
+  {
+    prefix: "/inventory/opening-stock",
+    title: "Opening stock",
+    purpose:
+      "Bring in a stock count sheet and pick which counts become the stock on hand.",
+    steps: [
+      "Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
+      "Fix the rows that need it, or set them aside.",
+      "Press Use as opening stock on each food row you want to start from.",
     ],
   },
   {
@@ -332,6 +354,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose:
       "Reusable load lists for event types you run often, so packing is never from memory.",
     steps: ["Build a template once; new pack lists start from it."],
+  },
+  {
+    prefix: "/logistics/pack-rules",
+    title: "Pack rules",
+    purpose:
+      "What an event puts on its pack list: a dish's tools, what a dish note asks for, napkins per guest, flooring for a grass venue, the bar kit.",
+    steps: [
+      "Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
+      "Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
+      "On a pack list, open Why under a line to see which rules and facts set its amount.",
+    ],
   },
   {
     prefix: "/logistics/style-kits",
@@ -445,8 +478,13 @@ export const PAGE_GUIDES: PageGuide[] = [
   {
     prefix: "/staff/training",
     title: "Training",
-    purpose: "Completed trainings that unlock certain shift types.",
-    steps: ["Record completions so people can be scheduled for those roles."],
+    purpose:
+      "Completed trainings that unlock certain shift types, and each person's skill level per area.",
+    steps: [
+      "Note who's finished training so they can be scheduled for those roles.",
+      "In the skills matrix, rate each person 0 to 4 per area; level 4 people are the trainers.",
+      "Start training to keep the trainer, the dates and each step the trainer initials; finish it when the quiz is done.",
+    ],
   },
   {
     prefix: "/staff/reviews",
@@ -467,6 +505,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Define the measurables per role; reviews use them."],
   },
   {
+    prefix: "/staff/crew-templates",
+    title: "Crew templates",
+    purpose:
+      "The crew each kind of event needs, posted as open shifts when the event is approved.",
+    steps: [
+      "Make a template for a service style and guest range; list each role and how many.",
+      "Approve an event: its open shifts appear on the event's Staff tab.",
+    ],
+  },
+  {
     prefix: "/staff/one-on-ones",
     title: "One-on-ones",
     purpose:
@@ -477,7 +525,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/staff/hiring",
     title: "Hiring",
     purpose: "Candidates moving through your hiring steps.",
-    steps: ["Move candidates along; record interview outcomes."],
+    steps: ["Move candidates along; note each interview's outcome."],
   },
   {
     prefix: "/clients",
@@ -545,6 +593,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Reply, and convert real inquiries into pipeline leads."],
   },
   {
+    prefix: "/clients/date-holds",
+    title: "Date holds",
+    purpose:
+      "Soft holds on dates for prospects, and who is waiting if a date opens.",
+    steps: [
+      "Hold a date for a prospect; it lapses on its own at the expiry.",
+      "When a held date opens, call the next client on its waitlist.",
+    ],
+  },
+  {
     prefix: "/finance",
     title: "Finance",
     purpose: "Money owed, money collected, and where to act next.",
@@ -559,14 +617,14 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose: "Bill clients and track what's been paid.",
     steps: [
       "Issue the invoice from the event.",
-      "Send it; record payments as they arrive.",
+      "Send it, then log payments as they arrive.",
     ],
   },
   {
     prefix: "/finance/payments",
     title: "Payments",
     purpose: "Money received, matched against invoices.",
-    steps: ["Record each payment and match it to its invoice."],
+    steps: ["Log each payment and match it to its invoice."],
   },
   {
     prefix: "/finance/payment-methods",
@@ -579,12 +637,25 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Closeout",
     purpose:
       "The financial wrap-up after each event — what it earned, what it cost.",
-    steps: ["Close out each event within a few days while it's fresh."],
+    steps: [
+      "Close out each event within a few days while it's fresh.",
+      "Open Leftovers on the closeout to record food donated, returned to stock, or thrown out.",
+    ],
+  },
+  {
+    prefix: "/finance/donations",
+    title: "Food donations",
+    purpose:
+      "A year of donated leftovers by recipient, for the tax file and Good Samaritan records.",
+    steps: [
+      "Pick the year and print the summary.",
+      "Chase any donation that still has no receipt number.",
+    ],
   },
   {
     prefix: "/finance/payroll",
     title: "Payroll",
-    purpose: "Pay runs built from recorded hours.",
+    purpose: "Pay runs built from the hours on file.",
     steps: ["Prepare the run, check the hours, and export."],
   },
   {
@@ -603,7 +674,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/finance/commission-terms",
     title: "Commission terms",
     purpose: "What each venue takes, written down.",
-    steps: ["Record each venue's cut so event profit is honest."],
+    steps: ["Log each venue's cut so event profit is honest."],
   },
   {
     prefix: "/finance/attribution",
@@ -628,6 +699,15 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Profit margins",
     purpose: "What each event and service line actually makes.",
     steps: ["Find the low-margin work and reprice or drop it."],
+  },
+  {
+    prefix: "/finance/money-check",
+    title: "Money check",
+    purpose:
+      "Old-system payments next to Capsule payments, by month, with every row that does not agree.",
+    steps: [
+      "Pick the dates, read each month's difference, and save a copy when it is right.",
+    ],
   },
   {
     prefix: "/reports",

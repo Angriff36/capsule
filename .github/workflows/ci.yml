@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # check:manifest-breaking compiles the last [release] commit's sources.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -43,3 +46,38 @@ jobs:
           # convex-test harness and never dial it.
           CONVEX_URL: http://127.0.0.1:3210
         run: bun run check
+
+  # The Manifest gate scripts are run from Windows PowerShell by the owner;
+  # prove they need no Unix tools or node_modules/.bin shims there.
+  manifest-gates-windows:
+    name: manifest gates (Windows PowerShell)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Breaking-change gate
+        run: bun run check:manifest-breaking
+
+      - name: Completeness gate
+        run: bun run check:manifest-completeness
+
+      - name: Format gate
+        run: bun run check:manifest-fmt
+
+      - name: Scan gate
+        run: bun run check:manifest-scan

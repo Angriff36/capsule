@@ -49,9 +49,7 @@ export function EventBudgetCard({
       aside={
         <span className="flex items-center gap-3">
           {locked ? (
-            <span className="chip border-line-2 bg-inset text-ink-2">
-              Locked at this stage
-            </span>
+            <span className="chip chip-tone-mute">Locked at this stage</span>
           ) : null}
           <Link
             to={marginHref}

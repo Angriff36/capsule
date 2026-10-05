@@ -47,10 +47,14 @@ export const prepareMyDelivery = query({
         .collect(),
     ]);
     const preferences = preferenceRows.find((row) => row.ownerId === auth.id);
-    const subscribed = isEmailNotificationSubscribed(
-      preferences,
-      args.category as EmailNotificationCategory,
-    );
+    // Nothing saved = nothing turned on (staffSummaries sends only to people
+    // who saved a choice).
+    const subscribed =
+      preferences != null &&
+      isEmailNotificationSubscribed(
+        preferences,
+        args.category as EmailNotificationCategory,
+      );
     if (!subscribed) {
       return {
         category: args.category,

@@ -1,9 +1,10 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import {
   InlineReferenceCreateSheet,
   useCanCreateInlineReference,
 } from "../../ui/InlineReferenceCreateSheet";
 import { SearchSelect } from "../../ui/SearchSelect";
+import { ADD_NEW_CHOICE } from "./inlineCatalogChoice";
 import { VENDOR_CONTACT_ROLES } from "./vendorContactRoles";
 import { suggestOrderNumber } from "./vendorOrderNumber";
 import { useWorkingEventId } from "../events/workingEvent";
@@ -27,11 +28,78 @@ export type PurchasingCommandFormProps = {
   form: PurchasingFormKind;
   busy: boolean;
   activeVendors: VendorOption[];
+  /** True while the vendor list has not loaded yet. */
+  vendorsLoading?: boolean;
   events: EventOption[] | undefined;
   contactVendorId?: string | null;
   onCancel: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
+
+/** Field name the order form reads when a new vendor is typed inline. */
+export const NEW_VENDOR_FIELD = "newVendorName";
+
+/**
+ * Vendor for a new order. No vendors yet, or "New vendor…" picked: the field
+ * becomes a name box and the order creates that vendor first, so the rest of
+ * the order form stays filled in (PR04-09).
+ */
+function OrderVendorField({
+  vendors,
+  loading,
+  renderPicker,
+}: {
+  vendors: VendorOption[];
+  loading: boolean;
+  /** The vendor picker; `startAdding` switches to the new-vendor name box. */
+  renderPicker: (startAdding: () => void) => ReactNode;
+}) {
+  const [adding, setAdding] = useState(false);
+  if (loading) {
+    return (
+      <label className="field-label">
+        Vendor
+        <select name="vendorId" className="input" required disabled>
+          <option value="">Loading vendors…</option>
+        </select>
+      </label>
+    );
+  }
+  if (vendors.length === 0 || adding) {
+    return (
+      <label className="field-label">
+        Vendor
+        <input
+          name={NEW_VENDOR_FIELD}
+          className="input"
+          placeholder="e.g. Sysco"
+          autoComplete="off"
+          required
+          autoFocus
+          data-testid="order-new-vendor"
+        />
+        <span className="field-hint">
+          {vendors.length === 0
+            ? "No vendors yet. Name one here and this order adds it."
+            : "Name the new vendor. This order adds it; add contact details later."}
+          {vendors.length > 0 ? (
+            <>
+              {" "}
+              <button
+                type="button"
+                className="underline font-medium"
+                onClick={() => setAdding(false)}
+              >
+                Pick an existing vendor
+              </button>
+            </>
+          ) : null}
+        </span>
+      </label>
+    );
+  }
+  return renderPicker(() => setAdding(true));
+}
 
 const FORM_TITLES: Record<PurchasingFormKind, string> = {
   vendor: "Onboard vendor",
@@ -43,6 +111,7 @@ export function PurchasingCommandForm({
   form,
   busy,
   activeVendors,
+  vendorsLoading,
   events,
   contactVendorId,
   onCancel,
@@ -71,6 +140,8 @@ export function PurchasingCommandForm({
       ? [temporaryVendor]
       : []),
   ];
+  const soleVendorId =
+    form === "order" && vendorOptions.length === 1 ? vendorOptions[0]!.id : "";
   return (
     <>
       <form className="supply-form" onSubmit={onSubmit}>
@@ -129,6 +200,7 @@ export function PurchasingCommandForm({
                   onChange={setVendorId}
                   options={vendorOptions}
                   required
+                  recentsKey="vendor"
                   placeholder="Search vendors…"
                   emptyText={
                     canCreateVendor
@@ -168,25 +240,46 @@ export function PurchasingCommandForm({
             </>
           ) : (
             <>
-              <label className="field-label">
-                Vendor
-                <SearchSelect
-                  name="vendorId"
-                  value={vendorId}
-                  onChange={setVendorId}
-                  options={vendorOptions}
-                  required
-                  autoFocus
-                  placeholder="Search vendors…"
-                  emptyText={
-                    canCreateVendor
-                      ? "No vendor matches - create one below."
-                      : "No vendor matches."
-                  }
-                  onCreate={canCreateVendor ? setCreateVendorName : undefined}
-                  createLabel={(name) => `Create vendor “${name}”`}
-                />
-              </label>
+              <OrderVendorField
+                loading={vendorsLoading === true}
+                vendors={activeVendors.filter(
+                  (vendor) => vendor.status === "active",
+                )}
+                renderPicker={(startAdding) => (
+                  <label className="field-label">
+                    Vendor
+                    <SearchSelect
+                      name="vendorId"
+                      value={vendorId || soleVendorId}
+                      onChange={(id) => {
+                        if (id === ADD_NEW_CHOICE) startAdding();
+                        else setVendorId(id);
+                      }}
+                      options={
+                        canCreateVendor
+                          ? vendorOptions
+                          : [
+                              ...vendorOptions,
+                              { id: ADD_NEW_CHOICE, label: "New vendor…" },
+                            ]
+                      }
+                      required
+                      autoFocus
+                      recentsKey="vendor"
+                      placeholder="Search vendors…"
+                      emptyText={
+                        canCreateVendor
+                          ? "No vendor matches - create one below."
+                          : "No vendor matches."
+                      }
+                      onCreate={
+                        canCreateVendor ? setCreateVendorName : undefined
+                      }
+                      createLabel={(name) => `Create vendor “${name}”`}
+                    />
+                  </label>
+                )}
+              />
               <label className="field-label">
                 Event (optional)
                 <select

@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -7,18 +7,15 @@ import {
   useGetPrepTask,
   useGetEvent,
   useListComponentImport,
-  useListDish,
   useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
   useListItemUnitMapping,
-  useListPerson,
   useListComponentIngredient,
   useListComponentSnapshot,
   useComponentIngredientAdjustQuantity,
   useComponentIngredientRemove,
   useComponentIngredientSetWasteFactor,
-  useComponentPublishVersion,
   useComponentPurge,
   useComponentRetract,
   useComponentReviseDraft,
@@ -26,8 +23,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
-import { useReconcileLiveEventsForComponent } from "../../lib/culinaryDemandClient";
-import { useAuthStatus } from "../../lib/useAuthStatus";
+import {
+  usePublishRecipeEdition,
+  useReconcileLiveEventsForComponent,
+} from "../../lib/culinaryDemandClient";
+import { RecipeEditionNotice } from "./RecipeEditionNotice";
 import { buildComponentSnapshotData } from "./componentSnapshot";
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
 import { captureBeforeChange } from "./componentSnapshotCapture";
@@ -48,6 +48,7 @@ import {
 } from "./IngredientPriceHistory";
 import { calculateComponentCost } from "./ComponentCostCalculator";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -59,12 +60,18 @@ import {
   UNIT_OF_MEASURE,
   unitOptionsFor,
 } from "./import/UnitOfMeasureMapper";
+import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
 import { ComponentImportSourcePanel } from "./import/ComponentImportSourcePanel";
 import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
 import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
 import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
+import { cookEdition, PublishedMethodPanel } from "./PublishedMethodPanel";
 import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
+import { ComponentKitchenStandardsPanel } from "./ComponentKitchenStandardsPanel";
+import { RecipeAllergenMarks } from "./RecipeAllergenMarks";
+import { RecipeTimesEquipmentPanel } from "./RecipeTimesEquipmentPanel";
+import { StylePackagingPanel } from "./StylePackagingPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
 import {
   beginPendingOperation,
@@ -73,6 +80,9 @@ import {
 import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
 import { componentRestoreOutcome } from "./culinaryRecovery";
 import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
+import { ReturnToListLink } from "../list-state/listOrigin";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -84,6 +94,8 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLElement>(null);
   const [searchParams] = useSearchParams();
   const prepTaskId = searchParams.get("prepTask") || undefined;
   const component = useRouteRecord(useGetComponent, id);
@@ -97,10 +109,20 @@ export function ComponentDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const itemUnitMappings = useListItemUnitMapping();
   const lines = useListComponentIngredient();
-  const dishes = useListDish();
   const dishComponents = useListDishComponent();
+  // Only the dishes that use this recipe, never the whole dish list.
+  const dishes = useDishesByIds(
+    component == null || dishComponents === undefined
+      ? undefined
+      : dishComponents
+          .filter(
+            (line) =>
+              line.deletedAt == null && line.componentId === component._id,
+          )
+          .map((line) => line.dishId),
+  );
   const revise = useComponentReviseDraft();
-  const publish = useComponentPublishVersion();
+  const publish = usePublishRecipeEdition();
   const retract = useComponentRetract();
   const purge = useComponentPurge();
   const createLine = useCreateComponentIngredient();
@@ -113,8 +135,6 @@ export function ComponentDetailPage() {
   const captureSnapshot = useCreateComponentSnapshot();
   const restoreSnapshotCommand = useRestoreComponentSnapshotSafely();
   const snapshots = useListComponentSnapshot();
-  const people = useListPerson();
-  const authStatus = useAuthStatus();
   // Completed-import provenance: the original source this component came
   // from. Older native components have none — absence is not an error.
   // Culinary features use generated hooks only (integration guard), so the
@@ -147,6 +167,7 @@ export function ComponentDetailPage() {
     value: string;
   } | null>(null);
   const [showLineForm, setShowLineForm] = useState(false);
+  const [lineFormKey, setLineFormKey] = useState(0);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [snapshotWarning, setSnapshotWarning] = useState<string | null>(null);
@@ -190,6 +211,18 @@ export function ComponentDetailPage() {
     component.deletedAt,
   );
   const prepYield = prepRecipeYield(component, prepTask);
+  // A cook sent here from a prep task follows the published edition while the
+  // chef changes a draft; the chef (no prep task) still edits the draft.
+  const cookMethodEdition = prepTaskId
+    ? cookEdition(
+        {
+          _id: String(component._id),
+          status: String(component.status),
+          versionNumber: Number(component.versionNumber),
+        },
+        snapshots,
+      )
+    : null;
   const hasYieldPreview = yieldPreview?.key === previewKey;
   const targetYield = hasYieldPreview
     ? yieldPreview.value
@@ -209,13 +242,6 @@ export function ComponentDetailPage() {
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
 
-  const myPersonId = authStatus?.personId ?? null;
-  const me = (people ?? []).find(
-    (person) => person._id === myPersonId && person.deletedAt == null,
-  );
-  const myName =
-    [me?.givenName, me?.familyName].filter(Boolean).join(" ") || "Unknown";
-
   const currentData = buildComponentSnapshotData(
     component,
     componentLines,
@@ -231,7 +257,6 @@ export function ComponentDetailPage() {
         captureSnapshot({
           componentId: component._id,
           versionNumber: component.versionNumber,
-          capturedByName: myName,
           changeSummary,
           snapshot: JSON.stringify(currentData),
         }),
@@ -360,23 +385,91 @@ export function ComponentDetailPage() {
       });
       await reconcileEvents(component._id);
       form.reset();
+      setLineFormKey((key) => key + 1);
     });
   };
 
   const invokeLifecycle = (key: string) => {
     void run(key, async () => {
       const args = { docId: component._id, version: component.version };
-      if (key === "publishVersion") await publish(args);
+      if (key === "publishVersion") {
+        // Saves the published edition, then brings events not finished yet
+        // up to it; finished events keep their demand.
+        await publish(component._id, component.version);
+        await reconcileEvents(component._id);
+      }
       if (key === "retract") await retract(args);
       if (key === "purge") await purge(args);
     });
   };
 
   return (
-    <article className="culinary-document culinary-document-compact culinary-studio">
-      <Link to="/kitchen/components" className="culinary-studio-back">
+    <article
+      ref={sectionScopeRef}
+      className="culinary-document culinary-document-compact culinary-studio"
+    >
+      <StickyRecordHeader
+        title={component.name}
+        facts={[
+          {
+            label: "Yield",
+            value: `${component.yieldQuantity} ${String(component.yieldUnit)}`,
+          },
+          {
+            label: "Status",
+            value: formatStatusLabel(String(component.status)),
+          },
+          {
+            label: "Serves",
+            value: `${servesPerYield} guests`,
+          },
+        ]}
+        actions={
+          <>
+            {component.status === "draft" ? (
+              <button
+                className="btn btn-ghost"
+                onClick={() => setEditing((value) => !value)}
+              >
+                {editing ? "Close editor" : "Edit draft"}
+              </button>
+            ) : null}
+            {actions
+              .filter((action) => action.key !== "publishVersion")
+              .map((action) => (
+                <button
+                  key={action.key}
+                  className="btn btn-ghost"
+                  disabled={busy != null}
+                  onClick={() => invokeLifecycle(action.key)}
+                >
+                  {busy === action.key ? "Working." : action.label}
+                </button>
+              ))}
+          </>
+        }
+        primaryAction={actions
+          .filter((action) => action.key === "publishVersion")
+          .map((action) => (
+            <button
+              key={action.key}
+              className="btn btn-primary"
+              disabled={busy != null}
+              onClick={() => invokeLifecycle(action.key)}
+            >
+              {busy === action.key ? "Working." : action.label}
+            </button>
+          ))}
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        headingId="recipe-detail-title"
+      />
+      <ReturnToListLink
+        fallback="/kitchen/components"
+        className="culinary-studio-back"
+      >
         ← Recipes
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {host}
       {failure ? (
@@ -396,7 +489,13 @@ export function ComponentDetailPage() {
               Recipe · Edition {component.versionNumber} ·{" "}
               {formatStatusLabel(String(component.status))}
             </p>
-            <h1 className="culinary-title-compact">{component.name}</h1>
+            <h1
+              id="recipe-detail-title"
+              tabIndex={-1}
+              className="culinary-title-compact"
+            >
+              {component.name}
+            </h1>
           </div>
           <div className="flex flex-wrap gap-2">
             {component.status === "draft" ? (
@@ -459,6 +558,12 @@ export function ComponentDetailPage() {
             <dd>{component.cuisine || "—"}</dd>
           </div>
         </dl>
+        <RecipeEditionNotice
+          componentId={component._id}
+          status={String(component.status)}
+          versionNumber={component.versionNumber}
+          saved={snapshots}
+        />
         {prepTaskId ? (
           <ComponentPrepContext
             recipe={component}
@@ -467,6 +572,7 @@ export function ComponentDetailPage() {
           />
         ) : null}
       </header>
+      <div ref={headerSentinelRef} aria-hidden="true" />
 
       <ComponentRecipeStatusPanel componentId={component._id} />
 
@@ -474,6 +580,10 @@ export function ComponentDetailPage() {
         component={component}
         onFailure={setFailure}
       />
+
+      <RecipeTimesEquipmentPanel component={component} onFailure={setFailure} />
+
+      <RecipeAllergenMarks component={component} onFailure={setFailure} />
 
       <div className="culinary-work-grid">
         <section className="culinary-section">
@@ -583,7 +693,7 @@ export function ComponentDetailPage() {
                               {
                                 name: "quantity",
                                 label: "Quantity",
-                                inputType: "number",
+                                unit: String(line.unit),
                                 defaultValue: String(line.quantity),
                                 required: true,
                               },
@@ -683,27 +793,24 @@ export function ComponentDetailPage() {
             <form className="culinary-line-form" onSubmit={submitLine}>
               <label className="field-label sm:col-span-2">
                 Ingredient
-                <IngredientOptionPicker ingredients={ingredients} required />
-              </label>
-              <label className="field-label">
-                Quantity
-                <input
-                  name="quantity"
-                  type="number"
-                  min={0.01}
-                  step="0.01"
-                  defaultValue={1}
-                  className="input"
+                <IngredientOptionPicker
+                  ingredients={ingredients}
                   required
+                  allowCreate
                 />
               </label>
               <label className="field-label">
-                Unit
-                <select name="unit" className="input">
-                  {SELECTABLE_UNITS.map((unit) => (
-                    <option key={unit}>{unit}</option>
-                  ))}
-                </select>
+                Quantity
+                {/* The line keeps the unit the cook enters; the hint shows
+                    the same amount in other units. */}
+                <UnitQuantityInput
+                  key={lineFormKey}
+                  name="quantity"
+                  unitName="unit"
+                  storeUnit="each"
+                  units={SELECTABLE_UNITS}
+                  defaultAmount={1}
+                />
               </label>
               <label className="field-label">
                 Preparation note
@@ -719,11 +826,25 @@ export function ComponentDetailPage() {
           ) : null}
         </section>
 
-        <ComponentMethodStepsPanel
-          componentId={component._id}
-          instructions={component.instructions}
-        />
+        {cookMethodEdition ? (
+          <PublishedMethodPanel edition={cookMethodEdition} />
+        ) : (
+          <ComponentMethodStepsPanel
+            componentId={component._id}
+            instructions={component.instructions}
+          />
+        )}
       </div>
+
+      <ComponentKitchenStandardsPanel
+        component={component}
+        onFailure={setFailure}
+      />
+
+      <StylePackagingPanel
+        owner={{ componentId: component._id }}
+        onFailure={setFailure}
+      />
 
       <ComponentSubRecipesPanel componentId={component._id} />
 
@@ -759,6 +880,7 @@ export function ComponentDetailPage() {
         heading="Per-portion nutrition"
         portionLabel={`per portion · serves ${servesPerYield}`}
         totals={componentNutrition.perPortion}
+        coverage={componentNutrition.coverage}
         coverageNote={nutritionCoverageNote}
         loading={ingredients === undefined || lines === undefined}
       />
@@ -772,6 +894,7 @@ export function ComponentDetailPage() {
           csvLinesText={sourceImport.csvLinesText ?? undefined}
           importId={String(sourceImport._id)}
           status={sourceImport.status}
+          duplicateOutcome={sourceImport.duplicateOutcome ?? undefined}
         />
       ) : null}
 
@@ -855,7 +978,10 @@ function ComponentEditForm({
           />
         </label>
         <label className="field-label">
-          Yield
+          <span className="field-label-row">
+            Yield
+            <FieldHelp term="yield" />
+          </span>
           <input
             name="yieldQuantity"
             type="number"
@@ -879,7 +1005,10 @@ function ComponentEditForm({
           </select>
         </label>
         <label className="field-label">
-          Batch multiplier
+          <span className="field-label-row">
+            Batch multiplier
+            <FieldHelp term="batchMultiplier" />
+          </span>
           <input
             name="batchMultiplier"
             type="number"

@@ -82,7 +82,7 @@ function nativeFacts(facts: EventImportFacts, issues: string[]): Row {
     delete args.startsAt;
     delete args.endsAt;
     issues.push(
-      "Printed start/end times conflict; scheduling fields remain blank.",
+      "The start and end times on the BEO don't agree, so the times were left blank.",
     );
   }
   return args;
@@ -129,7 +129,10 @@ export async function saveEventFromBeo(
     if (context.isActive && !context.isActive())
       throw new Error("Import paused. Its saved draft can be resumed.");
     const ref = mutations[name];
-    if (!ref) throw new Error(`Command ${name} is unavailable.`);
+    if (!ref)
+      throw new Error(
+        "Part of this import isn't working right now. Try the import again later.",
+      );
     return convex.mutation(ref, args);
   };
   let eventId = context.existingEventId ?? "";
@@ -170,7 +173,7 @@ export async function saveEventFromBeo(
       eventUrl: eventDetailPath(eventId, "overview"),
       status: "paused",
       error:
-        "Could not read the saved import in this workspace. No further records were changed.",
+        "Could not read the saved import in this workspace. Nothing else was changed.",
     };
   }
   const prior = parseEventImportDraft(current.importDraftJson);
@@ -193,7 +196,7 @@ export async function saveEventFromBeo(
       reason,
     })),
     message:
-      "Event draft saved. Missing facts remain blank. Import completion is not operational readiness or final approval.",
+      "Event draft saved. Anything missing was left blank. A finished import doesn't mean the event is ready or approved.",
   });
   const checkpoint = async (extra: Row = {}) => {
     const latest = await convex.query(queries.getEvent, { id: eventId });
@@ -264,7 +267,7 @@ export async function saveEventFromBeo(
         if (candidates.length === 1) matches[target] = candidates[0]._id;
         else
           draft.issues.push(
-            `${field}: ${candidates.length ? "multiple matches" : "no exact visible match"}; source name retained for review.`,
+            `${field}: ${candidates.length ? "more than one match" : "no exact match"}; kept the name as written so you can check it.`,
           );
       } catch (error) {
         draft.issues.push(`${field} lookup failed: ${message(error)}`);
@@ -300,8 +303,8 @@ export async function saveEventFromBeo(
       );
       if (candidates.length !== 1) {
         line.reason = candidates.length
-          ? "Multiple matching dishes; choose in review."
-          : "No exact visible catalog match; original line retained.";
+          ? "More than one dish matches; pick the right one when you review."
+          : "No matching dish found; kept the line as written.";
         continue;
       }
       if (
@@ -310,12 +313,12 @@ export async function saveEventFromBeo(
         !/^(serving|servings|portion|portions)$/i.test(line.unit ?? "")
       ) {
         line.reason =
-          "Original quantity/unit retained; serving count is not established.";
+          "Kept the amount as written; the serving count isn't clear.";
         continue;
       }
       if (existingMenu === null) {
         line.reason =
-          "Existing menu could not be checked. Source line retained to avoid adding a duplicate.";
+          "Couldn't check the current menu, so the line was kept as written to avoid adding it twice.";
         continue;
       }
       const sameDish = existingMenu.filter(
@@ -377,7 +380,7 @@ export async function saveEventFromBeo(
       status: "paused",
       error: message(error),
       message:
-        "Draft saved. Resume this same BEO to continue; completed commands will not be duplicated.",
+        "Draft saved. Resume this same BEO to continue; steps you've already done won't repeat.",
     };
   }
 }

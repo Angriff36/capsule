@@ -13,8 +13,8 @@
  */
 import { createClerkClient } from "@clerk/backend";
 import { createHash } from "node:crypto";
-import { commandApiIdempotencyGate } from "./CommandApiIdempotencyGate";
-import { ConvexSiteOrigin } from "./ConvexSiteOrigin";
+import { commandApiIdempotencyGate } from "./CommandApiIdempotencyGate.js";
+import { ConvexSiteOrigin } from "./ConvexSiteOrigin.js";
 
 export interface ApiKeyGatewayDeps {
   /**

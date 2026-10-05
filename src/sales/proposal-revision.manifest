@@ -14,7 +14,7 @@ entity ProposalRevision mixin TenantScoped, SoftDeletable {
   // Human-readable description of what changed (e.g., "Initial proposal", "Updated menu selection")
   property required changeSummary: string = ""
 
-  // Who captured this revision (display name, passed from caller)
+  // Who captured this revision (display name of the signed-in staff profile)
   property required capturedByName: string = ""
 
   // Auth subject ID of who captured (from trusted runtime context)
@@ -35,7 +35,6 @@ entity ProposalRevision mixin TenantScoped, SoftDeletable {
   command capture(
     proposalId: uuid,
     revisionNumber: int,
-    capturedByName: string,
     changeSummary: string,
     snapshot: string
   ) {
@@ -45,10 +44,10 @@ entity ProposalRevision mixin TenantScoped, SoftDeletable {
     guard self.capturedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Snapshot payload is required"
+    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Couldn't save what the proposal looked like for this revision"
     mutate proposalId = proposalId
     mutate revisionNumber = revisionNumber
-    mutate capturedByName = capturedByName
+    mutate capturedByName = user.personName != null ? user.personName : ""
     mutate capturedByAuthSubjectId = user.id
     mutate changeSummary = changeSummary
     mutate snapshot = snapshot
@@ -59,7 +58,7 @@ entity ProposalRevision mixin TenantScoped, SoftDeletable {
       proposalId: proposalId
       revisionNumber: revisionNumber
       changeSummary: changeSummary
-      capturedByName: capturedByName
+      capturedByName: user.personName != null ? user.personName : ""
       capturedAt: now()
     }
   }

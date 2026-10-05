@@ -60,15 +60,19 @@ entity Person mixin TenantScoped, SoftDeletable {
 
   property required searchable givenName: string
   property required searchable familyName: string
-  property required encrypted email: string
-  property encrypted phone: string?
+  // Coworker contact details: workforce staff manage them and everyone sees
+  // their own row (MyDay identity match); other staff see a masked value.
+  property required encrypted masked(email) email: string unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked(phone) phone: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
   // Postal address: ordinary editable contact data for the Staff Address &
-  // Phone List (#272). Optional and never gating.
-  property encrypted addressLine1: string?
-  property encrypted addressLine2: string?
-  property encrypted city: string?
-  property encrypted region: string?
-  property encrypted postalCode: string?
+  // Phone List (#272). Optional and never gating. A home address is private
+  // like the phone number: workforce staff and the person see it, other
+  // staff see it hidden (PL-ROLE-PROOF).
+  property encrypted masked addressLine1: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked addressLine2: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked city: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked region: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
+  property encrypted masked postalCode: string? unmask when roleAllows(user.role, "workforceAccess") or (self.authSubjectId != null and self.authSubjectId == user.id)
   property required role: CapsuleRole = "staff"
   // Optional link to external auth subject (Clerk/etc.). When set on an active
   // Person, convex/lib/authContext.ts uses this row's role as runtime
@@ -89,6 +93,16 @@ entity Person mixin TenantScoped, SoftDeletable {
   // critical allergen incident). Nullable so pre-existing rows pass Convex
   // schema validation; treated as false when unset.
   property smsAlertsOptIn: boolean?
+  // Scheduling facts (spec §12.2 worker data, AC-505/511). They shape who is
+  // suggested and auto-filled; a manager can still assign anyone by hand.
+  property preferredRoles: list<string> = []
+  // Venues or work areas this person is approved for; empty = anywhere.
+  property approvedWorkLocations: list<string> = []
+  // "Do not schedule" note: set = left out of suggestions and auto-fill.
+  property schedulingHoldReason: string?
+  // Staffing agency this worker comes through; empty = our own staff. Agency
+  // workers are the same Person population, never a second profile.
+  property staffingVendor: string?
 
   computed displayName: string = self.givenName + " " + self.familyName
   computed isAssignable: boolean = self.status == "active" and self.deletedAt == null
@@ -97,7 +111,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // create/bootstrap seeds (empty defaults) and field-by-field mutates during
   // hire are not blocked mid-command (runtime validates each mutate patch).
   // Keep expression on one line — multiline parenthesized or-constraints fail parse.
-  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "Hired people require first name, last name, and email"
+  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "A hired person needs a first name, a last name, and an email."
 
   transition status from "active" to ["inactive", "terminated"]
   transition status from "inactive" to ["active", "terminated"]
@@ -115,12 +129,14 @@ entity Person mixin TenantScoped, SoftDeletable {
     optional role: CapsuleRole,
     optional employmentType: EmploymentType,
     optional employeeNumber: string,
-    optional authSubjectId: string
+    optional authSubjectId: string,
+    optional staffingVendor: string
   ) {
     guard self.deletedAt == null
-    constraint hireGiven: length(trim(givenName)) > 0 "First name is required"
-    constraint hireFamily: length(trim(familyName)) > 0 "Last name is required"
-    constraint hireEmail: length(trim(email)) > 0 "Email is required"
+    mutate staffingVendor = staffingVendor != null and length(trim(staffingVendor)) > 0 ? staffingVendor : null
+    constraint hireGiven: length(trim(givenName)) > 0 "Give this person a first name."
+    constraint hireFamily: length(trim(familyName)) > 0 "Give this person a last name."
+    constraint hireEmail: length(trim(email)) > 0 "Give this person an email."
     mutate givenName = givenName
     mutate familyName = familyName
     mutate email = email
@@ -147,8 +163,8 @@ entity Person mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint correctGiven: length(trim(givenName)) > 0 "First name is required"
-    constraint correctFamily: length(trim(familyName)) > 0 "Last name is required"
+    constraint correctGiven: length(trim(givenName)) > 0 "Give this person a first name."
+    constraint correctFamily: length(trim(familyName)) > 0 "Give this person a last name."
     mutate givenName = givenName
     mutate familyName = familyName
     mutate phone = phone
@@ -169,7 +185,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   command correctEmail(email: string) {
     guard self.deletedAt == null
     guard self.status != "terminated"
-    constraint correctEmailPresent: length(trim(email)) > 0 "Email is required"
+    constraint correctEmailPresent: length(trim(email)) > 0 "Give this person an email."
     mutate email = email
     emit PersonEmailCorrected {
       personId: self.id
@@ -205,7 +221,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // closeouts and reports.
   command setPayRate(hourlyRate: number) {
     guard self.deletedAt == null
-    constraint payRateNonNegative: hourlyRate >= 0 "Hourly rate must be zero or more"
+    constraint payRateNonNegative: hourlyRate >= 0 "This person's hourly rate can't be negative. Use zero or more."
     mutate hourlyRate = hourlyRate
     emit PersonPayRateSet {
       personId: self.id
@@ -221,7 +237,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // managers set it from the payroll preview until regen emits this command.
   command setEmployeeNumber(employeeNumber: string) {
     guard self.deletedAt == null
-    constraint employeeNumberPresent: length(trim(employeeNumber)) > 0 "Employee number is required"
+    constraint employeeNumberPresent: length(trim(employeeNumber)) > 0 "Give this person an employee number."
     mutate employeeNumber = employeeNumber
     emit PersonEmployeeNumberSet {
       personId: self.id
@@ -240,6 +256,36 @@ entity Person mixin TenantScoped, SoftDeletable {
       personId: self.id
       tenantId: self.tenantId
       optIn: optIn
+    }
+  }
+
+  command setWorkPreferences(preferredRoles: list<string>, approvedWorkLocations: list<string>) {
+    guard self.deletedAt == null
+    mutate preferredRoles = preferredRoles
+    mutate approvedWorkLocations = approvedWorkLocations
+    emit PersonWorkPreferencesSet {
+      personId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Empty reason clears the hold.
+  command setSchedulingHold(optional reason: string) {
+    guard self.deletedAt == null
+    mutate schedulingHoldReason = reason != null and length(trim(reason)) > 0 ? reason : null
+    emit PersonSchedulingHoldSet {
+      personId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Empty vendor = our own staff.
+  command setStaffingVendor(optional vendorName: string) {
+    guard self.deletedAt == null
+    mutate staffingVendor = vendorName != null and length(trim(vendorName)) > 0 ? vendorName : null
+    emit PersonStaffingVendorSet {
+      personId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -300,9 +346,16 @@ entity Person mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Pause access (PR09-01 "suspend"). The linked sign-in resolves to no role
+  // while the row is inactive (authContext REMOVED); assignments, time and
+  // payroll rows are untouched, and reactivate() restores the same sign-in.
+  // Same escalation rule as linkAccount: pausing or restoring an admin's
+  // access is admin-only. (Team roles hides Pause on your own row; the
+  // command itself still lets a person remove themselves.)
   command deactivate() {
     guard self.status == "active"
     guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     mutate status = "inactive"
     emit PersonDeactivated {
       personId: self.id
@@ -313,6 +366,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   command reactivate() {
     guard self.status == "inactive"
     guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     mutate status = "active"
     emit PersonReactivated {
       personId: self.id
@@ -335,6 +389,21 @@ entity Person mixin TenantScoped, SoftDeletable {
   }
 
   store Person in durable
+}
+
+event PersonWorkPreferencesSet: "person.work_preferences_set" {
+  personId: string
+  tenantId: string
+}
+
+event PersonSchedulingHoldSet: "person.scheduling_hold_set" {
+  personId: string
+  tenantId: string
+}
+
+event PersonStaffingVendorSet: "person.staffing_vendor_set" {
+  personId: string
+  tenantId: string
 }
 
 event PersonHired: "person.hired" {

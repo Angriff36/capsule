@@ -8,6 +8,7 @@ const units: Record<string, readonly [string, number]> = {
   pound: ["mass", 453.59237],
   milliliter: ["volume", 1],
   liter: ["volume", 1000],
+  fluid_ounce: ["volume", 29.5735295625],
   teaspoon: ["volume", 4.92892159375],
   tablespoon: ["volume", 14.78676478125],
   cup: ["volume", 236.5882365],
@@ -15,6 +16,11 @@ const units: Record<string, readonly [string, number]> = {
   quart: ["volume", 946.352946],
   gallon: ["volume", 3785.411784],
 };
+
+/** "mass" or "volume" for a convertible unit; null for counts and batches. */
+export function recipeUnitDimension(unit: string): string | null {
+  return units[unit]?.[0] ?? null;
+}
 
 export function recipeUnitRatio(from: string, to: string): number | null {
   if (from === to) return 1;

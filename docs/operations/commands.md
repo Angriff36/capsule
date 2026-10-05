@@ -44,9 +44,8 @@ cp .env.example .env.local
 bun run convex:env-set -- CLERK_JWT_ISSUER_DOMAIN https://YOUR.clerk.accounts.dev
 bun run convex:env-set -- CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
 
-# 3. Run (two terminals)
-bun run dev:convex    # terminal 1 — Convex sync
-bun run dev           # terminal 2 — Vite → http://localhost:7811
+# 3. Run (one terminal)
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 
 # 4. Optional seed (needs deployment URL)
 bun run seed
@@ -78,8 +77,7 @@ builder generate convex \
 # Post-generate (in the app)
 bun install
 bun run codegen
-bun run dev:convex
-bun run dev
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 Capsule itself is already initialized — use section **2** for regen, not initial mode.
@@ -204,12 +202,16 @@ bun run check:manifest-registry  # @angriff36/manifest must be registry semver (
 
 ### Domain integration guards (part of `check`)
 
+~~`bun run check:event-manifest`, `check:culinary-manifest`, `check:supply-manifest`,
+`check:production-manifest`, `check:workforce-manifest`~~
+
+> **Correction (2026-09-25):** one runner covers every domain guard in
+> `generated/proof/guard.*.json` (culinary, event, supply, production,
+> workforce, logistics, commercial, closeout, payroll):
+
 ```bash
-bun run check:event-manifest
-bun run check:culinary-manifest
-bun run check:supply-manifest
-bun run check:production-manifest
-bun run check:workforce-manifest
+bun run check:manifest-integration
+bun run check:manifest-breaking   # domain IR vs last [release]; acks in scripts/manifest-breaking-acks.json
 ```
 
 ### Branch and release (the only path to production)
@@ -304,8 +306,7 @@ bunx vitest run tests/proofs/<your-proof>.runtime.test.ts
 ### E. Local dev (daily)
 
 ```bash
-bun run dev:convex             # terminal 1
-bun run dev                    # terminal 2
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 ---
@@ -315,7 +316,7 @@ bun run dev                    # terminal 2
 | Intent             | Command                              |
 | ------------------ | ------------------------------------ |
 | Install deps       | `bun install --frozen-lockfile`      |
-| Start app          | `bun run dev` + `bun run dev:convex` |
+| Start app          | `bun run dev` |
 | Plan Builder regen | `bun run manifest:regen`             |
 | Convex codegen     | `bun run codegen`                    |
 | Emit proof kit     | `bun run proof:emit`                 |

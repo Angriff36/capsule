@@ -2,15 +2,18 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { Link } from "react-router-dom";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { ChevronRightIcon } from "../../ui/icons";
 import { RecordPreviewSheet } from "../../ui/RecordPreviewSheet";
 import { useVirtualWindow } from "../../ui/useVirtualWindow";
+import { useListScrollRestoration } from "../list-state/ListScrollCoordinator";
+import { type ListOrigin } from "../list-state/listOrigin";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
@@ -46,6 +49,10 @@ export type CatalogItem = {
   canonicalIngredientId?: string | null;
   mergedIntoDishId?: string | null;
   mergedIntoIngredientId?: string | null;
+  /** Dishes: how many versions (tabs) this main dish has. */
+  versionCount?: number;
+  /** Dishes: the versions' names, so search finds the main dish. */
+  versionNames?: string;
 };
 
 type LifecycleCommands = {
@@ -77,6 +84,8 @@ type Props = Readonly<{
   showHidden: boolean;
   run: (key: string, work: () => Promise<void>) => Promise<void>;
   commands: LifecycleCommands;
+  origin: ListOrigin;
+  loaded: boolean;
 }>;
 
 const ROW_HEIGHT = 68;
@@ -96,6 +105,8 @@ export function KitchenCatalogCards({
   showHidden,
   run,
   commands,
+  origin,
+  loaded,
 }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = useMemo(
@@ -111,9 +122,18 @@ export function KitchenCatalogCards({
     [activeId, rows],
   );
   const closePreview = useCallback(() => setSelectedId(null), []);
-  const { scrollRef, virtualRows, totalHeight, onScroll } = useVirtualWindow({
-    count: rows.length,
-    rowHeight: ROW_HEIGHT,
+  const { scrollRef, virtualRows, totalHeight, onScroll, restoreScrollTop } =
+    useVirtualWindow({
+      count: rows.length,
+      rowHeight: ROW_HEIGHT,
+    });
+  useListScrollRestoration({
+    scrollRef,
+    namespace: `culinary:${section}`,
+    restoreScrollTop,
+    ready: totalHeight,
+    loaded,
+    revision: rows.length,
   });
   const tabStopIndex = useMemo(
     () =>
@@ -123,11 +143,13 @@ export function KitchenCatalogCards({
     [activeIndex, virtualRows],
   );
 
+  const previousViewKey = useRef(viewKey);
   useEffect(() => {
+    if (previousViewKey.current === viewKey) return;
+    previousViewKey.current = viewKey;
     setSelectedId(null);
     setActiveId(null);
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [scrollRef, viewKey]);
+  }, [viewKey]);
 
   useEffect(() => {
     if (pendingFocusIndex == null) return;
@@ -295,7 +317,14 @@ export function KitchenCatalogCards({
                         role="gridcell"
                         aria-colindex={1}
                       >
-                        <strong>{item.name}</strong>
+                        <strong>
+                          {item.name}
+                          {item.versionCount ? (
+                            <span className="ml-2 text-sm font-normal text-ink-3">
+                              {formatCountNoun(item.versionCount, "version")}
+                            </span>
+                          ) : null}
+                        </strong>
                         <small>{ledgerDescription(section, item)}</small>
                       </span>
                       <span
@@ -362,6 +391,7 @@ export function KitchenCatalogCards({
                 selected._id,
                 "Open full card",
                 "btn btn-primary",
+                origin,
               )}
               <KitchenCatalogLifecycleButtons
                 section={section}
@@ -491,16 +521,26 @@ function recordLink(
   id: string,
   body: ReactNode,
   className?: string,
+  origin?: ListOrigin,
 ): ReactNode {
   if (section === "ingredients") {
     return (
-      <CulinaryEntityLink className={className} kind="ingredient" id={id}>
+      <CulinaryEntityLink
+        className={className}
+        kind="ingredient"
+        id={id}
+        state={{ listOrigin: origin }}
+      >
         {body}
       </CulinaryEntityLink>
     );
   }
   return (
-    <Link className={className} to={catalogPath(section, id)}>
+    <Link
+      className={className}
+      to={catalogPath(section, id)}
+      state={{ listOrigin: origin }}
+    >
       {body}
     </Link>
   );

@@ -25,6 +25,31 @@ export function harness() {
 export type Proof = ReturnType<typeof harness>;
 export type Role = ReturnType<Proof["asRole"]>;
 
+/**
+ * Link a live staff profile to the sign-in, for steps that record who did
+ * the work (ShareLink_create and friends refuse unlinked sign-ins).
+ */
+export async function linkStaffProfile(
+  proof: Proof,
+  tenantId: string,
+  subject: string,
+  role = "owner",
+): Promise<void> {
+  await proof.asRole({ subject, role, tenantId }).run((ctx) =>
+    ctx.db.insert("people", {
+      tenantId,
+      givenName: "Proof",
+      familyName: subject,
+      email: `${subject}@example.test`,
+      role,
+      employmentType: "full_time",
+      status: "active",
+      authSubjectId: subject,
+      version: 1,
+    } as never),
+  );
+}
+
 export function rolesFor(
   proof: Proof,
   tenantId: string,

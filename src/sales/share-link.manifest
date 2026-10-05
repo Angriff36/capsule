@@ -89,17 +89,26 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     constraint createExpiresFuture: expiresAt == null or expiresAt > now() "Share link expiry must be in the future"
+    constraint createNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you create a share link."
     mutate proposalId = proposalId
     mutate proposalRevisionId = proposalRevisionId
     mutate status = "active"
     mutate expiresAt = expiresAt
-    mutate createdByPersonId = user.id
+    // The staff profile of the signed-in person, never the sign-in id.
+    mutate createdByPersonId = user.personId
+    // Revoke and view tracking belong to revoke and the public view seam.
+    mutate revokedAt = null
+    mutate revokedByPersonId = null
+    mutate viewCount = 0
+    mutate firstViewedAt = null
+    mutate lastViewedAt = null
+    mutate lastViewerIdentity = null
     emit ShareLinkCreated {
       shareLinkId: self.id
       tenantId: self.tenantId
       proposalId: proposalId
       proposalRevisionId: proposalRevisionId
-      createdByPersonId: user.id != null ? user.id : ""
+      createdByPersonId: user.personId != null ? user.personId : ""
       expiresAt: expiresAt
     }
   }
@@ -110,14 +119,16 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.status == "active" "Can only revoke active share links"
     guard roleAllows(user.role, "salesAccess") "Only sales staff can revoke share links"
+    constraint revokeNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you revoke a share link."
     mutate status = "revoked"
     mutate revokedAt = now()
-    mutate revokedByPersonId = user.id
+    // The staff profile of the signed-in person, never the sign-in id.
+    mutate revokedByPersonId = user.personId
     emit ShareLinkRevoked {
       shareLinkId: self.id
       tenantId: self.tenantId
       proposalId: self.proposalId
-      revokedByPersonId: user.id != null ? user.id : ""
+      revokedByPersonId: user.personId != null ? user.personId : ""
       revokedAt: now()
     }
   }

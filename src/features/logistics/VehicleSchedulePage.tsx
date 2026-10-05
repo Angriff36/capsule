@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { formatCountNoun } from "../../lib/format";
 import {
   useListDelivery,
-  useListEvent,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -52,7 +52,14 @@ type VehicleRow = {
 export function VehicleSchedulePage() {
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   const deliveries = useListDelivery() as DeliveryRow[] | undefined;
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      deliveries === undefined
+        ? undefined
+        : deliveries.map((row) => row.eventId),
+    [deliveries],
+  );
+  const events = useEventsById(eventIds);
   const assignVehicle = useAssignVehicle();
   const [day, setDay] = useState(() => toDateInputValue(new Date()));
   const [busy, setBusy] = useState<string | null>(null);

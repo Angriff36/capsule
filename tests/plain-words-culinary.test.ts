@@ -114,7 +114,7 @@ describe("plain words on culinary manifests", () => {
     }
 
     for (const fresh of [
-      "Kitchen staff may see recipes",
+      "Kitchen and inventory staff may see recipes",
       "Kitchen staff may see recipe ingredient lines",
       "Kitchen staff may see recipe steps",
       "Kitchen staff may see recipe versions",
@@ -134,7 +134,9 @@ describe("plain words on culinary manifests", () => {
     expect(visible).toContain("Kitchen staff may update dish recipes");
 
     // later leftovers stay as-is
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
   });
 
   it("keeps leftover culinary READ copy free of read jargon", () => {
@@ -173,12 +175,12 @@ describe("plain words on culinary manifests", () => {
 
     for (const fresh of [
       "Kitchen staff may see nested recipe lines",
-      "Kitchen, sales and managers may see dishes",
+      "Kitchen, inventory, sales and managers may see dishes",
       "Kitchen staff may see dish ingredient lines",
       "Kitchen staff and managers may see dish task templates",
       "Kitchen staff and managers may see task materials",
       "Kitchen staff may see dish containers",
-      "Kitchen staff may see ingredients",
+      "Kitchen, inventory and managers may see ingredients",
       "Kitchen, inventory and managers may see unit mappings",
       "Kitchen and sales staff may see menus",
       "Kitchen and sales staff may see menu dish lines",
@@ -206,12 +208,14 @@ describe("plain words on culinary manifests", () => {
     );
 
     // already-landed READ leftovers must stay put
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
     expect(visible).toContain("Kitchen staff may see dish recipes");
     expect(visible).toContain("Kitchen staff may see portion sizes");
 
     // leftover constraint stays as-is
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
   });
 
   it("keeps leftover culinary portion-size constraint copy free of spec jargon", () => {
@@ -222,8 +226,8 @@ describe("plain words on culinary manifests", () => {
     ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
 
     expect(visible).not.toContain("Portion spec name is required");
-    expect(visible).toContain("Portion size name is required");
-    expectPlain("Portion size name is required");
+    expect(visible).toContain("Give this portion size a name.");
+    expectPlain("Give this portion size a name.");
 
     // already-landed portion-size leftovers must stay put
     expect(visible).toContain("Kitchen staff may see portion sizes");
@@ -231,7 +235,9 @@ describe("plain words on culinary manifests", () => {
     expect(visible).toContain("Kitchen staff may change portion sizes");
 
     // later leftover, unchanged
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
   });
 
   it("keeps leftover culinary recipe-name constraint copy free of component jargon", () => {
@@ -242,19 +248,21 @@ describe("plain words on culinary manifests", () => {
     ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
 
     expect(visible).not.toContain("Component name is required");
-    expect(visible).toContain("Recipe name is required");
-    expectPlain("Recipe name is required");
+    expect(visible).toContain("Give this recipe a name.");
+    expectPlain("Give this recipe a name.");
 
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).not.toContain("Component name is required");
-    expect(mutations).toContain("Recipe name is required");
+    expect(mutations).toContain("Give this recipe a name.");
 
     // later leftovers, unchanged
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
 
     // already-landed leftovers must stay put
-    expect(visible).toContain("Portion size name is required");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Give this portion size a name.");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 
   it("keeps leftover culinary yield-and-batch constraint copy free of component jargon", () => {
@@ -268,10 +276,16 @@ describe("plain words on culinary manifests", () => {
     expect(visible).not.toContain(
       "Component batch multiplier must be positive",
     );
-    expect(visible).toContain("Recipe yield quantity must be positive");
-    expect(visible).toContain("Recipe batch multiplier must be positive");
-    expectPlain("Recipe yield quantity must be positive");
-    expectPlain("Recipe batch multiplier must be positive");
+    expect(visible).toContain(
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+    );
+    expect(visible).toContain(
+      "This recipe's batch size has to be more than zero.",
+    );
+    expectPlain(
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+    );
+    expectPlain("This recipe's batch size has to be more than zero.");
 
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).not.toContain(
@@ -280,16 +294,22 @@ describe("plain words on culinary manifests", () => {
     expect(mutations).not.toContain(
       "Component batch multiplier must be positive",
     );
-    expect(mutations).toContain("Recipe yield quantity must be positive");
-    expect(mutations).toContain("Recipe batch multiplier must be positive");
+    expect(mutations).toContain(
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+    );
+    expect(mutations).toContain(
+      "This recipe's batch size has to be more than zero.",
+    );
 
     // later leftovers, unchanged
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
 
     // already-landed leftovers must stay put
-    expect(visible).toContain("Recipe name is required");
-    expect(visible).toContain("Portion size name is required");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Give this recipe a name.");
+    expect(visible).toContain("Give this portion size a name.");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 
   it("keeps leftover culinary ingredient-step-and-drafted-name constraint copy free of component jargon", () => {
@@ -304,34 +324,44 @@ describe("plain words on culinary manifests", () => {
     );
     expect(visible).not.toContain("Component steps require an instruction");
     expect(visible).not.toContain("Drafted components require a name");
-    expect(visible).toContain("Recipe ingredient quantity must be positive");
-    expect(visible).toContain("Recipe steps require an instruction");
-    expect(visible).toContain("Drafted recipes require a name");
-    expectPlain("Recipe ingredient quantity must be positive");
-    expectPlain("Recipe steps require an instruction");
-    expectPlain("Drafted recipes require a name");
+    expect(visible).toContain(
+      "This recipe ingredient's amount has to be more than zero.",
+    );
+    expect(visible).toContain("Give this recipe step an instruction.");
+    expect(visible).toContain("Give this recipe a name.");
+    expectPlain("This recipe ingredient's amount has to be more than zero.");
+    expectPlain("Give this recipe step an instruction.");
+    expectPlain("Give this recipe a name.");
 
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).not.toContain(
       "Component ingredient quantity must be positive",
     );
-    expect(mutations).toContain("Recipe ingredient quantity must be positive");
+    expect(mutations).toContain(
+      "This recipe ingredient's amount has to be more than zero.",
+    );
 
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).not.toContain("Component steps require an instruction");
     expect(summary).not.toContain("Drafted components require a name");
-    expect(summary).toContain("Recipe steps require an instruction");
-    expect(summary).toContain("Drafted recipes require a name");
+    expect(summary).toContain("Give this recipe step an instruction.");
+    expect(summary).toContain("Give this recipe a name.");
 
     // later leftovers, unchanged
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
 
     // already-landed leftovers must stay put
-    expect(visible).toContain("Recipe name is required");
-    expect(visible).toContain("Recipe yield quantity must be positive");
-    expect(visible).toContain("Recipe batch multiplier must be positive");
-    expect(visible).toContain("Portion size name is required");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Give this recipe a name.");
+    expect(visible).toContain(
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+    );
+    expect(visible).toContain(
+      "This recipe's batch size has to be more than zero.",
+    );
+    expect(visible).toContain("Give this portion size a name.");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 
   it("keeps leftover culinary step-instruction-and-duration constraint copy free of component jargon", () => {
@@ -343,30 +373,44 @@ describe("plain words on culinary manifests", () => {
 
     expect(visible).not.toContain("Component step instruction is required");
     expect(visible).not.toContain("Component step duration cannot be negative");
-    expect(visible).toContain("Recipe step instruction is required");
-    expect(visible).toContain("Recipe step duration cannot be negative");
-    expectPlain("Recipe step instruction is required");
-    expectPlain("Recipe step duration cannot be negative");
+    expect(visible).toContain("Give this recipe step an instruction.");
+    expect(visible).toContain(
+      "This recipe step's time can't be negative. Use zero or more minutes.",
+    );
+    expectPlain("Give this recipe step an instruction.");
+    expectPlain(
+      "This recipe step's time can't be negative. Use zero or more minutes.",
+    );
 
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).not.toContain("Component step instruction is required");
     expect(mutations).not.toContain(
       "Component step duration cannot be negative",
     );
-    expect(mutations).toContain("Recipe step instruction is required");
-    expect(mutations).toContain("Recipe step duration cannot be negative");
+    expect(mutations).toContain("Give this recipe step an instruction.");
+    expect(mutations).toContain(
+      "This recipe step's time can't be negative. Use zero or more minutes.",
+    );
 
     // later leftover, unchanged
-    expect(visible).toContain("Piece quantity must be positive");
+    expect(visible).toContain(
+      "This portion size's piece amount has to be more than zero.",
+    );
 
     // already-landed leftovers must stay put
-    expect(visible).toContain("Recipe name is required");
-    expect(visible).toContain("Recipe yield quantity must be positive");
-    expect(visible).toContain("Recipe batch multiplier must be positive");
-    expect(visible).toContain("Recipe ingredient quantity must be positive");
-    expect(visible).toContain("Recipe steps require an instruction");
-    expect(visible).toContain("Drafted recipes require a name");
-    expect(visible).toContain("Portion size name is required");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Give this recipe a name.");
+    expect(visible).toContain(
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+    );
+    expect(visible).toContain(
+      "This recipe's batch size has to be more than zero.",
+    );
+    expect(visible).toContain(
+      "This recipe ingredient's amount has to be more than zero.",
+    );
+    expect(visible).toContain("Give this recipe step an instruction.");
+    expect(visible).toContain("Give this recipe a name.");
+    expect(visible).toContain("Give this portion size a name.");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 });

@@ -263,7 +263,7 @@ export function VehicleMaintenancePage() {
           ? `${milesFmt.format(nextDueMileage ?? 0)} mi`
           : formatDate(nextDueAt);
       setNotice(
-        `${vehicle?.registration ?? "Vehicle"} service recorded. Next due ${dueText}.`,
+        `${vehicle?.registration ?? "Vehicle"} service saved. Next due ${dueText}.`,
       );
     });
   };
@@ -282,7 +282,7 @@ export function VehicleMaintenancePage() {
       });
       form.reset();
       setPanel("none");
-      setNotice("Fuel and mileage recorded.");
+      setNotice("Fuel and mileage saved.");
     });
   };
 
@@ -299,9 +299,9 @@ export function VehicleMaintenancePage() {
           <p className="eyebrow">Logistics · Maintenance</p>
           <h1 className="display-title mt-2">Vehicle maintenance log</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Record mileage, fuel costs, and service events per vehicle. Set
-            time- or mileage-based service intervals and keep compliance records
-            current with due alerts.
+            Log mileage, fuel costs, and service events per vehicle. Set time-
+            or mileage-based service intervals and keep compliance current with
+            due alerts.
           </p>
         </div>
         <div className="supply-masthead-actions">
@@ -350,7 +350,7 @@ export function VehicleMaintenancePage() {
             service
           </strong>{" "}
           — schedule the work before the next dispatch to keep compliance
-          records current.
+          current.
         </div>
       ) : null}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
@@ -505,7 +505,7 @@ export function VehicleMaintenancePage() {
                 Cancel
               </button>
               <button className="btn btn-primary" disabled={busy != null}>
-                {busy === "fuel" ? "Saving…" : "Record fill-up"}
+                {busy === "fuel" ? "Saving…" : "Log fill-up"}
               </button>
             </div>
           </div>
@@ -587,7 +587,7 @@ export function VehicleMaintenancePage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Vehicle</th>
@@ -623,12 +623,12 @@ export function VehicleMaintenancePage() {
                           <small>{schedule.instructions}</small>
                         ) : null}
                       </td>
-                      <td>
+                      <td data-label="Interval">
                         {schedule.intervalType === "mileage"
                           ? `Every ${milesFmt.format(schedule.intervalMiles)} mi`
                           : `Every ${schedule.intervalDays} days`}
                       </td>
-                      <td>
+                      <td data-label="Next due">
                         {schedule.intervalType === "mileage" ? (
                           <>
                             <strong>
@@ -642,7 +642,7 @@ export function VehicleMaintenancePage() {
                           <strong>{formatDate(schedule.nextDueAt)}</strong>
                         )}
                       </td>
-                      <td>
+                      <td data-label="Status">
                         <StatusChip status={state} />
                         <small data-testid="maintenance-due-label">
                           {dueLabel(schedule)}
@@ -679,7 +679,7 @@ export function VehicleMaintenancePage() {
           >
             <div className="supply-form-heading">
               <div>
-                <p className="eyebrow">Completion record</p>
+                <p className="eyebrow">Completion details</p>
                 <h2>Log service · {serviceSchedule.taskName}</h2>
               </div>
               <div className="supply-row-actions">
@@ -764,14 +764,14 @@ export function VehicleMaintenancePage() {
           <TableSkeleton rows={3} />
         ) : fuelEntries.length === 0 && serviceEntries.length === 0 ? (
           <div className="document-empty">
-            <p>No fuel or service records yet.</p>
+            <p>No fuel or service history yet.</p>
             <span>
               Log a fill-up or service to build the compliance history.
             </span>
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Date</th>
@@ -788,17 +788,19 @@ export function VehicleMaintenancePage() {
                   return (
                     <tr key={`${row.kind}:${row.id}`}>
                       <td>{formatDate(row.at)}</td>
-                      <td>{vehicle?.registration ?? "—"}</td>
-                      <td>
+                      <td data-label="Vehicle">
+                        {vehicle?.registration ?? "—"}
+                      </td>
+                      <td data-label="Type">
                         <StatusChip
                           status={row.kind === "fuel" ? "fuel" : "service"}
                         />
                       </td>
-                      <td>{row.detail}</td>
-                      <td className="supply-number">
+                      <td data-label="Detail">{row.detail}</td>
+                      <td className="supply-number" data-label="Odometer">
                         {milesFmt.format(row.odometer)} mi
                       </td>
-                      <td className="supply-number">
+                      <td className="supply-number" data-label="Cost">
                         {costFmt.format(row.cost)}
                       </td>
                     </tr>

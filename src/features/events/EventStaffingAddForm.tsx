@@ -44,7 +44,7 @@ export function readStaffingAddForm(
   const startsAt = readWhen(data, "startsAt");
   const endsAt = readWhen(data, "endsAt");
   if (startsAt != null && endsAt != null && endsAt <= startsAt) {
-    return { error: "Out time must be after the in time." };
+    return { error: "Out time has to be after in time." };
   }
   const note = String(data.get("notes") ?? "").trim() || undefined;
   if (who === OPEN_SHIFT_PERSON) {
@@ -137,7 +137,7 @@ export function EventStaffingAddForm({
       </label>
       <button
         type="submit"
-        className="btn btn-primary self-end"
+        className="btn btn-primary self-end whitespace-nowrap"
         disabled={busy}
         data-testid="event-staffing-add"
       >

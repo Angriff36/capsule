@@ -68,7 +68,7 @@ const ACTIONS: ReadonlyArray<
     // (eventAccess, EventExecutionStarted). Neither freezes on unfinished
     // prep/pack/delivery — readiness is a projection, not a gate.
     key: "confirmSalesLock",
-    label: "Confirm sales lock & start execution",
+    label: "Confirm sales lock & start the event",
     kind: "primary",
     lifecycle: EventConfirmSalesLockLifecycle,
   },
@@ -80,7 +80,7 @@ const ACTIONS: ReadonlyArray<
   },
   {
     key: "beginExecution",
-    label: "Begin execution",
+    label: "Start the event",
     kind: "primary",
     lifecycle: EventBeginExecutionLifecycle,
   },
@@ -118,25 +118,76 @@ const HEADCOUNT_REVISION_STAGES = new Set<string>([
   ...EventCompleteLifecycle.map((transition) => transition.from),
 ]);
 
+/** Event fields the submit and sales-lock guards read. */
+export interface EventReadiness {
+  plannedAt?: number | null;
+  clientId?: string | null;
+  startsAt?: number | null;
+  endsAt?: number | null;
+  expectedHeadcount?: number | null;
+}
+
 /** UI offer set derived from generated, proven Event stage transitions. */
 export class EventLifecyclePolicy {
   availableActions(
     stage: string,
-    planning?: { plannedAt?: number | null },
+    planning?: EventReadiness,
   ): EventLifecycleAction[] {
-    return ACTIONS.filter((action) =>
-      action.lifecycle.some(
-        (transition) =>
-          transition.property === "stage" && transition.from === stage,
-      ),
-    )
-      .filter(
-        (action) =>
-          action.key !== "submitForApproval" ||
-          planning === undefined ||
-          planning.plannedAt != null,
+    const blocked = planning
+      ? this.blockedActions(stage, planning).map((item) => item.key)
+      : [];
+    return (
+      ACTIONS.filter((action) =>
+        action.lifecycle.some(
+          (transition) =>
+            transition.property === "stage" && transition.from === stage,
+        ),
       )
-      .map(({ lifecycle: _lifecycle, ...action }) => action);
+        // Planning -> completed exists only for old-system events that are
+        // already over (Event.recordPastCompletion, its own button); a planned
+        // event is never finished from the stage buttons.
+        .filter(
+          (action) => !(action.key === "complete" && stage === "planning"),
+        )
+        .filter((action) => !blocked.includes(action.key))
+        .map(({ lifecycle: _lifecycle, ...action }) => action)
+    );
+  }
+
+  /**
+   * Stage moves the lifecycle allows from `stage` that the Event command
+   * guards would still reject, with the reason a person can fix.
+   */
+  blockedActions(
+    stage: string,
+    event: EventReadiness,
+  ): { key: EventLifecycleActionKey; reason: string }[] {
+    if (stage === "planning" && event.plannedAt == null) {
+      return [
+        {
+          key: "submitForApproval",
+          reason: "Use Complete planning below before you submit for approval.",
+        },
+      ];
+    }
+    if (stage === "approved") {
+      const missing = [
+        event.clientId == null ? "a client" : null,
+        event.plannedAt == null ? "completed planning" : null,
+        event.startsAt == null ? "a start time" : null,
+        event.endsAt == null ? "an end time" : null,
+        !(Number(event.expectedHeadcount ?? 0) > 0) ? "a headcount" : null,
+      ].filter((item): item is string => item != null);
+      if (missing.length) {
+        return [
+          {
+            key: "lockForSales",
+            reason: `Add ${missing.join(", ")} before the sales lock.`,
+          },
+        ];
+      }
+    }
+    return [];
   }
 
   isEditableStage(stage: string): boolean {

@@ -77,7 +77,9 @@ describe("runtime proof: component import finalize", () => {
         ) as Promise<{ docId: string }>,
     });
 
-    await expect(finalizer.finalize(ready)).rejects.toThrow(/Kitchen staff/i);
+    await expect(finalizer.finalize(ready)).rejects.toThrow(
+      /Kitchen, inventory and managers may/i,
+    );
   });
 
   it("persists corrections through the repository, finalizes the durable review once, and conflicts on reuse", async () => {

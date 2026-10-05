@@ -1,13 +1,14 @@
 import { useState, type FormEvent } from "react";
 import {
   useCreateWasteRecord,
-  useListEvent,
   useListIngredient,
   useListInventoryItem,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
 
 export const WASTE_REASON_LABELS: Record<string, string> = {
   spoilage: "Spoilage",
@@ -24,7 +25,7 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
   const items = useListInventoryItem();
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([workingId]);
   const createWasteRecord = useCreateWasteRecord();
   const [inventoryItemId, setInventoryItemId] = useState("");
   const [busy, setBusy] = useState(false);
@@ -110,15 +111,13 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
           </select>
         </label>
         <label className="field-label">
-          Quantity{selectedItem ? ` (${selectedItem.unit})` : ""}
-          <input
+          Quantity
+          {/* Any unit that converts; the record keeps the stock line's unit. */}
+          <UnitQuantityInput
+            key={selectedItem?._id ?? "none"}
             name="quantity"
-            className="input"
-            type="number"
-            min={0.0001}
+            storeUnit={selectedItem?.unit ?? "each"}
             max={selectedItem?.quantityOnHand}
-            step="any"
-            required
           />
         </label>
         <label className="field-label">

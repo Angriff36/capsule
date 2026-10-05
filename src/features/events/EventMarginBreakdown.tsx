@@ -20,22 +20,36 @@ const BUCKET_BAR: Record<string, string> = {
   equipment: "bg-info",
 };
 
+/** "12.5% margin", or "At most 12.5% margin" when some cost is not known. */
+export function marginLabel(
+  marginPct: number | null,
+  costsIncomplete = false,
+): string {
+  if (marginPct == null) return "Margin needs revenue";
+  return costsIncomplete
+    ? `At most ${marginPct.toFixed(1)}% margin`
+    : `${marginPct.toFixed(1)}% margin`;
+}
+
 /** Three headline tiles: revenue in, cost out, what is left. */
 export function EventMarginTiles({
   revenue,
   totalCost,
   grossProfit,
   marginPct,
+  costsIncomplete = false,
 }: {
   revenue: number | null;
   totalCost: number;
   grossProfit: number | null;
   marginPct: number | null;
+  costsIncomplete?: boolean;
 }) {
   const costShare =
     revenue != null && revenue > 0 ? (totalCost / revenue) * 100 : null;
+  // A profit built on unpriced food is not a confirmed good result.
   const profitTone =
-    grossProfit == null
+    grossProfit == null || (costsIncomplete && grossProfit >= 0)
       ? "text-ink-3"
       : grossProfit < 0
         ? "text-danger"
@@ -57,14 +71,16 @@ export function EventMarginTiles({
           {formatMoney(totalCost)}
         </p>
         <p className="mt-1.5 text-base text-ink-3">
-          {costShare == null
-            ? "Revenue needed for cost share"
-            : `${costShare.toFixed(1)}% of revenue`}
+          {costsIncomplete
+            ? "Food not all priced, so the real cost is higher"
+            : costShare == null
+              ? "Revenue needed for cost share"
+              : `${costShare.toFixed(1)}% of revenue`}
         </p>
       </section>
       <section
         className={`rounded-md border px-4 py-3.5 ${
-          grossProfit == null
+          grossProfit == null || (costsIncomplete && grossProfit >= 0)
             ? "border-line bg-inset"
             : grossProfit < 0
               ? "border-danger/40 bg-danger-soft"
@@ -76,9 +92,7 @@ export function EventMarginTiles({
           {formatMoney(grossProfit)}
         </p>
         <p className={`mt-1.5 text-base ${profitTone}`}>
-          {marginPct == null
-            ? "Margin needs revenue"
-            : `${marginPct.toFixed(1)}% margin`}
+          {marginLabel(marginPct, costsIncomplete)}
         </p>
       </section>
     </div>

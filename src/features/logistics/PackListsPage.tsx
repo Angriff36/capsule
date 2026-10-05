@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackList,
-  useListEvent,
   useListPackList,
   useListPackListItem,
   usePackListCancel,
@@ -23,15 +23,29 @@ import {
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 const policy = new LogisticsLifecyclePolicy();
+const packListsState = new ListStateManager({
+  cancelled: {
+    key: "cancelled",
+    defaultValue: false,
+    parse: (value: string | null) => value === "1",
+    serialize: (value: boolean) => (value ? "1" : null),
+  },
+});
 
 export function PackListsPage() {
-  const eventScope = useWorkingEventScope();
+  const listOrigin = useListOrigin();
+  const eventScope = useWorkingEventScope("pack-lists");
   const workingId = useWorkingEventId();
   const packLists = useListPackList();
   const packListItems = useListPackListItem();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    packLists ? [workingId, ...packLists.map((row) => row.eventId)] : undefined,
+  );
   const createPackList = useCreatePackList();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -39,7 +53,8 @@ export function PackListsPage() {
   const dispatch = usePackListDispatch();
   const cancel = usePackListCancel();
   const [showCreate, setShowCreate] = useState(false);
-  const [showCancelled, setShowCancelled] = useState(false);
+  const [{ cancelled: showCancelled }, setListState] =
+    useListViewState(packListsState);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -134,11 +149,22 @@ export function PackListsPage() {
       }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
-        if (key === "startPacking") await startPacking(args);
-        if (key === "markPacked") await markPacked(args);
-        if (key === "markLoaded") await markLoaded(args);
-        if (key === "dispatch") await dispatch(args);
-        setNotice(`Pack list updated (${key}).`);
+        if (key === "startPacking") {
+          await startPacking(args);
+          setNotice("Packing started.");
+        }
+        if (key === "markPacked") {
+          await markPacked(args);
+          setNotice("Pack list marked packed.");
+        }
+        if (key === "markLoaded") {
+          await markLoaded(args);
+          setNotice("Pack list marked loaded.");
+        }
+        if (key === "dispatch") {
+          await dispatch(args);
+          setNotice("Pack list dispatched.");
+        }
       });
     })();
   };
@@ -160,7 +186,7 @@ export function PackListsPage() {
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => setShowCancelled((value) => !value)}
+            onClick={() => setListState({ cancelled: !showCancelled })}
           >
             {showCancelled ? "Hide cancelled" : "Show cancelled"}
           </button>
@@ -261,7 +287,7 @@ export function PackListsPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -277,13 +303,14 @@ export function PackListsPage() {
                       <Link
                         className="text-link"
                         to={`/logistics/packs/${row._id}`}
+                        state={listOriginState(listOrigin)}
                       >
                         <strong>{row.name || "Untitled pack list"}</strong>
                       </Link>
                       {row.purpose ? <small>{row.purpose}</small> : null}
                     </td>
-                    <td>{eventName(row.eventId)}</td>
-                    <td>
+                    <td data-label="Event">{eventName(row.eventId)}</td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                     </td>
                     <td>
@@ -291,6 +318,7 @@ export function PackListsPage() {
                         <Link
                           className="btn btn-ghost btn-sm"
                           to={`/logistics/packs/${row._id}`}
+                          state={listOriginState(listOrigin)}
                         >
                           Load sheet
                         </Link>

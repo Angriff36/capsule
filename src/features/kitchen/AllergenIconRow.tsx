@@ -30,7 +30,8 @@ export function AllergenIconRow({ codes, className }: Props) {
     return (
       <span
         className={className ?? "text-xs text-ink-3"}
-        aria-label="No allergens listed"
+        aria-label="No allergens on file. This is not an allergen-free check."
+        title="No allergens on file. This is not an allergen-free check."
       >
         —
       </span>

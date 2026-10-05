@@ -2,67 +2,67 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "b0bd799558d2c20ab1ce8f262839b64e68c930e0d45ea5464494903c9b484839"
+      "sha256": "b73f1686038a1b81cda7a985d3acf217a718fca2745666614425cd0131ee6c1d"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "d7c089fcf4af8246d38d372c332e85fa1fd6904520ac2a5e679e50bae8109ca2"
+      "sha256": "ff14ab7d50d00ecf1128071b31f071afdc120dfe6237d905b6ea3353be2a874f"
     },
     "convex/lib/authContext.ts": {
-      "sha256": "ee98a50d1d9b7db6bed6f2aedfd9ba45fa0bc8e245abdc4a230dc84b6f0aa5ad",
+      "sha256": "d18a22d82b44ddb5dbd519947c031b9d9ac0a50268b6c4603478b152a477be77",
       "baselined": true
     },
     "convex/lib/encryption.ts": {
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "f54b622677fe8839a89c57af5b022fda3e0a24c5405d2a71c68b3d3a01dab45f"
+      "sha256": "f98e9071b9bb99cbe77651e5d297bfe21f90c57de23d9ed3fe6702bb2e12cd56"
     },
     "convex/queries.ts": {
-      "sha256": "2eab35f304e5acdfdb28caae63607686fefcf6ce96291a15fd967e4760c6dcbc"
+      "sha256": "2de2a60c811605ba4be0a334da3fe6e8e3d77c983fa443cc62e7d56f1a80ddb6"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "4e96f3b26d1474f9c43ceab22a8bf6affbcdcd92179a045721a4256303f12ef7"
+      "sha256": "9f19777165df7244727e65e213867ddc95f603461e025c17cee4a3a9a149f2bf"
     },
     "manifest-context-summary.json": {
-      "sha256": "b1a4d4dd1f0c117624850af8c8d6c8b82bc6e9a7f3c34e0268844f52fbff86c8"
+      "sha256": "8d96a239eecbff53116ef651dabe3c319298e0783240f1539a57fef5f39fcf83"
     },
     "package.json": {
-      "sha256": "6c7b659dc46be8b0ed001e609ad02ee20471a66f995572f19f339996854840f6"
+      "sha256": "8eaec7fa603c3cd1025cac03266f180f8bc33a69369ac3cb861bb3849981aa1c"
     },
     "PRESET.md": {
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "b3c03668cb467230bfdede836bb77aaa16ccfa493d6ce11bf84756222d49378a"
+      "sha256": "0d443158efb57f6fc10225932a60fd1a8ea6cdbae5958959f0e7bca3326ae877"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "7f1b295cf2563d37d36389b4b6b3142f1b02c862787a90cb6105b6dbbb6a906e"
+      "sha256": "a7f4abe86f06f54fd5400b7e8aaef07c9e11f0fa8aea6823c2ddf6d376052444"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "c06ff669daa0306bfa53ffffe089250b964ffa0ebec7617742c8ec0aba17291b"
+      "sha256": "f65b926601646a2a60750b7aed5fa6f4df073513f5eb559537d9ba7db3c3288e"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "d5f4d69005ca6d99a2fd48012925f7b3f13fce1901d656aedcc768cf51e929c1"
+      "sha256": "757b77fb07ad93f40d5566619e759f1ce0f7e4fd92e4cabd366063281d8acac7"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "a0fc0c4cadff9d460f4054983853373e8921f157c22785e9eabf2ff8017783a5"
+      "sha256": "14a7302b007fd3ff133608075ba73169ed7fbb0e881848247a303bfa4eaf27e2"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "e9845c5df9e58445680e8983091c91dcce56388a6094a6533ecd2a633be2789a"
+      "sha256": "1c6b2e15310ccd55bf6c0a96c3d545f2fd4b0bf9cc9fffba5cbd931cf3ee0507"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.56",
+      "@angriff36/manifest": "3.6.58",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },
@@ -95,13 +95,18 @@
       "src/culinary/ingredient.manifest",
       "src/culinary/menu-dish.manifest",
       "src/culinary/menu.manifest",
+      "src/culinary/serving-by-style.manifest",
       "src/documents/attachment.manifest",
+      "src/facilities/equipment-issue.manifest",
       "src/facilities/equipment.manifest",
+      "src/facilities/operating-location.manifest",
       "src/finance/closeout.manifest",
       "src/finance/event-closeout.manifest",
+      "src/finance/leftover-disposition.manifest",
       "src/finance/payroll-input.manifest",
       "src/finance/revenue-attribution.manifest",
       "src/foundation/base.manifest",
+      "src/foundation/command-audit.manifest",
       "src/foundation/materialization-receipt.manifest",
       "src/identity/email-notification-subscription.manifest",
       "src/identity/person.manifest",
@@ -109,25 +114,37 @@
       "src/import/import-artifact.manifest",
       "src/import/import-dataset.manifest",
       "src/import/import-run.manifest",
+      "src/import/parallel-run-difference.manifest",
+      "src/insights/leadership.manifest",
       "src/insights/report.manifest",
       "src/insights/tpp-report-favorite.manifest",
       "src/integrations/integration-connection.manifest",
       "src/inventory/demand.manifest",
       "src/inventory/location.manifest",
+      "src/inventory/opening-stock.manifest",
       "src/inventory/stock-count.manifest",
       "src/inventory/stock.manifest",
       "src/inventory/transfer.manifest",
       "src/logistics/delivery.manifest",
+      "src/logistics/departure-override.manifest",
       "src/logistics/event-vehicle.manifest",
       "src/logistics/pack-list-template.manifest",
       "src/logistics/pack-list.manifest",
+      "src/logistics/pack-rule.manifest",
+      "src/logistics/pack-scan.manifest",
+      "src/logistics/pack-section-claim.manifest",
       "src/logistics/packing.manifest",
+      "src/logistics/rental-order.manifest",
+      "src/logistics/vehicle-trip-check.manifest",
       "src/logistics/vehicle.manifest",
       "src/operations/client-portal-link.manifest",
       "src/operations/event-number-sequence.manifest",
       "src/operations/event-packet.manifest",
+      "src/operations/event-planning.manifest",
+      "src/operations/event-task.manifest",
       "src/operations/event-template.manifest",
       "src/operations/event.manifest",
+      "src/operations/field-confirmation.manifest",
       "src/operations/occasion.manifest",
       "src/operations/service-style-kit.manifest",
       "src/operations/service-style.manifest",
@@ -139,6 +156,7 @@
       "src/procurement/order.manifest",
       "src/procurement/purchase-need.manifest",
       "src/procurement/vendor-contract.manifest",
+      "src/procurement/vendor-item.manifest",
       "src/procurement/vendor.manifest",
       "src/production/batch.manifest",
       "src/production/prep.manifest",
@@ -154,6 +172,8 @@
       "src/sales/contact.manifest",
       "src/sales/contract.manifest",
       "src/sales/credit-memo.manifest",
+      "src/sales/date-holds.manifest",
+      "src/sales/deck-share-link.manifest",
       "src/sales/invoice-core.manifest",
       "src/sales/invoice-number-sequence.manifest",
       "src/sales/invoice.manifest",
@@ -173,6 +193,8 @@
       "src/sales/share-link.manifest",
       "src/sales/signature-request.manifest",
       "src/sales/sync-error.manifest",
+      "src/sales/tasting-dish.manifest",
+      "src/sales/tasting.manifest",
       "src/sales/tax-rate.manifest",
       "src/workforce/assignment.manifest",
       "src/workforce/availability.manifest",
@@ -185,6 +207,8 @@
       "src/workforce/shift-swap.manifest",
       "src/workforce/shift.manifest",
       "src/workforce/staff-message.manifest",
+      "src/workforce/staff-need-waitlist.manifest",
+      "src/workforce/staffing-template.manifest",
       "src/workforce/time.manifest",
       "src/workforce/training.manifest"
     ],

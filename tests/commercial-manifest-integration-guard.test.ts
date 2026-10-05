@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectCommercialManifestIntegration,
-  inspectCommercialSource,
-} from "../scripts/check-commercial-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectCommercialManifestIntegration = () =>
+  inspectManifestIntegration("commercial");
+const inspectCommercialSource = (file: string, source: string) =>
+  inspectManifestSource("commercial", file, source);
 
 describe("Commercial Manifest integration guard", () => {
   it("keeps current authored finance integration on approved generated surfaces", () => {

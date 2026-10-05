@@ -5,30 +5,13 @@
 
 use "./payment.manifest"
 
-// Vision cascade: approved event ensures one Invoice issued from quoted price
-// (match else create). Remains draft until finance sends — issue sets issuedAt.
-// Currency code / exchange rate default to the tenant's functional currency
-// (no exchangeRate field on EventApproved). Finance can adjust per invoice on
-// the issue form before sending.
-// invoiceSequence: 0 marks the issue as auto-numbered (issues #136 / #165 —
-// the draft never carries the raw event document id). The command writes the
-// placeholder "INV-1" and emits InvoiceIssued with autoNumbered: true; the
-// authored numbering seam (convex/lib/invoiceNumbering.ts) then replaces it,
-// inside the same transaction, with the tenant's persisted
-// InvoiceNumberSequence + 1. No count() here: a reaction-param count compiles
-// to a full by_tenantId collect of the tenant's invoices on every approval.
-on EventApproved run Invoice.issue
-  match eventId = payload.eventId
-  else create
-  params {
-    clientId: payload.clientId
-    eventId: payload.eventId
-    invoiceSequence: 0
-    subtotal: payload.quotedPrice
-    taxAmount: 0
-    discountAmount: 0
-    total: payload.quotedPrice
-  }
+// An approved event gets one unsent draft Invoice from its quoted price, and
+// only when that price is more than zero (AC-618). A reaction cannot skip a
+// zero price, so the authored seam convex/lib/invoicePricingReconciliation.ts
+// (ensureEventDraftInvoice) makes it on EventApproved, and on a later price
+// change when the event still has no invoice, through Invoice.issue with
+// invoiceSequence: 0 (auto-numbered, #136 / #165) and the accepted proposal
+// and revision as the commercial source. It never sends the draft.
 
 // The transactional operational callback voids eligible unpaid invoices through
 // Invoice.markVoided. Paid/partial/voided/written-off invoices and payments stay

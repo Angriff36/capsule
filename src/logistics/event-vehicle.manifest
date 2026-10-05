@@ -12,10 +12,11 @@
 // already in the vehicle. Rows stay correctable up to and during the event:
 // trucks break down and drivers call out.
 //
-// A rig's truck, trailer and driver are set when the row is made and never
-// patched: an update command cannot check a NEW id against the caller's
-// workspace (relations read the saved row). To change one, the tracker attaches
-// the corrected rig and releases the old one.
+// A rig's truck and driver are set when the row is made. To change one, the
+// tracker attaches the corrected rig and releases the old one. A trailer can
+// be hitched to a rig already on the event (attachTrailer): the generated
+// command checks the new trailer id against the caller's workspace, and the
+// rig keeps its riders, its loaded pack lines and its preload record.
 
 use "../foundation/base.manifest"
 
@@ -34,6 +35,30 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   property assignedAt: datetime?
   property preloadedAt: datetime?
   property releasedAt: datetime?
+  // An outside vendor's own truck (a rental drop): named, not one of ours.
+  property vendorName: string?
+  // This run's own times (PL-ROUTE-LEGS). Unset = with the main crew: on site
+  // at the event's setup time, the event's load time, stays to the end. Every
+  // time still comes from the same event facts, so a change moves all runs.
+  property arriveBeforeServeMinutes: float?
+  property loadMinutes: float?
+  // A drop run leaves this long after arriving; the truck can then do a
+  // second trip (another row for the same truck).
+  property leaveAfterMinutes: float?
+  // Where this rig is loaded at the kitchen ("dock 2", "back lot"). Shown on
+  // every pack line that rides on it (PL-DELIVERY).
+  property loadingZone: string?
+  // Why this truck or trailer may run while it is on another run at the same
+  // time (the planner said so on the planning board). With it, the
+  // same-time check lets the run through; without it, the clash is refused.
+  property bookedTwiceReason: string?
+  // Staff profile that said the load is in the vehicle. Missing when that
+  // account is not linked to a profile.
+  property preloadedByPersonId: uuid?
+  // What this run cost the company: a hired truck's bill, a vendor's
+  // delivery fee, or fuel and tolls for our own truck. Empty = not known.
+  // The event closeout adds it up as the transport line.
+  property tripCost: money(12, 2)?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
@@ -43,7 +68,8 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   computed isPreloaded: boolean = self.preloadedAt != null
   computed isReleased: boolean = self.releasedAt != null
 
-  constraint assignmentHasRig: self.assignedAt == null or self.vehicleId != null or self.trailerId != null "An assignment needs a vehicle or a trailer"
+  constraint tripCostNotNegative: self.tripCost == null or self.tripCost >= 0 "Trip cost can't be negative. Use zero or more."
+  constraint assignmentHasRig: self.assignedAt == null or self.vehicleId != null or self.trailerId != null or (self.vendorName != null and length(trim(self.vendorName)) > 0) "An assignment needs a vehicle, a trailer or a vendor name"
 
   // The crew needs to know which truck they are on; the people who run events
   // and logistics set it from the tracker.
@@ -57,7 +83,13 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     optional trailerId: uuid,
     optional driverId: uuid,
     optional notes: string,
-    optional preloaded: boolean
+    optional preloaded: boolean,
+    optional vendorName: string,
+    optional arriveBeforeServeMinutes: float,
+    optional loadMinutes: float,
+    optional leaveAfterMinutes: float,
+    optional loadingZone: string,
+    optional bookedTwiceReason: string
   ) {
     guard self.assignedAt == null
     guard self.deletedAt == null
@@ -67,14 +99,26 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard vehicleId == null or self.vehicle != null
     guard trailerId == null or self.trailer != null
     guard driverId == null or self.driver != null
-    constraint assignHasRig: vehicleId != null or trailerId != null "Select a vehicle or a trailer"
+    constraint assignHasRig: vehicleId != null or trailerId != null or (vendorName != null and length(trim(vendorName)) > 0) "Select a vehicle or a trailer, or name the vendor"
+    // A second trip on the same truck is booked with its own times, so the
+    // booking check sees the real window (PL-DELIVERY).
+    constraint assignArriveNotNegative: arriveBeforeServeMinutes == null or arriveBeforeServeMinutes >= 0 "Arrival before serve cannot be negative"
+    constraint assignLoadNotNegative: loadMinutes == null or loadMinutes >= 0 "Load time cannot be negative"
+    constraint assignLeaveAfterPositive: leaveAfterMinutes == null or leaveAfterMinutes > 0 "Time on site before leaving has to be more than zero"
     mutate eventId = eventId
     mutate activeEventId = eventId
     mutate vehicleId = vehicleId
     mutate trailerId = trailerId
     mutate driverId = driverId
+    mutate vendorName = vendorName
     mutate notes = notes
+    mutate arriveBeforeServeMinutes = arriveBeforeServeMinutes
+    mutate loadMinutes = loadMinutes
+    mutate leaveAfterMinutes = leaveAfterMinutes
+    mutate loadingZone = loadingZone
+    mutate bookedTwiceReason = bookedTwiceReason != null and length(trim(bookedTwiceReason)) > 0 ? trim(bookedTwiceReason) : null
     mutate preloadedAt = preloaded == true ? now() : null
+    mutate preloadedByPersonId = preloaded == true ? user.personId : null
     mutate assignedAt = now()
     emit EventVehicleAssigned {
       eventVehicleAssignmentId: self.id
@@ -92,6 +136,7 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard self.releasedAt == null
     guard self.deletedAt == null
     mutate preloadedAt = now()
+    mutate preloadedByPersonId = user.personId
     emit EventVehiclePreloaded {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
@@ -103,10 +148,82 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     guard self.preloadedAt != null
     guard self.deletedAt == null
     mutate preloadedAt = null
+    mutate preloadedByPersonId = null
     emit EventVehiclePreloadCleared {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
+    }
+  }
+
+  // This run's own times. An omitted value goes back to the main crew's.
+  command planLeg(
+    optional arriveBeforeServeMinutes: float,
+    optional loadMinutes: float,
+    optional leaveAfterMinutes: float
+  ) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    constraint legArriveNotNegative: arriveBeforeServeMinutes == null or arriveBeforeServeMinutes >= 0 "Arrival before serve cannot be negative"
+    constraint legLoadNotNegative: loadMinutes == null or loadMinutes >= 0 "Load time cannot be negative"
+    constraint legLeaveAfterPositive: leaveAfterMinutes == null or leaveAfterMinutes > 0 "Time on site before leaving has to be more than zero"
+    mutate arriveBeforeServeMinutes = arriveBeforeServeMinutes
+    mutate loadMinutes = loadMinutes
+    mutate leaveAfterMinutes = leaveAfterMinutes
+    emit EventVehicleLegPlanned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Where this rig loads at the kitchen. Empty clears it.
+  command setLoadingZone(optional loadingZone: string) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate loadingZone = loadingZone != null and length(trim(loadingZone)) > 0 ? loadingZone : null
+    emit EventVehicleLoadingZoneSet {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // What this run cost. Stays changeable after the event, when the bill comes
+  // in. Empty clears it.
+  command setTripCost(optional tripCost: money(12, 2)) {
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    constraint setTripCostNotNegative: tripCost == null or tripCost >= 0 "Trip cost can't be negative. Use zero or more."
+    mutate tripCost = tripCost
+    emit EventVehicleTripCostSet {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Hitch a trailer to this truck's run. The same checks as a new rig run
+  // again (trailer in service, fits the truck, not on another run at the same
+  // time unless a reason is given), and the crew's times are planned again.
+  command attachTrailer(trailerId: uuid, optional bookedTwiceReason: string) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    guard self.activeEventId != null
+    constraint attachTrailerHasTruck: self.vehicleId != null "Pick a truck on this event to pull the trailer."
+    constraint attachTrailerFree: self.trailerId == null "This truck already pulls a trailer. Take that trailer off first."
+    mutate trailerId = trailerId
+    mutate bookedTwiceReason = bookedTwiceReason != null and length(trim(bookedTwiceReason)) > 0 ? trim(bookedTwiceReason) : self.bookedTwiceReason
+    emit EventVehicleAssigned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      vehicleId: self.vehicleId
+      trailerId: trailerId
+      driverId: self.driverId
     }
   }
 
@@ -145,6 +262,24 @@ event EventVehiclePreloaded: "event_vehicle.preloaded" {
 }
 
 event EventVehiclePreloadCleared: "event_vehicle.preload_cleared" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleLegPlanned: "event_vehicle.leg_planned" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleLoadingZoneSet: "event_vehicle.loading_zone_set" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleTripCostSet: "event_vehicle.trip_cost_set" {
   eventVehicleAssignmentId: string
   tenantId: string
   eventId: string

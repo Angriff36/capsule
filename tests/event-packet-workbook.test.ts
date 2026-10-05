@@ -390,3 +390,204 @@ it("prints crew and trailer facts plus only current assignment verification deta
   for (const kind of ["crew", "vehicle", "trailer"])
     expect(next).not.toContain(`Confirmed ${kind} assignment detail`);
 });
+
+import type { NativePacketContent } from "../src/lib/eventPacket/nativePacket";
+const nativeContent = (
+  over: Partial<NativePacketContent> = {},
+): NativePacketContent => ({
+  eventNumber: "6901",
+  serviceStyle: "Full Service",
+  barService: null,
+  menu: [],
+  pack: [],
+  staff: [],
+  pullSheet: [],
+  route: {
+    venueAddress: null,
+    mapLink: null,
+    loadIn: [],
+    runs: [],
+    diagrams: [],
+  },
+  ...over,
+});
+const partText = (s: EventPacketSnapshot, id: string) =>
+  buildWorkbook(s)
+    .sections.find((x) => x.id === id)!
+    .blocks.map((b) => b.text)
+    .join("\n");
+describe("native packet parts", () => {
+  it("prints event menu in the accepted service order, not lexical key order", () => {
+    const s = blank();
+    s.native = nativeContent({
+      menu: [
+        {
+          name: "Apple tart",
+          course: "Dessert",
+          servings: 90,
+          notes: null,
+          sortOrder: 3,
+        },
+        {
+          name: "Chowder",
+          course: "First",
+          servings: 90,
+          notes: null,
+          sortOrder: 1,
+        },
+        {
+          name: "Brisket",
+          course: "Main",
+          servings: 90,
+          notes: "Slice thin",
+          sortOrder: 2,
+        },
+        {
+          name: "Bread",
+          course: null,
+          servings: null,
+          notes: null,
+          sortOrder: null,
+        },
+      ],
+    });
+    const menu = partText(s, "menu");
+    const at = (name: string) => menu.indexOf(name);
+    expect(at("1. Chowder (First) - 90 servings")).toBeGreaterThanOrEqual(0);
+    expect(at("Chowder")).toBeLessThan(at("Brisket"));
+    expect(at("Brisket")).toBeLessThan(at("Apple tart"));
+    expect(at("Apple tart")).toBeLessThan(at("Bread"));
+    expect(menu).toContain("Note: Slice thin");
+    expect(menu).toContain("Bread - no place in the menu order yet");
+  });
+  it("renders a rental/decor pull sheet with per-line return owner from native equipment reservations", () => {
+    const s = blank();
+    s.native = nativeContent({
+      pullSheet: [
+        {
+          description: "Lanterns",
+          quantity: 12,
+          unit: "each",
+          source: "ours",
+          decor: true,
+          vendor: null,
+          returnOwner: "Our crew",
+          returnBy: "2026-10-03 00:00",
+          status: "reserved",
+        },
+        {
+          description: "Farm tables",
+          quantity: 10,
+          unit: "each",
+          source: "vendor",
+          decor: false,
+          vendor: "Party Rents",
+          returnOwner: "Party Rents picks up",
+          returnBy: "2026-10-03 11:00",
+          status: "confirmed",
+        },
+        {
+          description: "Cocktail rounds",
+          quantity: 6,
+          unit: "each",
+          source: "vendor",
+          decor: false,
+          vendor: "Party Rents",
+          returnOwner: null,
+          returnBy: null,
+          status: "requested",
+        },
+      ],
+    });
+    const pull = partText(s, "equipment");
+    expect(
+      buildWorkbook(s).sections.find((x) => x.id === "equipment")!.title,
+    ).toBe("Rental and decor pull sheet");
+    expect(pull).toContain("Our decor");
+    expect(pull).toContain(
+      "[ ] Lanterns - 12 each | back: Our crew by 2026-10-03 00:00",
+    );
+    expect(pull).toContain("From Party Rents");
+    expect(pull).toContain(
+      "Farm tables - 10 each | back: Party Rents picks up by 2026-10-03 11:00",
+    );
+    expect(pull).toContain("Cocktail rounds - 6 each | back: NOT SET");
+    expect(pull).toContain("Nobody is named to bring back: Cocktail rounds");
+  });
+  it("includes route/map/load-in and setup-diagram material in the packet", () => {
+    const s = blank();
+    s.native = nativeContent({
+      route: {
+        venueAddress: "12 Pier Road",
+        mapLink:
+          "https://www.google.com/maps/search/?api=1&query=12%20Pier%20Road",
+        loadIn: ["Freight door on the east side"],
+        runs: [
+          {
+            vehicle: "Ford Transit VAN17",
+            trailer: "Trailer 4",
+            driver: "Dev Crew",
+            loadingZone: "Dock B",
+            notes: null,
+          },
+        ],
+        diagrams: [
+          {
+            name: "Buffet line",
+            instructions: "Two tables along the north wall",
+          },
+          { name: "floor-plan.pdf", instructions: null },
+        ],
+      },
+    });
+    const route = partText(s, "venue");
+    expect(route).toContain("Venue: 12 Pier Road");
+    expect(route).toContain("Map: https://www.google.com/maps/search/");
+    expect(route).toContain("Load-in: Freight door on the east side");
+    expect(route).toContain(
+      "Truck run: Ford Transit VAN17 + Trailer 4 | driver Dev Crew | load at Dock B",
+    );
+    expect(route).toContain(
+      "Setup: Buffet line - Two tables along the north wall",
+    );
+    expect(route).toContain("Setup: floor-plan.pdf");
+    const empty = blank();
+    empty.native = nativeContent();
+    const bare = partText(empty, "venue");
+    expect(bare).toContain("No truck booked for this event yet.");
+    expect(bare).toContain("No setup diagram or layout on this event yet.");
+  });
+  it("prints the derived binder instruction including the bar half-inch binder case", () => {
+    const brief = (
+      serviceStyle: string | null,
+      barService: string | null = null,
+    ) => {
+      const s = blank();
+      s.native = nativeContent({ serviceStyle, barService });
+      return partText(s, "brief");
+    };
+    expect(brief("Full Service")).toContain(
+      "Red binder (cook on site / full service)",
+    );
+    expect(brief("Buffet - Cook Onsite")).toContain("Red binder");
+    expect(brief("Limited Service")).toContain(
+      "Green binder (limited service)",
+    );
+    expect(brief("Drop Off")).toContain("Blue clipboard (drop-off)");
+    expect(brief("Bar Service")).toContain("Blue half-inch binder (bar)");
+    expect(brief("Bar Service", "Full bar")).not.toContain(
+      "add a blue half-inch binder",
+    );
+    expect(brief("Full Service", "Full bar")).toContain(
+      "Bar: add a blue half-inch binder for the bar.",
+    );
+    expect(brief("Full Service", "No")).not.toContain("Bar: add");
+    expect(brief(null)).toContain(
+      "Binder color not known: choose the service style on the event.",
+    );
+    expect(brief("Drop Off")).toContain(
+      "Event 6901 goes on the spine and the cover.",
+    );
+    expect(brief("Drop Off")).toContain("Printing is optional.");
+  });
+});

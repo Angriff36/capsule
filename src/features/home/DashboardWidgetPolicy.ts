@@ -322,7 +322,7 @@ export class DashboardWidgetPolicy {
       ...payments.map((row) => ({
         timestamp: rowTimestamp(row) || number(row.recordedAt),
         label: `${formatMoney(number(row.amount))} payment`,
-        meta: String(row.status ?? "recorded").replaceAll("_", " "),
+        meta: String(row.status ?? "logged").replaceAll("_", " "),
         href: "/finance/payments",
       })),
     ]

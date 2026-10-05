@@ -12,7 +12,6 @@ import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import {
   useEventApprove,
   useEventAssignOwner,
-  useEventChangeHeadcount,
   useEventChangeVenue,
   useEventConfirmSalesLock,
   useEventLockForSales,
@@ -20,7 +19,6 @@ import {
   useEventSubmitForApproval,
   useListClient,
   useListDelivery,
-  useListEvent,
   useListEventNumberAssignment,
   useListEventVehicleAssignment,
   useListInvoice,
@@ -30,6 +28,8 @@ import {
   useListVehicle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
+import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -47,8 +47,12 @@ import "./EventTracker.css";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
 import { FailureBanner } from "./FailureBanner";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
+import { CascadePreviewDialog } from "./CascadePreviewDialog";
 
 const LANE_DAYS = 14;
+const TRACKER_DAYS_BACK = 60;
+const TRACKER_DAYS_AHEAD = 731;
 // Mirrors the Event command guards in src/operations/event.manifest so a card
 // never offers an edit the command would refuse: reschedule / changeVenue /
 // changePrimaryContact / changeRequirements run through sales_lock;
@@ -149,7 +153,18 @@ type StageMove = {
  */
 export function EventTrackerPage() {
   const authStatus = useAuthStatus();
-  const events = useListEvent();
+  const today = startOfDay(Date.now());
+  // Events from 60 days back (so a job still running shows on Today) to two
+  // years ahead, plus undated ones. The window moves once a day.
+  const eventWindow = useMemo(
+    () => ({
+      from: addDays(today, -TRACKER_DAYS_BACK),
+      to: addDays(today, TRACKER_DAYS_AHEAD),
+      withUndated: true,
+    }),
+    [today],
+  );
+  const events = useEventRecordsInRange(eventWindow);
   const clients = useListClient();
   const venues = useListVenue();
   const deliveries = useListDelivery();
@@ -162,7 +177,7 @@ export function EventTrackerPage() {
   const numberAssignments = useListEventNumberAssignment();
 
   const reschedule = useEventReschedule();
-  const changeHeadcount = useEventChangeHeadcount();
+  const applyDemandHeadcount = useApplyDemandHeadcount();
   const changeVenue = useEventChangeVenue();
   const assignOwner = useEventAssignOwner();
   const submitForApproval = useEventSubmitForApproval();
@@ -177,6 +192,12 @@ export function EventTrackerPage() {
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   // Bumped when an inline edit is rejected so the inputs fall back to the saved value.
   const [resetKey, setResetKey] = useState(0);
+  const [headcountPreview, setHeadcountPreview] = useState<{
+    event: CalendarEventFacts;
+    newHeadcount: number;
+  } | null>(null);
+  const [approvePreview, setApprovePreview] =
+    useState<CalendarEventFacts | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
 
   const loading = [
@@ -192,7 +213,6 @@ export function EventTrackerPage() {
   ].some((value) => value === undefined);
   const { loadingTooLong } = useSlowQuery(loading ? undefined : true);
 
-  const today = startOfDay(Date.now());
   const facts = useMemo(
     () =>
       loading
@@ -350,7 +370,7 @@ export function EventTrackerPage() {
         return canLock ? { label: "Lock sales", run: lockForSales } : null;
       case "sales_lock":
         return canLock
-          ? { label: "Confirm lock & start execution", run: confirmSalesLock }
+          ? { label: "Confirm lock & start the event", run: confirmSalesLock }
           : null;
       default:
         return null;
@@ -393,16 +413,7 @@ export function EventTrackerPage() {
       setResetKey((key) => key + 1);
       return;
     }
-    void run(
-      event,
-      () =>
-        changeHeadcount({
-          docId: event.id,
-          version: event.version,
-          newHeadcount: Math.round(value),
-        }),
-      "Guest count saved",
-    );
+    setHeadcountPreview({ event, newHeadcount: Math.round(value) });
   };
 
   const commitDate = (event: CalendarEventFacts, value: string) => {
@@ -797,7 +808,11 @@ export function EventTrackerPage() {
                             type="button"
                             className="btn btn-primary btn-sm ml-auto"
                             disabled={busy}
-                            onClick={() =>
+                            onClick={() => {
+                              if (move.run === approve) {
+                                setApprovePreview(event);
+                                return;
+                              }
                               void run(
                                 event,
                                 () =>
@@ -806,8 +821,8 @@ export function EventTrackerPage() {
                                     version: event.version,
                                   }),
                                 "Stage updated",
-                              )
-                            }
+                              );
+                            }}
                           >
                             {move.label}
                           </button>
@@ -822,6 +837,45 @@ export function EventTrackerPage() {
         })}
       </div>
       {savedToast}
+      {headcountPreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: headcountPreview.event.id,
+            kind: "headcount",
+            newHeadcount: headcountPreview.newHeadcount,
+          }}
+          onClose={() => {
+            setHeadcountPreview(null);
+            setResetKey((key) => key + 1);
+          }}
+          onApply={(expectedFingerprint) =>
+            applyDemandHeadcount({
+              eventId: headcountPreview.event.id,
+              newHeadcount: headcountPreview.newHeadcount,
+              version: headcountPreview.event.version,
+              expectedFingerprint,
+            })
+          }
+        />
+      ) : null}
+      {approvePreview ? (
+        <CascadePreviewDialog
+          eventId={approvePreview.id}
+          action="approve"
+          onClose={() => setApprovePreview(null)}
+          onConfirm={() =>
+            void run(
+              approvePreview,
+              () =>
+                approve({
+                  docId: approvePreview.id,
+                  version: approvePreview.version,
+                }),
+              "Stage updated",
+            )
+          }
+        />
+      ) : null}
     </div>
   );
 }

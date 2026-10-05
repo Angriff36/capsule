@@ -1,5 +1,5 @@
 import { useQuery } from "convex/react";
-import { useCallback, useState, type MouseEvent } from "react";
+import { useCallback, useMemo, useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/api";
 import { relativeDays } from "../../lib/format";
@@ -43,8 +43,16 @@ function saveReadIds(read: ReadonlySet<string>, visibleIds: string[]) {
 export function NotificationTray() {
   // One server query (convex/notifications.ts) instead of twelve whole-table
   // subscriptions: a re-auth or reconnect now costs one call, not twelve.
-  const notifications =
+  const listed =
     useQuery(api.notifications.listNotifications) ?? NO_NOTIFICATIONS;
+  // Managers only (the server returns nothing to anyone else): System health
+  // problems that need someone to act, first in the list.
+  const health =
+    useQuery(api.systemHealthNotices.attention) ?? NO_NOTIFICATIONS;
+  const notifications = useMemo(
+    () => (health.length === 0 ? listed : [...health, ...listed]),
+    [health, listed],
+  );
 
   const [readIds, setReadIds] = useState<ReadonlySet<string>>(loadReadIds);
   const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;

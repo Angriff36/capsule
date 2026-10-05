@@ -509,3 +509,47 @@ describe("packet reconciliation", () => {
     ).toBe(false);
   });
 });
+it("legacy report checks accept equivalent native records so no re-upload is required", async () => {
+  const native = (fieldKey: string): Fact => ({
+    fieldKey,
+    value: "{}",
+    status: "confirmed",
+    authority: "native_finalized",
+    confidence: 1,
+    evidence: [],
+  });
+  const reportKeys = [
+    "check.report.packlist_item_type",
+    "check.report.packlist_category",
+    "check.report.nowsta_event_timesheet",
+  ];
+  const status = (s: EventPacketSnapshot) =>
+    reportKeys.map((k) => s.issues.find((i) => i.key === k)!.status);
+  // No pack list or crew in Capsule: the old upload checks stay open.
+  expect(status(await reconcile(blank(), []))).toEqual([
+    "open",
+    "open",
+    "open",
+  ]);
+  // Capsule's own pack lines and crew answer them; nothing is uploaded.
+  const withNative = await reconcile(blank(), [
+    native("packlist.native-item-1"),
+    native("crew.native-1"),
+  ]);
+  expect(status(withNative)).toEqual(["resolved", "resolved", "resolved"]);
+  expect(withNative.artifacts).toEqual([]);
+  expect(withNative.resolutions).toEqual([]);
+  for (const k of reportKeys)
+    expect(withNative.issues.find((i) => i.key === k)!.message).toContain(
+      "no upload needed",
+    );
+  // A pack list alone answers only the pack reports.
+  const packOnly = await reconcile(blank(), [native("packlist.native-item-1")]);
+  expect(status(packOnly)).toEqual(["resolved", "resolved", "open"]);
+  // A candidate source row is not Capsule's own record.
+  const sourceOnly = await reconcile(blank(), [
+    { ...native("packlist.native-item-1"), authority: "source_agreement" },
+  ]);
+  expect(status(sourceOnly)[0]).toBe("open");
+  validateSnapshot(withNative);
+});

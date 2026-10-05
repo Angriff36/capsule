@@ -82,6 +82,8 @@ export type EventDayInputs = {
   layoutSections: readonly EventDayLayoutSection[];
   equipmentReservations: readonly EventDayEquipmentReservation[];
   clientContacts: readonly EventDayClientContact[];
+  /** "withheld": day-of numbers are not shared with this viewer. */
+  contactAccess?: "full" | "withheld";
   packLists: readonly EventDayPackList[];
   packListItems: readonly EventDayPackListItem[];
 };
@@ -315,6 +317,9 @@ export function deriveSections(inputs: EventDayInputs): EventDaySection[] {
   ].filter((value) => String(value ?? "").trim().length > 0);
   if (!named && contactRows.length === 0) {
     out.push(section("contacts", emptyStatus("contacts", rank), "No contacts"));
+  } else if (phones.length === 0 && inputs.contactAccess === "withheld") {
+    // Numbers exist for event staff and this event's crew; not a gap.
+    out.push(section("contacts", "ready", "Numbers with event staff"));
   } else if (phones.length === 0) {
     out.push(section("contacts", "review", "No day-of phone"));
   } else {

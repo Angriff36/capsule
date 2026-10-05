@@ -2,9 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
-  useListDish,
-  useListEvent,
-  useListEventDish,
   useListPerson,
   useListInvoice,
   useListPrepTask,
@@ -21,6 +18,9 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
+import { useEventsInRange } from "../facilities/useEventsById";
+import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
@@ -71,12 +71,10 @@ import "./command-deck/KitchenCommandDeck.css";
 import "./command-deck/KitchenCommandDeckSurfaces.css";
 import { useEventMenuSync } from "./useEventMenuSync";
 import { EventPrepWorkNotice } from "../events/EventPrepWorkNotice";
+import { prepTimeLabel } from "./prepTiming";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
-  const events = useListEvent();
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
   const components = useListComponent();
   const tasks = useListPrepTask();
   const invoices = useListInvoice();
@@ -116,10 +114,36 @@ export function KitchenDashboardPage() {
     [horizonOffset],
   );
 
+  // Only the events starting inside the 7-day window are read (and only their
+  // id, title and start time are used here).
+  const events = useEventsInRange({
+    from: horizon.start().getTime(),
+    to: horizon.end().getTime(),
+  });
+  // Menu lines of those events only, never every event's (PL-SCALE).
+  const eventDishes = useMenuLinesForEvents(
+    useMemo(() => events?.map((event) => event._id), [events]),
+  );
+  // Only the dishes those events' menu lines and prep tasks name.
+  const dishes = useDishesByIds(
+    useMemo(() => {
+      if (events === undefined || eventDishes === undefined || !tasks)
+        return undefined;
+      const inWindow = new Set(events.map((event) => String(event._id)));
+      return [
+        ...eventDishes.map((row) => row.dishId),
+        ...tasks
+          .filter((task) => inWindow.has(String(task.eventId)))
+          .map((task) => task.dishId),
+      ];
+    }, [eventDishes, events, tasks]),
+  );
+
   const model = useMemo(
     () =>
       new KitchenCommandDeckModel(
-        events ?? [],
+        // Every row in the window has a start time.
+        (events ?? []) as EventLike[],
         eventDishes ?? [],
         dishes ?? [],
         tasks ?? [],
@@ -356,7 +380,7 @@ export function KitchenDashboardPage() {
     if (status === "completed")
       return "This step is done. Its amount is what the yield was measured against.";
     if (status === "cancelled") return "This step was cancelled.";
-    return "This step cannot be re-measured.";
+    return "This step can't be measured again.";
   };
 
   /** Change a step's quantity or unit in place, through PrepTask.revise. */
@@ -1060,10 +1084,11 @@ export function KitchenDashboardPage() {
         <div className="font-display text-2xl leading-tight text-ink">
           {sentenceCase(row.task.name)}
         </div>
-        {/* The service time IS the deadline: prepTasks.dueAt is null on every
-            row, so a "Due" field here would be invented. State it once. */}
+        {/* The event's service time is context, not the prep deadline: a task
+            with no prep time says so instead of borrowing the event start. */}
         <div className="mt-1 text-base text-ink-2">
-          {String(row.event.title)} · service {dueLabel(row.event.startsAt)}
+          {String(row.event.title)} · service {dueLabel(row.event.startsAt)} ·{" "}
+          {prepTimeLabel((row.task as { dueAt?: number | null }).dueAt)}
         </div>
         <div className="mt-2 text-base text-ink-2">
           {row.task.quantity != null
@@ -1134,7 +1159,7 @@ export function KitchenDashboardPage() {
           </label>
           <select
             id="kcd-m-service"
-            className="input h-11 min-w-0 flex-1"
+            className="input order-last h-11 min-w-0 basis-full"
             value={selectedEventId}
             onChange={(e) => pickEvent(e.target.value)}
           >

@@ -14,6 +14,9 @@ import { eventWorkbookReviewPath } from "../events/eventRoutes";
 import { compareActivities } from "../events/EventTimelinePanel";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
+import { loadWindowLabel } from "../facilities/venueOperatingFacts";
+import { vibeGuide } from "../facilities/venueSellingProfile";
+import { binColorSummary, binRows, parseBinSheet } from "../logistics/packBins";
 import {
   allergenLabel,
   deriveDishAllergens,
@@ -78,6 +81,7 @@ export type EventDayDetailData = EventDayInputs &
     | "dishIngredients"
     | "dishComponents"
     | "componentIngredients"
+    | "components"
     | "people"
     | "vehicles"
     | "equipments"
@@ -172,13 +176,28 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
         venue.hasFreightElevator ? "Freight elevator" : null,
         venue.hasStairs ? "Stairs" : null,
         venue.storageAvailable ? "Storage" : null,
+        venue.hasOven ? "Oven" : null,
+        venue.hasRefrigeration ? "Fridge" : null,
       ].filter(Boolean)
     : [];
+  // A confirmed "no" changes what the crew brings, so say it out loud.
+  const missing = venue
+    ? [
+        venue.hasOven === false ? "no oven" : null,
+        venue.hasRefrigeration === false ? "no fridge" : null,
+      ].filter(Boolean)
+    : [];
+  const loadWindow = venue ? loadWindowLabel(venue) : null;
+  // The venue's look sets how the food is presented here (playbook 09).
+  const guide = vibeGuide(venue?.vibe);
+  const foodLook = guide
+    ? `${guide.label}. ${guide.presentation}. Serve: ${guide.serveStyle}.`
+    : null;
   return (
     <div>
       <Row
         title={String(name)}
-        sub={venue?.capacity != null ? `Capacity ${venue.capacity}` : undefined}
+        sub={venue?.capacity ? `Capacity ${venue.capacity}` : undefined}
       />
       {address ? <p className="evd-note">{address}</p> : null}
       {traits.length > 0 ? (
@@ -187,10 +206,20 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
           <p className="evd-note">{traits.join(" · ")}</p>
         </>
       ) : null}
+      {missing.length > 0 ? (
+        <Note
+          label="Bring your own"
+          text={`Venue has ${missing.join(" and ")}`}
+        />
+      ) : null}
+      <Note label="Load-in window" text={loadWindow} />
       <Note label="Load-in" text={venue?.loadInInstructions} />
       <Note label="Access" text={venue?.accessNotes} />
       <Note label="Catering notes" text={venue?.cateringNotes} />
       <Note label="Restrictions" text={venue?.restrictions} />
+      <Note label="Food look here" text={foodLook} />
+      <Note label="Show off" text={venue?.topFeature} />
+      <Note label="Photograph" text={venue?.photoFocus} />
       {venue?.contactName || venue?.contactPhone ? (
         <>
           <p className="evd-kicker">Venue contact</p>
@@ -315,7 +344,7 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
       {report != null && report.unflaggedCount > 0
         ? "Allergens unverified — ingredient flags not set"
         : report != null && report.unresolvedCount > 0
-          ? "Allergens unverified — recipe lines did not resolve"
+          ? "Allergens unverified — some recipe ingredients couldn't be found"
           : "No recipe visible — allergens unverified"}
     </span>
   );
@@ -336,6 +365,7 @@ export function MenuSheet({ data }: { data: EventDayDetailData }) {
     dishComponents: data.dishComponents,
     componentIngredients: data.componentIngredients,
     ingredients: [],
+    components: data.components ?? [],
   };
   const reportByDish = new Map<string, DishAllergenReport>();
   for (const row of rows) {
@@ -488,6 +518,11 @@ export function ContactsSheet({ data }: { data: EventDayDetailData }) {
     return <Empty>No contacts on file.</Empty>;
   return (
     <div>
+      {data.contactAccess === "withheld" ? (
+        <p className="evd-kicker">
+          Phone numbers are shared with event staff and this event's crew.
+        </p>
+      ) : null}
       {named ? (
         <>
           <p className="evd-kicker">Event contact</p>
@@ -553,6 +588,19 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
               {String(list.name ?? "Pack list")} ·{" "}
               {formatStatusLabel(String(list.status))}
             </p>
+            {binColorSummary(
+              binRows(
+                items.map((row) => ({
+                  description: String(row.description ?? ""),
+                  binNumber: row.binNumber,
+                })),
+                parseBinSheet(list.binSheet),
+              ),
+            ).map((line) => (
+              <p key={line} className="evd-kicker">
+                {line}
+              </p>
+            ))}
             {items.length === 0 ? (
               <Empty>No items listed.</Empty>
             ) : (
@@ -563,9 +611,14 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
                   <Row
                     key={row._id}
                     title={String(row.description ?? "Item")}
-                    sub={[row.requiredQuantity, row.unit]
-                      .filter((part) => part != null && part !== "")
-                      .join(" ")}
+                    sub={[
+                      [row.requiredQuantity, row.unit]
+                        .filter((part) => part != null && part !== "")
+                        .join(" "),
+                      row.binNumber ? `Bin ${row.binNumber}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                     flag={missing ? "Missing" : packed ? "Packed" : undefined}
                     flagClass={missing ? "evd-missing" : "evd-tone-ok"}
                   />

@@ -18,14 +18,24 @@ vi.mock("convex/react", () => ({
 vi.mock("../src/lib/manifest-convex-react", () => ({
   useAttachmentRemove: () => hooks.removeAttachment,
   useCreateAttachment: () => vi.fn(),
+  // Each attachment row now carries the share-link actions (PL-DECK-SHARING).
+  useListDeckShareLink: () => [],
+  useDeckShareLinkCreate: () => vi.fn(),
+  useDeckShareLinkRevoke: () => vi.fn(),
   useGetRevenueAttribution: () => hooks.attribution,
   useGetEvent: () => hooks.event,
+  useListEvent: () => (hooks.event ? [hooks.event] : []),
   useListVenue: () => [],
   useListPerson: () => [],
   useListReferralSource: () => [],
   useListClient: () => [],
   useRevenueAttributionCreate: () => vi.fn(),
   useRevenueAttributionApply: () => vi.fn(),
+  useRevenueAttributionChangeSplit: () => vi.fn(),
+  useRevenueAttributionAllowOverRevenue: () => vi.fn(),
+  useRevenueAttributionApprove: () => vi.fn(),
+  useRevenueAttributionReject: () => vi.fn(),
+  useRevenueAttributionRequestApproval: () => vi.fn(),
   useRevenueAttributionUpdate: () => vi.fn(),
 }));
 
@@ -58,6 +68,7 @@ describe("task 6 mounted interactions", () => {
         fileName: "menu.pdf",
         fileSize: 10,
         uploadedAt: 1,
+        uploadedByName: "Jane Cook",
         url: null,
       },
     ];
@@ -75,6 +86,8 @@ describe("task 6 mounted interactions", () => {
         }),
       ),
     );
+    // Who uploaded the file shows by name (#125).
+    expect(container.textContent).toContain("by Jane Cook");
     const button = [...container.querySelectorAll("button")].find(
       (node) => node.textContent === "Remove",
     )!;

@@ -11,6 +11,8 @@
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import {
+  eventCancellationObligations,
+  type CancellationObligation,
   standDownEventAssignments,
   standDownEventEquipmentReservations,
   standDownEventLogisticsAndBilling,
@@ -74,7 +76,13 @@ export class EventCancellationReconciliation {
     if (prior) return;
     const counts = await this.countWork(ctx, event);
     await this.standDown(ctx, eventId, event.tenantId, trigger, reason);
-    await this.recordReceipt(ctx, event, eventId, trigger, keys, counts);
+    // AC-137: what the cancel could not and must not undo stays on the receipt.
+    const obligations = await eventCancellationObligations(
+      ctx,
+      event.tenantId,
+      eventId,
+    );
+    await this.recordReceipt(ctx, event, eventId, trigger, keys, counts, obligations);
   }
 
   /** The cancelled event with its window makes the input shape; replaying the
@@ -170,7 +178,11 @@ export class EventCancellationReconciliation {
     trigger: CancellationReconcileTrigger,
     keys: ReconcileKeys,
     counts: ReconcileCounts,
+    obligations: CancellationObligation[],
   ): Promise<void> {
+    const unresolved = new Map<string, string[]>();
+    for (const row of obligations)
+      unresolved.set(row.code, [...(unresolved.get(row.code) ?? []), row.recordId]);
     await eventReconciliationReceipt.persist(
       ctx,
       event.tenantId,
@@ -186,8 +198,11 @@ export class EventCancellationReconciliation {
         updatedCount: counts.updatedCount,
         retiredCount: 0,
         preservedCount: counts.preservedCount,
-        exceptionCount: 0,
-        unresolved: [],
+        exceptionCount: obligations.length,
+        unresolved: [...unresolved].map(([code, recordIds]) => ({
+          code,
+          recordIds,
+        })),
         checkpoint: { state: "complete", key: keys.operationKey },
       } satisfies ReconciliationReceiptOutput,
     );

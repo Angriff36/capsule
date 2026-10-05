@@ -134,4 +134,48 @@ describe("EventStockReservationCoordinator", () => {
       },
     ]);
   });
+
+  it("never converts units: stock held in another unit is not a candidate and the shortage stays in the demand unit", async () => {
+    // Units are opaque labels (issue #150) — nothing converts between them.
+    // An ingredient stocked in liters cannot silently cover a kilogram need;
+    // the shortage is reported in the demand's base unit.
+    const coordinator = new EventStockReservationCoordinator({
+      createReservation: async () => {
+        throw new Error("another-unit stock must never be reserved");
+      },
+    });
+    const result = await coordinator.allocate({
+      eventId: "event-1",
+      demands: [
+        {
+          id: "demand-oil",
+          eventId: "event-1",
+          ingredientId: "ingredient-oil",
+          requiredQuantity: 4,
+          unit: "kilogram",
+          status: "confirmed",
+        },
+      ],
+      items: [
+        {
+          id: "item-oil",
+          ingredientId: "ingredient-oil",
+          quantityOnHand: 10,
+          unit: "liter",
+          stockedAt: 1,
+        },
+      ],
+      reservations: [],
+    });
+    expect(result.created).toEqual([]);
+    expect(result.shortages).toEqual([
+      {
+        ingredientId: "ingredient-oil",
+        unit: "kilogram",
+        requiredQuantity: 4,
+        reservedQuantity: 0,
+        shortageQuantity: 4,
+      },
+    ]);
+  });
 });

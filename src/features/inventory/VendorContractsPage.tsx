@@ -21,6 +21,7 @@ import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { useVendorContractEdits } from "./VendorContractEdits";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const EXPIRY_ALERT_DAYS = 30;
@@ -205,14 +206,16 @@ export function VendorContractsPage() {
           <div className="supply-form-grid">
             <label className="field-label supply-span-2">
               Vendor
-              <select name="vendorId" className="input" required>
-                <option value="">Select vendor</option>
-                {activeVendors.map((vendor) => (
-                  <option key={vendor._id} value={vendor._id}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
+              <SearchSelect
+                name="vendorId"
+                required
+                recentsKey="vendor"
+                placeholder="Search vendors…"
+                options={activeVendors.map((vendor) => ({
+                  id: vendor._id,
+                  label: vendor.name,
+                }))}
+              />
             </label>
             <label className="field-label supply-span-2">
               Title

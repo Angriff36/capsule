@@ -1,0 +1,36 @@
+{
+  "acceptance": "AC-359",
+  "at": "2026-10-03",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "browserRun": "scripts/loop-browser-check.mjs .artifacts/browser-checks/slice-journeys.mjs, signed in, 360x740 and 1280x800, 17 steps per size all PASS",
+  "base": "UX-01, catering operations app, 360px phone width. Audience: catering owners, sales and kitchen leads. This screen was taken right after an action: either a save that was then reloaded, or an action the app refused. PASS when the result is plain on screen: a saved value is visible, or a refusal says what is wrong in plain words and the user can see how to fix it. FAIL only on: no visible result, a refusal with no reason, raw codes or jargon, or clipped/overlapping text that hides the message.",
+  "slices": {
+    "0 event spine": {
+      "journey": "Edit event > Headcount > Save, reload: new guest count shows - PASS",
+      "failure": "End before start > Save schedule: 'Check the entered details - Event end must be after its start' - PASS"
+    },
+    "1 proposal": {
+      "journey": "New proposal > client + title > Draft proposal, reload: listed - PASS",
+      "failure": "Empty pricing line: 'Every pricing line needs a description. Fill that in, then try again.' - PASS"
+    },
+    "2 import": {
+      "journey": "New import > Start Import, reload: run listed - PASS",
+      "failure": "Menu CSV without a Name column: 'CSV is missing a \"Name\" column.' - PASS"
+    },
+    "3 venue": {
+      "journey": "Update Capacity, reload: 'Capacity: N' - PASS",
+      "failure": "Time zone Foo/Bar: '\"Foo/Bar\" is not a time zone. Use a name like America/New_York...' - PASS"
+    },
+    "4 operations (stock count)": {
+      "journey": "Start stock count > named > Freeze & begin, reload: listed - PASS",
+      "failure": "Blank name: 'Give this count session a name.' - PASS; with no storage location the page now says to add one (fixed in this batch)"
+    },
+    "5 integrations": {
+      "journey": "Outbound webhook > Register endpoint, reload: listed; Remove works on a phone - PASS",
+      "failure": "No event ticked: 'Webhook not saved - Select at least one event to subscribe to.' - PASS; outside services show 'Not connected'"
+    }
+  },
+  "judge": "PASS x12 on the phone screens of the run above",
+  "earlierRound": "First judge pass FAILED the webhook screen (saved endpoint below the first screen); the check now scrolls to it. The same run found the webhook section wider than a phone with Remove off screen - fixed in this batch."
+}

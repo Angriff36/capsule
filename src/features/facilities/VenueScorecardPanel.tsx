@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useListEvent } from "../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "./useEventsById";
 import { Section } from "../../ui/primitives";
 
 // Venue scorecard metrics — spec §8.1 ("…and scorecard metrics").
@@ -62,7 +62,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 export function VenueScorecardPanel({ venueId }: { venueId: string }) {
-  const events = useListEvent();
+  const events = useAllEventReportRows();
 
   const metrics = useMemo<VenueMetrics | null>(() => {
     if (events === undefined) return null;
@@ -130,8 +130,8 @@ export function VenueScorecardPanel({ venueId }: { venueId: string }) {
           <p className="text-sm text-ink-3">Loading event history…</p>
         ) : metrics.totalEvents === 0 ? (
           <p className="text-sm text-ink-3">
-            No events have been booked at this venue yet. Metrics appear once
-            events reference it.
+            No events have been booked at this venue yet. Numbers show up once
+            an event is booked here.
           </p>
         ) : (
           <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm sm:grid-cols-2 sm:gap-x-8">

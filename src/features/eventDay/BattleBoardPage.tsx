@@ -106,6 +106,7 @@ function buildBoard(briefing: EventDayBriefing) {
     dishComponents: briefing.dishComponents,
     componentIngredients: briefing.componentIngredients,
     ingredients: [],
+    components: briefing.components ?? [],
   };
   const reports = new Map<string, DishAllergenReport>();
   for (const row of menuRows) {

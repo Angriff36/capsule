@@ -27,8 +27,7 @@ bun install --frozen-lockfile
 cp .env.example .env.local
 # Fill VITE_CONVEX_URL and VITE_CLERK_PUBLISHABLE_KEY — see docs/operations/local-dev.md
 
-bun run dev:convex   # terminal 1
-bun run dev          # terminal 2 → http://localhost:7811
+bun run dev          # Convex backend + Vite frontend → http://localhost:7811
 ```
 
 ## Self-contained build tooling

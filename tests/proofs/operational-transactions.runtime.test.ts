@@ -230,7 +230,7 @@ describe("operational transactions", () => {
           operationKey: "stock-failure",
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     expect(
       await seeded.owner.run((ctx) =>
         ctx.db.get(seeded.reservationId as never),

@@ -33,15 +33,14 @@ const DISCONNECTED: ConnectionView = {
 };
 
 function chipColor(view: ConnectionView): string {
-  if (view.status === "error")
-    return "border-danger/40 bg-danger/10 text-danger";
+  if (view.status === "error") return "chip-tone-danger";
   if (view.status === "connected" && view.chargesEnabled) {
-    return "border-ok/40 bg-ok/10 text-ok";
+    return "chip-tone-ok";
   }
   if (view.status === "connected" || view.status === "pending") {
-    return "border-warn/40 bg-warn/10 text-warn";
+    return "chip-tone-warn";
   }
-  return "border-line-2 bg-inset text-ink-2";
+  return "chip-tone-mute";
 }
 
 function chipLabel(view: ConnectionView): string {

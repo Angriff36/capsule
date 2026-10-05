@@ -83,3 +83,33 @@
 - Separate pending PL-BOOKING/AC-411 finding, filed as issue https://github.com/Angriff36/capsule/issues/392, still open with no UI edits this increment: `EventCreatePage.tsx` submit's generic `useCreateEvent` fallback permits proposal-derived unlinked events when the proposal is missing/loading/nonaccepted/already linked.
 - Preview http://127.0.0.1:7813 has source-map identity C:/Projects/capsule; served main.tsx points at local Convex 3210 (frontend PID 45384, backend PID 55244, storage C:/projects/capsule/.convex/local/default, parent dev CLI belongs to this checkout). `authStatus:getAuthStatus` answered (anonymous only). No authenticated UI or production claim. `.ralph.env` already correct.
 - Increment outcome (final state): the manifest guard now lets draft or accepted proposals stage/link, a draft link emits a null menu-cascade key (no unaccepted menu copy), and the new internal `linkConvertedQuoteProposal` reconciles the canonical link before completion — checkpoint recovery before create, same-event no-op, conflicting ids and deleted-Event refusals with ids preserved. Evidence chain: `red.log` RED (6 green/1 red), `207-validate-recovered-event.log` deleted-Event RED→corrected, `focused-final.log` 5 files/39, `test.log` 197/918, `check-final.log` full check exit 0, `review.log` VERDICT: APPROVE (gpt-5.6-sol). AC-412/AC-433 PASS; AC-006 (J), AC-411 (UI), AC-436 (concurrency) and all other old PENDING stay PENDING; lifecycle meaning unresolved. Receipt: codex-plans/whole-spec-audit-2026-09-20/quote-retry-evidence-2026-09-21.md.
+
+# Findings and decisions
+
+## Requirements
+- Restore filters, sort, pagination, and scroll after list-to-detail navigation.
+- Provide safe browser-back and visible return-link behavior for the listed routes.
+- Verify with a temporary Playwright test and leave evidence under `.artifacts/`.
+
+## Research findings
+- The worktree has an incomplete prior implementation in `src/features/list-state/`, Events, Kitchen, shell, saved views, and virtual scrolling.
+- The shell has one persistent `<main>` scroller; current restoration saves during passive cleanup and observes the scroller rather than its changing workspace content.
+- Existing Events and Kitchen list state is query-backed but schemas are recreated on every render, and saved views use `location.search.length` instead of recognized-list-state detection.
+- Existing list/detail links outside Events and Kitchen are direct links with no origin state, so route coverage needs focused integration rather than a global route interception.
+- Round-3 remediation must preserve all prior in-progress feature changes while replacing incomplete free-function state/scroll behavior with the requested focused manager structure.
+- Repository-design rules require this authored UI work to retain the established visual language; no visual redesign is needed for URL and navigation behavior.
+
+## Technical decisions
+| Decision | Rationale |
+|---|---|
+| Inspect existing patterns before broad edits | Route and detail-page coverage must match the application’s actual paths and links. |
+| Use `ReturnToListLink` for visible list returns | It retains normal anchor behavior for modified clicks and only consumes browser Back when the stored predecessor is exact. |
+
+## Issues encountered
+| Issue | Resolution |
+|---|---|
+| | |
+
+## Sticky header findings
+- Existing sticky header implementation needs repair, not replacement.
+- The application scroll container is `.app-canvas`; observers must use it as root.

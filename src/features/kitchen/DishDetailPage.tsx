@@ -1,29 +1,51 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDish,
+  useDishClearFinishTiming,
+  useDishDetachVersion,
+  useDishLabelVersion,
   useDishLinkAsEdition,
+  useDishMakeVersionOf,
   useDishMergeInto,
   useDishPurge,
   useDishReinstate,
+  useDishSetFinishTiming,
   useGetDish,
-  useListDish,
-  useListEvent,
-  useListEventDish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
+import { deriveDishAllergens } from "./dishAllergens";
+import { useEventsById } from "../facilities/useEventsById";
+import { useMenuLinesForDish } from "../facilities/useMenuLinesFor";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useUndoToast } from "../../ui/useUndoToast";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
+import { CulinaryRecordPicker } from "./CulinaryRecordPicker";
+import {
+  FINISH_TIMINGS,
+  VERSION_NAME_SUGGESTIONS,
+  mainDishIdOf,
+  mainDishRows,
+  recipeDishIdOf,
+  versionTabLabel,
+  versionTabs,
+} from "./dishVersions";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishContainersPanel } from "./DishContainersPanel";
 import { DishDetailsEditor } from "./DishDetailsEditor";
+import { DishExclusiveVenueField } from "./DishExclusiveVenueField";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
+import { DishVersionRecipeSwitch } from "./DishVersionRecipeSwitch";
+import { StylePackagingPanel } from "./StylePackagingPanel";
 import { DishComponentsPanel } from "./DishComponentsPanel";
 import { DishComponentPortionSpecPanel } from "./DishComponentPortionSpecPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
@@ -33,6 +55,7 @@ import { RecipeNotes } from "./RecipeNotes";
 import "./DishRecipe.css";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { dishPath, kitchenCatalogPath, componentPath } from "./kitchenRoutes";
 
 const policy = new CulinaryLifecyclePolicy();
@@ -41,21 +64,47 @@ export function DishDetailPage() {
   const { id } = useParams();
   const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
-  const allDishes = useListDish();
-  const events = useListEvent();
-  const eventDishes = useListEventDish();
+  const allDishes = useWholeDishList();
+  const eventDishes = useMenuLinesForDish(dish?._id);
+  const events = useEventsById(
+    dish === undefined || eventDishes === undefined
+      ? undefined
+      : eventDishes
+          .filter((entry) => entry.dishId === dish?._id)
+          .map((entry) => entry.eventId),
+  );
   const purge = useDishPurge();
   const reinstate = useDishReinstate();
   const createDish = useCreateDish();
   const linkAsEdition = useDishLinkAsEdition();
   const mergeInto = useDishMergeInto();
+  const makeVersionOf = useDishMakeVersionOf();
+  const labelVersion = useDishLabelVersion();
+  const detachVersion = useDishDetachVersion();
+  const setFinishTiming = useDishSetFinishTiming();
+  const clearFinishTiming = useDishClearFinishTiming();
+  const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notifyUndo, host: undoHost } = useUndoToast();
   const { prompt, host } = useActionPrompt();
+  const { loadingTooLong } = useSlowQuery(dish);
+  // The recipe behind the dish, for allergens from its ingredients and recipes.
+  const recipeRows = useMenuRecipeRows(
+    dish ? [recipeDishIdOf(dish)] : undefined,
+  );
 
   if (!id) return <ErrorState title="Dish not found" />;
   if (dish === undefined) {
+    if (loadingTooLong) {
+      return (
+        <QueryLoadState
+          title="This dish isn't loading"
+          detail="We couldn't load this dish. Check your connection, then refresh the page."
+          loadingTooLong
+        />
+      );
+    }
     return (
       <div className="culinary-document culinary-document-compact space-y-4">
         <Skeleton className="h-6 w-32" />
@@ -101,14 +150,104 @@ export function DishDetailPage() {
     }
   };
 
+  // Versions: the main dish and its versions show as tabs on every one of them.
+  const tabs = allDishes ? versionTabs(allDishes, dish) : [];
+  const mainId = allDishes
+    ? mainDishIdOf(allDishes, dish)
+    : (dish.versionOfDishId ?? dish._id);
+  const main = tabs[0] ?? dish;
+  const isVersion = mainId !== dish._id;
+  const hasVersions = tabs.length > 1;
+  // A version may cook from the main dish's recipe; its panels then show
+  // the main dish's lines, read only. Portion, containers and notes stay its own.
+  const recipeId = recipeDishIdOf(dish);
+  const sharingRecipe = recipeId !== dish._id;
+
+  const askVersionName = async (title: string, defaultValue = "") =>
+    (
+      await prompt.askFields({
+        title,
+        description:
+          "A version is a tab on the dish: the same food made another way. Name the tab, for example Mini, Vegan or Finish at Event.",
+        fields: [
+          {
+            name: "label",
+            label: "Tab name",
+            defaultValue,
+            suggestions: VERSION_NAME_SUGGESTIONS,
+            required: true,
+          },
+        ],
+        confirmLabel: "Save",
+      })
+    )?.label?.trim() ?? "";
+
+  const addVersion = () =>
+    void (async () => {
+      const label = await askVersionName(`Add a version of ${main.name}`);
+      if (!label) return;
+      await run("addVersion", async () => {
+        const created = (await createDish({
+          name: `${main.name} - ${label}`,
+          portionSize: main.portionSize,
+          portionUnit: main.portionUnit,
+          description: main.description ?? undefined,
+          category: main.category ?? undefined,
+          course: main.course ?? undefined,
+          serviceStyle: main.serviceStyle ?? undefined,
+          dietaryTags: main.dietaryTags,
+          allergenSummary: main.allergenSummary,
+        })) as string | { docId: string } | undefined;
+        const createdId =
+          typeof created === "string" ? created : created?.docId;
+        if (!createdId) return;
+        await makeVersionOf({ docId: createdId, mainDishId: mainId, label });
+        navigate(dishPath(createdId));
+      });
+    })();
+
+  const renameTab = () =>
+    void (async () => {
+      const label = await askVersionName(
+        "Rename this tab",
+        dish.versionLabel ?? "",
+      );
+      if (!label) return;
+      await run("renameTab", async () => {
+        await labelVersion({ docId: dish._id, version: dish.version, label });
+      });
+    })();
+
+  const makeOwnDish = () =>
+    void run("detachVersion", async () => {
+      await detachVersion({ docId: dish._id, version: dish.version });
+    });
+
+  const joinMainDish = (mainDishId: string) =>
+    void (async () => {
+      const label = await askVersionName(
+        "Make this a version",
+        dish.versionLabel ?? "",
+      );
+      if (!label) return;
+      await run("makeVersionOf", async () => {
+        await makeVersionOf({
+          docId: dish._id,
+          version: dish.version,
+          mainDishId,
+          label,
+        });
+      });
+    })();
+
   return (
     <article className="culinary-document culinary-document-compact dish-recipe">
-      <Link
-        to={kitchenCatalogPath("dishes")}
+      <ReturnToListLink
+        fallback={kitchenCatalogPath("dishes")}
         className="culinary-studio-back relative z-[2]"
       >
         ← Dishes
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {failure ? (
         <div className="mt-4">
@@ -165,7 +304,7 @@ export function DishDetailPage() {
               {dish.portionSize} {String(dish.portionUnit)}
             </dd>
           </div>
-          <DishPlateCostFact dishId={dish._id} />
+          <DishPlateCostFact dishId={recipeId} />
           <div>
             <dt>Category</dt>
             <dd>{dish.category || "—"}</dd>
@@ -181,7 +320,13 @@ export function DishDetailPage() {
           <div>
             <dt>Allergens</dt>
             <dd>
-              <AllergenIconRow codes={dish.allergenSummary} />
+              <AllergenIconRow
+                codes={
+                  recipeRows
+                    ? deriveDishAllergens(dish, recipeRows).codes
+                    : dish.allergenSummary
+                }
+              />
             </dd>
           </div>
           <div>
@@ -194,6 +339,115 @@ export function DishDetailPage() {
           </div>
         </dl>
       </header>
+
+      <section className="dish-versions" aria-label="Versions">
+        {hasVersions ? (
+          <nav className="dish-version-tabs" role="tablist">
+            {tabs.map((tab) => (
+              <Link
+                key={tab._id}
+                to={dishPath(tab._id)}
+                role="tab"
+                aria-selected={tab._id === dish._id}
+                className={tab._id === dish._id ? "is-active" : undefined}
+              >
+                {versionTabLabel(tab)}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
+        <label className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-2">
+          {hasVersions ? "This tab is finished" : "Finished"}
+          <select
+            className="input w-auto"
+            value={dish.finishTiming ?? ""}
+            disabled={busy != null}
+            onChange={(event) => {
+              const timing = event.target.value;
+              void run("finishTiming", async () => {
+                if (timing)
+                  await setFinishTiming({
+                    docId: dish._id,
+                    version: dish.version,
+                    timing,
+                  });
+                else
+                  await clearFinishTiming({
+                    docId: dish._id,
+                    version: dish.version,
+                  });
+              });
+            }}
+          >
+            <option value="">Not set</option>
+            {FINISH_TIMINGS.map((entry) => (
+              <option key={entry.value} value={entry.value}>
+                {entry.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <DishExclusiveVenueField dish={dish} onFailure={setFailure} />
+        <details className="recipe-management">
+          <summary>Versions</summary>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={busy != null || allDishes === undefined}
+              onClick={addVersion}
+            >
+              {busy === "addVersion" ? "Working…" : "Add a version"}
+            </button>
+            {hasVersions ? (
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={busy != null}
+                onClick={renameTab}
+              >
+                Rename this tab
+              </button>
+            ) : null}
+            {isVersion ? (
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={busy != null}
+                onClick={makeOwnDish}
+              >
+                {busy === "detachVersion" ? "Working…" : "Make it its own dish"}
+              </button>
+            ) : null}
+          </div>
+          {!isVersion && !hasVersions && allDishes ? (
+            <div className="mt-3">
+              <p className="mb-2 text-sm text-ink-2">
+                Make this a version of another dish:
+              </p>
+              <CulinaryRecordPicker
+                kind="dish"
+                label="Search main dishes"
+                records={mainDishRows(allDishes)
+                  .filter((row) => row._id !== dish._id)
+                  .map((row) => ({
+                    _id: row._id,
+                    name: row.name,
+                    description: row.description,
+                    allergenSummary: row.allergenSummary,
+                    primaryImageStorageId: row.primaryImageStorageId,
+                    editionNumber: row.editionNumber,
+                    deletedAt: row.deletedAt,
+                    status: String(row.status),
+                    mergedIntoDishId: row.mergedIntoDishId,
+                    canonicalDishId: row.canonicalDishId,
+                  }))}
+                onSelect={joinMainDish}
+              />
+            </div>
+          ) : null}
+        </details>
+      </section>
 
       {dish.description ? (
         <p className="culinary-lead">{dish.description}</p>
@@ -264,15 +518,37 @@ export function DishDetailPage() {
         </section>
       ) : null}
 
-      <DishIngredientsPanel dishId={dish._id} />
+      {isVersion ? (
+        <DishVersionRecipeSwitch
+          dishId={dish._id}
+          dishVersion={dish.version}
+          mainDishId={mainId}
+          mainName={main.name}
+          sharing={sharingRecipe}
+          onFailure={setFailure}
+        />
+      ) : null}
 
-      <DishPrepTasksPanel dishId={dish._id} />
+      <fieldset
+        disabled={sharingRecipe}
+        className="contents"
+        aria-label={sharingRecipe ? "The main dish's recipe" : undefined}
+      >
+        <DishIngredientsPanel dishId={recipeId} />
 
-      <DishComponentsPanel dishId={dish._id} />
+        <DishPrepTasksPanel dishId={recipeId} />
 
-      <DishComponentPortionSpecPanel dishId={dish._id} />
+        <DishComponentsPanel dishId={recipeId} />
+
+        <DishComponentPortionSpecPanel dishId={recipeId} />
+      </fieldset>
 
       <DishContainersPanel dishId={dish._id} />
+
+      <StylePackagingPanel
+        owner={{ dishId: dish._id }}
+        onFailure={setFailure}
+      />
 
       <details className="recipe-management recipe-record-history">
         <summary>Editions &amp; duplicates ({nameMatches.length})</summary>
@@ -288,7 +564,7 @@ export function DishDetailPage() {
               disabled={busy != null}
               onClick={() =>
                 void run("createEdition", async () => {
-                  const createdId = await createDish({
+                  const created = (await createDish({
                     name: dish.name,
                     portionSize: dish.portionSize,
                     portionUnit: dish.portionUnit,
@@ -298,8 +574,12 @@ export function DishDetailPage() {
                     serviceStyle: dish.serviceStyle ?? undefined,
                     dietaryTags: dish.dietaryTags,
                     allergenSummary: dish.allergenSummary,
-                  });
-                  if (typeof createdId !== "string") return;
+                  })) as string | { docId: string } | undefined;
+                  // The save step answers { docId }; it never was a plain id,
+                  // so the new edition was made but never linked.
+                  const createdId =
+                    typeof created === "string" ? created : created?.docId;
+                  if (!createdId) return;
                   await linkAsEdition({
                     docId: createdId,
                     sourceDishId:
@@ -378,7 +658,7 @@ export function DishDetailPage() {
                 key={entry._id}
                 className="flex items-center justify-between border-b border-line py-3"
               >
-                <span>{event!.title ?? event!.name}</span>
+                <span>{event!.title}</span>
                 <span className="font-mono text-sm text-ink-3">
                   {entry.quantityServings} servings · {entry.course || "—"}
                 </span>

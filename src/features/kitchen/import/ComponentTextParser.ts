@@ -17,8 +17,39 @@ const FRACTIONS: Record<string, number> = {
   "⅞": 0.875,
 };
 
+// "1½" / "1 ½" (whole number + fraction glyph) comes first so the glyph is
+// never read as the start of the unit or the name.
 const QUANTITY_TOKEN =
-  "(?:(?:\\d+\\s+)?\\d+\\/\\d+|\\d+(?:\\.\\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])";
+  "(?:\\d+\\s*[½¼¾⅓⅔⅛⅜⅝⅞]|(?:\\d+\\s+)?\\d+\\/\\d+|\\d+(?:\\.\\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])";
+
+/** "fl oz", "fl. oz.", "floz", "fluid ounce(s)": volume, never the mass ounce. */
+const FLUID_OUNCE_UNIT = /^(fl\.?\s*oz|fluid\s+ounces?)\.?\s+(.+)$/iu;
+
+const SUBRECIPE_PREFIX = /^(?:sub[\s-]?recipe|recipe)\s*:\s*/i;
+const SUBRECIPE_MARK =
+  /\s*(?:\((?:see\s+)?(?:sub[\s-]?)?recipe\)|[-–—]\s*see\s+recipe|\bsee\s+recipe\b)\s*/i;
+
+/**
+ * Kitchens mark a line that is another recipe: "Sub-recipe: 2 qt alfredo",
+ * "2 qt alfredo (see recipe)", "alfredo - see recipe". Returns the line
+ * without the marker and whether one was found.
+ */
+export function stripSubrecipeMarker(line: string): {
+  text: string;
+  hint: boolean;
+} {
+  let text = line.trim();
+  let hint = false;
+  if (SUBRECIPE_PREFIX.test(text)) {
+    text = text.replace(SUBRECIPE_PREFIX, "");
+    hint = true;
+  }
+  if (SUBRECIPE_MARK.test(text)) {
+    text = text.replace(SUBRECIPE_MARK, " ").replace(/\s+/g, " ").trim();
+    hint = true;
+  }
+  return { text, hint };
+}
 
 /**
  * Deterministic plain-text component parser for the culinary import workbench.
@@ -239,6 +270,19 @@ export class ComponentTextParser {
   }
 
   parseIngredientLine(raw: string): ParsedIngredientLine | null {
+    const line = this.parseMeasuredLine(raw);
+    if (!line) return null;
+    const marked = stripSubrecipeMarker(line.raw);
+    if (!marked.hint) return line;
+    // Re-read the line without the marker so the name stays clean; the raw
+    // text keeps the marker as the source wrote it.
+    const unmarked = this.parseMeasuredLine(marked.text);
+    return unmarked
+      ? { ...unmarked, raw: line.raw, subrecipeHint: true }
+      : { ...line, subrecipeHint: true };
+  }
+
+  private parseMeasuredLine(raw: string): ParsedIngredientLine | null {
     const cleaned = raw.replace(/^[-*•]\s*/, "").trim();
     if (!cleaned || this.isSectionHeader(cleaned)) return null;
     if (this.isMethodStepLine(cleaned)) return null;
@@ -278,10 +322,15 @@ export class ComponentTextParser {
     let unitRaw = "";
     let unit: UnitOfMeasure | null = null;
 
-    const unitMatch = rest.match(
-      /^([#A-Za-z½¼¾]+)\b(?:\s*\(([^)]+)\))?\s+(.*)$/u,
-    );
-    if (
+    const fluidOunce = rest.match(FLUID_OUNCE_UNIT);
+    const unitMatch = fluidOunce
+      ? null
+      : rest.match(/^([#A-Za-z½¼¾]+)\b\.?(?:\s*\(([^)]+)\))?\s+(.*)$/u);
+    if (fluidOunce) {
+      unitRaw = fluidOunce[1];
+      unit = "fluid_ounce";
+      rest = fluidOunce[2].trim();
+    } else if (
       unitMatch &&
       (unitMatch[1] === "#" || this.units.isKnownAlias(unitMatch[1]))
     ) {
@@ -334,6 +383,8 @@ export class ComponentTextParser {
   private parseQuantity(raw: string): number {
     const token = raw.trim();
     if (FRACTIONS[token] != null) return FRACTIONS[token];
+    const glyph = token.match(/^(\d+)\s*([½¼¾⅓⅔⅛⅜⅝⅞])$/u);
+    if (glyph) return Number(glyph[1]) + FRACTIONS[glyph[2]];
     const mixed = token.match(/^(\d+)\s+(\d+)\/(\d+)$/);
     if (mixed) {
       return Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]);
@@ -342,12 +393,13 @@ export class ComponentTextParser {
     if (fraction) {
       return Number(fraction[1]) / Number(fraction[2]);
     }
-    const value = Number(token);
-    return Number.isFinite(value) ? value : 1;
+    // A token that is not a real amount (for example "1/0") stays missing so
+    // review asks for it; it never becomes one.
+    return Number(token);
   }
 
   private looksLikeIngredient(line: string): boolean {
-    const cleaned = line.replace(/^[-*•]\s*/, "").trim();
+    const cleaned = stripSubrecipeMarker(line.replace(/^[-*•]\s*/, "")).text;
     if (this.isMethodStepLine(cleaned)) return false;
     if (this.isInstructionSectionHeader(cleaned)) return false;
     return new RegExp(`^(?:${QUANTITY_TOKEN}|#)`, "u").test(cleaned);

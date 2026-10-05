@@ -401,7 +401,7 @@ describe("relation-guarded governed creation", () => {
         vendorId,
         orderNumber: "PO-CROSS-TENANT",
       }),
-    ).rejects.toThrow(/Guard/);
+    ).rejects.toThrow(/linked record was not found/);
 
     const rows = await tenantA.run((ctx) =>
       ctx.db.query("vendorOrders").collect(),

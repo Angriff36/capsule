@@ -92,10 +92,18 @@ export type EventDayVenue = {
   hasFreightElevator: boolean | null;
   hasStairs: boolean | null;
   storageAvailable: boolean | null;
+  hasOven?: boolean | null;
+  hasRefrigeration?: boolean | null;
+  loadInFrom?: string | null;
+  loadOutBy?: string | null;
   loadInInstructions: string | null;
   accessNotes: string | null;
   cateringNotes: string | null;
   restrictions: string | null;
+  // Venue selling profile (playbook 09): the look sets the food look here.
+  vibe?: string | null;
+  topFeature?: string | null;
+  photoFocus?: string | null;
   contactName: string | null;
   contactPhone: string | null;
 };
@@ -239,6 +247,8 @@ export type EventDayPackList = {
   deletedAt: number | null;
   status: string | null;
   name: string | null;
+  /** Bin sheet JSON (lid colours), src/features/logistics/packBins.ts. */
+  binSheet?: string | null;
 };
 
 export type EventDayPackListItem = {
@@ -249,6 +259,8 @@ export type EventDayPackListItem = {
   description: string | null;
   requiredQuantity: number | null;
   unit: string | null;
+  /** Number of the black bin the line was packed in. */
+  binNumber?: number | null;
 };
 
 export type EventDayPerson = {
@@ -263,6 +275,13 @@ export type EventDayMe = {
   role: string;
 };
 
+export type EventDayComponent = {
+  _id: string;
+  deletedAt: number | null;
+  name: string;
+  declaredAllergens: string[];
+};
+
 export type EventDayBriefing = {
   packetReadiness: EventDayPacketReadiness;
   event: EventDayEvent;
@@ -275,6 +294,8 @@ export type EventDayBriefing = {
   dishIngredients: EventDayRecipeLine[];
   dishComponents: EventDayDishComponent[];
   componentIngredients: EventDayRecipeLine[];
+  /** Recipes on the menu with the allergens marked on the recipe itself. */
+  components?: EventDayComponent[];
   deliveries: EventDayDelivery[];
   vehicles: EventDayVehicle[];
   layoutSections: EventDayLayoutSection[];
@@ -285,6 +306,8 @@ export type EventDayBriefing = {
   packListItems: EventDayPackListItem[];
   people: EventDayPerson[];
   me: EventDayMe;
+  /** "withheld": numbers blank for this viewer (not event/sales, not on this event). */
+  contactAccess: "full" | "withheld";
 };
 
 /** undefined = loading; null = signed out / no role / no tenant. */

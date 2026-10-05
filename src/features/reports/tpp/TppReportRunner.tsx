@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../lib/api";
 import { downloadTppCsv, downloadTppExcel } from "./exports";
+import { tppReportSummary } from "./reportSummary";
 import { parseTppReportRequest } from "./request";
 import {
   TppReportParameters,
@@ -71,6 +72,10 @@ export function TppReportRunner({
     setErrors({});
     setRequest(parsed.request);
   };
+  const summary =
+    result && request
+      ? tppReportSummary(definition, request, result, options)
+      : undefined;
   const filename = definition.name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -133,7 +138,7 @@ export function TppReportRunner({
                 <button
                   className="btn btn-ghost btn-sm"
                   type="button"
-                  onClick={() => downloadTppCsv(result, filename)}
+                  onClick={() => downloadTppCsv(result, filename, summary)}
                 >
                   CSV
                 </button>
@@ -142,7 +147,7 @@ export function TppReportRunner({
                 <button
                   className="btn btn-ghost btn-sm"
                   type="button"
-                  onClick={() => downloadTppExcel(result, filename)}
+                  onClick={() => downloadTppExcel(result, filename, summary)}
                 >
                   Excel
                 </button>
@@ -158,7 +163,7 @@ export function TppReportRunner({
               ) : null}
             </div>
           </div>
-          <TppReportResult result={result} />
+          <TppReportResult result={result} summary={summary} />
         </>
       ) : null}
     </section>

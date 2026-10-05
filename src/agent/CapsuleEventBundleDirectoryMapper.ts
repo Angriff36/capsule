@@ -112,7 +112,6 @@ export function mapBundleDirectory(
         status: rowText(row.status),
         lineDescriptions: linesByProposal.get(String(row._id)) ?? [],
       })),
-    vendorOrderNumbers: liveOrders.map((row) => rowText(row.orderNumber)),
     vendorOrders: liveOrders.map((row) => ({
       id: String(row._id),
       orderNumber: rowText(row.orderNumber),

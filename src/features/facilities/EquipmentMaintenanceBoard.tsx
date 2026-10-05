@@ -144,7 +144,7 @@ export function EquipmentMaintenanceBoard({
       form.reset();
       setServiceTaskId(null);
       setNotice(
-        `${item?.name ?? "Equipment"} service recorded. Next due ${formatDate(nextDueAt)}.`,
+        `${item?.name ?? "Equipment"} service logged. Next due ${formatDate(nextDueAt)}.`,
       );
     });
   };
@@ -384,7 +384,7 @@ export function EquipmentMaintenanceBoard({
                     data-testid="maintenance-service-form"
                   >
                     <div className="maintenance-form__stamp">
-                      <span>Completion record</span>
+                      <span>Completing service for</span>
                       <strong>{task.taskName}</strong>
                     </div>
                     <label className="field-label">
@@ -428,7 +428,7 @@ export function EquipmentMaintenanceBoard({
                       />
                     </label>
                     <button className="btn btn-primary" disabled={busy != null}>
-                      {busy === "service" ? "Recording…" : "Complete service"}
+                      {busy === "service" ? "Saving…" : "Complete service"}
                     </button>
                   </form>
                 ) : null}

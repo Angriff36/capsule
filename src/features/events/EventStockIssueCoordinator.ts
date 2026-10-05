@@ -71,22 +71,30 @@ export class EventStockIssueCoordinator {
       (row) => row.id === input.reservationId && row.deletedAt == null,
     );
     if (!reservation || reservation.eventId !== input.eventId) {
-      throw new Error("Reservation not found for this event");
+      throw new Error(
+        "This stock reservation isn't on this event. Refresh the page and try again.",
+      );
     }
     // Guard mirrors InventoryReservation.consume — blocks a second issue.
     if (reservation.status !== "active") {
-      throw new Error("Reservation is not active");
+      throw new Error(
+        "This stock reservation isn't active anymore, so it can't be issued.",
+      );
     }
 
     const item = input.items.find(
       (row) => row.id === reservation.inventoryItemId,
     );
     if (!item) {
-      throw new Error("Inventory item for reservation was not found");
+      throw new Error(
+        "The stock item for this reservation is gone. Refresh the page and try again.",
+      );
     }
     // Guard mirrors InventoryReservation.consume — expired lots cannot issue.
     if (item.useByAt != null && item.useByAt < Date.now()) {
-      throw new Error("Stock line is past its use-by date");
+      throw new Error(
+        "This stock is past its use-by date, so it can't be issued. Pick fresher stock.",
+      );
     }
 
     await this.ports.consumeReservation({

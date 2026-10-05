@@ -9,22 +9,34 @@
   **The independent review is the safety boundary**: every change is
   worktree-isolated, test-verified, and reviewed by a different provider than
   the maker (see Check & Land). APPROVE → the lander puts the fix on the
-  shared `dev` branch at once: no PR, no human step. `dev` is the work copy; production changes only
-  when the owner says "release". The loop does NOT pre-filter work into "safe"
+  shared `dev` branch at once: no PR, no human step. `dev` is the work copy. Every build round goes to `dev` at once
+  (loop-publish.ps1); the daily review checks everything on `dev` not yet in
+  production, and its APPROVE releases to production (Ryan 2026-09-28: "once the
+  reviewer clears it it should go to production"). The loop does NOT pre-filter work into "safe"
   and "unsafe". Anything reviewable is attemptable.
   Why the change: the owner does not code and cannot approve PRs. Under the
   draft-PR design 26 of 37 loop PRs sat unapproved, went stale against a
   moving tree, and were thrown away — most of them never looked at.
-- **One fix at a time, up to 4 per tick (the runner's round count).** Each fix
-  starts from the newest `origin/dev`, lands, and only then does the next one
-  start. NEVER hold two fixes open together — nearly every fix regenerates
-  the same Builder-owned files, so parallel fixes collide.
+- **One writer at a time; the unit of work is a CAPABILITY (Ryan 2026-09-27).**
+  The product builder works one IMPLEMENTATION_PLAN.md item (for example all of
+  PL-AUTH) and goes straight on to the next, all in one batch worktree.
+  Rounds run back to back with no round limit.
+- **Daily review (Ryan 2026-09-28: "the reviewer should only check work once a
+  day then have its back and forth on all the changes with no delay until it
+  passes").** No review during the day. Once a day `.claude/loop-review-due.ps1`
+  opens the review; the maker then only answers review findings and hands off,
+  and the lander reviews the whole batch at once, round after round with no
+  wait, until it approves and lands the batch on dev. NEVER hold two campaigns open
+  together — nearly every change regenerates the same Builder-owned files,
+  so parallel writers collide.
 - High-scrutiny areas (auth, payments, billing, schema, manifest sources) are
   ATTEMPTABLE, not skipped — they land on `dev` like the rest, but the commit
   subject starts "[loop] HIGH-SCRUTINY:" and STATE.md lists them under
   "Landed - check before release" so the release review sees them.
-- Check `loop-ledger.json` before any attempt: 3 failures on an item →
-  escalate in STATE.md, do not retry.
+- A rejected checkpoint keeps its worktree. The maker reads the saved review
+  and fixes every finding in the same campaign, then hands off again (Ryan
+  2026-09-27). There is no retry limit
+  (Ryan, 2026-09-21: "Blockers get fixed and retried until done").
 - The `file:../builder` dependency was REMOVED 2026-07-19 (it broke CI's
   bun install). Builder is now a local tool (`scripts/manifest-regen.ts`
   resolves the sibling ../builder checkout); regen freshness is enforced by
@@ -64,17 +76,18 @@
   the worktree up to date with `origin/dev`, reruns typecheck itself, then
   asks a reviewer from a DIFFERENT PROVIDER than the maker. APPROVE → it
   pushes the commit onto `dev`. Anything else → it records why in
-  loop-ledger.json + loop-run-log.md and deletes the attempt. No verdict from
-  any reviewer counts as REJECT. There is NO override — the 2026-07-22
+  loop-ledger.json + loop-run-log.md and KEEPS the worktree for the maker's
+  next round. No verdict from any reviewer lands nothing; the work waits for
+  a later review. There is NO override — the 2026-07-22
   `REVIEW_GATE=0` push (PR #31) was a violation, not a precedent.
 - A collision with newer `dev` work is NOT a strike on the item: the lander
-  records COLLISION and the maker retries from a fresh worktree.
+  records COLLISION and the maker merges `origin/dev` in the kept worktree.
 - `dev` pushes are chores (Vercel ignores non-`main` refs). `main` is only
   ever changed by `bash scripts/release.sh` when the owner says "release";
   the pre-push hook blocks every other push to `main`.
 - Reviewer selection (owner 2026-09-20): **the reviewer must come from a
   different PROVIDER than the maker**, and the lander picks and runs it — the
-  maker never does. The maker is GLM (z.ai) or MiniMax; the reviewer is
+  maker never does. The maker is Opus 5.5 (Anthropic) first, then GLM 5.3 flash (z.ai), then MiniMax M3 (Ryan 2026-09-25); the reviewer is
   Codex gpt-5.6-sol (OpenAI), and when Codex gives no verdict (quota/outage),
   grok via Cursor CLI (`cursor-grok-4.5-high-fast`, xAI). No verdict from
   either → the attempt is recorded as FAIL and nothing lands. The lander
@@ -108,7 +121,7 @@
 
 ## Code (applies at L2)
 
-- ALL code edits happen in an isolated git worktree — one per fix attempt
+- ALL code edits happen in an isolated git worktree — one per capability campaign
   (`npx @cobusgreyling/loop-worktree create --run-id <id> --pattern <p>`,
   worktrees live in `.loop-worktrees/`, gitignored). The loop NEVER edits
   files in this main checkout — that stays true after graduation, not just
@@ -116,14 +129,14 @@
   lander lands them.
 - Mark the worktree `rejected`/`escalated` when the verifier or breaker says
   so; `loop-worktree cleanup` sweeps them. `active` is never swept.
-- One logical fix per worktree (reviewability), smallest diff that truly
-  fixes it, one at a time.
-- Focused verification first: `bun run typecheck`, then any **existing**
-  focused tests via `bun run test` (vitest). Never invent new test files
-  unless the backlog item or owner explicitly asks. Never run the full
+- Fix by root cause: requirements that fail for one cause are fixed and
+  proven together, not as separate tiny items.
+- Focused verification: focused vitest tests for the area while developing
+  (add a test where a plan requirement has no proof yet), then
+  `bun run typecheck` and the focused tests once before each hand-off. Do not
+  rerun proof the change cannot affect. Never run the full
   `bun run check` gate unless the change warrants it. Never disable tests
   to go green.
-- Max 3 attempts per item, enforced via loop-ledger.json + `loop-context --check`.
 - `convex deploy` / `bun run deploy` are forbidden.
 
 ## Budget
@@ -131,6 +144,6 @@
 - NO token cap and no report-only mode (owner rule 2026-09-21). The old cap was an
   AI-invented backstop on flat-rate worker tokens, counted from the maker's own
   guesses; it stopped a working loop at 1 PM on its first unattended day. The
-  real limits: 3 FAILs per item, 4 rounds per tick, one tick at a time.
+  No round limit and no per-item FAIL limit; one run at a time.
 - `loop-pause-all` in STATE.md: exit immediately.
 

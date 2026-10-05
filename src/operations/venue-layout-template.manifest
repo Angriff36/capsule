@@ -35,7 +35,7 @@ entity VenueLayoutTemplate mixin TenantScoped, SoftDeletable {
 
   computed isActive: boolean = self.status == "active"
 
-  constraint templateComplete: self.definedAt == null or length(trim(self.name)) > 0 "Defined templates require a name"
+  constraint templateComplete: self.definedAt == null or length(trim(self.name)) > 0 "Give this template a name."
 
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
@@ -57,7 +57,7 @@ entity VenueLayoutTemplate mixin TenantScoped, SoftDeletable {
     // means "not yet defined".
     guard self.definedAt == null
     guard self.deletedAt == null
-    constraint defineTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint defineTemplateName: length(trim(name)) > 0 "Give this template a name."
     mutate venueId = venueId
     mutate name = name
     mutate description = description
@@ -79,7 +79,7 @@ entity VenueLayoutTemplate mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint reviseTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint reviseTemplateName: length(trim(name)) > 0 "Give this template a name."
     mutate name = name
     mutate description = description
     mutate sections = sections != null ? sections : self.sections

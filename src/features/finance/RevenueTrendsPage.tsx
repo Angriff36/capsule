@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import {
   useListClient,
-  useListEvent,
   useListInvoice,
   useListOrganization,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import { normalizeCurrencyCode } from "../../lib/format";
 import { formatCurrencyLabel } from "../../lib/currency";
 import { TableSkeleton } from "../../ui/primitives";
@@ -572,7 +572,12 @@ export function RevenueTrendsDashboard({
 export function RevenueTrendsPage() {
   const invoices = useListInvoice();
   const clients = useListClient();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      invoices === undefined ? undefined : invoices.map((row) => row.eventId),
+    [invoices],
+  );
+  const events = useEventsById(eventIds);
   const venueRows = useListVenue();
   const organizations = useListOrganization();
   const now = useMemo(() => new Date(), []);

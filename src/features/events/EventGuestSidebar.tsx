@@ -1,11 +1,10 @@
-import { Link } from "react-router-dom";
 import { AlertTriangleIcon } from "../../ui/icons";
+import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import type { GuestSummary } from "./eventGuestSummary";
 
 type Props = {
   summary: GuestSummary;
   expectedHeadcount?: number | null;
-  briefingPath: string;
 };
 
 function Tally({
@@ -60,11 +59,7 @@ function Meter({
  * kitchen has to cook around, and the allergen briefing this list feeds.
  * Every number comes from the recorded guest list — no invented totals.
  */
-export function EventGuestSidebar({
-  summary,
-  expectedHeadcount,
-  briefingPath,
-}: Props) {
+export function EventGuestSidebar({ summary, expectedHeadcount }: Props) {
   const headcount = Number(expectedHeadcount) || 0;
   return (
     <aside className="flex w-full shrink-0 flex-col gap-4 lg:w-64">
@@ -126,9 +121,9 @@ export function EventGuestSidebar({
                   </li>
                 ))}
               </ul>
-              <Link className="text-link mt-2 inline-flex" to={briefingPath}>
-                View briefing page
-              </Link>
+              <AllergenBriefingButton className="text-link mt-2 inline-flex">
+                View briefing
+              </AllergenBriefingButton>
             </div>
           </div>
         </div>

@@ -8,8 +8,10 @@ import {
   usePaymentBeginProcessing,
   usePaymentFail,
   usePaymentRefund,
+  usePaymentReverse,
   usePaymentSettle,
 } from "../../lib/manifest-convex-react";
+import { paymentBreakdown } from "./paymentBreakdown";
 import { formatMoneyExact } from "../../lib/format";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -20,6 +22,7 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { PaymentsLedgerPresenter } from "./PaymentsLedgerPresenter";
 import { useActionNotice } from "../../ui/action-result";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const policy = new CommercialLifecyclePolicy();
 const ledger = new PaymentsLedgerPresenter();
@@ -38,6 +41,7 @@ export function PaymentsPage() {
   const settle = usePaymentSettle();
   const fail = usePaymentFail();
   const refund = usePaymentRefund();
+  const reverse = usePaymentReverse();
   const [showRecord, setShowRecord] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
@@ -113,7 +117,11 @@ export function PaymentsPage() {
       return;
     }
     if (!(amount > 0)) {
-      setFailure(new Error("Payment amount must be positive."));
+      setFailure(
+        new Error(
+          "This payment's amount has to be more than zero. Enter how much was paid.",
+        ),
+      );
       return;
     }
     if (
@@ -127,6 +135,13 @@ export function PaymentsPage() {
       );
       return;
     }
+    const optionalMoney = (name: string) => {
+      const value = money(data.get(name));
+      return String(data.get(name) ?? "").trim() && value >= 0
+        ? value
+        : undefined;
+    };
+    const paidOn = String(data.get("paidOn") || "").trim();
     void run("record-payment", async () => {
       await createPayment({
         invoiceId,
@@ -136,11 +151,16 @@ export function PaymentsPage() {
         eventId: invoice.eventId || undefined,
         paymentMethodId: paymentMethodId || undefined,
         notes: String(data.get("notes") || "").trim() || undefined,
+        feeAmount: optionalMoney("feeAmount"),
+        gratuityAmount: optionalMoney("gratuityAmount"),
+        occurredAt: paidOn
+          ? new Date(`${paidOn}T12:00:00`).getTime()
+          : undefined,
       });
       form.reset();
       setSelectedInvoiceId("");
       setShowRecord(false);
-      setNotice("Payment recorded. Settle it to apply the balance.");
+      setNotice("Payment added. Settle it to apply the balance.");
     });
   };
 
@@ -158,6 +178,53 @@ export function PaymentsPage() {
         void run(`${row._id}:${key}`, async () => {
           await fail({ docId: row._id, version: row.version, reason });
           setNotice("Payment marked failed.");
+        });
+        return;
+      }
+      if (key === "reverse") {
+        const values = await prompt.askFields({
+          title: "Take money back",
+          description:
+            "Use this when part of a payment was refunded, the card company took it back, or the bank returned it. Money paid extra comes back first; the rest goes back on the invoice balance.",
+          fields: [
+            {
+              name: "kind",
+              label: "What happened",
+              defaultValue: "refund",
+              options: [
+                { value: "refund", label: "We refunded it" },
+                { value: "chargeback", label: "The card company took it back" },
+                { value: "ach_return", label: "The bank returned it" },
+              ],
+              required: true,
+            },
+            {
+              name: "amount",
+              label: "How much",
+              inputType: "number",
+              required: true,
+            },
+            {
+              name: "reason",
+              label: "Why",
+              placeholder: "For example: guest count dropped",
+              required: true,
+            },
+          ],
+          confirmLabel: "Take money back",
+          tone: "danger",
+        });
+        if (!values) return;
+        const kind = values.kind as "refund" | "chargeback" | "ach_return";
+        void run(`${row._id}:${key}`, async () => {
+          await reverse({
+            docId: row._id,
+            version: row.version,
+            kind,
+            amount: money(values.amount ?? ""),
+            reason: values.reason ?? "",
+          });
+          setNotice("Money taken back. Invoice balance updated.");
         });
         return;
       }
@@ -198,8 +265,8 @@ export function PaymentsPage() {
           <p className="eyebrow">Finance · Payments</p>
           <h1 className="display-title mt-2">Payment collection</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Record a payment against a sent invoice, then settle it so the
-            invoice balance applies automatically.
+            Add a payment against a sent invoice, then settle it so the invoice
+            balance applies automatically.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -215,7 +282,7 @@ export function PaymentsPage() {
             type="button"
             onClick={() => setShowRecord((value) => !value)}
           >
-            {showRecord ? "Close form" : "Record payment"}
+            {showRecord ? "Close form" : "Add payment"}
           </button>
         </div>
       </header>
@@ -232,7 +299,7 @@ export function PaymentsPage() {
         <form className="supply-form" onSubmit={submitRecord}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">Record</p>
+              <p className="eyebrow">Payment</p>
               <h2>New payment</h2>
             </div>
           </div>
@@ -320,6 +387,30 @@ export function PaymentsPage() {
                     <option value="other">Other</option>
                   </select>
                 </label>
+                <label className="field-label">
+                  Card fee (optional)
+                  <input
+                    className="input"
+                    name="feeAmount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                  />
+                </label>
+                <label className="field-label">
+                  Tip (optional)
+                  <input
+                    className="input"
+                    name="gratuityAmount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                  />
+                </label>
+                <label className="field-label">
+                  Date paid (optional)
+                  <BoundedDateInput className="input" name="paidOn" />
+                </label>
               </div>
               <label className="field-label">
                 Notes
@@ -331,7 +422,7 @@ export function PaymentsPage() {
                   type="submit"
                   disabled={busy != null}
                 >
-                  {busy === "record-payment" ? "Recording…" : "Record payment"}
+                  {busy === "record-payment" ? "Adding…" : "Add payment"}
                 </button>
               </div>
             </>
@@ -371,19 +462,19 @@ export function PaymentsPage() {
                   className="btn btn-ghost btn-sm"
                   onClick={() => setShowRecord(true)}
                 >
-                  Record payment
+                  Add payment
                 </button>
               </div>
             ) : (
               <>
-                <span>Record a payment after an invoice is sent.</span>
+                <span>Add a payment after an invoice is sent.</span>
                 <div className="mt-3 flex justify-center">
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"
                     onClick={() => setShowRecord(true)}
                   >
-                    Record payment
+                    Add payment
                   </button>
                 </div>
               </>
@@ -412,7 +503,12 @@ export function PaymentsPage() {
                       </Link>
                       <small>{String(row.method)}</small>
                     </td>
-                    <td>{formatMoneyExact(Number(row.amount ?? 0))}</td>
+                    <td>
+                      {formatMoneyExact(Number(row.amount ?? 0))}
+                      {paymentBreakdown(row) ? (
+                        <small>{paymentBreakdown(row)}</small>
+                      ) : null}
+                    </td>
                     <td>
                       <StatusChip status={String(row.status)} />
                     </td>
