@@ -96,6 +96,7 @@ import {
 } from "./EventMenuDietaryCard";
 import type { EventMenuNoteRow } from "./EventMenuNotesCard";
 import type { MenuTemplate } from "./EventMenuTemplateCard";
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
 
 type Props = {
   eventId: string;
@@ -330,8 +331,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const dietaryTallies: MenuDietaryTally[] = useMemo(
     () =>
       eventMenuDietaryTallies(
-        selections.map(
-          (row) => dishes?.find((dish) => dish._id === row.dishId)?.dietaryTags,
+        selections.map((row) =>
+          dietTagsOnly(
+            dishes?.find((dish) => dish._id === row.dishId)?.dietaryTags,
+          ),
         ),
       ),
     [dishes, selections],

@@ -9,6 +9,7 @@ import {
   type MenuPriceLabel,
 } from "../src/lib/catalogEligibility";
 import { clockNow } from "./lib/clockNow";
+import { dietTagsOnly } from "./lib/dietaryTags";
 
 // Anonymous public menu (spec CF-4-2). It reads the SAME catalog the proposal
 // builder prices from — published menus and their active dishes — through the
@@ -121,7 +122,7 @@ export const getPublicMenu = query({
                 description: dish.description ?? null,
                 course: md.course ?? dish.course ?? null,
                 serviceStyle: md.serviceStyle ?? dish.serviceStyle ?? null,
-                dietaryTags: dish.dietaryTags ?? [],
+                dietaryTags: dietTagsOnly(dish.dietaryTags),
                 allergens: allergensByDish.get(dish._id) ?? [],
                 price: effectiveSellingPrice(md, now),
               },

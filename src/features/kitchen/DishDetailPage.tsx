@@ -57,6 +57,7 @@ import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploade
 import { KitchenBookNav } from "./KitchenBookNav";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { dishPath, kitchenCatalogPath, componentPath } from "./kitchenRoutes";
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -332,9 +333,7 @@ export function DishDetailPage() {
           <div>
             <dt>Dietary</dt>
             <dd data-testid="dish-dietary-tags">
-              {dish.dietaryTags && dish.dietaryTags.length > 0
-                ? dish.dietaryTags.join(", ")
-                : "—"}
+              {dietTagsOnly(dish.dietaryTags).join(", ") || "—"}
             </dd>
           </div>
         </dl>

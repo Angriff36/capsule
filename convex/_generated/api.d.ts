@@ -126,6 +126,7 @@ import type * as lib_demandProvenance_DemandProvenanceManager from "../lib/deman
 import type * as lib_demandProvenance_DemandSnapshotDiffManager from "../lib/demandProvenance/DemandSnapshotDiffManager.js";
 import type * as lib_demandProvenance_types from "../lib/demandProvenance/types.js";
 import type * as lib_demandReconciliation from "../lib/demandReconciliation.js";
+import type * as lib_dietaryTags from "../lib/dietaryTags.js";
 import type * as lib_dishRecipeRepair from "../lib/dishRecipeRepair.js";
 import type * as lib_dropOffDelivery from "../lib/dropOffDelivery.js";
 import type * as lib_encryption from "../lib/encryption.js";
@@ -459,6 +460,7 @@ declare const fullApi: ApiFromModules<{
   "lib/demandProvenance/DemandSnapshotDiffManager": typeof lib_demandProvenance_DemandSnapshotDiffManager;
   "lib/demandProvenance/types": typeof lib_demandProvenance_types;
   "lib/demandReconciliation": typeof lib_demandReconciliation;
+  "lib/dietaryTags": typeof lib_dietaryTags;
   "lib/dishRecipeRepair": typeof lib_dishRecipeRepair;
   "lib/dropOffDelivery": typeof lib_dropOffDelivery;
   "lib/encryption": typeof lib_encryption;

@@ -27,6 +27,7 @@ import {
   menuPath,
   type KitchenSection,
 } from "./kitchenRoutes";
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
 
 export type CatalogItem = {
   _id: string;
@@ -474,8 +475,9 @@ function previewFacts(section: KitchenSection, item: CatalogItem) {
   if (section === "dishes" && item.course) {
     facts.push({ label: "Course", value: item.course });
   }
-  if (section === "dishes" && item.dietaryTags && item.dietaryTags.length) {
-    facts.push({ label: "Dietary", value: item.dietaryTags.join(", ") });
+  const dietary = dietTagsOnly(item.dietaryTags);
+  if (section === "dishes" && dietary.length) {
+    facts.push({ label: "Dietary", value: dietary.join(", ") });
   }
   if (section === "components" && item.cuisine) {
     facts.push({ label: "Cuisine", value: item.cuisine });

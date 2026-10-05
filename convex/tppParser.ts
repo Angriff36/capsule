@@ -7,6 +7,7 @@ import {
   type FinancialRowClass,
 } from "../src/lib/financialRowClass";
 import { derivedSourceId } from "./lib/importIdentity";
+import { dietTagsOnly } from "./lib/dietaryTags";
 
 /**
  * TPP field mapping types from ImportDataset manifest
@@ -421,6 +422,7 @@ export interface ParsedCapsuleMenu {
   // visible for reconciliation") — the normalized allergenSummary / portionSize
   // alone would lose the original free text.
   rawAllergens?: string;
+  rawTags?: string;
   rawPortionDescription?: string;
   // Preserved for fidelity (Dish has no price field); EMPTY in the real feed.
   pricePerPerson?: number;
@@ -947,16 +949,14 @@ export function parseTppMenu(record: TppMenuRecord): ParsedCapsuleMenu {
     serviceStyle: get("ServiceStyle", "service_style") as string | undefined,
     portionSize: parsePortionSize(portionText),
     portionUnit: "portion",
-    dietaryTags: dietaryText
-      ? dietaryText
-          .split(/[;,]/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [],
+    dietaryTags: dietTagsOnly(
+      dietaryText ? dietaryText.split(/[;,]/).map((s) => s.trim()) : [],
+    ),
     allergenSummary: mapTppAllergens(allergenText),
     // Preserve the raw source text on the link via JSON.stringify(menu)
     // (§6.1 reconciliation visibility).
     rawAllergens: allergenText,
+    rawTags: dietaryText,
     rawPortionDescription: portionText,
     pricePerPerson: parseTppMoney(
       get("PricePerPerson", "price_per_person") as string | number | undefined,

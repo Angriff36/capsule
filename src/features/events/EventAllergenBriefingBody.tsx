@@ -11,6 +11,7 @@ import {
   GuestListCoverageNotice,
 } from "./GuestListCoverageNotice";
 import { guestTableLabel } from "./guestTableLabel";
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
 
 const allergenLabel = (value: string) => value.replaceAll("_", " ");
 const normalize = (value: string) =>
@@ -196,9 +197,7 @@ export function EventAllergenBriefingBody({
                       : "None declared"}
                   </td>
                   <td className="py-1.5 capitalize text-ink-2">
-                    {dish?.dietaryTags?.length
-                      ? dish.dietaryTags.join(", ")
-                      : "—"}
+                    {dietTagsOnly(dish?.dietaryTags).join(", ") || "—"}
                   </td>
                 </tr>
               ))}
