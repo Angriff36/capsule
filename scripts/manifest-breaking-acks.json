@@ -2940,6 +2940,24 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Training doc quiz questions: optional; existing modules read as no quiz."
+    },
+    {
+      "path": "EventGuest.entreeEventDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Plated entrée pick (event-menu line): optional; existing guests stay valid with none."
+    },
+    {
+      "path": "EventGuest.seatNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Plated seat number: optional; existing guests stay valid with none."
+    },
+    {
+      "path": "EventGuest.placeCardName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Place-card name: optional; existing guests stay valid and print their name."
     }
   ]
 }

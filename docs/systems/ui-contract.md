@@ -549,7 +549,7 @@ Screens (31): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ## 3. Event overview
 
-Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
+Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestMealCard.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
 
 ### Generated reads
 
@@ -697,55 +697,69 @@ Screens (65): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Staff may see event checklists"; "Event managers, logistics staff and managers may update event checklists"; "Event managers, logistics staff and managers may change event checklists"; "Guard 0 failed"; "Guard 1 failed"; "Give this checklist a name."; and 2 more
   - effects: EventChecklistRevised
   - refresh: live reads update by themselves; reads affected: EventChecklist.list, EventChecklist.get, EventTask.list, EventTask.get
+- `mutations.EventDish_adjustServings` (EventDish.adjustServings)
+  - inputs from the screen: quantityServings; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishServingsAdjusted
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.EventDish_createViaAddToEvent` (EventDish.addToEvent)
   - inputs from the screen: eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: EventDishAdded
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishIngredient.list, DishIngredient.get and 22 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.EventGuest_assignMeal` (EventGuest.assignMeal)
+  - inputs from the screen: entreeEventDishId, seatNumber, placeCardName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "ConcurrencyConflict:"; "EventGuest not found"
+  - effects: EventGuestMealAssigned
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_assignTable` (EventGuest.assignTable)
   - inputs from the screen: tableAssignment; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Pick a table for this guest."; and 2 more
   - effects: EventGuestTableAssigned
-  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_checkIn` (EventGuest.checkIn)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: EventGuestCheckedIn
-  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_createViaInvite` (EventGuest.invite)
   - inputs from the screen: eventId, name, email, phone, dietaryRestrictions, allergenRestrictions, accessibilityNeeds, specialMealRequired; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Give this guest a name."
   - effects: EventGuestInvited
-  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_rsvpConfirm` (EventGuest.rsvpConfirm)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EventGuestRsvpConfirmed
-  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_rsvpDecline` (EventGuest.rsvpDecline)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EventGuestRsvpDeclined
-  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_withdraw` (EventGuest.withdraw)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Say why this guest is withdrawing."; "ConcurrencyConflict:"; and 1 more
   - effects: EventGuestWithdrawn
-  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventPlanNeeds_createViaNote` (EventPlanNeeds.note)
   - inputs from the screen: eventId, trucksNeeded, siteProvidesJson; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -1797,49 +1811,49 @@ Screens (173): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: EventDishServingsAdjusted
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 14 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.EventDish_changeCourse` (EventDish.changeCourse)
   - inputs from the screen: course, serviceStyle; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: EventDishCourseChanged
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 14 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.EventDish_createViaAddToEvent` (EventDish.addToEvent)
   - inputs from the screen: eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: EventDishAdded
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishIngredient.list, DishIngredient.get and 22 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishIngredient.list, DishIngredient.get and 24 more
 - `mutations.EventDish_remove` (EventDish.remove)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: EventDishRemoved
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 14 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.EventDish_reorder` (EventDish.reorder)
   - inputs from the screen: sortOrder; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EventDishReordered
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 14 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.EventDish_setHeadcountOverride` (EventDish.setHeadcountOverride)
   - inputs from the screen: headcountOverride; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: EventDishServingsAdjusted, EventDishHeadcountOverrideSet
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 14 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.EventDish_updateInstructions` (EventDish.updateInstructions)
   - inputs from the screen: specialInstructions; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: EventDishInstructionsUpdated
-  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 14 more
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
 - `mutations.Ingredient_classifyAllergens` (Ingredient.classifyAllergens)
   - inputs from the screen: allergens, isGlutenFree; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

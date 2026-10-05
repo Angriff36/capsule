@@ -250,6 +250,7 @@ import {
   EventDishSyncHeadcountParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventFinalizeEventParamsSchema,
+  EventGuestAssignMealParamsSchema,
   EventGuestAssignTableParamsSchema,
   EventGuestCheckInParamsSchema,
   EventGuestInviteParamsSchema,
@@ -4694,6 +4695,16 @@ export function useListEventGuest() {
 /** Reactive get-by-id for EventGuest. Pass "skip" to suspend. */
 export function useGetEventGuest(id: string | "skip") {
   return useQuery(api.queries.getEventGuest, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventGuest.assignMeal. */
+export function useEventGuestAssignMeal() {
+  const mutate = useMutation(api.mutations.EventGuest_assignMeal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventGuestAssignMealParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Mutation hook for EventGuest.assignTable. */
@@ -14359,4 +14370,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1517 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1518 as const;

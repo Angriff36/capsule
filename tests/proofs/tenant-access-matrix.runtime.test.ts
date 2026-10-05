@@ -196,6 +196,8 @@ const LINK_TABLE: Record<string, string> = {
   duplicateClientId: "clients",
   endpointId: "@outside",
   entityId: "events",
+  // Plated service: the event-menu line a guest picked as their entrée.
+  entreeEventDishId: "eventDishes",
   eventStaffingPersonId: "people",
   eventStaffingSourceIds: "eventStaffNeeds",
   excludedByPersonId: "people",
