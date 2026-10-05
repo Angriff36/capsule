@@ -843,9 +843,14 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.TrainingCompletion_createViaRecord, { "personId": "personId-training-completion-2", "trainingModuleId": "trainingModuleId-training-completion-2", "completedAt": 1767355200000, "assessmentScore": 2, "notes": "demo-notes-2" } as any);
   // TrainingModule → api.mutations.TrainingModule_createViaDefine
   rowsAttempted += 1;
-  await client.mutation(api.mutations.TrainingModule_createViaDefine, { "name": "TrainingModule 1", "category": "demo-category-1", "description": "demo-description-1", "passingScore": 1 } as any);
+  await client.mutation(api.mutations.TrainingModule_createViaDefine, { "name": "TrainingModule 1", "category": "demo-category-1", "description": "demo-description-1", "passingScore": 1, "steps": "demo-steps-1", "quiz": "demo-quiz-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.TrainingModule_createViaDefine, { "name": "TrainingModule 2", "category": "demo-category-2", "description": "demo-description-2", "passingScore": 2 } as any);
+  await client.mutation(api.mutations.TrainingModule_createViaDefine, { "name": "TrainingModule 2", "category": "demo-category-2", "description": "demo-description-2", "passingScore": 2, "steps": "demo-steps-2", "quiz": "demo-quiz-2" } as any);
+  // TrainingSignOff → api.mutations.TrainingSignOff_createViaBeginTraining
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.TrainingSignOff_createViaBeginTraining, { "personId": "personId-training-sign-off-1", "trainingModuleId": "trainingModuleId-training-sign-off-1", "trainerPersonId": "trainerPersonId-training-sign-off-1", "startedAt": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.TrainingSignOff_createViaBeginTraining, { "personId": "personId-training-sign-off-2", "trainingModuleId": "trainingModuleId-training-sign-off-2", "trainerPersonId": "trainerPersonId-training-sign-off-2", "startedAt": 1767355200000 } as any);
   // Vehicle → api.mutations.Vehicle_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.Vehicle_createViaRegister, { "make": "demo-make-1", "model": "demo-model-1", "registration": "demo-registration-1", "ownership": "demo-ownership-1", "payloadCapacityKg": 1, "operationalStatus": "demo-operationalStatus-1", "statusNote": "demo-statusNote-1" } as any);
@@ -1838,6 +1843,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "TrainingModule",
       "createMutation": "TrainingModule_createViaDefine",
+      "rowCount": 2
+    },
+    {
+      "entity": "TrainingSignOff",
+      "createMutation": "TrainingSignOff_createViaBeginTraining",
       "rowCount": 2
     },
     {

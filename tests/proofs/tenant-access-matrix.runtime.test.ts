@@ -256,6 +256,10 @@ const LINK_TABLE: Record<string, string> = {
   deliveredByPersonId: "people",
   preloadedByPersonId: "people",
   reportedByPersonId: "people",
+  // Skills matrix: who gave the rating.
+  ratedByPersonId: "people",
+  // Training sign-off: who trained the trainee.
+  trainerPersonId: "people",
   // PL-FIELD-CONFIRMATION day-of forms: planned people are picked by the
   // office; who signed, checked or chased is the signed-in person.
   responsiblePersonId: "people",

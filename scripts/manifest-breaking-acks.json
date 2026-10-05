@@ -2928,6 +2928,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Bin number written on a pack line: optional; existing lines read as not in a bin."
+    },
+    {
+      "path": "TrainingModule.steps",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Training doc steps a trainer initials: optional; existing modules read as no written steps."
+    },
+    {
+      "path": "TrainingModule.quiz",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Training doc quiz questions: optional; existing modules read as no quiz."
     }
   ]
 }

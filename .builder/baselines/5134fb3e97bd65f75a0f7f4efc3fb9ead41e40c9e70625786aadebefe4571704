@@ -851,6 +851,11 @@ import {
   TrainingModuleDefineParamsSchema,
   TrainingModuleReactivateParamsSchema,
   TrainingModuleRetireParamsSchema,
+  TrainingModuleSetTrainingDocParamsSchema,
+  TrainingSignOffBeginTrainingParamsSchema,
+  TrainingSignOffFinishTrainingParamsSchema,
+  TrainingSignOffInitialTrainingStepsParamsSchema,
+  TrainingSignOffReopenTrainingParamsSchema,
   VehicleFuelLogRecordParamsSchema,
   VehicleMaintenanceScheduleApplyServiceParamsSchema,
   VehicleMaintenanceScheduleScheduleParamsSchema,
@@ -12750,12 +12755,83 @@ export function useTrainingModuleRetire() {
   };
 }
 
+/** Mutation hook for TrainingModule.setTrainingDoc. */
+export function useTrainingModuleSetTrainingDoc() {
+  const mutate = useMutation(api.mutations.TrainingModule_setTrainingDoc);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingModuleSetTrainingDocParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for TrainingModule.define. */
 export function useCreateTrainingModule() {
   const mutate = useMutation(api.mutations.TrainingModule_createViaDefine);
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = TrainingModuleDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for TrainingSignOff. */
+export function useListTrainingSignOff() {
+  return useQuery(api.queries.listTrainingSignOff);
+}
+
+/** Reactive get-by-id for TrainingSignOff. Pass "skip" to suspend. */
+export function useGetTrainingSignOff(id: string | "skip") {
+  return useQuery(api.queries.getTrainingSignOff, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for TrainingSignOff.beginTraining. */
+export function useTrainingSignOffBeginTraining() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_beginTraining);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffBeginTrainingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TrainingSignOff.finishTraining. */
+export function useTrainingSignOffFinishTraining() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_finishTraining);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffFinishTrainingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TrainingSignOff.initialTrainingSteps. */
+export function useTrainingSignOffInitialTrainingSteps() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_initialTrainingSteps);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffInitialTrainingStepsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TrainingSignOff.reopenTraining. */
+export function useTrainingSignOffReopenTraining() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_reopenTraining);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffReopenTrainingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for TrainingSignOff.beginTraining. */
+export function useCreateTrainingSignOff() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_createViaBeginTraining);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffBeginTrainingParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -14283,4 +14359,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1509 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1517 as const;

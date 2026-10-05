@@ -4523,11 +4523,32 @@ export const TrainingModuleSchema = z.object({
   status: z.enum(["active", "retired"]).default("active"),
   definedAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
+  steps: z.string().nullable().optional(),
+  quiz: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
 export type TrainingModule = z.infer<typeof TrainingModuleSchema>;
+
+// Entity: TrainingSignOff
+export const TrainingSignOffSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  trainingModuleId: z.string().uuid(),
+  trainerPersonId: z.string().uuid().nullable().optional(),
+  startedAt: z.coerce.date().nullable().optional(),
+  finishedAt: z.coerce.date().nullable().optional(),
+  initialledSteps: z.string().nullable().optional(),
+  quizDone: z.boolean().default(false),
+  note: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TrainingSignOff = z.infer<typeof TrainingSignOffSchema>;
 
 // Entity: Vehicle
 export const VehicleSchema = z.object({
@@ -12411,6 +12432,8 @@ export const TrainingModuleDefineParamsSchema = z.object({
   category: z.enum(["food_safety", "equipment_operation", "service_standards", "other"]),
   passingScore: z.number().int(),
   description: z.string().optional(),
+  steps: z.string().optional(),
+  quiz: z.string().optional(),
 });
 
 export type TrainingModuleDefineParams = z.infer<typeof TrainingModuleDefineParamsSchema>;
@@ -12424,6 +12447,45 @@ export type TrainingModuleReactivateParams = z.infer<typeof TrainingModuleReacti
 export const TrainingModuleRetireParamsSchema = z.object({});
 
 export type TrainingModuleRetireParams = z.infer<typeof TrainingModuleRetireParamsSchema>;
+
+// Command: setTrainingDoc on TrainingModule
+export const TrainingModuleSetTrainingDocParamsSchema = z.object({
+  steps: z.string().optional(),
+  quiz: z.string().optional(),
+});
+
+export type TrainingModuleSetTrainingDocParams = z.infer<typeof TrainingModuleSetTrainingDocParamsSchema>;
+
+// Command: beginTraining on TrainingSignOff
+export const TrainingSignOffBeginTrainingParamsSchema = z.object({
+  personId: z.string().min(1),
+  trainingModuleId: z.string().min(1),
+  startedAt: z.coerce.date(),
+  trainerPersonId: z.string().min(1).optional(),
+});
+
+export type TrainingSignOffBeginTrainingParams = z.infer<typeof TrainingSignOffBeginTrainingParamsSchema>;
+
+// Command: finishTraining on TrainingSignOff
+export const TrainingSignOffFinishTrainingParamsSchema = z.object({
+  finishedAt: z.coerce.date(),
+  quizDone: z.boolean(),
+  note: z.string().optional(),
+});
+
+export type TrainingSignOffFinishTrainingParams = z.infer<typeof TrainingSignOffFinishTrainingParamsSchema>;
+
+// Command: initialTrainingSteps on TrainingSignOff
+export const TrainingSignOffInitialTrainingStepsParamsSchema = z.object({
+  initialledSteps: z.string(),
+});
+
+export type TrainingSignOffInitialTrainingStepsParams = z.infer<typeof TrainingSignOffInitialTrainingStepsParamsSchema>;
+
+// Command: reopenTraining on TrainingSignOff
+export const TrainingSignOffReopenTrainingParamsSchema = z.object({});
+
+export type TrainingSignOffReopenTrainingParams = z.infer<typeof TrainingSignOffReopenTrainingParamsSchema>;
 
 // Command: register on Vehicle
 export const VehicleRegisterParamsSchema = z.object({
