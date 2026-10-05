@@ -4672,6 +4672,12 @@ div.tpp-parameter-wide {
   .print-sheet * {
     visibility: visible;
   }
+  /* Hidden is not gone: the rest of a long page under the sheet still took
+     space and printed as blank pages after it. */
+  body:where(:has(.print-sheet))
+    *:not(:has(.print-sheet)):not(.print-sheet):not(.print-sheet *) {
+    display: none !important;
+  }
   /* !important: screen rules (.card, the report drawer's slide-in shift) are
      stronger and kept the sheet in place on the paper - it printed half way
      down, or two fifths across. The frames around a sheet are unpinned so it
