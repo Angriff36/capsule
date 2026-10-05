@@ -61,8 +61,8 @@ export function SharedVenueGalleryPage({ token }: { token: string }) {
         <div className="text-center">
           <h1 className="font-display text-3xl">{data.venueName}</h1>
           <p className="mt-1 text-sm text-ink-2">
-            Photos from events catered by {company}. Save any photo for your own
-            posts, and please credit {company} when you share it.
+            Save any photo from our events here for your own posts. Please
+            credit {company} when you share one.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export function SharedVenueGalleryPage({ token }: { token: string }) {
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm text-ink-2">{photo.caption}</p>
                   <a
-                    className="btn btn-secondary btn-sm"
+                    className="btn btn-secondary btn-sm shrink-0 whitespace-nowrap"
                     href={photo.url}
                     target="_blank"
                     rel="noreferrer"
