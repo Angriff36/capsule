@@ -141,7 +141,8 @@ export function IngredientDemandProvenancePanel({
               </>
             ) : (
               <p className="demand-provenance-empty">
-                This older contribution predates saved calculation inputs.
+                Worked out before Capsule kept the step-by-step math, so only
+                the total shows.
               </p>
             )}
             <p className="demand-provenance-links">

@@ -50,12 +50,12 @@ function available<Key extends string>(
 const DEMAND_ACTIONS = [
   {
     key: "fulfill",
-    label: "Fulfill",
+    label: "Mark covered",
     lifecycle: IngredientDemandFulfillLifecycle,
   },
   {
     key: "supersede",
-    label: "Supersede",
+    label: "Retire line",
     lifecycle: IngredientDemandSupersedeLifecycle,
   },
 ] as const;
