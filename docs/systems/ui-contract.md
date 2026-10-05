@@ -630,6 +630,13 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Event and kitchen staff may see corrective actions"; "Event and kitchen staff may update corrective actions"; "Event and kitchen staff may change corrective actions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
   - effects: CorrectiveActionOpened
   - refresh: live reads update by themselves; reads affected: CorrectiveAction.list, CorrectiveAction.get, Event.list, Event.get, Incident.list, Incident.get
+- `mutations.DateHold_convert` (DateHold.convert)
+  - inputs from the screen: eventId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and event staff may see date availability"; "Sales staff may manage prospective date holds"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; "DateHold not found"
+  - effects: DateHoldConverted
+  - refresh: live reads update by themselves; reads affected: DateHold.list, DateHold.get, Client.list, Client.get, Event.list, Event.get, Lead.list, Lead.get and 2 more
 - `mutations.EquipmentReservation_cancel` (EquipmentReservation.cancel)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

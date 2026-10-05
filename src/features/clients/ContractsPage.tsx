@@ -12,7 +12,6 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { SearchSelect } from "../../ui/SearchSelect";
 import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -80,15 +79,19 @@ export function ContractsPage() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const eventId = String(data.get("eventId") || "").trim();
-    const clientId = String(data.get("clientId") || "").trim();
     const title = String(data.get("title") || "").trim();
     const eventRow = events?.find((row) => row._id === eventId);
-    if (!eventId || !clientId || !title) {
-      setFailure(new Error("Event, client, and title are required."));
+    // The contract is with the event's own client; asking again only let
+    // someone pick a different one and be refused.
+    const clientId = String(eventRow?.clientId ?? "");
+    if (!eventId || !title) {
+      setFailure(new Error("Pick an event and give the contract a title."));
       return;
     }
-    if (eventRow && eventRow.clientId !== clientId) {
-      setFailure(new Error("Selected client must own the selected event."));
+    if (!clientId) {
+      setFailure(
+        new Error("This event has no client yet. Add one on the event first."),
+      );
       return;
     }
     void run("draft-contract", async () => {
@@ -245,20 +248,6 @@ export function ContractsPage() {
                     </option>
                   ))}
                 </select>
-              </label>
-              <label>
-                Client
-                <SearchSelect
-                  name="clientId"
-                  required
-                  defaultValue=""
-                  recentsKey="client"
-                  placeholder="Search clients…"
-                  options={activeClients.map((row) => ({
-                    id: row._id,
-                    label: clientDisplayName(row._id, clients),
-                  }))}
-                />
               </label>
               <label>
                 Title
