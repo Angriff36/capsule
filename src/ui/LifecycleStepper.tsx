@@ -9,16 +9,53 @@ export function LifecycleStepper({
   definition,
   status,
   actions,
+  blocked = [],
   busy = false,
   onAction,
 }: {
   definition: LifecycleDefinition;
   status: string;
   actions: readonly LifecycleAction[];
+  /** Moves the lifecycle allows from here but the record cannot make yet. */
+  blocked?: readonly { key: string; reason: string }[];
   busy?: boolean;
   onAction?: (key: string) => void;
 }) {
-  const model = buildLifecycleModel({ ...definition, actions }, status);
+  const blockedActions = definition.actions.flatMap((action) => {
+    const entry = blocked.find((item) => item.key === action.key);
+    return entry && !actions.some((item) => item.key === action.key)
+      ? [{ ...action, disabledReason: entry.reason }]
+      : [];
+  });
+  const model = buildLifecycleModel(
+    { ...definition, actions: [...actions, ...blockedActions] },
+    status,
+  );
+  const renderAction = (action: LifecycleAction, className: string) => {
+    const reasonId = action.disabledReason
+      ? `lifecycle-reason-${action.key}`
+      : undefined;
+    return (
+      <span className="lifecycle-action" key={action.key}>
+        <button
+          type="button"
+          className={className}
+          disabled={busy || action.disabledReason != null}
+          aria-describedby={reasonId}
+          title={action.disabledReason}
+          onClick={() => onAction?.(action.key)}
+        >
+          {action.label}
+          {action.needsInput ? "…" : ""}
+        </button>
+        {action.disabledReason ? (
+          <span className="lifecycle-action-reason" id={reasonId}>
+            {action.disabledReason}
+          </span>
+        ) : null}
+      </span>
+    );
+  };
 
   return (
     <section
@@ -42,18 +79,12 @@ export function LifecycleStepper({
             >
               {formatStatusLabel(node.state)}
             </span>
-            {node.actions.map((action) => (
-              <button
-                key={action.key}
-                type="button"
-                className="btn btn-ghost btn-sm lifecycle-step-action"
-                disabled={busy}
-                onClick={() => onAction?.(action.key)}
-              >
-                {action.label}
-                {action.needsInput ? "…" : ""}
-              </button>
-            ))}
+            {node.actions.map((action) =>
+              renderAction(
+                action,
+                "btn btn-ghost btn-sm lifecycle-step-action",
+              ),
+            )}
           </div>
         ))}
       </div>
@@ -73,22 +104,16 @@ export function LifecycleStepper({
           className="lifecycle-stepper-branches"
           aria-label="Other available moves"
         >
-          {model.otherActions.map((action) => (
-            <button
-              key={action.key}
-              type="button"
-              className={`btn btn-sm ${
+          {model.otherActions.map((action) =>
+            renderAction(
+              action,
+              `btn btn-sm ${
                 definition.sideStates.includes(action.to)
                   ? "btn-danger"
                   : "btn-ghost"
-              }`}
-              disabled={busy}
-              onClick={() => onAction?.(action.key)}
-            >
-              {action.label}
-              {action.needsInput ? "…" : ""}
-            </button>
-          ))}
+              }`,
+            ),
+          )}
         </div>
       ) : null}
     </section>

@@ -1,8 +1,8 @@
 export const EVENT_WIZARD_STEPS = [
-  "Client",
-  "Date, venue & headcount",
-  "Dishes",
-  "Staff",
+  "Basics",
+  "Client & headcount",
+  "Menu & dishes",
+  "Staffing",
   "Review",
 ] as const;
 export type EventWizardStep = (typeof EVENT_WIZARD_STEPS)[number];
@@ -54,6 +54,9 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isStep = (value: unknown): value is EventWizardStep =>
   typeof value === "string" &&
   EVENT_WIZARD_STEPS.includes(value as EventWizardStep);
+/** Drafts saved before the steps were re-sequenced restart their step marks. */
+const knownSteps = (value: unknown) =>
+  Array.isArray(value) ? value.filter(isStep) : value;
 const isCommitEntry = (value: unknown): value is EventWizardCommitEntry =>
   isRecord(value) &&
   typeof value.key === "string" &&
@@ -66,6 +69,12 @@ const isLine = (value: unknown, fields: readonly string[]) =>
 /** Reject malformed browser state before it can enter the controlled wizard. */
 export function parseEventWizardDraft(value: unknown): EventWizardDraft | null {
   if (!isRecord(value) || value.version !== 3) return null;
+  value = {
+    ...value,
+    skipped: knownSteps(value.skipped),
+    completed: knownSteps(value.completed),
+  };
+  if (!isRecord(value)) return null;
   const strings = [
     "draftKey",
     "clientId",
@@ -150,27 +159,27 @@ export function createEventWizardDraft(draftKey: string): EventWizardDraft {
     commitProgress: { dishes: {}, staff: {}, retryAttempts: {} },
   };
 }
-function clientErrors(draft: EventWizardDraft): string[] {
-  return [
-    !draft.clientId ? "Select a client." : "",
-    !draft.title.trim() ? "Enter an event title." : "",
-    !draft.primaryContactName.trim() ? "Enter a primary contact name." : "",
-  ].filter(Boolean);
-}
-function scheduleErrors(draft: EventWizardDraft): string[] {
+function basicsErrors(draft: EventWizardDraft): string[] {
   const start = Date.parse(draft.startsAt),
-    end = Date.parse(draft.endsAt),
-    headcount = Number(draft.expectedHeadcount),
-    budget = Number(draft.budgetAmount),
-    price = Number(draft.quotedPrice);
+    end = Date.parse(draft.endsAt);
   return [
-    !draft.venueId ? "Select a venue." : "",
+    !draft.title.trim() ? "Enter an event title." : "",
     !draft.eventType.trim() ? "Enter an event type." : "",
     !Number.isFinite(start) ? "Enter a start date and time." : "",
     !Number.isFinite(end) ? "Enter an end date and time." : "",
     Number.isFinite(start) && Number.isFinite(end) && end <= start
       ? "End must be after the start time."
       : "",
+    !draft.venueId ? "Select a venue." : "",
+  ].filter(Boolean);
+}
+function clientHeadcountErrors(draft: EventWizardDraft): string[] {
+  const headcount = Number(draft.expectedHeadcount),
+    budget = Number(draft.budgetAmount),
+    price = Number(draft.quotedPrice);
+  return [
+    !draft.clientId ? "Select a client." : "",
+    !draft.primaryContactName.trim() ? "Enter a primary contact name." : "",
     !Number.isFinite(headcount) || headcount < 1 || headcount > 100000
       ? "Headcount must be between 1 and 100000."
       : "",
@@ -210,16 +219,16 @@ export function validateEventWizardStep(
   step: EventWizardStep,
   draft: EventWizardDraft,
 ): string[] {
-  if (step === "Client") return clientErrors(draft);
-  if (step === "Date, venue & headcount") return scheduleErrors(draft);
-  if (step === "Dishes")
+  if (step === "Basics") return basicsErrors(draft);
+  if (step === "Client & headcount") return clientHeadcountErrors(draft);
+  if (step === "Menu & dishes")
     return [
       draft.dishes.length === 0
         ? "Add at least one dish, or choose Skip for now."
         : "",
       ...dishLineErrors(draft),
     ].filter(Boolean);
-  if (step === "Staff")
+  if (step === "Staffing")
     return [
       draft.staff.length === 0
         ? "Add at least one staff assignment, or choose Skip for now."
@@ -228,15 +237,15 @@ export function validateEventWizardStep(
     ].filter(Boolean);
   return [];
 }
-/** Only client/schedule are mandatory; entered optional lines must still be valid. */
+/** Only basics/client are mandatory; entered optional lines must still be valid. */
 export function eventWizardCreateErrors(draft: EventWizardDraft): string[] {
   return [
-    ...clientErrors(draft).map((error) => `Client: ${error}`),
-    ...scheduleErrors(draft).map(
-      (error) => `Date, venue & headcount: ${error}`,
+    ...basicsErrors(draft).map((error) => `Basics: ${error}`),
+    ...clientHeadcountErrors(draft).map(
+      (error) => `Client & headcount: ${error}`,
     ),
-    ...dishLineErrors(draft).map((error) => `Dishes: ${error}`),
-    ...staffLineErrors(draft).map((error) => `Staff: ${error}`),
+    ...dishLineErrors(draft).map((error) => `Menu & dishes: ${error}`),
+    ...staffLineErrors(draft).map((error) => `Staffing: ${error}`),
   ];
 }
 export const eventWizardRequiredErrors = eventWizardCreateErrors;
@@ -285,6 +294,77 @@ export function eventWizardUnlocks(
       missing: [...staff, ...schedule],
     },
   ];
+}
+export type WizardStepInput = {
+  input: string;
+  filled: boolean;
+  unlocks: string;
+};
+/** What each input on a step feeds downstream, so the payoff is visible while filling it in. */
+export function eventWizardStepInputs(
+  step: EventWizardStep,
+  draft: EventWizardDraft,
+): WizardStepInput[] {
+  const headcount = Number(draft.expectedHeadcount);
+  if (step === "Basics")
+    return [
+      {
+        input: "Title and event type",
+        filled: !!draft.title.trim() && !!draft.eventType.trim(),
+        unlocks: "Required to create the event record.",
+      },
+      {
+        input: "Start and end",
+        filled:
+          Number.isFinite(Date.parse(draft.startsAt)) &&
+          Number.isFinite(Date.parse(draft.endsAt)),
+        unlocks:
+          "Dates demand and prep planning, the Event Day briefing, and staffing shifts.",
+      },
+      {
+        input: "Venue",
+        filled: !!draft.venueId,
+        unlocks: "Gives the Event Day briefing its site and logistics context.",
+      },
+    ];
+  if (step === "Client & headcount")
+    return [
+      {
+        input: "Client and primary contact",
+        filled: !!draft.clientId && !!draft.primaryContactName.trim(),
+        unlocks: "Required to create the event; links proposals and invoices.",
+      },
+      {
+        input: "Headcount",
+        filled: Number.isFinite(headcount) && headcount >= 1,
+        unlocks:
+          "Sets the servings for every dish, which drives demand, prep lists, and staffing.",
+      },
+      {
+        input: "Budget and quoted price",
+        filled: Number(draft.budgetAmount) > 0 || Number(draft.quotedPrice) > 0,
+        unlocks:
+          "Starts the event's money picture for proposals and invoicing.",
+      },
+    ];
+  if (step === "Menu & dishes")
+    return [
+      {
+        input: "Dishes",
+        filled: draft.dishes.length > 0,
+        unlocks:
+          "Generates ingredient demand, prep lists, and allergen checks. Without dishes, no prep list is made.",
+      },
+    ];
+  if (step === "Staffing")
+    return [
+      {
+        input: "Staff assignments",
+        filled: draft.staff.length > 0,
+        unlocks: "Unlocks staffing and labor cost planning for the event.",
+      },
+    ];
+  return [];
 }
 /** JSON with deterministic object-key order: safe to compare stored command payloads. */
 export function eventWizardFingerprint(value: unknown): string {

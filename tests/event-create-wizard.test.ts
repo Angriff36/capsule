@@ -76,34 +76,40 @@ describe("event creation wizard", () => {
           { lineId: "b", dishId: "d", dishName: "D" },
         ],
       }),
-    ).toContain("Dishes: Add each dish only once.");
+    ).toContain("Menu & dishes: Add each dish only once.");
     expect(
       eventWizardCreateErrors({
         ...empty,
         staff: [{ lineId: "a", personId: "p", personName: "P", role: "" }],
       }),
-    ).toContain("Staff: Each staff assignment needs a person and role.");
+    ).toContain("Staffing: Each staff assignment needs a person and role.");
   });
 
   it("marks completed but subsequently invalid work incomplete, without turning skipped work into complete", () => {
     const empty = createEventWizardDraft("draft");
     expect(
-      eventWizardStepState("Dishes", { ...empty, skipped: ["Dishes"] }),
+      eventWizardStepState("Menu & dishes", {
+        ...empty,
+        skipped: ["Menu & dishes"],
+      }),
     ).toBe("Incomplete");
     expect(
-      eventWizardStepState("Dishes", { ...empty, completed: ["Dishes"] }),
+      eventWizardStepState("Menu & dishes", {
+        ...empty,
+        completed: ["Menu & dishes"],
+      }),
     ).toBe("Incomplete");
     const valid = {
       ...empty,
       dishes: [{ lineId: "a", dishId: "dish", dishName: "Dish" }],
-      completed: ["Dishes" as const],
+      completed: ["Menu & dishes" as const],
     };
-    expect(eventWizardStepState("Dishes", valid)).toBe("Complete");
-    expect(eventWizardStepState("Dishes", { ...valid, dishes: [] })).toBe(
-      "Incomplete",
-    );
-    expect(eventWizardStepState("Staff", empty)).toBe("Not started");
-    expect(validateEventWizardStep("Dishes", empty)).toContain(
+    expect(eventWizardStepState("Menu & dishes", valid)).toBe("Complete");
+    expect(
+      eventWizardStepState("Menu & dishes", { ...valid, dishes: [] }),
+    ).toBe("Incomplete");
+    expect(eventWizardStepState("Staffing", empty)).toBe("Not started");
+    expect(validateEventWizardStep("Menu & dishes", empty)).toContain(
       "Add at least one dish, or choose Skip for now.",
     );
   });

@@ -88,6 +88,22 @@ export class CommercialLifecyclePolicy {
     return actions.filter((action) => action.key !== "send");
   }
 
+  /** Lifecycle-legal invoice moves the record cannot make yet, with why. */
+  invoiceBlockedActions(status: string, invoice: InvoiceBalanceContext) {
+    const canSend = available(status, INVOICE_ACTIONS).some(
+      (action) => action.key === "send",
+    );
+    return canSend && !hasBalanceDue(invoice)
+      ? [
+          {
+            key: "send",
+            reason:
+              "Nothing is due on this invoice, so there is nothing to send.",
+          },
+        ]
+      : [];
+  }
+
   paymentActions(status: string) {
     return available(status, PAYMENT_ACTIONS);
   }

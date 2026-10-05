@@ -62,6 +62,7 @@ export function EventDashSheetBody({
     stage,
     currencyCode,
     lifecycleActions,
+    blockedLifecycleActions,
     onAction,
     people,
     dishCount,
@@ -317,6 +318,7 @@ export function EventDashSheetBody({
                     (available) => available.key === action.key,
                   ),
                 )}
+                blocked={blockedLifecycleActions}
                 busy={reviseProps.busy}
                 onAction={(key) => {
                   const action = lifecycleActions.find(
