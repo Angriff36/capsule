@@ -2986,6 +2986,22 @@
   grid-column: 1 / -1;
 }
 
+div.tpp-parameter-wide {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tpp-saved-texts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.tpp-saved-texts label {
+  flex: 1 1 14rem;
+}
+
 .tpp-checkbox {
   display: flex !important;
   align-items: center;

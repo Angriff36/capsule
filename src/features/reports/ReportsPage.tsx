@@ -35,6 +35,7 @@ import {
   type SavedReportRow,
 } from "./liveReportModel";
 import { canEditSavedReportDefinition } from "./reportEditAccess";
+import { LETTER_TEXT_MARKER } from "./tpp/savedLetterTexts";
 import {
   clearReportFiltersFromSearch,
   reportFiltersFromSearch,
@@ -105,7 +106,13 @@ function SavedReportsPage() {
   const { prompt, host } = useActionPrompt(busy != null);
 
   const { currentRows, definedRows } = useMemo(() => {
-    const activeRows = (reports ?? []).filter((row) => row.deletedAt == null);
+    // Saved list views and saved letter texts share this record; not reports.
+    const activeRows = (reports ?? []).filter(
+      (row) =>
+        row.deletedAt == null &&
+        String(row.chartType) !== "list-view" &&
+        String(row.chartType) !== LETTER_TEXT_MARKER,
+    );
     const defined = activeRows.filter((row) => row.definedAt != null);
     return {
       currentRows: defined.filter((row) => String(row.status) !== "archived"),

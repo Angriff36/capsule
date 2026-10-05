@@ -104,7 +104,13 @@ export const TPP_CONTACT_REPORTS: readonly TppReportDefinition[] = [
         required: false,
         lines: 1,
       },
-      { key: "body", type: "text", label: "Letter", required: true },
+      {
+        key: "body",
+        type: "text",
+        label: "Letter",
+        required: true,
+        savedTexts: true,
+      },
       {
         key: "closing",
         type: "text",

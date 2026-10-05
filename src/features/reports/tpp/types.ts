@@ -59,6 +59,8 @@ export type TppReportParameter =
       required: boolean;
       /** 1 = a one-line box; otherwise the number of text rows (5). */
       lines?: number;
+      /** Offer the team's saved texts for this box (TPP "Body Message"). */
+      savedTexts?: boolean;
     };
 
 export interface TppReportEvidence {
