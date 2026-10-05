@@ -2430,6 +2430,8 @@ export const MenuSchema = z.object({
   archiveReason: z.string().nullable().optional(),
   availableFrom: z.coerce.date().nullable().optional(),
   availableUntil: z.coerce.date().nullable().optional(),
+  guestsPerServer: z.number().int().nullable().optional(),
+  pickOneCourses: z.array(z.string()).optional().default([]),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -9166,6 +9168,14 @@ export const MenuSetSeasonParamsSchema = z.object({
 });
 
 export type MenuSetSeasonParams = z.infer<typeof MenuSetSeasonParamsSchema>;
+
+// Command: setService on Menu
+export const MenuSetServiceParamsSchema = z.object({
+  guestsPerServer: z.number().optional(),
+  pickOneCourses: z.array(z.string()),
+});
+
+export type MenuSetServiceParams = z.infer<typeof MenuSetServiceParamsSchema>;
 
 // Command: unpublish on Menu
 export const MenuUnpublishParamsSchema = z.object({

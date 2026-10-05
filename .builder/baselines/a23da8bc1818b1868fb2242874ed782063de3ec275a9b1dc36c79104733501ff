@@ -2259,6 +2259,8 @@ export default defineSchema({
     archiveReason: v.optional(v.union(v.string(), v.null())),
     availableFrom: v.optional(v.union(v.number(), v.null())),
     availableUntil: v.optional(v.union(v.number(), v.null())),
+    guestsPerServer: v.optional(v.union(v.number(), v.null())),
+    pickOneCourses: v.optional(v.array(v.string())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

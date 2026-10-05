@@ -472,6 +472,7 @@ import {
   MenuRestoreParamsSchema,
   MenuReviseDetailsParamsSchema,
   MenuSetSeasonParamsSchema,
+  MenuSetServiceParamsSchema,
   MenuUnpublishParamsSchema,
   MenuUpdatePricingParamsSchema,
   MessagePostParamsSchema,
@@ -7309,6 +7310,16 @@ export function useMenuSetSeason() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MenuSetSeasonParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Menu.setService. */
+export function useMenuSetService() {
+  const mutate = useMutation(api.mutations.Menu_setService);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetServiceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14207,4 +14218,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1501 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1502 as const;

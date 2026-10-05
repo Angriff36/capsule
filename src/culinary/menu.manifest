@@ -32,6 +32,11 @@ entity Menu mixin TenantScoped, SoftDeletable {
   // Season: the event dates this menu can be booked for. Empty = all year.
   property availableFrom: datetime?
   property availableUntil: datetime?
+  // Service, as the printed menu book shows it: "1:12 server ratio" = one
+  // server for every 12 guests (empty = not stated), and the courses where
+  // each guest picks one dish ("Guests select one entrée", "or").
+  property guestsPerServer: int?
+  property pickOneCourses: list<string> = []
 
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
@@ -143,6 +148,23 @@ entity Menu mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Set the server ratio and the pick-one courses. Leave guestsPerServer
+  // empty to not state a ratio; send every pick-one course each time.
+  command setService(optional guestsPerServer: number, pickOneCourses: list<string>) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint serviceRatioPositive: guestsPerServer == null or guestsPerServer >= 1 "Guests per server has to be 1 or more. Leave it empty to not show a ratio."
+    mutate guestsPerServer = guestsPerServer
+    mutate pickOneCourses = pickOneCourses
+    emit MenuServiceSet {
+      menuId: self.id
+      tenantId: self.tenantId
+      guestsPerServer: guestsPerServer
+      pickOneCourses: pickOneCourses
+    }
+  }
+
   command markPublished() {
     guard self.status == "draft"
     guard self.draftedAt != null
@@ -230,6 +252,13 @@ event MenuSeasonSet: "menu.season_set" {
   tenantId: string
   availableFrom: datetime?
   availableUntil: datetime?
+}
+
+event MenuServiceSet: "menu.service_set" {
+  menuId: string
+  tenantId: string
+  guestsPerServer: number?
+  pickOneCourses: list<string>
 }
 
 event MenuPublished:"menu.published" {

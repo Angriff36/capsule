@@ -2904,6 +2904,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Company website for the public menu foot: optional; existing companies stay valid with none."
+    },
+    {
+      "path": "Menu.guestsPerServer",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Menu server ratio from the printed menu book: optional; existing menus stay valid with none."
+    },
+    {
+      "path": "Menu.pickOneCourses",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Courses where guests pick one dish: optional list; existing menus read as none."
     }
   ]
 }
