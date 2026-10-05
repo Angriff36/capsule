@@ -21,6 +21,7 @@ const RECORD_NAMES: Record<string, string> = {
   revenueAttributions: "Commission",
   eventVehicleAssignments: "Truck run",
   eventGuests: "Guest",
+  fieldConfirmations: "Food waste form",
 };
 
 function amount(line: CloseoutLine, value: number | null) {
@@ -40,7 +41,9 @@ function RecordList({ line }: { line: CloseoutLine }) {
           <li key={`${source.table}:${source.id}`}>
             {RECORD_NAMES[source.table] ?? "Record"}
             {source.label ? ` · ${source.label}` : ""}
-            {line.key === "headcount" || line.key === "labor"
+            {line.key === "headcount" ||
+            line.key === "labor" ||
+            source.table === "fieldConfirmations"
               ? ""
               : ` · ${formatMoneyExact(source.amount)}`}
           </li>
