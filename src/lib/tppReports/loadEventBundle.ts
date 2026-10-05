@@ -5,16 +5,11 @@ import type {
   EventBundleSource,
 } from "./eventBundle";
 import { mergeEventBundle } from "./mergeEventBundle";
-import { parseBattleBoard } from "./parseBattleBoard";
 import { parseBeoText } from "./parseBeoText";
-import { beoPdfText, isBeoPdf } from "./beoPdfText";
 import { bundlePartFromSheets } from "./bundlePartFromSheets";
-import { parseEventWorksheet } from "./parseEventWorksheet";
-import { isEventWorksheetPdf, worksheetPdfRows } from "./worksheetPdfRows";
-import { isPackListPdf, parsePackListPdf } from "./packListPdf";
-import { isEventMenuPdf, parseEventMenuPdf } from "./eventMenuPdf";
+import { bundlePartFromPdfLines } from "./pdfReports";
 import { isRtf, rtfToText } from "./rtfToText";
-import { readPdfTextLines } from "./pdfTextReader";
+import { readPdfTextLines } from "./pdfTextReaderNode";
 import { readXlsxWorkbook } from "./xlsxReader";
 import { XlsxReportGrid } from "./xlsxReportGrid";
 import { packetEvidenceFromText } from "../eventPacket/packetContract";
@@ -58,15 +53,7 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   }
 
   if (lower.endsWith(".pdf")) {
-    const lines = readPdfTextLines(file.contents);
-    // TPP prints the BEO, the event worksheet and the pack list as PDF too;
-    // any other PDF is the battle board.
-    if (isBeoPdf(lines)) return parseBeoText(beoPdfText(lines));
-    if (isEventWorksheetPdf(lines))
-      return parseEventWorksheet(worksheetPdfRows(lines));
-    if (isPackListPdf(lines)) return parsePackListPdf(lines);
-    if (isEventMenuPdf(lines)) return parseEventMenuPdf(lines);
-    return parseBattleBoard(lines);
+    return bundlePartFromPdfLines(readPdfTextLines(file.contents));
   }
   if (lower.endsWith(".xlsx")) {
     // Typed read: date cells print as M/D/YYYY and format-literal units ride

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { loadEventBundle } from "../src/lib/tppReports/loadEventBundle";
-import { readPdfTextLines } from "../src/lib/tppReports/pdfTextReader";
+import { readPdfTextLines } from "../src/lib/tppReports/pdfTextReaderNode";
 
 /**
  * A TPP Banquet Event Order printed to PDF (ActiveReports, as in

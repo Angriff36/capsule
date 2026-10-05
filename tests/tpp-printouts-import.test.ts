@@ -2,6 +2,9 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { loadEventBundle } from "../src/lib/tppReports/loadEventBundle";
+import { loadEventBundleFromText } from "../src/lib/tppReports/loadEventBundleFromText";
+import { readPdfTextLinesInBrowser } from "../src/lib/tppReports/pdfTextReaderBrowser";
+import { readPdfTextLines } from "../src/lib/tppReports/pdfTextReaderNode";
 
 /**
  * The rest of the Ewing Wedding (invoice 5935) printouts in work/Ewing: the
@@ -154,6 +157,8 @@ describe("TPP printouts read by the event import", () => {
       "Cream sauce finished with brandy, shallots and green peppercorns. Great addition to any of our beef entrees!",
     );
     expect(rtf.bundle.notes.dietary).toContain("NO OLIVE OIL");
+    // The PDF's Windows long dash reads as a dash, not a box.
+    expect(pdf.bundle.notes.dietary).toContain("anything — bride");
   });
 
   it("joins every printout of one event into one bundle", () => {
@@ -168,5 +173,53 @@ describe("TPP printouts read by the event import", () => {
     expect(bundle.warnings).not.toContainEqual(
       expect.stringContaining("not recognized"),
     );
+  });
+});
+
+describe("TPP printouts on the event import page", () => {
+  const pdfs = [
+    "pack-list.pdf",
+    "pack-list-by-menu-item.pdf",
+    "event-menu.pdf",
+    "event-worksheet.pdf",
+    "beo.pdf",
+  ];
+  const bytes = (name: string) =>
+    new Uint8Array(
+      readFileSync(new URL(`./fixtures/tpp-reports/${name}`, import.meta.url)),
+    );
+
+  it("reads each PDF in the page exactly as the agent path does", async () => {
+    for (const name of pdfs) {
+      expect(await readPdfTextLinesInBrowser(bytes(name))).toEqual(
+        readPdfTextLines(bytes(name)),
+      );
+    }
+  });
+
+  it("builds the same bundle from PDFs read in the page", async () => {
+    const csvFiles = await Promise.all(
+      pdfs.map(async (name) => ({
+        name,
+        text: "",
+        pdfLines: await readPdfTextLinesInBrowser(bytes(name)),
+      })),
+    );
+    const page = loadEventBundleFromText({ csvFiles });
+    expect(page.recognized.map((entry) => entry.source)).toEqual([
+      "packList",
+      "packList",
+      "eventMenu",
+      "eventWorksheet",
+      "beo",
+    ]);
+    expect(page.bundle).toEqual(load(...pdfs).bundle);
+  });
+
+  it("names a PDF that is no TPP report instead of reading nothing", () => {
+    const page = loadEventBundleFromText({
+      csvFiles: [{ name: "contract.pdf", text: "", pdfLines: [] }],
+    });
+    expect(page.unrecognized).toEqual(["contract.pdf"]);
   });
 });

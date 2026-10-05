@@ -23,7 +23,8 @@ const SKIPPED_GROUPS = new Set([
 
 const CP1252_HIGH = "€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ";
 
-function cp1252(byte: number): string {
+/** One Windows-1252 byte as text (the PDF reader's WinAnsi fallback too). */
+export function cp1252(byte: number): string {
   return byte >= 0x80 && byte <= 0x9f
     ? CP1252_HIGH[byte - 0x80]
     : String.fromCharCode(byte);

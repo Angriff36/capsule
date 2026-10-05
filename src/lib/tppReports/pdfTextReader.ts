@@ -1,9 +1,12 @@
 import {
   fontReferences,
+  latin1,
   readIndirectObjects,
   referenceIn,
   type PdfIndirectObject,
+  type PdfInflate,
 } from "./pdfObjects";
+import { cp1252 } from "./rtfToText";
 
 /**
  * Extracts positioned text from a TPP PDF export.
@@ -93,9 +96,7 @@ function unicodeMapForFont(
   }
   const stream = toUnicode === undefined ? undefined : objects.get(toUnicode);
   const map =
-    stream?.stream === undefined
-      ? empty
-      : parseCMap(stream.stream.toString("latin1"));
+    stream?.stream === undefined ? empty : parseCMap(latin1(stream.stream));
   cache.set(fontNumber, map);
   return map;
 }
@@ -122,8 +123,10 @@ function decodeLiteralString(literal: string, unicode: UnicodeMap): string {
     return table[esc] ?? esc;
   });
   let out = "";
+  // A code the font does not map is WinAnsi text: 0x97 is a long dash.
   for (const char of unescaped) {
-    out += unicode.get(char.charCodeAt(0)) ?? char;
+    const code = char.charCodeAt(0);
+    out += unicode.get(code) ?? (code <= 0xff ? cp1252(code) : char);
   }
   return out;
 }
@@ -338,7 +341,7 @@ function groupIntoLines(
 }
 
 interface PdfPage {
-  contents: Buffer[];
+  contents: Uint8Array[];
   fonts: Map<string, UnicodeMap>;
   number: number;
 }
@@ -361,7 +364,7 @@ function collectPages(objects: Map<number, PdfIndirectObject>): PdfPage[] {
       fonts.set(name, unicodeMapForFont(number, objects, cache));
     }
 
-    const contents: Buffer[] = [];
+    const contents: Uint8Array[] = [];
     const single = referenceIn(object.header, "Contents");
     if (single !== undefined) {
       const stream = objects.get(single)?.stream;
@@ -396,14 +399,18 @@ function collectPages(objects: Map<number, PdfIndirectObject>): PdfPage[] {
     .map(({ page }) => page);
 }
 
-/** Extract text lines from a PDF, in page then top-to-bottom order. */
-export function readPdfTextLines(buffer: Buffer): PdfTextLine[] {
-  const objects = readIndirectObjects(buffer);
+/**
+ * Extract text lines from a PDF, in page then top-to-bottom order. The
+ * inflate comes from the caller (pdfTextReaderNode / pdfTextReaderBrowser).
+ */
+export function readPdfTextLinesWith(
+  buffer: Uint8Array,
+  inflate: PdfInflate,
+): PdfTextLine[] {
+  const objects = readIndirectObjects(buffer, inflate);
   const lines: PdfTextLine[] = [];
   const pages = collectPages(objects).map((page) =>
-    page.contents.flatMap((content) =>
-      readRuns(content.toString("latin1"), page.fonts),
-    ),
+    page.contents.flatMap((content) => readRuns(latin1(content), page.fonts)),
   );
   const advances = measureAdvances(pages.flat());
   pages.forEach((runs, index) => {
