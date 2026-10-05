@@ -2588,7 +2588,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 
 ## 6. Staffing and My Day
 
-Screens (71): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
+Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/trainingDoc.ts`, `workforce/TrainingDocAction.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/TrainingSignOffPanel.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
 
 ### Generated reads
 
@@ -2636,6 +2636,7 @@ Screens (71): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listTimeRecord` - live read
 - `queries.listTrainingCompletion` - live read
 - `queries.listTrainingModule` - live read
+- `queries.listTrainingSignOff` - live read
 - `queries.listWeeklyScheduleNotice` - live read
 
 ### Generated actions
@@ -2884,35 +2885,35 @@ Screens (71): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "This person's hourly rate can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
   - effects: PersonPayRateSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 84 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 86 more
 - `mutations.Person_setSchedulingHold` (Person.setSchedulingHold)
   - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonSchedulingHoldSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 84 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 86 more
 - `mutations.Person_setSmsAlerts` (Person.setSmsAlerts)
   - inputs from the screen: optIn; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonSmsAlertsChanged
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 84 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 86 more
 - `mutations.Person_setStaffingVendor` (Person.setStaffingVendor)
   - inputs from the screen: vendorName; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonStaffingVendorSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 84 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 86 more
 - `mutations.Person_setWorkPreferences` (Person.setWorkPreferences)
   - inputs from the screen: preferredRoles, approvedWorkLocations; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
   - effects: PersonWorkPreferencesSet
-  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 84 more
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 86 more
 - `mutations.PrepTask_claim` (PrepTask.claim)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -3229,26 +3230,61 @@ Screens (71): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - effects: TrainingCompleted
   - refresh: live reads update by themselves; reads affected: TrainingCompletion.list, TrainingCompletion.get, Person.list, Person.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get and 2 more
 - `mutations.TrainingModule_createViaDefine` (TrainingModule.define)
-  - inputs from the screen: name, category, passingScore, description; filled by the server: none
+  - inputs from the screen: name, category, passingScore, description, steps, quiz; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: TrainingModuleDefined
-  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
 - `mutations.TrainingModule_reactivate` (TrainingModule.reactivate)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: TrainingModuleReactivated
-  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
 - `mutations.TrainingModule_retire` (TrainingModule.retire)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: TrainingModuleRetired
-  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
+- `mutations.TrainingModule_setTrainingDoc` (TrainingModule.setTrainingDoc)
+  - inputs from the screen: steps, quiz; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: none
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
+- `mutations.TrainingSignOff_createViaBeginTraining` (TrainingSignOff.beginTraining)
+  - inputs from the screen: personId, trainingModuleId, startedAt, trainerPersonId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: TrainingSignOffStarted
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.TrainingSignOff_finishTraining` (TrainingSignOff.finishTraining)
+  - inputs from the screen: finishedAt, quizDone, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: TrainingSignOffFinished
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.TrainingSignOff_initialTrainingSteps` (TrainingSignOff.initialTrainingSteps)
+  - inputs from the screen: initialledSteps; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: none
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.TrainingSignOff_reopenTraining` (TrainingSignOff.reopenTraining)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: none
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
 - `mutations.WeeklyScheduleNotice_acknowledge` (WeeklyScheduleNotice.acknowledge)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)

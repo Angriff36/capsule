@@ -483,6 +483,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Note who's finished training so they can be scheduled for those roles.",
       "In the skills matrix, rate each person 0 to 4 per area; level 4 people are the trainers.",
+      "Start training to keep the trainer, the dates and each step the trainer initials; finish it when the quiz is done.",
     ],
   },
   {

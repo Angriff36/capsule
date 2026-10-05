@@ -18,6 +18,8 @@ import {
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { SkillsMatrixPanel } from "./SkillsMatrixPanel";
+import { TrainingDocAction } from "./TrainingDocAction";
+import { TrainingSignOffPanel } from "./TrainingSignOffPanel";
 import { starterModules } from "./trainingStarters";
 import "./TrainingPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -47,12 +49,15 @@ export function TrainingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt(busy != null);
-  const [moduleDraft, setModuleDraft] = useState({
+  const emptyModuleDraft = {
     name: "",
     category: "food_safety",
     passingScore: 80,
     description: "",
-  });
+    steps: "",
+    quiz: "",
+  };
+  const [moduleDraft, setModuleDraft] = useState(emptyModuleDraft);
 
   const activeModules = (modules ?? []).filter(
     (row) => row.deletedAt == null && row.status === "active",
@@ -108,13 +113,10 @@ export function TrainingPage() {
           "food_safety" | "equipment_operation" | "service_standards" | "other",
         passingScore: Number(data.get("passingScore")),
         description: String(data.get("description") || "") || undefined,
+        steps: moduleDraft.steps.trim() || undefined,
+        quiz: moduleDraft.quiz.trim() || undefined,
       });
-      setModuleDraft({
-        name: "",
-        category: "food_safety",
-        passingScore: 80,
-        description: "",
-      });
+      setModuleDraft(emptyModuleDraft);
       setEditor(null);
     });
   };
@@ -239,7 +241,13 @@ export function TrainingPage() {
               <button
                 key={starter.name}
                 type="button"
-                onClick={() => setModuleDraft(starter)}
+                onClick={() =>
+                  setModuleDraft({
+                    ...starter,
+                    steps: starter.steps ?? "",
+                    quiz: starter.quiz ?? "",
+                  })
+                }
               >
                 <span>{categoryLabels[starter.category]}</span>
                 <strong>{starter.name}</strong>
@@ -315,6 +323,37 @@ export function TrainingPage() {
                   }))
                 }
                 placeholder="Skills and knowledge assessed"
+              />
+            </label>
+            <label className="field-label training-wide-field">
+              Steps the trainer initials (one per line; start a line with
+              &quot;- &quot; for detail under the step above)
+              <textarea
+                className="input"
+                rows={5}
+                value={moduleDraft.steps}
+                onChange={(event) =>
+                  setModuleDraft((draft) => ({
+                    ...draft,
+                    steps: event.target.value,
+                  }))
+                }
+                placeholder={"Go over all kits\n- What is a kit"}
+              />
+            </label>
+            <label className="field-label training-wide-field">
+              Quiz questions (optional)
+              <textarea
+                className="input"
+                rows={3}
+                value={moduleDraft.quiz}
+                onChange={(event) =>
+                  setModuleDraft((draft) => ({
+                    ...draft,
+                    quiz: event.target.value,
+                  }))
+                }
+                placeholder="Q: What do the red magnets mean?"
               />
             </label>
           </div>
@@ -469,6 +508,12 @@ export function TrainingPage() {
                     <span>
                       {completionCount === 1 ? "completion" : "completions"}
                     </span>
+                    <TrainingDocAction
+                      row={module}
+                      prompt={prompt}
+                      busy={busy}
+                      run={run}
+                    />
                     <TrainingModuleLifecycleAction
                       row={module}
                       prompt={prompt}
@@ -487,6 +532,13 @@ export function TrainingPage() {
         people={activePeople}
         modules={activeModules}
         prompt={prompt}
+        busy={busy}
+        run={run}
+      />
+
+      <TrainingSignOffPanel
+        people={activePeople}
+        modules={activeModules}
         busy={busy}
         run={run}
       />
