@@ -14,6 +14,7 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { openActionsForNextMeeting } from "./oneOnOneCarryOver";
 import { effectiveScorecard } from "./scorecardVersions";
 
@@ -212,31 +213,31 @@ export function OneOnOnesPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Lead (manager)
-              <select name="leadPersonId" className="input" required>
-                <option value="">Select lead</option>
-                {activePeople.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.givenName} {person.familyName}
-                  </option>
-                ))}
-              </select>
+              <SearchSelect
+                name="leadPersonId"
+                required
+                recentsKey="staff"
+                placeholder="Select lead"
+                options={activePeople.map((person) => ({
+                  id: person._id,
+                  label: `${person.givenName} ${person.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Staff member
-              <select
+              <SearchSelect
                 name="staffMemberId"
-                className="input"
                 required
+                recentsKey="staff"
+                placeholder="Select staff member"
                 value={staffDraft}
-                onChange={(e) => pickStaff(e.target.value)}
-              >
-                <option value="">Select staff member</option>
-                {activePeople.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.givenName} {person.familyName}
-                  </option>
-                ))}
-              </select>
+                onChange={(id) => pickStaff(id)}
+                options={activePeople.map((person) => ({
+                  id: person._id,
+                  label: `${person.givenName} ${person.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Scorecard
@@ -547,18 +548,16 @@ export function OneOnOnesPage() {
                 >
                   <label className="field-label">
                     Owner
-                    <select
+                    <SearchSelect
                       name="ownerPersonId"
-                      className="input"
                       defaultValue={meeting.staffMemberId}
                       required
-                    >
-                      {activePeople.map((person) => (
-                        <option key={person._id} value={person._id}>
-                          {person.givenName} {person.familyName}
-                        </option>
-                      ))}
-                    </select>
+                      recentsKey="staff"
+                      options={activePeople.map((person) => ({
+                        id: person._id,
+                        label: `${person.givenName} ${person.familyName}`,
+                      }))}
+                    />
                   </label>
                   <label className="field-label">
                     Follow-up action

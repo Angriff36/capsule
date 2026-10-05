@@ -12,6 +12,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 const policy = new WorkforceLifecyclePolicy();
 const EXPIRY_ALERT_WINDOW_MS = 30 * 86_400_000;
@@ -147,14 +148,16 @@ export function QualificationsPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Person
-              <select name="personId" className="input" required>
-                <option value="">Select person</option>
-                {activePeople.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.givenName} {item.familyName}
-                  </option>
-                ))}
-              </select>
+              <SearchSelect
+                name="personId"
+                required
+                recentsKey="staff"
+                placeholder="Select person"
+                options={activePeople.map((item) => ({
+                  id: item._id,
+                  label: `${item.givenName} ${item.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Name

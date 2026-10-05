@@ -13,6 +13,7 @@ the Storybook build; this checks compilation, not visual or interaction behavior
 | Need | Import from | Story file |
 | --- | --- | --- |
 | Action dropdown, grouped actions, menu checkbox/radio choices, submenus | `src/ui/DropdownMenu.tsx` | `src/ui/DropdownMenu.stories.tsx` |
+| Record picker for a dish, ingredient, client, vendor, or staff field (type-ahead fuzzy search, five recent picks pinned via `recentsKey`) | `src/ui/SearchSelect.tsx` | `src/ui/SearchSelect.stories.tsx` |
 | Page heading and facts | `src/ui/primitives.tsx` (`PageHeader`) | `src/ui/PageHeader.stories.tsx` |
 | Status chip | `src/ui/primitives.tsx` (`StatusChip`) | `src/ui/StatusChip.stories.tsx` |
 | Empty state with action or next steps | `src/ui/EmptyState.tsx` | `src/ui/EmptyState.stories.tsx` |

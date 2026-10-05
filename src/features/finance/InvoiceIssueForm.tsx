@@ -17,6 +17,7 @@ import {
 import { formatMoney } from "../../lib/format";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
+import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
@@ -233,6 +234,16 @@ export function InvoiceIssueForm({
           eventId={selectedEventId}
           lines={lines}
           onAdd={(added) => setLines((current) => [...current, ...added])}
+        />
+        <InvoiceTravelFee
+          eventId={selectedEventId}
+          lines={lines}
+          onAdd={(added) =>
+            setLines((current) => [
+              ...current.filter((line) => !line.id.startsWith("travel-")),
+              added,
+            ])
+          }
         />
         <label className="field-label">
           Invoice currency

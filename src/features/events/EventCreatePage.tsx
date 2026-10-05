@@ -964,22 +964,20 @@ export function EventCreatePage() {
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label">
                 Salesperson
-                <select
+                <SearchSelect
                   name="salespersonId"
                   value={salespersonId}
-                  onChange={(event) => setSalespersonId(event.target.value)}
-                  className="input"
+                  onChange={(id) => setSalespersonId(id)}
                   form="event-create-form"
-                >
-                  <option value="">Select a salesperson</option>
-                  {salespeople.map((person) => (
-                    <option key={person._id} value={person._id}>
-                      {[person.givenName, person.familyName]
-                        .filter(Boolean)
-                        .join(" ")}
-                    </option>
-                  ))}
-                </select>
+                  recentsKey="staff"
+                  placeholder="Search salespeople…"
+                  options={salespeople.map((person) => ({
+                    id: person._id,
+                    label: [person.givenName, person.familyName]
+                      .filter(Boolean)
+                      .join(" "),
+                  }))}
+                />
                 {people !== undefined && salespeople.length === 0 ? (
                   <span
                     className="field-hint"
@@ -1170,6 +1168,7 @@ export function EventCreatePage() {
                       placeholder={`Search ${activeClients.length} clients by name or email…`}
                       emptyText="No client matches — create one below."
                       testId="event-create-client"
+                      recentsKey="client"
                       options={activeClients.map((client) => ({
                         id: client._id,
                         label: clientDisplayName(client._id, activeClients),

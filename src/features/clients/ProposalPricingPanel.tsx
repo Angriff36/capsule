@@ -10,6 +10,7 @@ import {
   type PricingBasis,
 } from "../../lib/pricing";
 import { useCatalogDishes } from "./useCatalogDishes";
+import { ProposalTravelFee } from "./ProposalTravelFee";
 
 interface ProposalPricingPanelProps {
   proposalId: string;
@@ -467,6 +468,10 @@ export function ProposalPricingPanel({
         >
           Add line
         </button>
+      ) : null}
+
+      {editable ? (
+        <ProposalTravelFee proposalId={proposalId} onFailure={onFailure} />
       ) : null}
 
       <p className="mt-2 text-base text-ink-2">

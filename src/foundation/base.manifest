@@ -161,6 +161,14 @@ enum RouteTrafficPolicy {
   no_traffic
 }
 
+// How the travel & delivery fee is priced: not charged, a rate per mile, or
+// a flat fee per distance band.
+enum TravelFeeMode {
+  off
+  per_mile
+  zone
+}
+
 entity Organization mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -187,6 +195,16 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property routeSafetyBufferMinutes: int?
   property routeTrafficPolicy: RouteTrafficPolicy?
   property routeRefreshHours: int?
+  // Travel & delivery fee rules (src/lib/travelFee.ts): per mile or by
+  // distance band, miles included free, the smallest fee, whether the
+  // distance counts there and back, and the bands as a JSON list of
+  // {"upToMiles": n, "fee": n}. Unset mode = no travel fee.
+  property travelFeeMode: TravelFeeMode?
+  property travelFeeRatePerMile: money(12, 2)?
+  property travelFeeFreeMiles: float?
+  property travelFeeMinimum: money(12, 2)?
+  property travelFeeRoundTrip: boolean?
+  property travelFeeZonesJson: string?
   // Event timing rules (spec §8.4, PL-TIMING): on-site setup before serve
   // for full and limited service, crew briefing before loading, the load
   // time used when no load rule matches, and the load rules themselves (JSON
@@ -342,6 +360,33 @@ entity Organization mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       safetyBufferMinutes: safetyBufferMinutes
       refreshHours: refreshHours
+    }
+  }
+
+  // Company travel & delivery fee rules; proposals and invoices for an event
+  // price its travel line from these.
+  command configureTravelFee(
+    mode: TravelFeeMode,
+    ratePerMile: money(12, 2),
+    freeMiles: number,
+    minimumFee: money(12, 2),
+    roundTrip: boolean,
+    optional zonesJson: string
+  ) {
+    guard self.deletedAt == null
+    constraint travelFeeRateNonnegative: ratePerMile >= 0 "The rate per mile can't be negative. Use zero or more."
+    constraint travelFeeFreeMilesNonnegative: freeMiles >= 0 "Free miles can't be negative. Use zero or more."
+    constraint travelFeeMinimumNonnegative: minimumFee >= 0 "The smallest fee can't be negative. Use zero or more."
+    mutate travelFeeMode = mode
+    mutate travelFeeRatePerMile = ratePerMile
+    mutate travelFeeFreeMiles = freeMiles
+    mutate travelFeeMinimum = minimumFee
+    mutate travelFeeRoundTrip = roundTrip
+    mutate travelFeeZonesJson = zonesJson
+    emit OrganizationTravelFeeConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+      mode: mode
     }
   }
 
@@ -509,6 +554,12 @@ event OrganizationRoutePolicyConfigured: "organization.route_policy_configured" 
   tenantId: string
   safetyBufferMinutes: int
   refreshHours: int
+}
+
+event OrganizationTravelFeeConfigured: "organization.travel_fee_configured" {
+  organizationId: string
+  tenantId: string
+  mode: string
 }
 
 event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured" {

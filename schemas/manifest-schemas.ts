@@ -1125,6 +1125,9 @@ export const EventSchema = z.object({
   referralSourceId: z.string().uuid().nullable().optional(),
   venueId: z.string().uuid().nullable().optional(),
   operatingLocationId: z.string().uuid().nullable().optional(),
+  travelDistanceMiles: z.number().nullable().optional(),
+  travelFeeOverride: z.number().nullable().optional(),
+  travelFeeOverrideReason: z.string().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   ownerName: z.string().nullable().optional(),
   title: z.string().default(""),
@@ -2739,6 +2742,12 @@ export const OrganizationSchema = z.object({
   routeSafetyBufferMinutes: z.number().int().nullable().optional(),
   routeTrafficPolicy: z.enum(["traffic_aware", "no_traffic"]).nullable().optional(),
   routeRefreshHours: z.number().int().nullable().optional(),
+  travelFeeMode: z.enum(["off", "per_mile", "zone"]).nullable().optional(),
+  travelFeeRatePerMile: z.number().nullable().optional(),
+  travelFeeFreeMiles: z.number().nullable().optional(),
+  travelFeeMinimum: z.number().nullable().optional(),
+  travelFeeRoundTrip: z.boolean().nullable().optional(),
+  travelFeeZonesJson: z.string().nullable().optional(),
   timingFullServiceSetupMinutes: z.number().int().nullable().optional(),
   timingLimitedServiceSetupMinutes: z.number().int().nullable().optional(),
   timingBriefingMinutes: z.number().int().nullable().optional(),
@@ -3559,6 +3568,7 @@ export const ProposalLineItemSchema = z.object({
   menuDishId: z.string().uuid().nullable().optional(),
   overrideReason: z.string().nullable().optional(),
   equipmentId: z.string().uuid().nullable().optional(),
+  travelFee: z.boolean().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -7298,6 +7308,15 @@ export const EventSetEventNumberParamsSchema = z.object({
 
 export type EventSetEventNumberParams = z.infer<typeof EventSetEventNumberParamsSchema>;
 
+// Command: setTravelFee on Event
+export const EventSetTravelFeeParamsSchema = z.object({
+  distanceMiles: z.number().optional(),
+  overrideAmount: z.number().optional(),
+  overrideReason: z.string().optional(),
+});
+
+export type EventSetTravelFeeParams = z.infer<typeof EventSetTravelFeeParamsSchema>;
+
 // Command: stageClientMerge on Event
 export const EventStageClientMergeParamsSchema = z.object({
   clientMergeId: z.string().uuid(),
@@ -9822,6 +9841,18 @@ export const OrganizationConfigureTimingPolicyParamsSchema = z.object({
 
 export type OrganizationConfigureTimingPolicyParams = z.infer<typeof OrganizationConfigureTimingPolicyParamsSchema>;
 
+// Command: configureTravelFee on Organization
+export const OrganizationConfigureTravelFeeParamsSchema = z.object({
+  mode: z.enum(["off", "per_mile", "zone"]),
+  ratePerMile: z.number(),
+  freeMiles: z.number(),
+  minimumFee: z.number(),
+  roundTrip: z.boolean(),
+  zonesJson: z.string().optional(),
+});
+
+export type OrganizationConfigureTravelFeeParams = z.infer<typeof OrganizationConfigureTravelFeeParamsSchema>;
+
 // Command: deactivate on Organization
 export const OrganizationDeactivateParamsSchema = z.object({});
 
@@ -11289,6 +11320,7 @@ export const ProposalLineItemAddLineParamsSchema = z.object({
   menuDishId: z.string().uuid().optional(),
   overrideReason: z.string().optional(),
   equipmentId: z.string().min(1).optional(),
+  travelFee: z.boolean().optional(),
 });
 
 export type ProposalLineItemAddLineParams = z.infer<typeof ProposalLineItemAddLineParamsSchema>;
