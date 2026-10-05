@@ -84,7 +84,11 @@ export class ComponentTextParser {
     const lines = text.split("\n").map((line) => line.trim());
     const name = this.extractName(lines);
     const description = this.extractDescription(lines, name);
-    const { yieldQuantity, yieldUnit } = this.extractYield(text, warnings);
+    const { yieldQuantity, yieldUnit } = this.extractYield(
+      lines.filter((line) => !/^\W*per\b/i.test(line)).join("\n"),
+      this.headerText(lines),
+      warnings,
+    );
     const ingredientLines = this.extractIngredientBlock(lines);
     const instructions = this.extractInstructions(lines);
     const parsedLines = ingredientLines
@@ -144,8 +148,32 @@ export class ComponentTextParser {
     return description || undefined;
   }
 
+  /**
+   * A bare amount with no "yields"/"makes" word counts as the yield only above
+   * the ingredients: "3 POUNDS FRESH BASIL" is an ingredient, never the batch
+   * size, and a "*PER 5 POUNDS CHICKEN*" note says what the batch is for, not
+   * what it makes.
+   */
+  private headerText(lines: string[]): string {
+    const header: string[] = [];
+    for (const line of lines) {
+      if (
+        /^(ingredients?|components?)\s*:?\s*$/i.test(line) ||
+        this.isInstructionSectionHeader(line) ||
+        this.looksLikeIngredient(line) ||
+        this.isMethodStepLine(line)
+      ) {
+        break;
+      }
+      if (/^\W*per\b/i.test(line)) continue;
+      header.push(line);
+    }
+    return header.join("\n");
+  }
+
   private extractYield(
     text: string,
+    header: string,
     warnings: string[],
   ): { yieldQuantity: number | null; yieldUnit: UnitOfMeasure | null } {
     const poundYield =
@@ -155,7 +183,7 @@ export class ComponentTextParser {
           "iu",
         ),
       ) ??
-      text.match(
+      header.match(
         new RegExp(`\\b(${QUANTITY_TOKEN})\\s*#\\s*(?:raw\\s+weight)?`, "iu"),
       );
     if (poundYield) {
@@ -178,7 +206,7 @@ export class ComponentTextParser {
           "iu",
         ),
       ) ??
-      text.match(
+      header.match(
         new RegExp(
           `\\b(${QUANTITY_TOKEN})\\s*(servings?|portions?|quarts?|qts?|gallons?|gals?|cups?|pints?|pts?|pounds?|lbs?)\\b`,
           "iu",
@@ -219,7 +247,21 @@ export class ComponentTextParser {
       /^(ingredients?|components?)\s*:?\s*$/i.test(line),
     );
     if (start < 0) {
-      return lines.filter((line) => this.looksLikeIngredient(line));
+      // No INGREDIENTS heading: every measured line is an ingredient, and a
+      // "(FRESH)" line under one is the end of that ingredient wrapped over.
+      const block: string[] = [];
+      lines.forEach((line, index) => {
+        if (this.looksLikeIngredient(line)) {
+          block.push(line);
+        } else if (
+          this.isWrappedNote(line) &&
+          index > 0 &&
+          this.looksLikeIngredient(lines[index - 1])
+        ) {
+          block[block.length - 1] += `, ${line.slice(1, -1).trim()}`;
+        }
+      });
+      return block;
     }
     const block: string[] = [];
     for (let i = start + 1; i < lines.length; i += 1) {
@@ -253,7 +295,7 @@ export class ComponentTextParser {
     const ingredientStart = lines.findIndex((line) =>
       /^(ingredients?|components?)\s*:?\s*$/i.test(line),
     );
-    if (ingredientStart < 0) return undefined;
+    if (ingredientStart < 0) return this.extractUnheadedSteps(lines);
     let stepStart = -1;
     for (let i = ingredientStart + 1; i < lines.length; i += 1) {
       if (this.isMethodStepLine(lines[i])) {
@@ -267,6 +309,59 @@ export class ComponentTextParser {
       .filter((line) => line.length > 0)
       .join("\n")
       .trim();
+  }
+
+  /**
+   * Kitchen recipe sheets often have no headings: name, yield, measured lines,
+   * then the steps. Some work in stages (two ingredients, "1. MELT BUTTER",
+   * three more, "1. ADD TO ROUX"), so each stage restarts at 1; the steps keep
+   * their order and are numbered straight through. Plain sentences wrapped
+   * over several lines become one step per paragraph.
+   */
+  private extractUnheadedSteps(lines: string[]): string | undefined {
+    const first = lines.findIndex(
+      (line) => this.looksLikeIngredient(line) || this.isMethodStepLine(line),
+    );
+    if (first < 0) return undefined;
+    const steps: string[] = [];
+    let paragraph: string[] = [];
+    const endParagraph = () => {
+      if (paragraph.length) steps.push(paragraph.join(" "));
+      paragraph = [];
+    };
+    lines.slice(first).forEach((line, offset) => {
+      const index = first + offset;
+      if (!line || this.looksLikeIngredient(line)) {
+        endParagraph();
+        return;
+      }
+      if (
+        this.isWrappedNote(line) &&
+        this.looksLikeIngredient(lines[index - 1])
+      )
+        return;
+      if (this.isMethodStepLine(line)) {
+        endParagraph();
+        steps.push(line.replace(/^\s*(?:\d+|[a-z])[.)]\s*/i, ""));
+        return;
+      }
+      paragraph.push(line);
+    });
+    endParagraph();
+    if (steps.length === 0) return undefined;
+    return steps.map((step, index) => `${index + 1}. ${step}`).join("\n");
+  }
+
+  private isTeaspoonShorthand(unitMatch: RegExpMatchArray): boolean {
+    return (
+      /^tea$/i.test(unitMatch[1]) &&
+      !unitMatch[2] &&
+      !/^bags?\b/i.test(unitMatch[3].trim())
+    );
+  }
+
+  private isWrappedNote(line: string): boolean {
+    return /^\([^()]+\)$/.test(line.trim());
   }
 
   parseIngredientLine(raw: string): ParsedIngredientLine | null {
@@ -330,6 +425,11 @@ export class ComponentTextParser {
       unitRaw = fluidOunce[1];
       unit = "fluid_ounce";
       rest = fluidOunce[2].trim();
+    } else if (unitMatch && this.isTeaspoonShorthand(unitMatch)) {
+      // Kitchen sheets write "1 TEA SALT" for a teaspoon; "4 tea bags" stays tea.
+      unitRaw = unitMatch[1];
+      unit = "teaspoon";
+      rest = unitMatch[3].trim();
     } else if (
       unitMatch &&
       (unitMatch[1] === "#" || this.units.isKnownAlias(unitMatch[1]))
@@ -340,6 +440,13 @@ export class ComponentTextParser {
       rest = unitMatch[3].trim();
       if (parenthetical) {
         rest = `${rest}, ${parenthetical}`.replace(/^,\s*/, "");
+      }
+    }
+    // "1/4 CUP CUPS WATER": the unit typed twice is still one unit.
+    if (unit) {
+      const repeated = rest.match(/^([A-Za-z]+)\s+(.+)$/);
+      if (repeated && this.mapUnitAlias(repeated[1]) === unit) {
+        rest = repeated[2].trim();
       }
     }
 
