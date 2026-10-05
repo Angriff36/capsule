@@ -15,6 +15,7 @@ import { compareActivities } from "../events/EventTimelinePanel";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import { loadWindowLabel } from "../facilities/venueOperatingFacts";
+import { vibeGuide } from "../facilities/venueSellingProfile";
 import {
   allergenLabel,
   deriveDishAllergens,
@@ -186,6 +187,11 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
       ].filter(Boolean)
     : [];
   const loadWindow = venue ? loadWindowLabel(venue) : null;
+  // The venue's look sets how the food is presented here (playbook 09).
+  const guide = vibeGuide(venue?.vibe);
+  const foodLook = guide
+    ? `${guide.label}. ${guide.presentation}. Serve: ${guide.serveStyle}.`
+    : null;
   return (
     <div>
       <Row
@@ -210,6 +216,9 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
       <Note label="Access" text={venue?.accessNotes} />
       <Note label="Catering notes" text={venue?.cateringNotes} />
       <Note label="Restrictions" text={venue?.restrictions} />
+      <Note label="Food look here" text={foodLook} />
+      <Note label="Show off" text={venue?.topFeature} />
+      <Note label="Photograph" text={venue?.photoFocus} />
       {venue?.contactName || venue?.contactPhone ? (
         <>
           <p className="evd-kicker">Venue contact</p>

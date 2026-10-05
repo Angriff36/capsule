@@ -100,6 +100,10 @@ export type EventDayVenue = {
   accessNotes: string | null;
   cateringNotes: string | null;
   restrictions: string | null;
+  // Venue selling profile (playbook 09): the look sets the food look here.
+  vibe?: string | null;
+  topFeature?: string | null;
+  photoFocus?: string | null;
   contactName: string | null;
   contactPhone: string | null;
 };

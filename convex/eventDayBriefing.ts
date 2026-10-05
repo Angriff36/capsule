@@ -539,6 +539,9 @@ export const getBriefing = query({
               accessNotes: venueRaw.accessNotes ?? null,
               cateringNotes: venueRaw.cateringNotes ?? null,
               restrictions: venueRaw.restrictions ?? null,
+              vibe: venueRaw.vibe ?? null,
+              topFeature: venueRaw.topFeature ?? null,
+              photoFocus: venueRaw.photoFocus ?? null,
               contactName: await decryptField(
                 ctx,
                 "Venue",
