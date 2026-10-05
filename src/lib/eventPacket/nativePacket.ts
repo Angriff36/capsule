@@ -23,6 +23,8 @@ export interface NativePackLine {
   food: boolean;
   ownership: "owned" | "rented" | "client" | null;
   leftOff: boolean;
+  /** Numbered black bin the line was packed in (Perfect Packing memo). */
+  bin?: number | null;
 }
 export interface NativeStaffLine {
   name: string;
@@ -190,7 +192,7 @@ export function nativePartBlocks(
   const menu = menuInServiceOrder(content.menu);
   const pack = content.pack.filter((line) => !line.leftOff);
   const packLine = (line: NativePackLine) =>
-    `${line.description} - ${amount(line.quantity, line.unit)}`;
+    `${line.description} - ${amount(line.quantity, line.unit)}${line.bin ? ` - bin ${line.bin}` : ""}`;
   const none = (text: string): PartBlock[] => [
     { kind: "issue", text, small: true },
   ];

@@ -436,6 +436,8 @@ async function readNativeContent(
         food: !!(item.eventDishId || item.dishId || item.dishContainerId || item.productionBatchId),
         ownership: item.ownership ?? null,
         leftOff: item.excludedAt != null,
+        // Only when set, so a packet without bins keeps its fingerprint.
+        ...(item.binNumber ? { bin: item.binNumber } : {}),
       });
     }
   }
