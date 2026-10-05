@@ -4,9 +4,10 @@ import {
   useCreateVendor,
   useCreateVendorContact,
   useCreateVendorOrder,
-  useListEvent,
   useListIngredient,
+  useListIngredientDemand,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListInventoryItem,
   useListPurchaseNeed,
   useListVendor,
@@ -31,16 +32,27 @@ import {
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
-import { PurchasingCommandForm } from "./PurchasingCommandForm";
+import {
+  NEW_VENDOR_FIELD,
+  PurchasingCommandForm,
+} from "./PurchasingCommandForm";
+import { findByName } from "./inlineCatalogChoice";
+import { WeeklyDraftPanel } from "./WeeklyDraftPanel";
+import { currentWeeklyDraft, weeklyDraftLines } from "./weeklyDraftView";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { purchasingStockContext } from "./purchasingStockContext";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
+import { VendorPriceListImport } from "./VendorPriceListImport";
+import { SentOrderSurplusPanel } from "./SentOrderSurplusPanel";
+import { sentOrderSurplus } from "./sentOrderSurplus";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { vendorOrderTitle } from "./vendorOrderNumber";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
 import { WorkingEventScopeNote } from "../events/WorkingEventScope";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { usePurchasingScopeViewModel } from "./PurchasingScopeViewModel";
 
 const policy = new SupplyLifecyclePolicy();
@@ -48,6 +60,7 @@ const policy = new SupplyLifecyclePolicy();
 export function PurchasingPage() {
   const { eventScope, linkedEventId, scopedEventId, showAllEvents } =
     usePurchasingScopeViewModel();
+  const listOrigin = useListOrigin();
   const needs = useListPurchaseNeed();
   const vendors = useListVendor();
   const orders = useListVendorOrder();
@@ -55,9 +68,20 @@ export function PurchasingPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
   const inventoryItems = useListInventoryItem();
-  const events = useListEvent();
   const vendorContacts = useListVendorContact();
   const priceObservations = useListIngredientPriceObservation();
+  const demands = useListIngredientDemand();
+  const events = usePickerAndNamedEvents(
+    needs && orders && demands
+      ? [
+          scopedEventId,
+          ...needs.map((row) => row.eventId),
+          ...orders.map((row) => row.eventId),
+          ...demands.map((row) => row.eventId),
+        ]
+      : undefined,
+  );
+  const unitMappings = useListItemUnitMapping();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
   const createContact = useCreateVendorContact();
@@ -116,6 +140,23 @@ export function PurchasingPage() {
     (order) =>
       scopedEventId == null || String(order.eventId ?? "") === scopedEventId,
   );
+  // Purchasing opens on the week's automatic draft (BE-10.6).
+  const currentDraft = currentWeeklyDraft(weeklyDrafts, Date.now());
+  const currentDraftLines =
+    currentDraft &&
+    lines !== undefined &&
+    demandLinks !== undefined &&
+    needs !== undefined &&
+    demands !== undefined
+      ? weeklyDraftLines({
+          order: currentDraft,
+          lines,
+          links: demandLinks,
+          needs,
+          demands,
+          mappings: unitMappings ?? [],
+        })
+      : null;
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
   const eventName = (id: string) =>
@@ -185,6 +226,27 @@ export function PurchasingPage() {
     }
   };
 
+  // A vendor named in the inline box is added first (or reused when a retry
+  // or a teammate already added that name), then the order uses it.
+  const addVendorByName = async (name: string) => {
+    const existing = findByName(
+      activeVendors.filter((vendor) => String(vendor.status) === "active"),
+      name,
+    );
+    if (existing) return existing._id;
+    const created = (await createVendor({
+      name: name.trim(),
+      paymentTermsDays: 30,
+    })) as { docId: string };
+    return String(created.docId);
+  };
+  const orderVendorId = async (data: FormData) => {
+    const newName = String(data.get(NEW_VENDOR_FIELD) ?? "").trim();
+    return newName
+      ? await addVendorByName(newName)
+      : String(data.get("vendorId"));
+  };
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const current = form;
@@ -211,7 +273,7 @@ export function PurchasingPage() {
         });
       } else {
         await createOrder({
-          vendorId: String(data.get("vendorId")),
+          vendorId: await orderVendorId(data),
           eventId: String(data.get("eventId")) || undefined,
           orderNumber:
             String(data.get("orderNumber") ?? "").trim() || undefined,
@@ -294,38 +356,39 @@ export function PurchasingPage() {
           value: vendor._id,
           label: String(vendor.name ?? vendor._id),
         }));
-      if (vendorOptions.length === 0) {
-        setFailure(
-          new Error("Onboard a vendor first — the default routes to one."),
-        );
-        return;
-      }
+      // No vendors yet: name one here instead of a dead end.
       const values = await prompt.askFields({
         title: "Default purchasing vendor",
         description:
-          "Approved-event shortages route to this vendor's weekly draft order.",
+          vendorOptions.length === 0
+            ? "No vendors yet. Name the vendor you buy from most; add contact details later."
+            : "Approved-event shortages route to this vendor's weekly draft order.",
         fields: [
-          {
-            name: "vendorId",
-            label: "Vendor",
-            required: true,
-            defaultValue: defaultVendorId ?? undefined,
-            options: vendorOptions,
-          },
+          vendorOptions.length === 0
+            ? { name: "vendorName", label: "Vendor name", required: true }
+            : {
+                name: "vendorId",
+                label: "Vendor",
+                required: true,
+                defaultValue: defaultVendorId ?? undefined,
+                options: vendorOptions,
+              },
         ],
         confirmLabel: "Set default vendor",
       });
-      if (!values?.vendorId) return;
+      const typedName = String(values?.vendorName ?? "").trim();
+      if (!values?.vendorId && !typedName) return;
       void run("default-vendor", async () => {
+        const vendorId = values?.vendorId || (await addVendorByName(typedName));
         if (purchasingConfig) {
           await configureWeeklyPurchasing({
             docId: purchasingConfig._id,
             version: purchasingConfig.version,
-            defaultVendorId: values.vendorId,
+            defaultVendorId: vendorId,
           });
         } else {
           await createWeeklyPurchasingConfig({
-            defaultVendorId: values.vendorId,
+            defaultVendorId: vendorId,
           });
         }
       });
@@ -361,8 +424,14 @@ export function PurchasingPage() {
       if (!values) return;
       const raw = String(values.amount ?? "").trim();
       const amount = raw === "" ? undefined : Number(raw);
-      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0))
+      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0)) {
+        setFailure(
+          new Error(
+            "The approval threshold must be a number of 0 or more. Leave it empty for no threshold.",
+          ),
+        );
         return;
+      }
       void run("approval-threshold", async () => {
         await setApprovalThreshold({
           docId: purchasingConfig._id,
@@ -427,8 +496,9 @@ export function PurchasingPage() {
         <strong>Automatic weekly draft</strong>
         <span>
           Add dishes, set headcount, approve the event — Capsule rolls the
-          ingredient shortages into one draft vendor order for the week. Nothing
-          is sent to a vendor until you submit it.
+          ingredient shortages into one draft vendor order for the week. Mark
+          the order sent, then email it to the vendor from the order page (or
+          send it your own way).
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -438,6 +508,7 @@ export function PurchasingPage() {
           form={form}
           busy={busy != null}
           activeVendors={rankedVendors}
+          vendorsLoading={vendors === undefined}
           events={events}
           contactVendorId={contactVendorId}
           onCancel={() => {
@@ -448,10 +519,20 @@ export function PurchasingPage() {
         />
       ) : null}
 
+      {currentDraft && currentDraftLines ? (
+        <WeeklyDraftPanel
+          order={currentDraft}
+          vendorName={vendorName(currentDraft.vendorId)}
+          lines={currentDraftLines}
+          ingredientName={ingredientName}
+          eventName={eventName}
+        />
+      ) : null}
+
       <section className="working-ledger mt-6">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">This week</p>
+            <p className="eyebrow">All weeks</p>
             <h2>Auto-maintained drafts</h2>
           </div>
           <span>{shownWeeklyDrafts.length} drafts</span>
@@ -508,6 +589,7 @@ export function PurchasingPage() {
                       <Link
                         className="text-link"
                         to={`/inventory/orders/${order._id}`}
+                        state={listOriginState(listOrigin)}
                       >
                         Review &amp; submit →
                       </Link>
@@ -519,6 +601,12 @@ export function PurchasingPage() {
           </div>
         )}
       </section>
+
+      <SentOrderSurplusPanel
+        rows={sentOrderSurplus({ needs: needs ?? [], orders: orders ?? [] })}
+        eventName={eventName}
+        ingredientName={ingredientName}
+      />
 
       <PurchasingQueueSplit
         needsLoading={
@@ -634,6 +722,7 @@ export function PurchasingPage() {
                       <Link
                         className="text-link"
                         to={`/inventory/orders/${order._id}`}
+                        state={listOriginState(listOrigin)}
                       >
                         Open folio →
                       </Link>
@@ -647,6 +736,8 @@ export function PurchasingPage() {
       </section>
 
       <SeasonalDemandForecast />
+
+      <VendorPriceListImport />
 
       <BulkActionBar
         count={selection.count}

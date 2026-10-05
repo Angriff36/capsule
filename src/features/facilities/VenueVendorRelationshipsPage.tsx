@@ -24,6 +24,7 @@ import {
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 // Enum values from manifest
 const CATEGORIES = [
@@ -199,7 +200,7 @@ export function VenueVendorRelationshipsPage() {
       const values = await prompt.askFields({
         title: `Edit ${getVendorName(row.vendorId)}`,
         description:
-          "Terms this venue holds with the vendor. A box left blank keeps its saved value; change the policy with the status control.",
+          "Terms this venue holds with the vendor. A box left blank keeps its saved value; use the status control to change it.",
         fields: [
           {
             name: "category",
@@ -357,8 +358,8 @@ export function VenueVendorRelationshipsPage() {
         title="Venue vendor relationships"
         lead={
           venue
-            ? `Vendor policies for ${venue.name}`
-            : "Venue-specific vendor policies and status"
+            ? `Which vendors ${venue.name} prefers or limits, and on what terms`
+            : "Which vendors each venue prefers or limits, and on what terms"
         }
         actions={
           <button
@@ -411,18 +412,16 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Vendor *
               </label>
-              <select
+              <SearchSelect
                 name="vendorId"
                 required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
-              >
-                <option value="">Select vendor...</option>
-                {filteredVendors.map((v) => (
-                  <option key={v._id} value={v._id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+                recentsKey="vendor"
+                placeholder="Search vendors…"
+                options={filteredVendors.map((v) => ({
+                  id: v._id,
+                  label: v.name,
+                }))}
+              />
             </div>
 
             <div>
@@ -529,7 +528,7 @@ export function VenueVendorRelationshipsPage() {
               <input
                 type="text"
                 name="insuranceCertificate"
-                placeholder="Certificate number or reference"
+                placeholder="Certificate number or note"
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>

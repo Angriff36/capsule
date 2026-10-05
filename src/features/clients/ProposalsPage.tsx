@@ -1,8 +1,8 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useListClient,
-  useListEvent,
+  useGetEvent,
   useListEventTimelineActivity,
   useListVenue,
   useListProposal,
@@ -10,7 +10,6 @@ import {
   useListProposalEnhancement,
   useListProposalDishSelection,
   useListProposalRevision,
-  useListDish,
   useProposalAccept,
   useProposalDecline,
   useProposalExpire,
@@ -20,11 +19,19 @@ import {
   useShareLinkCreate,
   useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useProposalPictureUrls } from "../../lib/useProposalPictureUrls";
 import { type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatMoneyExact } from "../../lib/format";
+import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
+import { useEmailProposal } from "../../lib/proposalEmailActions";
+import { ProposalEmailHistory } from "./ProposalEmailHistory";
 import { clientDisplayName } from "../events/clientName";
+import {
+  useEventRecordsById,
+  useEventRecordsInRange,
+} from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -32,6 +39,7 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import {
   downloadProposalPdf,
+  proposalPdfBase64,
   transformTimelineActivities,
   transformVenueLogistics,
   type ProposalPdfRecord,
@@ -39,15 +47,26 @@ import {
 import { ProposalSignatureRevokeAction } from "../sales/ProposalSignatureRevokeAction";
 import { ProposalChangeAction } from "./ProposalChangeAction";
 import { ProposalChangeLabel } from "./ProposalChangeLabel";
+import {
+  HistoricalAcceptanceLabel,
+  RecordAcceptedBeforeCapsule,
+} from "./ProposalHistoricalAcceptance";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
+import {
+  ProposalDraftCheck,
+  useGenerateProposalDraft,
+} from "./ProposalDraftCheck";
 import { generateAcceptanceUrl } from "./proposalSignatureRequest";
+import "./ProposalsPage.css";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 import { useActionNotice } from "../../ui/action-result";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { proposalLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import {
   projectProposalPdf,
   downloadProjectedProposalPdf,
@@ -65,6 +84,9 @@ const LINKABLE_EVENT_STAGES = [
 // Proposal statuses where the client is still choosing dishes.
 const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
 
+const DAY_MS = 86_400_000;
+const PROPOSAL_EVENT_DAYS = 731;
+
 const policy = new CrmLifecyclePolicy();
 
 // Proposal money math lives in the shared pricing engine (src/lib/pricing.ts).
@@ -72,9 +94,42 @@ const policy = new CrmLifecyclePolicy();
 
 export function ProposalsPage() {
   const { branding } = useTenantBranding();
+  const withPictureUrls = useProposalPictureUrls();
   const proposals = useListProposal();
   const clients = useListClient();
-  const events = useListEvent();
+  // Events from two years back to two years ahead, plus undated ones: the
+  // linked events of recent proposals and the accept-time link picker. The
+  // window moves once a day.
+  const today = Math.floor(Date.now() / DAY_MS) * DAY_MS;
+  const eventWindow = useMemo(
+    () => ({
+      from: today - PROPOSAL_EVENT_DAYS * DAY_MS,
+      to: today + PROPOSAL_EVENT_DAYS * DAY_MS,
+      withUndated: true,
+    }),
+    [today],
+  );
+  const windowEvents = useEventRecordsInRange(eventWindow);
+  // A proposal linked to an event outside that window keeps its event too.
+  const olderEventIds = useMemo(() => {
+    if (!proposals || !windowEvents) return undefined;
+    const inWindow = new Set(windowEvents.map((e) => String(e._id)));
+    return [
+      ...new Set(
+        proposals
+          .map((p) => (p.eventId ? String(p.eventId) : ""))
+          .filter((id) => id && !inWindow.has(id)),
+      ),
+    ];
+  }, [proposals, windowEvents]);
+  const olderEvents = useEventRecordsById(olderEventIds);
+  const events = useMemo(
+    () =>
+      windowEvents && olderEvents
+        ? [...windowEvents, ...olderEvents]
+        : windowEvents,
+    [windowEvents, olderEvents],
+  );
   const timelineActivities = useListEventTimelineActivity();
   const venues = useListVenue();
   // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
@@ -83,7 +138,7 @@ export function ProposalsPage() {
   const proposalEnhancements = useListProposalEnhancement();
   const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
-  const dishes = useListDish();
+  const dishes = useWholeDishList();
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
@@ -98,6 +153,7 @@ export function ProposalsPage() {
   const shareLinks = useListShareLink();
   const createShareLink = useShareLinkCreate();
   const revokeShareLink = useShareLinkRevoke();
+  const emailProposal = useEmailProposal();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
@@ -136,19 +192,51 @@ export function ProposalsPage() {
       setNotice(`Share link: ${url}`);
     }
   };
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  // One button builds the draft from the event, or brings the draft it built
+  // before up to date (convex/lib/proposalGenerate.ts); staff edits are kept.
+  const generateDraft = useGenerateProposalDraft();
+  const buildFromEvent = async (eventId: Id<"events">) => {
+    setBusy("build-from-event");
+    setFailure(null);
+    try {
+      const result = await generateDraft({ eventId });
+      setShowDraft(false);
+      setNotice(
+        result.created
+          ? "Proposal built from the event. Check it, then send it."
+          : result.changed
+            ? "Proposal brought up to date with the event. Staff changes were kept."
+            : "This event's proposal already matches the event.",
+      );
+      setSearchParams({ proposal: result.proposalId });
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
   const fromEventId = searchParams.get("event");
-  const fromEvent =
+  const windowFromEvent =
     fromEventId && events
-      ? (events ?? []).find(
-          (row) => row._id === fromEventId && row.deletedAt == null,
-        )
+      ? events.find((row) => row._id === fromEventId && row.deletedAt == null)
       : undefined;
+  // An event outside the window above is read on its own.
+  const singleFromEvent = useGetEvent(
+    fromEventId && events && !windowFromEvent ? fromEventId : "skip",
+  );
+  const fromEvent =
+    windowFromEvent ??
+    (singleFromEvent && singleFromEvent.deletedAt == null
+      ? singleFromEvent
+      : undefined);
 
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
   const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(
     null,
   );
+  const [emailsOpenFor, setEmailsOpenFor] = useState<string | null>(null);
+  const [emailsKey, setEmailsKey] = useState(0);
 
   // Row deep link: /clients/proposals?proposal=<id> opens that proposal's
   // detail panels (menu, pricing, enhancements) and scrolls the row into view,
@@ -165,10 +253,17 @@ export function ProposalsPage() {
       ?.scrollIntoView({ block: "start" });
   }, [focusedProposalId, proposalsLoaded]);
 
+  // "Create proposal" on an event navigates here with ?event=<id>: one click
+  // builds the proposal from the event (menu, prices, date, venue) and opens
+  // it (issue #415). Building again is safe: an unchanged event writes
+  // nothing. Only an event with no client yet falls back to the form.
+  const builtFor = useRef<string | null>(null);
   useEffect(() => {
-    // "Create proposal" on an event navigates here with ?event=<id>; open the
-    // draft form prefilled from that event (spec §5.3 create-proposal-from-event).
-    if (fromEvent) {
+    if (!fromEvent || builtFor.current === fromEvent._id) return;
+    builtFor.current = fromEvent._id;
+    if (fromEvent.clientId) {
+      void buildFromEvent(fromEvent._id as Id<"events">);
+    } else {
       setShowDraft(true);
     }
   }, [fromEvent?._id]);
@@ -300,9 +395,7 @@ export function ProposalsPage() {
         const revision = latestRevisionFor(row._id);
         if (!revision) {
           setFailure(
-            new Error(
-              "Send the proposal first — a share link needs a published revision.",
-            ),
+            new Error("Send the proposal first, then make its share link."),
           );
           return;
         }
@@ -364,7 +457,7 @@ export function ProposalsPage() {
         if (!proposalRevisionId) {
           setFailure(
             new Error(
-              "This proposal has no revision snapshot (sent before snapshots existed). Create a share link or accept it manually; signature requests need a snapshot.",
+              "This proposal was sent before Capsule kept a copy of each sent version, so it cannot ask for a signature. Send it again to ask for one, or mark it accepted by hand.",
             ),
           );
           return;
@@ -379,7 +472,9 @@ export function ProposalsPage() {
         const recipientEmail = client.email;
         if (!recipientEmail) {
           setFailure(
-            new Error("Client email is required for signature request"),
+            new Error(
+              "Give this client an email address before you request a signature.",
+            ),
           );
           return;
         }
@@ -426,7 +521,7 @@ export function ProposalsPage() {
         if (key === "expire") await expire(args);
         setNotice(
           key === "send"
-            ? "Proposal published in Capsule. Copy its share link or PDF into your delivery channel; Capsule does not send it externally."
+            ? "Proposal published. Press Email the proposal to send the client the PDF, or copy its share link."
             : key === "markViewed"
               ? "Proposal marked as viewed."
               : key === "expire"
@@ -438,6 +533,149 @@ export function ProposalsPage() {
   };
 
   const loading = proposals === undefined || clients === undefined;
+
+  // The PDF a row's Download PDF saves: a sent proposal's published
+  // version, a draft's current data. Email the proposal sends the same file.
+  const pdfProjectionFor = (row: (typeof visibleRows)[number]) => {
+    if (String(row.status) !== "draft" && proposalRevisions === undefined)
+      return null;
+    if (
+      String(row.status) === "draft" &&
+      (proposalDishSelections === undefined || dishes === undefined)
+    )
+      return null;
+    // Enrich proposal with timeline and venue logistics data
+    const event = events?.find((e) => e._id === row.eventId);
+    const eventTimelineItems =
+      event && timelineActivities
+        ? timelineActivities.filter(
+            (a) => a.eventId === event._id && a.deletedAt == null,
+          )
+        : [];
+    const venue =
+      event?.venueId && venues
+        ? venues.find((v) => v._id === event.venueId)
+        : null;
+
+    const enrichedProposal: ProposalPdfRecord = {
+      ...row,
+      visibleSections: (row.visibleSections ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
+      sectionOrder: (row.sectionOrder ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
+      timelineItems: transformTimelineActivities(eventTimelineItems),
+      venueLogistics: event
+        ? transformVenueLogistics(venue || null, event)
+        : undefined,
+      dishSelections: (proposalDishSelections ?? [])
+        .filter(
+          (selection) =>
+            selection.proposalId === row._id && selection.deletedAt == null,
+        )
+        .flatMap((selection) => {
+          const dish = dishes?.find(
+            (candidate) => candidate._id === selection.dishId,
+          );
+          return dish
+            ? [
+                {
+                  dishName: dish.name,
+                  dishDescription: dish.description ?? null,
+                },
+              ]
+            : [];
+        }),
+      pricingLines: (proposalLineItems ?? [])
+        .filter((line) => line.proposalId === row._id && line.deletedAt == null)
+        .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder))
+        .map((line) => ({
+          description: line.description,
+          pricingBasis: line.pricingBasis as PricingBasis,
+          unitPrice: Number(line.unitPrice) || 0,
+          quantity: line.quantity,
+          unit: line.unit,
+        })),
+      enhancements: (proposalEnhancements ?? [])
+        .filter(
+          (item) =>
+            item.proposalId === row._id &&
+            item.deletedAt == null &&
+            item.addedAt != null,
+        )
+        .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder))
+        .map((item) => ({
+          name: item.name,
+          description: item.description ?? undefined,
+          price: Number(item.price) || 0,
+        })),
+    };
+    const pdfClientName = clientDisplayName(row.clientId, clients);
+
+    const publishedRevision = latestRevisionFor(row._id);
+    const pdfProjection =
+      String(row.status) === "draft"
+        ? {
+            proposal: enrichedProposal,
+            clientName: pdfClientName,
+            source: null,
+          }
+        : projectProposalPdf(
+            enrichedProposal,
+            pdfClientName,
+            publishedRevision,
+          );
+
+    return pdfProjection;
+  };
+
+  // Emails the published version's PDF (the Download PDF file) to the client.
+  const onEmailProposal = (row: (typeof visibleRows)[number]) => {
+    const projection = pdfProjectionFor(row);
+    const revision = latestRevisionFor(row._id);
+    if (!projection || !revision) return;
+    if (projection.source !== "revision") {
+      setFailure(
+        new Error(
+          "This proposal's published version could not be read, so Capsule will not email it. Send the proposal again from a draft.",
+        ),
+      );
+      return;
+    }
+    void run(`${row._id}:email`, async () => {
+      const pdf = await proposalPdfBase64({
+        proposal: await withPictureUrls(projection.proposal),
+        clientName: projection.clientName,
+        branding,
+      });
+      const result = await emailProposal({
+        proposalId: row._id,
+        revisionId: revision._id,
+        pdfBase64: pdf.base64,
+        fileName: pdf.fileName,
+      }).finally(() => {
+        // Sent or not, the row's email list opens with the newest try.
+        setEmailsOpenFor(row._id);
+        setEmailsKey((key) => key + 1);
+      });
+      if (result.status === "already_sent") {
+        setNotice(
+          `Not sent again — this version already went${
+            result.to ? ` to ${result.to}` : ""
+          }${
+            result.sentAt != null
+              ? ` at ${formatTime(result.sentAt)} on ${formatDate(result.sentAt)}`
+              : ""
+          }.`,
+        );
+        return;
+      }
+      setNotice(
+        `Proposal PDF emailed to ${result.to ?? "the client"} just now.`,
+      );
+    });
+  };
 
   return (
     <div className="operations-stage supply-stage">
@@ -458,8 +696,31 @@ export function ProposalsPage() {
           >
             {showTerminal ? "Hide declined/expired" : "Show declined/expired"}
           </button>
+          {fromEvent ? (
+            <button
+              className="btn btn-primary"
+              type="button"
+              disabled={busy != null}
+              onClick={() => void buildFromEvent(fromEvent._id)}
+            >
+              Build from event
+            </button>
+          ) : null}
+          {fromEvent ? (
+            <RecordAcceptedBeforeCapsule
+              event={fromEvent}
+              prompt={prompt}
+              busy={busy}
+              run={run}
+              onNotice={setNotice}
+              onOpen={(proposalId) => {
+                setShowDraft(false);
+                setSearchParams({ proposal: proposalId });
+              }}
+            />
+          ) : null}
           <button
-            className="btn btn-primary"
+            className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
             type="button"
             onClick={() => setShowDraft((value) => !value)}
           >
@@ -514,7 +775,7 @@ export function ProposalsPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table proposal-table">
               <thead>
                 <tr>
                   <th>Title</th>
@@ -537,6 +798,10 @@ export function ProposalsPage() {
                         </Link>
                         <ProposalChangeLabel
                           replacesProposalId={row.replacesProposalId}
+                        />
+                        <HistoricalAcceptanceLabel
+                          source={row.acceptanceSource}
+                          evidence={row.acceptanceEvidence}
                         />
                       </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>
@@ -596,146 +861,68 @@ export function ProposalsPage() {
                                 dishes === undefined))
                           }
                           onClick={() => {
-                            if (
-                              String(row.status) !== "draft" &&
-                              proposalRevisions === undefined
-                            )
-                              return;
-                            if (
-                              String(row.status) === "draft" &&
-                              (proposalDishSelections === undefined ||
-                                dishes === undefined)
-                            )
-                              return;
-                            // Enrich proposal with timeline and venue logistics data
-                            const event = events?.find(
-                              (e) => e._id === row.eventId,
-                            );
-                            const eventTimelineItems =
-                              event && timelineActivities
-                                ? timelineActivities.filter(
-                                    (a) =>
-                                      a.eventId === event._id &&
-                                      a.deletedAt == null,
-                                  )
-                                : [];
-                            const venue =
-                              event?.venueId && venues
-                                ? venues.find((v) => v._id === event.venueId)
-                                : null;
-
-                            const enrichedProposal: ProposalPdfRecord = {
-                              ...row,
-                              visibleSections: (
-                                row.visibleSections ?? []
-                              ).filter(
-                                (section): section is string =>
-                                  typeof section === "string",
-                              ),
-                              timelineItems:
-                                transformTimelineActivities(eventTimelineItems),
-                              venueLogistics: event
-                                ? transformVenueLogistics(venue || null, event)
-                                : undefined,
-                              dishSelections: (proposalDishSelections ?? [])
-                                .filter(
-                                  (selection) =>
-                                    selection.proposalId === row._id &&
-                                    selection.deletedAt == null,
-                                )
-                                .flatMap((selection) => {
-                                  const dish = dishes?.find(
-                                    (candidate) =>
-                                      candidate._id === selection.dishId,
-                                  );
-                                  return dish
-                                    ? [
-                                        {
-                                          dishName: dish.name,
-                                          dishDescription:
-                                            dish.description ?? null,
-                                        },
-                                      ]
-                                    : [];
-                                }),
-                              pricingLines: (proposalLineItems ?? [])
-                                .filter(
-                                  (line) =>
-                                    line.proposalId === row._id &&
-                                    line.deletedAt == null,
-                                )
-                                .sort(
-                                  (a, b) =>
-                                    Number(a.sortOrder) - Number(b.sortOrder),
-                                )
-                                .map((line) => ({
-                                  description: line.description,
-                                  pricingBasis:
-                                    line.pricingBasis as PricingBasis,
-                                  unitPrice: Number(line.unitPrice) || 0,
-                                  quantity: line.quantity,
-                                  unit: line.unit,
-                                })),
-                              enhancements: (proposalEnhancements ?? [])
-                                .filter(
-                                  (item) =>
-                                    item.proposalId === row._id &&
-                                    item.deletedAt == null &&
-                                    item.addedAt != null,
-                                )
-                                .sort(
-                                  (a, b) =>
-                                    Number(a.sortOrder) - Number(b.sortOrder),
-                                )
-                                .map((item) => ({
-                                  name: item.name,
-                                  description: item.description ?? undefined,
-                                  price: Number(item.price) || 0,
-                                })),
-                            };
-                            const pdfClientName = clientDisplayName(
-                              row.clientId,
-                              clients,
-                            );
-
-                            const publishedRevision = latestRevisionFor(
-                              row._id,
-                            );
-                            const pdfProjection =
-                              String(row.status) === "draft"
-                                ? {
-                                    proposal: enrichedProposal,
-                                    clientName: pdfClientName,
-                                    source: null,
-                                  }
-                                : projectProposalPdf(
-                                    enrichedProposal,
-                                    pdfClientName,
-                                    publishedRevision,
-                                  );
-
-                            if (pdfProjection.source) {
-                              void downloadProjectedProposalPdf({
-                                projection: pdfProjection,
-                                branding,
-                                download: downloadProposalPdf,
-                                onNotice: setNotice,
-                              }).catch((error) => setFailure(error));
-                            } else {
-                              void downloadProposalPdf({
-                                proposal: pdfProjection.proposal,
-                                clientName: pdfProjection.clientName,
-                                branding,
-                              })
-                                .then(() =>
+                            const projected = pdfProjectionFor(row);
+                            if (!projected) return;
+                            void withPictureUrls(projected.proposal)
+                              .then((proposal) => {
+                                const pdfProjection = {
+                                  ...projected,
+                                  proposal,
+                                };
+                                if (pdfProjection.source) {
+                                  return downloadProjectedProposalPdf({
+                                    projection: pdfProjection,
+                                    branding,
+                                    download: downloadProposalPdf,
+                                    onNotice: setNotice,
+                                  });
+                                }
+                                return downloadProposalPdf({
+                                  proposal: pdfProjection.proposal,
+                                  clientName: pdfProjection.clientName,
+                                  branding,
+                                }).then(() =>
                                   setNotice("Proposal PDF downloaded."),
-                                )
-                                .catch((error) => setFailure(error));
-                            }
+                                );
+                              })
+                              .catch((error) => setFailure(error));
                           }}
                         >
                           Download PDF
                         </button>
+                        {["sent", "viewed", "accepted"].includes(
+                          String(row.status),
+                        ) && (
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            disabled={
+                              busy != null || proposalRevisions === undefined
+                            }
+                            onClick={() => onEmailProposal(row)}
+                          >
+                            {busy === `${row._id}:email`
+                              ? "Emailing…"
+                              : "Email the proposal"}
+                          </button>
+                        )}
+                        {["sent", "viewed", "accepted"].includes(
+                          String(row.status),
+                        ) && (
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            onClick={() =>
+                              setEmailsOpenFor((current) =>
+                                current === row._id ? null : row._id,
+                              )
+                            }
+                          >
+                            {emailsOpenFor === row._id
+                              ? "Hide emails"
+                              : "Emails"}
+                          </button>
+                        )}
                         {(String(row.status) === "sent" ||
                           String(row.status) === "viewed") && (
                           <button
@@ -779,21 +966,28 @@ export function ProposalsPage() {
                             )}
                           </>
                         )}
-                        {policy
-                          .proposalActions(String(row.status))
-                          .map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost"
-                              type="button"
-                              disabled={busy != null}
-                              onClick={() => invoke(row, action.key)}
-                            >
-                              {action.key === "send"
-                                ? "Publish proposal"
-                                : action.label}
-                            </button>
-                          ))}
+                        <LifecycleStepper
+                          definition={proposalLifecycle}
+                          status={String(row.status)}
+                          actions={proposalLifecycle.actions.filter(
+                            (candidate) =>
+                              policy
+                                .proposalActions(String(row.status))
+                                .some((action) => action.key === candidate.key),
+                          )}
+                          busy={busy != null}
+                          onAction={(key) => invoke(row, key)}
+                        />
+                        {String(row.status) === "sent" ||
+                        String(row.status) === "viewed" ? (
+                          <ProposalChangeAction
+                            proposalId={row._id}
+                            busy={busy}
+                            run={run}
+                            onNotice={setNotice}
+                            accepted={false}
+                          />
+                        ) : null}
                         {String(row.status) === "accepted" ? (
                           <>
                             <ProposalChangeAction
@@ -835,9 +1029,15 @@ export function ProposalsPage() {
                           eventId={row.eventId ? String(row.eventId) : null}
                           status={String(row.status)}
                           total={Number(row.total ?? 0)}
-                          hasVenue={Boolean(
-                            events?.find((e) => e._id === row.eventId)?.venueId,
-                          )}
+                          hasVenue={(() => {
+                            // A typed venue (quote form, import) counts too.
+                            const linked = events?.find(
+                              (e) => e._id === row.eventId,
+                            );
+                            return Boolean(
+                              linked?.venueId || linked?.venueName?.trim(),
+                            );
+                          })()}
                           hasMenuSelections={(
                             proposalDishSelections ?? []
                           ).some(
@@ -851,6 +1051,13 @@ export function ProposalsPage() {
                               line.deletedAt == null,
                           )}
                         />
+                        {String(row.status) === "draft" ? (
+                          <ProposalDraftCheck
+                            proposalId={row._id}
+                            onFailure={setFailure}
+                            onNotice={setNotice}
+                          />
+                        ) : null}
                       </td>
                     </tr>
                     {menuOpenFor === row._id ? (
@@ -877,6 +1084,16 @@ export function ProposalsPage() {
                             discountAmount={Number(row.discountAmount ?? 0)}
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                    {emailsOpenFor === row._id ? (
+                      <tr>
+                        <td colSpan={5}>
+                          <ProposalEmailHistory
+                            proposalId={row._id}
+                            refreshKey={emailsKey}
                           />
                         </td>
                       </tr>

@@ -12,7 +12,7 @@ import { api } from "../../../lib/api";
 const DISPOSITION_LABELS: Record<string, string> = {
   pending: "Pending",
   normalized: "Normalized",
-  linked_reference: "Linked reference",
+  linked_reference: "Linked to existing",
   duplicate_view: "Duplicate view",
   needs_mapping: "Needs a match",
   unsupported: "Unsupported",
@@ -104,8 +104,8 @@ export function ImportProvenancePanel({
         <p className="text-xs text-ink-3">
           Raw source evidence for every workbook: the preserved original
           (checksum, byte size), cell coordinates, raw stored values, and their
-          interpretation under the parser version and date system recorded at
-          parse time. Raw evidence stays separate from the interpreted value.
+          interpretation under the parser version and date system noted at parse
+          time. Raw evidence stays separate from the interpreted value.
         </p>
         <div className="mt-4 divide-y divide-line">
           {sorted.map((artifact) => {
@@ -141,7 +141,7 @@ export function ImportProvenancePanel({
                 </div>
                 {workbook === undefined ? (
                   <p className="mt-2 text-xs text-ink-2">
-                    Provenance not recorded yet — it records when the archive is
+                    Provenance not on file yet — it's noted when the archive is
                     parsed.
                   </p>
                 ) : workbook.error !== undefined ? (
@@ -222,7 +222,7 @@ export function ImportProvenancePanel({
                           workbook.mergedRangesTruncated ? (
                             <p className="mt-1 text-2xs text-ink-3">
                               {sheet.cells.length > RENDERED_CELL_LIMIT
-                                ? `+${sheet.cells.length - RENDERED_CELL_LIMIT} more cells recorded on the artifact. `
+                                ? `+${sheet.cells.length - RENDERED_CELL_LIMIT} more cells on file for this workbook. `
                                 : ""}
                               {workbook.cellsTruncated
                                 ? `Provenance caps at ${workbook.cellCap} cells / ${Math.round((workbook.byteBudget ?? 0) / 1024)} KiB of detail; this workbook has ${workbook.cellCount} cells.`

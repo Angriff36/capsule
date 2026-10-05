@@ -5,18 +5,27 @@ import { ActionMenu, ActionMenuRule, StatusChip } from "../../ui/primitives";
 import { CheckCircleIcon } from "../../ui/icons";
 import { eventGuestPolicy } from "./EventGuestPolicy";
 import { guestTableLabel } from "./guestTableLabel";
+import type { EntreeLine } from "./guestMealCounts";
 
-export type GuestRowAction = "decline" | "table" | "withdraw";
+export type GuestRowAction = "decline" | "table" | "withdraw" | "meal";
+
+export type GuestMealValues = {
+  entreeEventDishId?: string;
+  seatNumber?: number;
+  placeCardName?: string;
+};
 
 type Props = {
   guest: Doc<"eventGuests">;
   isBusy: boolean;
   openAction: GuestRowAction | null;
+  entreeLines: readonly EntreeLine[];
   onConfirm: () => void;
   onCheckIn: () => void;
   onOpenAction: (kind: GuestRowAction) => void;
   onCloseAction: () => void;
   onSubmitAction: (kind: GuestRowAction, value: string) => void;
+  onSubmitMeal: (values: GuestMealValues) => void;
 };
 
 function actionLabel(kind: GuestRowAction, guestName: string): string {
@@ -33,15 +42,20 @@ export function EventGuestRow({
   guest,
   isBusy,
   openAction,
+  entreeLines,
   onConfirm,
   onCheckIn,
   onOpenAction,
   onCloseAction,
   onSubmitAction,
+  onSubmitMeal,
 }: Props) {
   const dietary = (guest.dietaryRestrictions ?? []).filter(Boolean);
   const allergens = (guest.allergenRestrictions ?? []).filter(Boolean);
   const access = (guest.accessibilityNeeds ?? []).filter(Boolean);
+  const entree = entreeLines.find(
+    (line) => line.id === guest.entreeEventDishId,
+  );
 
   return (
     <Fragment>
@@ -81,9 +95,7 @@ export function EventGuestRow({
         </td>
         <td className="td">
           {allergens.length ? (
-            <span className="chip border-warn/40 bg-warn-soft text-warn">
-              {allergens.join(", ")}
-            </span>
+            <span className="chip chip-tone-warn">{allergens.join(", ")}</span>
           ) : (
             <span className="text-sm text-ink-3">—</span>
           )}
@@ -105,6 +117,18 @@ export function EventGuestRow({
             guestTableLabel(guest.tableAssignment)
           ) : (
             <span className="text-ink-3">Unassigned</span>
+          )}
+          {guest.seatNumber != null ? (
+            <span className="block text-xs text-ink-3">
+              Seat {guest.seatNumber}
+            </span>
+          ) : null}
+        </td>
+        <td className="td text-sm text-ink">
+          {guest.entreeEventDishId ? (
+            (entree?.name ?? "Removed dish")
+          ) : (
+            <span className="text-ink-3">—</span>
           )}
         </td>
         <td className="td text-right">
@@ -130,6 +154,13 @@ export function EventGuestRow({
             >
               Assign table
             </button>
+            <button
+              type="button"
+              disabled={guest.deletedAt != null || isBusy}
+              onClick={() => onOpenAction("meal")}
+            >
+              Entrée, seat &amp; place card
+            </button>
             <ActionMenuRule />
             <button
               type="button"
@@ -142,9 +173,79 @@ export function EventGuestRow({
           </ActionMenu>
         </td>
       </tr>
-      {openAction ? (
+      {openAction === "meal" ? (
         <tr>
-          <td className="td bg-inset" colSpan={9}>
+          <td className="td bg-inset" colSpan={10}>
+            <form
+              className="flex flex-wrap items-end gap-2 py-2"
+              onSubmit={(event: FormEvent<HTMLFormElement>) => {
+                event.preventDefault();
+                const data = new FormData(event.currentTarget);
+                const entreeId = String(data.get("entree") ?? "");
+                const seat = Number.parseInt(
+                  String(data.get("seat") ?? ""),
+                  10,
+                );
+                const card = String(data.get("placeCard") ?? "").trim();
+                onSubmitMeal({
+                  entreeEventDishId: entreeId || undefined,
+                  seatNumber: Number.isFinite(seat) ? seat : undefined,
+                  placeCardName: card || undefined,
+                });
+              }}
+            >
+              <label className="field-label min-w-0 flex-1 basis-48">
+                Entrée for {guest.name}
+                <select
+                  name="entree"
+                  className="input"
+                  defaultValue={guest.entreeEventDishId ?? ""}
+                  autoFocus
+                >
+                  <option value="">No entrée picked</option>
+                  {entreeLines.map((line) => (
+                    <option key={line.id} value={line.id}>
+                      {line.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label w-24">
+                Seat
+                <input
+                  name="seat"
+                  type="number"
+                  min={1}
+                  step={1}
+                  className="input"
+                  defaultValue={guest.seatNumber ?? ""}
+                />
+              </label>
+              <label className="field-label min-w-0 flex-1 basis-40">
+                Name on place card
+                <input
+                  name="placeCard"
+                  className="input"
+                  placeholder={guest.name}
+                  defaultValue={guest.placeCardName ?? ""}
+                />
+              </label>
+              <button className="btn btn-primary btn-sm" disabled={isBusy}>
+                Apply
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={onCloseAction}
+              >
+                Dismiss
+              </button>
+            </form>
+          </td>
+        </tr>
+      ) : openAction ? (
+        <tr>
+          <td className="td bg-inset" colSpan={10}>
             <form
               className="flex flex-wrap items-end gap-2 py-2"
               onSubmit={(event: FormEvent<HTMLFormElement>) => {

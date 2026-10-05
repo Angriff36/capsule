@@ -20,7 +20,7 @@ export function RecentsMenu() {
     <details ref={menuRef} className="group relative">
       <summary
         className="flex h-8 cursor-pointer list-none items-center gap-2 rounded-xs border border-transparent px-2 text-ink-2 group-open:border-line-2 group-open:bg-inset hover:text-ink [&::-webkit-details-marker]:hidden"
-        aria-label="Recently opened records"
+        aria-label="Recently opened"
       >
         <ClockIcon />
       </summary>
@@ -28,7 +28,7 @@ export function RecentsMenu() {
         <p className="font-medium">Recently opened</p>
         {recents.length === 0 ? (
           <p className="mt-1.5 text-sm leading-relaxed text-ink-3">
-            Records you open will show up here for quick access.
+            Things you open will show up here for quick access.
           </p>
         ) : (
           <ul className="mt-2 max-h-96 space-y-0.5 overflow-y-auto">

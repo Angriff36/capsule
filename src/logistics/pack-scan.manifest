@@ -1,0 +1,83 @@
+// Capsule logistics — every scan on a pack list, kept.
+//
+// The Scan box on a load sheet counts a line when a label is read. Each read
+// is kept here, the ones that counted and the ones that did not (a label for
+// another event, two lines that match, nothing on this list), so the crew
+// lead can see afterwards what was scanned, by whom and what happened.
+//
+// A scan record changes nothing on the pack list; the count itself is the
+// pack line's own command.
+
+use "../foundation/base.manifest"
+
+entity PackScan mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required packListId: uuid
+  property packListItemId: uuid?
+  // pack, check, load or back.
+  property required step: string = ""
+  // What the scanner read, as read.
+  property required label: string = ""
+  // "ok" when it counted; otherwise why not (wrong_event, two_lines...).
+  property required outcome: string = ""
+  // The plain words shown to the packer.
+  property required message: string = ""
+  property quantity: decimal(12, 4)?
+  property scannedAt: datetime?
+  property personId: uuid?
+  property personName: string = ""
+
+  belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
+  belongsTo packListItem: PackListItem fields [tenantId, packListItemId] references [tenantId, id]
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  // The same people who may count pack lines.
+  default policy packScanRead read: roleAllows(user.role, "staffAccess") "Staff may see what was scanned on a pack list"
+  default policy packScanWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may scan on a pack list"
+  default policy packScanExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may scan on a pack list"
+
+  command record(
+    packListId: uuid,
+    step: string,
+    label: string,
+    outcome: string,
+    message: string,
+    optional packListItemId: uuid,
+    optional quantity: decimal(12, 4)
+  ) {
+    guard self.scannedAt == null
+    guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only.
+    guard self.packList != null and self.packList.deletedAt == null
+    guard packListItemId == null or (self.packListItem != null and self.packListItem.packListId == packListId)
+    constraint recordScanListMatch: packListId == self.packListId "This scan is for a different pack list. Pick the pack list already on it."
+    constraint recordScanStep: step == "pack" or step == "check" or step == "load" or step == "back" "Pick the step: pack, second check, on truck or came back."
+    mutate step = step
+    mutate label = trim(label)
+    mutate outcome = outcome
+    mutate message = message
+    mutate packListItemId = packListItemId
+    mutate quantity = quantity
+    mutate scannedAt = now()
+    mutate personId = user.personId
+    mutate personName = user.personName != null ? user.personName : ""
+    emit PackScanRecorded {
+      packScanId: self.id
+      tenantId: self.tenantId
+      packListId: packListId
+      outcome: outcome
+    }
+  }
+
+  store PackScan in durable
+}
+
+event PackScanRecorded: "pack_scan.recorded" {
+  packScanId: string
+  tenantId: string
+  packListId: string
+  outcome: string
+}

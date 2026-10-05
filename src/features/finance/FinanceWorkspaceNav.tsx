@@ -17,10 +17,16 @@ const financeNavigation = [
   },
   { key: "revenue", label: "Revenue", path: FINANCE_ROUTES.revenue },
   { key: "foodCost", label: "Food cost", path: FINANCE_ROUTES.foodCost },
+  { key: "donations", label: "Donations", path: FINANCE_ROUTES.donations },
   {
     key: "profitMargins",
     label: "Profit margins",
     path: FINANCE_ROUTES.profitMargins,
+  },
+  {
+    key: "reconciliation",
+    label: "Money check",
+    path: FINANCE_ROUTES.reconciliation,
   },
   {
     key: "salesDashboard",

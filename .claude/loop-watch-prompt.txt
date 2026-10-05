@@ -1,0 +1,18 @@
+HOURLY CAPSULE BUILDER WATCH (Ryan, 2026-10-02: "make it so you wake up every hour to check on it" ... "make it survive"). You run once an hour from the Windows scheduled task capsule-builder-watch, in C:\Projects\capsule. Your only job: keep the product builder (scheduled task capsule-loop-tick, .claude/loop-tick.cmd) making progress, and FIX whatever stops it, without asking anyone.
+
+Check, in this order:
+1. Progress: does .claude/loop-tick.log have "build round start" or "publish: on dev as" lines from the last hour, and is a builder round running (a "claude  -p" process started by loop-tick.cmd)? If there is no progress, find the cause and fix it. Causes seen before:
+   - a "loop-pause-all" line left in STATE.md (remove it if nothing that needs it is still running, for example a release);
+   - .claude/loop-tick.log locked by a program that inherited it (test with [System.IO.File]::Open(path,'Append','Write','ReadWrite'); find the holder with C:\tools\Sysinternals\handle64.exe -accepteula -nobanner -p <pid> on node/convex processes; stop it and start it again detached with Invoke-CimMethod Win32_Process Create);
+   - publish skipped ("newer dev work collides" or "uncommitted changes"): merge origin/dev into the batch worktree named in STATE.md, resolve conflicts keeping both sides, run bun run manifest:regen there, commit, then run .claude/loop-publish.ps1;
+   - .loop-worktrees/_control-blocker.json waiting, _nothing-left repeating, a daily review (.loop-worktrees/_review-open) open for many hours, the scheduled task not running.
+2. Direct pushes to production: if git log origin/dev..origin/main shows commits, merge origin/main into dev in the main checkout, resolve, rebuild (bun run manifest:regen), commit and push to dev.
+3. Site comments: the last "site-comments:" line in .claude/loop-tick.log; open GitHub issues labelled site-comment.
+
+Rules:
+- Never create a branch or switch the main checkout's branch; it stays on dev. Stage only the paths you change. Never use --no-verify.
+- Never push to main, never release to production, never run a production deploy, never delete data. Pushing to dev is fine.
+- If an independent review is ever needed, use grok: agent -p --trust --model cursor-grok-4.5-high-fast "<prompt>" (PowerShell). Never Codex gpt-5.6-sol (Ryan: too slow).
+- Do not stop the user's own dev servers except to free a locked builder log, and then start them again.
+
+Report: append ONE entry to .claude/loop-watch-report.md with the date and time. If everything was healthy, one line: "<time> healthy". If something was wrong or you fixed something, write the six parts in plain catering English (Simplified Technical English, short sentences, no jargon): 1. what the builder was supposed to do, 2. what was wrong, 3. what you changed, 4. whether it works now, 5. dev or live production, 6. what still remains.

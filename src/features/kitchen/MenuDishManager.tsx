@@ -17,8 +17,18 @@ type MenuDishRow = {
   sortOrder: number;
   sellingPrice?: number | null;
   course?: string | null;
+  serviceStyle?: string | null;
+  specialInstructions?: string | null;
   deletedAt?: number | null;
 };
+
+// updateDetails clears any optional field it is not sent, so every call
+// restates the line's course, service style and notes.
+const kept = (line: MenuDishRow) => ({
+  course: line.course ?? undefined,
+  serviceStyle: line.serviceStyle ?? undefined,
+  specialInstructions: line.specialInstructions ?? undefined,
+});
 
 type Props = {
   menuId: string;
@@ -134,7 +144,9 @@ export function MenuDishManager({
                   <p className="font-medium">{dish?.name ?? "Unknown dish"}</p>
                   <p className="text-sm text-ink-3">
                     Edition {dish?.editionNumber ?? 1}
-                    {line.course ? ` · ${line.course}` : ""}
+                    {(line.course ?? dish?.course)
+                      ? ` · ${line.course ?? dish?.course}`
+                      : ""}
                     {line.sellingPrice != null
                       ? ` · ${formatMoneyExact(Number(line.sellingPrice))}`
                       : ""}
@@ -162,11 +174,13 @@ export function MenuDishManager({
                           docId: line._id,
                           version: line.version,
                           sortOrder: prev.sortOrder,
+                          ...kept(line),
                         });
                         await updateDetails({
                           docId: prev._id,
                           version: prev.version,
                           sortOrder: line.sortOrder,
+                          ...kept(prev),
                         });
                       })
                     }
@@ -187,16 +201,52 @@ export function MenuDishManager({
                           docId: line._id,
                           version: line.version,
                           sortOrder: next.sortOrder,
+                          ...kept(line),
                         });
                         await updateDetails({
                           docId: next._id,
                           version: next.version,
                           sortOrder: line.sortOrder,
+                          ...kept(next),
                         });
                       })
                     }
                   >
                     Down
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    disabled={!canEdit || busy != null}
+                    onClick={() => {
+                      void (async () => {
+                        const values = await prompt.askFields({
+                          title: "Course",
+                          description: `The course ${dish?.name ?? "this dish"} is served in on this menu. Leave it empty to use the dish's own course.`,
+                          fields: [
+                            {
+                              name: "course",
+                              label: "Course",
+                              defaultValue: line.course ?? dish?.course ?? "",
+                              placeholder: "Entrée, salad, dessert…",
+                            },
+                          ],
+                          confirmLabel: "Save course",
+                        });
+                        if (!values) return;
+                        await run(`course:${line._id}`, () =>
+                          updateDetails({
+                            docId: line._id,
+                            version: line.version,
+                            sortOrder: line.sortOrder,
+                            ...kept(line),
+                            course: values.course?.trim() || undefined,
+                          }),
+                        );
+                      })();
+                    }}
+                  >
+                    Course
                   </button>
                   <button
                     type="button"

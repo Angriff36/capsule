@@ -9,6 +9,7 @@ import {
   useTrailerUpdateOperationalStatus,
   useTrailerUpdateRegistration,
   useVehicleReviseDetails,
+  useVehicleSetTowCapacity,
   useVehicleUpdateInsurance,
   useVehicleUpdateOperationalStatus,
   useVehicleUpdateRegistration,
@@ -40,6 +41,7 @@ type VehicleRow = {
   registration: string;
   ownership: VehicleOwnership;
   payloadCapacityKg: number;
+  towCapacityKg?: number | null;
   operationalStatus: OperationalStatus;
   statusNote?: string | null;
   deletedAt?: number | null;
@@ -149,6 +151,7 @@ export function VehicleFleetPage() {
   const createVehicle = useCreateVehicle();
   const createTrailer = useCreateTrailer();
   const reviseVehicle = useVehicleReviseDetails();
+  const setTowCapacity = useVehicleSetTowCapacity();
   const reviseTrailer = useTrailerReviseDetails();
   const updateVehicleStatus = useVehicleUpdateOperationalStatus();
   const updateTrailerStatus = useTrailerUpdateOperationalStatus();
@@ -222,6 +225,15 @@ export function VehicleFleetPage() {
             version: editingVehicle.version,
             ...details,
           });
+          const towText = String(data.get("towCapacityKg") ?? "").trim();
+          const tow = towText === "" ? null : Number(towText);
+          if (tow !== (editingVehicle.towCapacityKg ?? null)) {
+            await setTowCapacity({
+              docId: editingVehicle._id,
+              version: editingVehicle.version + 1,
+              towCapacityKg: tow ?? undefined,
+            });
+          }
           setNotice(`${details.registration} updated.`);
         } else {
           await createVehicle({
@@ -478,7 +490,7 @@ export function VehicleFleetPage() {
         <section className="working-ledger">
           <div className="ledger-heading">
             <div>
-              <p className="eyebrow">Dispatch source record</p>
+              <p className="eyebrow">Dispatch source</p>
               <h2>Vehicle catalog</h2>
             </div>
             <span>
@@ -508,7 +520,7 @@ export function VehicleFleetPage() {
             </div>
           ) : (
             <div className="supply-table-wrap">
-              <table className="supply-table">
+              <table className="supply-table phone-cards">
                 <thead>
                   <tr>
                     <th>Vehicle</th>
@@ -531,17 +543,24 @@ export function VehicleFleetPage() {
                           <small>{vehicle.statusNote}</small>
                         ) : null}
                       </td>
-                      <td>{vehicle.registration}</td>
-                      <td>
+                      <td data-label="Registration">{vehicle.registration}</td>
+                      <td data-label="Ownership">
                         <StatusChip status={vehicle.ownership} />
                       </td>
-                      <td className="supply-number">
+                      <td className="supply-number" data-label="Payload">
                         {vehicle.payloadCapacityKg.toLocaleString()} kg
+                        {vehicle.towCapacityKg === 0 ? (
+                          <small>No trailer</small>
+                        ) : vehicle.towCapacityKg != null ? (
+                          <small>
+                            Tows {vehicle.towCapacityKg.toLocaleString()} kg
+                          </small>
+                        ) : null}
                       </td>
-                      <td>
+                      <td data-label="Status">
                         <StatusChip status={vehicle.operationalStatus} />
                       </td>
-                      <td>
+                      <td data-label="Compliance">
                         <ComplianceChips row={vehicle} />
                       </td>
                       <td>
@@ -599,7 +618,7 @@ export function VehicleFleetPage() {
         <section className="working-ledger">
           <div className="ledger-heading">
             <div>
-              <p className="eyebrow">Dispatch source record</p>
+              <p className="eyebrow">Dispatch source</p>
               <h2>Trailer catalog</h2>
             </div>
             <span>
@@ -629,7 +648,7 @@ export function VehicleFleetPage() {
             </div>
           ) : (
             <div className="supply-table-wrap">
-              <table className="supply-table">
+              <table className="supply-table phone-cards">
                 <thead>
                   <tr>
                     <th>Trailer</th>
@@ -651,14 +670,14 @@ export function VehicleFleetPage() {
                           <small>{trailer.statusNote}</small>
                         ) : null}
                       </td>
-                      <td>{trailer.registration}</td>
-                      <td className="supply-number">
+                      <td data-label="Registration">{trailer.registration}</td>
+                      <td className="supply-number" data-label="Payload">
                         {trailer.payloadCapacityKg.toLocaleString()} kg
                       </td>
-                      <td>
+                      <td data-label="Status">
                         <StatusChip status={trailer.operationalStatus} />
                       </td>
-                      <td>
+                      <td data-label="Compliance">
                         <ComplianceChips row={trailer} />
                       </td>
                       <td>
@@ -758,7 +777,7 @@ function VehicleForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Fleet record</p>
+          <p className="eyebrow">Fleet details</p>
           <h2>{vehicle ? "Edit vehicle" : "Register vehicle"}</h2>
         </div>
         <div className="supply-row-actions">
@@ -828,6 +847,21 @@ function VehicleForm({
             required
           />
         </label>
+        {vehicle ? (
+          <label className="field-label">
+            Can tow (kg)
+            <input
+              name="towCapacityKg"
+              className="input"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={vehicle.towCapacityKg ?? ""}
+              placeholder="Not recorded"
+            />
+            <small>0 = cannot pull a trailer. Empty = not recorded.</small>
+          </label>
+        ) : null}
         {!vehicle ? (
           <>
             <label className="field-label">
@@ -874,7 +908,7 @@ function TrailerForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Fleet record</p>
+          <p className="eyebrow">Fleet details</p>
           <h2>{trailer ? "Edit trailer" : "Register trailer"}</h2>
         </div>
         <div className="supply-row-actions">

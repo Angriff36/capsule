@@ -62,7 +62,8 @@ export function toEpochMillis(
 /** "$12,911.55" or "($12,646.61)" → 1291155 / -1264661 in minor units. */
 export function parseMoneyCents(value: string | undefined): number | undefined {
   if (value === undefined) return undefined;
-  const negative = /^\(.*\)$/.test(value.trim());
+  // "(50.00)", "-50.00" and "-$50.00" are all minus fifty (PR05-02).
+  const negative = /^\(.*\)$|^-|^\$\s*-/.test(value.trim());
   const digits = value.replace(/[^0-9.]/g, "");
   if (digits.length === 0) return undefined;
   const amount = Number(digits);

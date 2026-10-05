@@ -1,4 +1,5 @@
 import type { Id } from "../../lib/api";
+import { EventTripChecks } from "../logistics/EventTripChecks";
 import { EventTabIntro } from "./EventTabIntro";
 import { EventTimelinePanel } from "./EventTimelinePanel";
 import { EventTimingPlanner } from "./EventTimingPlanner";
@@ -17,6 +18,7 @@ export function EventTimelineTab({ eventId }: Props) {
         description="Build the day-of timeline from templates or custom blocks. Leave times blank until known. Drag fully timed, uncompleted blocks to move their time slots; other reorders keep the saved times. Assign teams or event staff, and open Questions for crew notes."
       />
       <EventTimingPlanner eventId={eventId} />
+      <EventTripChecks eventId={eventId} />
       <div data-testid="event-timeline-blocks">
         <EventTimelinePanel eventId={eventId} />
       </div>

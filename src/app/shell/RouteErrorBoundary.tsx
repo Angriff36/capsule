@@ -1,6 +1,8 @@
 import { Component, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { ErrorState } from "../../ui/primitives";
+import { reloadKeepingDrafts } from "../../ui/unsavedDrafts";
+import { isMissingCodeError, RUNNING_BUILD, shortCommit } from "./newVersion";
 
 /**
  * Last-resort failure state for unexpected render errors. Missing/invalid
@@ -9,6 +11,23 @@ import { ErrorState } from "../../ui/primitives";
  * Raw messages leak internal query names and request ids — dev builds only.
  */
 function RouteRenderFailureState({ error }: { error: Error }) {
+  // AC-166: after a new version goes live, an open tab asks for screen files
+  // that are gone. Say so, and reload with every unsaved form draft written.
+  if (isMissingCodeError(error)) {
+    return (
+      <div className="mx-auto mt-16 max-w-120">
+        <ErrorState
+          title="Capsule was updated while this page was open"
+          detail={`This screen belongs to the newer version${
+            RUNNING_BUILD
+              ? ` (this page is version ${shortCommit(RUNNING_BUILD)})`
+              : ""
+          }. Press Try again to load the newest version. Anything you typed in a form is kept.`}
+          onRetry={reloadKeepingDrafts}
+        />
+      </div>
+    );
+  }
   const detail = import.meta.env.DEV
     ? error.message
     : "Something went wrong loading this screen. Try again, and if it keeps failing let an admin know.";

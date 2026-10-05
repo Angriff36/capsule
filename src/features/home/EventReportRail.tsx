@@ -193,7 +193,8 @@ export function EventReportRail({
   useEffect(() => {
     if (!open) return;
     const onKey = (keyEvent: KeyboardEvent) => {
-      if (keyEvent.key === "Escape") close();
+      // An open menu or picker inside the rail owns the press.
+      if (keyEvent.key === "Escape" && !keyEvent.defaultPrevented) close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

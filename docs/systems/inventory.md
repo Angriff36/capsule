@@ -60,7 +60,7 @@ Stock counts keep the frozen expected quantity separate from the live ledger. Wh
 
 Search and exact decimal precision remain degraded. The stock book shows on-hand and active reservation facts separately. Approved event demand maintains purchasing drafts; draft generation does not submit the order or mark a need ordered. Each partial line receipt creates a searchable supplier-lot fact with purchase-order-line provenance and updates stock in the same transaction. Current purchasing behavior and its unresolved date/allocation issues are documented in [procurement.md](procurement.md).
 
-Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and `bun run check:supply-manifest`.
+Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and ~~`bun run check:supply-manifest`~~ `bun run check:manifest-integration` (2026-09-25).
 
 ## References
 

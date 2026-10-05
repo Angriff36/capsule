@@ -1,8 +1,5 @@
-import {
-  useListDish,
-  useListMenu,
-  useListMenuDish,
-} from "../../lib/manifest-convex-react";
+import { useListMenu, useListMenuDish } from "../../lib/manifest-convex-react";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 
 export type MenuTemplateLine = {
   dishId: string;
@@ -33,7 +30,27 @@ export function EventMenuTemplateCard({
 }: Props) {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useListDish();
+  // Only the dishes on published template menus, not the whole dish list.
+  const templateMenuIds = new Set(
+    (menus ?? [])
+      .filter(
+        (menu) =>
+          menu.deletedAt == null &&
+          menu.isTemplate === true &&
+          String(menu.status) === "published",
+      )
+      .map((menu) => menu._id),
+  );
+  const dishes = useDishesByIds(
+    menus === undefined || menuDishes === undefined
+      ? undefined
+      : menuDishes
+          .filter(
+            (line) =>
+              line.deletedAt == null && templateMenuIds.has(line.menuId),
+          )
+          .map((line) => line.dishId),
+  );
 
   if (menus === undefined || menuDishes === undefined || dishes === undefined) {
     return null;

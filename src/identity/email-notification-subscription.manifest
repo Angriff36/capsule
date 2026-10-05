@@ -15,7 +15,7 @@ entity EmailNotificationSubscription mixin TenantScoped {
   property required shiftChanges: boolean = true
   property configuredAt: datetime?
 
-  constraint configuredOwnerPresent: self.configuredAt == null or self.ownerId != null "Configured email subscriptions require an owner"
+  constraint configuredOwnerPresent: self.configuredAt == null or self.ownerId != null "Email notifications need an owner before they can be turned on."
 
   // ownerId is null only for Builder's transient create-via draft. Persisted
   // configured rows are visible solely to their owner.

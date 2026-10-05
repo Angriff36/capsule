@@ -2,6 +2,7 @@ import {
   formatTppDate,
   formatTppDateTime,
   formatTppMoney,
+  formatTppPercent,
   formatTppQuantity,
   displayCell,
 } from "./formatters";
@@ -91,7 +92,7 @@ export function TppReportTable({
                 {total.kind === "money"
                   ? formatTppMoney(total.value)
                   : total.kind === "percentage"
-                    ? `${formatTppQuantity(total.value)}%`
+                    ? formatTppPercent(total.value)
                     : formatTppQuantity(total.value)}
               </dd>
             </div>

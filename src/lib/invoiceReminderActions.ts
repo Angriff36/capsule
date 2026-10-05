@@ -10,6 +10,8 @@ export function useInvoiceReminderActions() {
     api.invoiceReminders.configureSchedule,
   );
   const sendNowAction = useAction(api.invoiceReminders.sendNow);
+  const getHistoryAction = useAction(api.invoiceReminders.getHistory);
+  const emailInvoiceAction = useAction(api.invoiceEmail.send);
 
   const getSchedule = useCallback(
     (invoiceId: string) =>
@@ -29,10 +31,23 @@ export function useInvoiceReminderActions() {
       sendNowAction({ invoiceId: invoiceId as Id<"invoices"> }),
     [sendNowAction],
   );
+  const getHistory = useCallback(
+    (invoiceId: string) =>
+      getHistoryAction({ invoiceId: invoiceId as Id<"invoices"> }),
+    [getHistoryAction],
+  );
+
+  const emailInvoice = useCallback(
+    (invoiceId: string) =>
+      emailInvoiceAction({ invoiceId: invoiceId as Id<"invoices"> }),
+    [emailInvoiceAction],
+  );
 
   return {
     getSchedule,
     configureSchedule,
     sendNow,
+    getHistory,
+    emailInvoice,
   };
 }

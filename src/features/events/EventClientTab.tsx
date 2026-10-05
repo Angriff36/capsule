@@ -4,8 +4,8 @@ import type { Id } from "../../lib/api";
 import {
   useListClient,
   useListClientContact,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
+import { useClientEvents } from "../facilities/useEventsById";
 import { formatDate } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { ClientCommunicationPanel } from "../clients/ClientCommunicationPanel";
@@ -56,7 +56,7 @@ export function EventClientTab({
 }: Props) {
   const clients = useListClient();
   const clientContacts = useListClientContact();
-  const events = useListEvent();
+  const events = useClientEvents(clientId);
   const client = clients?.find((row) => row._id === clientId);
   const name = clientDisplayName(clientId, clients);
 
@@ -108,7 +108,7 @@ export function EventClientTab({
             >
               {initials(name)}
             </span>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 basis-48">
               <h2 className="font-display text-2xl text-ink">{name}</h2>
               <p className="mt-0.5 text-base text-ink-2">
                 {client?.clientType === "company"

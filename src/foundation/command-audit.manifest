@@ -1,0 +1,37 @@
+// PL-AUDIT (AC-635, BE-17.3): who ran a step, for which company, when, with
+// which retry key, and what it changed. One row per step transaction, written
+// by convex/lib/commandAudit.ts from the existing event callback and the
+// retry-key receipt seam - never by hand-edited generated steps. The row
+// keeps ids and names only, never a step's values, so no secret, token or
+// card detail can reach it. The event rows of the same transaction carry the
+// change itself (same tenant, same occurredAt).
+
+use "./base.manifest"
+
+entity CommandAuditRecord mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property indexed occurredAt: int
+  property lastOccurredAt: int?
+  property stepName: string?
+  property subjectEntity: string?
+  property subjectId: string?
+  property eventType: string?
+  property manifestEventId: string?
+  // Exact event membership for one command transaction. This deliberately
+  // replaces timestamp-window inference in downstream receipts.
+  property manifestEventIds: json?
+  property eventCount: int?
+  property versionAfter: int?
+  property actorUserId: string?
+  property actorPersonId: string?
+  property actorRole: string?
+  property idempotencyKey: string?
+
+  default policy commandAuditRead read: roleAllows(user.role, "commandAuditSeamOnly") "This history stays behind the scenes"
+  default policy commandAuditWrite write: roleAllows(user.role, "commandAuditSeamOnly") "The system keeps this history"
+  default policy commandAuditExecute execute: roleAllows(user.role, "commandAuditSeamOnly") "Staff cannot change this history"
+
+  store CommandAuditRecord in durable
+}

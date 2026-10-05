@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { registerUnsavedDraft } from "./unsavedDrafts";
 
 // ponytail: uncontrolled-form draft persistence. A native delegated "input"
 // listener on the <form> serializes FormData to localStorage (debounced) and
@@ -42,19 +43,26 @@ export function useFormDraft(key: string) {
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const offeredDraft = useRef(draft);
   offeredDraft.current = draft;
+  // Set while armed: lets a reload for a new Capsule version save this form.
+  const unregister = useRef<(() => void) | null>(null);
+  const saveNow = useRef<() => void>(() => {});
 
   const arm = useCallback(() => {
     if (armed.current) return;
     armed.current = true;
     window.addEventListener("beforeunload", beforeUnload);
+    unregister.current = registerUnsavedDraft(() => saveNow.current());
   }, []);
 
   const disarm = useCallback(() => {
     armed.current = false;
     window.removeEventListener("beforeunload", beforeUnload);
+    unregister.current?.();
+    unregister.current = null;
   }, []);
 
   const persist = useCallback(() => {
+    timer.current = undefined;
     if (!form) return;
     const values: Record<string, string> = {};
     new FormData(form).forEach((value, name) => {
@@ -80,6 +88,16 @@ export function useFormDraft(key: string) {
     timer.current = setTimeout(persist, SAVE_DEBOUNCE_MS);
   }, [form, arm, persist]);
 
+  // A reload for a new Capsule version: write the draft now, then drop the
+  // "leave page?" guard. While an older draft still waits for Restore or
+  // Discard it is never replaced, so the guard stays and the browser asks.
+  saveNow.current = () => {
+    if (offeredDraft.current) return;
+    clearTimeout(timer.current);
+    persist();
+    disarm();
+  };
+
   // Persist edits (debounced) and arm the unload guard while dirty.
   useEffect(() => {
     if (!form) return;
@@ -88,14 +106,20 @@ export function useFormDraft(key: string) {
     form.addEventListener("input", onInput);
     return () => {
       form.removeEventListener("input", onInput);
-      clearTimeout(timer.current);
+      // Leaving the screen inside the save delay still keeps the last edits.
+      if (timer.current !== undefined) {
+        clearTimeout(timer.current);
+        persist();
+      }
     };
-  }, [form, schedulePersist]);
+  }, [form, schedulePersist, persist]);
 
   // Drop the unload guard if the whole page unmounts (e.g. after submit+nav).
   useEffect(() => disarm, [disarm]);
 
   const clear = useCallback(() => {
+    clearTimeout(timer.current);
+    timer.current = undefined;
     disarm();
     try {
       localStorage.removeItem(storageKey);

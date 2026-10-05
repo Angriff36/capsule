@@ -60,7 +60,7 @@ const EVENT_MANAGE_ROLES = new Set([
   "system",
 ]);
 
-function permits(
+export function permits(
   auth: Awaited<ReturnType<typeof getAuthContext>>,
   action: "inventoryAccess" | "eventManageAccess" | "manageAccess",
 ) {

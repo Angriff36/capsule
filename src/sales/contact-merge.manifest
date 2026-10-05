@@ -28,8 +28,8 @@ entity ClientMerge mixin TenantScoped, SoftDeletable {
     guard self.primaryClient.deletedAt == null
     guard self.duplicateClient.status == "active"
     guard self.duplicateClient.deletedAt == null
-    constraint mergePrimaryMatch: primaryClientId == self.primaryClientId "Primary client must match the seeded account"
-    constraint mergeDuplicateMatch: duplicateClientId == self.duplicateClientId "Duplicate client must match the seeded account"
+    constraint mergePrimaryMatch: primaryClientId == self.primaryClientId "This merge is for a different primary client. Use the primary client already on this merge."
+    constraint mergeDuplicateMatch: duplicateClientId == self.duplicateClientId "This merge is for a different duplicate client. Use the duplicate client already on this merge."
     constraint mergeDistinctClients: primaryClientId != duplicateClientId "Choose two different clients"
     mutate primaryClientId = primaryClientId
     mutate duplicateClientId = duplicateClientId
@@ -86,6 +86,25 @@ on ClientMergeCompleted fanOut CreditMemo where clientId = payload.duplicateClie
   run stageClientMerge
   params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
 
+// PL-SOURCE-MERGE (AC-061): leads, follow-up reminders and website quote
+// requests move too, so none is left on the hidden duplicate.
+on ClientMergeCompleted fanOut Lead where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut ClientOutreachTask where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut QuoteSubmission where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+// PL-SOURCE-HISTORY: old-system history filed under the client moves too.
+on ClientMergeCompleted fanOut ClientCommunication where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
 on ClientMergeCompleted fanOut Client where id = payload.duplicateClientId
   run stageClientMerge
   params { clientMergeId: payload.clientMergeId, primaryClientId: payload.primaryClientId }
@@ -113,6 +132,18 @@ on PaymentMethodClientMergeStaged run PaymentMethod.reassignClient
 
 on CreditMemoClientMergeStaged run CreditMemo.reassignClient
   resolve payload.creditMemoId
+
+on LeadClientMergeStaged run Lead.reassignClient
+  resolve payload.leadId
+
+on ClientOutreachTaskClientMergeStaged run ClientOutreachTask.reassignClient
+  resolve payload.reminderId
+
+on QuoteSubmissionClientMergeStaged run QuoteSubmission.reassignClient
+  resolve payload.submissionId
+
+on ClientCommunicationClientMergeStaged run ClientCommunication.reassignClient
+  resolve payload.clientCommunicationId
 
 on ClientMergeStaged run Client.markMerged
   resolve payload.duplicateClientId

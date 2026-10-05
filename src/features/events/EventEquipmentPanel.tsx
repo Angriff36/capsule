@@ -9,7 +9,10 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
-import { useReserveEquipment } from "../facilities/equipmentCheckout";
+import {
+  useEquipmentAvailability,
+  useReserveEquipment,
+} from "../facilities/equipmentCheckout";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import "./EventEquipmentPanel.css";
 import { useActionNotice } from "../../ui/action-result";
@@ -26,6 +29,16 @@ import {
   type EquipmentCategoryCount,
 } from "./EventEquipmentSidebar";
 import { EventEquipmentReserveForm } from "./EventEquipmentReserveForm";
+import { EventEquipmentProblems } from "./EventEquipmentProblems";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+
+/** Same list as convex/equipmentCheckout.ts OVERRIDE_ROLES. */
+const OVERRIDE_ROLES = new Set([
+  "inventory_manager",
+  "logistics_manager",
+  "admin",
+  "owner",
+]);
 
 export function EventEquipmentPanel({
   eventId,
@@ -42,6 +55,7 @@ export function EventEquipmentPanel({
   const checkOut = useEquipmentReservationCheckOut();
   const markReturned = useEquipmentReservationMarkReturned();
   const cancelReservation = useEquipmentReservationCancel();
+  const role = useAuthStatus()?.role;
   const [showReserveForm, setShowReserveForm] = useState(false);
   const [selectedEquipmentId, setSelectedEquipmentId] = useState("");
   const [checklistDraft, setChecklistDraft] = useState<ChecklistDraft | null>(
@@ -77,8 +91,14 @@ export function EventEquipmentPanel({
   const returnedCount = eventReservations.filter(
     (row) => row.status === "returned",
   ).length;
-  const defaultStart = startsAt ?? Date.now();
+  const [now] = useState(() => Date.now());
+  const defaultStart = startsAt ?? now;
   const defaultEnd = endsAt ?? defaultStart + 4 * 60 * 60 * 1000;
+  const availability = useEquipmentAvailability(
+    eventId,
+    defaultStart,
+    defaultEnd,
+  );
 
   const sheetRows: EquipmentSheetRow[] = eventReservations.map(
     (reservation) => {
@@ -145,6 +165,8 @@ export function EventEquipmentPanel({
         startsAt: new Date(String(data.get("startsAt"))).getTime(),
         endsAt: new Date(String(data.get("endsAt"))).getTime(),
         quantity: Number(data.get("quantity")),
+        overrideReason:
+          String(data.get("overrideReason") ?? "").trim() || undefined,
       });
       form.reset();
       setSelectedEquipmentId("");
@@ -189,7 +211,13 @@ export function EventEquipmentPanel({
         note: checklistDraft.note.trim() || undefined,
       };
       if (mode === "checkout") await checkOut(args);
-      else await markReturned(args);
+      else
+        await markReturned({
+          ...args,
+          missingQuantity: checklistDraft.missing ?? 0,
+          damagedQuantity: checklistDraft.damaged ?? 0,
+          cleaningQuantity: checklistDraft.cleaning ?? 0,
+        });
       setChecklistDraft(null);
       setNotice(
         mode === "checkout"
@@ -301,6 +329,8 @@ export function EventEquipmentPanel({
               />
             )}
 
+            <EventEquipmentProblems eventId={String(eventId)} />
+
             {showReserveForm ? (
               <EventEquipmentReserveForm
                 equipment={equipmentRows}
@@ -311,6 +341,11 @@ export function EventEquipmentPanel({
                 busy={busy}
                 onSubmit={submitReservation}
                 onDismiss={() => setShowReserveForm(false)}
+                canOverride={OVERRIDE_ROLES.has(role ?? "")}
+                availability={availability?.map((row) => ({
+                  ...row,
+                  equipmentId: String(row.equipmentId),
+                }))}
               />
             ) : (
               <button

@@ -23,23 +23,43 @@ entity OrganizationCapabilitySetting mixin TenantScoped, SoftDeletable {
   // `self.capability == null` guard rejected every first-time registration
   // (#360). Same shape as Dish/Ingredient `introducedAt`.
   property registeredAt: datetime?
-  default policy capabilitySettingRead read: user.id != null "Authenticated staff may see capability settings"
-  default policy capabilitySettingWrite write: user.id != null "Authenticated staff may update capability settings"
-  default policy capabilitySettingExecute execute: user.id != null "Authenticated staff may change capability settings"
-  command register(capability: OrganizationCapability, enabled: boolean, optional updatedBy: string) {
+  default policy capabilitySettingRead read: user.id != null "Signed-in staff may see capability settings"
+  default policy capabilitySettingWrite write: user.id != null "Signed-in staff may update capability settings"
+  default policy capabilitySettingExecute execute: user.id != null "Signed-in staff may change capability settings"
+  // updatedBy is the signed-in person, never a name the caller sends (CF-15).
+  command register(capability: OrganizationCapability, enabled: boolean) {
     guard self.deletedAt == null
     guard self.registeredAt == null
     guard roleAllows(user.role, "adminAccess")
     mutate capability = capability
     mutate enabled = enabled
-    mutate updatedBy = updatedBy
+    mutate updatedBy = user.id
     mutate registeredAt = now()
+    emit OrganizationCapabilitySettingRegistered {
+      organizationCapabilitySettingId: self.id
+      tenantId: self.tenantId
+    }
   }
-  command setEnabled(enabled: boolean, optional updatedBy: string) {
+  command setEnabled(enabled: boolean) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
     mutate enabled = enabled
-    mutate updatedBy = updatedBy
+    mutate updatedBy = user.id
+    emit OrganizationCapabilitySettingEnabledSet {
+      organizationCapabilitySettingId: self.id
+      tenantId: self.tenantId
+    }
   }
   store OrganizationCapabilitySetting in durable
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event OrganizationCapabilitySettingRegistered: "organization.capability.setting.registered" {
+  organizationCapabilitySettingId: string
+  tenantId: string
+}
+
+event OrganizationCapabilitySettingEnabledSet: "organization.capability.setting.enabled.set" {
+  organizationCapabilitySettingId: string
+  tenantId: string
 }

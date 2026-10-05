@@ -16,6 +16,8 @@ import {
 } from "../../lib/currency";
 import { formatMoney } from "../../lib/format";
 import { FINANCE_ROUTES } from "./financeRoutes";
+import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
+import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
@@ -84,6 +86,7 @@ export function InvoiceIssueForm({
       : "";
   const functionalCode = normalizeCurrencyCode(functionalCurrencyCode, "USD");
   const [selectedClientId, setSelectedClientId] = useState(clientDefault);
+  const [selectedEventId, setSelectedEventId] = useState(eventDefault);
   const [lines, setLines] = useState<InvoiceLineDraft[]>([initialLine()]);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [currencyCode, setCurrencyCode] = useState(functionalCode);
@@ -211,7 +214,12 @@ export function InvoiceIssueForm({
         </label>
         <label className="field-label">
           Event (optional)
-          <select className="input" name="eventId" defaultValue={eventDefault}>
+          <select
+            className="input"
+            name="eventId"
+            value={selectedEventId}
+            onChange={(event) => setSelectedEventId(event.target.value)}
+          >
             <option value="">No linked event</option>
             {events
               .filter((row) => row.deletedAt == null)
@@ -222,6 +230,21 @@ export function InvoiceIssueForm({
               ))}
           </select>
         </label>
+        <InvoiceEquipmentCharges
+          eventId={selectedEventId}
+          lines={lines}
+          onAdd={(added) => setLines((current) => [...current, ...added])}
+        />
+        <InvoiceTravelFee
+          eventId={selectedEventId}
+          lines={lines}
+          onAdd={(added) =>
+            setLines((current) => [
+              ...current.filter((line) => !line.id.startsWith("travel-")),
+              added,
+            ])
+          }
+        />
         <label className="field-label">
           Invoice currency
           <select
@@ -246,7 +269,8 @@ export function InvoiceIssueForm({
             ))}
           </select>
           <span className="mt-1 block text-xs font-normal text-ink-3">
-            Tenant functional currency is {formatCurrencyLabel(functionalCode)}.
+            Your business's functional currency is{" "}
+            {formatCurrencyLabel(functionalCode)}.
           </span>
         </label>
         <label className="field-label">
@@ -265,7 +289,7 @@ export function InvoiceIssueForm({
           <span className="mt-1 block text-xs font-normal text-ink-3">
             {isFunctionalCurrency
               ? "Locked at 1.000000 — invoice is already in the functional currency."
-              : `1 ${normalizedCurrencyCode} = ${parsedExchangeRate || 0} ${functionalCode} (recorded at issue).`}
+              : `1 ${normalizedCurrencyCode} = ${parsedExchangeRate || 0} ${functionalCode} (set at issue).`}
           </span>
         </label>
       </div>

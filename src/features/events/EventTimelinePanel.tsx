@@ -5,13 +5,15 @@ import {
   useCreateEventTimelineActivity,
   useEventTimelineActivityAdjust,
   useEventTimelineActivityRemove,
-  useListEventAssignment,
-  useListEventStaffNeed,
-  useListEventTimelineActivity,
-  useListEventTimelineComment,
   useListPerson,
-  useListShift,
 } from "../../lib/manifest-convex-react";
+import {
+  useEventAssignments,
+  useEventShifts,
+  useEventStaffNeeds,
+  useEventTimelineActivities,
+  useEventTimelineComments,
+} from "../../lib/useEventRows";
 import { EmptyState, Skeleton } from "../../ui/primitives";
 import { PlusIcon } from "../../ui/icons";
 import type { BattleBoardTaskTemplate } from "./battleBoardTaskTemplates";
@@ -87,12 +89,12 @@ const remapper = new TimelineSlotRemapper();
 
 /** Day-of timeline: templates, manual add, Gantt, and editable blocks. */
 export function EventTimelinePanel({ eventId }: Props) {
-  const allRecords = useListEventTimelineActivity();
-  const assignments = useListEventAssignment();
-  const staffNeeds = useListEventStaffNeed();
-  const shifts = useListShift();
+  const allRecords = useEventTimelineActivities(eventId);
+  const assignments = useEventAssignments(eventId);
+  const staffNeeds = useEventStaffNeeds(eventId);
+  const shifts = useEventShifts(eventId);
   const people = useListPerson();
-  const comments = useListEventTimelineComment();
+  const comments = useEventTimelineComments(eventId);
   const records = useMemo(
     () => allRecords?.filter((row) => row.eventId === eventId),
     [allRecords, eventId],
@@ -274,7 +276,7 @@ export function EventTimelinePanel({ eventId }: Props) {
           const activity = byId.get(slot.id);
           if (activity == null || typeof activity.version !== "number") {
             throw new Error(
-              "Timeline activity is unavailable; refresh and retry",
+              "This timeline item didn't load. Refresh the page and try again.",
             );
           }
           return {

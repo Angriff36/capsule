@@ -21,6 +21,7 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
+import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
 import {
   readCurrentPacket,
   projectPacketReadiness,
@@ -58,6 +59,60 @@ async function decryptField(
     (envelope as { ct: string }).ct,
     (envelope as { kid: string }).kid,
     { ctx, entity, property },
+  );
+}
+
+/**
+ * Roles whose capabilities include eventAccess or salesAccess — the same
+ * audience the Event read surface unmasks the primary contact for
+ * (src/operations/event.manifest `unmask when`). Kept equal to the compiled
+ * role hierarchy by tests/proofs/event-day-contact-access.runtime.test.ts.
+ */
+export const EVENT_CONTACT_ROLES: ReadonlySet<string> = new Set([
+  "admin",
+  "event_manager",
+  "event_staff",
+  "owner",
+  "sales_manager",
+  "sales_staff",
+  "system",
+]);
+
+/**
+ * Day-of client/venue numbers go to event and sales staff and to crew who
+ * work this event (assigned, or driving one of its deliveries) so they can
+ * call on site. Everyone else sees the names without the numbers.
+ */
+export function mayCallContacts(
+  auth: {
+    role: string;
+    personId?: string | null;
+    disabledCapabilities?: unknown;
+  },
+  assignments: any[],
+  deliveries: any[],
+): boolean {
+  const events = !orgCapabilityDeniesAction(
+    "eventAccess",
+    auth.disabledCapabilities,
+  );
+  const sales = !orgCapabilityDeniesAction(
+    "salesAccess",
+    auth.disabledCapabilities,
+  );
+  if (EVENT_CONTACT_ROLES.has(auth.role) && (events || sales)) return true;
+  const me = auth.personId == null ? null : String(auth.personId);
+  if (me == null) return false;
+  return (
+    assignments.some(
+      (row) =>
+        String(row.personId) === me &&
+        row.status !== "unassigned" &&
+        row.status !== "no_show",
+    ) ||
+    deliveries.some(
+      (row) => row.driverId != null && String(row.driverId) === me,
+    )
   );
 }
 
@@ -187,6 +242,8 @@ export const getBriefing = query({
       byEvent(ctx, "packLists", tenantId, id),
     ]);
 
+    const canCall = mayCallContacts(auth, assignments, deliveries);
+
     const packListItems = (
       await Promise.all(
         packLists.map((list: any) =>
@@ -225,6 +282,14 @@ export const getBriefing = query({
     const dishIds = [
       ...new Set(eventDishes.map((row: any) => String(row.dishId))),
     ];
+    // A version may cook from its main dish's recipe (recipeDishId): read
+    // those lines and show them under the menu's dish, so allergens match.
+    const recipeOf = new Map<string, string>(
+      eventDishes.map((row: any) => [
+        String(row.dishId),
+        String(row.recipeDishId ?? row.dishId),
+      ]),
+    );
     const dishes = (
       await Promise.all(
         eventDishes
@@ -247,11 +312,15 @@ export const getBriefing = query({
 
     const dishLineRows = (
       await Promise.all(
-        dishIds.map((dishId) =>
-          ctx.db
-            .query("dishIngredients")
-            .withIndex("by_dishId", (q: any) => q.eq("dishId", dishId))
-            .collect(),
+        dishIds.map(async (dishId) =>
+          (
+            await ctx.db
+              .query("dishIngredients")
+              .withIndex("by_dishId", (q: any) =>
+                q.eq("dishId", recipeOf.get(dishId) ?? dishId),
+              )
+              .collect()
+          ).map((row: any) => ({ ...row, dishId })),
         ),
       )
     )
@@ -259,11 +328,15 @@ export const getBriefing = query({
       .filter((row: any) => row.tenantId === tenantId && live(row));
     const dishComponentRows = (
       await Promise.all(
-        dishIds.map((dishId) =>
-          ctx.db
-            .query("dishComponents")
-            .withIndex("by_dishId", (q: any) => q.eq("dishId", dishId))
-            .collect(),
+        dishIds.map(async (dishId) =>
+          (
+            await ctx.db
+              .query("dishComponents")
+              .withIndex("by_dishId", (q: any) =>
+                q.eq("dishId", recipeOf.get(dishId) ?? dishId),
+              )
+              .collect()
+          ).map((row: any) => ({ ...row, dishId })),
         ),
       )
     )
@@ -286,6 +359,23 @@ export const getBriefing = query({
     )
       .flat()
       .filter((row: any) => row.tenantId === tenantId && live(row));
+
+    // Allergens marked on a recipe itself (recipe sheet) count for its dishes,
+    // even when the recipe was removed but a live dish line still uses it.
+    const componentRows = (
+      await Promise.all(
+        componentIds.map((componentId) =>
+          tenantDocAllowDeleted(ctx, tenantId, componentId),
+        ),
+      )
+    )
+      .filter((row: any) => row != null)
+      .map((row: any) => ({
+        _id: row._id,
+        deletedAt: null,
+        name: row.name,
+        declaredAllergens: row.declaredAllergens ?? [],
+      }));
 
     const dishIngredients = await Promise.all(
       dishLineRows.map((line: any) => hydrateLine(ctx, tenantId, line)),
@@ -385,18 +475,22 @@ export const getBriefing = query({
           "primaryContactName",
           event.primaryContactName,
         ),
-        primaryContactEmail: await decryptField(
-          ctx,
-          "Event",
-          "primaryContactEmail",
-          event.primaryContactEmail,
-        ),
-        primaryContactPhone: await decryptField(
-          ctx,
-          "Event",
-          "primaryContactPhone",
-          event.primaryContactPhone,
-        ),
+        primaryContactEmail: canCall
+          ? await decryptField(
+              ctx,
+              "Event",
+              "primaryContactEmail",
+              event.primaryContactEmail,
+            )
+          : null,
+        primaryContactPhone: canCall
+          ? await decryptField(
+              ctx,
+              "Event",
+              "primaryContactPhone",
+              event.primaryContactPhone,
+            )
+          : null,
       },
       venue:
         venueRaw == null
@@ -437,22 +531,31 @@ export const getBriefing = query({
               hasFreightElevator: venueRaw.hasFreightElevator ?? null,
               hasStairs: venueRaw.hasStairs ?? null,
               storageAvailable: venueRaw.storageAvailable ?? null,
+              hasOven: venueRaw.hasOven ?? null,
+              hasRefrigeration: venueRaw.hasRefrigeration ?? null,
+              loadInFrom: venueRaw.loadInFrom ?? null,
+              loadOutBy: venueRaw.loadOutBy ?? null,
               loadInInstructions: venueRaw.loadInInstructions ?? null,
               accessNotes: venueRaw.accessNotes ?? null,
               cateringNotes: venueRaw.cateringNotes ?? null,
               restrictions: venueRaw.restrictions ?? null,
+              vibe: venueRaw.vibe ?? null,
+              topFeature: venueRaw.topFeature ?? null,
+              photoFocus: venueRaw.photoFocus ?? null,
               contactName: await decryptField(
                 ctx,
                 "Venue",
                 "contactName",
                 venueRaw.contactName,
               ),
-              contactPhone: await decryptField(
-                ctx,
-                "Venue",
-                "contactPhone",
-                venueRaw.contactPhone,
-              ),
+              contactPhone: canCall
+                ? await decryptField(
+                    ctx,
+                    "Venue",
+                    "contactPhone",
+                    venueRaw.contactPhone,
+                  )
+                : null,
             },
       assignments: (assignments as any[]).map((row) => ({
         _id: row._id,
@@ -512,6 +615,7 @@ export const getBriefing = query({
         componentId: row.componentId,
       })),
       componentIngredients,
+      components: componentRows,
       deliveries: (deliveries as any[]).map((row) => ({
         _id: row._id,
         eventId: row.eventId,
@@ -554,13 +658,12 @@ export const getBriefing = query({
           givenName: row.givenName ?? null,
           familyName: row.familyName ?? null,
           title: row.title ?? null,
-          phone: await decryptField(ctx, "ClientContact", "phone", row.phone),
-          mobile: await decryptField(
-            ctx,
-            "ClientContact",
-            "mobile",
-            row.mobile,
-          ),
+          phone: canCall
+            ? await decryptField(ctx, "ClientContact", "phone", row.phone)
+            : null,
+          mobile: canCall
+            ? await decryptField(ctx, "ClientContact", "mobile", row.mobile)
+            : null,
         })),
       ),
       packLists: (packLists as any[]).map((row) => ({
@@ -569,6 +672,7 @@ export const getBriefing = query({
         deletedAt: row.deletedAt ?? null,
         status: row.status ?? null,
         name: row.name ?? null,
+        binSheet: row.binSheet ?? null,
       })),
       packListItems: (packListItems as any[]).map((row: any) => ({
         _id: row._id,
@@ -578,12 +682,16 @@ export const getBriefing = query({
         description: row.description ?? null,
         requiredQuantity: row.requiredQuantity ?? null,
         unit: row.unit ?? null,
+        binNumber: row.binNumber ?? null,
       })),
       people,
       me: {
         personId: auth.personId ?? null,
         role: auth.role,
       },
+      // "withheld": numbers are blank because this viewer neither works with
+      // the client (event/sales) nor works this event — not because none exist.
+      contactAccess: canCall ? ("full" as const) : ("withheld" as const),
     };
   },
 });

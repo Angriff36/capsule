@@ -27,12 +27,12 @@ export function formatStatusLabel(value: string): string {
 export type ChipTone = "mute" | "ok" | "info" | "warn" | "danger" | "brand";
 
 export const CHIP_TONE_CLASS: Record<ChipTone, string> = {
-  mute: "border-line-2 bg-mute-soft text-ink-2",
-  ok: "border-ok/30 bg-ok-soft text-ok",
-  info: "border-info/30 bg-info-soft text-info",
-  warn: "border-warn/30 bg-warn-soft text-warn",
-  danger: "border-danger/30 bg-danger-soft text-danger",
-  brand: "border-brand/30 bg-brand-soft text-brand",
+  mute: "chip-tone-mute",
+  ok: "chip-tone-ok",
+  info: "chip-tone-info",
+  warn: "chip-tone-warn",
+  danger: "chip-tone-danger",
+  brand: "chip-tone-brand",
 };
 
 /**

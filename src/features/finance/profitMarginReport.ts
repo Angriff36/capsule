@@ -48,6 +48,11 @@ export type ProfitMetrics = {
   netProfit: number;
   netMarginPercent: number | null;
   eventCount: number;
+  /**
+   * AC-093: events with revenue but no food cost or no labor cost. Their
+   * profit is not fully known, and the report must say so.
+   */
+  costMissingCount: number;
 };
 
 export type ProfitMarginEventRow = ProfitMetrics & {
@@ -102,6 +107,7 @@ type MutableMetrics = {
   equipmentCost: number;
   overheadCost: number;
   eventCount: number;
+  costMissingCount: number;
 };
 
 const EMPTY_METRICS: MutableMetrics = {
@@ -111,6 +117,7 @@ const EMPTY_METRICS: MutableMetrics = {
   equipmentCost: 0,
   overheadCost: 0,
   eventCount: 0,
+  costMissingCount: 0,
 };
 
 function amount(value: number | null | undefined): number {
@@ -152,6 +159,7 @@ function addMetrics(target: MutableMetrics, source: ProfitMetrics): void {
   target.equipmentCost += source.equipmentCost;
   target.overheadCost += source.overheadCost;
   target.eventCount += source.eventCount;
+  target.costMissingCount += source.costMissingCount;
 }
 
 function clientName(client: ProfitMarginClient | undefined): string {
@@ -230,6 +238,7 @@ function metricsColumns(metrics: ProfitMetrics): Array<string | number> {
     csvPercent(metrics.grossMarginPercent),
     csvMoney(metrics.netProfit),
     csvPercent(metrics.netMarginPercent),
+    metrics.costMissingCount,
   ];
 }
 
@@ -245,6 +254,7 @@ const METRIC_HEADERS = [
   "Gross margin percent",
   "Net profit",
   "Net margin percent",
+  "Events missing food or labor cost",
 ];
 
 export function buildProfitMarginReport({
@@ -296,13 +306,18 @@ export function buildProfitMarginReport({
     const clientId = String(event.clientId ?? "unknown-client");
     const client = clientsById.get(clientId);
     const segment = clientSegment(client);
+    const revenue = amount(closeout.actualRevenue);
+    const foodCost = amount(closeout.actualIngredientCost);
+    const laborCost = amount(closeout.actualLaborCost);
     const rowMetrics = metricsOf({
-      revenue: amount(closeout.actualRevenue),
-      foodCost: amount(closeout.actualIngredientCost),
-      laborCost: amount(closeout.actualLaborCost),
+      revenue,
+      foodCost,
+      laborCost,
       equipmentCost: amount(closeout.actualVendorCost),
       overheadCost: amount(closeout.actualWasteCost),
       eventCount: 1,
+      costMissingCount:
+        revenue > 0 && (foodCost === 0 || laborCost === 0) ? 1 : 0,
     });
     eventRows.push({
       ...rowMetrics,

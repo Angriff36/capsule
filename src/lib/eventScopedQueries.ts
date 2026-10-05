@@ -24,3 +24,10 @@ export function useEventShiftRows(eventId: EventId) {
     eventId === "skip" ? "skip" : { eventId },
   );
 }
+
+export function useEventTaskRows(eventId: EventId) {
+  return useQuery(
+    api.queries.listEventTaskByEventId,
+    eventId === "skip" ? "skip" : { eventId },
+  );
+}

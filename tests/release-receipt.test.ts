@@ -32,17 +32,21 @@ function completeInput(): ReleaseReceiptInput {
       },
     },
     convex: {
-      expectedDeployment: "impartial-mule-193",
-      frontendDeployment: "impartial-mule-193",
-      functionsReachable: true,
-      commandCount: 597,
-      expectedCommandCount: 597,
+      expectedDeployment: "pop-os",
+      frontendDeployment: "pop-os",
+      backendReleaseSha: INTEGRATED_SHA,
+      backendChangesSinceDeployed: null,
     },
     config: { ok: true, blockerCount: 0, blockerCodes: [] },
     workflow: {
       unauthenticatedStatus: 401,
       authenticatedStatus: 200,
       commandCount: 597,
+      productStep: {
+        name: "Organization.configurePlanningChecks",
+        status: 200,
+        succeeded: true,
+      },
     },
   };
 }
@@ -106,23 +110,33 @@ const scenarios: Array<[string, (input: ReleaseReceiptInput) => void]> = [
     },
   ],
   [
-    "convex:functions_unreachable",
+    "convex:backend_identity_unverifiable",
     (i) => {
-      i.convex.functionsReachable = false;
+      i.convex.backendReleaseSha = null;
     },
   ],
   [
-    "convex:command_surface_unverifiable",
+    // Deployed by hand (or before the release stamp existed).
+    "convex:backend_not_released",
     (i) => {
-      i.convex.expectedCommandCount = null;
+      i.convex.backendReleaseSha = "unreleased";
     },
   ],
   [
-    // The stale backend: the alias is right but the backend still serves the
-    // previous release's command surface.
-    "convex:command_surface_mismatch",
+    "convex:backend_lineage_unverifiable",
     (i) => {
-      i.convex.commandCount = 596;
+      i.convex.backendReleaseSha = STALE_SHA;
+      i.convex.backendChangesSinceDeployed = null;
+    },
+  ],
+  [
+    // The stale self-hosted backend: the alias is right, the command count may
+    // even be equal, but the backend runs an older release and this release
+    // changes backend code after it (#382).
+    "convex:stale_backend",
+    (i) => {
+      i.convex.backendReleaseSha = STALE_SHA;
+      i.convex.backendChangesSinceDeployed = ["convex/lib/eventStageMoves.ts"];
     },
   ],
   [
@@ -167,6 +181,25 @@ const scenarios: Array<[string, (input: ReleaseReceiptInput) => void]> = [
     "workflow:registry_empty",
     (i) => {
       i.workflow.commandCount = 0;
+    },
+  ],
+  [
+    // A registry listing is not a product workflow.
+    "workflow:product_step_not_configured",
+    (i) => {
+      i.workflow.productStep = null;
+    },
+  ],
+  [
+    "workflow:product_step_failed",
+    (i) => {
+      i.workflow.productStep = { name: "X.y", status: 400, succeeded: false };
+    },
+  ],
+  [
+    "workflow:product_step_failed",
+    (i) => {
+      i.workflow.productStep = { name: "X.y", status: 200, succeeded: false };
     },
   ],
   [
@@ -216,16 +249,30 @@ describe("releaseReceipt", () => {
     expect(aliasReceipt.vercel.code).toBe("vercel:stale_alias");
     expect(aliasReceipt.vercel.detail).toContain(STALE_SHA);
 
+    // Same command count, older backend with backend changes since: stale.
     const staleBackend = completeInput();
-    staleBackend.convex.commandCount = 596;
+    staleBackend.convex.backendReleaseSha = STALE_SHA;
+    staleBackend.convex.backendChangesSinceDeployed = ["convex/schema.ts"];
     const backendReceipt = buildReleaseReceipt(staleBackend);
     expect(backendReceipt.convex.state).toBe("failed");
-    expect(backendReceipt.convex.code).toBe("convex:command_surface_mismatch");
+    expect(backendReceipt.convex.code).toBe("convex:stale_backend");
+    expect(backendReceipt.convex.detail).toContain(STALE_SHA);
+    expect(backendReceipt.convex.detail).toContain("convex/schema.ts");
 
     const markdown = renderReleaseReceiptMarkdown(aliasReceipt);
     expect(markdown).toContain("PARTIAL — NOT shipped");
     expect(markdown).toContain("vercel:stale_alias");
     expect(markdown).not.toContain("COMPLETE — shipped");
+  });
+
+  it("an earlier backend release with no backend change since still matches; a frontend-only release is not held back", () => {
+    const input = completeInput();
+    input.convex.backendReleaseSha = STALE_SHA;
+    input.convex.backendChangesSinceDeployed = [];
+    const receipt = buildReleaseReceipt(input);
+    expect(receipt.status).toBe("complete");
+    expect(receipt.convex.detail).toContain(STALE_SHA);
+    expect(receipt.convex.detail).toContain("nothing between");
   });
 
   it("markdown marks a fully verified receipt as shipped and carries every leg's evidence", () => {
@@ -235,7 +282,7 @@ describe("releaseReceipt", () => {
     expect(markdown).toContain("COMPLETE — shipped");
     expect(markdown).toContain(CANONICAL_URL);
     expect(markdown).toContain(INTEGRATED_SHA);
-    expect(markdown).toContain("impartial-mule-193");
+    expect(markdown).toContain("pop-os");
     expect(markdown).not.toContain("PARTIAL");
   });
 });

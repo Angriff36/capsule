@@ -12,6 +12,8 @@ type Props<S> = {
   currentState: S;
   /** Apply a saved view's state back onto the page. */
   onApply: (state: S) => void;
+  /** A URL-restored list state must take precedence over a saved default. */
+  hasExplicitState?: boolean;
 };
 
 /**
@@ -24,6 +26,7 @@ export function SavedViewsBar<S>({
   subjectArea,
   currentState,
   onApply,
+  hasExplicitState = false,
 }: Props<S>) {
   const { ready, views, save, setDefault, remove } = useSavedViews<S>(
     pageKey,
@@ -36,15 +39,19 @@ export function SavedViewsBar<S>({
   const appliedDefault = useRef(false);
 
   // Run a saved-view mutation, surfacing failures instead of a silent no-op.
-  // (Persistence currently depends on the SavedReportDefinition.ownerId fix,
-  // issue #24 — until it lands, saves report a clear error rather than vanish.)
-  const guardedRun = async (work: () => Promise<void>) => {
+  // The message names the action that failed and gives the reason.
+  const guardedRun = async (
+    work: () => Promise<void>,
+    failed = "Couldn't save your view.",
+  ) => {
     setError(null);
     setBusy(true);
     try {
       await work();
-    } catch {
-      setError("Couldn't save your view. Please try again.");
+    } catch (cause) {
+      setError(
+        `${failed} ${cause instanceof Error ? cause.message : "Please try again."}`,
+      );
     } finally {
       setBusy(false);
     }
@@ -52,7 +59,7 @@ export function SavedViewsBar<S>({
 
   // Open the workspace on the user's default view exactly once.
   useEffect(() => {
-    if (!ready || appliedDefault.current) return;
+    if (!ready || appliedDefault.current || hasExplicitState) return;
     appliedDefault.current = true;
     const fallback = views.find((v) => v.isDefault);
     if (fallback) {
@@ -116,7 +123,12 @@ export function SavedViewsBar<S>({
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() => guardedRun(() => setDefault(current.id))}
+              onClick={() =>
+                guardedRun(
+                  () => setDefault(current.id),
+                  "Couldn't make this your default view.",
+                )
+              }
               disabled={busy}
             >
               Set default
@@ -137,7 +149,7 @@ export function SavedViewsBar<S>({
                 await guardedRun(async () => {
                   await remove(current.id);
                   setSelected("");
-                });
+                }, "Couldn't delete this view.");
               })();
             }}
             disabled={busy}

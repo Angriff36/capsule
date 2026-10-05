@@ -7,12 +7,14 @@ export type InvoicePaymentLink = {
   url: string;
   createdAt: number;
   amount: number;
+  overpaidAmount?: number;
 };
 
 export type InvoiceStripeSyncResult = {
   checked: number;
   recorded: number;
   recordedAmount: number;
+  overpaidAmount: number;
   failures: string[];
 };
 

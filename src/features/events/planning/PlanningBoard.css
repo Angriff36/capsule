@@ -1,0 +1,320 @@
+/* Planning board: a calendar of events beside the pool of people, trucks,
+   trailers and equipment. Ruled, flat surfaces; an event's state is the rule
+   on its leading edge plus a short word. */
+
+.plan-board {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+@media (min-width: 1100px) {
+  .plan-board {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+  }
+}
+
+.plan-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.plan-bar > strong {
+  min-width: 11rem;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--color-ink);
+}
+
+.plan-switch {
+  display: inline-flex;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-inset);
+  padding: 0.125rem;
+}
+.plan-switch > button {
+  min-height: 2rem;
+  padding: 0.25rem 0.875rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.plan-switch > button[data-active] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+.plan-scroll {
+  overflow-x: auto;
+  border-top: 1.5px solid var(--color-ink);
+}
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(7.5rem, 1fr));
+  min-width: 52.5rem;
+}
+.plan-grid[data-view="day"] {
+  grid-template-columns: 1fr;
+  min-width: 0;
+}
+.plan-grid-head {
+  padding: 0.375rem 0.5rem;
+  border-bottom: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.plan-day {
+  min-height: 6.5rem;
+  padding: 0.375rem;
+  border-right: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+}
+.plan-grid[data-view="week"] .plan-day,
+.plan-grid[data-view="day"] .plan-day {
+  min-height: 14rem;
+}
+.plan-day[data-outside] {
+  background: var(--color-inset);
+}
+.plan-day-number {
+  display: inline-flex;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.375rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.plan-day-number[data-today] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+.plan-day-events {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.plan-event {
+  display: grid;
+  width: 100%;
+  gap: 0.0625rem;
+  padding: 0.3125rem 0.375rem 0.3125rem 0.5rem;
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-line-2);
+  border-radius: var(--radius-xs);
+  background: var(--color-panel);
+  text-align: left;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.plan-event:hover {
+  background: var(--color-inset);
+}
+.plan-event > strong {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-ink);
+}
+.plan-event[data-status="fix"] {
+  border-left-color: var(--color-danger);
+}
+.plan-event[data-status="look"] {
+  border-left-color: var(--color-warn);
+}
+.plan-event[data-status="ready"] {
+  border-left-color: var(--color-ok);
+}
+.plan-event[data-selected] {
+  border-color: var(--color-brand);
+  background: var(--color-accent-soft);
+}
+.plan-event[data-over] {
+  outline: 2px dashed var(--color-brand);
+  outline-offset: 1px;
+}
+.plan-event-word[data-status="fix"] {
+  color: var(--color-danger);
+}
+.plan-event-word[data-status="look"] {
+  color: var(--color-warn);
+}
+.plan-event-word[data-status="ready"] {
+  color: var(--color-ok);
+}
+
+.plan-pool {
+  border-top: 1.5px solid var(--color-ink);
+}
+.plan-pool-list {
+  max-height: 34rem;
+  overflow-y: auto;
+}
+.plan-pool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--color-line);
+}
+.plan-pool-row[draggable="true"] {
+  cursor: grab;
+}
+.plan-pool-row > div {
+  min-width: 0;
+}
+.plan-pool-row strong {
+  display: block;
+  overflow: hidden;
+  font-size: var(--text-base);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-ink);
+}
+.plan-pool-row small {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-ink-3);
+}
+.plan-pool-state {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.plan-pool-state[data-tone="fix"] {
+  color: var(--color-danger);
+}
+.plan-pool-state[data-tone="look"] {
+  color: var(--color-warn);
+}
+.plan-pool-state[data-tone="on"] {
+  color: var(--color-ok);
+}
+
+.plan-detail {
+  margin-top: 1.5rem;
+  border-top: 1.5px solid var(--color-ink);
+  padding-top: 1rem;
+}
+.plan-detail-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+@media (min-width: 900px) {
+  .plan-detail-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.plan-open {
+  display: grid;
+  gap: 0.375rem;
+}
+.plan-open > li {
+  display: grid;
+  gap: 0.125rem;
+  padding-left: 0.625rem;
+  border-left: 3px solid var(--color-warn);
+  font-size: var(--text-base);
+  color: var(--color-ink);
+}
+.plan-open > li[data-level="fix"] {
+  border-left-color: var(--color-danger);
+}
+.plan-open > li > small {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.plan-rows > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-line);
+  font-size: var(--text-base);
+}
+.plan-rows > li > span {
+  min-width: 0;
+}
+.plan-rows small {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+/* Schedule: who and what is where, a row each, a column per day. */
+.plan-schedule {
+  width: 100%;
+  min-width: 56rem;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.plan-schedule th,
+.plan-schedule td {
+  padding: 0.375rem 0.5rem;
+  border-right: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+  vertical-align: top;
+}
+.plan-schedule thead th {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-ink-3);
+}
+.plan-schedule thead th[data-today] {
+  color: var(--color-brand);
+}
+.plan-schedule tbody th {
+  min-width: 11rem;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.plan-schedule tbody th > small {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--color-ink-3);
+}
+.plan-schedule td[data-twice] {
+  background: var(--color-danger-soft);
+}
+.plan-schedule-cell {
+  display: grid;
+  width: 100%;
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0.375rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-xs);
+  background: var(--color-panel);
+  text-align: left;
+  color: var(--color-ink-2);
+}
+.plan-schedule-cell > strong {
+  color: var(--color-ink);
+}
+.plan-schedule-cell[data-selected] {
+  border-color: var(--color-brand);
+  background: var(--color-accent-soft);
+}
+.plan-schedule-twice {
+  font-weight: 700;
+  color: var(--color-danger);
+}

@@ -113,7 +113,7 @@ export function MembershipRequired() {
     matched: "Your profile is linked. Opening Capsule…",
     unauthenticated: "Your session ended. Sign in again.",
     not_configured:
-      "Self-link is not set up on this deployment yet (CLERK_SECRET_KEY). Ask your manager to link your account under Team roles.",
+      "Capsule can't link your sign-in on its own yet. Ask your manager to link your account under Team roles.",
     provider_error:
       "The sign-in service could not be reached to confirm your email. Tap Try again in a moment.",
     no_email:

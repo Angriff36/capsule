@@ -37,7 +37,7 @@ import {
   type ChatMessageView,
 } from "./lib/teamChatRead";
 import { channelRows, scanChannel } from "./lib/teamChatScan";
-import { TEXT_TARGETS } from "./search";
+import { TEXT_TARGETS, canRead } from "./search";
 
 /** Channels stay in the rail from one day before the event starts. */
 const DAY_MS = 86_400_000;
@@ -377,6 +377,8 @@ export const searchLinkTargets = query({
     await Promise.all(
       TEXT_TARGETS.filter((target) => LINKABLE_KINDS.has(target.kind)).map(
         async (target) => {
+          // Same read policy as the kind's generated reads (see search.ts).
+          if (!canRead(auth, target.read)) return;
           // Table/index/field are data-driven, so go through an untyped builder.
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const rows: any[] = await (ctx.db as any)

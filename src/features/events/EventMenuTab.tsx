@@ -9,22 +9,15 @@ import {
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
-  useListComponent,
-  useListComponentIngredient,
-  useListDish,
-  useListDishComponent,
-  useListDishContainer,
-  useListDishIngredient,
-  useListEventDish,
-  useListEventGuest,
-  useListIngredient,
-  useListIngredientPriceObservation,
-  useListItemUnitMapping,
-  useListInventoryItem,
-  useListInventoryReservation,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
+import { venueExclusiveNote } from "./venueExclusiveNote";
+import { useEventGuests } from "../../lib/useEventRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
+import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
@@ -40,11 +33,15 @@ import {
   confirmPendingOperation,
 } from "../../lib/pendingOperationKey";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
+import { deriveDishAllergens } from "../kitchen/dishAllergens";
 import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
+import { eventLineRecipeDishId } from "../kitchen/dishVersions";
 import { EventMenuStockShortageBanner } from "../kitchen/EventMenuStockShortageBanner";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
+import { EventMenuLineKitchen } from "./EventMenuLineKitchen";
+import { EventUnresolvedMaterialsNotice } from "./EventUnresolvedMaterialsNotice";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { ActionMenu, ActionMenuRule, Skeleton } from "../../ui/primitives";
@@ -106,25 +103,36 @@ type Props = {
 };
 
 /** One ledger row: identity, the four editable fields, cost, actions. */
+// The action column has a fixed width so its buttons wrap; an `auto` column
+// took its one-line width first and left the dish name about 30px.
 const MENU_ROW_COLUMNS =
-  "xl:grid-cols-[minmax(0,1fr)_8rem_5.5rem_7rem_4.5rem_7.5rem_auto]";
+  "xl:grid-cols-[minmax(12rem,1fr)_7rem_4.5rem_6rem_4rem_6.5rem_11rem]";
 
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
-  const dishes = useHeldQueryRows("dishes", useListDish());
-  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
-  const eventGuests = useListEventGuest();
+  const eventDishes = useHeldQueryRows(
+    `eventDishes:${eventId}`,
+    useEventMenuLines(eventId),
+  );
+  // The menu's own dishes; the whole dish list only while the picker is open.
+  const dishes = useHeldQueryRows(
+    `dishes:${eventId}`,
+    useDishesByIds(eventDishes?.map((row) => row.dishId)),
+  );
+  const eventGuests = useEventGuests(eventId);
   const reviewFlags = useEventReviewFlags(eventId);
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  const itemUnitMappings = useListItemUnitMapping();
-  const priceObservations = useListIngredientPriceObservation();
-  const containers = useListDishContainer();
-  const inventoryItems = useListInventoryItem();
-  const inventoryReservations = useListInventoryReservation();
+  // Recipe, price and stock rows of the menu's dishes only.
+  const recipe = useSharedRecipeRows(eventDishes);
+  const dishIngredients = recipe?.dishIngredients;
+  const dishComponents = recipe?.dishComponents;
+  const components = recipe?.components;
+  const componentIngredients = recipe?.componentIngredients;
+  const ingredients = recipe?.ingredients;
+  const itemUnitMappings = recipe?.unitMappings;
+  const priceObservations = recipe?.priceObservations;
+  const containers = recipe?.containers;
+  const inventoryItems = recipe?.inventoryItems;
+  const inventoryReservations = recipe?.inventoryReservations;
   const materializeTemplate = useMaterializeEventMenuTemplate();
   const applyPackage = useApplyCateringPackage();
   const createEventDish = useCreateEventDish();
@@ -140,6 +148,12 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     demandVersionsForEvent,
   } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
+  const pickerDishes = useWholeDishList(showPicker);
+  const venues = useListVenue();
+  const venueNames = useMemo(
+    () => new Map((venues ?? []).map((v) => [String(v._id), v.name])),
+    [venues],
+  );
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
   );
@@ -174,7 +188,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   );
   const existingDishIds = selections.map((row) => row.dishId);
 
-  const nutrition = useEventMenuNutrition(existingDishIds);
+  const nutrition = useEventMenuNutrition(existingDishIds, recipe);
 
   const refreshStock = async () => {
     if (!prepSyncReady) return;
@@ -377,14 +391,36 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     ],
   );
 
-  const menuAllergenCodes = useMemo(() => {
-    const codes = new Set<string>();
+  // Allergens from the recipe (ingredients and recipe marks) plus the dish's own.
+  const allergenCodesByDish = useMemo(() => {
+    const recipe = {
+      dishIngredients: dishIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
+      ingredients: ingredients ?? [],
+      components: components ?? [],
+    };
+    const byDish = new Map<string, string[]>();
     for (const selection of selections) {
       const dish = dishes?.find((row) => row._id === selection.dishId);
-      for (const code of dish?.allergenSummary ?? []) codes.add(String(code));
+      if (!dish || byDish.has(dish._id)) continue;
+      byDish.set(dish._id, deriveDishAllergens(dish, recipe).codes);
     }
-    return [...codes];
-  }, [dishes, selections]);
+    return byDish;
+  }, [
+    componentIngredients,
+    components,
+    dishComponents,
+    dishIngredients,
+    dishes,
+    ingredients,
+    selections,
+  ]);
+
+  const menuAllergenCodes = useMemo(
+    () => [...new Set([...allergenCodesByDish.values()].flat())],
+    [allergenCodesByDish],
+  );
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -494,7 +530,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       !Number.isSafeInteger(servings) ||
       servings <= 0
     )
-      throw new Error("Enter a positive whole-number serving count.");
+      throw new Error(
+        "Enter how many servings, as a whole number more than zero.",
+      );
     return servings;
   };
 
@@ -626,6 +664,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         </button>
       </div>
 
+      <EventUnresolvedMaterialsNotice eventId={eventId} />
+
       <CateringPackagePicker
         eventId={eventId}
         headcount={expectedHeadcount}
@@ -748,10 +788,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         }))}
         onDismiss={() => setStockShortages([])}
       />
-      {showPicker ? (
+      {showPicker && pickerDishes === undefined ? (
+        <p className="text-sm text-ink-3" role="status">
+          Loading dishes…
+        </p>
+      ) : showPicker ? (
         <CulinaryRecordPicker
           kind="dish"
-          records={(dishes ?? []).map((dish) => ({
+          records={(pickerDishes ?? []).map((dish) => ({
             _id: dish._id,
             name: dish.name,
             description: dish.description,
@@ -762,6 +806,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             status: String(dish.status),
             mergedIntoDishId: dish.mergedIntoDishId,
             canonicalDishId: dish.canonicalDishId,
+            versionOfDishId: dish.versionOfDishId,
+            versionLabel: dish.versionLabel,
+            note: venueExclusiveNote(
+              dish.exclusiveVenueId,
+              event?.venueId,
+              venueNames,
+            ),
           }))}
           excludeIds={existingDishIds}
           onSelect={(dishId) =>
@@ -772,7 +823,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                 eventId,
                 dishId,
                 quantityServings: servings,
-                dishName: dishes?.find((d) => d._id === dishId)?.name,
+                dishName: pickerDishes?.find((d) => d._id === dishId)?.name,
                 headcountOverride: 0,
               });
               await refreshStock();
@@ -1035,7 +1086,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                   Catalog dish ↗
                                 </Link>
                               ) : null}
-                              <AllergenIconRow codes={dish?.allergenSummary} />
+                              <AllergenIconRow
+                                codes={
+                                  dish
+                                    ? allergenCodesByDish.get(dish._id)
+                                    : undefined
+                                }
+                              />
                               <span
                                 className={`rounded-sm px-2 py-0.5 text-xs font-semibold ${
                                   estimateKind === "priced"
@@ -1063,12 +1120,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             <EventMenuLineOverrides
                               eventId={eventId}
                               eventDishId={selection._id}
-                              dishId={selection.dishId}
+                              dishId={eventLineRecipeDishId(selection)}
                               dishName={dishTitle}
                               busy={busy != null}
                               prompt={prompt}
                               onFailure={(error) =>
                                 setFailure(classifyCommandFailure(error))
+                              }
+                            />
+                            <EventMenuLineKitchen
+                              eventId={eventId}
+                              eventDishId={selection._id}
+                              followsEventHeadcount={
+                                selection.followsEventHeadcount
                               }
                             />
                             <p className="mt-1 text-sm text-ink-2 xl:hidden">
@@ -1185,7 +1249,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           ) : null}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 xl:pt-4">
+                        <div className="flex flex-wrap items-center gap-2 xl:justify-end xl:pt-4 [&_.btn]:whitespace-nowrap">
                           <button
                             type="button"
                             className="btn btn-ghost btn-sm"
@@ -1320,6 +1384,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                         <div className="border-t border-line bg-inset/40 px-4 py-3">
                           <EventMenuRecipeEditor
                             dishId={selection.dishId}
+                            recipeDishId={selection.recipeDishId}
                             servings={
                               dishCost?.servings ??
                               Number(selection.quantityServings)
@@ -1384,6 +1449,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         totals={
           nutrition.totals.componentCount > 0 ? nutrition.totals.perGuest : null
         }
+        coverage={nutrition.totals.coverage}
         coverageNote={nutrition.coverageNote}
         loading={nutrition.loading}
       />

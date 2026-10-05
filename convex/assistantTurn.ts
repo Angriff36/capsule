@@ -21,6 +21,7 @@ import {
   assistantToolDefs,
   executionSpecFor,
 } from "./lib/assistantToolSurface";
+import { tenantIdFromIdentityClaims } from "./lib/personAuthPick";
 // @ts-expect-error pdfjs-dist ships no type declarations for its worker entry.
 import * as pdfjsWorker from "pdfjs-dist/legacy/build/pdf.worker.mjs";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
@@ -363,13 +364,20 @@ export const turn = action({
     if (!identity) throw new Error("Sign in to use the assistant.");
 
     // Tenant settings row wins (set in-app under Administration → Assistant);
-    // deployment env vars are the fallback.
-    const settings = await ctx.runQuery(
-      internal.assistantConfig.readForSubject,
-      {
-        subject: identity.subject,
-      },
-    );
+    // deployment env vars are the fallback. The sign-in's claimed workspace
+    // is passed through: a live profile in another workspace must not answer
+    // these claims (the claims outlive a removal).
+    const caller = await ctx.runQuery(internal.assistantConfig.readForSubject, {
+      subject: identity.subject,
+      tenantId:
+        tenantIdFromIdentityClaims(
+          identity as unknown as Record<string, unknown>,
+        ) || undefined,
+    });
+    if (!caller.staff) {
+      throw new Error("No staff profile is linked to your account.");
+    }
+    const settings = caller.settings;
     const baseUrl = settings?.baseUrl ?? process.env.ASSISTANT_LLM_BASE_URL;
     const apiKey = settings?.apiKey ?? process.env.ASSISTANT_LLM_API_KEY;
     const model = settings?.model ?? process.env.ASSISTANT_LLM_MODEL;
@@ -397,6 +405,10 @@ export const turn = action({
         internal.assistantConfig.resolveFiles,
         {
           subject: identity.subject,
+          tenantId:
+            tenantIdFromIdentityClaims(
+              identity as unknown as Record<string, unknown>,
+            ) || undefined,
           files: allFiles.map((f) => ({
             storageId: f.storageId,
             kind: f.kind,

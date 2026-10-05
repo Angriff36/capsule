@@ -21,6 +21,7 @@
 import type { Doc, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
+import { findRosterConflicts } from "../src/features/workforce/rosterConflicts";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
 import { CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
@@ -78,6 +79,8 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
 const MESSAGE_TAKE = 400;
 /** Same window deriveNotifications uses for mentions (RECENT_WINDOW_MS). */
 const MENTION_WINDOW_MS = 7 * 86_400_000;
+/** Same window deriveNotifications uses for stage changes (RECENT_WINDOW_MS). */
+const STAGE_WINDOW_MS = 7 * 86_400_000;
 /** Same retention window deriveNotifications uses for unread DMs. */
 const MESSAGE_RETENTION_MS = 90 * 86_400_000;
 /** Hard ceiling on the caller's received-DM walk (it stops at retention first). */
@@ -119,10 +122,57 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
+      dateHolds,
+      dateWaitlistEntries,
     ] = await Promise.all([
-      when(can(auth, "eventAccess", "salesAccess"), () =>
-        ctx.db.query("events").withIndex("by_tenantId", byTenant).collect(),
-      ),
+      // Not every event (13 s at 10,000 events, and the socket holds every
+      // other read of the screen until this one answers): only the events
+      // waiting for approval and those whose stage changed inside the
+      // seven-day window deriveNotifications shows.
+      when(can(auth, "eventAccess", "salesAccess"), async () => {
+        const since = Date.now() - STAGE_WINDOW_MS;
+        const lists = await Promise.all([
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_stage_and_startsAt", (q) =>
+              q.eq("tenantId", tenantId).eq("stage", "pending_approval"),
+            )
+            .collect(),
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_approvedAt", (q) =>
+              q.eq("tenantId", tenantId).gte("approvedAt", since),
+            )
+            .collect(),
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_executionStartedAt", (q) =>
+              q.eq("tenantId", tenantId).gte("executionStartedAt", since),
+            )
+            .collect(),
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_completedAt", (q) =>
+              q.eq("tenantId", tenantId).gte("completedAt", since),
+            )
+            .collect(),
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_cancelledAt", (q) =>
+              q.eq("tenantId", tenantId).gte("cancelledAt", since),
+            )
+            .collect(),
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_closedOutAt", (q) =>
+              q.eq("tenantId", tenantId).gte("closedOutAt", since),
+            )
+            .collect(),
+        ]);
+        const byId = new Map<string, Doc<"events">>();
+        for (const row of lists.flat()) byId.set(String(row._id), row);
+        return [...byId.values()];
+      }),
       when(can(auth, "eventAccess", "kitchenAccess"), () =>
         ctx.db.query("incidents").withIndex("by_tenantId", byTenant).collect(),
       ),
@@ -240,7 +290,42 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
+      // Date holds and their waitlist: low-volume sales rows (listDateHold /
+      // listDateWaitlistEntry read guard; the tray prompt is for sales).
+      when(can(auth, "salesAccess"), () =>
+        ctx.db.query("dateHolds").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "salesAccess"), () =>
+        ctx.db
+          .query("dateWaitlistEntries")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
     ]);
+
+    // Names of waiting clients, tenant-checked, for the date-opened prompt.
+    const clientNames: Record<string, string> = {};
+    await Promise.all(
+      [
+        ...new Set(
+          (dateWaitlistEntries ?? [])
+            .filter((row) => row.status === "waiting" && row.clientId)
+            .map((row) => String(row.clientId)),
+        ),
+      ].map(async (id) => {
+        const clientId = ctx.db.normalizeId("clients", id);
+        const client = clientId ? await ctx.db.get(clientId) : null;
+        if (client && client.tenantId === tenantId) {
+          const person = [client.givenName, client.familyName]
+            .filter(Boolean)
+            .join(" ");
+          clientNames[id] =
+            client.clientType === "company"
+              ? (client.companyName ?? person)
+              : person || (client.companyName ?? "");
+        }
+      }),
+    );
 
     // A mention hides once its channel has been read. The caller's cursor is
     // read per mention channel through the (channel, account) index, never
@@ -277,12 +362,49 @@ export const listNotifications = query({
       .flat()
       .filter((row) => row.tenantId === tenantId);
 
-    // Roles without eventAccess cannot list events, but a mention still
-    // needs its channel's title: hydrate only the events of the caller's own
-    // mentions inside the mention window, tenant-checked, title only (same
-    // narrow projection as eventDayBriefing).
+    // Titles the tray names beside an open allergen incident or a double
+    // booking, read by id for callers that list events (as before, when the
+    // whole event list supplied them).
+    const eventTitles: Record<string, string> = {};
+    if (events) {
+      const ids = new Set<string>();
+      for (const incident of incidents ?? []) {
+        if (
+          incident.eventId &&
+          incident.deletedAt == null &&
+          incident.category === "allergen" &&
+          (incident.status === "open" || incident.status === "investigating")
+        ) {
+          ids.add(String(incident.eventId));
+        }
+      }
+      findRosterConflicts({
+        shifts: shifts ?? [],
+        timeOff: [],
+        qualifications: [],
+        eventTitle: (id) => {
+          if (id) ids.add(String(id));
+          return "";
+        },
+        personName: () => "",
+      });
+      for (const event of events) ids.delete(String(event._id));
+      await Promise.all(
+        [...ids].map(async (id) => {
+          const eventId = ctx.db.normalizeId("events", id);
+          const event = eventId ? await ctx.db.get(eventId) : null;
+          if (event && event.tenantId === tenantId) {
+            eventTitles[id] = String(event.title ?? "Untitled event");
+          }
+        }),
+      );
+    }
+
+    // A mention needs its channel's title: hydrate only the events of the
+    // caller's own mentions inside the mention window, tenant-checked, title
+    // only (same narrow projection as eventDayBriefing).
     const mentionEventTitles: Record<string, string> = {};
-    if (!events && staffMessages && auth.personId) {
+    if (staffMessages && auth.personId) {
       const now = Date.now();
       const ids = new Set<string>();
       for (const message of staffMessages) {
@@ -327,6 +449,10 @@ export const listNotifications = query({
       prepTaskComments,
       staffChatReadCursors,
       mentionEventTitles,
+      eventTitles,
+      dateHolds,
+      dateWaitlistEntries,
+      clientNames,
     });
   },
 });

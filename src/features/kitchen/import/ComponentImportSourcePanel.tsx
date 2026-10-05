@@ -27,7 +27,21 @@ export interface ComponentImportSourcePanelProps {
   csvLinesText?: string;
   importId?: string;
   status?: string;
+  /** What finalize did when the formula matched a recipe already in the book. */
+  duplicateOutcome?: string;
 }
+
+/** Plain sentences for a finished duplicate match (AC-067). */
+export const DUPLICATE_OUTCOME_NOTES: Record<string, string> = {
+  identical_source:
+    "This recipe was already in the book — nothing new was made.",
+  scaled_copy:
+    "This formula was already in the book at another batch size — the recipe already there keeps its own amounts.",
+  same_formula_other_name:
+    "The same formula was finished under a new name. The book now holds both.",
+  same_name_other_formula:
+    "A recipe with this name already had a different formula. Both are in the book — compare them and keep the right one.",
+};
 
 /**
  * Read-only provenance panel: the original source text beside the corrected
@@ -42,6 +56,7 @@ export function ComponentImportSourcePanel({
   csvLinesText,
   importId,
   status,
+  duplicateOutcome,
 }: ComponentImportSourcePanelProps) {
   return (
     <section className="component-import-pane" aria-label="Original source">
@@ -82,6 +97,11 @@ export function ComponentImportSourcePanel({
             {csvLinesText}
           </pre>
         </div>
+      ) : null}
+      {duplicateOutcome ? (
+        <p className="component-import-source-note" role="note">
+          {DUPLICATE_OUTCOME_NOTES[duplicateOutcome] ?? duplicateOutcome}
+        </p>
       ) : null}
       <p className="component-import-source-note">
         Corrections never change this text.

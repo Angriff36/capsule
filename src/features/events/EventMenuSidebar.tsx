@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import { AlertTriangleIcon } from "../../ui/icons";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import {
@@ -108,12 +108,9 @@ export function EventMenuSidebar({
               <p className="mt-1 text-sm text-warn">
                 {allergenCodes.map(allergenLabel).join(", ")}
               </p>
-              <Link
-                to={`/events/${eventId}/allergen-briefing`}
-                className="btn-link mt-1.5 inline-block"
-              >
+              <AllergenBriefingButton className="btn-link mt-1.5 inline-block">
                 View guest restrictions
-              </Link>
+              </AllergenBriefingButton>
             </div>
           </div>
         </div>

@@ -9,10 +9,10 @@ import {
   useCreateContract,
   useListClient,
   useListContract,
-  useListEvent,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -21,6 +21,7 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -28,7 +29,7 @@ export function ContractsPage() {
   const workingId = useWorkingEventId();
   const contracts = useListContract();
   const clients = useListClient();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
   const send = useContractSend();
   const markViewed = useContractMarkViewed();
@@ -247,16 +248,17 @@ export function ContractsPage() {
               </label>
               <label>
                 Client
-                <select name="clientId" required defaultValue="">
-                  <option value="" disabled>
-                    Select client
-                  </option>
-                  {activeClients.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {clientDisplayName(row._id, clients)}
-                    </option>
-                  ))}
-                </select>
+                <SearchSelect
+                  name="clientId"
+                  required
+                  defaultValue=""
+                  recentsKey="client"
+                  placeholder="Search clients…"
+                  options={activeClients.map((row) => ({
+                    id: row._id,
+                    label: clientDisplayName(row._id, clients),
+                  }))}
+                />
               </label>
               <label>
                 Title
@@ -297,7 +299,7 @@ export function ContractsPage() {
             <p>No open contracts.</p>
           </div>
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Title</th>
@@ -310,8 +312,10 @@ export function ContractsPage() {
               {visibleRows.map((row) => (
                 <tr key={row._id}>
                   <td>{row.title}</td>
-                  <td>{clientDisplayName(row.clientId, clients)}</td>
-                  <td>
+                  <td data-label="Client">
+                    {clientDisplayName(row.clientId, clients)}
+                  </td>
+                  <td data-label="Status">
                     <StatusChip status={String(row.status)} />
                   </td>
                   <td className="supply-row-actions">

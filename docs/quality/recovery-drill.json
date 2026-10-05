@@ -1,0 +1,83 @@
+{
+  "recordedAt": "2026-10-04T08:58:47.645Z",
+  "environment": "throwaway local backend (ports 3310/3311, own data folder, deleted after), local webhook receiver",
+  "sourceEvent": "a stand-in 'Event approved' ledger row; sending, failure, Try again and the alerts are Capsule's own code",
+  "backendReleaseSha": "unreleased",
+  "timesMs": {
+    "firstStartReadyMs": 23323,
+    "failureToBellMs": 61207,
+    "tryAgainToBellClearMs": 91,
+    "tryAgainToDeliveredMs": 60551,
+    "crashToAnsweringMs": 8390,
+    "restartAnsweringMs": 2019,
+    "restartReadyMs": 8250,
+    "restartNewEventDeliveredMs": 50751
+  },
+  "checks": [
+    {
+      "check": "bell starts empty",
+      "ok": true,
+      "detail": "0 items"
+    },
+    {
+      "check": "bell names the problem and opens System health",
+      "ok": true,
+      "detail": "\"Capsule stopped trying 1 webhook\" -> /admin/integrations"
+    },
+    {
+      "check": "Capsule tried once and stopped (404 is not retried)",
+      "ok": true,
+      "detail": "1 sends"
+    },
+    {
+      "check": "System health list counts 1 stopped",
+      "ok": true,
+      "detail": "{\"channel\":\"webhooks\",\"delivered\":0,\"label\":\"Webhooks\",\"notSure\":0,\"oldestWaitingSince\":null,\"stopped\":1,\"waiting\":0}"
+    },
+    {
+      "check": "no alert carries the receiver address",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "another company's manager sees nothing",
+      "ok": true,
+      "detail": "0 items"
+    },
+    {
+      "check": "Try again delivers it and the bell clears",
+      "ok": true,
+      "detail": "{\"channel\":\"webhooks\",\"delivered\":1,\"label\":\"Webhooks\",\"notSure\":0,\"oldestWaitingSince\":null,\"stopped\":0,\"waiting\":0}"
+    },
+    {
+      "check": "the resend carries the same delivery id (receiver can drop repeats)",
+      "ok": true,
+      "detail": "2 sends"
+    },
+    {
+      "check": "after the crash the server does not answer (screens show 'not answering')",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "data from before the crash is still there",
+      "ok": true,
+      "detail": "1 people"
+    },
+    {
+      "check": "the webhook schedule resumed by itself and sent only the new event",
+      "ok": true,
+      "detail": "3 sends"
+    },
+    {
+      "check": "bell is empty after the restart",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "a backend set up outside a release shows the 'set up by hand' check",
+      "ok": true,
+      "detail": "releaseSha unreleased"
+    }
+  ]
+}

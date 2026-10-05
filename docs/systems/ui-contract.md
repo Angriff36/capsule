@@ -1,0 +1,4727 @@
+# Screen read and action contract
+
+Built by `bun scripts/ui-contract.ts` from the screens under `src/features`, the generated
+hooks (`src/lib/manifest-convex-react.ts`) and the generated wiring bindings
+(`src/generated/manifest-wiring-bindings.ts`). Do not edit by hand; rebuild it.
+`tests/backend-ui-contract.test.ts` fails when this file is out of date or a screen calls a
+function that does not exist.
+
+Shared rules for every area:
+
+- Every read is a Convex live query, filtered to the signed-in company and to records that are
+  not removed. A screen never needs a full page reload after an action.
+- Every action is a generated Manifest command or a named authored step. Failures carry one
+  stable code from `classifyCommandFailure` (`src/features/events/CommandFailure.ts`):
+  NOT_FOUND_OR_FORBIDDEN, STALE_VERSION, INVALID_STATE, VALIDATION_FAILED, MISSING_REQUIRED_FACT,
+  UNIT_CONVERSION_UNRESOLVED, INSUFFICIENT_STOCK, SCHEDULE_CONFLICT, PROVIDER_RETRYING,
+  PROVIDER_ACTION_REQUIRED, RECONCILIATION_REQUIRED, UNEXPECTED.
+- The generated result envelope is kept as is.
+
+## 1. Lead and client
+
+Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientEmailPreferencePanel.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
+
+### Generated reads
+
+- `queries.getClient` - live read
+- `queries.getContract` - live read
+- `queries.getEvent` - live read
+- `queries.listClient` - live read
+- `queries.listClientCommunication` - live read
+- `queries.listClientContact` - live read
+- `queries.listClientOutreachTask` - live read
+- `queries.listContract` - live read
+- `queries.listEvent` - live read
+- `queries.listInvoice` - live read
+- `queries.listLead` - live read
+- `queries.listMessage` - live read
+- `queries.listMessageThread` - live read
+- `queries.listOccasion` - live read
+- `queries.listOrganization` - live read
+- `queries.listPerson` - live read
+- `queries.listProposal` - live read
+- `queries.listQuoteSubmission` - live read
+- `queries.listReferralSource` - live read
+- `queries.listServiceStyle` - live read
+- `queries.listSyncError` - live read
+
+### Generated actions
+
+- `mutations.ClientCommunication_createViaRecord` (ClientCommunication.record)
+  - inputs from the screen: clientContactId, eventId, occurredAt, medium, summary; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see client communication history"; "Staff may add client notes"; "Staff may change client notes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ClientCommunicationRecorded
+  - refresh: live reads update by themselves; reads affected: ClientCommunication.list, ClientCommunication.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 4 more
+- `mutations.ClientContact_createViaAdd` (ClientContact.add)
+  - inputs from the screen: clientId, givenName, familyName, title, email, phone, mobile, isPrimary, isBillingContact, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see client contacts"; "Sales staff may update client contacts"; "Sales staff may change client contacts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ClientContactAdded
+  - refresh: live reads update by themselves; reads affected: ClientContact.list, ClientContact.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 4 more
+- `mutations.ClientContact_remove` (ClientContact.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see client contacts"; "Sales staff may update client contacts"; "Sales staff may change client contacts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ClientContactRemoved
+  - refresh: live reads update by themselves; reads affected: ClientContact.list, ClientContact.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 4 more
+- `mutations.ClientContact_setPrimary` (ClientContact.setPrimary)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see client contacts"; "Sales staff may update client contacts"; "Sales staff may change client contacts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ClientContactPrimarySet
+  - refresh: live reads update by themselves; reads affected: ClientContact.list, ClientContact.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 4 more
+- `mutations.ClientContact_updateDetails` (ClientContact.updateDetails)
+  - inputs from the screen: givenName, familyName, title, email, phone, mobile, isBillingContact, notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see client contacts"; "Sales staff may update client contacts"; "Sales staff may change client contacts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ClientContactDetailsUpdated
+  - refresh: live reads update by themselves; reads affected: ClientContact.list, ClientContact.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 4 more
+- `mutations.ClientMerge_createViaMerge` (ClientMerge.merge)
+  - inputs from the screen: primaryClientId, duplicateClientId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may review client merge history"; "Administrators may consolidate client accounts and their financial history"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 8 more
+  - effects: ClientMergeCompleted
+  - refresh: live reads update by themselves; reads affected: ClientMerge.list, ClientMerge.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get and 20 more
+- `mutations.ClientOutreachTask_complete` (ClientOutreachTask.complete)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; clientId: string; rea...`
+  - refusals (role, stage and rules): "Sales staff may see client follow-up reminders"; "Sales staff may update client follow-up reminders"; "Sales staff may change client follow-up reminders"; "Guard 0 failed"; "ConcurrencyConflict:"; "ClientOutreachTask not found"
+  - effects: ClientOutreachTaskCompleted
+  - refresh: live reads update by themselves; reads affected: ClientOutreachTask.list, ClientOutreachTask.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get
+- `mutations.ClientOutreachTask_dismiss` (ClientOutreachTask.dismiss)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; clientId: string; rea...`
+  - refusals (role, stage and rules): "Sales staff may see client follow-up reminders"; "Sales staff may update client follow-up reminders"; "Sales staff may change client follow-up reminders"; "Guard 0 failed"; "ConcurrencyConflict:"; "ClientOutreachTask not found"
+  - effects: ClientOutreachTaskDismissed
+  - refresh: live reads update by themselves; reads affected: ClientOutreachTask.list, ClientOutreachTask.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get
+- `mutations.Client_archive` (Client.archive)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ClientArchived
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_assignOwner` (Client.assignOwner)
+  - inputs from the screen: assignedToId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ClientOwnerAssigned
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_changeBillingProfile` (Client.changeBillingProfile)
+  - inputs from the screen: paymentTermsDays, taxExempt, taxId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ClientBillingProfileChanged
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_changeContact` (Client.changeContact)
+  - inputs from the screen: email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Country code must contain two characters"; and 2 more
+  - effects: ClientContactChanged
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_createViaRegister` (Client.register)
+  - inputs from the screen: clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Company clients require a company name; person clients require a given name"; and 2 more
+  - effects: ClientRegistered
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_reactivate` (Client.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ClientReactivated
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_setBirthday` (Client.setBirthday)
+  - inputs from the screen: birthday; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Birthday must be a YYYY-MM-DD date"; and 2 more
+  - effects: ClientBirthdaySet
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_setEmailPreference` (Client.setEmailPreference)
+  - inputs from the screen: preference, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "ConcurrencyConflict:"; "Client not found"
+  - effects: ClientEmailPreferenceSet
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Contract_createViaDraft` (Contract.draft)
+  - inputs from the screen: eventId, clientId, title, contractNumber, documentUrl, expiresAt, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: ContractDrafted
+  - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Contract_expire` (Contract.expire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ContractExpired
+  - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Contract_markViewed` (Contract.markViewed)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ContractViewed
+  - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Contract_markVoided` (Contract.markVoided)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason for voiding this contract"; and 2 more
+  - effects: ContractVoided
+  - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Contract_send` (Contract.send)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ContractSent
+  - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Contract_sign` (Contract.sign)
+  - inputs from the screen: signedBy; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "Give the name of who signed"; and 2 more
+  - effects: ContractSigned
+  - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Lead_confirmConversion` (Lead.confirmConversion)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: LeadConverted
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_confirmProposalSent` (Lead.confirmProposalSent)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: LeadProposalLinked
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_createViaCapture` (Lead.capture)
+  - inputs from the screen: leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
+  - effects: LeadCaptured
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_reviseDetails` (Lead.reviseDetails)
+  - inputs from the screen: leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
+  - effects: LeadDetailsRevised
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_stageConversion` (Lead.stageConversion)
+  - inputs from the screen: clientId, clientContactId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: LeadConversionStaged
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_stageProposal` (Lead.stageProposal)
+  - inputs from the screen: proposalId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: LeadProposalStaged
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_updatePipeline` (Lead.updatePipeline)
+  - inputs from the screen: stage, estimatedValue, probability; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "This lead's estimated value can't be negative. Use zero or more."; and 3 more
+  - effects: LeadPipelineUpdated
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.MessageThread_create` (MessageThread.create)
+  - inputs from the screen: provider, providerAccountId, providerThreadId, subject, senderIdentity, contactId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: created `{ _id: string; tenantId: string; deletedAt: number | null; provider: "interna...`
+  - refusals (role, stage and rules): "Staff may see message threads"; "Staff may update conversations"; "Staff may change conversations"; "Guard 0 failed"; "Guard 1 failed"
+  - effects: MessageThreadCreated
+  - refresh: live reads update by themselves; reads affected: MessageThread.list, MessageThread.get, ClientContact.list, ClientContact.get, Event.list, Event.get, Lead.list, Lead.get and 2 more
+- `mutations.MessageThread_linkLead` (MessageThread.linkLead)
+  - inputs from the screen: leadId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see message threads"; "Staff may update conversations"; "Staff may change conversations"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: MessageThreadLeadLinked
+  - refresh: live reads update by themselves; reads affected: MessageThread.list, MessageThread.get, ClientContact.list, ClientContact.get, Event.list, Event.get, Lead.list, Lead.get and 2 more
+- `mutations.MessageThread_setStatus` (MessageThread.setStatus)
+  - inputs from the screen: status; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see message threads"; "Staff may update conversations"; "Staff may change conversations"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: MessageThreadStatusSet
+  - refresh: live reads update by themselves; reads affected: MessageThread.list, MessageThread.get, ClientContact.list, ClientContact.get, Event.list, Event.get, Lead.list, Lead.get and 2 more
+- `mutations.Message_createViaPost` (Message.post)
+  - inputs from the screen: threadId, direction, status, bodyText, providerMessageId, senderIdentity, sentAt, rawPayload, mediaJson; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see messages"; "Staff may update messages"; "Staff may change messages"; "Guard 0 failed"; "Guard 1 failed"; "Write something in the message"
+  - effects: MessagePosted
+  - refresh: live reads update by themselves; reads affected: Message.list, Message.get, MessageThread.list, MessageThread.get
+- `mutations.Organization_createViaRegister` (Organization.register)
+  - inputs from the screen: name, brandDisplayName, brandAddress, brandPrimaryColor, brandAccentColor; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "Guard 1 failed"; "Give your company a name."
+  - effects: OrganizationRegistered
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.Organization_setBrandLogo` (Organization.setBrandLogo)
+  - inputs from the screen: storageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationBrandLogoSet
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.Proposal_createViaDraft` (Proposal.draft)
+  - inputs from the screen: clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId, sectionOrder; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 6 more
+  - effects: ProposalDrafted
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.QuoteSubmission_dismiss` (QuoteSubmission.dismiss)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Anyone may check a quote request"; "Only sales staff may update quote submissions"; "Anyone may send a quote request"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: QuoteSubmissionDismissed
+  - refresh: live reads update by themselves; reads affected: QuoteSubmission.list, QuoteSubmission.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 10 more
+- `mutations.QuoteSubmission_retry` (QuoteSubmission.retry)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Anyone may check a quote request"; "Only sales staff may update quote submissions"; "Anyone may send a quote request"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: QuoteSubmissionRetried
+  - refresh: live reads update by themselves; reads affected: QuoteSubmission.list, QuoteSubmission.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 10 more
+- `mutations.SyncError_markResolved` (SyncError.markResolved)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see sync errors"; "Staff may update connection problems"; "Staff may change connection problems"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: SyncErrorResolved
+  - refresh: live reads update by themselves; reads affected: SyncError.list, SyncError.get
+
+### Authored reads and steps
+
+- `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `lib.clientOutreach.ensureOpen` - mutation; authored step; live reads update by themselves
+- `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
+- `messageInbox.ingestInboundMessage` - action; one-time call (not live); the live reads it changes update by themselves
+- `messageInbox.ingestProviderEnvelope` - action; one-time call (not live); the live reads it changes update by themselves
+- `messageInbox.qualifyThreadAsLead` - action; one-time call (not live); the live reads it changes update by themselves
+- `messageReply.sendEmailReply` - action; one-time call (not live); the live reads it changes update by themselves
+- `quoteBuilder.getQuoteFormOptions` - query; live read, updates by itself
+- `quoteBuilder.processQuoteSubmission` - action; one-time call (not live); the live reads it changes update by themselves
+- `quoteBuilder.submitQuote` - action; one-time call (not live); the live reads it changes update by themselves
+- `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
+- `sourceProvenance.listMergedClients` - query; live read, updates by itself
+
+## 2. Proposal
+
+Screens (32): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.listClient` - live read
+- `queries.listEvent` - live read
+- `queries.listEventTimelineActivity` - live read
+- `queries.listMenu` - live read
+- `queries.listMenuDish` - live read
+- `queries.listOrganization` - live read
+- `queries.listProposal` - live read
+- `queries.listProposalDishSelection` - live read
+- `queries.listProposalEnhancement` - live read
+- `queries.listProposalLineItem` - live read
+- `queries.listProposalRevision` - live read
+- `queries.listProposalTemplate` - live read
+- `queries.listServiceStyle` - live read
+- `queries.listShareLink` - live read
+- `queries.listSignatureRequest` - live read
+- `queries.listVenue` - live read
+
+### Generated actions
+
+- `mutations.Organization_setBrandLogo` (Organization.setBrandLogo)
+  - inputs from the screen: storageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationBrandLogoSet
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.ProposalDishSelection_adjustServings` (ProposalDishSelection.adjustServings)
+  - inputs from the screen: quantityServings; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal dish selections"; "Sales staff may update proposal dish selections"; "Sales staff may change proposal dish selections"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ProposalDishSelectionServingsAdjusted
+  - refresh: live reads update by themselves; reads affected: ProposalDishSelection.list, ProposalDishSelection.get, Dish.list, Dish.get, Menu.list, Menu.get, Proposal.list, Proposal.get
+- `mutations.ProposalDishSelection_createViaSelect` (ProposalDishSelection.select)
+  - inputs from the screen: proposalId, menuId, dishId, quantityServings, course, serviceStyle, specialInstructions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see proposal dish selections"; "Sales staff may update proposal dish selections"; "Sales staff may change proposal dish selections"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ProposalDishSelected
+  - refresh: live reads update by themselves; reads affected: ProposalDishSelection.list, ProposalDishSelection.get, Dish.list, Dish.get, Menu.list, Menu.get, Proposal.list, Proposal.get
+- `mutations.ProposalDishSelection_remove` (ProposalDishSelection.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal dish selections"; "Sales staff may update proposal dish selections"; "Sales staff may change proposal dish selections"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ProposalDishSelectionRemoved
+  - refresh: live reads update by themselves; reads affected: ProposalDishSelection.list, ProposalDishSelection.get, Dish.list, Dish.get, Menu.list, Menu.get, Proposal.list, Proposal.get
+- `mutations.ProposalEnhancement_createViaOffer` (ProposalEnhancement.offer)
+  - inputs from the screen: proposalId, name, price, description, sortOrder; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see proposal enhancements"; "Sales staff may update proposal enhancements"; "Sales staff may change proposal enhancements"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ProposalEnhancementOffered
+  - refresh: live reads update by themselves; reads affected: ProposalEnhancement.list, ProposalEnhancement.get, Proposal.list, Proposal.get
+- `mutations.ProposalEnhancement_revise` (ProposalEnhancement.revise)
+  - inputs from the screen: name, price, description, sortOrder; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal enhancements"; "Sales staff may update proposal enhancements"; "Sales staff may change proposal enhancements"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: ProposalEnhancementRevised
+  - refresh: live reads update by themselves; reads affected: ProposalEnhancement.list, ProposalEnhancement.get, Proposal.list, Proposal.get
+- `mutations.ProposalEnhancement_withdraw` (ProposalEnhancement.withdraw)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal enhancements"; "Sales staff may update proposal enhancements"; "Sales staff may change proposal enhancements"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ProposalEnhancementWithdrawn
+  - refresh: live reads update by themselves; reads affected: ProposalEnhancement.list, ProposalEnhancement.get, Proposal.list, Proposal.get
+- `mutations.ProposalTemplate_archive` (ProposalTemplate.archive)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ProposalTemplateArchived
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.ProposalTemplate_createViaDefine` (ProposalTemplate.define)
+  - inputs from the screen: name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ProposalTemplateDefined
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.ProposalTemplate_reactivate` (ProposalTemplate.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ProposalTemplateReactivated
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.ProposalTemplate_revise` (ProposalTemplate.revise)
+  - inputs from the screen: name, description, visibleSections, defaultTerms, defaultNotes, defaultTaxRate, defaultServiceChargePercent, validityDays, sectionOrder, serviceStyleId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposal templates"; "Sales staff may update proposal templates"; "Sales staff may change proposal templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: ProposalTemplateRevised
+  - refresh: live reads update by themselves; reads affected: ProposalTemplate.list, ProposalTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.Proposal_accept` (Proposal.accept)
+  - inputs from the screen: eventId, acceptedRevisionId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ProposalAccepted
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 20 more
+- `mutations.Proposal_decline` (Proposal.decline)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ProposalDeclined
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_expire` (Proposal.expire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ProposalExpired
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_markViewed` (Proposal.markViewed)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ProposalViewed
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.ShareLink_create` (ShareLink.create)
+  - inputs from the screen: proposalId, proposalRevisionId, expiresAt; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: created `{ _id: string; tenantId: string; deletedAt: number | null; proposalId: string...`
+  - refusals (role, stage and rules): "Sales staff may see share links"; "Sales staff may update share links"; "Sales staff may change share links"; "Guard 0 failed"; "Guard 1 failed"; "Share link expiry must be in the future"; and 1 more
+  - effects: ShareLinkCreated
+  - refresh: live reads update by themselves; reads affected: ShareLink.list, ShareLink.get, Proposal.list, Proposal.get, ProposalRevision.list, ProposalRevision.get
+- `mutations.ShareLink_revoke` (ShareLink.revoke)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see share links"; "Sales staff may update share links"; "Sales staff may change share links"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ShareLinkRevoked
+  - refresh: live reads update by themselves; reads affected: ShareLink.list, ShareLink.get, Proposal.list, Proposal.get, ProposalRevision.list, ProposalRevision.get
+- `mutations.SignatureRequest_createViaRequestSignature` (SignatureRequest.requestSignature)
+  - inputs from the screen: proposalRevisionId, recipientEmail, recipientName, recipientPersonId, recipientContactId, provider, expiresAt, proposalId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales staff may see signature requests"; "Sales staff may update signature requests"; "Sales staff and clients may change signature requests"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: SignatureRequested
+  - refresh: live reads update by themselves; reads affected: SignatureRequest.list, SignatureRequest.get, Person.list, Person.get, ProposalRevision.list, ProposalRevision.get
+- `mutations.SignatureRequest_revoke` (SignatureRequest.revoke)
+  - inputs from the screen: revokeReason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see signature requests"; "Sales staff may update signature requests"; "Sales staff and clients may change signature requests"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: SignatureRevoked
+  - refresh: live reads update by themselves; reads affected: SignatureRequest.list, SignatureRequest.get, Person.list, Person.get, ProposalRevision.list, ProposalRevision.get
+
+### Authored reads and steps
+
+- `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `lib.proposalChangeDraft.startProposalChange` - mutation; authored step; live reads update by themselves
+- `lib.proposalDraft.draftProposalWithLines` - mutation; authored step; live reads update by themselves
+- `lib.proposalDraftReport.getProposalDraftReport` - query; live read, updates by itself
+- `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
+- `lib.proposalGenerate.generateProposalDraft` - mutation; authored step; live reads update by themselves
+- `lib.proposalHistoricalAcceptance.recordImportedAcceptance` - mutation; authored step; live reads update by themselves
+- `lib.proposalPictures.forProposal` - query; live read, updates by itself
+- `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
+- `lib.proposalPricing.listRentalItems` - query; live read, updates by itself
+- `lib.proposalPricing.removeProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
+- `lib.proposalPricing.reviseProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
+- `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
+- `lib.quoteSelections.estimateQuote` - query; live read, updates by itself
+- `proposalEmail.getHistory` - action; one-time call (not live); the live reads it changes update by themselves
+- `proposalEmail.send` - action; one-time call (not live); the live reads it changes update by themselves
+- `publicMenu.getPublicMenu` - query; live read, updates by itself
+- `publicMenu.getPublicMenuCompany` - query; live read, updates by itself
+- `quoteBuilder.getEventBookingDetails` - query; live read, updates by itself
+- `shareLinks.getSharedProposal` - query; live read, updates by itself
+- `shareLinks.recordShareView` - mutation; authored step; live reads update by themselves
+- `signatureAcceptance.completeSignature` - mutation; authored step; live reads update by themselves
+- `signatureAcceptance.getPendingSignatureRequest` - query; live read, updates by itself
+- `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
+- `sourceProvenance.listMergedClients` - query; live read, updates by itself
+- `travelFees.applyProposalTravelFee` - mutation; authored step; live reads update by themselves
+- `travelFees.getEventTravelFee` - query; live read, updates by itself
+- `travelFees.getProposalTravelFee` - query; live read, updates by itself
+
+## 3. Event overview
+
+Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestMealCard.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.getEventTemplate` - live read
+- `queries.getProposal` - live read
+- `queries.listAvailabilityWindow` - live read
+- `queries.listClient` - live read
+- `queries.listClientContact` - live read
+- `queries.listCorrectiveAction` - live read
+- `queries.listDelivery` - live read
+- `queries.listDish` - live read
+- `queries.listEquipment` - live read
+- `queries.listEquipmentIssue` - live read
+- `queries.listEquipmentPart` - live read
+- `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignment` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventChecklist` - live read
+- `queries.listEventDishByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventNumberAssignment` - live read
+- `queries.listEventPlanNeeds` - live read
+- `queries.listEventStaffNeed` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTask` - live read
+- `queries.listEventTaskByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listEventVehicleAssignment` - live read
+- `queries.listIncident` - live read
+- `queries.listIngredient` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listInvoice` - live read
+- `queries.listMenu` - live read
+- `queries.listOccasion` - live read
+- `queries.listOrganization` - live read
+- `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPackListItem` - live read
+- `queries.listPerson` - live read
+- `queries.listPlanningOverride` - live read
+- `queries.listPlanningReceipt` - live read
+- `queries.listPlanningRule` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelection` - live read
+- `queries.listProposalEnhancement` - live read
+- `queries.listQualification` - live read
+- `queries.listReferralSource` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listServiceStyle` - live read
+- `queries.listShiftByEventId` - live read
+- `queries.listTimeOffRequest` - live read
+- `queries.listTrailer` - live read
+- `queries.listVehicle` - live read
+- `queries.listVenue` - live read
+
+### Generated actions
+
+- `mutations.Client_createViaRegister` (Client.register)
+  - inputs from the screen: clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Company clients require a company name; person clients require a given name"; and 2 more
+  - effects: ClientRegistered
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.CorrectiveAction_close` (CorrectiveAction.close)
+  - inputs from the screen: resolutionNotes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event and kitchen staff may see corrective actions"; "Event and kitchen staff may update corrective actions"; "Event and kitchen staff may change corrective actions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: CorrectiveActionClosed
+  - refresh: live reads update by themselves; reads affected: CorrectiveAction.list, CorrectiveAction.get, Event.list, Event.get, Incident.list, Incident.get
+- `mutations.CorrectiveAction_createViaOpen` (CorrectiveAction.open)
+  - inputs from the screen: incidentId, eventId, description; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event and kitchen staff may see corrective actions"; "Event and kitchen staff may update corrective actions"; "Event and kitchen staff may change corrective actions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: CorrectiveActionOpened
+  - refresh: live reads update by themselves; reads affected: CorrectiveAction.list, CorrectiveAction.get, Event.list, Event.get, Incident.list, Incident.get
+- `mutations.EquipmentReservation_cancel` (EquipmentReservation.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentReservationCancelled
+  - refresh: live reads update by themselves; reads affected: EquipmentReservation.list, EquipmentReservation.get, Equipment.list, Equipment.get, Event.list, Event.get
+- `mutations.Equipment_setOperatingFacts` (Equipment.setOperatingFacts)
+  - inputs from the screen: providesJson, needsJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentOperatingFactsSet
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.EventAssignment_chooseTravelLeg` (EventAssignment.chooseTravelLeg)
+  - inputs from the screen: rideVehicleAssignmentId, meetsAtVenue; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventAssignmentTravelLegChosen
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_createViaAssign` (EventAssignment.assign)
+  - inputs from the screen: eventId, personId, role, startsAt, endsAt, notes, overrideReason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EventAssignmentAssigned
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_unassign` (EventAssignment.unassign)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventAssignmentUnassigned
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventChecklist_createViaDefine` (EventChecklist.define)
+  - inputs from the screen: name, itemsJson, category; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see event checklists"; "Event managers, logistics staff and managers may update event checklists"; "Event managers, logistics staff and managers may change event checklists"; "Guard 0 failed"; "Guard 1 failed"; "Give this checklist a name."
+  - effects: EventChecklistDefined
+  - refresh: live reads update by themselves; reads affected: EventChecklist.list, EventChecklist.get, EventTask.list, EventTask.get
+- `mutations.EventChecklist_reinstate` (EventChecklist.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event checklists"; "Event managers, logistics staff and managers may update event checklists"; "Event managers, logistics staff and managers may change event checklists"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventChecklistReinstated
+  - refresh: live reads update by themselves; reads affected: EventChecklist.list, EventChecklist.get, EventTask.list, EventTask.get
+- `mutations.EventChecklist_retire` (EventChecklist.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event checklists"; "Event managers, logistics staff and managers may update event checklists"; "Event managers, logistics staff and managers may change event checklists"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventChecklistRetired
+  - refresh: live reads update by themselves; reads affected: EventChecklist.list, EventChecklist.get, EventTask.list, EventTask.get
+- `mutations.EventChecklist_revise` (EventChecklist.revise)
+  - inputs from the screen: name, itemsJson, category; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event checklists"; "Event managers, logistics staff and managers may update event checklists"; "Event managers, logistics staff and managers may change event checklists"; "Guard 0 failed"; "Guard 1 failed"; "Give this checklist a name."; and 2 more
+  - effects: EventChecklistRevised
+  - refresh: live reads update by themselves; reads affected: EventChecklist.list, EventChecklist.get, EventTask.list, EventTask.get
+- `mutations.EventDish_adjustServings` (EventDish.adjustServings)
+  - inputs from the screen: quantityServings; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishServingsAdjusted
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.EventDish_createViaAddToEvent` (EventDish.addToEvent)
+  - inputs from the screen: eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishAdded
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.EventGuest_assignMeal` (EventGuest.assignMeal)
+  - inputs from the screen: entreeEventDishId, seatNumber, placeCardName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "ConcurrencyConflict:"; "EventGuest not found"
+  - effects: EventGuestMealAssigned
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_assignTable` (EventGuest.assignTable)
+  - inputs from the screen: tableAssignment; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Pick a table for this guest."; and 2 more
+  - effects: EventGuestTableAssigned
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_checkIn` (EventGuest.checkIn)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventGuestCheckedIn
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_createViaInvite` (EventGuest.invite)
+  - inputs from the screen: eventId, name, email, phone, dietaryRestrictions, allergenRestrictions, accessibilityNeeds, specialMealRequired; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Give this guest a name."
+  - effects: EventGuestInvited
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_rsvpConfirm` (EventGuest.rsvpConfirm)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventGuestRsvpConfirmed
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_rsvpDecline` (EventGuest.rsvpDecline)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventGuestRsvpDeclined
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_withdraw` (EventGuest.withdraw)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Say why this guest is withdrawing."; "ConcurrencyConflict:"; and 1 more
+  - effects: EventGuestWithdrawn
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventPlanNeeds_createViaNote` (EventPlanNeeds.note)
+  - inputs from the screen: eventId, trucksNeeded, siteProvidesJson; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see what an event needs"; "Event, sales and logistics staff and managers may say what an event needs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "These needs are for a different event. Pick the event already on them."; and 1 more
+  - effects: EventPlanNeedsNoted
+  - refresh: live reads update by themselves; reads affected: EventPlanNeeds.list, EventPlanNeeds.get, Event.list, Event.get
+- `mutations.EventPlanNeeds_revise` (EventPlanNeeds.revise)
+  - inputs from the screen: trucksNeeded, siteProvidesJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see what an event needs"; "Event, sales and logistics staff and managers may say what an event needs"; "Guard 0 failed"; "Guard 1 failed"; "Trucks needed can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
+  - effects: EventPlanNeedsNoted
+  - refresh: live reads update by themselves; reads affected: EventPlanNeeds.list, EventPlanNeeds.get, Event.list, Event.get
+- `mutations.EventTask_complete` (EventTask.complete)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTaskCompleted
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_createViaAdd` (EventTask.add)
+  - inputs from the screen: eventId, title, details, category, ownerPersonId, dueAt, priority, waitsForTaskId, proofRequired, checklistTemplateId, templateLineKey, suggestionKey; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventTaskAdded
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_giveTo` (EventTask.giveTo)
+  - inputs from the screen: ownerPersonId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTaskOwnerChanged
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_remove` (EventTask.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTaskRemoved
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_reopen` (EventTask.reopen)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTaskReopened
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_revise` (EventTask.revise)
+  - inputs from the screen: title, details, category, dueAt, priority, waitsForTaskId, proofRequired; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventTaskRevised
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_skip` (EventTask.skip)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "Say why this to-do is not needed."; and 2 more
+  - effects: EventTaskSkipped
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventTask_start` (EventTask.start)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event to-dos"; "Staff may update event to-dos"; "Staff may work event to-dos"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTaskStarted
+  - refresh: live reads update by themselves; reads affected: EventTask.list, EventTask.get, Event.list, Event.get, EventChecklist.list, EventChecklist.get, Person.list, Person.get
+- `mutations.EventVehicleAssignment_clearPreloaded` (EventVehicleAssignment.clearPreloaded)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventVehiclePreloadCleared
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_createViaAssign` (EventVehicleAssignment.assign)
+  - inputs from the screen: eventId, vehicleId, trailerId, driverId, notes, preloaded, vendorName, arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes, loadingZone, bookedTwiceReason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EventVehicleAssigned
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_markPreloaded` (EventVehicleAssignment.markPreloaded)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventVehiclePreloaded
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_release` (EventVehicleAssignment.release)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventVehicleReleased
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.Event_approve` (Event.approve)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventApproved
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_archive` (Event.archive)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventArchived
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_assignOwner` (Event.assignOwner)
+  - inputs from the screen: assignedToId, ownerName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventOwnerAssigned
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_beginExecution` (Event.beginExecution)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventExecutionStarted
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_cancel` (Event.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventCancelled
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_changePricing` (Event.changePricing)
+  - inputs from the screen: budgetAmount, quotedPrice; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventPricingChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_changePrimaryContact` (Event.changePrimaryContact)
+  - inputs from the screen: primaryContactName, primaryContactEmail, primaryContactPhone; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Give this event a primary contact name."; and 2 more
+  - effects: EventPrimaryContactChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_changeRequirements` (Event.changeRequirements)
+  - inputs from the screen: accessibilityNeeds, serviceRequirements, operationalRequirements; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventRequirementsChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_changeServiceStyle` (Event.changeServiceStyle)
+  - inputs from the screen: serviceStyleId, serviceStyleName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Pick a service style for this event."; and 3 more
+  - effects: EventServiceStyleChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_changeVenue` (Event.changeVenue)
+  - inputs from the screen: venueId, venueName, venueAddress, venueCapacity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Venue capacity can't be negative. Use zero or more."; and 2 more
+  - effects: EventVenueChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_clearBinderBuilt` (Event.clearBinderBuilt)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventBinderBuiltCleared
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_closeOut` (Event.closeOut)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventClosedOut
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_complete` (Event.complete)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventCompleted
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_confirmSalesLock` (Event.confirmSalesLock)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventSalesLockConfirmed
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_createViaPlanEngagement` (Event.planEngagement)
+  - inputs from the screen: clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, clientName, serviceStyleId, serviceStyleName, occasionId, occasionName, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, ownerName, referralSourceId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EventPlanned
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_finalizeEvent` (Event.finalizeEvent)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventFinalized
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_lockForSales` (Event.lockForSales)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 10 more
+  - effects: EventSalesLocked
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_markBinderBuilt` (Event.markBinderBuilt)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventBinderBuilt
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_moveToClient` (Event.moveToClient)
+  - inputs from the screen: clientId, primaryContactName, primaryContactEmail, primaryContactPhone; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "This event already belongs to that client."; and 3 more
+  - effects: EventClientChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_planEngagement` (Event.planEngagement)
+  - inputs from the screen: clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, clientName, serviceStyleId, serviceStyleName, occasionId, occasionName, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, ownerName, referralSourceId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EventPlanned
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_reactivate` (Event.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventReactivated
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_reschedule` (Event.reschedule)
+  - inputs from the screen: startsAt, endsAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Event end must be after its start"; and 2 more
+  - effects: EventScheduleChanged, EventPurchasingWeekChanged
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_returnToPlanning` (Event.returnToPlanning)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventReturnedToPlanning
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_setEventNumber` (Event.setEventNumber)
+  - inputs from the screen: eventNumber; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventNumberSet
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_submitForApproval` (Event.submitForApproval)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventSubmittedForApproval
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_updateSetupNotes` (Event.updateSetupNotes)
+  - inputs from the screen: linenColorTables, linenColorBaskets, servingwareKit, decorKit, rainPlan, setupDiagram, venueSurface, tentAndFlooring, handwashing; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventSetupNotesUpdated
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_updateTaskBreakdown` (Event.updateTaskBreakdown)
+  - inputs from the screen: servingwareSource, takeRentalsWithUs, leaveRentalsOnsite, guestTableSetup, buffetTableSetup, appetizerTableSetup, beverageTableSetup, beverageDispensers, buffetService; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventTaskBreakdownUpdated
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Incident_beginInvestigation` (Incident.beginInvestigation)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event and kitchen staff may see incidents"; "Event and kitchen staff may update incidents"; "Event and kitchen staff may change incidents"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: IncidentInvestigationStarted
+  - refresh: live reads update by themselves; reads affected: Incident.list, Incident.get, CorrectiveAction.list, CorrectiveAction.get, Delivery.list, Delivery.get, Event.list, Event.get and 4 more
+- `mutations.Incident_createViaReport` (Incident.report)
+  - inputs from the screen: eventId, severity, category, description, prepTaskId, deliveryId, shiftId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event and kitchen staff may see incidents"; "Event and kitchen staff may update incidents"; "Event and kitchen staff may change incidents"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: IncidentReported
+  - refresh: live reads update by themselves; reads affected: Incident.list, Incident.get, CorrectiveAction.list, CorrectiveAction.get, Delivery.list, Delivery.get, Event.list, Event.get and 4 more
+- `mutations.Incident_dismiss` (Incident.dismiss)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event and kitchen staff may see incidents"; "Event and kitchen staff may update incidents"; "Event and kitchen staff may change incidents"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: IncidentDismissed
+  - refresh: live reads update by themselves; reads affected: Incident.list, Incident.get, CorrectiveAction.list, CorrectiveAction.get, Delivery.list, Delivery.get, Event.list, Event.get and 4 more
+- `mutations.Incident_markResolved` (Incident.markResolved)
+  - inputs from the screen: resolution; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event and kitchen staff may see incidents"; "Event and kitchen staff may update incidents"; "Event and kitchen staff may change incidents"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: IncidentResolved
+  - refresh: live reads update by themselves; reads affected: Incident.list, Incident.get, CorrectiveAction.list, CorrectiveAction.get, Delivery.list, Delivery.get, Event.list, Event.get and 4 more
+- `mutations.Occasion_createViaRegister` (Occasion.register)
+  - inputs from the screen: name, code, sortOrder, description; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event and sales staff may see occasions"; "Event managers may update occasions"; "Event managers may change occasions"; "Guard 0 failed"; "Guard 1 failed"; "Give this occasion a name."; and 2 more
+  - effects: OccasionRegistered
+  - refresh: live reads update by themselves; reads affected: Occasion.list, Occasion.get, Event.list, Event.get, QuoteSubmission.list, QuoteSubmission.get
+- `mutations.Organization_configureEquipmentFields` (Organization.configureEquipmentFields)
+  - inputs from the screen: fieldsJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationEquipmentFieldsConfigured
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.Organization_configurePlanningChecks` (Organization.configurePlanningChecks)
+  - inputs from the screen: checksJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationPlanningChecksConfigured
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.Organization_configureStageMoves` (Organization.configureStageMoves)
+  - inputs from the screen: byHandJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationStageMovesConfigured
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.Organization_setBrandLogo` (Organization.setBrandLogo)
+  - inputs from the screen: storageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationBrandLogoSet
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.PackList_createViaOpen` (PackList.open)
+  - inputs from the screen: eventId, name, purpose, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: PackListOpened, PackListKitRequested
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 10 more
+- `mutations.PlanningReceipt_answerAgain` (PlanningReceipt.answerAgain)
+  - inputs from the screen: quantity, declined, basis; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see answered suggestions"; "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"; "Guard 0 failed"; "Guard 1 failed"; "The amount can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
+  - effects: PlanningSuggestionAnswered
+  - refresh: live reads update by themselves; reads affected: PlanningReceipt.list, PlanningReceipt.get, Event.list, Event.get
+- `mutations.PlanningReceipt_createViaRecord` (PlanningReceipt.record)
+  - inputs from the screen: eventId, suggestionKey, quantity, declined, basis; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see answered suggestions"; "Event, inventory, sales, logistics and workforce staff and managers may answer suggestions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "This answer is for a different event. Pick the event already on it."; and 2 more
+  - effects: PlanningSuggestionAnswered
+  - refresh: live reads update by themselves; reads affected: PlanningReceipt.list, PlanningReceipt.get, Event.list, Event.get
+- `mutations.PlanningRule_createViaDefine` (PlanningRule.define)
+  - inputs from the screen: name, trigger, actionsJson, triggerEquipmentId, triggerEquipmentKind; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see planning rules"; "Event managers, logistics staff and managers may update planning rules"; "Event managers, logistics staff and managers may change planning rules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PlanningRuleDefined
+  - refresh: live reads update by themselves; reads affected: PlanningRule.list, PlanningRule.get, Equipment.list, Equipment.get
+- `mutations.PlanningRule_reinstate` (PlanningRule.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see planning rules"; "Event managers, logistics staff and managers may update planning rules"; "Event managers, logistics staff and managers may change planning rules"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PlanningRuleReinstated
+  - refresh: live reads update by themselves; reads affected: PlanningRule.list, PlanningRule.get, Equipment.list, Equipment.get
+- `mutations.PlanningRule_retire` (PlanningRule.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see planning rules"; "Event managers, logistics staff and managers may update planning rules"; "Event managers, logistics staff and managers may change planning rules"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PlanningRuleRetired
+  - refresh: live reads update by themselves; reads affected: PlanningRule.list, PlanningRule.get, Equipment.list, Equipment.get
+- `mutations.PlanningRule_revise` (PlanningRule.revise)
+  - inputs from the screen: name, actionsJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see planning rules"; "Event managers, logistics staff and managers may update planning rules"; "Event managers, logistics staff and managers may change planning rules"; "Guard 0 failed"; "Guard 1 failed"; "Give this rule a name."; and 2 more
+  - effects: PlanningRuleRevised
+  - refresh: live reads update by themselves; reads affected: PlanningRule.list, PlanningRule.get, Equipment.list, Equipment.get
+- `mutations.ReferralSource_createViaRegister` (ReferralSource.register)
+  - inputs from the screen: name, code, sortOrder, description; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event and sales staff may see referral sources"; "Sales managers may update referral sources"; "Sales managers may change referral sources"; "Guard 0 failed"; "Guard 1 failed"; "Give this referral source a name"; and 2 more
+  - effects: ReferralSourceRegistered
+  - refresh: live reads update by themselves; reads affected: ReferralSource.list, ReferralSource.get, Event.list, Event.get, Lead.list, Lead.get, QuoteSubmission.list, QuoteSubmission.get and 4 more
+- `mutations.ReviewFlag_createViaRaise` (ReviewFlag.raise)
+  - inputs from the screen: eventId, targetKind, question, targetId, targetLabel; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: ReviewFlagRaised
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_dismiss` (ReviewFlag.dismiss)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ReviewFlagSettled
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_markResolved` (ReviewFlag.markResolved)
+  - inputs from the screen: resolution; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Say what was decided to settle this flag."; and 2 more
+  - effects: ReviewFlagSettled
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_reopen` (ReviewFlag.reopen)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; "ReviewFlag not found"
+  - effects: ReviewFlagReopened
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.StaffMessage_edit` (StaffMessage.edit)
+  - inputs from the screen: body, mentionedPersonIds; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageEdited
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_markRead` (StaffMessage.markRead)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageRead
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_remove` (StaffMessage.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffMessageRemoved
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.Trailer_setCargoFacts` (Trailer.setCargoFacts)
+  - inputs from the screen: cargoVolumeM3, hitchType, emptyWeightKg; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Cargo space can't be negative. Use zero or more, or leave it empty."; and 3 more
+  - effects: TrailerCargoFactsSet
+  - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.Venue_createViaRegister` (Venue.register)
+  - inputs from the screen: name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see venues"; "Event staff may update venues"; "Event staff may change venues"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: VenueRegistered
+  - refresh: live reads update by themselves; reads affected: Venue.list, Venue.get, DateHold.list, DateHold.get, Dish.list, Dish.get, Event.list, Event.get and 16 more
+
+### Authored reads and steps
+
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `commandReceipts.latestCascadeReceipt` - query; live read, updates by itself
+- `culinaryDemand.addNestedRecipeLine` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandHeadcount` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandRecalculation` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandSupersede` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.componentContentReport` - query; live read, updates by itself
+- `culinaryDemand.eventDemandReview` - query; live read, updates by itself
+- `culinaryDemand.eventFoodCostReport` - query; live read, updates by itself
+- `culinaryDemand.kitchenUnresolvedReport` - query; live read, updates by itself
+- `culinaryDemand.previewDemandChange` - query; live read, updates by itself
+- `culinaryDemand.reconcileEventDemand` - mutation; authored step; live reads update by themselves
+- `culinaryDemandSweep.publishRecipeEdition` - mutation; authored step; live reads update by themselves
+- `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
+- `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
+- `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
+- `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
+- `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
+- `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
+- `eventActivity.listEventActivity` - query; live read, updates by itself
+- `eventAutoStage.check` - mutation; authored step; live reads update by themselves
+- `eventChecklistApply.apply` - mutation; authored step; live reads update by themselves
+- `eventCreateCatalog.ensureBuiltInServiceStyle` - mutation; authored step; live reads update by themselves
+- `eventLedger.ledgerWindow` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMonthRows.forEvents` - query; live read, updates by itself
+- `eventReadiness.getEventReadiness` - query; live read, updates by itself
+- `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `lib.eventDuplicate.duplicateEvent` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.canManagePacket` - query; live read, updates by itself
+- `lib.eventPacket.commands.generatePacketUploadUrl` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.getPacket` - query; live read, updates by itself
+- `lib.eventPacket.commands.importEvidence` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.listPacketSummaries` - query; live read, updates by itself
+- `lib.eventPacket.commands.packetPrintFiles` - query; live read, updates by itself
+- `lib.eventPacket.commands.recordPacketRevision` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.registerPacketUpload` - action; one-time call (not live); the live reads it changes update by themselves
+- `lib.eventPacket.commands.resolveOperationalIssue` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.revisionUrl` - query; live read, updates by itself
+- `lib.eventPacket.commands.sourceUrl` - query; live read, updates by itself
+- `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.acceptSuggestion` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.assignPersonWithReason` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.assignRigWithReason` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.holdEquipmentWithReason` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.sendOutWithReason` - mutation; authored step; live reads update by themselves
+- `rigTrailer.hitchTrailer` - mutation; authored step; live reads update by themselves
+- `rigTrailer.saveTruckFacts` - mutation; authored step; live reads update by themselves
+- `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
+- `sourceProvenance.listMergedClients` - query; live read, updates by itself
+- `teamChat.channelSummary` - query; live read, updates by itself
+- `teamChat.listChannel` - query; live read, updates by itself
+- `teamChat.listConversations` - query; live read, updates by itself
+- `teamChat.searchLinkTargets` - query; live read, updates by itself
+- `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
+- `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
+- `venueVendorPolicy.forEvent` - query; live read, updates by itself
+
+## 4. Menu and kitchen
+
+Screens (174): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicker.tsx`, `events/ComponentStockSuggestions.tsx`, `events/EventAllergenBriefingBody.tsx`, `events/EventAllergenBriefingPage.tsx`, `events/EventDraftPoButton.tsx`, `events/EventDraftPoCoordinator.ts`, `events/EventMenuDietaryCard.tsx`, `events/EventMenuDietaryConflictsCard.tsx`, `events/EventMenuLineKitchen.tsx`, `events/EventMenuLineNote.tsx`, `events/EventMenuLineOverrides.tsx`, `events/EventMenuNotesCard.tsx`, `events/EventMenuRecipeEditor.tsx`, `events/EventMenuSidebar.tsx`, `events/EventMenuStatsCard.tsx`, `events/EventMenuTab.tsx`, `events/EventMenuTemplateCard.tsx`, `events/EventPrepList.tsx`, `events/EventPrepTab.tsx`, `events/EventPrepWorkNotice.tsx`, `events/EventStockIssueCoordinator.ts`, `events/EventStockReservationCoordinator.ts`, `events/EventUnresolvedMaterialsNotice.tsx`, `events/useEventMenuNutrition.ts`, `kitchen/AllergenIconRow.tsx`, `kitchen/AllergenMatrixPage.tsx`, `kitchen/command-deck/KitchenCommandDeckCrewRail.tsx`, `kitchen/command-deck/KitchenCommandDeckEventRail.tsx`, `kitchen/command-deck/KitchenCommandDeckFilters.tsx`, `kitchen/command-deck/KitchenCommandDeckHorizon.ts`, `kitchen/command-deck/KitchenCommandDeckModel.ts`, `kitchen/command-deck/KitchenCommandDeckPersonLabel.ts`, `kitchen/command-deck/KitchenCommandDeckTaskPanel.tsx`, `kitchen/command-deck/KitchenCommandDeckTypes.ts`, `kitchen/command-deck/KitchenPrepAssignManager.ts`, `kitchen/ComponentCostCalculator.ts`, `kitchen/ComponentCostPanel.tsx`, `kitchen/ComponentDetailPage.tsx`, `kitchen/ComponentIngredientWasteButton.tsx`, `kitchen/ComponentKitchenStandardsPanel.tsx`, `kitchen/ComponentMethodStepsPanel.tsx`, `kitchen/ComponentNutrition.ts`, `kitchen/ComponentNutritionPanel.tsx`, `kitchen/ComponentPortionSpecsPanel.tsx`, `kitchen/ComponentPrepContext.tsx`, `kitchen/ComponentRecipeStatusPanel.tsx`, `kitchen/componentSnapshot.ts`, `kitchen/componentSnapshotCapture.ts`, `kitchen/ComponentSubRecipesPanel.tsx`, `kitchen/ComponentVersionHistoryPanel.tsx`, `kitchen/ComponentYieldStoragePanel.tsx`, `kitchen/culinary-studio/CulinaryCatalogCardCopy.ts`, `kitchen/culinary-studio/CulinaryCatalogCardTone.ts`, `kitchen/CulinaryAllergenVocabulary.ts`, `kitchen/CulinaryCanonicalMatcher.ts`, `kitchen/CulinaryCatalogVisibility.ts`, `kitchen/CulinaryEntityLink.tsx`, `kitchen/CulinaryFailureBanner.tsx`, `kitchen/CulinaryLifecyclePolicy.ts`, `kitchen/CulinaryRecordPicker.tsx`, `kitchen/culinaryRecovery.ts`, `kitchen/dishAllergens.ts`, `kitchen/DishComponentPortionSpecPanel.tsx`, `kitchen/DishComponentsPanel.tsx`, `kitchen/DishContainerEditForm.tsx`, `kitchen/DishContainersPanel.tsx`, `kitchen/DishDetailPage.tsx`, `kitchen/DishDetailsEditor.tsx`, `kitchen/DishExclusiveVenueField.tsx`, `kitchen/dishIngredientRemoval.ts`, `kitchen/DishIngredientsPanel.tsx`, `kitchen/DishPlateCostFact.tsx`, `kitchen/DishPrepTasksPanel.tsx`, `kitchen/DishPrepTaskWorkControls.tsx`, `kitchen/DishVersionRecipeSwitch.tsx`, `kitchen/dishVersions.ts`, `kitchen/EventMenuReservationSync.ts`, `kitchen/EventMenuStockShortageBanner.tsx`, `kitchen/EventMenuSyncController.ts`, `kitchen/EventPrepCoordinator.ts`, `kitchen/EventPrepTaskSynchronizer.ts`, `kitchen/import/ComponentCsvParser.ts`, `kitchen/import/ComponentImportCoordinator.ts`, `kitchen/import/ComponentImportFinalizer.ts`, `kitchen/import/ComponentImportLineKind.tsx`, `kitchen/import/ComponentImportPage.tsx`, `kitchen/import/ComponentImportPanes.tsx`, `kitchen/import/ComponentImportRepository.ts`, `kitchen/import/ComponentImportSourcePanel.tsx`, `kitchen/import/ComponentImportTypes.ts`, `kitchen/import/ComponentTextParser.ts`, `kitchen/import/ImportSourceReadiness.ts`, `kitchen/import/IngredientCatalogMatcher.ts`, `kitchen/import/RecipeSheetParser.ts`, `kitchen/import/SourceFingerprint.ts`, `kitchen/import/UnitOfMeasureMapper.ts`, `kitchen/IngredientAllergenFieldset.tsx`, `kitchen/IngredientCatalogLabel.tsx`, `kitchen/IngredientCostingEditor.tsx`, `kitchen/IngredientDetailPage.tsx`, `kitchen/IngredientDetailsEditor.tsx`, `kitchen/IngredientMergeControl.tsx`, `kitchen/IngredientNutritionEditor.tsx`, `kitchen/IngredientOptionPicker.tsx`, `kitchen/IngredientPreviewCard.tsx`, `kitchen/IngredientPriceHistory.ts`, `kitchen/IngredientPriceTrendPanel.tsx`, `kitchen/IngredientQuickCreate.tsx`, `kitchen/IngredientStorageEditor.tsx`, `kitchen/IngredientSubstitution.ts`, `kitchen/IngredientSubstitutionEditor.tsx`, `kitchen/ItemUnitMappingsPanel.tsx`, `kitchen/KitchenBookNav.tsx`, `kitchen/KitchenCatalogCards.tsx`, `kitchen/KitchenCatalogCleanupPage.tsx`, `kitchen/KitchenCatalogCreateForm.tsx`, `kitchen/KitchenCatalogDisplayCache.ts`, `kitchen/KitchenCatalogLifecycleButtons.tsx`, `kitchen/KitchenCatalogPage.tsx`, `kitchen/KitchenDashboardPage.tsx`, `kitchen/kitchenRoutes.ts`, `kitchen/kitchenStationName.ts`, `kitchen/KitchenStationsPage.tsx`, `kitchen/KitchenUnresolvedWorkPage.tsx`, `kitchen/lookup/ExternalIngredientProfile.ts`, `kitchen/lookup/IngredientDatabaseLookup.tsx`, `kitchen/lookup/parseIngredientNutritionFromForm.ts`, `kitchen/MenuDetailPage.tsx`, `kitchen/MenuDetailsEditor.tsx`, `kitchen/MenuDishManager.tsx`, `kitchen/menuPdf.ts`, `kitchen/MenuPriceChangePlanner.tsx`, `kitchen/MenuProfitabilityAnalysis.ts`, `kitchen/MenuProfitabilityPanel.tsx`, `kitchen/menuTemplates.ts`, `kitchen/newDishMatch.ts`, `kitchen/NewDishPanel.tsx`, `kitchen/prepQuantityLabel.ts`, `kitchen/prepTaskCheck.ts`, `kitchen/prepTaskQuantity.ts`, `kitchen/PrepTaskRow.tsx`, `kitchen/PrepTemplateQuantityCoordinator.ts`, `kitchen/prepTiming.ts`, `kitchen/PublishedMethodPanel.tsx`, `kitchen/RecipeAllergenMarks.tsx`, `kitchen/RecipeEditionNotice.tsx`, `kitchen/recipeEquipment.ts`, `kitchen/RecipeNotes.tsx`, `kitchen/RecipeTimesEquipmentPanel.tsx`, `kitchen/stylePackaging.ts`, `kitchen/StylePackagingPanel.tsx`, `kitchen/useEventMenuSync.ts`, `kitchen/VendorItemsPanel.tsx`, `kitchen/VendorPriceComparisonPanel.tsx`, `production/BatchAllocationsPanel.tsx`, `production/batchCompletion.ts`, `production/BatchCompletionFields.tsx`, `production/BatchShortfallPanel.tsx`, `production/KitchenDisplayPage.tsx`, `production/KitchenDisplayTaskFacts.tsx`, `production/PrepActionReasonForm.tsx`, `production/PrepBoardPage.tsx`, `production/prepLabel.ts`, `production/PrepTaskCommentThread.tsx`, `production/PrepTaskDependencies.ts`, `production/ProductionFailureBanner.tsx`, `production/ProductionLifecyclePolicy.ts`, `production/ProductionPlanPage.tsx`, `production/productionRoutes.ts`, `production/ProductionWorkspaceNav.tsx`, `production/productionYield.ts`, `production/ProductionYieldDashboardPage.tsx`, `production/usePrepLabelPrint.ts`
+
+### Generated reads
+
+- `queries.getComponent` - live read
+- `queries.getComponentImport` - live read
+- `queries.getDish` - live read
+- `queries.getEvent` - live read
+- `queries.getIngredient` - live read
+- `queries.getMenu` - live read
+- `queries.getPrepTask` - live read
+- `queries.listComponent` - live read
+- `queries.listComponentComponent` - live read
+- `queries.listComponentEquipment` - live read
+- `queries.listComponentImport` - live read
+- `queries.listComponentImportLine` - live read
+- `queries.listComponentIngredient` - live read
+- `queries.listComponentPortionSpec` - live read
+- `queries.listComponentSnapshot` - live read
+- `queries.listComponentStep` - live read
+- `queries.listDish` - live read
+- `queries.listDishComponent` - live read
+- `queries.listDishContainer` - live read
+- `queries.listDishIngredient` - live read
+- `queries.listDishTask` - live read
+- `queries.listDishTaskMaterial` - live read
+- `queries.listEquipment` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventDish` - live read
+- `queries.listEventDishByEventId` - live read
+- `queries.listEventDishLineOverride` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredient` - live read
+- `queries.listIngredientDemand` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listIngredientPriceObservation` - live read
+- `queries.listInventoryItem` - live read
+- `queries.listInventoryLot` - live read
+- `queries.listInventoryReservation` - live read
+- `queries.listInvoice` - live read
+- `queries.listItemUnitMapping` - live read
+- `queries.listMenu` - live read
+- `queries.listMenuDish` - live read
+- `queries.listOrganization` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPerson` - live read
+- `queries.listPrepTask` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listPrepTaskComment` - live read
+- `queries.listPrepTaskDependency` - live read
+- `queries.listProductionBatch` - live read
+- `queries.listProductionBatchAllocation` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listQualityCheck` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listServiceStyle` - live read
+- `queries.listShiftByEventId` - live read
+- `queries.listStation` - live read
+- `queries.listStylePackaging` - live read
+- `queries.listVendor` - live read
+- `queries.listVendorItem` - live read
+- `queries.listVendorOrder` - live read
+- `queries.listVendorOrderLine` - live read
+- `queries.listVenue` - live read
+- `queries.listWeeklyPurchasingConfig` - live read
+
+### Generated actions
+
+- `mutations.Attachment_createViaAttach` (Attachment.attach)
+  - inputs from the screen: parentType, parentId, fileName, contentType, fileSize, storageId, evidenceType; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see attached files; chat files show up with their message"; "Staff may update attachments"; "Staff may change attachments"; "Guard 0 failed"; "Chat files are attached through their message"; "This file needs something to attach to"; and 3 more
+  - effects: AttachmentAdded
+  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get, DeckShareLink.list, DeckShareLink.get
+- `mutations.ComponentComponent_adjustQuantity` (ComponentComponent.adjustQuantity)
+  - inputs from the screen: quantity, unit; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see nested recipe lines"; "Kitchen staff may update nested recipe lines"; "Kitchen staff may change nested recipe lines"; "Guard 0 failed"; "Guard 1 failed"; "This sub-recipe's amount has to be more than zero."; and 2 more
+  - effects: ComponentComponentQuantityAdjusted
+  - refresh: live reads update by themselves; reads affected: ComponentComponent.list, ComponentComponent.get, Component.list, Component.get
+- `mutations.ComponentComponent_remove` (ComponentComponent.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see nested recipe lines"; "Kitchen staff may update nested recipe lines"; "Kitchen staff may change nested recipe lines"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're removing this."; and 2 more
+  - effects: ComponentComponentRemoved
+  - refresh: live reads update by themselves; reads affected: ComponentComponent.list, ComponentComponent.get, Component.list, Component.get
+- `mutations.ComponentEquipment_createViaAdd` (ComponentEquipment.add)
+  - inputs from the screen: componentId, name, sortOrder; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see recipe equipment"; "Kitchen staff and managers may update recipe equipment"; "Kitchen staff and managers may change recipe equipment"; "Guard 0 failed"
+  - effects: ComponentEquipmentAdded
+  - refresh: live reads update by themselves; reads affected: ComponentEquipment.list, ComponentEquipment.get, Component.list, Component.get
+- `mutations.ComponentEquipment_remove` (ComponentEquipment.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see recipe equipment"; "Kitchen staff and managers may update recipe equipment"; "Kitchen staff and managers may change recipe equipment"; "Guard 0 failed"; "ConcurrencyConflict:"; "ComponentEquipment not found"
+  - effects: ComponentEquipmentRemoved
+  - refresh: live reads update by themselves; reads affected: ComponentEquipment.list, ComponentEquipment.get, Component.list, Component.get
+- `mutations.ComponentIngredient_adjustQuantity` (ComponentIngredient.adjustQuantity)
+  - inputs from the screen: quantity, unit; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe ingredient lines"; "Kitchen staff may update recipe ingredient lines"; "Kitchen staff may change recipe ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "This recipe ingredient's amount has to be more than zero."; and 2 more
+  - effects: ComponentIngredientQuantityAdjusted
+  - refresh: live reads update by themselves; reads affected: ComponentIngredient.list, ComponentIngredient.get, Component.list, Component.get, EventDishComponentSeed.list, EventDishComponentSeed.get, EventIngredientContribution.list, EventIngredientContribution.get and 2 more
+- `mutations.ComponentIngredient_createViaAdd` (ComponentIngredient.add)
+  - inputs from the screen: componentId, ingredientId, quantity, unit, sortOrder, wasteFactor, prepNotes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe ingredient lines"; "Kitchen staff may update recipe ingredient lines"; "Kitchen staff may change recipe ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "This recipe ingredient's amount has to be more than zero."; and 1 more
+  - effects: ComponentIngredientAdded
+  - refresh: live reads update by themselves; reads affected: ComponentIngredient.list, ComponentIngredient.get, Component.list, Component.get, EventDishComponentSeed.list, EventDishComponentSeed.get, Ingredient.list, Ingredient.get
+- `mutations.ComponentIngredient_remove` (ComponentIngredient.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe ingredient lines"; "Kitchen staff may update recipe ingredient lines"; "Kitchen staff may change recipe ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're removing this."; and 2 more
+  - effects: ComponentIngredientRemoved
+  - refresh: live reads update by themselves; reads affected: ComponentIngredient.list, ComponentIngredient.get, Component.list, Component.get, EventIngredientContribution.list, EventIngredientContribution.get, Ingredient.list, Ingredient.get
+- `mutations.ComponentIngredient_setWasteFactor` (ComponentIngredient.setWasteFactor)
+  - inputs from the screen: wasteFactor; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe ingredient lines"; "Kitchen staff may update recipe ingredient lines"; "Kitchen staff may change recipe ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "This waste amount has to be more than zero."; and 2 more
+  - effects: ComponentIngredientWasteFactorSet
+  - refresh: live reads update by themselves; reads affected: ComponentIngredient.list, ComponentIngredient.get, Component.list, Component.get, Ingredient.list, Ingredient.get
+- `mutations.ComponentPortionSpec_createViaDefine` (ComponentPortionSpec.define)
+  - inputs from the screen: componentId, name, pieceQuantity, pieceUnit, piecesPerBatch, source; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see portion sizes"; "Kitchen staff may update portion sizes"; "Kitchen staff may change portion sizes"; "Guard 0 failed"; "Guard 1 failed"; "Give this portion size a name."; and 2 more
+  - effects: ComponentPortionSpecDefined
+  - refresh: live reads update by themselves; reads affected: ComponentPortionSpec.list, ComponentPortionSpec.get, Component.list, Component.get, DishComponent.list, DishComponent.get
+- `mutations.ComponentPortionSpec_retire` (ComponentPortionSpec.retire)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see portion sizes"; "Kitchen staff may update portion sizes"; "Kitchen staff may change portion sizes"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason."; and 2 more
+  - effects: ComponentPortionSpecRetired
+  - refresh: live reads update by themselves; reads affected: ComponentPortionSpec.list, ComponentPortionSpec.get, Component.list, Component.get, DishComponent.list, DishComponent.get
+- `mutations.ComponentPortionSpec_revise` (ComponentPortionSpec.revise)
+  - inputs from the screen: name, pieceQuantity, pieceUnit, piecesPerBatch, source; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see portion sizes"; "Kitchen staff may update portion sizes"; "Kitchen staff may change portion sizes"; "Guard 0 failed"; "Guard 1 failed"; "Give this portion size a name."; and 3 more
+  - effects: ComponentPortionSpecRevised
+  - refresh: live reads update by themselves; reads affected: ComponentPortionSpec.list, ComponentPortionSpec.get, Component.list, Component.get, DishComponent.list, DishComponent.get
+- `mutations.ComponentSnapshot_createViaCapture` (ComponentSnapshot.capture)
+  - inputs from the screen: componentId, versionNumber, changeSummary, snapshot; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe versions"; "Kitchen staff may update recipe versions"; "Kitchen staff may change recipe versions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 1 more
+  - effects: ComponentSnapshotCaptured
+  - refresh: live reads update by themselves; reads affected: ComponentSnapshot.list, ComponentSnapshot.get, Component.list, Component.get
+- `mutations.ComponentStep_createViaAdd` (ComponentStep.add)
+  - inputs from the screen: componentId, instruction, sortOrder, durationMinutes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe steps"; "Kitchen staff may update recipe steps"; "Kitchen staff may change recipe steps"; "Guard 0 failed"; "Guard 1 failed"; "Give this recipe step an instruction."; and 1 more
+  - effects: ComponentStepAdded
+  - refresh: live reads update by themselves; reads affected: ComponentStep.list, ComponentStep.get, Component.list, Component.get
+- `mutations.ComponentStep_remove` (ComponentStep.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe steps"; "Kitchen staff may update recipe steps"; "Kitchen staff may change recipe steps"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're removing this."; and 2 more
+  - effects: ComponentStepRemoved
+  - refresh: live reads update by themselves; reads affected: ComponentStep.list, ComponentStep.get, Component.list, Component.get
+- `mutations.ComponentStep_revise` (ComponentStep.revise)
+  - inputs from the screen: instruction, sortOrder, durationMinutes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see recipe steps"; "Kitchen staff may update recipe steps"; "Kitchen staff may change recipe steps"; "Guard 0 failed"; "Guard 1 failed"; "Give this recipe step an instruction."; and 3 more
+  - effects: ComponentStepRevised
+  - refresh: live reads update by themselves; reads affected: ComponentStep.list, ComponentStep.get, Component.list, Component.get
+- `mutations.Component_createViaDraft` (Component.draft)
+  - inputs from the screen: name, yieldQuantity, yieldUnit, servesPerYield, batchMultiplier, category, cuisine, description, instructions, sourceFingerprint, sourceText, recipeIdentityFingerprint; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Guard 1 failed"; "Give this recipe a name."; and 3 more
+  - effects: ComponentDrafted
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_purge` (Component.purge)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ComponentPurged
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_retract` (Component.retract)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ComponentVersionRetracted
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_reviseDraft` (Component.reviseDraft)
+  - inputs from the screen: name, yieldQuantity, yieldUnit, batchMultiplier, servesPerYield, category, cuisine, description, instructions; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Guard 1 failed"; "Give this recipe a name."; and 5 more
+  - effects: ComponentDraftRevised
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_setDeclaredAllergens` (Component.setDeclaredAllergens)
+  - inputs from the screen: declaredAllergens; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Component not found"
+  - effects: ComponentKitchenStandardsSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_setKitchenStandards` (Component.setKitchenStandards)
+  - inputs from the screen: equipmentNotes, platingInstructions, coolingInstructions, holdingInstructions, reheatInstructions, substitutionNotes, videoUrl; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Component not found"
+  - effects: ComponentKitchenStandardsSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_setPrimaryImage` (Component.setPrimaryImage)
+  - inputs from the screen: storageId, fileName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Add a photo before you set it as the main picture."; "ConcurrencyConflict:"; and 1 more
+  - effects: ComponentPrimaryImageSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_setServesPerYield` (Component.setServesPerYield)
+  - inputs from the screen: servesPerYield; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "How many guests this recipe serves has to be more than zero."; "ConcurrencyConflict:"; and 1 more
+  - effects: ComponentServesPerYieldSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_setStorageWindow` (Component.setStorageWindow)
+  - inputs from the screen: storageWindowDays, source; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "This recipe's storage window can't be negative. Use zero or more days."; "ConcurrencyConflict:"; and 1 more
+  - effects: ComponentStorageWindowSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.Component_setTimes` (Component.setTimes)
+  - inputs from the screen: activePrepMinutes, passiveCookMinutes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and inventory staff may see recipes"; "Kitchen staff may update recipes"; "Kitchen staff may change recipes"; "Guard 0 failed"; "Times can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
+  - effects: ComponentKitchenStandardsSet
+  - refresh: live reads update by themselves; reads affected: Component.list, Component.get, ComponentComponent.list, ComponentComponent.get, ComponentEquipment.list, ComponentEquipment.get, ComponentImport.list, ComponentImport.get and 22 more
+- `mutations.DishComponent_createViaAttach` (DishComponent.attach)
+  - inputs from the screen: dishId, componentId, yieldQuantity, batchMultiplier, sortOrder, role; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see dish recipes"; "Kitchen staff may update dish recipes"; "Kitchen staff may change dish recipes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: DishComponentAttached
+  - refresh: live reads update by themselves; reads affected: DishComponent.list, DishComponent.get, Component.list, Component.get, ComponentPortionSpec.list, ComponentPortionSpec.get, Dish.list, Dish.get and 6 more
+- `mutations.DishComponent_detach` (DishComponent.detach)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish recipes"; "Kitchen staff may update dish recipes"; "Kitchen staff may change dish recipes"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're detaching this."; and 2 more
+  - effects: DishComponentDetached
+  - refresh: live reads update by themselves; reads affected: DishComponent.list, DishComponent.get, Component.list, Component.get, ComponentPortionSpec.list, ComponentPortionSpec.get, Dish.list, Dish.get and 6 more
+- `mutations.DishComponent_setPortionSpec` (DishComponent.setPortionSpec)
+  - inputs from the screen: portionSpecId, pieceCount, quantityBasis; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish recipes"; "Kitchen staff may update dish recipes"; "Kitchen staff may change dish recipes"; "Guard 0 failed"; "Guard 1 failed"; "The pieces per portion have to be more than zero."; and 2 more
+  - effects: DishComponentPortionSpecSet
+  - refresh: live reads update by themselves; reads affected: DishComponent.list, DishComponent.get, Component.list, Component.get, ComponentPortionSpec.list, ComponentPortionSpec.get, Dish.list, Dish.get and 2 more
+- `mutations.DishContainer_createViaDefine` (DishContainer.define)
+  - inputs from the screen: dishId, name, serviceMethod, servingsPerContainer, baseQuantity, unit, equipmentNotes, handlingNotes, sortOrder; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see dish containers"; "Kitchen staff may update dish containers"; "Kitchen staff may change dish containers"; "Guard 0 failed"; "Guard 1 failed"; "Give this container a name."; and 1 more
+  - effects: DishContainerDefined
+  - refresh: live reads update by themselves; reads affected: DishContainer.list, DishContainer.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, EventDish.list, EventDish.get and 2 more
+- `mutations.DishContainer_reinstate` (DishContainer.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish containers"; "Kitchen staff may update dish containers"; "Kitchen staff may change dish containers"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: DishContainerReinstated
+  - refresh: live reads update by themselves; reads affected: DishContainer.list, DishContainer.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, EventDish.list, EventDish.get and 2 more
+- `mutations.DishContainer_retire` (DishContainer.retire)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish containers"; "Kitchen staff may update dish containers"; "Kitchen staff may change dish containers"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: DishContainerRetired
+  - refresh: live reads update by themselves; reads affected: DishContainer.list, DishContainer.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, PackListItem.list, PackListItem.get
+- `mutations.DishContainer_revise` (DishContainer.revise)
+  - inputs from the screen: name, serviceMethod, servingsPerContainer, baseQuantity, unit, equipmentNotes, handlingNotes, sortOrder; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish containers"; "Kitchen staff may update dish containers"; "Kitchen staff may change dish containers"; "Guard 0 failed"; "Guard 1 failed"; "Give this container a name."; and 3 more
+  - effects: DishContainerRevised
+  - refresh: live reads update by themselves; reads affected: DishContainer.list, DishContainer.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, EventDish.list, EventDish.get and 2 more
+- `mutations.DishIngredient_adjustQuantity` (DishIngredient.adjustQuantity)
+  - inputs from the screen: quantity, unit; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish ingredient lines"; "Kitchen staff may update dish ingredient lines"; "Kitchen staff may change dish ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "This dish ingredient's amount has to be more than zero."; and 2 more
+  - effects: DishIngredientQuantityAdjusted
+  - refresh: live reads update by themselves; reads affected: DishIngredient.list, DishIngredient.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, EventDish.list, EventDish.get and 4 more
+- `mutations.DishIngredient_createViaAdd` (DishIngredient.add)
+  - inputs from the screen: dishId, ingredientId, quantity, unit, sortOrder, wasteFactor, prepNotes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see dish ingredient lines"; "Kitchen staff may update dish ingredient lines"; "Kitchen staff may change dish ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "This dish ingredient's amount has to be more than zero."; and 1 more
+  - effects: DishIngredientAdded
+  - refresh: live reads update by themselves; reads affected: DishIngredient.list, DishIngredient.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, EventDish.list, EventDish.get and 4 more
+- `mutations.DishIngredient_remove` (DishIngredient.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see dish ingredient lines"; "Kitchen staff may update dish ingredient lines"; "Kitchen staff may change dish ingredient lines"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're removing this."; and 2 more
+  - effects: DishIngredientRemoved
+  - refresh: live reads update by themselves; reads affected: DishIngredient.list, DishIngredient.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get, EventIngredientContribution.list, EventIngredientContribution.get and 2 more
+- `mutations.DishTaskMaterial_createViaLink` (DishTaskMaterial.link)
+  - inputs from the screen: dishTaskId, dishIngredientId, dishComponentId, dishContainerId, workQuantity, workUnit; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see task materials"; "Kitchen staff and managers may update task materials"; "Kitchen staff and managers may change task materials"; "Guard 0 failed"; "Guard 1 failed"; "Pick what this task uses — an ingredient, a recipe, or a container."; and 1 more
+  - effects: DishTaskMaterialLinked
+  - refresh: live reads update by themselves; reads affected: DishTaskMaterial.list, DishTaskMaterial.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 2 more
+- `mutations.DishTaskMaterial_unlink` (DishTaskMaterial.unlink)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see task materials"; "Kitchen staff and managers may update task materials"; "Kitchen staff and managers may change task materials"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason."; and 2 more
+  - effects: DishTaskMaterialUnlinked
+  - refresh: live reads update by themselves; reads affected: DishTaskMaterial.list, DishTaskMaterial.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 2 more
+- `mutations.DishTask_createViaAdd` (DishTask.add)
+  - inputs from the screen: dishId, name, category, taskType, defaultQuantity, defaultUnit, station, sortOrder, componentId, ingredientId, instructions, synchronizePrep; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see dish task templates"; "Kitchen staff and managers may update dish task templates"; "Kitchen staff and managers may change dish task templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: DishTaskAdded
+  - refresh: live reads update by themselves; reads affected: DishTask.list, DishTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get and 4 more
+- `mutations.DishTask_retire` (DishTask.retire)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see dish task templates"; "Kitchen staff and managers may update dish task templates"; "Kitchen staff and managers may change dish task templates"; "Guard 0 failed"; "Guard 1 failed"; "This dish task needs a reason before you retire it. Write why you're taking it off."; and 2 more
+  - effects: DishTaskRetired
+  - refresh: live reads update by themselves; reads affected: DishTask.list, DishTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get and 4 more
+- `mutations.DishTask_revise` (DishTask.revise)
+  - inputs from the screen: name, category, taskType, defaultQuantity, defaultUnit, station, sortOrder, componentId, ingredientId, instructions, synchronizePrep; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see dish task templates"; "Kitchen staff and managers may update dish task templates"; "Kitchen staff and managers may change dish task templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: DishTaskRevised
+  - refresh: live reads update by themselves; reads affected: DishTask.list, DishTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get and 4 more
+- `mutations.DishTask_specifyWork` (DishTask.specifyWork)
+  - inputs from the screen: stage, resolution, choiceOptions, leadTimeMinDays, leadTimeMaxDays, sequenceAfterDishTaskId, stationId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see dish task templates"; "Kitchen staff and managers may update dish task templates"; "Kitchen staff and managers may change dish task templates"; "Guard 0 failed"; "Guard 1 failed"; "This dish task's lead time can't be negative. Use zero or more days."; and 3 more
+  - effects: DishTaskWorkSpecified
+  - refresh: live reads update by themselves; reads affected: DishTask.list, DishTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTaskMaterial.list, DishTaskMaterial.get and 4 more
+- `mutations.Dish_classifyAllergens` (Dish.classifyAllergens)
+  - inputs from the screen: allergenSummary; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: DishAllergensClassified
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_classifyKind` (Dish.classifyKind)
+  - inputs from the screen: kind; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishKindClassified
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_clearFinishTiming` (Dish.clearFinishTiming)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishFinishTimingSet
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_createViaIntroduce` (Dish.introduce)
+  - inputs from the screen: name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Give this dish a name."; and 1 more
+  - effects: DishIntroduced
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_detachVersion` (Dish.detachVersion)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishVersionUnlinked
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_labelVersion` (Dish.labelVersion)
+  - inputs from the screen: label; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishVersionLabeled
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_linkAsEdition` (Dish.linkAsEdition)
+  - inputs from the screen: sourceDishId, editionNumber; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: DishEditionCreated
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_makeVersionOf` (Dish.makeVersionOf)
+  - inputs from the screen: mainDishId, label; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "A dish cannot be a version of itself."; and 3 more
+  - effects: DishVersionLinked
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_mergeInto` (Dish.mergeInto)
+  - inputs from the screen: targetDishId, reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: DishMerged
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_purge` (Dish.purge)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: DishPurged
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_reinstate` (Dish.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: DishReinstated
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_reviseDetails` (Dish.reviseDetails)
+  - inputs from the screen: name, description, category, course, serviceStyle, dietaryTags; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Give this dish a name."; and 2 more
+  - effects: DishDetailsRevised
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_saveServiceInstructions` (Dish.saveServiceInstructions)
+  - inputs from the screen: instructions, source; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "Say where these serving instructions came from."; and 2 more
+  - effects: DishServiceInstructionsSaved
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_setExclusiveVenue` (Dish.setExclusiveVenue)
+  - inputs from the screen: venueId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishExclusiveVenueSet
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_setFinishTiming` (Dish.setFinishTiming)
+  - inputs from the screen: timing; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "ConcurrencyConflict:"; "Dish not found"
+  - effects: DishFinishTimingSet
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_updatePortioning` (Dish.updatePortioning)
+  - inputs from the screen: portionSize, portionUnit; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "This dish's portion size has to be more than zero."; and 2 more
+  - effects: DishPortioningUpdated
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.Dish_useMainRecipe` (Dish.useMainRecipe)
+  - inputs from the screen: shared; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory, sales and managers may see dishes"; "Kitchen staff and managers may update dishes"; "Kitchen staff and managers may change dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: DishRecipeSourceChanged
+  - refresh: live reads update by themselves; reads affected: Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishContainer.list, DishContainer.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.EventDishLineOverride_createViaApply` (EventDishLineOverride.apply)
+  - inputs from the screen: eventDishId, eventId, kind, portionsAffected, reason, targetDishIngredientId, targetDishComponentId, targetDishContainerId, targetDishTaskId, ingredientId, componentId, quantity, unit; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Employed staff may see event dish overrides"; "Managers and kitchen staff may update event dish overrides"; "Managers and kitchen staff may change event dish overrides"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're making this change."; and 4 more
+  - effects: EventDishLineOverrideApplied
+  - refresh: live reads update by themselves; reads affected: EventDishLineOverride.list, EventDishLineOverride.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventDishLineOverride_revoke` (EventDishLineOverride.revoke)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dish overrides"; "Managers and kitchen staff may update event dish overrides"; "Managers and kitchen staff may change event dish overrides"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're undoing this change."; and 2 more
+  - effects: EventDishLineOverrideRevoked
+  - refresh: live reads update by themselves; reads affected: EventDishLineOverride.list, EventDishLineOverride.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventDish_adjustServings` (EventDish.adjustServings)
+  - inputs from the screen: quantityServings; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishServingsAdjusted
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.EventDish_changeCourse` (EventDish.changeCourse)
+  - inputs from the screen: course, serviceStyle; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventDishCourseChanged
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.EventDish_createViaAddToEvent` (EventDish.addToEvent)
+  - inputs from the screen: eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishAdded
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, DishComponent.list, DishComponent.get, DishIngredient.list, DishIngredient.get and 24 more
+- `mutations.EventDish_remove` (EventDish.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishRemoved
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.EventDish_reorder` (EventDish.reorder)
+  - inputs from the screen: sortOrder; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventDishReordered
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.EventDish_setHeadcountOverride` (EventDish.setHeadcountOverride)
+  - inputs from the screen: headcountOverride; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventDishServingsAdjusted, EventDishHeadcountOverrideSet
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.EventDish_updateInstructions` (EventDish.updateInstructions)
+  - inputs from the screen: specialInstructions; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see event dishes"; "Managers, sales and kitchen staff may update event dishes"; "Managers, sales and kitchen staff may change event dishes"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventDishInstructionsUpdated
+  - refresh: live reads update by themselves; reads affected: EventDish.list, EventDish.get, Dish.list, Dish.get, Event.list, Event.get, EventAllergenCheck.list, EventAllergenCheck.get and 16 more
+- `mutations.Ingredient_classifyAllergens` (Ingredient.classifyAllergens)
+  - inputs from the screen: allergens, isGlutenFree; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: IngredientAllergensClassified
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_configureSubstitutes` (Ingredient.configureSubstitutes)
+  - inputs from the screen: substituteIngredientIds; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: IngredientSubstitutesConfigured
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_createViaIntroduce` (Ingredient.introduce)
+  - inputs from the screen: name, unit, costPerUnit, allergens, category, preferredVendorId, isGlutenFree; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Give this ingredient a name."; and 1 more
+  - effects: IngredientIntroduced
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_discontinue` (Ingredient.discontinue)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: IngredientDiscontinued
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_mergeInto` (Ingredient.mergeInto)
+  - inputs from the screen: targetIngredientId, reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: IngredientMerged
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_purge` (Ingredient.purge)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: IngredientPurged
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_reinstate` (Ingredient.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: IngredientReinstated
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_setNutrition` (Ingredient.setNutrition)
+  - inputs from the screen: caloriesPerUnit, proteinGramsPerUnit, carbsGramsPerUnit, fatGramsPerUnit, fiberGramsPerUnit, sugarGramsPerUnit, sodiumMgPerUnit, calciumMgPerUnit, ironMgPerUnit; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "This ingredient's calories can't be negative. Use zero or more."; and 10 more
+  - effects: IngredientNutritionSet
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_setPreferredVendors` (Ingredient.setPreferredVendors)
+  - inputs from the screen: preferredVendorIds, preferredVendorId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: IngredientPreferredVendorsSet
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_setPrimaryImage` (Ingredient.setPrimaryImage)
+  - inputs from the screen: storageId, fileName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Add a photo before you set it as the main picture."; and 2 more
+  - effects: IngredientPrimaryImageSet
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_setStorage` (Ingredient.setStorage)
+  - inputs from the screen: shelfLifeDays, storageInstructions; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Shelf life can't be negative. Use zero or more days."; "ConcurrencyConflict:"; and 1 more
+  - effects: IngredientStorageSet
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_updateCosting` (Ingredient.updateCosting)
+  - inputs from the screen: costPerUnit; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: IngredientCostingUpdated
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.Ingredient_updateDetails` (Ingredient.updateDetails)
+  - inputs from the screen: name, unit, category; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see ingredients"; "Kitchen staff may update ingredients"; "Kitchen staff may change ingredients"; "Guard 0 failed"; "Guard 1 failed"; "Give this ingredient a name."; and 2 more
+  - effects: IngredientDetailsUpdated
+  - refresh: live reads update by themselves; reads affected: Ingredient.list, Ingredient.get, ComponentImportLine.list, ComponentImportLine.get, ComponentIngredient.list, ComponentIngredient.get, DishIngredient.list, DishIngredient.get and 36 more
+- `mutations.InventoryReservation_createViaReserve` (InventoryReservation.reserve)
+  - inputs from the screen: inventoryItemId, eventId, ingredientId, quantity, inventoryLotId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory staff or event managers may see inventory reservations"; "Inventory staff or event managers may update inventory reservations"; "Inventory staff or event managers may change inventory reservations"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: InventoryReserved
+  - refresh: live reads update by themselves; reads affected: InventoryReservation.list, InventoryReservation.get, Event.list, Event.get, Ingredient.list, Ingredient.get, InventoryItem.list, InventoryItem.get and 4 more
+- `mutations.InventoryReservation_release` (InventoryReservation.release)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory staff or event managers may see inventory reservations"; "Inventory staff or event managers may update inventory reservations"; "Inventory staff or event managers may change inventory reservations"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: InventoryReservationReleased
+  - refresh: live reads update by themselves; reads affected: InventoryReservation.list, InventoryReservation.get, Event.list, Event.get, Ingredient.list, Ingredient.get, InventoryItem.list, InventoryItem.get and 4 more
+- `mutations.ItemUnitMapping_createViaRecord` (ItemUnitMapping.record)
+  - inputs from the screen: kind, unit, equalsQuantity, equalsUnit, ingredientId, componentId, fromBasis, toBasis, source; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see unit mappings"; "Kitchen, inventory and managers may update unit mappings"; "Kitchen, inventory and managers may change unit mappings"; "Guard 0 failed"; "Guard 1 failed"; "A unit mapping needs an ingredient or a recipe"; and 1 more
+  - effects: ItemUnitMappingRecorded
+  - refresh: live reads update by themselves; reads affected: ItemUnitMapping.list, ItemUnitMapping.get, Ingredient.list, Ingredient.get
+- `mutations.ItemUnitMapping_retire` (ItemUnitMapping.retire)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen, inventory and managers may see unit mappings"; "Kitchen, inventory and managers may update unit mappings"; "Kitchen, inventory and managers may change unit mappings"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason."; and 2 more
+  - effects: ItemUnitMappingRetired
+  - refresh: live reads update by themselves; reads affected: ItemUnitMapping.list, ItemUnitMapping.get, Ingredient.list, Ingredient.get
+- `mutations.MenuDish_createViaAdd` (MenuDish.add)
+  - inputs from the screen: menuId, dishId, sortOrder, sellingPrice, course, serviceStyle, specialInstructions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menu dish lines"; "Kitchen staff may update menu dish lines"; "Kitchen staff may change menu dish lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: MenuDishAdded
+  - refresh: live reads update by themselves; reads affected: MenuDish.list, MenuDish.get, Dish.list, Dish.get, Menu.list, Menu.get
+- `mutations.MenuDish_remove` (MenuDish.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menu dish lines"; "Kitchen staff may update menu dish lines"; "Kitchen staff may change menu dish lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuDishRemoved
+  - refresh: live reads update by themselves; reads affected: MenuDish.list, MenuDish.get, Dish.list, Dish.get, Menu.list, Menu.get
+- `mutations.MenuDish_schedulePriceChange` (MenuDish.schedulePriceChange)
+  - inputs from the screen: sellingPrice, effectiveAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menu dish lines"; "Kitchen staff may update menu dish lines"; "Kitchen staff may change menu dish lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: MenuDishPriceChangeScheduled
+  - refresh: live reads update by themselves; reads affected: MenuDish.list, MenuDish.get, Dish.list, Dish.get, Menu.list, Menu.get
+- `mutations.MenuDish_updateDetails` (MenuDish.updateDetails)
+  - inputs from the screen: sortOrder, course, serviceStyle, specialInstructions; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menu dish lines"; "Kitchen staff may update menu dish lines"; "Kitchen staff may change menu dish lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: MenuDishDetailsUpdated
+  - refresh: live reads update by themselves; reads affected: MenuDish.list, MenuDish.get, Dish.list, Dish.get, Menu.list, Menu.get
+- `mutations.MenuDish_updateSellingPrice` (MenuDish.updateSellingPrice)
+  - inputs from the screen: sellingPrice; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menu dish lines"; "Kitchen staff may update menu dish lines"; "Kitchen staff may change menu dish lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: MenuDishSellingPriceUpdated
+  - refresh: live reads update by themselves; reads affected: MenuDish.list, MenuDish.get, Dish.list, Dish.get, Menu.list, Menu.get
+- `mutations.Menu_archive` (Menu.archive)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuArchived
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_createViaDraft` (Menu.draft)
+  - inputs from the screen: name, description, category, isTemplate, basePrice, pricePerPerson, minGuests, maxGuests; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Give this menu a name."; and 2 more
+  - effects: MenuDrafted
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_markPublished` (Menu.markPublished)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuPublished
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_restore` (Menu.restore)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: MenuRestored
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_reviseDetails` (Menu.reviseDetails)
+  - inputs from the screen: name, description, category, isTemplate; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Give this menu a name."; and 2 more
+  - effects: MenuDetailsRevised
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_setSeason` (Menu.setSeason)
+  - inputs from the screen: availableFrom, availableUntil; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuSeasonSet
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_setService` (Menu.setService)
+  - inputs from the screen: guestsPerServer, pickOneCourses; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuServiceSet
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_unpublish` (Menu.unpublish)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuUnpublished
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Menu_updatePricing` (Menu.updatePricing)
+  - inputs from the screen: basePrice, pricePerPerson, minGuests, maxGuests; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menus"; "Kitchen staff may update menus"; "Kitchen staff may change menus"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: MenuPricingUpdated
+  - refresh: live reads update by themselves; reads affected: Menu.list, Menu.get, MenuDish.list, MenuDish.get, ProposalDishSelection.list, ProposalDishSelection.get, TastingDish.list, TastingDish.get
+- `mutations.Organization_setBrandLogo` (Organization.setBrandLogo)
+  - inputs from the screen: storageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationBrandLogoSet
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.PrepTaskComment_createViaPost` (PrepTaskComment.post)
+  - inputs from the screen: prepTaskId, eventId, body, eventDishId, category, taskOwnerAssignedToId, taskOwnerAuthSubjectId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff and event managers may see prep task comments"; "Kitchen staff and event managers may update prep task comments"; "Kitchen staff and event managers may change prep task comments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskCommentPosted
+  - refresh: live reads update by themselves; reads affected: PrepTaskComment.list, PrepTaskComment.get, Event.list, Event.get, EventDish.list, EventDish.get, Person.list, Person.get and 2 more
+- `mutations.PrepTaskDependency_createViaDeclare` (PrepTaskDependency.declare)
+  - inputs from the screen: dependentTaskId, predecessorTaskId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep task dependencies"; "Kitchen and event managers may declare prep task dependencies"; "Kitchen and event managers may change prep task dependencies"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PrepTaskDependencyDeclared
+  - refresh: live reads update by themselves; reads affected: PrepTaskDependency.list, PrepTaskDependency.get, PrepTask.list, PrepTask.get
+- `mutations.PrepTaskDependency_dropLink` (PrepTaskDependency.dropLink)
+  - inputs from the screen: reason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; dependentTaskId: stri...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep task dependencies"; "Kitchen and event managers may declare prep task dependencies"; "Kitchen and event managers may change prep task dependencies"; "Guard 0 failed"; "Say why you're dropping this link."; "PrepTaskDependency not found"
+  - effects: PrepTaskDependencyLinkDropped
+  - refresh: live reads update by themselves; reads affected: PrepTaskDependency.list, PrepTaskDependency.get, PrepTask.list, PrepTask.get
+- `mutations.PrepTask_assign` (PrepTask.assign)
+  - inputs from the screen: personId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: PrepTaskAssigned
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_cancel` (PrepTask.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskCancelled
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_claim` (PrepTask.claim)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: PrepTaskClaimed
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_complete` (PrepTask.complete)
+  - inputs from the screen: completedQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskCompleted
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_createViaOpen` (PrepTask.open)
+  - inputs from the screen: eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, componentId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes, resolution, choiceOptions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: PrepTaskOpened
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_markBlocked` (PrepTask.markBlocked)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskBlocked
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_release` (PrepTask.release)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskReleased
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_resolveChoice` (PrepTask.resolveChoice)
+  - inputs from the screen: choice; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Pick a choice."; and 3 more
+  - effects: PrepTaskChoiceResolved
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_revise` (PrepTask.revise)
+  - inputs from the screen: name, quantity, unit, category, taskType, specialInstructions, ingredientId, componentId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Give this prep task a name."; and 3 more
+  - effects: PrepTaskRevised
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_start` (PrepTask.start)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: PrepTaskStarted
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_unblock` (PrepTask.unblock)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskUnblocked
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.ProductionBatchAllocation_markPortioned` (ProductionBatchAllocation.markPortioned)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see batch allocations"; "Kitchen staff and managers may update batch allocations"; "Kitchen staff and managers may change batch allocations"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ProductionBatchAllocationPortioned
+  - refresh: live reads update by themselves; reads affected: ProductionBatchAllocation.list, ProductionBatchAllocation.get, Event.list, Event.get, EventDish.list, EventDish.get, ProductionBatch.list, ProductionBatch.get
+- `mutations.ProductionBatch_cancel` (ProductionBatch.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see production batches"; "Kitchen staff and managers may update production batches"; "Kitchen staff and managers may change production batches"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ProductionBatchCancelled
+  - refresh: live reads update by themselves; reads affected: ProductionBatch.list, ProductionBatch.get, Component.list, Component.get, Event.list, Event.get, PackListItem.list, PackListItem.get and 4 more
+- `mutations.ProductionBatch_complete` (ProductionBatch.complete)
+  - inputs from the screen: actualYield, wasteQuantity, wasteReason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see production batches"; "Kitchen staff and managers may update production batches"; "Kitchen staff and managers may change production batches"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: ProductionBatchCompleted
+  - refresh: live reads update by themselves; reads affected: ProductionBatch.list, ProductionBatch.get, Component.list, Component.get, Event.list, Event.get, PackListItem.list, PackListItem.get and 4 more
+- `mutations.ProductionBatch_correctYield` (ProductionBatch.correctYield)
+  - inputs from the screen: actualYield, reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see production batches"; "Kitchen staff and managers may update production batches"; "Kitchen staff and managers may change production batches"; "Guard 0 failed"; "Guard 1 failed"; "The actual yield can't be negative. Use zero or more."; and 3 more
+  - effects: ProductionBatchYieldCorrected
+  - refresh: live reads update by themselves; reads affected: ProductionBatch.list, ProductionBatch.get, Component.list, Component.get, Event.list, Event.get, PackListItem.list, PackListItem.get and 4 more
+- `mutations.ProductionBatch_createViaPlan` (ProductionBatch.plan)
+  - inputs from the screen: componentId, plannedYield, yieldUnit, eventId, notes, makeUpForBatchId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see production batches"; "Kitchen staff and managers may update production batches"; "Kitchen staff and managers may change production batches"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ProductionBatchPlanned
+  - refresh: live reads update by themselves; reads affected: ProductionBatch.list, ProductionBatch.get, Component.list, Component.get, Event.list, Event.get, PackListItem.list, PackListItem.get and 4 more
+- `mutations.ProductionBatch_resolveShortfall` (ProductionBatch.resolveShortfall)
+  - inputs from the screen: resolution; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see production batches"; "Kitchen staff and managers may update production batches"; "Kitchen staff and managers may change production batches"; "Guard 0 failed"; "Guard 1 failed"; "Say how the missing amount was handled."; and 2 more
+  - effects: ProductionBatchShortfallResolved
+  - refresh: live reads update by themselves; reads affected: ProductionBatch.list, ProductionBatch.get, Component.list, Component.get, Event.list, Event.get, PackListItem.list, PackListItem.get and 4 more
+- `mutations.ProductionBatch_start` (ProductionBatch.start)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff and managers may see production batches"; "Kitchen staff and managers may update production batches"; "Kitchen staff and managers may change production batches"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ProductionBatchStarted
+  - refresh: live reads update by themselves; reads affected: ProductionBatch.list, ProductionBatch.get, Component.list, Component.get, Event.list, Event.get, PackListItem.list, PackListItem.get and 4 more
+- `mutations.QualityCheck_createViaOpen` (QualityCheck.open)
+  - inputs from the screen: prepTaskId, productionBatchId, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Kitchen staff may see quality checks"; "Kitchen staff may update quality checks"; "Kitchen staff may change quality checks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: QualityCheckOpened
+  - refresh: live reads update by themselves; reads affected: QualityCheck.list, QualityCheck.get, Person.list, Person.get, PrepTask.list, PrepTask.get, ProductionBatch.list, ProductionBatch.get
+- `mutations.QualityCheck_fail` (QualityCheck.fail)
+  - inputs from the screen: notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see quality checks"; "Kitchen staff may update quality checks"; "Kitchen staff may change quality checks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: QualityCheckFailed
+  - refresh: live reads update by themselves; reads affected: QualityCheck.list, QualityCheck.get, Person.list, Person.get, PrepTask.list, PrepTask.get, ProductionBatch.list, ProductionBatch.get
+- `mutations.QualityCheck_pass` (QualityCheck.pass)
+  - inputs from the screen: notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see quality checks"; "Kitchen staff may update quality checks"; "Kitchen staff may change quality checks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: QualityCheckPassed
+  - refresh: live reads update by themselves; reads affected: QualityCheck.list, QualityCheck.get, Person.list, Person.get, PrepTask.list, PrepTask.get, ProductionBatch.list, ProductionBatch.get
+- `mutations.QualityCheck_reinspect` (QualityCheck.reinspect)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen staff may see quality checks"; "Kitchen staff may update quality checks"; "Kitchen staff may change quality checks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: QualityCheckReopened
+  - refresh: live reads update by themselves; reads affected: QualityCheck.list, QualityCheck.get, Person.list, Person.get, PrepTask.list, PrepTask.get, ProductionBatch.list, ProductionBatch.get
+- `mutations.ReviewFlag_createViaRaise` (ReviewFlag.raise)
+  - inputs from the screen: eventId, targetKind, question, targetId, targetLabel; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: ReviewFlagRaised
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_dismiss` (ReviewFlag.dismiss)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ReviewFlagSettled
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_markResolved` (ReviewFlag.markResolved)
+  - inputs from the screen: resolution; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Say what was decided to settle this flag."; and 2 more
+  - effects: ReviewFlagSettled
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_reopen` (ReviewFlag.reopen)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; "ReviewFlag not found"
+  - effects: ReviewFlagReopened
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.Station_createViaDefine` (Station.define)
+  - inputs from the screen: name, sortOrder, aliases; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Employed staff may see stations"; "Kitchen staff and managers may update stations"; "Kitchen staff and managers may change stations"; "Guard 0 failed"; "Guard 1 failed"; "Give this station a name."
+  - effects: StationDefined
+  - refresh: live reads update by themselves; reads affected: Station.list, Station.get
+- `mutations.Station_reinstate` (Station.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see stations"; "Kitchen staff and managers may update stations"; "Kitchen staff and managers may change stations"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: StationReinstated
+  - refresh: live reads update by themselves; reads affected: Station.list, Station.get
+- `mutations.Station_rename` (Station.rename)
+  - inputs from the screen: name, sortOrder, aliases; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see stations"; "Kitchen staff and managers may update stations"; "Kitchen staff and managers may change stations"; "Guard 0 failed"; "Guard 1 failed"; "Give this station a name."; and 2 more
+  - effects: StationRenamed
+  - refresh: live reads update by themselves; reads affected: Station.list, Station.get
+- `mutations.Station_retire` (Station.retire)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Employed staff may see stations"; "Kitchen staff and managers may update stations"; "Kitchen staff and managers may change stations"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're retiring this station."; and 2 more
+  - effects: StationRetired
+  - refresh: live reads update by themselves; reads affected: Station.list, Station.get
+- `mutations.StylePackaging_createViaAdd` (StylePackaging.add)
+  - inputs from the screen: serviceStyleId, instructions, componentId, dishId, container; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see packaging instructions"; "Kitchen staff and managers may update packaging instructions"; "Kitchen staff and managers may change packaging instructions"; "Guard 0 failed"
+  - effects: StylePackagingAdded
+  - refresh: live reads update by themselves; reads affected: StylePackaging.list, StylePackaging.get, Component.list, Component.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.StylePackaging_remove` (StylePackaging.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see packaging instructions"; "Kitchen staff and managers may update packaging instructions"; "Kitchen staff and managers may change packaging instructions"; "Guard 0 failed"; "ConcurrencyConflict:"; "StylePackaging not found"
+  - effects: StylePackagingRemoved
+  - refresh: live reads update by themselves; reads affected: StylePackaging.list, StylePackaging.get, Component.list, Component.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.StylePackaging_revise` (StylePackaging.revise)
+  - inputs from the screen: instructions, container; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see packaging instructions"; "Kitchen staff and managers may update packaging instructions"; "Kitchen staff and managers may change packaging instructions"; "Guard 0 failed"; "Write how it is packaged or served."; "ConcurrencyConflict:"; and 1 more
+  - effects: StylePackagingRevised
+  - refresh: live reads update by themselves; reads affected: StylePackaging.list, StylePackaging.get, Component.list, Component.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.VendorItem_createViaAdd` (VendorItem.add)
+  - inputs from the screen: vendorId, ingredientId, description, packQuantity, packUnit, itemCode, packPrice, priceDate; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: VendorItemAdded
+  - refresh: live reads update by themselves; reads affected: VendorItem.list, VendorItem.get, Ingredient.list, Ingredient.get, Vendor.list, Vendor.get
+- `mutations.VendorItem_remove` (VendorItem.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: VendorItemRemoved
+  - refresh: live reads update by themselves; reads affected: VendorItem.list, VendorItem.get, Ingredient.list, Ingredient.get, Vendor.list, Vendor.get
+- `mutations.VendorItem_update` (VendorItem.update)
+  - inputs from the screen: description, packQuantity, packUnit, itemCode, packPrice, priceDate; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Purchasing, kitchen and managers may see vendor items"; "Purchasing and managers may update vendor items"; "Purchasing and managers may change vendor items"; "Guard 0 failed"; "Guard 1 failed"; "Say what the vendor calls this item."; and 5 more
+  - effects: VendorItemUpdated
+  - refresh: live reads update by themselves; reads affected: VendorItem.list, VendorItem.get, Ingredient.list, Ingredient.get, Vendor.list, Vendor.get
+- `mutations.VendorOrderLine_createViaAddLine` (VendorOrderLine.addLine)
+  - inputs from the screen: vendorOrderId, ingredientId, orderedQuantity, unit, unitCost, ingredientDemandId, locationId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Procurement and managers may see vendor order lines"; "Procurement and managers may update vendor order lines"; "Procurement and managers may change vendor order lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: VendorOrderLineAdded
+  - refresh: live reads update by themselves; reads affected: VendorOrderLine.list, VendorOrderLine.get, Ingredient.list, Ingredient.get, IngredientDemand.list, IngredientDemand.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 14 more
+- `mutations.VendorOrder_createViaOpen` (VendorOrder.open)
+  - inputs from the screen: vendorId, eventId, sourceRangeStart, sourceRangeEnd, orderNumber, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Procurement and managers may see vendor orders"; "Procurement and managers may update vendor orders"; "Procurement and managers may change vendor orders"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: VendorOrderOpened
+  - refresh: live reads update by themselves; reads affected: VendorOrder.list, VendorOrder.get, Event.list, Event.get, IngredientPriceObservation.list, IngredientPriceObservation.get, InventoryLot.list, InventoryLot.get and 14 more
+
+### Authored reads and steps
+
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `catalogReclassification.apply` - mutation; authored step; live reads update by themselves
+- `catalogReclassification.decide` - mutation; authored step; live reads update by themselves
+- `catalogReclassification.plan` - query; live read, updates by itself
+- `culinaryDemand.addNestedRecipeLine` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandHeadcount` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandRecalculation` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandSupersede` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.componentContentReport` - query; live read, updates by itself
+- `culinaryDemand.eventDemandReview` - query; live read, updates by itself
+- `culinaryDemand.eventFoodCostReport` - query; live read, updates by itself
+- `culinaryDemand.kitchenUnresolvedReport` - query; live read, updates by itself
+- `culinaryDemand.previewDemandChange` - query; live read, updates by itself
+- `culinaryDemand.reconcileEventDemand` - mutation; authored step; live reads update by themselves
+- `culinaryDemandSweep.publishRecipeEdition` - mutation; authored step; live reads update by themselves
+- `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
+- `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
+- `eventDayBriefing.getBriefing` - query; live read, updates by itself
+- `eventDayBriefing.listEvents` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMenuLookup.forDish` - query; live read, updates by itself
+- `eventMenuLookup.forEvents` - query; live read, updates by itself
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `ingredientLookup.applyCostToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
+- `ingredientLookup.applyImageToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
+- `ingredientLookup.applyToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
+- `ingredientLookup.getFoodAutofill` - action; one-time call (not live); the live reads it changes update by themselves
+- `ingredientLookup.resolveCreateLookupCost` - action; one-time call (not live); the live reads it changes update by themselves
+- `ingredientLookup.resolveLookupCost` - action; one-time call (not live); the live reads it changes update by themselves
+- `ingredientLookup.searchFoods` - action; one-time call (not live); the live reads it changes update by themselves
+- `lib.culinaryOperations.cloneMenu` - mutation; authored step; live reads update by themselves
+- `lib.culinaryOperations.createComponentImportReview` - mutation; authored step; live reads update by themselves
+- `lib.culinaryOperations.eventPrepWorkReview` - query; live read, updates by itself
+- `lib.culinaryOperations.importComponent` - mutation; authored step; live reads update by themselves
+- `lib.culinaryOperations.reconcileEventPrepWorkBalance` - mutation; authored step; live reads update by themselves
+- `lib.culinaryOperations.restoreComponentSnapshot` - mutation; authored step; live reads update by themselves
+- `lib.culinaryOperations.saveComponentImportReview` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
+- `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `menuRecipeLookup.forDishes` - query; live read, updates by itself
+- `vendorPriceList.importVendorPriceRows` - mutation; authored step; live reads update by themselves
+- `vendorPriceList.priceHistory` - query; live read, updates by itself
+
+## 5. Timeline and route
+
+Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`, `events/EventMapPanel.tsx`, `events/EventRouteLegsPanel.tsx`, `events/EventRouteMapPage.tsx`, `events/EventRunStops.tsx`, `events/EventShiftChangesPanel.tsx`, `events/EventTimelineActivityList.tsx`, `events/EventTimelineAddForm.tsx`, `events/EventTimelineAssigneePicker.tsx`, `events/EventTimelineBlockQuestions.tsx`, `events/EventTimelineCommentsPanel.tsx`, `events/EventTimelineGanttStrip.tsx`, `events/EventTimelinePanel.tsx`, `events/EventTimelineRunSheetHeader.tsx`, `events/EventTimelineSidebar.tsx`, `events/EventTimelineTab.tsx`, `events/EventTimelineTemplatesMenu.tsx`, `events/EventTimingPlanner.tsx`, `events/EventTimingPlannerDraft.ts`, `events/EventTimingRulesPanel.tsx`, `events/TimelineBlockPicker.tsx`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listOperatingLocation` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPerson` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listShift` - live read
+- `queries.listShiftByEventId` - live read
+
+### Generated actions
+
+- `mutations.EventTimelineActivity_adjust` (EventTimelineActivity.adjust)
+  - inputs from the screen: name, startsAt, endsAt, clearStartsAt, clearEndsAt, responsibleParty, notes, category, siteNotes, sortOrder, assigneeTeams, assigneePersonIds; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the shared event timeline"; "Staff may add timeline work"; "Staff may change timeline work"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: EventTimelineActivityAdjusted
+  - refresh: live reads update by themselves; reads affected: EventTimelineActivity.list, EventTimelineActivity.get, Event.list, Event.get
+- `mutations.EventTimelineActivity_createViaSchedule` (EventTimelineActivity.schedule)
+  - inputs from the screen: eventId, name, startsAt, endsAt, responsibleParty, notes, category, siteNotes, sortOrder, assigneeTeams, assigneePersonIds; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see the shared event timeline"; "Staff may add timeline work"; "Staff may change timeline work"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventTimelineActivityScheduled
+  - refresh: live reads update by themselves; reads affected: EventTimelineActivity.list, EventTimelineActivity.get, Event.list, Event.get
+- `mutations.EventTimelineActivity_planTiming` (EventTimelineActivity.planTiming)
+  - inputs from the screen: milestone, startsAt, endsAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the shared event timeline"; "Staff may add timeline work"; "Staff may change timeline work"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: EventTimelineTimingPlanned
+  - refresh: live reads update by themselves; reads affected: EventTimelineActivity.list, EventTimelineActivity.get, Event.list, Event.get
+- `mutations.EventTimelineActivity_remove` (EventTimelineActivity.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the shared event timeline"; "Staff may add timeline work"; "Staff may change timeline work"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTimelineActivityRemoved
+  - refresh: live reads update by themselves; reads affected: EventTimelineActivity.list, EventTimelineActivity.get, Event.list, Event.get
+- `mutations.EventTimelineActivity_useCalculatedTiming` (EventTimelineActivity.useCalculatedTiming)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the shared event timeline"; "Staff may add timeline work"; "Staff may change timeline work"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventTimelineCalculatedTimingRequested
+  - refresh: live reads update by themselves; reads affected: EventTimelineActivity.list, EventTimelineActivity.get, Event.list, Event.get
+- `mutations.EventTimelineComment_createViaPost` (EventTimelineComment.post)
+  - inputs from the screen: eventId, body, activityId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event staff may see timeline comments"; "Event staff may add timeline comments"; "Event staff may change timeline comments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventTimelineCommentPosted
+  - refresh: live reads update by themselves; reads affected: EventTimelineComment.list, EventTimelineComment.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.EventTimelineComment_remove` (EventTimelineComment.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see timeline comments"; "Event staff may add timeline comments"; "Event staff may change timeline comments"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventTimelineCommentRemoved
+  - refresh: live reads update by themselves; reads affected: EventTimelineComment.list, EventTimelineComment.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.EventVehicleAssignment_createViaAssign` (EventVehicleAssignment.assign)
+  - inputs from the screen: eventId, vehicleId, trailerId, driverId, notes, preloaded, vendorName, arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes, loadingZone, bookedTwiceReason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EventVehicleAssigned
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_planLeg` (EventVehicleAssignment.planLeg)
+  - inputs from the screen: arriveBeforeServeMinutes, loadMinutes, leaveAfterMinutes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: EventVehicleLegPlanned
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_setLoadingZone` (EventVehicleAssignment.setLoadingZone)
+  - inputs from the screen: loadingZone; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventVehicleLoadingZoneSet
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.EventVehicleAssignment_setTripCost` (EventVehicleAssignment.setTripCost)
+  - inputs from the screen: tripCost; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see event vehicle assignments"; "Event, sales and logistics staff and managers may update event vehicle assignments"; "Event, sales and logistics staff and managers may change event vehicle assignments"; "Guard 0 failed"; "Guard 1 failed"; "Trip cost can't be negative. Use zero or more."; and 2 more
+  - effects: EventVehicleTripCostSet
+  - refresh: live reads update by themselves; reads affected: EventVehicleAssignment.list, EventVehicleAssignment.get, Event.list, Event.get, EventAssignment.list, EventAssignment.get, EventStaffNeed.list, EventStaffNeed.get and 10 more
+- `mutations.Event_chooseOperatingLocation` (Event.chooseOperatingLocation)
+  - inputs from the screen: operatingLocationId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventOperatingLocationChosen
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_configureTiming` (Event.configureTiming)
+  - inputs from the screen: serviceStartsAt, setupMinutes, loadMinutes, outboundTravelMinutes, cleanupMinutes, returnTravelMinutes, unloadMinutes, setupOverrideReason, loadOverrideReason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Finished or cancelled events keep their saved timing; correct individual blocks if needed"; and 8 more
+  - effects: EventTimingConfigured
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_updateDaySheet` (Event.updateDaySheet)
+  - inputs from the screen: barService, cocktailHourFood, dessertService, bussing, placeSettings, passedApps, stationaryApps, beveragesOnMenu, tablesideWater, mangiaDisposables, eventRentals, scullery, powerOnsite, waterOnsite, buffetColdPlates, buffetHotPlates; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventDaySheetUpdated
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_useCompanyTimingRule` (Event.useCompanyTimingRule)
+  - inputs from the screen: setup, load; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Guard 1 failed"; "Finished or cancelled events keep their saved timing; correct individual blocks if needed"; and 2 more
+  - effects: EventTimingRuleRestored
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.StaffMessage_edit` (StaffMessage.edit)
+  - inputs from the screen: body, mentionedPersonIds; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageEdited
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_markRead` (StaffMessage.markRead)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageRead
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_remove` (StaffMessage.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffMessageRemoved
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+
+### Authored reads and steps
+
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
+- `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `eventRoutes.getEventRoute` - query; live read, updates by itself
+- `eventRoutes.refreshEventRoute` - action; one-time call (not live); the live reads it changes update by themselves
+- `eventTimingRules.getEventTimingRules` - query; live read, updates by itself
+- `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
+- `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
+- `shiftTimingChanges.applyShiftTimingChange` - mutation; authored step; live reads update by themselves
+- `shiftTimingChanges.keepShiftTime` - mutation; authored step; live reads update by themselves
+- `shiftTimingChanges.listEventShiftChanges` - query; live read, updates by itself
+- `teamChat.channelSummary` - query; live read, updates by itself
+- `teamChat.listChannel` - query; live read, updates by itself
+- `teamChat.listConversations` - query; live read, updates by itself
+- `teamChat.searchLinkTargets` - query; live read, updates by itself
+- `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
+- `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
+
+## 6. Staffing and My Day
+
+Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/trainingDoc.ts`, `workforce/TrainingDocAction.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/TrainingSignOffPanel.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.listAvailabilityWindow` - live read
+- `queries.listCandidate` - live read
+- `queries.listDelivery` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignment` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseout` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeed` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listInterview` - live read
+- `queries.listOneOnOne` - live read
+- `queries.listOneOnOneAction` - live read
+- `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPackListItem` - live read
+- `queries.listPerformanceReview` - live read
+- `queries.listPerson` - live read
+- `queries.listPrepTask` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listPrepTaskDependency` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listQualification` - live read
+- `queries.listRecurringAvailability` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listRoleScorecard` - live read
+- `queries.listServiceStyle` - live read
+- `queries.listShift` - live read
+- `queries.listShiftByEventId` - live read
+- `queries.listShiftSwapRequest` - live read
+- `queries.listShiftType` - live read
+- `queries.listSkillLevel` - live read
+- `queries.listStaffNeedWaitlistEntry` - live read
+- `queries.listStaffingTemplate` - live read
+- `queries.listTimeOffRequest` - live read
+- `queries.listTimeRecord` - live read
+- `queries.listTrainingCompletion` - live read
+- `queries.listTrainingModule` - live read
+- `queries.listTrainingSignOff` - live read
+- `queries.listWeeklyScheduleNotice` - live read
+
+### Generated actions
+
+- `mutations.AvailabilityWindow_createViaDeclare` (AvailabilityWindow.declare)
+  - inputs from the screen: personId, startsAt, endsAt, kind, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see availability windows"; "Workforce staff or the linked person may update availability"; "Workforce staff or the linked person may change availability"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: AvailabilityDeclared
+  - refresh: live reads update by themselves; reads affected: AvailabilityWindow.list, AvailabilityWindow.get, Person.list, Person.get
+- `mutations.AvailabilityWindow_withdraw` (AvailabilityWindow.withdraw)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see availability windows"; "Workforce staff or the linked person may update availability"; "Workforce staff or the linked person may change availability"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: AvailabilityWithdrawn
+  - refresh: live reads update by themselves; reads affected: AvailabilityWindow.list, AvailabilityWindow.get, Person.list, Person.get
+- `mutations.Candidate_advance` (Candidate.advance)
+  - inputs from the screen: toStage; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce managers may see candidates"; "Workforce managers may update candidates"; "Workforce managers may change candidates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: CandidateStageChanged
+  - refresh: live reads update by themselves; reads affected: Candidate.list, Candidate.get, Interview.list, Interview.get, Person.list, Person.get
+- `mutations.Candidate_createViaApply` (Candidate.apply)
+  - inputs from the screen: fullName, email, phone, roleAppliedFor, sourceSystem, externalCandidateId, rawSourceData; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce managers may see candidates"; "Workforce managers may update candidates"; "Workforce managers may change candidates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 1 more
+  - effects: CandidateApplied
+  - refresh: live reads update by themselves; reads affected: Candidate.list, Candidate.get, Interview.list, Interview.get, Person.list, Person.get
+- `mutations.Candidate_reject` (Candidate.reject)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce managers may see candidates"; "Workforce managers may update candidates"; "Workforce managers may change candidates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: CandidateRejected
+  - refresh: live reads update by themselves; reads affected: Candidate.list, Candidate.get, Interview.list, Interview.get, Person.list, Person.get
+- `mutations.EventAssignment_checkIn` (EventAssignment.checkIn)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventAssignmentCheckedIn
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_checkOut` (EventAssignment.checkOut)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventAssignmentCheckedOut
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_chooseTravelLeg` (EventAssignment.chooseTravelLeg)
+  - inputs from the screen: rideVehicleAssignmentId, meetsAtVenue; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventAssignmentTravelLegChosen
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_confirm` (EventAssignment.confirm)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventAssignmentConfirmed
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_createViaAssign` (EventAssignment.assign)
+  - inputs from the screen: eventId, personId, role, startsAt, endsAt, notes, overrideReason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EventAssignmentAssigned
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_decline` (EventAssignment.decline)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: EventAssignmentDeclined
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_markNoShow` (EventAssignment.markNoShow)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventAssignmentNoShowMarked
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_planTiming` (EventAssignment.planTiming)
+  - inputs from the screen: startsAt, endsAt, followsEventTiming, synchronizeShifts; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventAssignmentTimingChanged
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventAssignment_unassign` (EventAssignment.unassign)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventAssignmentUnassigned
+  - refresh: live reads update by themselves; reads affected: EventAssignment.list, EventAssignment.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get
+- `mutations.EventStaffNeed_cancel` (EventStaffNeed.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedCancelled
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_changeCoverage` (EventStaffNeed.changeCoverage)
+  - inputs from the screen: personId, startsAt, endsAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EventStaffNeedCoverageChangeRequested
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_chooseTravelLeg` (EventStaffNeed.chooseTravelLeg)
+  - inputs from the screen: rideVehicleAssignmentId, meetsAtVenue; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedTravelLegChosen
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_claim` (EventStaffNeed.claim)
+  - inputs from the screen: personId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedClaimed
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_createViaPostOpen` (EventStaffNeed.postOpen)
+  - inputs from the screen: eventId, role, description, startsAt, endsAt, notes, previousStaffNeedId, continuationSlot, followsEventTiming, skills, qualificationName, certificationType, uniform, workLocation, payBasis, budgetHourlyRate, staffingTemplateId, templateLineKey, templateSlot; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedPosted
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_describeDemand` (EventStaffNeed.describeDemand)
+  - inputs from the screen: skills, qualificationName, certificationType, uniform, workLocation, payBasis, budgetHourlyRate; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedDemandDescribed
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_fill` (EventStaffNeed.fill)
+  - inputs from the screen: personId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedFilled
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_planTiming` (EventStaffNeed.planTiming)
+  - inputs from the screen: startsAt, endsAt, followsEventTiming, synchronizeShifts; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventStaffNeedTimingChanged
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.EventStaffNeed_releaseClaim` (EventStaffNeed.releaseClaim)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see shared event staffing"; "Crew may update shared event staffing"; "Crew may change shared event staffing"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EventStaffNeedReleased
+  - refresh: live reads update by themselves; reads affected: EventStaffNeed.list, EventStaffNeed.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get, Person.list, Person.get and 2 more
+- `mutations.FieldConfirmation_complete` (FieldConfirmation.complete)
+  - inputs from the screen: outcome, observedAt, note, photoStorageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."; "This form is already signed."; and 5 more
+  - effects: FieldConfirmationCompleted
+  - refresh: live reads update by themselves; reads affected: FieldConfirmation.list, FieldConfirmation.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.FieldConfirmation_countersign` (FieldConfirmation.countersign)
+  - inputs from the screen: observedAt, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."; "The first person has to sign this form first."; and 4 more
+  - effects: FieldConfirmationCountersigned
+  - refresh: live reads update by themselves; reads affected: FieldConfirmation.list, FieldConfirmation.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.FieldConfirmation_escalate` (FieldConfirmation.escalate)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Only event or logistics managers chase day-of forms."; "This form is already done."; and 3 more
+  - effects: FieldConfirmationEscalated
+  - refresh: live reads update by themselves; reads affected: FieldConfirmation.list, FieldConfirmation.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.Interview_createViaSchedule` (Interview.schedule)
+  - inputs from the screen: candidateId, scheduledFor, interviewerPersonId, sourceSystem, externalInterviewId, rawSourceData; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce managers may see interviews"; "Workforce managers may update interviews"; "Workforce managers may change interviews"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 1 more
+  - effects: InterviewScheduled
+  - refresh: live reads update by themselves; reads affected: Interview.list, Interview.get, Candidate.list, Candidate.get, Person.list, Person.get
+- `mutations.Interview_recordOutcome` (Interview.recordOutcome)
+  - inputs from the screen: outcome, notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce managers may see interviews"; "Workforce managers may update interviews"; "Workforce managers may change interviews"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: InterviewOutcomeRecorded
+  - refresh: live reads update by themselves; reads affected: Interview.list, Interview.get, Candidate.list, Candidate.get, Person.list, Person.get
+- `mutations.OneOnOneAction_close` (OneOnOneAction.close)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce managers may see one-on-one actions"; "Workforce managers may update one-on-one actions"; "Workforce managers may change one-on-one actions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: OneOnOneActionClosed
+  - refresh: live reads update by themselves; reads affected: OneOnOneAction.list, OneOnOneAction.get, OneOnOne.list, OneOnOne.get, Person.list, Person.get
+- `mutations.OneOnOneAction_createViaCapture` (OneOnOneAction.capture)
+  - inputs from the screen: oneOnOneId, ownerPersonId, description, dueDate; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce managers may see one-on-one actions"; "Workforce managers may update one-on-one actions"; "Workforce managers may change one-on-one actions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: OneOnOneActionCaptured
+  - refresh: live reads update by themselves; reads affected: OneOnOneAction.list, OneOnOneAction.get, OneOnOne.list, OneOnOne.get, Person.list, Person.get
+- `mutations.OneOnOne_createViaHold` (OneOnOne.hold)
+  - inputs from the screen: leadPersonId, staffMemberId, meetingDate, agenda, goals, wins, opportunities, decisions, scorecardId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce managers may see one-on-ones"; "Workforce managers may update one-on-ones"; "Workforce managers may change one-on-ones"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"
+  - effects: OneOnOneHeld
+  - refresh: live reads update by themselves; reads affected: OneOnOne.list, OneOnOne.get, OneOnOneAction.list, OneOnOneAction.get, Person.list, Person.get, RoleScorecard.list, RoleScorecard.get
+- `mutations.PackListItem_markMissing` (PackListItem.markMissing)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PackListItemMissing
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_markPacked` (PackListItem.markPacked)
+  - inputs from the screen: packedQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: PackListItemPacked
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PerformanceReview_createViaRecord` (PerformanceReview.record)
+  - inputs from the screen: personId, reviewerId, eventId, reviewDate, reliabilityRating, qualityRating, teamworkRating, notes, scorecardId, strengths, opportunities, comments, followUp, followUpDue; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce managers may see performance reviews"; "Workforce managers may update performance reviews"; "Workforce managers may change performance reviews"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: PerformanceReviewRecorded
+  - refresh: live reads update by themselves; reads affected: PerformanceReview.list, PerformanceReview.get, Event.list, Event.get, Person.list, Person.get, RoleScorecard.list, RoleScorecard.get
+- `mutations.Person_setPayRate` (Person.setPayRate)
+  - inputs from the screen: hourlyRate; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "This person's hourly rate can't be negative. Use zero or more."; "ConcurrencyConflict:"; and 1 more
+  - effects: PersonPayRateSet
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 88 more
+- `mutations.Person_setSchedulingHold` (Person.setSchedulingHold)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
+  - effects: PersonSchedulingHoldSet
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 88 more
+- `mutations.Person_setSmsAlerts` (Person.setSmsAlerts)
+  - inputs from the screen: optIn; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
+  - effects: PersonSmsAlertsChanged
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 88 more
+- `mutations.Person_setStaffingVendor` (Person.setStaffingVendor)
+  - inputs from the screen: vendorName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
+  - effects: PersonStaffingVendorSet
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 88 more
+- `mutations.Person_setWorkPreferences` (Person.setWorkPreferences)
+  - inputs from the screen: preferredRoles, approvedWorkLocations; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see people"; "Workforce managers may update people"; "Workforce managers may change people"; "Guard 0 failed"; "ConcurrencyConflict:"; "Person not found"
+  - effects: PersonWorkPreferencesSet
+  - refresh: live reads update by themselves; reads affected: Person.list, Person.get, AvailabilityWindow.list, AvailabilityWindow.get, Candidate.list, Candidate.get, Client.list, Client.get and 88 more
+- `mutations.PrepTask_claim` (PrepTask.claim)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: PrepTaskClaimed
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_complete` (PrepTask.complete)
+  - inputs from the screen: completedQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskCompleted
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_release` (PrepTask.release)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PrepTaskReleased
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.PrepTask_start` (PrepTask.start)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and event managers may see prep tasks"; "Kitchen and event managers may update prep tasks"; "Kitchen and event managers may change prep tasks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: PrepTaskStarted
+  - refresh: live reads update by themselves; reads affected: PrepTask.list, PrepTask.get, Component.list, Component.get, Dish.list, Dish.get, DishTask.list, DishTask.get and 20 more
+- `mutations.Qualification_createViaGrant` (Qualification.grant)
+  - inputs from the screen: personId, name, issuedAt, certificationType, issuingBody, expiresAt, documentRef, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see qualifications"; "Workforce staff may update qualifications"; "Workforce staff may change qualifications"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: QualificationGranted
+  - refresh: live reads update by themselves; reads affected: Qualification.list, Qualification.get, Person.list, Person.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get
+- `mutations.Qualification_expire` (Qualification.expire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see qualifications"; "Workforce staff may update qualifications"; "Workforce staff may change qualifications"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: QualificationExpired
+  - refresh: live reads update by themselves; reads affected: Qualification.list, Qualification.get, Person.list, Person.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get
+- `mutations.Qualification_revoke` (Qualification.revoke)
+  - inputs from the screen: notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see qualifications"; "Workforce staff may update qualifications"; "Workforce staff may change qualifications"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: QualificationRevoked
+  - refresh: live reads update by themselves; reads affected: Qualification.list, Qualification.get, Person.list, Person.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get
+- `mutations.RecurringAvailability_createViaDeclare` (RecurringAvailability.declare)
+  - inputs from the screen: personId, dayOfWeek, startMinute, endMinute, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see recurring availability"; "Workforce staff or the linked person may update recurring availability"; "Workforce staff or the linked person may change recurring availability"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: RecurringAvailabilityDeclared
+  - refresh: live reads update by themselves; reads affected: RecurringAvailability.list, RecurringAvailability.get, Person.list, Person.get
+- `mutations.RecurringAvailability_withdraw` (RecurringAvailability.withdraw)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see recurring availability"; "Workforce staff or the linked person may update recurring availability"; "Workforce staff or the linked person may change recurring availability"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: RecurringAvailabilityWithdrawn
+  - refresh: live reads update by themselves; reads affected: RecurringAvailability.list, RecurringAvailability.get, Person.list, Person.get
+- `mutations.RoleScorecard_archive` (RoleScorecard.archive)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce managers may see role scorecards"; "Workforce managers may update role scorecards"; "Workforce managers may change role scorecards"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: RoleScorecardArchived
+  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get, OneOnOne.list, OneOnOne.get, PerformanceReview.list, PerformanceReview.get
+- `mutations.RoleScorecard_createViaDefine` (RoleScorecard.define)
+  - inputs from the screen: role, title, expectations, effectiveFrom; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce managers may see role scorecards"; "Workforce managers may update role scorecards"; "Workforce managers may change role scorecards"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 1 more
+  - effects: RoleScorecardDefined
+  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get, OneOnOne.list, OneOnOne.get, PerformanceReview.list, PerformanceReview.get
+- `mutations.RoleScorecard_reactivate` (RoleScorecard.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce managers may see role scorecards"; "Workforce managers may update role scorecards"; "Workforce managers may change role scorecards"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: RoleScorecardReactivated
+  - refresh: live reads update by themselves; reads affected: RoleScorecard.list, RoleScorecard.get, OneOnOne.list, OneOnOne.get, PerformanceReview.list, PerformanceReview.get
+- `mutations.ShiftSwapRequest_accept` (ShiftSwapRequest.accept)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see their own shift swaps"; "Crew may respond to their own shift swaps"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 6 more
+  - effects: ShiftSwapAccepted
+  - refresh: live reads update by themselves; reads affected: ShiftSwapRequest.list, ShiftSwapRequest.get, Person.list, Person.get, Qualification.list, Qualification.get, Shift.list, Shift.get and 4 more
+- `mutations.ShiftSwapRequest_approve` (ShiftSwapRequest.approve)
+  - inputs from the screen: reviewNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see their own shift swaps"; "Crew may respond to their own shift swaps"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 19 more
+  - effects: ShiftSwapApproved
+  - refresh: live reads update by themselves; reads affected: ShiftSwapRequest.list, ShiftSwapRequest.get, Person.list, Person.get, Qualification.list, Qualification.get, Shift.list, Shift.get and 4 more
+- `mutations.ShiftSwapRequest_createViaPropose` (ShiftSwapRequest.propose)
+  - inputs from the screen: shiftId, requesterPersonId, recipientPersonId, shiftTypeId, sourceQualificationId, targetQualificationId, targetTrainingCompletionId, reason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Crew may see their own shift swaps"; "Crew may respond to their own shift swaps"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 24 more
+  - effects: ShiftSwapProposed
+  - refresh: live reads update by themselves; reads affected: ShiftSwapRequest.list, ShiftSwapRequest.get, Person.list, Person.get, Qualification.list, Qualification.get, Shift.list, Shift.get and 4 more
+- `mutations.ShiftSwapRequest_decline` (ShiftSwapRequest.decline)
+  - inputs from the screen: reviewNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see their own shift swaps"; "Crew may respond to their own shift swaps"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 3 more
+  - effects: ShiftSwapDeclined
+  - refresh: live reads update by themselves; reads affected: ShiftSwapRequest.list, ShiftSwapRequest.get, Person.list, Person.get, Qualification.list, Qualification.get, Shift.list, Shift.get and 4 more
+- `mutations.ShiftSwapRequest_reject` (ShiftSwapRequest.reject)
+  - inputs from the screen: reviewNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see their own shift swaps"; "Crew may respond to their own shift swaps"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: ShiftSwapRejected
+  - refresh: live reads update by themselves; reads affected: ShiftSwapRequest.list, ShiftSwapRequest.get, Person.list, Person.get, Qualification.list, Qualification.get, Shift.list, Shift.get and 4 more
+- `mutations.ShiftSwapRequest_withdraw` (ShiftSwapRequest.withdraw)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see their own shift swaps"; "Crew may respond to their own shift swaps"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 3 more
+  - effects: ShiftSwapWithdrawn
+  - refresh: live reads update by themselves; reads affected: ShiftSwapRequest.list, ShiftSwapRequest.get, Person.list, Person.get, Qualification.list, Qualification.get, Shift.list, Shift.get and 4 more
+- `mutations.ShiftType_createViaDefine` (ShiftType.define)
+  - inputs from the screen: name, description, requiredTrainingModuleId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see shift types"; "Workforce staff may update shift types"; "Workforce staff may change shift types"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ShiftTypeDefined
+  - refresh: live reads update by themselves; reads affected: ShiftType.list, ShiftType.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get, TrainingModule.list, TrainingModule.get
+- `mutations.ShiftType_reactivate` (ShiftType.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shift types"; "Workforce staff may update shift types"; "Workforce staff may change shift types"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ShiftTypeReactivated
+  - refresh: live reads update by themselves; reads affected: ShiftType.list, ShiftType.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get, TrainingModule.list, TrainingModule.get
+- `mutations.ShiftType_retire` (ShiftType.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shift types"; "Workforce staff may update shift types"; "Workforce staff may change shift types"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ShiftTypeRetired
+  - refresh: live reads update by themselves; reads affected: ShiftType.list, ShiftType.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get, TrainingModule.list, TrainingModule.get
+- `mutations.Shift_cancel` (Shift.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"; "Crew may update their own shifts and the shared event schedule"; "Crew may change their own shifts and the shared event schedule"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ShiftCancelled
+  - refresh: live reads update by themselves; reads affected: Shift.list, Shift.get, Event.list, Event.get, Incident.list, Incident.get, PayrollInput.list, PayrollInput.get and 12 more
+- `mutations.Shift_complete` (Shift.complete)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"; "Crew may update their own shifts and the shared event schedule"; "Crew may change their own shifts and the shared event schedule"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ShiftCompleted
+  - refresh: live reads update by themselves; reads affected: Shift.list, Shift.get, Event.list, Event.get, Incident.list, Incident.get, PayrollInput.list, PayrollInput.get and 12 more
+- `mutations.Shift_markNoShow` (Shift.markNoShow)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"; "Crew may update their own shifts and the shared event schedule"; "Crew may change their own shifts and the shared event schedule"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ShiftNoShowMarked
+  - refresh: live reads update by themselves; reads affected: Shift.list, Shift.get, Event.list, Event.get, Incident.list, Incident.get, PayrollInput.list, PayrollInput.get and 12 more
+- `mutations.Shift_reschedule` (Shift.reschedule)
+  - inputs from the screen: startsAt, endsAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"; "Crew may update their own shifts and the shared event schedule"; "Crew may change their own shifts and the shared event schedule"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ShiftRescheduled
+  - refresh: live reads update by themselves; reads affected: Shift.list, Shift.get, Event.list, Event.get, Incident.list, Incident.get, PayrollInput.list, PayrollInput.get and 12 more
+- `mutations.Shift_start` (Shift.start)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"; "Crew may update their own shifts and the shared event schedule"; "Crew may change their own shifts and the shared event schedule"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ShiftStarted
+  - refresh: live reads update by themselves; reads affected: Shift.list, Shift.get, Event.list, Event.get, Incident.list, Incident.get, PayrollInput.list, PayrollInput.get and 12 more
+- `mutations.SkillLevel_changeLevel` (SkillLevel.changeLevel)
+  - inputs from the screen: level, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see skill levels"; "Workforce staff may update skill levels"; "Workforce staff may change skill levels"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: SkillLevelRated
+  - refresh: live reads update by themselves; reads affected: SkillLevel.list, SkillLevel.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.SkillLevel_createViaRate` (SkillLevel.rate)
+  - inputs from the screen: personId, trainingModuleId, level, note; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see skill levels"; "Workforce staff may update skill levels"; "Workforce staff may change skill levels"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: SkillLevelRated
+  - refresh: live reads update by themselves; reads affected: SkillLevel.list, SkillLevel.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.StaffMessage_edit` (StaffMessage.edit)
+  - inputs from the screen: body, mentionedPersonIds; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageEdited
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_markRead` (StaffMessage.markRead)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: StaffMessageRead
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffMessage_remove` (StaffMessage.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see channel messages and their own direct messages"; "Staff may update staff messages"; "Staff may change staff messages"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffMessageRemoved
+  - refresh: live reads update by themselves; reads affected: StaffMessage.list, StaffMessage.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.StaffNeedWaitlistEntry_createViaJoin` (StaffNeedWaitlistEntry.join)
+  - inputs from the screen: staffNeedId, personId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Crew may see who is waiting for event shifts"; "Crew may join or leave event shift waiting lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 4 more
+  - effects: StaffNeedWaitlistJoined
+  - refresh: live reads update by themselves; reads affected: StaffNeedWaitlistEntry.list, StaffNeedWaitlistEntry.get, EventStaffNeed.list, EventStaffNeed.get, Person.list, Person.get
+- `mutations.StaffNeedWaitlistEntry_leave` (StaffNeedWaitlistEntry.leave)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Crew may see who is waiting for event shifts"; "Crew may join or leave event shift waiting lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: StaffNeedWaitlistLeft
+  - refresh: live reads update by themselves; reads affected: StaffNeedWaitlistEntry.list, StaffNeedWaitlistEntry.get, EventStaffNeed.list, EventStaffNeed.get, Person.list, Person.get
+- `mutations.StaffingTemplate_createViaDefine` (StaffingTemplate.define)
+  - inputs from the screen: name, lines, serviceStyleId, minGuests, maxGuests; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff and event managers may see crew templates"; "Workforce managers may update crew templates"; "Workforce managers may change crew templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffingTemplateDefined
+  - refresh: live reads update by themselves; reads affected: StaffingTemplate.list, StaffingTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.StaffingTemplate_reactivate` (StaffingTemplate.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff and event managers may see crew templates"; "Workforce managers may update crew templates"; "Workforce managers may change crew templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffingTemplateReactivated
+  - refresh: live reads update by themselves; reads affected: StaffingTemplate.list, StaffingTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.StaffingTemplate_retire` (StaffingTemplate.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff and event managers may see crew templates"; "Workforce managers may update crew templates"; "Workforce managers may change crew templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: StaffingTemplateRetired
+  - refresh: live reads update by themselves; reads affected: StaffingTemplate.list, StaffingTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.StaffingTemplate_revise` (StaffingTemplate.revise)
+  - inputs from the screen: name, lines, serviceStyleId, minGuests, maxGuests; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff and event managers may see crew templates"; "Workforce managers may update crew templates"; "Workforce managers may change crew templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: StaffingTemplateRevised
+  - refresh: live reads update by themselves; reads affected: StaffingTemplate.list, StaffingTemplate.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.TimeOffRequest_approve` (TimeOffRequest.approve)
+  - inputs from the screen: responseNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see their own time-off requests; workforce managers may review all requests"; "Staff may submit their own time-off requests; workforce managers may review them"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: TimeOffRequestApproved
+  - refresh: live reads update by themselves; reads affected: TimeOffRequest.list, TimeOffRequest.get, Person.list, Person.get
+- `mutations.TimeOffRequest_createViaSubmit` (TimeOffRequest.submit)
+  - inputs from the screen: personId, startsAt, endsAt, reason; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see their own time-off requests; workforce managers may review all requests"; "Staff may submit their own time-off requests; workforce managers may review them"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 5 more
+  - effects: TimeOffRequestSubmitted
+  - refresh: live reads update by themselves; reads affected: TimeOffRequest.list, TimeOffRequest.get, Person.list, Person.get
+- `mutations.TimeOffRequest_decline` (TimeOffRequest.decline)
+  - inputs from the screen: responseNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see their own time-off requests; workforce managers may review all requests"; "Staff may submit their own time-off requests; workforce managers may review them"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: TimeOffRequestDenied
+  - refresh: live reads update by themselves; reads affected: TimeOffRequest.list, TimeOffRequest.get, Person.list, Person.get
+- `mutations.TimeRecord_approve` (TimeRecord.approve)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: TimeRecordApproved
+  - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.TimeRecord_clockOut` (TimeRecord.clockOut)
+  - inputs from the screen: breakMinutes, notes, paidBreakMinutes, latitude, longitude, accuracyMeters; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: TimeRecordClockedOut
+  - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.TimeRecord_correct` (TimeRecord.correct)
+  - inputs from the screen: clockInAt, clockOutAt, reason, breakMinutes, notes, paidBreakMinutes, timeZone; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: TimeRecordCorrected
+  - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.TimeRecord_createViaClockIn` (TimeRecord.clockIn)
+  - inputs from the screen: personId, shiftId, eventId, notes, timeZone, latitude, longitude, accuracyMeters; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: TimeRecordClockedIn
+  - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.TrainingCompletion_createViaRecord` (TrainingCompletion.record)
+  - inputs from the screen: personId, trainingModuleId, completedAt, assessmentScore, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see training completions"; "Workforce staff may update training completions"; "Workforce staff may change training completions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 6 more
+  - effects: TrainingCompleted
+  - refresh: live reads update by themselves; reads affected: TrainingCompletion.list, TrainingCompletion.get, Person.list, Person.get, Shift.list, Shift.get, ShiftSwapRequest.list, ShiftSwapRequest.get and 2 more
+- `mutations.TrainingModule_createViaDefine` (TrainingModule.define)
+  - inputs from the screen: name, category, passingScore, description, steps, quiz; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: TrainingModuleDefined
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
+- `mutations.TrainingModule_reactivate` (TrainingModule.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: TrainingModuleReactivated
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
+- `mutations.TrainingModule_retire` (TrainingModule.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: TrainingModuleRetired
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
+- `mutations.TrainingModule_setTrainingDoc` (TrainingModule.setTrainingDoc)
+  - inputs from the screen: steps, quiz; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training modules"; "Workforce staff may update training modules"; "Workforce staff may change training modules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: none
+  - refresh: live reads update by themselves; reads affected: TrainingModule.list, TrainingModule.get, ShiftType.list, ShiftType.get, SkillLevel.list, SkillLevel.get, TrainingCompletion.list, TrainingCompletion.get and 2 more
+- `mutations.TrainingSignOff_createViaBeginTraining` (TrainingSignOff.beginTraining)
+  - inputs from the screen: personId, trainingModuleId, startedAt, trainerPersonId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: TrainingSignOffStarted
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.TrainingSignOff_finishTraining` (TrainingSignOff.finishTraining)
+  - inputs from the screen: finishedAt, quizDone, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: TrainingSignOffFinished
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.TrainingSignOff_initialTrainingSteps` (TrainingSignOff.initialTrainingSteps)
+  - inputs from the screen: initialledSteps; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: none
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.TrainingSignOff_reopenTraining` (TrainingSignOff.reopenTraining)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff may see training sign-offs"; "Workforce staff may update training sign-offs"; "Workforce staff may change training sign-offs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: none
+  - refresh: live reads update by themselves; reads affected: TrainingSignOff.list, TrainingSignOff.get, Person.list, Person.get, TrainingModule.list, TrainingModule.get
+- `mutations.WeeklyScheduleNotice_acknowledge` (WeeklyScheduleNotice.acknowledge)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see schedule notices"; "Workforce staff or the linked person may update schedule notices"; "Workforce staff or the linked person may change schedule notices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: WeeklyScheduleAcknowledged
+  - refresh: live reads update by themselves; reads affected: WeeklyScheduleNotice.list, WeeklyScheduleNotice.get, Person.list, Person.get
+- `mutations.WeeklyScheduleNotice_createViaPublishSchedule` (WeeklyScheduleNotice.publishSchedule)
+  - inputs from the screen: personId, recipientAuthSubjectId, weekStartsAt, weekEndsAt, shiftCount, shiftSummary; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see schedule notices"; "Workforce staff or the linked person may update schedule notices"; "Workforce staff or the linked person may change schedule notices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: WeeklySchedulePublished
+  - refresh: live reads update by themselves; reads affected: WeeklyScheduleNotice.list, WeeklyScheduleNotice.get, Person.list, Person.get
+- `mutations.WeeklyScheduleNotice_republishSchedule` (WeeklyScheduleNotice.republishSchedule)
+  - inputs from the screen: recipientAuthSubjectId, shiftCount, shiftSummary; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see schedule notices"; "Workforce staff or the linked person may update schedule notices"; "Workforce staff or the linked person may change schedule notices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: WeeklyScheduleRepublished
+  - refresh: live reads update by themselves; reads affected: WeeklyScheduleNotice.list, WeeklyScheduleNotice.get, Person.list, Person.get
+
+### Authored reads and steps
+
+- `authLink.ensureAccountProfile` - action; one-time call (not live); the live reads it changes update by themselves
+- `authProvision.provisionStaffSignIn` - action; one-time call (not live); the live reads it changes update by themselves
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `candidateHireRevocation.revokeHire` - mutation; authored step; live reads update by themselves
+- `candidateToTeam.hireIntoTeam` - mutation; authored step; live reads update by themselves
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `eventMenuLookup.forDish` - query; live read, updates by itself
+- `eventMenuLookup.forEvents` - query; live read, updates by itself
+- `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
+- `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `hiringPipeline.ingestKmCandidates` - mutation; authored step; live reads update by themselves
+- `laborSummary.attendanceAlerts` - query; live read, updates by itself
+- `laborSummary.eventLaborSummary` - query; live read, updates by itself
+- `laborSummary.listPayRates` - query; live read, updates by itself
+- `laborSummary.payrollTimeRecords` - query; live read, updates by itself
+- `laborSummary.personPeriodLaborSummary` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.listEventFieldForms` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.myFieldForms` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
+- `personEmail.correctStaffEmail` - action; one-time call (not live); the live reads it changes update by themselves
+- `staffSelfReviews.listMyReviews` - query; live read, updates by itself
+- `staffShiftSwaps.getCandidates` - query; live read, updates by itself
+- `staffShiftSwaps.listRelatedShifts` - query; live read, updates by itself
+- `teamChat.channelSummary` - query; live read, updates by itself
+- `teamChat.listChannel` - query; live read, updates by itself
+- `teamChat.listConversations` - query; live read, updates by itself
+- `teamChat.searchLinkTargets` - query; live read, updates by itself
+- `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
+- `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
+- `vendorNames.active` - query; live read, updates by itself
+- `workforceScheduling.autoFillEventStaffNeeds` - mutation; authored step; live reads update by themselves
+- `workforceScheduling.scheduleShift` - mutation; authored step; live reads update by themselves
+- `workforceScheduling.suggestStaffForNeed` - query; live read, updates by itself
+
+## 7. Pack list and warehouse
+
+Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`, `logistics/EventTripChecks.tsx`, `logistics/LogisticsOverviewPage.tsx`, `logistics/PackBinSheet.tsx`, `logistics/PackFoodPackaging.tsx`, `logistics/PackingFloorPage.tsx`, `logistics/PackLineWhy.tsx`, `logistics/PackListDetailPage.tsx`, `logistics/PackListItemForm.tsx`, `logistics/PackListItemTable.tsx`, `logistics/PackListKitAssistBar.tsx`, `logistics/PackListSourcePanel.tsx`, `logistics/PackListsPage.tsx`, `logistics/PackListTemplatesPage.tsx`, `logistics/PackListViews.tsx`, `logistics/PackReadinessNotice.tsx`, `logistics/PackRuleFields.tsx`, `logistics/PackRulesPage.tsx`, `logistics/PackScanPanel.tsx`, `logistics/PackTemplatePreview.tsx`, `logistics/RoutePlannerPage.tsx`, `logistics/ServiceStyleKitLineFields.tsx`, `logistics/ServiceStyleKitLineTable.tsx`, `logistics/ServiceStyleKitsPage.tsx`, `logistics/TripCheckPanel.tsx`, `logistics/usePackRigs.ts`, `logistics/VehicleFleetPage.tsx`, `logistics/VehicleMaintenancePage.tsx`, `logistics/VehicleSchedulePage.tsx`
+
+### Generated reads
+
+- `queries.getPackList` - live read
+- `queries.listComponent` - live read
+- `queries.listDelivery` - live read
+- `queries.listDepartureOverride` - live read
+- `queries.listDishComponent` - live read
+- `queries.listEquipment` - live read
+- `queries.listEquipmentReservation` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignment` - live read
+- `queries.listEventDishByEventId` - live read
+- `queries.listEventStaffNeed` - live read
+- `queries.listEventVehicleAssignment` - live read
+- `queries.listOccasion` - live read
+- `queries.listPackList` - live read
+- `queries.listPackListItem` - live read
+- `queries.listPackListTemplate` - live read
+- `queries.listPackRule` - live read
+- `queries.listPackSectionClaim` - live read
+- `queries.listPerson` - live read
+- `queries.listServiceStyle` - live read
+- `queries.listServiceStyleKitItem` - live read
+- `queries.listStylePackaging` - live read
+- `queries.listTrailer` - live read
+- `queries.listVehicle` - live read
+- `queries.listVehicleFuelLog` - live read
+- `queries.listVehicleMaintenanceSchedule` - live read
+- `queries.listVehicleServiceEntry` - live read
+- `queries.listVehicleTripCheck` - live read
+
+### Generated actions
+
+- `mutations.Delivery_cancel` (Delivery.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see deliveries"; "Logistics staff and managers may update deliveries"; "Logistics staff and managers may change deliveries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: DeliveryCancelled
+  - refresh: live reads update by themselves; reads affected: Delivery.list, Delivery.get, Event.list, Event.get, Incident.list, Incident.get, PackList.list, PackList.get and 4 more
+- `mutations.Delivery_confirmDelivery` (Delivery.confirmDelivery)
+  - inputs from the screen: receivedByName, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see deliveries"; "Logistics staff and managers may update deliveries"; "Logistics staff and managers may change deliveries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: DeliveryConfirmed
+  - refresh: live reads update by themselves; reads affected: Delivery.list, Delivery.get, Event.list, Event.get, Incident.list, Incident.get, PackList.list, PackList.get and 4 more
+- `mutations.Delivery_createViaSchedule` (Delivery.schedule)
+  - inputs from the screen: packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics staff and managers may see deliveries"; "Logistics staff and managers may update deliveries"; "Logistics staff and managers may change deliveries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: DeliveryScheduled
+  - refresh: live reads update by themselves; reads affected: Delivery.list, Delivery.get, Event.list, Event.get, Incident.list, Incident.get, PackList.list, PackList.get and 4 more
+- `mutations.Delivery_markFailed` (Delivery.markFailed)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see deliveries"; "Logistics staff and managers may update deliveries"; "Logistics staff and managers may change deliveries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: DeliveryFailed
+  - refresh: live reads update by themselves; reads affected: Delivery.list, Delivery.get, Event.list, Event.get, Incident.list, Incident.get, PackList.list, PackList.get and 4 more
+- `mutations.Delivery_schedule` (Delivery.schedule)
+  - inputs from the screen: packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics staff and managers may see deliveries"; "Logistics staff and managers may update deliveries"; "Logistics staff and managers may change deliveries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: DeliveryScheduled
+  - refresh: live reads update by themselves; reads affected: Delivery.list, Delivery.get, Event.list, Event.get, Incident.list, Incident.get, PackList.list, PackList.get and 4 more
+- `mutations.Delivery_startTransit` (Delivery.startTransit)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see deliveries"; "Logistics staff and managers may update deliveries"; "Logistics staff and managers may change deliveries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: DeliveryTransitStarted
+  - refresh: live reads update by themselves; reads affected: Delivery.list, Delivery.get, Event.list, Event.get, Incident.list, Incident.get, PackList.list, PackList.get and 4 more
+- `mutations.PackListItem_adjustQuantity` (PackListItem.adjustQuantity)
+  - inputs from the screen: requiredQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 5 more
+  - effects: PackListItemQuantityAdjusted
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_annotate` (PackListItem.annotate)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "ConcurrencyConflict:"; "PackListItem not found"
+  - effects: PackListItemAnnotated
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_assignLoad` (PackListItem.assignLoad)
+  - inputs from the screen: loadAssignmentId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListItemLoadAssigned
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_createViaAddItem` (PackListItem.addItem)
+  - inputs from the screen: packListId, description, requiredQuantity, unit, dishId, productionBatchId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 6 more
+  - effects: PackListItemAdded
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_exclude` (PackListItem.exclude)
+  - inputs from the screen: reason, replacementDescription, coveredBy; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Say why this item is not going."; and 2 more
+  - effects: PackListItemExcluded
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_markMissing` (PackListItem.markMissing)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PackListItemMissing
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_markPacked` (PackListItem.markPacked)
+  - inputs from the screen: packedQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: PackListItemPacked
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_recordChecked` (PackListItem.recordChecked)
+  - inputs from the screen: checkedQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "The checked amount can't be negative. Use zero or more."; and 3 more
+  - effects: PackListItemChecked
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_recordLoaded` (PackListItem.recordLoaded)
+  - inputs from the screen: loadedQuantity, loadAssignmentId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "The loaded amount can't be negative. Use zero or more."; and 4 more
+  - effects: PackListItemLoaded
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_recordPackedCount` (PackListItem.recordPackedCount)
+  - inputs from the screen: packedQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: PackListItemCountRecorded
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_recordReturn` (PackListItem.recordReturn)
+  - inputs from the screen: returnedQuantity, usedQuantity, lostQuantity, damagedQuantity, finding; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "This line does not come back, so there is no return to count."; and 4 more
+  - effects: PackListItemReturnCounted
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_recordSentInstead` (PackListItem.recordSentInstead)
+  - inputs from the screen: sentInstead; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "ConcurrencyConflict:"; "PackListItem not found"
+  - effects: PackListItemSentInsteadRecorded
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_remove` (PackListItem.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListItemRemoved
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_restoreExcluded` (PackListItem.restoreExcluded)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListItemRequirementSynced
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_setBin` (PackListItem.setBin)
+  - inputs from the screen: binNumber; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Use a bin number above zero."; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListItemBinSet
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_setUnitVolume` (PackListItem.setUnitVolume)
+  - inputs from the screen: unitVolumeM3; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Size cannot be negative."; and 2 more
+  - effects: PackListItemVolumeSet
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListItem_setUnitWeight` (PackListItem.setUnitWeight)
+  - inputs from the screen: unitWeightKg; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack list items"; "Kitchen, logistics, event and sales staff and managers may update pack list items"; "Kitchen, logistics, event and sales staff and managers may change pack list items"; "Guard 0 failed"; "Guard 1 failed"; "Weight cannot be negative."; and 2 more
+  - effects: PackListItemWeightSet
+  - refresh: live reads update by themselves; reads affected: PackListItem.list, PackListItem.get, Dish.list, Dish.get, DishContainer.list, DishContainer.get, EventDish.list, EventDish.get and 8 more
+- `mutations.PackListTemplate_archive` (PackListTemplate.archive)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see pack list templates"; "Logistics staff and managers may update pack list templates"; "Logistics staff and managers may change pack list templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PackListTemplateArchived
+  - refresh: live reads update by themselves; reads affected: PackListTemplate.list, PackListTemplate.get
+- `mutations.PackListTemplate_createViaDefine` (PackListTemplate.define)
+  - inputs from the screen: name, description, items, serviceStyleId, occasionId, guestCountMin, guestCountMax, venueRequirement; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics staff and managers may see pack list templates"; "Logistics staff and managers may update pack list templates"; "Logistics staff and managers may change pack list templates"; "Guard 0 failed"; "Guard 1 failed"; "Give this template a name."; and 1 more
+  - effects: PackListTemplateDefined
+  - refresh: live reads update by themselves; reads affected: PackListTemplate.list, PackListTemplate.get
+- `mutations.PackListTemplate_reactivate` (PackListTemplate.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see pack list templates"; "Logistics staff and managers may update pack list templates"; "Logistics staff and managers may change pack list templates"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListTemplateReactivated
+  - refresh: live reads update by themselves; reads affected: PackListTemplate.list, PackListTemplate.get
+- `mutations.PackListTemplate_revise` (PackListTemplate.revise)
+  - inputs from the screen: name, description, items, serviceStyleId, occasionId, guestCountMin, guestCountMax, venueRequirement; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics staff and managers may see pack list templates"; "Logistics staff and managers may update pack list templates"; "Logistics staff and managers may change pack list templates"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: PackListTemplateRevised
+  - refresh: live reads update by themselves; reads affected: PackListTemplate.list, PackListTemplate.get
+- `mutations.PackList_applyServiceStyleKit` (PackList.applyServiceStyleKit)
+  - inputs from the screen: serviceStyleId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "ConcurrencyConflict:"; "PackList not found"
+  - effects: PackListKitRequested
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 8 more
+- `mutations.PackList_cancel` (PackList.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PackListCancelled
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_createViaOpen` (PackList.open)
+  - inputs from the screen: eventId, name, purpose, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: PackListOpened, PackListKitRequested
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 10 more
+- `mutations.PackList_dispatch` (PackList.dispatch)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PackListDispatched
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_markLoaded` (PackList.markLoaded)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PackListLoaded
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_markPacked` (PackList.markPacked)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PackListPacked
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_requestAssistance` (PackList.requestAssistance)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "ConcurrencyConflict:"; "PackList not found"
+  - effects: PackListAssistanceRequested
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_resolveAssistance` (PackList.resolveAssistance)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PackListAssistanceResolved
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_setBinSheet` (PackList.setBinSheet)
+  - inputs from the screen: binSheet; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "ConcurrencyConflict:"; "PackList not found"
+  - effects: PackListBinSheetSet
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackList_startPacking` (PackList.startPacking)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PackListPackingStarted
+  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
+- `mutations.PackRule_createViaDefine` (PackRule.define)
+  - inputs from the screen: trigger, description, category, dishId, serviceStyleId, matchFact, matchText, unit, baseQuantity, scaleBy, perUnits, sparePercent, ownership, returnRequired, returnNote, requiredCapability, note; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see pack rules"; "Event managers, logistics staff and managers may update pack rules"; "Event managers, logistics staff and managers may change pack rules"; "Guard 0 failed"; "Guard 1 failed"; "Say what goes on the pack list."
+  - effects: PackRuleDefined
+  - refresh: live reads update by themselves; reads affected: PackRule.list, PackRule.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.PackRule_reinstate` (PackRule.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack rules"; "Event managers, logistics staff and managers may update pack rules"; "Event managers, logistics staff and managers may change pack rules"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PackRuleReinstated
+  - refresh: live reads update by themselves; reads affected: PackRule.list, PackRule.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.PackRule_retire` (PackRule.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack rules"; "Event managers, logistics staff and managers may update pack rules"; "Event managers, logistics staff and managers may change pack rules"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PackRuleRetired
+  - refresh: live reads update by themselves; reads affected: PackRule.list, PackRule.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.PackRule_revise` (PackRule.revise)
+  - inputs from the screen: description, category, dishId, serviceStyleId, matchFact, matchText, unit, baseQuantity, scaleBy, perUnits, sparePercent, ownership, returnRequired, returnNote, requiredCapability, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see pack rules"; "Event managers, logistics staff and managers may update pack rules"; "Event managers, logistics staff and managers may change pack rules"; "Guard 0 failed"; "Guard 1 failed"; "Say what goes on the pack list."; and 2 more
+  - effects: PackRuleRevised
+  - refresh: live reads update by themselves; reads affected: PackRule.list, PackRule.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.PackScan_createViaRecord` (PackScan.record)
+  - inputs from the screen: packListId, step, label, outcome, message, packListItemId, quantity; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see what was scanned on a pack list"; "Kitchen, logistics, event and sales staff and managers may scan on a pack list"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: PackScanRecorded
+  - refresh: live reads update by themselves; reads affected: PackScan.list, PackScan.get, PackList.list, PackList.get, PackListItem.list, PackListItem.get, Person.list, Person.get
+- `mutations.PackSectionClaim_release` (PackSectionClaim.release)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see who is packing each section"; "Kitchen, logistics, event and sales staff and managers may take a pack list section"; "Guard 0 failed"; "Guard 1 failed"; "Only the person packing this section can give it back. Use "Take over" to take it yourself."; "ConcurrencyConflict:"; and 1 more
+  - effects: PackSectionReleased
+  - refresh: live reads update by themselves; reads affected: PackSectionClaim.list, PackSectionClaim.get, PackList.list, PackList.get, Person.list, Person.get
+- `mutations.ServiceStyleKitItem_createViaAdd` (ServiceStyleKitItem.add)
+  - inputs from the screen: serviceStyleId, description, baseQuantity, guestsPerUnit, unit, note, sortOrder, sparePercent; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see service style kits"; "Event managers, logistics staff and managers may update service style kits"; "Event managers, logistics staff and managers may change service style kits"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 1 more
+  - effects: ServiceStyleKitItemAdded
+  - refresh: live reads update by themselves; reads affected: ServiceStyleKitItem.list, ServiceStyleKitItem.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.ServiceStyleKitItem_reinstate` (ServiceStyleKitItem.reinstate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see service style kits"; "Event managers, logistics staff and managers may update service style kits"; "Event managers, logistics staff and managers may change service style kits"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ServiceStyleKitItemReinstated
+  - refresh: live reads update by themselves; reads affected: ServiceStyleKitItem.list, ServiceStyleKitItem.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.ServiceStyleKitItem_retire` (ServiceStyleKitItem.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see service style kits"; "Event managers, logistics staff and managers may update service style kits"; "Event managers, logistics staff and managers may change service style kits"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ServiceStyleKitItemRetired
+  - refresh: live reads update by themselves; reads affected: ServiceStyleKitItem.list, ServiceStyleKitItem.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.ServiceStyleKitItem_revise` (ServiceStyleKitItem.revise)
+  - inputs from the screen: description, baseQuantity, guestsPerUnit, unit, note, sortOrder, sparePercent; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see service style kits"; "Event managers, logistics staff and managers may update service style kits"; "Event managers, logistics staff and managers may change service style kits"; "Guard 0 failed"; "Guard 1 failed"; "Give this kit line a description."; and 2 more
+  - effects: ServiceStyleKitItemRevised
+  - refresh: live reads update by themselves; reads affected: ServiceStyleKitItem.list, ServiceStyleKitItem.get, ServiceStyle.list, ServiceStyle.get
+- `mutations.Trailer_createViaRegister` (Trailer.register)
+  - inputs from the screen: make, model, registration, payloadCapacityKg, operationalStatus, statusNote; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Give this trailer a make."; and 3 more
+  - effects: TrailerRegistered
+  - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.Trailer_reviseDetails` (Trailer.reviseDetails)
+  - inputs from the screen: make, model, registration, payloadCapacityKg; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Give this trailer a make."; and 5 more
+  - effects: TrailerDetailsRevised
+  - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.Trailer_updateInsurance` (Trailer.updateInsurance)
+  - inputs from the screen: insuranceProvider, insurancePolicyNumber, insuranceExpiresAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Give this trailer an insurance provider."; and 4 more
+  - effects: TrailerInsuranceUpdated
+  - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.Trailer_updateOperationalStatus` (Trailer.updateOperationalStatus)
+  - inputs from the screen: operationalStatus, statusNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: TrailerOperationalStatusUpdated
+  - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.Trailer_updateRegistration` (Trailer.updateRegistration)
+  - inputs from the screen: registrationNumber, registrationExpiresAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see trailers"; "Logistics staff and managers may update trailers"; "Logistics staff and managers may change trailers"; "Guard 0 failed"; "Guard 1 failed"; "Give this trailer a registration number."; and 3 more
+  - effects: TrailerRegistrationUpdated
+  - refresh: live reads update by themselves; reads affected: Trailer.list, Trailer.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.VehicleFuelLog_createViaRecord` (VehicleFuelLog.record)
+  - inputs from the screen: vehicleId, odometer, fuelCost, filledAt, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics staff and managers may see fuel logs"; "Logistics staff and managers may add fuel logs"; "Logistics staff and managers may change fuel logs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: VehicleFuelLogged
+  - refresh: live reads update by themselves; reads affected: VehicleFuelLog.list, VehicleFuelLog.get, Vehicle.list, Vehicle.get
+- `mutations.VehicleMaintenanceSchedule_createViaSchedule` (VehicleMaintenanceSchedule.schedule)
+  - inputs from the screen: vehicleId, taskName, intervalType, intervalDays, intervalMiles, nextDueAt, nextDueMileage, instructions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics staff and managers may see vehicle maintenance"; "Logistics staff and managers may update vehicle maintenance"; "Logistics staff and managers may change vehicle maintenance"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: VehicleMaintenanceScheduled
+  - refresh: live reads update by themselves; reads affected: VehicleMaintenanceSchedule.list, VehicleMaintenanceSchedule.get, Vehicle.list, Vehicle.get, VehicleServiceEntry.list, VehicleServiceEntry.get
+- `mutations.VehicleServiceEntry_createViaRecord` (VehicleServiceEntry.record)
+  - inputs from the screen: maintenanceScheduleId, vehicleId, vendor, cost, odometer, completedAt, nextDueAt, nextDueMileage, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics staff and managers may see vehicle service history"; "Logistics staff and managers may add vehicle service"; "Logistics staff and managers may change vehicle service"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: VehicleServiceRecorded
+  - refresh: live reads update by themselves; reads affected: VehicleServiceEntry.list, VehicleServiceEntry.get, Vehicle.list, Vehicle.get, VehicleMaintenanceSchedule.list, VehicleMaintenanceSchedule.get
+- `mutations.VehicleTripCheck_createViaRecord` (VehicleTripCheck.record)
+  - inputs from the screen: eventVehicleAssignmentId, kind, tires, brakes, lights, fluids, bodywork, interior, refrigeration, odometer, fuelLevel, damageNote, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see trip checks"; "Staff may add trip checks"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "This check is for a different truck run. Pick the run already on this check."; and 1 more
+  - effects: VehicleTripChecked
+  - refresh: live reads update by themselves; reads affected: VehicleTripCheck.list, VehicleTripCheck.get, Event.list, Event.get, EventVehicleAssignment.list, EventVehicleAssignment.get
+- `mutations.Vehicle_createViaRegister` (Vehicle.register)
+  - inputs from the screen: make, model, registration, ownership, payloadCapacityKg, operationalStatus, statusNote; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Give this vehicle a make."; and 3 more
+  - effects: VehicleRegistered
+  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
+- `mutations.Vehicle_reviseDetails` (Vehicle.reviseDetails)
+  - inputs from the screen: make, model, registration, ownership, payloadCapacityKg; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Give this vehicle a make."; and 5 more
+  - effects: VehicleDetailsRevised
+  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
+- `mutations.Vehicle_setTowCapacity` (Vehicle.setTowCapacity)
+  - inputs from the screen: towCapacityKg; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Towing limit cannot be negative."; and 2 more
+  - effects: VehicleTowCapacitySet
+  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
+- `mutations.Vehicle_updateInsurance` (Vehicle.updateInsurance)
+  - inputs from the screen: insuranceProvider, insurancePolicyNumber, insuranceExpiresAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Give this vehicle an insurance provider."; and 4 more
+  - effects: VehicleInsuranceUpdated
+  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
+- `mutations.Vehicle_updateOperationalStatus` (Vehicle.updateOperationalStatus)
+  - inputs from the screen: operationalStatus, statusNote; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: VehicleOperationalStatusUpdated
+  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
+- `mutations.Vehicle_updateRegistration` (Vehicle.updateRegistration)
+  - inputs from the screen: registrationNumber, registrationExpiresAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see vehicles"; "Logistics staff and managers may update vehicles"; "Logistics staff and managers may change vehicles"; "Guard 0 failed"; "Guard 1 failed"; "Give this vehicle a registration number."; and 3 more
+  - effects: VehicleRegistrationUpdated
+  - refresh: live reads update by themselves; reads affected: Vehicle.list, Vehicle.get, Delivery.list, Delivery.get, EventVehicleAssignment.list, EventVehicleAssignment.get, VehicleFuelLog.list, VehicleFuelLog.get and 4 more
+
+### Authored reads and steps
+
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `dishLookup.byIds` - query; live read, updates by itself
+- `dishLookup.exclusiveToVenue` - query; live read, updates by itself
+- `dishLookup.page` - query; live read, updates by itself
+- `driverAssignment.assign` - mutation; authored step; live reads update by themselves
+- `driverAssignment.unassign` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
+- `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `packScans.count` - mutation; authored step; live reads update by themselves
+- `packScans.listForPackList` - query; live read, updates by itself
+- `packSections.take` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.acceptSuggestion` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.assignPersonWithReason` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.assignRigWithReason` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.holdEquipmentWithReason` - mutation; authored step; live reads update by themselves
+- `reasonedChanges.sendOutWithReason` - mutation; authored step; live reads update by themselves
+- `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
+- `sourceProvenance.listMergedClients` - query; live read, updates by itself
+- `vehicleAssignment.assign` - mutation; authored step; live reads update by themselves
+- `vehicleAssignment.unassign` - mutation; authored step; live reads update by themselves
+
+## 8. Rentals and decor
+
+Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentAvailabilityNote.tsx`, `events/EventEquipmentPanel.tsx`, `events/EventEquipmentProblems.tsx`, `events/EventEquipmentReserveForm.tsx`, `events/EventEquipmentSheet.tsx`, `events/EventEquipmentSidebar.tsx`, `events/EventLayoutSectionCard.tsx`, `events/EventLayoutsSidebar.tsx`, `events/EventLayoutsTab.tsx`, `events/EventLayoutTemplateLinks.tsx`, `events/EventRentalOrdersPanel.tsx`, `facilities/EquipmentBulkAddPanel.tsx`, `facilities/EquipmentCatalogPage.tsx`, `facilities/EquipmentCatalogTable.tsx`, `facilities/EquipmentDetailPanel.tsx`, `facilities/EquipmentForm.tsx`, `facilities/EquipmentMaintenanceBoard.tsx`, `facilities/EquipmentRepairsPanel.tsx`, `logistics/ReturnsPage.tsx`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.getVenue` - live read
+- `queries.listEquipment` - live read
+- `queries.listEquipmentIssue` - live read
+- `queries.listEquipmentMaintenanceTask` - live read
+- `queries.listEquipmentPart` - live read
+- `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEquipmentServiceEntry` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventLayoutSection` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listOrganization` - live read
+- `queries.listPackList` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPackListItem` - live read
+- `queries.listPerson` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listShiftByEventId` - live read
+- `queries.listStorageLocation` - live read
+- `queries.listVenueLayoutTemplate` - live read
+
+### Generated actions
+
+- `mutations.Attachment_createViaAttach` (Attachment.attach)
+  - inputs from the screen: parentType, parentId, fileName, contentType, fileSize, storageId, evidenceType; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see attached files; chat files show up with their message"; "Staff may update attachments"; "Staff may change attachments"; "Guard 0 failed"; "Chat files are attached through their message"; "This file needs something to attach to"; and 3 more
+  - effects: AttachmentAdded
+  - refresh: live reads update by themselves; reads affected: Attachment.list, Attachment.get, DeckShareLink.list, DeckShareLink.get
+- `mutations.EquipmentIssue_createViaRaise` (EquipmentIssue.raise)
+  - inputs from the screen: kind, description, equipmentId, eventId, equipmentReservationId, rentalOrderLineId, quantity, severity, holdsUnits, dueAt, ownerName, vendorId, cost, payer, chargeAmount, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory, logistics, event or finance staff may see equipment problems"; "Inventory, logistics, event or finance staff may update equipment problems"; "Inventory, logistics, event or finance staff may change equipment problems"; "Guard 0 failed"; "Guard 1 failed"; "Say what is wrong."; and 6 more
+  - effects: EquipmentIssueRaised
+  - refresh: live reads update by themselves; reads affected: EquipmentIssue.list, EquipmentIssue.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.EquipmentIssue_revise` (EquipmentIssue.revise)
+  - inputs from the screen: severity, holdsUnits, dueAt, ownerName, vendorId, cost, payer, chargeAmount, notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics, event or finance staff may see equipment problems"; "Inventory, logistics, event or finance staff may update equipment problems"; "Inventory, logistics, event or finance staff may change equipment problems"; "Guard 0 failed"; "Guard 1 failed"; "This problem is already sorted out. Open a new one if something else is wrong."; and 3 more
+  - effects: EquipmentIssueRevised
+  - refresh: live reads update by themselves; reads affected: EquipmentIssue.list, EquipmentIssue.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.EquipmentIssue_settle` (EquipmentIssue.settle)
+  - inputs from the screen: resolution, cost, payer, chargeAmount; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics, event or finance staff may see equipment problems"; "Inventory, logistics, event or finance staff may update equipment problems"; "Inventory, logistics, event or finance staff may change equipment problems"; "Guard 0 failed"; "Guard 1 failed"; "This problem is already sorted out."; and 4 more
+  - effects: EquipmentIssueResolved
+  - refresh: live reads update by themselves; reads affected: EquipmentIssue.list, EquipmentIssue.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.EquipmentMaintenanceTask_createViaSchedule` (EquipmentMaintenanceTask.schedule)
+  - inputs from the screen: equipmentId, taskName, intervalDays, nextDueAt, instructions; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment maintenance"; "Inventory or logistics staff may update equipment maintenance"; "Inventory or logistics staff may change equipment maintenance"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EquipmentMaintenanceScheduled
+  - refresh: live reads update by themselves; reads affected: EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, Equipment.list, Equipment.get, EquipmentServiceEntry.list, EquipmentServiceEntry.get
+- `mutations.EquipmentPart_createViaAttach` (EquipmentPart.attach)
+  - inputs from the screen: equipmentId, partEquipmentId, role, quantity; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment parts"; "Inventory or logistics staff may update equipment parts"; "Inventory or logistics staff may change equipment parts"; "Guard 0 failed"; "Guard 1 failed"; "Pick both the item and its part from your own equipment list."; and 2 more
+  - effects: EquipmentPartAttached
+  - refresh: live reads update by themselves; reads affected: EquipmentPart.list, EquipmentPart.get, Equipment.list, Equipment.get
+- `mutations.EquipmentPart_detach` (EquipmentPart.detach)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment parts"; "Inventory or logistics staff may update equipment parts"; "Inventory or logistics staff may change equipment parts"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentPartDetached
+  - refresh: live reads update by themselves; reads affected: EquipmentPart.list, EquipmentPart.get, Equipment.list, Equipment.get
+- `mutations.EquipmentReservation_cancel` (EquipmentReservation.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentReservationCancelled
+  - refresh: live reads update by themselves; reads affected: EquipmentReservation.list, EquipmentReservation.get, Equipment.list, Equipment.get, Event.list, Event.get
+- `mutations.EquipmentReservation_checkOut` (EquipmentReservation.checkOut)
+  - inputs from the screen: condition, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"; "Guard 0 failed"; "Guard 1 failed"; "This equipment is marked out of service, so it can't be checked out. Pick other equipment, or ask a manager to book it anyway with a reason."; and 2 more
+  - effects: EquipmentCheckedOut
+  - refresh: live reads update by themselves; reads affected: EquipmentReservation.list, EquipmentReservation.get, Equipment.list, Equipment.get, Event.list, Event.get
+- `mutations.EquipmentReservation_markReturned` (EquipmentReservation.markReturned)
+  - inputs from the screen: condition, note, missingQuantity, damagedQuantity, cleaningQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"; "Guard 0 failed"; "Guard 1 failed"; "The missing amount has to be between zero and the amount that went out."; and 4 more
+  - effects: EquipmentReturned
+  - refresh: live reads update by themselves; reads affected: EquipmentReservation.list, EquipmentReservation.get, Equipment.list, Equipment.get, Event.list, Event.get
+- `mutations.EquipmentServiceEntry_createViaRecord` (EquipmentServiceEntry.record)
+  - inputs from the screen: maintenanceTaskId, equipmentId, technician, cost, completedAt, nextDueAt, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory or logistics staff may see equipment service history"; "Inventory or logistics staff may add equipment service"; "Inventory or logistics staff may change equipment service"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EquipmentServiceRecorded
+  - refresh: live reads update by themselves; reads affected: EquipmentServiceEntry.list, EquipmentServiceEntry.get, Equipment.list, Equipment.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get
+- `mutations.Equipment_clearPrimaryImage` (Equipment.clearPrimaryImage)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentImageChanged
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_createViaRegister` (Equipment.register)
+  - inputs from the screen: name, assetTag, category, ownership, quantity, purchaseValue, condition, trackingMode, serialNumber, description, countUnit, replacementCost, customerPrice, vendorId, homeLocation; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Give this equipment a name."; and 7 more
+  - effects: EquipmentRegistered
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_reactivate` (Equipment.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: EquipmentReactivated
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_recount` (Equipment.recount)
+  - inputs from the screen: actualQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "This equipment's counted amount can't be negative. Use zero or more."; and 3 more
+  - effects: EquipmentRecounted
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_retire` (Equipment.retire)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: EquipmentRetired
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_reviseDetails` (Equipment.reviseDetails)
+  - inputs from the screen: name, category, ownership, purchaseValue, homeLocation, currentLocation, trackingMode, serialNumber, description, countUnit, replacementCost, customerPrice, vendorId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
+  - effects: EquipmentDetailsRevised
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_setCustomFields` (Equipment.setCustomFields)
+  - inputs from the screen: customFieldsJson; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentCustomFieldsSet
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_setPrimaryImage` (Equipment.setPrimaryImage)
+  - inputs from the screen: storageId, fileName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Add a photo before you set it as the main picture."; and 2 more
+  - effects: EquipmentImageChanged
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_transfer` (Equipment.transfer)
+  - inputs from the screen: toLocation, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Say where the equipment is going."; and 2 more
+  - effects: EquipmentTransferred
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_updateCondition` (Equipment.updateCondition)
+  - inputs from the screen: condition, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EquipmentConditionUpdated
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.EventLayoutSection_createViaAdd` (EventLayoutSection.add)
+  - inputs from the screen: eventId, type, instructions, sortOrder, sourceTemplateId, sourceTemplateVersion; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Event staff may see event layout sections"; "Event staff may update the floor plan"; "Event staff may change the floor plan"; "Guard 0 failed"; "Guard 1 failed"; "Pick a layout section type."; and 1 more
+  - effects: EventLayoutSectionAdded
+  - refresh: live reads update by themselves; reads affected: EventLayoutSection.list, EventLayoutSection.get, Event.list, Event.get
+- `mutations.EventLayoutSection_remove` (EventLayoutSection.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see event layout sections"; "Event staff may update the floor plan"; "Event staff may change the floor plan"; "Guard 0 failed"; "ConcurrencyConflict:"; "EventLayoutSection not found"
+  - effects: EventLayoutSectionRemoved
+  - refresh: live reads update by themselves; reads affected: EventLayoutSection.list, EventLayoutSection.get, Event.list, Event.get
+- `mutations.EventLayoutSection_update` (EventLayoutSection.update)
+  - inputs from the screen: type, instructions, sortOrder; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see event layout sections"; "Event staff may update the floor plan"; "Event staff may change the floor plan"; "Guard 0 failed"; "Guard 1 failed"; "Layout section type cannot be blanked"; and 3 more
+  - effects: EventLayoutSectionUpdated
+  - refresh: live reads update by themselves; reads affected: EventLayoutSection.list, EventLayoutSection.get, Event.list, Event.get
+- `mutations.RentalOrderLine_cancel` (RentalOrderLine.cancel)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics, inventory or event staff may see rentals from vendors"; "Logistics, inventory or event staff may update rentals from vendors"; "Logistics, inventory or event staff may change rentals from vendors"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: RentalOrderLineCancelled
+  - refresh: live reads update by themselves; reads affected: RentalOrderLine.list, RentalOrderLine.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.RentalOrderLine_confirm` (RentalOrderLine.confirm)
+  - inputs from the screen: vendorReference; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics, inventory or event staff may see rentals from vendors"; "Logistics, inventory or event staff may update rentals from vendors"; "Logistics, inventory or event staff may change rentals from vendors"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: RentalOrderLineConfirmed
+  - refresh: live reads update by themselves; reads affected: RentalOrderLine.list, RentalOrderLine.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.RentalOrderLine_createViaAskVendor` (RentalOrderLine.askVendor)
+  - inputs from the screen: eventId, vendorId, description, quantity, equipmentId, countUnit, vendorCost, deliverBy, pickupAt, note; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Logistics, inventory or event staff may see rentals from vendors"; "Logistics, inventory or event staff may update rentals from vendors"; "Logistics, inventory or event staff may change rentals from vendors"; "Guard 0 failed"; "Guard 1 failed"; "That event isn't one of yours. Open the event and try again."; and 6 more
+  - effects: RentalOrderLineRequested
+  - refresh: live reads update by themselves; reads affected: RentalOrderLine.list, RentalOrderLine.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.RentalOrderLine_markDelivered` (RentalOrderLine.markDelivered)
+  - inputs from the screen: deliveredQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics, inventory or event staff may see rentals from vendors"; "Logistics, inventory or event staff may update rentals from vendors"; "Logistics, inventory or event staff may change rentals from vendors"; "Guard 0 failed"; "Guard 1 failed"; "The amount that arrived can't be negative. Use zero or more."; and 2 more
+  - effects: RentalOrderLineDelivered
+  - refresh: live reads update by themselves; reads affected: RentalOrderLine.list, RentalOrderLine.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.RentalOrderLine_markReturned` (RentalOrderLine.markReturned)
+  - inputs from the screen: returnedQuantity, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Logistics, inventory or event staff may see rentals from vendors"; "Logistics, inventory or event staff may update rentals from vendors"; "Logistics, inventory or event staff may change rentals from vendors"; "Guard 0 failed"; "Guard 1 failed"; "The amount sent back can't be negative. Use zero or more."; and 3 more
+  - effects: RentalOrderLineReturned
+  - refresh: live reads update by themselves; reads affected: RentalOrderLine.list, RentalOrderLine.get, Equipment.list, Equipment.get, Event.list, Event.get, Vendor.list, Vendor.get
+- `mutations.Vendor_createViaOnboard` (Vendor.onboard)
+  - inputs from the screen: name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Procurement staff and event managers may see vendors"; "Procurement staff may update vendors"; "Procurement staff may change vendors"; "Guard 0 failed"; "Guard 1 failed"; "Give this vendor a name."; and 2 more
+  - effects: VendorOnboarded
+  - refresh: live reads update by themselves; reads affected: Vendor.list, Vendor.get, Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, IngredientPriceObservation.list, IngredientPriceObservation.get and 20 more
+
+### Authored reads and steps
+
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
+- `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
+- `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
+- `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
+- `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `venueVendorPolicy.forEvent` - query; live read, updates by itself
+
+## 9. Final Lock and event packet
+
+Screens (12): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbookRow.tsx`, `events/packet/EventWorkbooksPage.tsx`, `events/packet/FieldFormCard.tsx`, `events/packet/FieldFormsPanel.tsx`, `events/packet/FinalLockQuestions.tsx`, `events/packet/OutsideChannelForm.tsx`, `events/review-flags/EventReviewFlagsPanel.tsx`, `events/review-flags/EventReviewFlagsSection.tsx`, `events/review-flags/ReviewFlagButton.tsx`, `events/review-flags/ReviewFlagInline.tsx`, `events/review-flags/useEventReviewFlags.ts`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.listEquipmentReservationByEventId` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listRentalOrderLineByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
+- `queries.listShiftByEventId` - live read
+
+### Generated actions
+
+- `mutations.Event_linkExternalChannel` (Event.linkExternalChannel)
+  - inputs from the screen: channelName, channelId, channelUrl; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "Give the channel's name and its id"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventExternalChannelLinked
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_unlinkExternalChannel` (Event.unlinkExternalChannel)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventExternalChannelUnlinked
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.FieldConfirmation_complete` (FieldConfirmation.complete)
+  - inputs from the screen: outcome, observedAt, note, photoStorageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."; "This form is already signed."; and 5 more
+  - effects: FieldConfirmationCompleted
+  - refresh: live reads update by themselves; reads affected: FieldConfirmation.list, FieldConfirmation.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.FieldConfirmation_countersign` (FieldConfirmation.countersign)
+  - inputs from the screen: observedAt, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."; "The first person has to sign this form first."; and 4 more
+  - effects: FieldConfirmationCountersigned
+  - refresh: live reads update by themselves; reads affected: FieldConfirmation.list, FieldConfirmation.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.FieldConfirmation_escalate` (FieldConfirmation.escalate)
+  - inputs from the screen: note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff and crew may see the day-of forms"; "Event staff and crew may fill in the day-of forms"; "Guard 0 failed"; "Guard 1 failed"; "Only event or logistics managers chase day-of forms."; "This form is already done."; and 3 more
+  - effects: FieldConfirmationEscalated
+  - refresh: live reads update by themselves; reads affected: FieldConfirmation.list, FieldConfirmation.get, Event.list, Event.get, Person.list, Person.get
+- `mutations.ReviewFlag_createViaRaise` (ReviewFlag.raise)
+  - inputs from the screen: eventId, targetKind, question, targetId, targetLabel; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Guard 3 failed"; and 2 more
+  - effects: ReviewFlagRaised
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_dismiss` (ReviewFlag.dismiss)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: ReviewFlagSettled
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_markResolved` (ReviewFlag.markResolved)
+  - inputs from the screen: resolution; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "Say what was decided to settle this flag."; and 2 more
+  - effects: ReviewFlagSettled
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+- `mutations.ReviewFlag_reopen` (ReviewFlag.reopen)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Any staff member may see review flags"; "Any staff member may raise or settle a review flag"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; "ReviewFlag not found"
+  - effects: ReviewFlagReopened
+  - refresh: live reads update by themselves; reads affected: ReviewFlag.list, ReviewFlag.get, Event.list, Event.get
+
+### Authored reads and steps
+
+- `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `lib.eventPacket.commands.canManagePacket` - query; live read, updates by itself
+- `lib.eventPacket.commands.generatePacketUploadUrl` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.getPacket` - query; live read, updates by itself
+- `lib.eventPacket.commands.importEvidence` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.listPacketSummaries` - query; live read, updates by itself
+- `lib.eventPacket.commands.packetPrintFiles` - query; live read, updates by itself
+- `lib.eventPacket.commands.recordPacketRevision` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.registerPacketUpload` - action; one-time call (not live); the live reads it changes update by themselves
+- `lib.eventPacket.commands.resolveOperationalIssue` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.commands.revisionUrl` - query; live read, updates by itself
+- `lib.eventPacket.commands.sourceUrl` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.getFinalLock` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.listEventFieldForms` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.myFieldForms` - query; live read, updates by itself
+- `lib.eventPacket.finalLock.overrideFinalLockAnswer` - mutation; authored step; live reads update by themselves
+- `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
+
+## 10. Billing and closeout
+
+Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventInvoiceCard.tsx`, `events/EventMarginBreakdown.tsx`, `events/EventMarginSummaryAside.tsx`, `events/EventMarginTab.tsx`, `events/LiveEventProfitabilityWidget.tsx`, `finance/CloseoutBillingTruth.tsx`, `finance/CloseoutCaptureForm.tsx`, `finance/CloseoutCorrectionPanel.tsx`, `finance/CloseoutLifecyclePolicy.ts`, `finance/CloseoutPage.tsx`, `finance/CloseoutSourcesPanel.tsx`, `finance/CommercialLifecyclePolicy.ts`, `finance/DonationSummaryPage.tsx`, `finance/eventCostSummary.ts`, `finance/EventCostSummaryReport.tsx`, `finance/EventFoodCostPanel.tsx`, `finance/FinanceFailureBanner.tsx`, `finance/FinanceOverviewPage.tsx`, `finance/FinanceReconciliationPage.tsx`, `finance/financeRoutes.ts`, `finance/FinanceWorkspaceNav.tsx`, `finance/foodCostPercentage.ts`, `finance/FoodCostPercentagePage.tsx`, `finance/invoiceBilling.ts`, `finance/InvoiceDetailPage.tsx`, `finance/InvoiceEquipmentCharges.tsx`, `finance/InvoiceIssueForm.tsx`, `finance/invoiceNumberDisplay.ts`, `finance/InvoiceNumberEditor.tsx`, `finance/invoicePdf.ts`, `finance/InvoicesPage.tsx`, `finance/invoiceTax.ts`, `finance/InvoiceTravelFee.tsx`, `finance/laborCost.ts`, `finance/LeftoverDispositionPanel.tsx`, `finance/leftoverDispositions.ts`, `finance/paymentBreakdown.ts`, `finance/PaymentMethodLifecyclePolicy.ts`, `finance/PaymentMethodsPage.tsx`, `finance/PaymentsLedgerPresenter.ts`, `finance/PaymentsPage.tsx`, `finance/payrollExport.ts`, `finance/PayrollExportPanel.tsx`, `finance/PayrollLifecyclePolicy.ts`, `finance/PayrollPage.tsx`, `finance/payrollPeriod.ts`, `finance/PayrollPrepareForm.tsx`, `finance/PayrollPreparePayloadBuilder.ts`, `finance/PayrollReceipts.tsx`, `finance/payrollReconcile.ts`, `finance/PayrollWorksheet.tsx`, `finance/profitMarginReport.ts`, `finance/ProfitMarginReportsPage.tsx`, `finance/ReconciliationTables.tsx`, `finance/ReminderHistoryList.tsx`, `finance/RevenueAttributionDetailPage.tsx`, `finance/RevenueAttributionsPage.tsx`, `finance/revenueAttributionValues.ts`, `finance/RevenueSplitChanges.tsx`, `finance/revenueSplitMeasures.ts`, `finance/RevenueSplitSummary.tsx`, `finance/revenueTrend.ts`, `finance/RevenueTrendsPage.tsx`, `finance/TaxRatesPage.tsx`, `finance/tipDistribution.ts`, `finance/TipDistributionPage.tsx`, `finance/useFinanceReportFilters.ts`, `finance/VenueCommissionTermsPage.tsx`
+
+### Generated reads
+
+- `queries.getEvent` - live read
+- `queries.getInvoice` - live read
+- `queries.getRevenueAttribution` - live read
+- `queries.listClient` - live read
+- `queries.listComponent` - live read
+- `queries.listComponentIngredient` - live read
+- `queries.listCreditMemo` - live read
+- `queries.listDishComponent` - live read
+- `queries.listDishIngredient` - live read
+- `queries.listEquipment` - live read
+- `queries.listEquipmentReservation` - live read
+- `queries.listEvent` - live read
+- `queries.listEventAssignment` - live read
+- `queries.listEventCloseout` - live read
+- `queries.listEventDishByEventId` - live read
+- `queries.listIngredient` - live read
+- `queries.listIngredientDemand` - live read
+- `queries.listIngredientPriceObservation` - live read
+- `queries.listInvoice` - live read
+- `queries.listItemUnitMapping` - live read
+- `queries.listLeftoverDisposition` - live read
+- `queries.listOrganization` - live read
+- `queries.listPayment` - live read
+- `queries.listPaymentMethod` - live read
+- `queries.listPayrollExportRecord` - live read
+- `queries.listPayrollInput` - live read
+- `queries.listPerson` - live read
+- `queries.listReferralSource` - live read
+- `queries.listRevenueAttribution` - live read
+- `queries.listShift` - live read
+- `queries.listTaxRate` - live read
+- `queries.listVendorOrder` - live read
+- `queries.listVendorOrderLine` - live read
+- `queries.listVendorOrderLineDemand` - live read
+- `queries.listVenue` - live read
+- `queries.listVenueCommissionTerm` - live read
+
+### Generated actions
+
+- `mutations.CreditMemo_createViaIssue` (CreditMemo.issue)
+  - inputs from the screen: sourceInvoiceId, clientId, creditMemoNumber, amount, reason, disposition, targetInvoiceId, eventId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance staff may see credit memos"; "Finance staff may update credit memos"; "Finance staff may change credit memos"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 17 more
+  - effects: CreditMemoIssued
+  - refresh: live reads update by themselves; reads affected: CreditMemo.list, CreditMemo.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 2 more
+- `mutations.EventCloseout_finalize` (EventCloseout.finalize)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and event coordinators may see event closeouts"; "Finance staff and event coordinators may update event closeouts"; "Finance staff and event coordinators may change event closeouts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: EventCloseoutFinalized
+  - refresh: live reads update by themselves; reads affected: EventCloseout.list, EventCloseout.get, Event.list, Event.get
+- `mutations.Invoice_assignNumber` (Invoice.assignNumber)
+  - inputs from the screen: invoiceNumber; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: InvoiceNumberAssigned
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_createViaIssue` (Invoice.issue)
+  - inputs from the screen: clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate, proposalId, proposalRevisionId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: InvoiceIssued
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_markDepositPaid` (Invoice.markDepositPaid)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: InvoiceDepositPaid
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_markOverdue` (Invoice.markOverdue)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: InvoiceMarkedOverdue
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_markViewed` (Invoice.markViewed)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: InvoiceViewed
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_markVoided` (Invoice.markVoided)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: InvoiceVoided
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_send` (Invoice.send)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: InvoiceSent
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_sendBalanceReminder` (Invoice.sendBalanceReminder)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "No outstanding balance to remind about"; and 2 more
+  - effects: InvoiceBalanceReminderSent
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_setDeposit` (Invoice.setDeposit)
+  - inputs from the screen: depositAmount, balanceReminderLeadDays; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "This deposit amount can't be negative. Use zero or more."; and 4 more
+  - effects: InvoiceDepositSet
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.Invoice_writeOff` (Invoice.writeOff)
+  - inputs from the screen: reason, writeOffAmount; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason for writing this off"; and 4 more
+  - effects: InvoiceWrittenOff
+  - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
+- `mutations.LeftoverDisposition_createViaRecord` (LeftoverDisposition.record)
+  - inputs from the screen: eventId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientEin, recipientAddress, recipientContact, receiptReference, handlingNote, note; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance, event and kitchen staff may see what happened to leftover food"; "Finance, event and kitchen staff may log what happened to leftover food"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; "These leftovers are for a different event. Pick the event already on them."; and 5 more
+  - effects: LeftoverDispositionRecorded
+  - refresh: live reads update by themselves; reads affected: LeftoverDisposition.list, LeftoverDisposition.get, Event.list, Event.get
+- `mutations.LeftoverDisposition_remove` (LeftoverDisposition.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance, event and kitchen staff may see what happened to leftover food"; "Finance, event and kitchen staff may log what happened to leftover food"; "Guard 0 failed"; "ConcurrencyConflict:"; "LeftoverDisposition not found"
+  - effects: LeftoverDispositionRemoved
+  - refresh: live reads update by themselves; reads affected: LeftoverDisposition.list, LeftoverDisposition.get, Event.list, Event.get
+- `mutations.LeftoverDisposition_revise` (LeftoverDisposition.revise)
+  - inputs from the screen: disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientEin, recipientAddress, recipientContact, receiptReference, handlingNote, note; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance, event and kitchen staff may see what happened to leftover food"; "Finance, event and kitchen staff may log what happened to leftover food"; "Guard 0 failed"; "Guard 1 failed"; "Say what food this is."; "Pick the day the food left."; and 5 more
+  - effects: LeftoverDispositionRevised
+  - refresh: live reads update by themselves; reads affected: LeftoverDisposition.list, LeftoverDisposition.get, Event.list, Event.get
+- `mutations.Organization_setBrandLogo` (Organization.setBrandLogo)
+  - inputs from the screen: storageId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
+  - effects: OrganizationBrandLogoSet
+  - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
+- `mutations.PaymentMethod_clearDefault` (PaymentMethod.clearDefault)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PaymentMethodDefaultCleared
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.PaymentMethod_createViaRegister` (PaymentMethod.register)
+  - inputs from the screen: clientId, methodType, provider, lastFour, isDefault, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PaymentMethodRegistered
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.PaymentMethod_expire` (PaymentMethod.expire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PaymentMethodExpired
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.PaymentMethod_invalidate` (PaymentMethod.invalidate)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason for marking this invalid"; and 2 more
+  - effects: PaymentMethodInvalidated
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.PaymentMethod_makeDefault` (PaymentMethod.makeDefault)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PaymentMethodDefaultSet
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.PaymentMethod_reactivate` (PaymentMethod.reactivate)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PaymentMethodReactivated
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.PaymentMethod_remove` (PaymentMethod.remove)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payment methods"; "Finance staff may update payment methods"; "Finance staff may change payment methods"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PaymentMethodRemoved
+  - refresh: live reads update by themselves; reads affected: PaymentMethod.list, PaymentMethod.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Payment.list, Payment.get
+- `mutations.Payment_beginProcessing` (Payment.beginProcessing)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payments"; "Finance staff may update payments"; "Finance staff may change payments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PaymentProcessingStarted
+  - refresh: live reads update by themselves; reads affected: Payment.list, Payment.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 4 more
+- `mutations.Payment_createViaRecord` (Payment.record)
+  - inputs from the screen: invoiceId, clientId, amount, method, eventId, paymentMethodId, notes, feeAmount, gratuityAmount, occurredAt, effectiveAt, externalSource, externalPaymentId, providerAccount; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance staff may see payments"; "Finance staff may update payments"; "Finance staff may change payments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: PaymentRecorded
+  - refresh: live reads update by themselves; reads affected: Payment.list, Payment.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 4 more
+- `mutations.Payment_fail` (Payment.fail)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payments"; "Finance staff may update payments"; "Finance staff may change payments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PaymentFailed
+  - refresh: live reads update by themselves; reads affected: Payment.list, Payment.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 4 more
+- `mutations.Payment_refund` (Payment.refund)
+  - inputs from the screen: reason, effectiveAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payments"; "Finance staff may update payments"; "Finance staff may change payments"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason for this refund"; and 2 more
+  - effects: PaymentRefunded, PaymentReversed
+  - refresh: live reads update by themselves; reads affected: Payment.list, Payment.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 4 more
+- `mutations.Payment_reverse` (Payment.reverse)
+  - inputs from the screen: kind, amount, reason, effectiveAt, providerReversalId; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payments"; "Finance staff may update payments"; "Finance staff may change payments"; "Guard 0 failed"; "Guard 1 failed"; "The amount taken back has to be more than zero"; and 4 more
+  - effects: PaymentReversed
+  - refresh: live reads update by themselves; reads affected: Payment.list, Payment.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 4 more
+- `mutations.Payment_settle` (Payment.settle)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see payments"; "Finance staff may update payments"; "Finance staff may change payments"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PaymentSettled
+  - refresh: live reads update by themselves; reads affected: Payment.list, Payment.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 4 more
+- `mutations.PayrollExportRecord_acknowledge` (PayrollExportRecord.acknowledge)
+  - inputs from the screen: providerReference; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and staffing managers may see payroll export receipts"; "Finance managers may update payroll export receipts"; "Finance managers may change payroll export receipts"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: PayrollExportAcknowledged
+  - refresh: live reads update by themselves; reads affected: PayrollExportRecord.list, PayrollExportRecord.get, Person.list, Person.get
+- `mutations.PayrollExportRecord_createViaRecord` (PayrollExportRecord.record)
+  - inputs from the screen: personId, periodKey, periodStart, periodEnd, processor, revision, regularMinutes, overtimeMinutes, totalMinutes, deltaMinutes, previousTotalMinutes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance and staffing managers may see payroll export receipts"; "Finance managers may update payroll export receipts"; "Finance managers may change payroll export receipts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: PayrollExportRecorded
+  - refresh: live reads update by themselves; reads affected: PayrollExportRecord.list, PayrollExportRecord.get, Person.list, Person.get
+- `mutations.PayrollExportRecord_reject` (PayrollExportRecord.reject)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and staffing managers may see payroll export receipts"; "Finance managers may update payroll export receipts"; "Finance managers may change payroll export receipts"; "Guard 0 failed"; "Guard 1 failed"; "Say why the payroll provider turned this down."; and 2 more
+  - effects: PayrollExportRejected
+  - refresh: live reads update by themselves; reads affected: PayrollExportRecord.list, PayrollExportRecord.get, Person.list, Person.get
+- `mutations.PayrollInput_createViaPrepare` (PayrollInput.prepare)
+  - inputs from the screen: personId, periodStart, periodEnd, regularMinutes, overtimeMinutes, totalMinutes, eventId, shiftId, hourlyRate, overtimeRate, grossAmount, notes, sourceTimeRecordIds; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance managers may see payroll inputs"; "Finance managers may update payroll inputs"; "Finance managers may change payroll inputs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - effects: PayrollInputPrepared
+  - refresh: live reads update by themselves; reads affected: PayrollInput.list, PayrollInput.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.PayrollInput_finalize` (PayrollInput.finalize)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance managers may see payroll inputs"; "Finance managers may update payroll inputs"; "Finance managers may change payroll inputs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: PayrollInputFinalized
+  - refresh: live reads update by themselves; reads affected: PayrollInput.list, PayrollInput.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.PayrollInput_markVoided` (PayrollInput.markVoided)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance managers may see payroll inputs"; "Finance managers may update payroll inputs"; "Finance managers may change payroll inputs"; "Guard 0 failed"; "Guard 1 failed"; "Say why you're voiding this payroll input."; and 2 more
+  - effects: PayrollInputVoided
+  - refresh: live reads update by themselves; reads affected: PayrollInput.list, PayrollInput.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.RevenueAttribution_allowOverRevenue` (RevenueAttribution.allowOverRevenue)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "This split is already applied."; "Say why this event's splits may add up to more than its revenue."; and 3 more
+  - effects: RevenueAttributionUpdated
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_apply` (RevenueAttribution.apply)
+  - inputs from the screen: eventRevenue; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "This event's revenue can't be negative. Use zero or more."; and 2 more
+  - effects: RevenueAttributionApplied
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_approve` (RevenueAttribution.approve)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: RevenueAttributionApproved
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_changeSplit` (RevenueAttribution.changeSplit)
+  - inputs from the screen: reason, percentBasis, fixedAmount; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "This split is already approved. Reject it first, or add a new one."; "Say why you are changing this split."; and 5 more
+  - effects: RevenueAttributionUpdated
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_create` (RevenueAttribution.create)
+  - inputs from the screen: eventId, attributionType, allocationMethod, percentBasis, fixedAmount, venueId, salespersonId, referralSourceId, partnerPersonId, partnerClientId, effectiveStartDate, effectiveEndDate, reason, venueCommissionTermId; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: created `{ _id: string; tenantId: string; deletedAt: number | null; eventId: string; a...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Link your account to a staff profile before you add a revenue attribution."
+  - effects: RevenueAttributionCreated
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_reject` (RevenueAttribution.reject)
+  - inputs from the screen: rejectionReason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: RevenueAttributionRejected
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_requestApproval` (RevenueAttribution.requestApproval)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: RevenueAttributionApprovalRequested
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.RevenueAttribution_update` (RevenueAttribution.update)
+  - inputs from the screen: percentBasis, fixedAmount, effectiveStartDate, effectiveEndDate, reason, notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance and sales staff may see attributions"; "Finance staff may update attributions"; "Finance staff may change attributions"; "Guard 0 failed"; "Guard 1 failed"; "This attribution's percent basis has to be between 0 and 100."; and 3 more
+  - effects: RevenueAttributionUpdated
+  - refresh: live reads update by themselves; reads affected: RevenueAttribution.list, RevenueAttribution.get, Client.list, Client.get, Event.list, Event.get, Person.list, Person.get and 6 more
+- `mutations.SavedReportDefinition_createViaCreateDefinition` (SavedReportDefinition.createDefinition)
+  - inputs from the screen: name, subjectArea, chartType, definition, sharingScope; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Staff may see unfinished reports; a just-for-you report can only be seen by its owner or a manager"; "Staff may update saved reports"; "Staff may change saved reports"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: SavedReportDefinitionCreated
+  - refresh: live reads update by themselves; reads affected: SavedReportDefinition.list, SavedReportDefinition.get, Person.list, Person.get, SavedReportSnapshot.list, SavedReportSnapshot.get
+- `mutations.TaxRate_createViaDefine` (TaxRate.define)
+  - inputs from the screen: name, percentage, appliesToFood, appliesToService, appliesToRental; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance staff may see tax rates"; "Finance staff may maintain tax rates"; "Finance staff may change tax rates"; "Guard 0 failed"; "Guard 1 failed"; "Give this tax rate a name"; and 2 more
+  - effects: TaxRateDefined
+  - refresh: live reads update by themselves; reads affected: TaxRate.list, TaxRate.get
+- `mutations.TaxRate_revise` (TaxRate.revise)
+  - inputs from the screen: name, percentage, appliesToFood, appliesToService, appliesToRental; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see tax rates"; "Finance staff may maintain tax rates"; "Finance staff may change tax rates"; "Guard 0 failed"; "Guard 1 failed"; "Give this tax rate a name"; and 4 more
+  - effects: TaxRateRevised
+  - refresh: live reads update by themselves; reads affected: TaxRate.list, TaxRate.get
+- `mutations.TaxRate_setActive` (TaxRate.setActive)
+  - inputs from the screen: active; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see tax rates"; "Finance staff may maintain tax rates"; "Finance staff may change tax rates"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: TaxRateActivationChanged
+  - refresh: live reads update by themselves; reads affected: TaxRate.list, TaxRate.get
+- `mutations.VenueCommissionTerm_createViaDefine` (VenueCommissionTerm.define)
+  - inputs from the screen: venueId, commissionPercent, effectiveStartDate, effectiveEndDate, notes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "This venue's commission percent has to be between 0 and 100."; and 1 more
+  - effects: VenueCommissionTermDefined
+  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, RevenueAttribution.list, RevenueAttribution.get, Venue.list, Venue.get
+- `mutations.VenueCommissionTerm_retire` (VenueCommissionTerm.retire)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "This venue commission term is already retired."; and 2 more
+  - effects: VenueCommissionTermRetired
+  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, RevenueAttribution.list, RevenueAttribution.get, Venue.list, Venue.get
+- `mutations.VenueCommissionTerm_revise` (VenueCommissionTerm.revise)
+  - inputs from the screen: commissionPercent, effectiveEndDate, notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Finance staff may see venue commission terms"; "Finance staff may update venue commission terms"; "Finance staff may change venue commission terms"; "Guard 0 failed"; "Guard 1 failed"; "This venue commission term is already retired. You can't revise it."; and 4 more
+  - effects: VenueCommissionTermRevised
+  - refresh: live reads update by themselves; reads affected: VenueCommissionTerm.list, VenueCommissionTerm.get, RevenueAttribution.list, RevenueAttribution.get, Venue.list, Venue.get
+
+### Authored reads and steps
+
+- `authStatus.getAuthStatus` - query; live read, updates by itself
+- `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
+- `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `closeoutSources.captureCloseoutFromSources` - mutation; authored step; live reads update by themselves
+- `closeoutSources.closeoutResults` - query; live read, updates by itself
+- `closeoutSources.correctCloseoutFromSources` - mutation; authored step; live reads update by themselves
+- `closeoutSources.eventCloseoutSources` - query; live read, updates by itself
+- `culinaryDemand.addNestedRecipeLine` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandHeadcount` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandRecalculation` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.applyDemandSupersede` - mutation; authored step; live reads update by themselves
+- `culinaryDemand.componentContentReport` - query; live read, updates by itself
+- `culinaryDemand.eventDemandReview` - query; live read, updates by itself
+- `culinaryDemand.eventFoodCostReport` - query; live read, updates by itself
+- `culinaryDemand.kitchenUnresolvedReport` - query; live read, updates by itself
+- `culinaryDemand.previewDemandChange` - query; live read, updates by itself
+- `culinaryDemand.reconcileEventDemand` - mutation; authored step; live reads update by themselves
+- `culinaryDemandSweep.publishRecipeEdition` - mutation; authored step; live reads update by themselves
+- `culinaryDemandSweep.recipeEditionImpact` - query; live read, updates by itself
+- `culinaryDemandSweep.reconcileLiveEventsForComponent` - mutation; authored step; live reads update by themselves
+- `equipmentCheckout.equipmentAvailability` - query; live read, updates by itself
+- `equipmentCheckout.eventEquipmentExceptions` - query; live read, updates by itself
+- `equipmentCheckout.rentalVendorChoices` - query; live read, updates by itself
+- `equipmentCheckout.reserve` - mutation; authored step; live reads update by themselves
+- `eventLookup.byClient` - query; live read, updates by itself
+- `eventLookup.byIds` - query; live read, updates by itself
+- `eventLookup.docsByIds` - query; live read, updates by itself
+- `eventLookup.picker` - query; live read, updates by itself
+- `eventLookup.range` - query; live read, updates by itself
+- `eventLookup.rangeDocs` - query; live read, updates by itself
+- `eventLookup.reportPage` - query; live read, updates by itself
+- `externalRecordLinkLists.listFor` - query; live read, updates by itself
+- `externalRecordLinkLists.menuLinkStats` - query; live read, updates by itself
+- `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `invoiceEmail.send` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoicePayments.createPaymentLink` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoicePayments.getPaymentLink` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoicePayments.syncStripePayments` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoiceReminders.configureSchedule` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoiceReminders.getHistory` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoiceReminders.getSchedule` - action; one-time call (not live); the live reads it changes update by themselves
+- `invoiceReminders.sendNow` - action; one-time call (not live); the live reads it changes update by themselves
+- `laborSummary.attendanceAlerts` - query; live read, updates by itself
+- `laborSummary.eventLaborSummary` - query; live read, updates by itself
+- `laborSummary.listPayRates` - query; live read, updates by itself
+- `laborSummary.payrollTimeRecords` - query; live read, updates by itself
+- `laborSummary.personPeriodLaborSummary` - query; live read, updates by itself
+- `travelFees.applyProposalTravelFee` - mutation; authored step; live reads update by themselves
+- `travelFees.getEventTravelFee` - query; live read, updates by itself
+- `travelFees.getProposalTravelFee` - query; live read, updates by itself
+- `venueVendorPolicy.forEvent` - query; live read, updates by itself

@@ -339,6 +339,12 @@
   font-size: 11px;
 }
 
+.lead-pipeline-closed-note {
+  margin: 0.5rem 0 0;
+  color: var(--color-ink-3);
+  font-size: 12px;
+}
+
 .lead-card {
   position: relative;
   display: grid;

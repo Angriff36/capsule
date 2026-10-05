@@ -99,7 +99,7 @@ describe("EventDraftPoCoordinator", () => {
       const result = await coordinator.draftFromNeeds(needInput(stage));
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.reason).toMatch(/cannot draft a po/i);
+        expect(result.reason).toMatch(/can't draft a po/i);
       }
       expect(createOrder).not.toHaveBeenCalled();
       expect(createLine).not.toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe("EventDraftPoCoordinator", () => {
     });
     expect(cancelled).toEqual({
       ok: false,
-      reason: "Cannot draft a PO while the event is cancelled.",
+      reason: "This event is cancelled, so you can't draft a PO for it now.",
     });
 
     const empty = await coordinator.draftFromNeeds({

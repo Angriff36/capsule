@@ -15,7 +15,7 @@ type PurchasingScopeViewModel = {
 /** Keeps a cascade link and the page-local working-event filter in agreement. */
 export function usePurchasingScopeViewModel(): PurchasingScopeViewModel {
   const [searchParams, setSearchParams] = useSearchParams();
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("purchasing");
   const linkedEventId = searchParams.get("event")?.trim() || null;
   const scopedEventId = linkedEventId ?? eventScope.scopeId;
 

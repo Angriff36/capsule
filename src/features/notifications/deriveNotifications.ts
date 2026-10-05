@@ -1,6 +1,8 @@
 import type { Doc } from "../../lib/api";
 import { formatDate, formatMoney } from "../../lib/format";
 import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
+import { findRosterConflicts } from "../workforce/rosterConflicts";
+import { dateKeyToMs, openedDates } from "../sales/dateHolds";
 
 /**
  * Client-derived notifications. Capsule reads are live Convex queries, so
@@ -22,7 +24,9 @@ export interface AppNotification {
     | "allergen_incident"
     | "staff_message"
     | "mention"
-    | "prep_task_comment";
+    | "prep_task_comment"
+    | "system_health"
+    | "date_opened";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -43,6 +47,8 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     staff_message: "Message",
     mention: "Mention",
     prep_task_comment: "Prep note",
+    system_health: "System health",
+    date_opened: "Date open",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -88,6 +94,12 @@ export interface NotificationSources {
   staffChatReadCursors?: Doc<"staffChatReadCursors">[] | undefined;
   /** Titles for mention channels whose events the caller's role cannot list. */
   mentionEventTitles?: Record<string, string>;
+  /** Titles of events named by incidents / double bookings but not in `events`. */
+  eventTitles?: Record<string, string>;
+  dateHolds?: Doc<"dateHolds">[] | undefined;
+  dateWaitlistEntries?: Doc<"dateWaitlistEntries">[] | undefined;
+  /** Names of the clients waiting first for an opened date. */
+  clientNames?: Record<string, string>;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
@@ -142,9 +154,10 @@ export function deriveNotifications(
     });
   }
 
-  const eventTitles = new Map(
-    (src.events ?? []).map((e) => [e._id as string, e.title]),
-  );
+  const eventTitles = new Map([
+    ...Object.entries(src.eventTitles ?? {}),
+    ...(src.events ?? []).map((e) => [e._id as string, e.title] as const),
+  ]);
   for (const incident of src.incidents ?? []) {
     if (incident.deletedAt != null || incident.reportedAt == null) continue;
     if (incident.category !== "allergen") continue;
@@ -402,31 +415,42 @@ export function deriveNotifications(
     });
   }
 
-  const byPerson = new Map<string, Doc<"shifts">[]>();
-  for (const shift of src.shifts ?? []) {
-    if (shift.deletedAt != null) continue;
-    if (shift.status !== "scheduled" && shift.status !== "started") continue;
-    if (shift.startsAt == null || shift.endsAt == null) continue;
-    const key = shift.personId as string;
-    const list = byPerson.get(key);
-    if (list) list.push(shift);
-    else byPerson.set(key, [shift]);
+  // Double bookings name the worker, both events and the shared window.
+  const overlaps = findRosterConflicts({
+    shifts: src.shifts ?? [],
+    timeOff: [],
+    qualifications: [],
+    eventTitle: (id) => (id && eventTitles.get(id)) || "another event",
+    personName: (id) => personNames.get(id) ?? "A staff member",
+  }).filter((conflict) => conflict.kind === "overlap");
+  for (const conflict of overlaps) {
+    out.push({
+      id: conflict.id.replace(/^overlap:/, "shift-conflict:"),
+      kind: "shift_conflict",
+      message: conflict.message,
+      link: "/staff/roster",
+      at: conflict.startsAt,
+    });
   }
-  for (const [personId, shifts] of byPerson) {
-    shifts.sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
-    for (let i = 1; i < shifts.length; i++) {
-      const prev = shifts[i - 1];
-      const cur = shifts[i];
-      if ((cur.startsAt ?? 0) >= (prev.endsAt ?? 0)) continue;
-      const who = personNames.get(personId) ?? "A staff member";
-      out.push({
-        id: `shift-conflict:${prev._id}:${cur._id}`,
-        kind: "shift_conflict",
-        message: `${who} has overlapping shifts on ${formatDate(cur.startsAt)}`,
-        link: "/staff/roster",
-        at: cur.startsAt ?? now,
-      });
-    }
+
+  // A held date opened (released or lapsed): prompt sales to call the next
+  // client on that date's waitlist.
+  for (const { dateKey, openedAt, next } of openedDates(
+    src.dateHolds,
+    src.dateWaitlistEntries,
+    now,
+  )) {
+    const who =
+      (next.clientId && src.clientNames?.[next.clientId]) ||
+      next.note ||
+      "A prospect";
+    out.push({
+      id: `date-opened:${dateKey}:${next._id}`,
+      kind: "date_opened",
+      message: `${formatDate(dateKeyToMs(dateKey))} is open again — ${who} is next on the waitlist`,
+      link: "/clients/date-holds",
+      at: openedAt,
+    });
   }
 
   out.sort((a, b) => b.at - a.at);

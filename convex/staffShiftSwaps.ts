@@ -15,16 +15,23 @@ type Candidate = {
   targetTrainingCompletionId?: string;
 };
 
+type Exclusion = { personId: Id<"people">; name: string; reason: string };
+
 /** Return eligible coworkers, never their private credential or time-off rows. */
 export const getCandidates = query({
   args: { shiftId: v.id("shifts"), now: v.number() },
   handler: async (
     ctx,
     { shiftId, now },
-  ): Promise<{ candidates: Candidate[]; unavailableReason: string | null }> => {
+  ): Promise<{
+    candidates: Candidate[];
+    excluded: Exclusion[];
+    unavailableReason: string | null;
+  }> => {
     const auth = await getAuthContext(ctx);
     const unavailable = {
       candidates: [],
+      excluded: [],
       unavailableReason: "This shift is unavailable for a swap.",
     };
     if (!auth.personId || !auth.tenantId || !Number.isFinite(now))
@@ -61,6 +68,7 @@ export const getCandidates = query({
     )
       return {
         candidates: [],
+        excluded: [],
         unavailableReason:
           "The shift's certification requirement needs a manager's update before a swap.",
       };
@@ -73,6 +81,7 @@ export const getCandidates = query({
     )
       return {
         candidates: [],
+        excluded: [],
         unavailableReason:
           "The shift type needs a manager's update before a swap.",
       };
@@ -83,13 +92,26 @@ export const getCandidates = query({
       )
       .collect();
     const candidates: Candidate[] = [];
+    // Everyone left out gets a reason (AC-515) - worded so a coworker never
+    // learns WHY someone is busy (time off stays private).
+    const excluded: Exclusion[] = [];
+    const leaveOut = (row: Doc<"people">, reason: string) =>
+      excluded.push({
+        personId: row._id,
+        name: `${row.givenName} ${row.familyName}`.trim(),
+        reason,
+      });
     for (const candidate of people) {
-      if (
-        candidate.deletedAt != null ||
-        !candidate.authSubjectId ||
-        candidate._id === shift.personId
-      )
+      if (candidate.deletedAt != null || candidate._id === shift.personId)
         continue;
+      if (!candidate.authSubjectId) {
+        leaveOut(candidate, "Has no Capsule sign-in yet");
+        continue;
+      }
+      if (candidate.schedulingHoldReason?.trim()) {
+        leaveOut(candidate, "Not taking shifts right now");
+        continue;
+      }
       // Select matching evidence by index, without reading accumulated history.
       // Missing and null expiry both mean a certification has no expiry.
       let qualification: Doc<"qualifications"> | null = null;
@@ -122,7 +144,13 @@ export const getCandidates = query({
             .first();
           if (qualification) break;
         }
-        if (!qualification) continue;
+        if (!qualification) {
+          leaveOut(
+            candidate,
+            `No current ${sourceQualification.name} certificate`,
+          );
+          continue;
+        }
       }
       const moduleId = shiftType?.requiredTrainingModuleId;
       const training = moduleId
@@ -146,7 +174,10 @@ export const getCandidates = query({
             )
             .first()
         : null;
-      if (moduleId && !training) continue;
+      if (moduleId && !training) {
+        leaveOut(candidate, "Missing the training this shift needs");
+        continue;
+      }
       const startsAt = shift.startsAt,
         endsAt = shift.endsAt;
       const [scheduled, started, leave] = await Promise.all([
@@ -207,23 +238,27 @@ export const getCandidates = query({
         trainingCompletions: training ? [training] : [],
         shiftTypes: shiftType ? [shiftType] : [],
       });
-      if (result.eligible)
-        candidates.push({
-          personId: candidate._id,
-          name: `${candidate.givenName} ${candidate.familyName}`.trim(),
-          ...(result.targetQualificationId
-            ? { targetQualificationId: result.targetQualificationId }
-            : {}),
-          ...(result.targetTrainingCompletionId
-            ? { targetTrainingCompletionId: result.targetTrainingCompletionId }
-            : {}),
-        });
+      if (!result.eligible) {
+        leaveOut(candidate, "Not free at this time");
+        continue;
+      }
+      candidates.push({
+        personId: candidate._id,
+        name: `${candidate.givenName} ${candidate.familyName}`.trim(),
+        ...(result.targetQualificationId
+          ? { targetQualificationId: result.targetQualificationId }
+          : {}),
+        ...(result.targetTrainingCompletionId
+          ? { targetTrainingCompletionId: result.targetTrainingCompletionId }
+          : {}),
+      });
     }
     candidates.sort(
       (a, b) =>
         a.name.localeCompare(b.name) || a.personId.localeCompare(b.personId),
     );
-    return { candidates, unavailableReason: null };
+    excluded.sort((a, b) => a.name.localeCompare(b.name));
+    return { candidates, excluded, unavailableReason: null };
   },
 });
 

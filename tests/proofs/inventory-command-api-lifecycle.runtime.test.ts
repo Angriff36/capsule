@@ -5,6 +5,9 @@
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
 import schema from "../../convex/schema";
+import { internal } from "../../convex/_generated/api";
+import type { InventoryAuditEntry } from "../../convex/inventoryAudit";
+import { checkStockLedger, stockBalance } from "../../src/lib/stockBalance";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { EventStockIssueCoordinator } from "../../src/features/events/EventStockIssueCoordinator";
 import { EventStockReservationCoordinator } from "../../src/features/events/EventStockReservationCoordinator";
@@ -208,5 +211,62 @@ describe("runtime proof: inventory command API lifecycle", () => {
     expect(
       afterFulfill.reservations.every((row: any) => row.status === "consumed"),
     ).toBe(true);
+  });
+
+  it("a receipt-then-consume-then-count sequence keeps the movement ledger reconciled", async () => {
+    const proof = harness();
+    const eventId = await seedApprovedEvent(proof);
+    const { inventory, ingredientId, itemId } = await seedStock(proof, eventId);
+    const item = async () =>
+      (await loadRows(inventory, eventId)).items.find(
+        (row: any) => row._id === itemId,
+      ) as any;
+
+    await dispatchCommand(inventory, "InventoryItem", "receiveStock", {
+      docId: itemId,
+      quantity: 5,
+    });
+    const hold = (await dispatchCommand(
+      inventory,
+      "InventoryReservation",
+      "reserve",
+      { inventoryItemId: itemId, eventId, ingredientId, quantity: 12 },
+    )) as { docId: string };
+    await dispatchCommand(inventory, "InventoryReservation", "consume", {
+      docId: hold.docId,
+    });
+    expect((await item()).quantityOnHand).toBe(S.onHand + 5 - 12);
+    await dispatchCommand(inventory, "InventoryItem", "recount", {
+      docId: itemId,
+      actualQuantity: 22,
+    });
+
+    const entries = (await inventory.query(
+      internal.inventoryAudit.readForItem as never,
+      { tenantId: S.tenantId, inventoryItemId: itemId } as never,
+    )) as InventoryAuditEntry[];
+    const onHandMoves = entries.filter((entry) => entry.measure === "on_hand");
+    expect(onHandMoves.map((entry) => [entry.action, entry.delta])).toEqual([
+      ["Opening balance", S.onHand],
+      ["Stock received", 5],
+      ["Issued", -12],
+      ["Recount", 22 - (S.onHand + 5 - 12)],
+    ]);
+    // Event consumption points back at the Event it fed.
+    expect(
+      entries.find(
+        (entry) => entry.eventType === "InventoryReservationConsumed",
+      )?.reason,
+    ).toBe(`Event ${eventId}`);
+    const rows = await loadRows(inventory, eventId);
+    expect(checkStockLedger(entries, (await item()).quantityOnHand)).toEqual({
+      ledgerOnHand: 22,
+      matches: true,
+      difference: 0,
+      gaps: [],
+    });
+    expect(
+      stockBalance(itemId, (await item()).quantityOnHand, rows.reservations),
+    ).toEqual({ onHand: 22, reserved: 0, available: 22 });
   });
 });

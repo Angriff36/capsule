@@ -56,10 +56,10 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   ref importRun: ImportRun fields [tenantId, importRunId] references [tenantId, id]
 
   // Constraints
-  constraint artifactImportRunPresent: length(trim(self.importRunId)) > 0 "Import run id is required"
-  constraint artifactNamePresent: length(trim(self.name)) > 0 "Artifact name is required"
-  constraint artifactByteSizeNonNegative: self.byteSize >= 0 "Byte size must not be negative"
-  constraint artifactEntryCountNonNegative: self.entryCount >= 0 "Entry count must not be negative"
+  constraint artifactImportRunPresent: length(trim(self.importRunId)) > 0 "Say which import this file belongs to."
+  constraint artifactNamePresent: length(trim(self.name)) > 0 "Give this file a name."
+  constraint artifactByteSizeNonNegative: self.byteSize >= 0 "This file's size can't be negative. Use zero or more."
+  constraint artifactEntryCountNonNegative: self.entryCount >= 0 "This file's number of entries can't be negative. Use zero or more."
 
   // Policies
   default policy importArtifactRead read: roleAllows(user.role, "importAccess") "Staff may see imported files"
@@ -78,13 +78,13 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt == null
-    constraint registerImportRunPresent: length(trim(importRunId)) > 0 "Import run id is required"
-    constraint registerNamePresent: length(trim(name)) > 0 "Artifact name is required"
-    constraint registerByteSizeNonNegative: byteSize >= 0 "Byte size must not be negative"
-    constraint registerEntryCountNonNegative: entryCount >= 0 "Entry count must not be negative"
-    constraint registerChecksumPresent: checksum == null or length(trim(checksum)) > 0 "Checksum must be non-empty when present"
-    constraint registerStorageIdPresent: storageId == null or length(trim(storageId)) > 0 "Storage id must be non-empty when present"
-    constraint registerProvenancePresent: provenance == null or length(trim(provenance)) > 0 "Provenance must be non-empty when present"
+    constraint registerImportRunPresent: length(trim(importRunId)) > 0 "Say which import this file belongs to."
+    constraint registerNamePresent: length(trim(name)) > 0 "Give this file a name."
+    constraint registerByteSizeNonNegative: byteSize >= 0 "This file's size can't be negative. Use zero or more."
+    constraint registerEntryCountNonNegative: entryCount >= 0 "This file's number of entries can't be negative. Use zero or more."
+    constraint registerChecksumPresent: checksum == null or length(trim(checksum)) > 0 "If you give a checksum for this file, it can't be blank."
+    constraint registerStorageIdPresent: storageId == null or length(trim(storageId)) > 0 "If you give a storage ID for this file, it can't be blank."
+    constraint registerProvenancePresent: provenance == null or length(trim(provenance)) > 0 "If you give origin details for this file, they can't be blank."
     mutate importRunId = importRunId
     mutate name = name
     mutate byteSize = byteSize
@@ -116,9 +116,9 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint classifyNotPending: disposition != "pending" "Disposition must be a final classification, not pending"
-    constraint classifyTotalRowCountNonNegative: totalRowCount == null or totalRowCount >= 0 "Total row count must not be negative when present"
-    constraint classifyRowOutcomeCountsPresent: rowOutcomeCounts == null or length(trim(rowOutcomeCounts)) > 0 "Row outcome counts must be non-empty when present"
+    constraint classifyNotPending: disposition != "pending" "Pick what this file turned out to be. It can't stay set to pending."
+    constraint classifyTotalRowCountNonNegative: totalRowCount == null or totalRowCount >= 0 "This file's total row count can't be negative. Use zero or more."
+    constraint classifyRowOutcomeCountsPresent: rowOutcomeCounts == null or length(trim(rowOutcomeCounts)) > 0 "If you give row counts for this file, they can't be blank."
     compute previousDisposition = self.disposition
     mutate disposition = disposition
     mutate totalRowCount = totalRowCount != null ? totalRowCount : self.totalRowCount
@@ -144,8 +144,8 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
-    constraint recordParseNotPending: parseStatus != "pending" "Parse status must be parsed or failed, not pending"
-    constraint recordParseProvenancePresent: provenance == null or length(trim(provenance)) > 0 "Provenance must be non-empty when present"
+    constraint recordParseNotPending: parseStatus != "pending" "Say if reading this file worked or failed. It can't stay pending."
+    constraint recordParseProvenancePresent: provenance == null or length(trim(provenance)) > 0 "If you give origin details for this file, they can't be blank."
     mutate parseStatus = parseStatus
     mutate provenance = provenance != null ? provenance : self.provenance
     emit ImportArtifactParseRecorded {

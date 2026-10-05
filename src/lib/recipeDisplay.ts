@@ -70,6 +70,7 @@ export function readableRecipeAmount(quantity: number, unit: string): string {
   }
   const labels: Record<string, string> = {
     ounce: "oz",
+    fluid_ounce: "fl oz",
     pound: "lb",
     tablespoon: "tbsp",
     teaspoon: "tsp",

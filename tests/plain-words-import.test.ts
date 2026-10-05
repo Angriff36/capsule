@@ -181,7 +181,7 @@ describe("plain words on leftover import manifests", () => {
     expect(visible).toContain("Staff may see import lists");
     expectPlain("Staff may see import lists");
     expect(visible).toContain("Staff may update import lists");
-    expect(visible).toContain("Dataset category is required");
+    expect(visible).toContain("Pick what kind of data this import handles.");
   });
 
   it("keeps leftover admin nav labels free of run and record jargon", () => {
@@ -291,11 +291,16 @@ describe("plain words on leftover import manifests", () => {
       "Items marked",
       "Select multiple items",
       "Skipped while matching leftover items",
-      "Matched to a Capsule payment while matching leftover items",
     ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);
     }
+    // Matching a leftover payment moved to the server step; its saved note stays plain.
+    const matchNote = "Matched by hand to imported payment";
+    expect(readFileSync("convex/importPaymentMatch.ts", "utf8")).toContain(
+      matchNote,
+    );
+    expectPlain(matchNote);
 
     expect(visible).toContain(
       'formatCountNoun(unresolvedMappings.length, "item")',

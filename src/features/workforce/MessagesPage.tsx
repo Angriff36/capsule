@@ -7,6 +7,7 @@ import { ChatAppearanceMenu } from "../chat/ChatAppearanceMenu";
 import { ChatComposer, type ChatComposerSubmit } from "../chat/ChatComposer";
 import { ChatPushToggle } from "../chat/ChatPushToggle";
 import { ChatUnsentDrafts } from "../chat/ChatUnsentDrafts";
+import { ChatWalkieBar } from "../chat/ChatWalkieBar";
 import { useChatAppearance } from "../chat/useChatAppearance";
 import {
   ChatConversationRail,
@@ -165,6 +166,40 @@ export function MessagesPage() {
     [teammates],
   );
 
+  /** Walkie-talkie transmission: the recorded take as a voice attachment. */
+  const onWalkieSend = useCallback(
+    async (take: { blob: Blob; durationMs: number }) => {
+      if (!channel) return;
+      const sentFrom = channel;
+      const sentBy = identity.sender;
+      if (!sentBy) return;
+      const seconds = Math.max(1, Math.round(take.durationMs / 1000));
+      await sendMessage(
+        sentFrom,
+        {
+          body: "",
+          files: [
+            new File([take.blob], `Voice message (${seconds}s).webm`, {
+              type: take.blob.type || "audio/webm",
+            }),
+          ],
+          mentionedPersonIds: [],
+          draft: { text: "", files: [], links: [], mentions: [] },
+          idempotencyKey: `walkie-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 10)}`,
+        },
+        sentBy,
+      );
+      // Same pin guard as onSubmit: the send finishes on the channel it
+      // left from, not wherever the user is looking now.
+      if (channelRef.current === chatChannelKey(sentFrom)) {
+        setPinSignal((n) => n + 1);
+      }
+    },
+    [channel, identity.sender, sendMessage],
+  );
+
   const showRail = !mobile || channel == null;
   const showThread = !mobile || channel != null;
   const headerTitle =
@@ -304,6 +339,9 @@ export function MessagesPage() {
                   identity={identity.identityKey}
                   onSent={() => setPinSignal((n) => n + 1)}
                 />
+                {identity.personId ? (
+                  <ChatWalkieBar onSend={onWalkieSend} disabled={sending} />
+                ) : null}
                 <ChatComposer
                   key={channelKey}
                   placeholder={

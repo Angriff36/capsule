@@ -75,10 +75,10 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
   ref recipientPerson: Person fields [tenantId, recipientPersonId] references [tenantId, id]
   ref requestedBy: Person fields [tenantId, requestedByPersonId] references [tenantId, id]
 
-  constraint recipientEmailValid: self.recipientEmail != null and length(trim(self.recipientEmail)) > 0 "Recipient email is required"
-  constraint recipientNameValid: self.recipientName != null and length(trim(self.recipientName)) > 0 "Recipient name is required"
-  constraint callbackTokenUnique: self.callbackToken == null or length(trim(self.callbackToken)) > 0 "Callback token must not be empty"
-  constraint completedHasArtifact: self.status == "completed" and self.signedArtifactReference != null or self.status != "completed" "Completed status requires signed artifact reference"
+  constraint recipientEmailValid: self.recipientEmail != null and length(trim(self.recipientEmail)) > 0 "Give the recipient's email"
+  constraint recipientNameValid: self.recipientName != null and length(trim(self.recipientName)) > 0 "Give the recipient's name"
+  constraint callbackTokenUnique: self.callbackToken == null or length(trim(self.callbackToken)) > 0 "This signature request is missing its tracking code"
+  constraint completedHasArtifact: self.status == "completed" and self.signedArtifactReference != null or self.status != "completed" "A completed signature needs the signed document attached"
 
   transition status from "requested" to ["completed", "expired", "revoked"]
   transition status from "completed" to []
@@ -148,7 +148,7 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
     guard self.expiresAt == null or now() < self.expiresAt "Request has expired"
 
     // Idempotency check - callback token must match
-    guard self.callbackToken == callbackToken "Invalid callback token"
+    guard self.callbackToken == callbackToken "That tracking code doesn't match"
 
     mutate status = "completed"
     mutate completedAt = now()
@@ -191,7 +191,7 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
     guard self.status == "requested" "Can only revoke pending requests"
     guard self.requestedAt != null "Request must be initiated"
     guard roleAllows(user.role, "salesAccess") or roleAllows(user.role, "salesManageAccess") "Only sales staff can revoke signature requests"
-    guard length(trim(revokeReason)) > 0 "Revoke reason is required"
+    guard length(trim(revokeReason)) > 0 "Give a reason for revoking this"
 
     mutate status = "revoked"
     mutate revokedAt = now()

@@ -6,6 +6,7 @@ import {
   useListOccasion,
   useListOrganization,
   useListQuoteSubmission,
+  useListReferralSource,
   useListServiceStyle,
   useQuoteSubmissionDismiss,
   useQuoteSubmissionRetry,
@@ -20,6 +21,7 @@ import {
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
+import { QuoteRequestPicks } from "./QuoteRequestPicks";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import type { Doc } from "../../lib/api";
@@ -73,6 +75,7 @@ export function QuoteSubmissionsReviewPage() {
   const submissions = useListQuoteSubmission();
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
+  const referralSources = useListReferralSource();
   const organizations = useListOrganization();
   const process = useAction(api.quoteBuilder.processQuoteSubmission);
   const dismissSubmission = useQuoteSubmissionDismiss();
@@ -349,6 +352,14 @@ export function QuoteSubmissionsReviewPage() {
                     .join(" — ")}
                 </p>
               )}
+
+              <QuoteRequestPicks
+                submission={sub}
+                referralSourceName={nameOf(
+                  referralSources,
+                  sub.referralSourceId,
+                )}
+              />
 
               {(sub.menuPreferences ||
                 sub.dietaryRestrictions ||

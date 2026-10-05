@@ -46,7 +46,9 @@ export function eventReadinessRows(
 }
 
 export function eventReadinessIssueLine(issue: EventReadinessIssue): string {
-  return `${issue.reason} · ${issue.severity} · ${issue.resolvingAction}`;
+  // Staff read the reason; severity and the resolving command name are for
+  // the server, not the screen.
+  return issue.reason;
 }
 
 export function eventReadinessOpenCount(

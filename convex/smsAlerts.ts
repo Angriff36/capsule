@@ -29,11 +29,16 @@ import { getAuthContext, requireTenant } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
 import {
   isSendablePhone,
+  phoneKey,
   requireTwilioConfig,
   safeTwilioMessage,
   sendSms,
   twilioConfigured,
+  twilioErrorCode,
+  TWILIO_UNSUBSCRIBED_CODE,
 } from "./lib/twilio";
+import { insertStepEvent } from "./lib/commandAudit";
+import { quietHoursEnd } from "./lib/clientEmailConsent";
 
 const CONFIG_ENTITY = "SmsAlertConfig";
 const ALERT_ENTITY = "SmsAlert";
@@ -41,6 +46,7 @@ const SCAN_INTERVAL_MS = 5 * 60_000;
 const EVENT_LEAD_MS = 2 * 60 * 60_000; // "starts in 2 hours"
 const RECENT_TRIGGER_MS = 24 * 60 * 60_000; // ignore stale deliveries/incidents
 const MAX_SENDS_PER_SCAN = 100;
+const MAX_ATTEMPTS = 3; // same bound as the webhook outbox
 
 type AlertType = "event_soon" | "delivery_dispatched" | "allergen_incident";
 
@@ -48,26 +54,41 @@ interface Trigger {
   triggerKey: string;
   alertType: AlertType;
   body: string;
+  /** The event the alert is about; null when it is not tied to one. */
+  eventId: string | null;
+  /** Urgent alerts go at any hour; the others wait out the night. */
+  urgent: boolean;
 }
 
 interface Recipient {
   personId: string;
   name: string;
   phone: string;
+  phoneKey: string;
+  /** Events this person has a shift on - they still get its alerts at night. */
+  eventIds: string[];
 }
 
 interface ScanContext {
   enabled: boolean;
   recipients: Recipient[];
   triggers: Trigger[];
-  alreadySent: string[]; // `${triggerKey}::${personId}`
+  alreadySent: string[]; // `${triggerKey}::${personId}`, sent or out of tries
+  currentChainId: string | null; // chain id of the newest SmsAlertsEnabled row
+  /** When the kitchen's night ends; null = it is daytime (or no time zone). */
+  quietUntil: number | null;
+  /** People whose phone told the text service to stop (they texted STOP). */
+  optedOut: number;
 }
 
 interface ScanResult {
-  status: "ok" | "disabled" | "partial";
+  status: "ok" | "disabled" | "partial" | "superseded";
   sent: number;
   skipped: number;
   failed: number;
+  /** Texts held for the morning: night time, and not the person's event. */
+  heldForNight: number;
+  optedOut: number;
   error?: string;
 }
 
@@ -77,7 +98,7 @@ function asRecord(value: unknown): Record<string, unknown> {
     : {};
 }
 
-function canManage(role: string): boolean {
+export function canManage(role: string): boolean {
   return (
     role === "manager" ||
     role === "admin" ||
@@ -108,7 +129,26 @@ function latestConfigEnabled(
 }
 
 /** Decrypt a Manifest `encrypted` field envelope; falls back to plaintext. */
-async function decryptField(
+/**
+ * Phones whose owner texted STOP: the text service refuses them, so the scan
+ * stops texting them. A later good text to the same phone (they texted START
+ * and a manager used Send again) clears it; a new number is a new phone.
+ */
+export function optedOutPhones(
+  ledger: ReadonlyArray<{ entity: string; type: string; payload: unknown }>,
+): Set<string> {
+  const refused = new Set<string>();
+  for (const row of ledger) {
+    if (row.entity !== ALERT_ENTITY) continue;
+    const payload = asRecord(row.payload);
+    if (typeof payload.phoneKey !== "string") continue;
+    if (payload.optedOut === true) refused.add(payload.phoneKey);
+    if (row.type === "SmsAlertSent") refused.delete(payload.phoneKey);
+  }
+  return refused;
+}
+
+export async function decryptField(
   ctx: unknown,
   entity: string,
   property: string,
@@ -134,7 +174,7 @@ async function decryptField(
   return raw;
 }
 
-function personName(
+export function personName(
   givenName?: string | null,
   familyName?: string | null,
 ): string {
@@ -179,6 +219,9 @@ export const getStatus = query({
               at: lastScan.createdAt,
               sent: typeof scan.sent === "number" ? scan.sent : 0,
               failed: typeof scan.failed === "number" ? scan.failed : 0,
+              heldForNight:
+                typeof scan.heldForNight === "number" ? scan.heldForNight : 0,
+              optedOut: typeof scan.optedOut === "number" ? scan.optedOut : 0,
               error: typeof scan.error === "string" ? scan.error : null,
             },
     };
@@ -192,14 +235,19 @@ export const enableAlerts = action({
     const tenantId = requireTenant(auth);
     requireManager(auth.role);
     requireTwilioConfig(); // fail early with a clear message if unconfigured
+    // The newest enable owns the tenant's scan chain; older chains end at
+    // their next scan, so enabling twice never leaves two chains running.
+    const chainId = crypto.randomUUID();
     await ctx.runMutation(internal.smsAlerts.recordConfigEvent, {
       tenantId,
       type: "SmsAlertsEnabled",
       actorId: auth.id,
+      payload: { chainId },
     });
     await ctx.scheduler.runAfter(0, internal.smsAlerts.scanTenant, {
       tenantId,
       scheduleNext: true,
+      chainId,
     });
     return { enabled: true };
   },
@@ -232,7 +280,7 @@ export const recordConfigEvent = internalMutation({
     payload: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.type,
       entity: CONFIG_ENTITY,
       entityId: args.tenantId,
@@ -255,9 +303,14 @@ export const recordAlert = internalMutation({
     status: v.union(v.literal("sent"), v.literal("failed")),
     messageSid: v.optional(v.string()),
     error: v.optional(v.string()),
+    body: v.optional(v.string()),
+    phoneKey: v.optional(v.string()),
+    optedOut: v.optional(v.boolean()),
+    sentAgainBy: v.optional(v.string()),
+    requestId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: args.status === "sent" ? "SmsAlertSent" : "SmsAlertFailed",
       entity: ALERT_ENTITY,
       entityId: args.tenantId,
@@ -268,6 +321,11 @@ export const recordAlert = internalMutation({
         alertType: args.alertType,
         messageSid: args.messageSid ?? null,
         error: args.error ?? null,
+        body: args.body ?? null,
+        phoneKey: args.phoneKey ?? null,
+        optedOut: args.optedOut === true,
+        sentAgainBy: args.sentAgainBy ?? null,
+        requestId: args.requestId ?? null,
       },
       createdAt: Date.now(),
     });
@@ -281,34 +339,68 @@ export const loadScanContext = internalQuery({
       .query("manifestEvents")
       .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
       .collect();
-    const enabled = latestConfigEnabled(
-      ledger.filter((row) => row.entity === CONFIG_ENTITY),
-    );
+    const configRows = ledger.filter((row) => row.entity === CONFIG_ENTITY);
+    const enabled = latestConfigEnabled(configRows);
     if (!enabled) {
-      return { enabled: false, recipients: [], triggers: [], alreadySent: [] };
+      return {
+        enabled: false,
+        recipients: [],
+        triggers: [],
+        alreadySent: [],
+        currentChainId: null,
+        quietUntil: null,
+        optedOut: 0,
+      };
+    }
+    let currentChainId: string | null = null;
+    let chainAt = -Infinity;
+    for (const row of configRows) {
+      const chainId = asRecord(row.payload).chainId;
+      // Rows come in insertion order, so a same-time later row is newer.
+      if (
+        row.type === "SmsAlertsEnabled" &&
+        typeof chainId === "string" &&
+        row.createdAt >= chainAt
+      ) {
+        currentChainId = chainId;
+        chainAt = row.createdAt;
+      }
     }
 
     const now = Date.now();
-    const [people, events, deliveries, incidents] = await Promise.all([
-      ctx.db
-        .query("people")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-        .collect(),
-      ctx.db
-        .query("events")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-        .collect(),
-      ctx.db
-        .query("deliveries")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-        .collect(),
-      ctx.db
-        .query("incidents")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-        .collect(),
-    ]);
+    const [people, events, deliveries, incidents, locations] =
+      await Promise.all([
+        ctx.db
+          .query("people")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .collect(),
+        ctx.db
+          .query("events")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .collect(),
+        ctx.db
+          .query("deliveries")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .collect(),
+        ctx.db
+          .query("incidents")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .collect(),
+        ctx.db
+          .query("operatingLocations")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .take(50),
+      ]);
+    const kitchenTimeZone =
+      locations.find(
+        (row) =>
+          row.deletedAt == null && row.status === "active" && row.timeZone,
+      )?.timeZone ?? null;
+
+    const refusedPhones = optedOutPhones(ledger);
 
     const recipients: Recipient[] = [];
+    let optedOut = 0;
     for (const person of people) {
       if (
         person.deletedAt != null ||
@@ -319,10 +411,17 @@ export const loadScanContext = internalQuery({
       }
       const phone = await decryptField(ctx, "Person", "phone", person.phone);
       if (!isSendablePhone(phone)) continue;
+      const key = await phoneKey(phone!);
+      if (refusedPhones.has(key)) {
+        optedOut += 1;
+        continue;
+      }
       recipients.push({
         personId: String(person._id),
         name: personName(person.givenName, person.familyName),
         phone: phone!.trim(),
+        phoneKey: key,
+        eventIds: [],
       });
     }
 
@@ -341,6 +440,8 @@ export const loadScanContext = internalQuery({
         triggers.push({
           triggerKey: `event:${String(event._id)}:t2h`,
           alertType: "event_soon",
+          eventId: String(event._id),
+          urgent: false,
           body: `⏰ ${event.title} starts around ${formatEventTime(event.startsAt)} (about 2 hours). — Capsule`,
         });
       }
@@ -356,6 +457,8 @@ export const loadScanContext = internalQuery({
         triggers.push({
           triggerKey: `delivery:${String(delivery._id)}:dispatched`,
           alertType: "delivery_dispatched",
+          eventId: String(delivery.eventId),
+          urgent: false,
           body: `🚚 Delivery to ${delivery.destination || "the event"} is now in transit. — Capsule`,
         });
       }
@@ -373,37 +476,93 @@ export const loadScanContext = internalQuery({
         triggers.push({
           triggerKey: `incident:${String(incident._id)}:allergen`,
           alertType: "allergen_incident",
+          eventId: incident.eventId == null ? null : String(incident.eventId),
+          urgent: true,
           body: `⚠️ Critical allergen incident reported for ${title}. Immediate attention required. — Capsule`,
         });
       }
     }
 
-    const alreadySent = ledger
-      .filter(
-        (row) => row.entity === ALERT_ENTITY && row.type === "SmsAlertSent",
-      )
-      .map((row) => {
-        const payload = asRecord(row.payload);
-        return `${String(payload.triggerKey)}::${String(payload.personId)}`;
-      });
+    // Who works each alerted event: they still get its texts at night.
+    const recipientById = new Map(
+      recipients.map((recipient) => [recipient.personId, recipient] as const),
+    );
+    for (const event of events) {
+      const eventId = String(event._id);
+      if (!triggers.some((trigger) => trigger.eventId === eventId)) continue;
+      const shifts = await ctx.db
+        .query("shifts")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .collect();
+      for (const shift of shifts) {
+        if (
+          shift.tenantId !== args.tenantId ||
+          shift.deletedAt != null ||
+          shift.status === "cancelled"
+        ) {
+          continue;
+        }
+        recipientById.get(String(shift.personId))?.eventIds.push(eventId);
+      }
+    }
 
-    return { enabled: true, recipients, triggers, alreadySent };
+    // A key is done once it was sent, or after MAX_ATTEMPTS failed tries.
+    const alreadySent: string[] = [];
+    const failures = new Map<string, number>();
+    for (const row of ledger) {
+      if (row.entity !== ALERT_ENTITY) continue;
+      const payload = asRecord(row.payload);
+      const key = `${String(payload.triggerKey)}::${String(payload.personId)}`;
+      if (row.type === "SmsAlertSent") alreadySent.push(key);
+      if (row.type === "SmsAlertFailed") {
+        const count = (failures.get(key) ?? 0) + 1;
+        failures.set(key, count);
+        if (count === MAX_ATTEMPTS) alreadySent.push(key);
+      }
+    }
+
+    return {
+      enabled: true,
+      recipients,
+      triggers,
+      alreadySent,
+      currentChainId,
+      quietUntil: quietHoursEnd(now, kitchenTimeZone),
+      optedOut,
+    };
   },
 });
 
 export const scanTenant = internalAction({
-  args: { tenantId: v.string(), scheduleNext: v.boolean() },
+  args: {
+    tenantId: v.string(),
+    scheduleNext: v.boolean(),
+    chainId: v.optional(v.string()),
+  },
   handler: async (ctx, args): Promise<ScanResult> => {
     const context: ScanContext = await ctx.runQuery(
       internal.smsAlerts.loadScanContext,
       { tenantId: args.tenantId },
     );
+    const empty = { sent: 0, skipped: 0, failed: 0, heldForNight: 0 };
     if (!context.enabled) {
-      return { status: "disabled", sent: 0, skipped: 0, failed: 0 };
+      return { status: "disabled", ...empty, optedOut: 0 };
+    }
+    // A newer chain owns this tenant: end this one without sends or reschedule.
+    if (
+      args.scheduleNext &&
+      context.currentChainId != null &&
+      args.chainId !== context.currentChainId
+    ) {
+      return { status: "superseded", ...empty, optedOut: 0 };
     }
 
     const sentKeys = new Set(context.alreadySent);
-    const result: ScanResult = { status: "ok", sent: 0, skipped: 0, failed: 0 };
+    const result: ScanResult = {
+      status: "ok",
+      ...empty,
+      optedOut: context.optedOut,
+    };
 
     let config;
     try {
@@ -415,17 +574,42 @@ export const scanTenant = internalAction({
         type: "SmsAlertsScanned",
         payload: { sent: 0, failed: 0, error },
       });
-      return { status: "partial", sent: 0, skipped: 0, failed: 0, error };
+      return { status: "partial", ...empty, optedOut: 0, error };
     }
 
+    const stopped = new Set<string>(); // texted STOP during this scan
     outer: for (const trigger of context.triggers) {
       for (const recipient of context.recipients) {
+        if (stopped.has(recipient.personId)) continue;
         const dedupKey = `${trigger.triggerKey}::${recipient.personId}`;
         if (sentKeys.has(dedupKey)) {
           result.skipped += 1;
           continue;
         }
+        // At night only the people working the event get its texts; the
+        // rest get it in the morning if it still applies.
+        if (
+          context.quietUntil != null &&
+          !trigger.urgent &&
+          !(trigger.eventId && recipient.eventIds.includes(trigger.eventId))
+        ) {
+          result.heldForNight += 1;
+          continue;
+        }
         if (result.sent >= MAX_SENDS_PER_SCAN) break outer;
+        // A scan running at the same moment may have claimed this text.
+        const claim = await ctx.runMutation(
+          internal.smsAlertClaims.claimAlert,
+          {
+            tenantId: args.tenantId,
+            triggerKey: trigger.triggerKey,
+            personId: recipient.personId,
+          },
+        );
+        if (!claim.claimed) {
+          result.skipped += 1;
+          continue;
+        }
         try {
           const messageSid = await sendSms({
             config,
@@ -441,10 +625,14 @@ export const scanTenant = internalAction({
             alertType: trigger.alertType,
             status: "sent",
             messageSid,
+            body: trigger.body,
+            phoneKey: recipient.phoneKey,
           });
           result.sent += 1;
         } catch (cause) {
           const error = safeTwilioMessage(cause);
+          const optedOutNow =
+            twilioErrorCode(cause) === TWILIO_UNSUBSCRIBED_CODE;
           await ctx.runMutation(internal.smsAlerts.recordAlert, {
             tenantId: args.tenantId,
             triggerKey: trigger.triggerKey,
@@ -452,7 +640,14 @@ export const scanTenant = internalAction({
             alertType: trigger.alertType,
             status: "failed",
             error,
+            body: trigger.body,
+            phoneKey: recipient.phoneKey,
+            optedOut: optedOutNow,
           });
+          if (optedOutNow) {
+            stopped.add(recipient.personId);
+            result.optedOut += 1;
+          }
           result.failed += 1;
           result.status = "partial";
           result.error ??= error;
@@ -466,12 +661,14 @@ export const scanTenant = internalAction({
       payload: {
         sent: result.sent,
         failed: result.failed,
+        heldForNight: result.heldForNight,
+        optedOut: result.optedOut,
         error: result.error ?? null,
       },
     });
 
     if (args.scheduleNext) {
-      await scheduleNextScan(ctx, args.tenantId);
+      await scheduleNextScan(ctx, args.tenantId, args.chainId);
     }
     return result;
   },
@@ -480,6 +677,7 @@ export const scanTenant = internalAction({
 async function scheduleNextScan(
   ctx: ActionCtx,
   tenantId: string,
+  chainId: string | undefined,
 ): Promise<void> {
   const stillEnabled: boolean = await ctx.runQuery(
     internal.smsAlerts.isEnabled,
@@ -492,6 +690,7 @@ async function scheduleNextScan(
       {
         tenantId,
         scheduleNext: true,
+        chainId,
       },
     );
   }

@@ -1,4 +1,4 @@
-import { Fragment, useState, type FormEvent } from "react";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { formatCountNoun } from "../../lib/format";
@@ -9,12 +9,12 @@ import {
   useDeliveryMarkFailed,
   useDeliverySchedule,
   useDeliveryStartTransit,
-  useListEvent,
   useListDelivery,
   useListPackList,
   useListPerson,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useEventsById } from "../facilities/useEventsById";
 import {
   useAssignDriver,
   useUnassignDriver,
@@ -45,10 +45,17 @@ const toEpoch = (value: FormDataEntryValue | null) => {
 };
 
 export function DeliveriesPage() {
-  const eventScope = useWorkingEventScope();
+  const eventScope = useWorkingEventScope("deliveries");
   const deliveries = useListDelivery();
   const packLists = useListPackList();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      deliveries === undefined || packLists === undefined
+        ? undefined
+        : [...deliveries, ...packLists].map((row) => row.eventId),
+    [deliveries, packLists],
+  );
+  const events = useEventsById(eventIds);
   const people = useListPerson();
   const vehicles = useListVehicle();
   const assignDriver = useAssignDriver();
@@ -191,11 +198,34 @@ export function DeliveriesPage() {
         });
         return;
       }
+      if (key === "confirmDelivery") {
+        const values = await prompt.askFields({
+          title: "Delivered",
+          description: "Say who took it at the venue, if someone did.",
+          confirmLabel: "Confirm delivery",
+          fields: [
+            { name: "receivedBy", label: "Taken by", required: false },
+            { name: "note", label: "Note", required: false },
+          ],
+        });
+        if (!values) return;
+        void run(`${row._id}:${key}`, async () => {
+          await confirmDelivery({
+            docId: row._id,
+            version: row.version,
+            receivedByName: values.receivedBy?.trim() || undefined,
+            note: values.note?.trim() || undefined,
+          });
+          setNotice("Delivery confirmed.");
+        });
+        return;
+      }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
-        if (key === "startTransit") await startTransit(args);
-        if (key === "confirmDelivery") await confirmDelivery(args);
-        setNotice(`Delivery updated (${key}).`);
+        if (key === "startTransit") {
+          await startTransit(args);
+          setNotice("Delivery is on the way.");
+        }
       });
     })();
   };
@@ -259,7 +289,7 @@ export function DeliveriesPage() {
           <h1 className="display-title mt-2">Delivery runs</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Schedule a delivery from a packed pack list, assign a driver, then
-            start transit and confirm delivery or record failure.
+            start transit and confirm delivery, or mark it failed.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -400,7 +430,7 @@ export function DeliveriesPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Destination</th>
@@ -419,11 +449,11 @@ export function DeliveriesPage() {
                       <td>
                         <strong>{row.destination}</strong>
                       </td>
-                      <td>
+                      <td data-label="Pack / event">
                         {packName(row.packListId)}
                         <small>{eventName(row.eventId)}</small>
                       </td>
-                      <td>
+                      <td data-label="Driver">
                         {String(row.status) === "scheduled" ||
                         String(row.status) === "in_transit" ? (
                           <select
@@ -446,7 +476,7 @@ export function DeliveriesPage() {
                           personName(row.driverId)
                         )}
                       </td>
-                      <td>
+                      <td data-label="Vehicle">
                         {String(row.status) === "scheduled" ||
                         String(row.status) === "in_transit" ? (
                           <select
@@ -471,7 +501,7 @@ export function DeliveriesPage() {
                           )?.registration ?? "—")
                         )}
                       </td>
-                      <td>
+                      <td data-label="Window">
                         {row.windowStartsAt
                           ? new Date(row.windowStartsAt).toLocaleString()
                           : "—"}{" "}
@@ -480,10 +510,27 @@ export function DeliveriesPage() {
                           ? new Date(row.windowEndsAt).toLocaleString()
                           : "—"}
                       </td>
-                      <td>
+                      <td data-label="State">
                         <StatusChip status={String(row.status)} />
                         {row.failureReason ? (
                           <small>{row.failureReason}</small>
+                        ) : null}
+                        {row.departedByPersonId ? (
+                          <small>
+                            Left with {personName(row.departedByPersonId)}
+                          </small>
+                        ) : null}
+                        {row.deliveredAt ? (
+                          <small>
+                            Handed over by{" "}
+                            {row.deliveredByPersonId
+                              ? personName(row.deliveredByPersonId)
+                              : "the office"}
+                            {row.receivedByName
+                              ? `, taken by ${row.receivedByName}`
+                              : ""}
+                            {row.deliveryNote ? `. ${row.deliveryNote}` : ""}
+                          </small>
                         ) : null}
                       </td>
                       <td>

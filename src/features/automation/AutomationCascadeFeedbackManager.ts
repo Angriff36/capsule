@@ -1,9 +1,9 @@
-import type { ActionResultAction } from "../../ui/action-result";
+import type { ActionResultLink } from "../../ui/action-result";
 import { stockLineLink } from "../inventory/stockLevels";
 
 type CascadePublisher = (
   message: string,
-  actions?: readonly ActionResultAction[],
+  actions?: readonly ActionResultLink[],
 ) => void;
 
 /**
@@ -18,14 +18,14 @@ export class AutomationCascadeFeedbackManager {
     this.publish("Event approved. Purchase planning is up to date.", [
       {
         label: "View purchase needs",
-        to: `/inventory/purchasing?event=${eventId}`,
+        href: `/inventory/purchasing?event=${eventId}`,
       },
     ]);
   }
 
   wasteRecorded(inventoryItemId: string, quantity: number, unit: string): void {
     this.publish(`Waste recorded. Stock reduced by ${quantity} ${unit}.`, [
-      { label: "View stock line", to: stockLineLink(inventoryItemId) },
+      { label: "View stock line", href: stockLineLink(inventoryItemId) },
     ]);
   }
 }

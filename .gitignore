@@ -11,6 +11,8 @@ dist/
 coverage/
 test-results/
 .artifacts/
+# Loop maker test output (the maker session cannot delete files).
+/.artifacts-*.txt
 .pw-verify/
 graphify-out/
 
@@ -33,6 +35,8 @@ generated/ir/
 
 # Loop fix-attempt worktrees (loop-worktree tool)
 .loop-worktrees/
+# Other agent worktrees
+.worktrees/
 
 # AboardAI board data lives in .aboardai/ (features, kanban). Do NOT move that
 # tree under .local/ — agents did that once and emptied the Kanban. .local/ is
@@ -65,6 +69,7 @@ storybook-static/
 
 # Ralph loop state (loop.sh writes these every iteration; never commit them)
 .ralph-checkpoint
+.ralph-complete
 .ralph-telemetry.jsonl
 .ralph-failures.md
 .ralph-tasks/
@@ -74,3 +79,9 @@ storybook-static/
 # a clean CI checkout)
 .mcp.json
 .playwright-cli/
+
+# Builder notes for this computer only (Ryan 2026-09-29: "do it"). The builder
+# rewrites them every round; tracked, they kept the main checkout dirty.
+/STATE.md
+/loop-ledger.json
+/loop-run-log.md

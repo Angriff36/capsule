@@ -112,7 +112,7 @@ describe("personal saved views and outreach", () => {
         state: {},
         makeDefault: true,
       }),
-    ).rejects.toThrow("Report name is required");
+    ).rejects.toThrow("Give this report a name.");
     const row = await owner.auth.run(async (ctx) =>
       ctx.db.get(existing as never),
     );

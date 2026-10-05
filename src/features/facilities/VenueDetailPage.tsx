@@ -6,7 +6,9 @@ import {
   useVenueChangeCapacity,
   useVenueDeactivate,
   useVenueActivate,
+  useVenueSetTimeZone,
 } from "../../lib/manifest-convex-react";
+import { isValidTimeZone } from "../../lib/routeFacts";
 import {
   venueLayoutTemplatesListPath,
   venueListPath,
@@ -14,13 +16,24 @@ import {
 } from "./facilitiesRoutes";
 import { StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { formatDate } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
+import { VenuePartnershipPanel } from "./VenuePartnershipPanel";
+import { VenueSellingProfilePanel } from "./VenueSellingProfilePanel";
+import { VenueExclusiveDishesPanel } from "./VenueExclusiveDishesPanel";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
+import { VenueLogisticsProfilePanel } from "./VenueLogisticsProfilePanel";
+import { VenueOperatingFactsPanel } from "./VenueOperatingFactsPanel";
+import { VenueSiteVisitPanel } from "./VenueSiteVisitPanel";
+import { VenueEventGalleryPanel } from "./VenueEventGalleryPanel";
+import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import {
   coordinatesFromFields,
   coordinatesMapUrl,
@@ -73,6 +86,7 @@ export function VenueDetailPage() {
   const venue = useRouteRecord(useGetVenue, id);
 
   const updateDetails = useVenueUpdateDetails();
+  const setTimeZone = useVenueSetTimeZone();
   const changeCapacity = useVenueChangeCapacity();
   const deactivate = useVenueDeactivate();
   const activate = useVenueActivate();
@@ -81,12 +95,15 @@ export function VenueDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
+  const { loadingTooLong } = useSlowQuery(venue);
 
-  if (id === "skip" || venue === undefined) {
+  if (venue === undefined) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center text-ink-3">Loading...</div>
-      </div>
+      <QueryLoadState
+        title="This venue isn't loading"
+        detail="We couldn't load this venue. Check your connection, then refresh the page."
+        loadingTooLong={loadingTooLong}
+      />
     );
   }
 
@@ -95,9 +112,12 @@ export function VenueDetailPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center text-ink-3">
           <p>Venue not found</p>
-          <Link to={venueListPath()} className="text-brand hover:underline">
+          <ReturnToListLink
+            fallback={venueListPath()}
+            className="text-brand hover:underline"
+          >
             Back to Venues
-          </Link>
+          </ReturnToListLink>
         </div>
       </div>
     );
@@ -125,6 +145,15 @@ export function VenueDetailPage() {
     );
     if (!coordinates.ok) {
       setFailure(new Error(coordinates.error));
+      return;
+    }
+    const timeZone = String(data.get("timeZone") ?? "").trim();
+    if (timeZone && !isValidTimeZone(timeZone)) {
+      setFailure(
+        new Error(
+          `"${timeZone}" is not a time zone. Use a name like America/New_York, or leave it empty to use your kitchen's.`,
+        ),
+      );
       return;
     }
     void run("updateDetails", async () => {
@@ -170,6 +199,14 @@ export function VenueDetailPage() {
         contactPhone:
           String(data.get("contactPhone") ?? "").trim() || undefined,
       });
+      // Its own step so older venue forms never clear it; runs after the
+      // details save, which already moved the version on.
+      if (timeZone !== (venue.timeZone ?? "")) {
+        await setTimeZone({
+          docId: venue._id,
+          timeZone: timeZone || undefined,
+        });
+      }
       setShowEditForm(false);
     });
   };
@@ -221,12 +258,12 @@ export function VenueDetailPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link
-            to={venueListPath()}
+          <ReturnToListLink
+            fallback={venueListPath()}
             className="text-xs text-brand hover:underline"
           >
             ← Back to Venues
-          </Link>
+          </ReturnToListLink>
         </div>
         <StatusChip
           status={venue.status === "active" ? "active" : "inactive"}
@@ -451,6 +488,18 @@ export function VenueDetailPage() {
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
               />
             </div>
+            <div>
+              <label className="block text-xs font-medium text-ink-2">
+                Time zone
+              </label>
+              <input
+                type="text"
+                name="timeZone"
+                placeholder="Same as your kitchen"
+                defaultValue={venue.timeZone ?? ""}
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              />
+            </div>
             <VenueCoordinatesFields
               defaultLatitude={venue.latitude}
               defaultLongitude={venue.longitude}
@@ -639,7 +688,7 @@ export function VenueDetailPage() {
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
             <dt className="text-xs font-medium text-ink-3">Capacity</dt>
             <dd className="col-span-2 text-xs text-ink">
-              {venue.capacity ?? "Not set"}
+              {venue.capacity ? venue.capacity : "Not known"}
             </dd>
           </div>
           {/* Logistics features */}
@@ -832,13 +881,30 @@ export function VenueDetailPage() {
         </dl>
       </div>
 
+      <VenueOperatingFactsPanel venue={venue} />
+
+      <VenueLogisticsProfilePanel venue={venue} />
+
       {/* Venue Rooms & Spaces */}
       <VenueScorecardPanel venueId={venue._id} />
 
+      <VenueSellingProfilePanel venue={venue} />
+
+      <VenuePartnershipPanel venue={venue} />
+
+      <VenueExclusiveDishesPanel venueId={String(venue._id)} />
+
       <VenueRoomsPanel venueId={venue._id} />
+
+      <VenueSiteVisitPanel venue={venue} />
+
+      <VenueEventGalleryPanel venue={venue} />
 
       {/* Venue Notes */}
       <VenueNotesPanel venueId={venue._id} />
+
+      {/* Photos, floor plans, insurance papers */}
+      <AttachmentsSection parentType="venue" parentId={venue._id} />
 
       {/* Danger Zone */}
       {venue.status === "active" && (
@@ -846,8 +912,8 @@ export function VenueDetailPage() {
           <h3 className="text-lg font-medium text-danger">Danger Zone</h3>
           <p className="mt-2 text-xs text-danger">
             Deactivating a venue will mark it as inactive. It will no longer
-            appear in dropdowns for new events, but will remain visible in
-            historical event records.
+            appear in dropdowns for new events, but will still show up on past
+            events.
           </p>
           <button
             className="btn btn-danger mt-4"

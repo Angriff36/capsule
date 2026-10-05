@@ -148,6 +148,96 @@ export const findPriorArchivedRun = internalQuery({
   },
 });
 
+/** A fresh intake upload is read within minutes; one day is ample. */
+const FRESH_UPLOAD_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * PL-ARCHIVE / AC-177: may this tenant's run read these stored bytes as its
+ * archive? Knowing a storage id grants nothing. Allowed when a run of THIS
+ * tenant already holds the id (resume, duplicate check), or when the blob is
+ * a fresh upload that no other company's row references. Refused when
+ * another company's import run holds it, when another company's record
+ * (attachment, assistant upload, event packet, dish/ingredient/equipment
+ * photo) references it, or when an unclaimed blob is older than a day — an
+ * old file is some record's file, not an archive this person just uploaded.
+ */
+export const archiveStorageClaim = internalQuery({
+  args: { tenantId: v.string(), storageId: v.id("_storage") },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ allowed: true } | { allowed: false; reason: string }> => {
+    const refused = {
+      allowed: false as const,
+      reason:
+        "This file is not an upload from your company. Upload the archive again.",
+    };
+    const blob = await ctx.db.system.get(args.storageId);
+    if (!blob) {
+      return { allowed: false, reason: "Archive not found in file storage." };
+    }
+    const runs = await ctx.db
+      .query("importRuns")
+      .withIndex("by_archiveStorageId", (q) =>
+        q.eq("archiveStorageId", args.storageId),
+      )
+      .collect();
+    if (runs.some((run) => run.tenantId !== args.tenantId)) return refused;
+    if (runs.length > 0) return { allowed: true };
+
+    const foreign = (rows: Array<{ tenantId: string }>) =>
+      rows.some((row) => row.tenantId !== args.tenantId);
+    if (
+      foreign(
+        await ctx.db
+          .query("attachments")
+          .withIndex("by_storageId", (q) => q.eq("storageId", args.storageId))
+          .collect(),
+      ) ||
+      foreign(
+        await ctx.db
+          .query("assistantUploads")
+          .withIndex("by_storageId", (q) => q.eq("storageId", args.storageId))
+          .collect(),
+      ) ||
+      foreign(
+        await ctx.db
+          .query("eventPacketArtifacts")
+          .withIndex("by_storageId", (q) => q.eq("storageId", args.storageId))
+          .collect(),
+      ) ||
+      foreign(
+        await ctx.db
+          .query("dishes")
+          .withIndex("by_primaryImageStorageId", (q) =>
+            q.eq("primaryImageStorageId", args.storageId),
+          )
+          .collect(),
+      ) ||
+      foreign(
+        await ctx.db
+          .query("ingredients")
+          .withIndex("by_primaryImageStorageId", (q) =>
+            q.eq("primaryImageStorageId", args.storageId),
+          )
+          .collect(),
+      ) ||
+      foreign(
+        await ctx.db
+          .query("equipments")
+          .withIndex("by_primaryImageStorageId", (q) =>
+            q.eq("primaryImageStorageId", args.storageId),
+          )
+          .collect(),
+      )
+    ) {
+      return refused;
+    }
+    if (Date.now() - blob._creationTime > FRESH_UPLOAD_MS) return refused;
+    return { allowed: true };
+  },
+});
+
 /** Live name → checksum pairs for a run's artifacts — the delta input. */
 export const listArtifactChecksums = internalQuery({
   args: { importRunId: v.id("importRuns") },

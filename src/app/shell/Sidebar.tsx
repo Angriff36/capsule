@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import { eventsIndexPath } from "../../features/events/eventRoutes";
@@ -50,6 +50,7 @@ export function ThemeToggle() {
  * choice persists per browser.
  */
 export function Sidebar() {
+  const location = useLocation();
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const [collapsed, setCollapsed] = useState(
     () => localStorage.getItem(COLLAPSED_KEY) !== "0",
@@ -92,7 +93,14 @@ export function Sidebar() {
                   aria-label={area.label}
                   title={area.label}
                   className={({ isActive }) =>
-                    isActive ? "active" : undefined
+                    isActive &&
+                    // Events stays quiet on the tracker, which has its own item.
+                    !(
+                      area.path === "/events" &&
+                      location.pathname.startsWith("/events/tracker")
+                    )
+                      ? "active"
+                      : undefined
                   }
                 >
                   <area.icon width={17} height={17} />

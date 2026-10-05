@@ -57,14 +57,23 @@ export function EventReviewFlagsPanel({
 
   const dismiss = (flag: ReviewFlagRow) => {
     void (async () => {
-      const reason = await prompt.askReason({
+      const values = await prompt.askFields({
         title: "Dismiss the flag",
         description: `${flag.question}\n\nDismiss when it turned out not to be a problem. A reason is optional.`,
-        label: "Why (optional)",
+        fields: [
+          {
+            name: "reason",
+            label: "Why (optional)",
+            multiline: true,
+            required: false,
+          },
+        ],
         confirmLabel: "Dismiss",
       });
-      if (reason === null) return;
-      await run(flag._id, () => flags.dismiss(flag, reason || undefined));
+      if (values === null) return;
+      await run(flag._id, () =>
+        flags.dismiss(flag, values.reason?.trim() || undefined),
+      );
     })();
   };
 

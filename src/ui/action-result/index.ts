@@ -4,7 +4,7 @@ export {
   reportActionFail,
   reportActionOk,
   type ActionResult,
-  type ActionResultAction,
+  type ActionResultLink,
   type ActionResultKind,
 } from "./ActionResultStore";
 export { ActionResultHost } from "./ActionResultHost";

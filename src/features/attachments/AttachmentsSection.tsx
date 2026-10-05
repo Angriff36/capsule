@@ -8,6 +8,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
 import { useActionFailure } from "../../ui/action-result";
+import { DeckShareActions } from "./DeckShareActions";
 
 export type AttachmentParentType =
   | "eventRecord"
@@ -17,7 +18,10 @@ export type AttachmentParentType =
   | "delivery"
   | "closeout"
   | "dish"
-  | "ingredient";
+  | "ingredient"
+  | "equipment"
+  | "component"
+  | "venue";
 
 function formatSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -127,7 +131,7 @@ export function AttachmentsSection({
       ) : attachments.length === 0 ? (
         <EmptyState
           title="No files attached yet"
-          hint="PDFs, images, and spreadsheets attached here stay with this record."
+          hint="PDFs, images, and spreadsheets attached here stay with this item."
         />
       ) : (
         <ul className="mt-3 divide-y">
@@ -154,7 +158,11 @@ export function AttachmentsSection({
                   {row.uploadedAt
                     ? ` · ${formatDate(row.uploadedAt)} ${formatTime(row.uploadedAt)}`
                     : ""}
+                  {row.uploadedByName ? ` · by ${row.uploadedByName}` : ""}
                 </p>
+                {parentType === "client" || parentType === "venue" ? (
+                  <DeckShareActions attachmentId={row._id} />
+                ) : null}
               </div>
               <button
                 type="button"

@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 export const EQUIPMENT_CONDITIONS = [
   "excellent",
@@ -34,7 +35,90 @@ export type EquipmentDetailRow = {
   purchaseValue: number;
   homeLocation?: string | null;
   currentLocation?: string | null;
+  trackingMode?: "serialized" | "bulk" | null;
+  serialNumber?: string | null;
+  description?: string | null;
+  countUnit?: string | null;
+  replacementCost?: number | null;
+  customerPrice?: number | null;
+  vendorId?: string | null;
 };
+
+export type VendorChoice = { vendorId: string; name: string };
+
+function text(data: FormData, name: string): string | undefined {
+  const value = String(data.get(name) ?? "").trim();
+  return value.length > 0 ? value : undefined;
+}
+
+function money(data: FormData, name: string): number | undefined {
+  const value = text(data, name);
+  return value === undefined ? undefined : Number(value);
+}
+
+function placeKey(place: string): string {
+  return place.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/**
+ * Places already in use: the catalog's own storage and current places, then
+ * the kitchen's storage places. One entry per spelling-insensitive name.
+ */
+export function equipmentPlaceChoices(
+  catalog: ReadonlyArray<{
+    homeLocation?: string | null;
+    currentLocation?: string | null;
+  }>,
+  storagePlaces: ReadonlyArray<string>,
+): string[] {
+  const byKey = new Map<string, string>();
+  const add = (place: string | null | undefined) => {
+    const trimmed = place?.trim().replace(/\s+/g, " ");
+    if (trimmed && !byKey.has(placeKey(trimmed))) {
+      byKey.set(placeKey(trimmed), trimmed);
+    }
+  };
+  for (const item of catalog) {
+    add(item.homeLocation);
+    add(item.currentLocation);
+  }
+  storagePlaces.forEach(add);
+  return [...byKey.values()].sort((a, b) => a.localeCompare(b));
+}
+
+/** A typed place in another spelling saves as the place's own name. */
+export function matchEquipmentPlace(
+  typed: string,
+  places: ReadonlyArray<string>,
+): string {
+  const trimmed = typed.trim();
+  if (!trimmed) return trimmed;
+  return (
+    places.find((place) => placeKey(place) === placeKey(trimmed)) ?? trimmed
+  );
+}
+
+/** The catalog facts both register and edit send (blank = leave unset). */
+export function equipmentCatalogFields(
+  data: FormData,
+  places: ReadonlyArray<string>,
+) {
+  const homeLocation = text(data, "homeLocation");
+  return {
+    trackingMode: String(data.get("trackingMode") ?? "bulk") as
+      "serialized" | "bulk",
+    serialNumber: text(data, "serialNumber"),
+    description: text(data, "description"),
+    countUnit: text(data, "countUnit"),
+    replacementCost: money(data, "replacementCost"),
+    customerPrice: money(data, "customerPrice"),
+    vendorId: text(data, "vendorId"),
+    homeLocation:
+      homeLocation === undefined
+        ? undefined
+        : matchEquipmentPlace(homeLocation, places),
+  };
+}
 
 /** Register-one / edit-one form for the equipment catalog. */
 export function EquipmentForm({
@@ -42,11 +126,15 @@ export function EquipmentForm({
   onSubmit,
   onClose,
   editItem,
+  vendors,
+  places,
 }: {
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose: () => void;
   editItem?: EquipmentDetailRow | null;
+  vendors: VendorChoice[];
+  places: string[];
 }) {
   const editing = editItem != null;
   return (
@@ -115,6 +203,26 @@ export function EquipmentForm({
             <option value="rented">Rented</option>
           </select>
         </label>
+        <label className="field-label">
+          How it is counted
+          <select
+            name="trackingMode"
+            className="input"
+            defaultValue={editItem?.trackingMode ?? "bulk"}
+          >
+            <option value="bulk">A group we count (chairs, linens)</option>
+            <option value="serialized">One piece with a serial number</option>
+          </select>
+        </label>
+        <label className="field-label">
+          Serial number
+          <input
+            name="serialNumber"
+            className="input"
+            defaultValue={editItem?.serialNumber ?? ""}
+            placeholder="Only for one-piece items"
+          />
+        </label>
         {editing ? null : (
           <label className="field-label">
             Quantity
@@ -130,6 +238,15 @@ export function EquipmentForm({
           </label>
         )}
         <label className="field-label">
+          Counted as
+          <input
+            name="countUnit"
+            className="input"
+            defaultValue={editItem?.countUnit ?? ""}
+            placeholder="each, set of 10, case of 25"
+          />
+        </label>
+        <label className="field-label">
           Purchase value (per unit)
           <input
             name="purchaseValue"
@@ -140,6 +257,47 @@ export function EquipmentForm({
             defaultValue={editItem?.purchaseValue ?? 0}
             required
           />
+        </label>
+        <label className="field-label">
+          Replacement cost (per unit)
+          <input
+            name="replacementCost"
+            className="input"
+            type="number"
+            min={0}
+            step="any"
+            defaultValue={editItem?.replacementCost ?? ""}
+            placeholder="What a lost one costs us"
+          />
+        </label>
+        <label className="field-label">
+          Client price (per unit)
+          <input
+            name="customerPrice"
+            className="input"
+            type="number"
+            min={0}
+            step="any"
+            defaultValue={editItem?.customerPrice ?? ""}
+            placeholder="What a client pays to rent one"
+          />
+        </label>
+        <label className="field-label">
+          Rented from
+          <SearchSelect
+            name="vendorId"
+            recentsKey="vendor"
+            placeholder="Search vendors…"
+            defaultValue={editItem?.vendorId ?? ""}
+            options={[
+              { id: "", label: "No vendor" },
+              ...vendors.map((vendor) => ({
+                id: vendor.vendorId,
+                label: vendor.name,
+              })),
+            ]}
+          />
+          <span className="field-hint">For items we rent, not own.</span>
         </label>
         {editing ? null : (
           <label className="field-label">
@@ -153,28 +311,45 @@ export function EquipmentForm({
             </select>
           </label>
         )}
+        <label className="field-label">
+          Storage place
+          <input
+            name="homeLocation"
+            className="input"
+            defaultValue={editItem?.homeLocation ?? ""}
+            placeholder="Where it lives"
+            list="equipment-places"
+          />
+          <span className="field-hint">
+            Pick a place already in use, or type a new one.
+          </span>
+        </label>
         {editing ? (
-          <>
-            <label className="field-label">
-              Home location
-              <input
-                name="homeLocation"
-                className="input"
-                defaultValue={editItem?.homeLocation ?? ""}
-                placeholder="Where it lives"
-              />
-            </label>
-            <label className="field-label">
-              Current location
-              <input
-                name="currentLocation"
-                className="input"
-                defaultValue={editItem?.currentLocation ?? ""}
-                placeholder="Where it is now"
-              />
-            </label>
-          </>
+          <label className="field-label">
+            Current location
+            <input
+              name="currentLocation"
+              className="input"
+              defaultValue={editItem?.currentLocation ?? ""}
+              placeholder="Where it is now"
+              list="equipment-places"
+            />
+          </label>
         ) : null}
+        <datalist id="equipment-places">
+          {places.map((place) => (
+            <option key={place} value={place} />
+          ))}
+        </datalist>
+        <label className="field-label">
+          Description
+          <input
+            name="description"
+            className="input"
+            defaultValue={editItem?.description ?? ""}
+            placeholder="Size, colour, what it looks like"
+          />
+        </label>
       </div>
     </form>
   );

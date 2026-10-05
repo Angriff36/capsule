@@ -215,4 +215,59 @@ export function canMarkNotApplicable(
     fact.fieldKey.startsWith("vehicle.native-"),
   );
 }
+/**
+ * Checks Capsule answers from the event's own records, so nobody ticks them
+ * by hand (issue #418). Old report checks asked for an uploaded TPP / Nowsta
+ * report: when Capsule holds the event's own pack list or crew, it prints
+ * those views itself (spec §14.3). The same holds for the crew, the truck run,
+ * rentals, layouts and the tracker, which Capsule keeps itself, and for the
+ * load and travel times once the event's timeline has them. Every pattern in
+ * a list must match at least one of the event's own facts.
+ */
+const NATIVE_ANSWERS: Record<string, RegExp[]> = {
+  "check.report.packlist_item_type": [/^packlist\.native-item-/],
+  "check.report.packlist_category": [/^packlist\.native-item-/],
+  "check.report.nowsta_event_timesheet": [/^crew\.native-/],
+  "check.assignment.crew": [/^crew\.native-/],
+  "check.assignment.vehicle": [/^vehicle\.native-/],
+  "check.live.tracker": [/^crew\.native-/, /^packlist\.native-/],
+  "check.live.goodshuffle": [/^equipment\.native-/],
+  "check.live.dropbox": [/^layouts\.native-/],
+  "check.timeline.load-travel": [
+    /^timeline\.event_staff_on\.\d+\.time$/,
+    /^timeline\.nlt\.\d+\.time$/,
+    /^timeline\.arrive_onsite\.\d+\.time$/,
+  ],
+};
+/**
+ * Checks about imported paperwork: tray and roll counts, units copied from an
+ * import, "***" recipe placeholders, the import system's final approval date.
+ * An event with no imported file has none of that paperwork, so these never
+ * ask a person to tick "not applicable" on it.
+ */
+const IMPORT_ONLY = new Set([
+  "check.menu.components",
+  "check.menu.unit-conversion",
+  "check.production.placeholders",
+  "check.live.tpp-final",
+]);
+export function nativelyAnswered(
+  checkKey: string,
+  facts: Pick<EventPacketSnapshot, "facts">["facts"],
+  imported = true,
+): boolean {
+  if (!imported && IMPORT_ONLY.has(checkKey)) return true;
+  const patterns = NATIVE_ANSWERS[checkKey];
+  return (
+    !!patterns &&
+    patterns.every((pattern) =>
+      facts.some(
+        (f) =>
+          pattern.test(f.fieldKey) &&
+          f.status === "confirmed" &&
+          f.authority === "native_finalized",
+      ),
+    )
+  );
+}
 export { forms as formDefinitions };

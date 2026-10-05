@@ -34,10 +34,11 @@
  * looked up against prior contacts/venues imports (recordType "contact"/"venue"
  * → Capsule id) before the Event is created; an event whose client was not
  * imported becomes a `pending_conflict` link (reconcile queue) rather than
- * fabricating a client. The TPP-mapped stage is NOT applied (the create command
- * hardcodes `stage: "planning"` and exposes no stage arg); the raw TPP
- * EventStatus is preserved on the link's rawSourceData for parallel-run
- * reconciliation (§6.1).
+ * fabricating a client. The create command makes the event in Planning; an old
+ * event that is over (Complete / Closed Out) or Cancelled then takes that
+ * status (`lib/importEventStage.ts`), and live old statuses stay in Planning.
+ * The raw TPP EventStatus is preserved on the link's rawSourceData for
+ * parallel-run reconciliation (§6.1).
  *
  * Leads need NO cross-dataset resolution: a Lead is the PRE-client inquiry
  * (`clientId` is optional, set only on conversion), so a TPP opportunity/
@@ -89,8 +90,14 @@
  * caller-supplied (TPP has no bulk export, spec §6.3), so this is the manual/
  * JSON-paste migration path.
  */
-import { ConvexError, v } from "convex/values";
-import { action, internalMutation, internalQuery } from "./_generated/server";
+import { ConvexError, v, type ObjectType } from "convex/values";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  type ActionCtx,
+  type MutationCtx,
+} from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
 import {
@@ -101,6 +108,7 @@ import {
   parseTppPackLists,
   parseTppPayments,
   parseTppVenues,
+  type ImportedClientName,
   type ParsedCapsuleEvent,
   type ParsedCapsuleLead,
   type ParsedCapsuleMenu,
@@ -115,7 +123,39 @@ import {
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
+import { FINANCIAL_ROW_LABEL } from "../src/lib/financialRowClass";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
+import {
+  clientLookAlikeNote,
+  venueLookAlikeNote,
+  type LookAlikeClient,
+  type LookAlikeVenue,
+} from "./lib/importIdentity";
+import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
+import {
+  matchClientByName,
+  type ClientName,
+  type ClientNameMatch,
+} from "./importClientByName";
+import { commitStockRows } from "./openingStock";
+import { commitHistoryRows } from "./importHistory";
+import { reconcileExistingLink, type DeltaOutcome } from "./importSourceDelta";
+import { attachImportedEventFiles } from "./lib/importEventFiles";
+import { applyImportedEventStage } from "./lib/importEventStage";
+import {
+  COMPANY_RECORD_TYPE,
+  commitImportedCompany,
+  importedCompanyName,
+} from "./lib/importCompanies";
+import { compensateStoppedRun } from "./importCancel";
+import { madeSnapshot } from "./lib/importRecordHomes";
+import { skippedByPerson } from "./lib/importResolution";
+import {
+  eventRequirementsText,
+  SOURCE_FIELD_MAPS,
+  sourceVersionOf,
+  type SourceDeltaDataset,
+} from "./lib/importSourceFields";
 
 /**
  * Canonical ExternalRecordLink key for an import-commit identity. Commit links
@@ -283,78 +323,169 @@ export const countRunLinks = internalQuery({
   },
 });
 
-/** Insert or update the link for a (tenant, source, recordType, externalId) key. */
-export const upsertLink = internalMutation({
-  args: {
-    tenantId: v.string(),
-    sourceSystem: v.string(),
-    recordType: v.string(),
-    externalId: v.string(),
-    capsuleEntity: v.string(),
-    capsuleId: v.string(),
-    sourceImportRunId: v.id("importRuns"),
-    rawSourceData: v.string(),
-    conflictStatus: v.union(
-      v.literal("resolved"),
-      v.literal("pending_conflict"),
-    ),
-    resolutionNote: v.optional(v.string()),
-  },
-  handler: async (ctx, args): Promise<Id<"externalRecordLinks">> => {
-    const linkKey = commitLinkKey(args);
-    const existing = await ctx.db
-      .query("externalRecordLinks")
-      .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("tenantId"), args.tenantId),
-          q.eq(q.field("deletedAt"), null),
-        ),
-      )
-      .first();
+/**
+ * AC-271: a link keeps the normalized record (read back by later datasets,
+ * e.g. events → contact name) AND the input row exactly as received, under
+ * its own `sourceRow` key, so raw source stays apart from the interpretation.
+ */
+async function loadClientNames(
+  ctx: ActionCtx,
+  tenantId: string,
+): Promise<ClientName[]> {
+  const names: ClientName[] = [];
+  let cursor: string | null = null;
+  for (;;) {
+    const page: {
+      names: ClientName[];
+      isDone: boolean;
+      continueCursor: string;
+    } = await ctx.runQuery(internal.importClientByName.clientNamesPage, {
+      tenantId,
+      cursor,
+    });
+    names.push(...page.names);
+    if (page.isDone) return names;
+    cursor = page.continueCursor;
+  }
+}
 
-    const now = Date.now();
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        capsuleEntity:
-          args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
-        capsuleId: args.capsuleId,
-        sourceImportRunId: args.sourceImportRunId,
-        rawSourceData: args.rawSourceData,
-        conflictStatus: args.conflictStatus,
-        resolutionNote: args.resolutionNote ?? existing.resolutionNote,
-        updatedAt: now,
-        version: existing.version + 1,
-      });
-      return existing._id;
+/** "Rebecca Griffith (Spokane Inc)" — a client named on an event list row. */
+function clientNameText(name: ImportedClientName | undefined): string {
+  const person = [name?.givenName, name?.familyName].filter(Boolean).join(" ");
+  if (person && name?.companyName) return `${person} (${name.companyName})`;
+  return person || name?.companyName || "Imported Contact";
+}
+
+function withSourceRow(normalized: object, sourceRow: unknown): string {
+  return JSON.stringify({ ...normalized, sourceRow: sourceRow ?? null });
+}
+
+/** The client a merged client now lives on (itself when never merged). */
+export const survivingClientId = internalQuery({
+  args: { tenantId: v.string(), clientId: v.string() },
+  handler: async (ctx, args): Promise<string> => {
+    let id = ctx.db.normalizeId("clients", args.clientId);
+    if (!id) return args.clientId;
+    let surviving: string = args.clientId;
+    const seen = new Set<string>();
+    while (id && !seen.has(id)) {
+      seen.add(id);
+      const row: Doc<"clients"> | null = await ctx.db.get(id);
+      if (!row || row.tenantId !== args.tenantId) break;
+      surviving = id;
+      id = row.mergedIntoClientId ?? null;
     }
+    return surviving;
+  },
+});
 
-    return await ctx.db.insert("externalRecordLinks", {
-      tenantId: args.tenantId,
-      sourceSystem:
-        args.sourceSystem as Doc<"externalRecordLinks">["sourceSystem"],
-      recordType: args.recordType,
-      externalId: args.externalId,
-      linkKey,
+/** Insert or update the link for a (tenant, source, recordType, externalId) key. */
+export const upsertLinkArgs = {
+  tenantId: v.string(),
+  sourceSystem: v.string(),
+  recordType: v.string(),
+  externalId: v.string(),
+  capsuleEntity: v.string(),
+  capsuleId: v.string(),
+  sourceImportRunId: v.id("importRuns"),
+  rawSourceData: v.string(),
+  conflictStatus: v.union(v.literal("resolved"), v.literal("pending_conflict")),
+  resolutionNote: v.optional(v.string()),
+  // PL-SOURCE-DELTA: the values this import wrote into Capsule, so a later
+  // run can tell a source change from a person's edit.
+  appliedValues: v.optional(v.string()),
+  sourceVersion: v.optional(v.string()),
+  // PL-SOURCE-IDENTITY: this run made the record, but it waits for a person
+  // (a look-alike), so the link is pending yet keeps the made snapshot.
+  madeRecord: v.optional(v.boolean()),
+};
+
+export const upsertLink = internalMutation({
+  args: upsertLinkArgs,
+  handler: (ctx, args) => writeLink(ctx, args),
+});
+
+/** upsertLink's write, for a seam that links inside its own transaction. */
+export async function writeLink(
+  ctx: MutationCtx,
+  args: ObjectType<typeof upsertLinkArgs>,
+): Promise<Id<"externalRecordLinks">> {
+  const linkKey = commitLinkKey(args);
+  const baseline =
+    args.appliedValues !== undefined
+      ? {
+          appliedValues: args.appliedValues,
+          appliedSourceVersion: args.sourceVersion,
+          appliedAt: Date.now(),
+          appliedImportRunId: String(args.sourceImportRunId),
+          sourceVersion: args.sourceVersion,
+          lastSeenAt: Date.now(),
+          lastSeenImportRunId: String(args.sourceImportRunId),
+        }
+      : {};
+  // AC-631: the record as this run finished it, so a stopped run can tell
+  // an untouched record from one a person changed.
+  const made =
+    args.conflictStatus === "resolved" || args.madeRecord === true
+      ? await madeSnapshot(ctx.db, args.recordType, args.capsuleId)
+      : undefined;
+  const madeMetadata = made !== undefined ? { metadata: made } : {};
+  const existing = await ctx.db
+    .query("externalRecordLinks")
+    .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
+    .filter((q) =>
+      q.and(
+        q.eq(q.field("tenantId"), args.tenantId),
+        q.eq(q.field("deletedAt"), null),
+      ),
+    )
+    .first();
+
+  const now = Date.now();
+  if (existing) {
+    await ctx.db.patch(existing._id, {
       capsuleEntity:
         args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
       capsuleId: args.capsuleId,
-      verified: false,
       sourceImportRunId: args.sourceImportRunId,
       rawSourceData: args.rawSourceData,
       conflictStatus: args.conflictStatus,
-      resolutionNote: args.resolutionNote,
-      // SoftDeletable shape: generated creates stamp deletedAt: null, and
-      // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
-      // the key leaves it undefined and every cross-dataset findLink
-      // (events→contact, payments→event, pack_list→event) silently misses.
-      deletedAt: null,
-      createdAt: now,
+      resolutionNote: args.resolutionNote ?? existing.resolutionNote,
+      ...baseline,
+      ...madeMetadata,
       updatedAt: now,
-      version: 0,
+      version: existing.version + 1,
     });
-  },
-});
+    return existing._id;
+  }
+
+  return await ctx.db.insert("externalRecordLinks", {
+    tenantId: args.tenantId,
+    sourceSystem:
+      args.sourceSystem as Doc<"externalRecordLinks">["sourceSystem"],
+    recordType: args.recordType,
+    externalId: args.externalId,
+    linkKey,
+    capsuleEntity:
+      args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
+    capsuleId: args.capsuleId,
+    verified: false,
+    sourceImportRunId: args.sourceImportRunId,
+    rawSourceData: args.rawSourceData,
+    conflictStatus: args.conflictStatus,
+    resolutionNote: args.resolutionNote,
+    ...baseline,
+    ...madeMetadata,
+    // SoftDeletable shape: generated creates stamp deletedAt: null, and
+    // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
+    // the key leaves it undefined and every cross-dataset findLink
+    // (events→contact, payments→event, pack_list→event) silently misses.
+    deletedAt: null,
+    createdAt: now,
+    updatedAt: now,
+    version: 0,
+  });
+}
 
 /**
  * One-time migration: stamp the canonical linkKey on link rows written before
@@ -416,6 +547,21 @@ export const supersedeLink = internalMutation({
   },
 });
 
+/** The rows a run kept when it started committing (AC-056). */
+async function readKeptRows(
+  ctx: ActionCtx,
+  storageId: string,
+): Promise<unknown[]> {
+  const blob = await ctx.storage.get(storageId as Id<"_storage">);
+  if (!blob) {
+    throw new ConvexError(
+      "This import's saved rows are gone. Paste the rows again to continue.",
+    );
+  }
+  const rows: unknown = JSON.parse(await blob.text());
+  return Array.isArray(rows) ? rows : [];
+}
+
 export type CommitResult = {
   committed: number;
   skipped: number;
@@ -428,6 +574,14 @@ export type CommitResult = {
    * dedup makes the resume create only the missing records).
    */
   stoppedEarly?: boolean;
+  /**
+   * PL-SOURCE-DELTA: records already in Capsule whose source changed. `updated`
+   * took the source change; `conflicted` hold at least one field a person
+   * changed too (waiting in the review list). `skipped` is then only the
+   * records whose source did not change.
+   */
+  updated?: number;
+  conflicted?: number;
   /** Cumulative records handled across this run's commit invocations. */
   processedCount?: number;
 };
@@ -495,6 +649,40 @@ function mergeCheckpoint(
  * terminal outcome this invocation, `remaining` records (this one included)
  * are still unhandled.
  */
+/** PL-SOURCE-DELTA: the compared values a fresh create wrote, kept on its link. */
+function sourceBaseline(
+  dataset: SourceDeltaDataset,
+  record: object,
+): { appliedValues: string; sourceVersion: string } {
+  const values = SOURCE_FIELD_MAPS[dataset].fromSource(
+    record as Record<string, unknown>,
+  );
+  return {
+    appliedValues: JSON.stringify(values),
+    sourceVersion: sourceVersionOf(values),
+  };
+}
+
+/**
+ * PL-SOURCE-DELTA tallies for records that already had a link from an earlier
+ * run. The checkpoint still counts every such record as skipped (handled,
+ * nothing new created); the result splits out the ones that changed.
+ */
+type DeltaTally = { updated: number; conflicted: number };
+
+function countDelta(tally: DeltaTally, outcome: DeltaOutcome): void {
+  if (outcome === "updated") tally.updated += 1;
+  else if (outcome === "conflict") tally.conflicted += 1;
+}
+
+function deltaResult(skipped: number, tally: DeltaTally) {
+  return {
+    skipped: skipped - tally.updated - tally.conflicted,
+    updated: tally.updated,
+    conflicted: tally.conflicted,
+  };
+}
+
 function batchLimitReached(
   maxRecords: number | undefined,
   handled: number,
@@ -546,6 +734,22 @@ export const commitImportRun = action({
     }
     if (args.maxRecords !== undefined && args.maxRecords < 1) {
       throw new ConvexError("maxRecords must be at least 1 when provided.");
+    }
+
+    // PL-IMPORT-CANCEL (AC-056): the first commit keeps its rows in file
+    // storage; a later Continue with no rows reads them back, so a run whose
+    // worker stopped finishes without the browser that started it.
+    let rawRows: unknown[] = args.rawRows;
+    if (rawRows.length === 0 && importRun.sourceRowsStorageId) {
+      rawRows = await readKeptRows(ctx, importRun.sourceRowsStorageId);
+    } else if (rawRows.length > 0 && !importRun.sourceRowsStorageId) {
+      const storageId = await ctx.storage.store(
+        new Blob([JSON.stringify(rawRows)], { type: "application/json" }),
+      );
+      await ctx.runMutation(api.mutations.ImportRun_keepSourceRows, {
+        docId: args.importRunId,
+        sourceRowsStorageId: storageId,
+      });
     }
 
     // R2-6 resume state, shared by every dataset branch below. Counting
@@ -629,6 +833,42 @@ export const commitImportRun = action({
       });
     };
 
+    // PL-IMPORT-RESUME (AC-631): a person stopped this import (the run is no
+    // longer committing). Start no further record; take back what this run
+    // made that nobody has changed since — this worker may have linked one
+    // more record after the stop, so it runs the same take-back the stop did.
+    const stopIfStopped = async (): Promise<void> => {
+      const still = await ctx.runQuery(internal.importCancel.runIsCommitting, {
+        importRunId: args.importRunId,
+      });
+      if (still) return;
+      const state = await ctx.runQuery(internal.importCancel.stopState, {
+        importRunId: args.importRunId,
+      });
+      if (!state.stopped) {
+        // Another worker finished it; this one adds nothing more.
+        throw new ConvexError("This import already finished.");
+      }
+      await compensateStoppedRun(ctx, args.importRunId);
+      throw new ConvexError(
+        "This import was stopped. Nothing more was brought in.",
+      );
+    };
+
+    // PL-ARCHIVE: a report-archive run with no rows to bring in finishes on
+    // accounting alone. ImportRun_commit still refuses until every file is
+    // accounted for and any report-list gap is explained; finishing creates
+    // no records, and the run keeps each file's outcome visible.
+    if (rawRows.length === 0 && importRun.archiveStorageId) {
+      const none = { committed: 0, skipped: 0, pending: 0 };
+      await completeRun(none);
+      return {
+        ...none,
+        parseErrors: 0,
+        processedCount: mergeCheckpoint(checkpoint, none).processedCount,
+      };
+    }
+
     // ponytail: a TPP contact (a person we cater for) → a person-type Client
     // account. We deliberately do NOT create a ClientContact here: that entity
     // requires a parent clientId (the TPP CompanyID → Capsule Client resolution
@@ -640,10 +880,10 @@ export const commitImportRun = action({
     // "client"). The company/title are folded into notes (the full raw row is
     // also preserved on the link), so nothing is lost.
     if (importRun.datasetType === "contacts") {
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppContacts(args.rawRows as TppContactRecord[]);
+      const parsed = parseTppContacts(rawRows as TppContactRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid contact records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -653,6 +893,20 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
+      // PL-SOURCE-IDENTITY (AC-058): a new client with the same name or email
+      // as one Capsule has is still made on its own; only that record waits
+      // on the match list for a person to say same or different.
+      let clientPool: LookAlikeClient[] | null = null;
+      const lookAlike = async (made: LookAlikeClient) => {
+        clientPool ??= (await ctx.runQuery(
+          api.queries.listClient,
+          {},
+        )) as LookAlikeClient[];
+        const note = clientLookAlikeNote(made, clientPool);
+        clientPool.push(made);
+        return note;
+      };
       for (const [index, contact] of parsed.records.entries()) {
         // R2-6 batch stop: halt before the next record once maxRecords
         // records reached a terminal outcome this invocation.
@@ -669,27 +923,79 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
+        if (contact.company) {
+          // A company row (TPP_COMPANY_MAPPINGS) becomes a company client.
+          const outcome = await commitImportedCompany(ctx, {
+            tenantId,
+            sourceSystem,
+            importRunId: args.importRunId,
+            company: contact,
+            rawSourceData: withSourceRow(
+              contact,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            lookAlike,
+          });
+          if (outcome === "committed") committed += 1;
+          else if (outcome === "skipped") skipped += 1;
+          else if (outcome === "pending") pending += 1;
+          else if (outcome !== "resumed") {
+            // PL-SOURCE-DELTA: an earlier run's company, compared again.
+            countDelta(delta, outcome);
+            skipped += 1;
+          }
+          continue;
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
           recordType: "contact",
           externalId: contact.externalId,
         });
+        // PL-SOURCE-RESOLUTION (AC-065): a row a person skipped stays skipped.
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip. A link THIS run wrote
-          // was counted by the invocation that handled it, so a resume
-          // skips it silently (R2-6) and checkpoint counts stay exact.
+          // Already materialized. A link THIS run wrote was counted by the
+          // invocation that handled it, so a resume skips it silently (R2-6)
+          // and checkpoint counts stay exact.
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA: an earlier run's record takes a changed source
+          // row as a reviewed delta (never over a person's edit).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "contacts",
+            link: existing,
+            record: contact,
+            rawSourceData: withSourceRow(
+              contact,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
 
-        const idempotencyKey = `import:${args.importRunId}:contact:${contact.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:contact:${contact.externalId}`;
         const notes =
           [contact.title, contact.notes].filter(Boolean).join(" — ") ||
           undefined;
+        // AC-275: the person's company, when the company row was imported.
+        const companyName =
+          (contact.companyId
+            ? await importedCompanyName(ctx, {
+                tenantId,
+                sourceSystem,
+                companyId: contact.companyId,
+              })
+            : undefined) ?? contact.companyName;
         try {
           const created = await ctx.runMutation(
             api.mutations.Client_createViaRegister,
@@ -697,13 +1003,33 @@ export const commitImportRun = action({
               clientType: "person",
               givenName: contact.givenName,
               familyName: contact.familyName,
+              companyName,
               email: contact.email,
               phone: contact.phone ?? contact.mobile,
+              addressLine1: contact.addressLine1,
+              city: contact.city,
+              region: contact.region,
+              postalCode: contact.postalCode,
               notes,
               idempotencyKey,
             },
           );
           const clientId: string = (created as { docId: string }).docId;
+          // AC-063: the birthday goes on the client (Birthday List report).
+          if (contact.birthday) {
+            await ctx.runMutation(api.mutations.Client_setBirthday, {
+              docId: clientId as Id<"clients">,
+              birthday: contact.birthday,
+              idempotencyKey: `${idempotencyKey}:birthday`,
+            });
+          }
+          const lookAlikeNote = await lookAlike({
+            _id: clientId,
+            clientType: "person",
+            givenName: contact.givenName,
+            familyName: contact.familyName,
+            email: contact.email,
+          });
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -712,9 +1038,21 @@ export const commitImportRun = action({
             capsuleEntity: "client",
             capsuleId: clientId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(contact),
-            conflictStatus: "resolved",
+            rawSourceData: withSourceRow(
+              contact,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            ...(lookAlikeNote
+              ? {
+                  conflictStatus: "pending_conflict" as const,
+                  resolutionNote: lookAlikeNote,
+                  madeRecord: true,
+                }
+              : { conflictStatus: "resolved" as const }),
+            ...sourceBaseline("contacts", contact),
           });
+          // A look-alike is a made record: it counts as added, and its link
+          // waits on the match list.
           committed += 1;
         } catch (cause) {
           // Per-record failure (e.g. salesAccess denied) → review queue.
@@ -730,7 +1068,10 @@ export const commitImportRun = action({
             capsuleEntity: "client",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(contact),
+            rawSourceData: withSourceRow(
+              contact,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -738,7 +1079,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -750,7 +1091,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -762,10 +1103,10 @@ export const commitImportRun = action({
     }
 
     if (importRun.datasetType === "events") {
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppEvents(args.rawRows as TppEventRecord[]);
+      const parsed = parseTppEvents(rawRows as TppEventRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid event records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -775,6 +1116,9 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
+      // Read once per batch, only when a row names its client by name.
+      let clientNames: ClientName[] | null = null;
 
       for (const [index, event] of (
         parsed.records as ParsedCapsuleEvent[]
@@ -793,18 +1137,36 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
           recordType: "event",
           externalId: event.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized (own-run links skip silently so resume
+          // counts stay exact, R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA (see the contacts branch).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "events",
+            link: existing,
+            record: event,
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -816,13 +1178,29 @@ export const commitImportRun = action({
         // TPP company id never imported as a contact) becomes a
         // pending_conflict link rather than fabricating a client — the
         // documented next slice (company→Client).
-        const clientLink = await ctx.runQuery(internal.importCommit.findLink, {
-          tenantId,
-          sourceSystem,
-          recordType: "contact",
-          externalId: event.clientId,
-        });
-        if (!clientLink || !clientLink.capsuleId) {
+        // A ClientID may name a person contact or a company row (AC-275).
+        // TPP's event list report has no ClientID, only the client's name.
+        let byName: ClientNameMatch | null = null;
+        if (!event.clientId && event.clientName) {
+          clientNames ??= await loadClientNames(ctx, tenantId);
+          byName = matchClientByName(clientNames, event.clientName);
+        }
+        const clientLink = byName
+          ? null
+          : ((await ctx.runQuery(internal.importCommit.findLink, {
+              tenantId,
+              sourceSystem,
+              recordType: "contact",
+              externalId: event.clientId,
+            })) ??
+            (await ctx.runQuery(internal.importCommit.findLink, {
+              tenantId,
+              sourceSystem,
+              recordType: COMPANY_RECORD_TYPE,
+              externalId: event.clientId,
+            })));
+        if (byName && byName.status !== "found") {
+          const who = clientNameText(event.clientName);
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -831,14 +1209,50 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            conflictStatus: "pending_conflict",
+            resolutionNote:
+              byName.status === "several"
+                ? `${byName.count} clients are named ${who}; merge them or read the file again after one is renamed.`
+                : `No client named ${who}; import the contact list first, then read this file again.`,
+          });
+          pending += 1;
+          continue;
+        }
+        if (!byName && (!clientLink || !clientLink.capsuleId)) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "event",
+            externalId: event.externalId,
+            capsuleEntity: "event_record",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Client not imported (external ${event.clientId}); import contacts first.`,
           });
           pending += 1;
           continue;
         }
-        const clientId: string = clientLink.capsuleId;
+        // AC-181: a client merged since its import hands its events to the
+        // client it was merged into.
+        const clientId: string = await ctx.runQuery(
+          internal.importCommit.survivingClientId,
+          {
+            tenantId,
+            clientId:
+              byName?.status === "found"
+                ? byName.clientId
+                : (clientLink?.capsuleId ?? ""),
+          },
+        );
 
         // Venue is optional on Event; resolve if the TPP VenueID was imported.
         let venueId: string | undefined;
@@ -863,15 +1277,19 @@ export const commitImportRun = action({
         // Headcount is guarded >= 1; dates require endsAt > startsAt (default a
         // 1h window when EndTime is absent).
         const eventType = event.occasionId || "Imported Event";
-        let primaryContactName = "Imported Contact";
+        let primaryContactName = event.clientName
+          ? clientNameText(event.clientName)
+          : "Imported Contact";
         try {
-          const contact = JSON.parse(clientLink.rawSourceData || "{}") as {
+          const contact = JSON.parse(clientLink?.rawSourceData || "{}") as {
             givenName?: string;
             familyName?: string;
+            company?: { name?: string };
           };
-          const name = [contact.givenName, contact.familyName]
-            .filter(Boolean)
-            .join(" ");
+          const name =
+            [contact.givenName, contact.familyName].filter(Boolean).join(" ") ||
+            contact.company?.name ||
+            "";
           if (name) primaryContactName = name;
         } catch {
           // keep placeholder
@@ -886,7 +1304,10 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: "Event is missing a start date (EventDate).",
           });
@@ -901,7 +1322,17 @@ export const commitImportRun = action({
         const budgetAmount = Math.max(0, event.budgetAmount ?? 0);
         const quotedPrice = Math.max(0, event.quotedRevenue ?? 0);
 
-        const idempotencyKey = `import:${args.importRunId}:event:${event.externalId}`;
+        // Service style (AC-064): use the matching Capsule style; an unknown
+        // one never blocks the event — it waits on the matching screen.
+        const styleMatch = event.serviceStyleId
+          ? await ctx.runQuery(internal.importServiceStyle.matchServiceStyle, {
+              tenantId,
+              sourceSystem,
+              code: event.serviceStyleId,
+            })
+          : null;
+
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:event:${event.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.Event_createViaPlanEngagement,
@@ -916,15 +1347,45 @@ export const commitImportRun = action({
               budgetAmount,
               quotedPrice,
               venueId,
+              serviceStyleId: styleMatch?._id,
+              serviceStyleName: styleMatch?.name,
               venueName: event.venueName,
               venueAddress: event.venueAddress,
               accessibilityNeeds: event.accessibilityNeeds,
-              operationalRequirements:
-                event.operationalRequirements ?? event.notes,
+              operationalRequirements: eventRequirementsText({
+                ...event,
+              }),
               idempotencyKey,
             },
           );
           const eventId: string = (created as { docId: string }).docId;
+          // AC-024: the event's files, attached BEFORE the link (the pack-list
+          // item shape). A worker that dies between files leaves no link, so
+          // the resume re-opens the same event and each per-file key returns
+          // the file already attached with zero writes — a file a person
+          // removed in the meantime stays removed.
+          const fileErrors = await attachImportedEventFiles(ctx, {
+            tenantId,
+            importRunId: args.importRunId,
+            externalId: event.externalId,
+            eventId,
+            files: event.files ?? [],
+          });
+          // An old event that is over or was cancelled takes that status;
+          // live old statuses stay in Planning.
+          const stageError = await applyImportedEventStage(ctx, {
+            importRunId: args.importRunId,
+            externalId: event.externalId,
+            eventId,
+            rawStatus: event.rawEventStatus,
+            endsAt,
+          });
+          const notes = [
+            ...(fileErrors.length > 0
+              ? [`Some files were not added: ${fileErrors.join("; ")}`]
+              : []),
+            ...(stageError ? [stageError] : []),
+          ];
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -933,8 +1394,13 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: eventId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
+            ...(notes.length > 0 ? { resolutionNote: notes.join(" ") } : {}),
+            ...sourceBaseline("events", event),
           });
           committed += 1;
         } catch (cause) {
@@ -952,15 +1418,36 @@ export const commitImportRun = action({
             capsuleEntity: "event_record",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(event),
+            rawSourceData: withSourceRow(
+              event,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
           pending += 1;
         }
+        // One matching-screen item per unknown old style; the event itself
+        // imports either way.
+        if (event.serviceStyleId && !styleMatch) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: SERVICE_STYLE_RECORD_TYPE,
+            externalId: event.serviceStyleId,
+            capsuleEntity: SERVICE_STYLE_RECORD_TYPE,
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({
+              serviceStyle: event.serviceStyleId,
+            }),
+            conflictStatus: "pending_conflict",
+            resolutionNote: `Service style "${event.serviceStyleId.replace(/_/g, " ")}" is not in your service styles. Match it to one; the imported events that use it get that style.`,
+          });
+        }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -972,7 +1459,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -984,10 +1471,10 @@ export const commitImportRun = action({
     }
 
     if (importRun.datasetType === "leads") {
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppLeads(args.rawRows as TppLeadRecord[]);
+      const parsed = parseTppLeads(rawRows as TppLeadRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid lead records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -997,6 +1484,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, lead] of (
         parsed.records as ParsedCapsuleLead[]
@@ -1015,18 +1503,36 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
           recordType: "lead",
           externalId: lead.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized (own-run links skip silently so resume
+          // counts stay exact, R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA (see the contacts branch).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "leads",
+            link: existing,
+            record: lead,
+            rawSourceData: withSourceRow(
+              lead,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -1039,14 +1545,8 @@ export const commitImportRun = action({
         // hardcodes stage "new" with no stage arg). Linking the lead to a
         // Capsule Client is the conversion workflow (stageConversion →
         // confirmConversion), a separate operator action.
-        const idempotencyKey = `import:${args.importRunId}:lead:${lead.externalId}`;
-        const notes =
-          [
-            lead.stage !== "new" ? `TPP stage: ${lead.stage}` : null,
-            lead.clientId ? `TPP client ${lead.clientId}` : null,
-          ]
-            .filter(Boolean)
-            .join(" — ") || undefined;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:lead:${lead.externalId}`;
+        const notes = lead.clientId ? `TPP client ${lead.clientId}` : undefined;
         try {
           const created = await ctx.runMutation(
             api.mutations.Lead_createViaCapture,
@@ -1061,6 +1561,16 @@ export const commitImportRun = action({
             },
           );
           const leadId: string = (created as { docId: string }).docId;
+          // AC-276: the old stage, event date and close date go on the lead
+          // itself (a close date means the deal is closed), before the link.
+          await ctx.runMutation(api.mutations.Lead_recordSourceHistory, {
+            docId: leadId as Id<"leads">,
+            stage: lead.stage,
+            sourceStage: lead.rawStage,
+            eventDate: lead.eventDate,
+            closedAt: lead.closeDate,
+            idempotencyKey: `${idempotencyKey}:history`,
+          });
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,
@@ -1069,8 +1579,12 @@ export const commitImportRun = action({
             capsuleEntity: "lead",
             capsuleId: leadId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(lead),
+            rawSourceData: withSourceRow(
+              lead,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
+            ...sourceBaseline("leads", lead),
           });
           committed += 1;
         } catch (cause) {
@@ -1087,7 +1601,10 @@ export const commitImportRun = action({
             capsuleEntity: "lead",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(lead),
+            rawSourceData: withSourceRow(
+              lead,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1095,7 +1612,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -1107,7 +1624,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -1129,10 +1646,10 @@ export const commitImportRun = action({
       // in the queue. conflictStatus "pending_conflict" is the CORRECT
       // "awaiting match" state here — not a creation failure — so a staged link
       // counts as `committed` (the link IS the artifact this dataset produces).
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppPayments(args.rawRows as TppPaymentRecord[]);
+      const parsed = parseTppPayments(rawRows as TppPaymentRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid payment records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1160,6 +1677,7 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         // Idempotent skip: an existing ACTIVE link means this payment reference
         // is already staged (or already matched). The link IS the artifact, so
         // ANY active link — matched or not — is a no-op skip (re-runs don't
@@ -1201,8 +1719,30 @@ export const commitImportRun = action({
             resolvedEventNote = `external event ${payment.eventId} (imported but unresolved)`;
           }
         }
+        // AC-084: only money moving on its own waits for a match; the same
+        // accounting transaction seen in an overlapping report counts once.
+        let sameMoneyAs: string | null = null;
+        if (payment.movesMoney && payment.providerTransactionId) {
+          const counted = await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "payment_transaction",
+            externalId: payment.providerTransactionId,
+          });
+          const countedAs = counted
+            ? (JSON.parse(counted.rawSourceData ?? "{}").paymentId as string)
+            : null;
+          if (countedAs && countedAs !== payment.externalId)
+            sameMoneyAs = countedAs;
+        }
+        const waitsForMatch = payment.movesMoney && !sameMoneyAs;
+        const label = FINANCIAL_ROW_LABEL[payment.rowClass];
         const note = [
-          "Imported TPP payment — reconciliation reference (match via markMatched on a Capsule payment)",
+          sameMoneyAs
+            ? `Same money as payment ${sameMoneyAs} (same accounting transaction ${payment.providerTransactionId}) — counted once, kept for the record`
+            : waitsForMatch
+              ? `Imported TPP ${label} — reconciliation reference (match via markMatched on a Capsule payment)`
+              : `Imported TPP ${label} — reference only, not money of its own, not counted`,
           payment.invoiceId
             ? `external invoice ${payment.invoiceId} (no invoice import)`
             : null,
@@ -1215,6 +1755,21 @@ export const commitImportRun = action({
           .filter(Boolean)
           .join(" — ");
 
+        // The transaction marker goes first: a run that stops between the
+        // two writes resumes to the same result.
+        if (waitsForMatch && payment.providerTransactionId)
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "payment_transaction",
+            externalId: payment.providerTransactionId,
+            capsuleEntity: "payment",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({ paymentId: payment.externalId }),
+            conflictStatus: "resolved",
+            resolutionNote: `Accounting transaction counted once, as payment ${payment.externalId}`,
+          });
         await ctx.runMutation(internal.importCommit.upsertLink, {
           tenantId,
           sourceSystem,
@@ -1223,8 +1778,11 @@ export const commitImportRun = action({
           capsuleEntity: "payment",
           capsuleId: "",
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(payment),
-          conflictStatus: "pending_conflict",
+          rawSourceData: withSourceRow(
+            payment,
+            rawRows[parsed.sourceIndexes[index]!],
+          ),
+          conflictStatus: waitsForMatch ? "pending_conflict" : "resolved",
           resolutionNote: note,
         });
         committed += 1;
@@ -1267,10 +1825,10 @@ export const commitImportRun = action({
       // the other branches), so a role with importAccess but not kitchenAccess
       // sees every dish land as pending_conflict (managers/admins/owners hold
       // both); portionSize is parsed from free text and defaults to 1.
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppMenus(args.rawRows as TppMenuRecord[]);
+      const parsed = parseTppMenus(rawRows as TppMenuRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid menu records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1280,6 +1838,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, menu] of (
         parsed.records as ParsedCapsuleMenu[]
@@ -1298,23 +1857,41 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
           recordType: "menu",
           externalId: menu.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized (own-run links skip silently so resume
+          // counts stay exact, R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA (see the contacts branch).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "menus",
+            link: existing,
+            record: menu,
+            rawSourceData: withSourceRow(
+              menu,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
 
-        const idempotencyKey = `import:${args.importRunId}:menu:${menu.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:menu:${menu.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.Dish_createViaIntroduce,
@@ -1336,11 +1913,16 @@ export const commitImportRun = action({
             sourceSystem,
             recordType: "menu",
             externalId: menu.externalId,
-            capsuleEntity: "menu",
+            // AC-180: the record is a Dish, so the link says so.
+            capsuleEntity: "dish",
             capsuleId: dishId,
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(menu),
+            rawSourceData: withSourceRow(
+              menu,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "resolved",
+            ...sourceBaseline("menus", menu),
           });
           committed += 1;
         } catch (cause) {
@@ -1354,10 +1936,13 @@ export const commitImportRun = action({
             sourceSystem,
             recordType: "menu",
             externalId: menu.externalId,
-            capsuleEntity: "menu",
+            capsuleEntity: "dish",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(menu),
+            rawSourceData: withSourceRow(
+              menu,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1365,7 +1950,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -1377,7 +1962,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -1401,10 +1986,10 @@ export const commitImportRun = action({
       // per-event (externalId = sourceEventId): a re-run skips an already-linked
       // event. PackList_createViaOpen is logisticsAccess-guarded, so a role with
       // importAccess but not logisticsAccess sees the row land as pending_conflict.
-      if (args.rawRows.length === 0) {
+      if (rawRows.length === 0) {
         throw new ConvexError("No source rows provided — nothing to commit.");
       }
-      const parsed = parseTppPackLists(args.rawRows as TppPackListRecord[]);
+      const parsed = parseTppPackLists(rawRows as TppPackListRecord[]);
       if (parsed.records.length === 0) {
         throw new ConvexError(
           `No valid pack-list records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
@@ -1414,6 +1999,7 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
+      const delta: DeltaTally = { updated: 0, conflicted: 0 };
 
       for (const [index, packList] of (
         parsed.records as ParsedCapsulePackList[]
@@ -1432,18 +2018,34 @@ export const commitImportRun = action({
             pending,
           });
         }
+        await stopIfStopped();
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
           recordType: "pack_list",
           externalId: packList.externalId,
         });
+        if (existing && skippedByPerson(existing)) {
+          if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+          continue;
+        }
         if (existing && existing.capsuleId) {
-          // Already materialized — idempotent skip (own-run links skip
-          // silently so resume counts stay exact, R2-6).
+          // Already materialized — own-run links skip silently so resume
+          // counts stay exact (R2-6).
           if (existing.sourceImportRunId === args.importRunId) {
             continue;
           }
+          // PL-SOURCE-DELTA: an earlier run's pack list takes changed lines
+          // as a reviewed delta (never over a packer's change).
+          const outcome = await reconcileExistingLink(ctx, {
+            dataset: "pack_lists",
+            link: existing,
+            record: packList,
+            rawSourceData: JSON.stringify(packList),
+            importRunId: args.importRunId,
+          });
+          if (outcome === "resumed") continue;
+          countDelta(delta, outcome);
           skipped += 1;
           continue;
         }
@@ -1468,7 +2070,10 @@ export const commitImportRun = action({
             capsuleEntity: "pack_list",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(packList),
+            rawSourceData: withSourceRow(
+              packList,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: `Source event not imported (external ${packList.sourceEventId}); import events first.`,
           });
@@ -1477,7 +2082,7 @@ export const commitImportRun = action({
         }
         const eventId: string = eventLink.capsuleId;
 
-        const idempotencyKey = `import:${args.importRunId}:pack_list:${packList.externalId}`;
+        const idempotencyKey = `tenant-shared/import:${args.importRunId}:pack_list:${packList.externalId}`;
         try {
           const created = await ctx.runMutation(
             api.mutations.PackList_createViaOpen,
@@ -1495,6 +2100,7 @@ export const commitImportRun = action({
           // errors") and the PackList already exists.
           const itemImportErrors: string[] = [];
           let itemsAdded = 0;
+          const addedItems: typeof packList.items = [];
           for (const [itemIndex, item] of packList.items.entries()) {
             try {
               await ctx.runMutation(
@@ -1510,10 +2116,11 @@ export const commitImportRun = action({
                   // §6.3 idempotent-import requirement. Run-scoped to match the
                   // PackList/Dish create-key convention; cross-run dedup is the
                   // pack-list link check's job (findLink above).
-                  idempotencyKey: `import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
+                  idempotencyKey: `tenant-shared/import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
                 },
               );
               itemsAdded += 1;
+              addedItems.push(item);
             } catch (itemCause) {
               itemImportErrors.push(
                 `${item.description}: ${itemCause instanceof Error ? itemCause.message : "add item failed"}`,
@@ -1535,6 +2142,9 @@ export const commitImportRun = action({
               itemImportErrors,
             }),
             conflictStatus: "resolved",
+            // Only lines that saved count as applied, so a line that failed
+            // is added by a later import of the same list.
+            ...sourceBaseline("pack_lists", { ...packList, items: addedItems }),
           });
           committed += 1;
         } catch (cause) {
@@ -1551,7 +2161,10 @@ export const commitImportRun = action({
             capsuleEntity: "pack_list",
             capsuleId: "",
             sourceImportRunId: args.importRunId,
-            rawSourceData: JSON.stringify(packList),
+            rawSourceData: withSourceRow(
+              packList,
+              rawRows[parsed.sourceIndexes[index]!],
+            ),
             conflictStatus: "pending_conflict",
             resolutionNote: note,
           });
@@ -1559,7 +2172,7 @@ export const commitImportRun = action({
         }
       }
 
-      if (committed === 0 && pending > 0) {
+      if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
           `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
         );
@@ -1571,7 +2184,7 @@ export const commitImportRun = action({
 
       return {
         committed,
-        skipped,
+        ...deltaResult(skipped, delta),
         pending,
         parseErrors: parsed.errors.length,
         processedCount: mergeCheckpoint(checkpoint, {
@@ -1582,16 +2195,83 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "stock") {
+      // Opening stock count sheets (PL-OPENING-STOCK): each row is staged as
+      // an OpeningStockRecord for review; on-hand stock is never written here.
+      if (rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const result = await commitStockRows(ctx, {
+        importRunId: args.importRunId,
+        tenantId,
+        sourceSystem: importRun.sourceSystem,
+        rawRows: rawRows,
+        maxRecords: args.maxRecords,
+      });
+      const invocation = {
+        committed: result.committed,
+        skipped: result.skipped,
+        pending: result.pending,
+      };
+      if (result.stoppedEarly) {
+        return await stopEarly(result.parseErrors, invocation);
+      }
+      await completeRun(invocation);
+      return {
+        ...invocation,
+        parseErrors: result.parseErrors,
+        processedCount: mergeCheckpoint(checkpoint, invocation).processedCount,
+      };
+    }
+
+    if (importRun.datasetType === "history") {
+      // PL-SOURCE-HISTORY (AC-062, AC-111): old messages and tasks become
+      // client/event history only (convex/importHistory.ts).
+      if (rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const result = await commitHistoryRows(ctx, {
+        importRunId: args.importRunId,
+        tenantId,
+        actorId: runCtx.actorId,
+        sourceSystem: importRun.sourceSystem,
+        rawRows,
+        maxRecords: args.maxRecords,
+        beforeEach: stopIfStopped,
+      });
+      const invocation = {
+        committed: result.committed,
+        skipped: result.skipped,
+        pending: result.pending,
+      };
+      if (result.stoppedEarly) {
+        return await stopEarly(result.parseErrors, invocation);
+      }
+      if (result.committed === 0 && result.skipped === 0) {
+        throw new ConvexError(
+          result.pending > 0
+            ? `No history brought in (${result.pending} waiting on the match list). Bring in the contacts and events first.`
+            : `No history rows could be read (${result.parseErrors} row(s) with problems). Nothing to commit.`,
+        );
+      }
+      await completeRun(invocation);
+      return {
+        ...invocation,
+        parseErrors: result.parseErrors,
+        processedCount: mergeCheckpoint(checkpoint, invocation).processedCount,
+      };
+    }
+
     // ImportDatasetType is a closed union (contacts/events/leads/payments/menus/
-    // pack_list/venues); the six branches above each return, so TS narrows
+    // pack_list/stock/history/venues); the branches above each return, so TS narrows
     // importRun.datasetType to "venues" here — this fall-through is exhaustive.
     // A future member added without a branch would fall through to venue parsing
     // and fail loudly ("No valid venue records parsed") rather than misroute.
-    if (args.rawRows.length === 0) {
+    if (rawRows.length === 0) {
       throw new ConvexError("No source rows provided — nothing to commit.");
     }
 
-    const parsed = parseTppVenues(args.rawRows as TppVenueRecord[]);
+    const parsed = parseTppVenues(rawRows as TppVenueRecord[]);
     if (parsed.records.length === 0) {
       // Non-empty input that yields zero valid records (all rows failed to
       // parse) must NOT silently flip the run to completed.
@@ -1603,6 +2283,10 @@ export const commitImportRun = action({
     let committed = 0;
     let skipped = 0;
     let pending = 0;
+    const delta: DeltaTally = { updated: 0, conflicted: 0 };
+    // PL-SOURCE-IDENTITY (AC-058): same name, or same address under a new
+    // name (a renamed venue), waits on the match list; nothing is joined.
+    let venuePool: LookAlikeVenue[] | null = null;
 
     for (const [index, venue] of parsed.records.entries()) {
       // R2-6 batch stop (see the contacts branch).
@@ -1619,23 +2303,41 @@ export const commitImportRun = action({
           pending,
         });
       }
+      await stopIfStopped();
       const existing = await ctx.runQuery(internal.importCommit.findLink, {
         tenantId,
         sourceSystem,
         recordType: "venue",
         externalId: venue.externalId,
       });
+      if (existing && skippedByPerson(existing)) {
+        if (existing.sourceImportRunId !== args.importRunId) skipped += 1;
+        continue;
+      }
       if (existing && existing.capsuleId) {
-        // Already materialized — idempotent skip (own-run links skip
-        // silently so resume counts stay exact, R2-6).
+        // Already materialized (own-run links skip silently so resume
+        // counts stay exact, R2-6).
         if (existing.sourceImportRunId === args.importRunId) {
           continue;
         }
+        // PL-SOURCE-DELTA (see the contacts branch).
+        const outcome = await reconcileExistingLink(ctx, {
+          dataset: "venues",
+          link: existing,
+          record: venue,
+          rawSourceData: withSourceRow(
+            venue,
+            rawRows[parsed.sourceIndexes[index]!],
+          ),
+          importRunId: args.importRunId,
+        });
+        if (outcome === "resumed") continue;
+        countDelta(delta, outcome);
         skipped += 1;
         continue;
       }
 
-      const idempotencyKey = `import:${args.importRunId}:venue:${venue.externalId}`;
+      const idempotencyKey = `tenant-shared/import:${args.importRunId}:venue:${venue.externalId}`;
       try {
         const created = await ctx.runMutation(
           api.mutations.Venue_createViaRegister,
@@ -1652,10 +2354,24 @@ export const commitImportRun = action({
             contactPhone: venue.contactPhone,
             accessNotes: venue.accessNotes,
             cateringNotes: venue.cateringNotes,
+            loadInInstructions: venue.loadInInstructions,
+            logisticsNotes: venue.logisticsNotes,
             idempotencyKey,
           },
         );
         const venueId: string = (created as { docId: string }).docId;
+        venuePool ??= (await ctx.runQuery(
+          api.queries.listVenue,
+          {},
+        )) as LookAlikeVenue[];
+        const made: LookAlikeVenue = {
+          _id: venueId,
+          name: venue.name,
+          addressLine1: venue.addressLine1,
+          postalCode: venue.postalCode,
+        };
+        const lookAlikeNote = venueLookAlikeNote(made, venuePool);
+        venuePool.push(made);
         await ctx.runMutation(internal.importCommit.upsertLink, {
           tenantId,
           sourceSystem,
@@ -1664,9 +2380,20 @@ export const commitImportRun = action({
           capsuleEntity: "venue",
           capsuleId: venueId,
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(venue),
-          conflictStatus: "resolved",
+          rawSourceData: withSourceRow(
+            venue,
+            rawRows[parsed.sourceIndexes[index]!],
+          ),
+          ...(lookAlikeNote
+            ? {
+                conflictStatus: "pending_conflict" as const,
+                resolutionNote: lookAlikeNote,
+                madeRecord: true,
+              }
+            : { conflictStatus: "resolved" as const }),
+          ...sourceBaseline("venues", venue),
         });
+        // A look-alike is a made record: it counts as added (see contacts).
         committed += 1;
       } catch (cause) {
         // Per-record failure (e.g. eventManageAccess denied) → review queue.
@@ -1682,7 +2409,10 @@ export const commitImportRun = action({
           capsuleEntity: "venue",
           capsuleId: "",
           sourceImportRunId: args.importRunId,
-          rawSourceData: JSON.stringify(venue),
+          rawSourceData: withSourceRow(
+            venue,
+            rawRows[parsed.sourceIndexes[index]!],
+          ),
           conflictStatus: "pending_conflict",
           resolutionNote: note,
         });
@@ -1690,7 +2420,7 @@ export const commitImportRun = action({
       }
     }
 
-    if (committed === 0 && pending > 0) {
+    if (committed === 0 && skipped === 0 && pending > 0) {
       throw new ConvexError(
         `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
       );
@@ -1704,7 +2434,7 @@ export const commitImportRun = action({
 
     return {
       committed,
-      skipped,
+      ...deltaResult(skipped, delta),
       pending,
       parseErrors: parsed.errors.length,
       processedCount: mergeCheckpoint(checkpoint, {

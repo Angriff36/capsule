@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
+import { insertStepEvent } from "./lib/commandAudit";
 
 // Delivery write policy: logisticsAccess or manageAccess (base.manifest roles).
 const DELIVERY_ROLES = new Set([
@@ -77,7 +78,7 @@ export const assign = mutation({
       updatedAt: now,
       version: (delivery.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "DeliveryDriverAssigned",
       entity: "Delivery",
       entityId: args.deliveryId,
@@ -137,7 +138,7 @@ export const unassign = mutation({
       updatedAt: now,
       version: (delivery.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "DeliveryDriverUnassigned",
       entity: "Delivery",
       entityId: args.deliveryId,

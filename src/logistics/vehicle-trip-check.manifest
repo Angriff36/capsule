@@ -1,0 +1,128 @@
+// Capsule logistics — trip check: what the driver found on a truck before it
+// left for an event and after it came back (tires, brakes, lights, fluids,
+// body, cab, and the fridge unit when the truck has one), with the odometer
+// and fuel level at that moment.
+//
+// One row per check and a row is never edited: a new check takes its place on
+// screen and the old one stays as history. A failed item does not stop the
+// truck. The event's "ready to leave" list shows it and a person decides.
+
+use "../foundation/base.manifest"
+
+enum TripCheckKind {
+  before_leaving
+  after_return
+}
+
+enum TripCheckRating {
+  good
+  fair
+  poor
+  fail
+}
+
+enum TripFuelLevel {
+  empty
+  quarter
+  half
+  three_quarters
+  full
+}
+
+entity VehicleTripCheck mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // The truck run on the event this check belongs to.
+  property indexed required eventVehicleAssignmentId: uuid
+  property indexed eventId: uuid?
+  property required kind: TripCheckKind = "before_leaving"
+  property required tires: TripCheckRating = "good"
+  property required brakes: TripCheckRating = "good"
+  property required lights: TripCheckRating = "good"
+  property required fluids: TripCheckRating = "good"
+  property required bodywork: TripCheckRating = "good"
+  property required interior: TripCheckRating = "good"
+  // Empty = the truck has no fridge unit.
+  property refrigeration: TripCheckRating?
+  property odometer: int?
+  property fuelLevel: TripFuelLevel?
+  property damageNote: string?
+  property notes: string?
+  property checkedAt: datetime?
+  // Staff profile that did the check. Missing when that account is not linked
+  // to a profile; the check is still saved.
+  property checkedByPersonId: uuid?
+
+  belongsTo run: EventVehicleAssignment fields [tenantId, eventVehicleAssignmentId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  computed passed: boolean = self.tires != "fail" and self.brakes != "fail" and self.lights != "fail" and self.fluids != "fail" and self.bodywork != "fail" and self.interior != "fail" and (self.refrigeration == null or self.refrigeration != "fail")
+
+  constraint tripCheckOdometerNonnegative: self.odometer == null or self.odometer >= 0 "The odometer reading can't be negative. Use zero or more."
+
+  // The driver is often plain crew, and the whole crew needs to see whether
+  // the truck was checked.
+  default policy vehicleTripCheckRead read: roleAllows(user.role, "staffAccess") "Staff may see trip checks"
+  default policy vehicleTripCheckWrite write: roleAllows(user.role, "staffAccess") "Staff may add trip checks"
+  default policy vehicleTripCheckExecute execute: roleAllows(user.role, "staffAccess") "Staff may add trip checks"
+
+  command record(
+    eventVehicleAssignmentId: uuid,
+    kind: TripCheckKind,
+    tires: TripCheckRating,
+    brakes: TripCheckRating,
+    lights: TripCheckRating,
+    fluids: TripCheckRating,
+    bodywork: TripCheckRating,
+    interior: TripCheckRating,
+    optional refrigeration: TripCheckRating,
+    optional odometer: int,
+    optional fuelLevel: TripFuelLevel,
+    optional damageNote: string,
+    optional notes: string
+  ) {
+    guard self.checkedAt == null
+    guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only: a run from another
+    // workspace resolves to nothing and the check is refused.
+    guard self.run != null and self.run.deletedAt == null
+    constraint recordTripCheckRunMatch: eventVehicleAssignmentId == self.eventVehicleAssignmentId "This check is for a different truck run. Pick the run already on this check."
+    constraint recordTripCheckOdometer: odometer == null or odometer >= 0 "The odometer reading can't be negative. Use zero or more."
+    mutate kind = kind
+    mutate tires = tires
+    mutate brakes = brakes
+    mutate lights = lights
+    mutate fluids = fluids
+    mutate bodywork = bodywork
+    mutate interior = interior
+    mutate refrigeration = refrigeration
+    mutate odometer = odometer
+    mutate fuelLevel = fuelLevel
+    mutate damageNote = damageNote
+    mutate notes = notes
+    mutate eventId = self.run.eventId
+    mutate checkedAt = now()
+    mutate checkedByPersonId = user.personId
+    emit VehicleTripChecked {
+      vehicleTripCheckId: self.id
+      tenantId: self.tenantId
+      eventVehicleAssignmentId: eventVehicleAssignmentId
+      eventId: self.run.eventId
+      kind: kind
+      odometer: odometer
+    }
+  }
+
+  store VehicleTripCheck in durable
+}
+
+event VehicleTripChecked: "vehicle.trip_checked" {
+  vehicleTripCheckId: string
+  tenantId: string
+  eventVehicleAssignmentId: string
+  eventId: string
+  kind: TripCheckKind
+  odometer: int?
+}

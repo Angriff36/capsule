@@ -1,5 +1,6 @@
 import type { Doc } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { insertStepEvent } from "./commandAudit";
 
 export const RUN_ALERT_CONFIG_ENTITY = "RunAlertConfig";
 
@@ -46,7 +47,7 @@ export class RunAlertLoopLedger {
   ): Promise<string | null> {
     const latest = await this.latestConfig(ctx, tenantId);
     if (latest?.type === "RunAlertsEnabled") return null;
-    const id = await ctx.db.insert("manifestEvents", {
+    const id = await insertStepEvent(ctx, {
       type: "RunAlertsEnabled",
       entity: RUN_ALERT_CONFIG_ENTITY,
       entityId: tenantId,
@@ -61,7 +62,7 @@ export class RunAlertLoopLedger {
     tenantId: string,
     actorId: string | undefined,
   ): Promise<void> {
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "RunAlertsDisabled",
       entity: RUN_ALERT_CONFIG_ENTITY,
       entityId: tenantId,

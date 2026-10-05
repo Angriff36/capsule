@@ -4,14 +4,18 @@ import {
   useCreatePerformanceReview,
   useListPerformanceReview,
   useListPerson,
-  useListEvent,
+  useListRoleScorecard,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { ReviewFeedback } from "./ReviewFeedback";
+import { effectiveScorecard } from "./scorecardVersions";
 
 const DIMENSIONS = [
   { key: "reliabilityRating", label: "Reliability" },
@@ -27,9 +31,14 @@ export function PerformanceReviewsPage() {
   const workingId = useWorkingEventId();
   const reviews = useListPerformanceReview();
   const people = useListPerson();
-  const events = useListEvent();
+  const events = usePickerAndNamedEvents(
+    reviews ? [workingId, ...reviews.map((row) => row.eventId)] : undefined,
+  );
+  const scorecards = useListRoleScorecard();
   const createReview = useCreatePerformanceReview();
   const [open, setOpen] = useState(false);
+  const [personId, setPersonId] = useState("");
+  const [scorecardId, setScorecardId] = useState("");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
 
@@ -45,6 +54,20 @@ export function PerformanceReviewsPage() {
     return person ? `${person.givenName} ${person.familyName}` : "Unknown";
   };
 
+  const definedScorecards = (scorecards ?? []).filter(
+    (row) => row.deletedAt == null && row.definedAt != null,
+  );
+  const scorecardTitle = (id: string | null | undefined) =>
+    id
+      ? (definedScorecards.find((row) => row._id === id)?.title ?? null)
+      : null;
+
+  const pickPerson = (id: string) => {
+    setPersonId(id);
+    const role = activePeople.find((row) => row._id === id)?.role;
+    setScorecardId(effectiveScorecard(scorecards, role, Date.now())?._id ?? "");
+  };
+
   const eventName = (id: string | null | undefined) => {
     if (!id) return null;
     const event = events?.find((row) => row._id === id);
@@ -58,6 +81,8 @@ export function PerformanceReviewsPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
+    const text = (name: string) => String(data.get(name) || "") || undefined;
+    const followUpDue = data.get("followUpDue");
     setFailure(null);
     setBusy(true);
     void (async () => {
@@ -70,9 +95,17 @@ export function PerformanceReviewsPage() {
           reliabilityRating: Number(data.get("reliabilityRating")),
           qualityRating: Number(data.get("qualityRating")),
           teamworkRating: Number(data.get("teamworkRating")),
-          notes: String(data.get("notes") || "") || undefined,
+          notes: text("notes"),
+          scorecardId: scorecardId || undefined,
+          strengths: text("strengths"),
+          opportunities: text("opportunities"),
+          comments: text("comments"),
+          followUp: text("followUp"),
+          followUpDue: followUpDue ? localDateEpoch(followUpDue) : undefined,
         });
         form.reset();
+        setPersonId("");
+        setScorecardId("");
         setOpen(false);
       } catch (error) {
         setFailure(error);
@@ -92,8 +125,9 @@ export function PerformanceReviewsPage() {
           <h1 className="display-title mt-2">Reviews that guide the roster.</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Record structured reviews for each person — reliability, quality,
-            and teamwork — as context for shift assignment and compensation.
-            Visible to managers only.
+            and teamwork — as context for shift assignment and compensation. The
+            person reviewed sees their ratings, strengths, things to work on,
+            comments and follow-up. Private notes stay with staff managers.
           </p>
         </div>
         <div aria-label="Performance actions">
@@ -120,25 +154,31 @@ export function PerformanceReviewsPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Person reviewed
-              <select name="personId" className="input" required>
-                <option value="">Select person</option>
-                {activePeople.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.givenName} {person.familyName}
-                  </option>
-                ))}
-              </select>
+              <SearchSelect
+                name="personId"
+                required
+                recentsKey="staff"
+                placeholder="Select person"
+                value={personId}
+                onChange={(id) => pickPerson(id)}
+                options={activePeople.map((person) => ({
+                  id: person._id,
+                  label: `${person.givenName} ${person.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Reviewer
-              <select name="reviewerId" className="input" required>
-                <option value="">Select reviewer</option>
-                {activePeople.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.givenName} {person.familyName}
-                  </option>
-                ))}
-              </select>
+              <SearchSelect
+                name="reviewerId"
+                required
+                recentsKey="staff"
+                placeholder="Select reviewer"
+                options={activePeople.map((person) => ({
+                  id: person._id,
+                  label: `${person.givenName} ${person.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Event (optional)
@@ -175,11 +215,52 @@ export function PerformanceReviewsPage() {
               </label>
             ))}
             <label className="field-label">
-              Notes
+              Scorecard
+              <select
+                name="scorecardId"
+                className="input"
+                value={scorecardId}
+                onChange={(event) => setScorecardId(event.target.value)}
+              >
+                <option value="">No scorecard</option>
+                {definedScorecards.map((row) => (
+                  <option key={row._id} value={row._id}>
+                    {row.title}
+                    {row.status === "archived" ? " (old version)" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
+              Strengths
+              <input name="strengths" className="input" />
+            </label>
+            <label className="field-label">
+              To work on
+              <input name="opportunities" className="input" />
+            </label>
+            <label className="field-label">
+              Comments for them
+              <input name="comments" className="input" />
+            </label>
+            <label className="field-label">
+              Follow-up
+              <input
+                name="followUp"
+                className="input"
+                placeholder="What happens next"
+              />
+            </label>
+            <label className="field-label">
+              Follow-up by
+              <BoundedDateInput name="followUpDue" className="input" />
+            </label>
+            <label className="field-label">
+              Private notes
               <input
                 name="notes"
                 className="input"
-                placeholder="Optional review notes"
+                placeholder="Only staff managers see these"
               />
             </label>
           </div>
@@ -216,7 +297,8 @@ export function PerformanceReviewsPage() {
                   <th>Quality</th>
                   <th>Teamwork</th>
                   <th>Average</th>
-                  <th>Notes</th>
+                  <th>Feedback</th>
+                  <th>Private notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -247,6 +329,14 @@ export function PerformanceReviewsPage() {
                       <td>{row.qualityRating}</td>
                       <td>{row.teamworkRating}</td>
                       <td>{average(row).toFixed(1)}</td>
+                      <td>
+                        <ReviewFeedback
+                          review={{
+                            ...row,
+                            scorecardTitle: scorecardTitle(row.scorecardId),
+                          }}
+                        />
+                      </td>
                       <td>{row.notes || "—"}</td>
                     </tr>
                   ))}

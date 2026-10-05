@@ -16,7 +16,7 @@ it("reports a truthful approval result with a direct purchasing route", () => {
       actions: [
         {
           label: "View purchase needs",
-          to: "/inventory/purchasing?event=event-1",
+          href: "/inventory/purchasing?event=event-1",
         },
       ],
     },
@@ -36,5 +36,7 @@ it("reports the completed stock reduction with a direct stock-line route", () =>
     message: "Waste recorded. Stock reduced by 2.5 kg.",
     actions: [{ label: "View stock line" }],
   });
-  expect((published[0].actions?.[0] as { to: string }).to).toContain("stock-1");
+  expect((published[0].actions?.[0] as { href: string }).href).toContain(
+    "stock-1",
+  );
 });

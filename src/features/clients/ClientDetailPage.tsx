@@ -25,19 +25,23 @@ import {
   ErrorState,
   PageHeader,
   Section,
-  StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
 import { ClientContactsPanel } from "./ClientContactsPanel";
+import { ClientEmailPreferencePanel } from "./ClientEmailPreferencePanel";
 import { ClientProfilePanel } from "./ClientProfilePanel";
+import { ClientSourceProvenancePanel } from "./ClientSourceProvenancePanel";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -69,6 +73,11 @@ export function ClientDetailPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
+  const { loadingTooLong } = useSlowQuery(
+    [client, contacts, proposals, contracts, invoices].includes(undefined)
+      ? undefined
+      : client,
+  );
 
   if (!id) {
     return (
@@ -89,7 +98,15 @@ export function ClientDetailPage() {
     return (
       <div className="space-y-4">
         <ClientsWorkspaceNav />
-        <TableSkeleton rows={6} />
+        {loadingTooLong ? (
+          <QueryLoadState
+            title="This client isn't loading"
+            detail="We couldn't load this client. Check your connection, then refresh the page."
+            loadingTooLong
+          />
+        ) : (
+          <TableSkeleton rows={6} />
+        )}
       </div>
     );
   }
@@ -139,7 +156,7 @@ export function ClientDetailPage() {
     const data = new FormData(form);
     const givenName = String(data.get("givenName") || "").trim();
     if (!givenName) {
-      setFailure(new Error("Contact given name is required."));
+      setFailure(new Error("Give this contact a first name."));
       return;
     }
     void run("add-contact", async () => {
@@ -214,37 +231,38 @@ export function ClientDetailPage() {
   };
 
   const name = clientDisplayName(client._id, [client]);
-  const profileLine = [
-    formatStatusLabel(String(client.clientType)),
-    client.email,
-    client.phone,
-    client.website,
-    `Net ${Number(client.paymentTermsDays ?? 30)} terms`,
-    client.registeredAt != null
-      ? `Client since ${formatDate(Number(client.registeredAt))}`
-      : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const facts = [
+    { label: "Type", value: formatStatusLabel(String(client.clientType)) },
+    { label: "Email", value: client.email || null },
+    { label: "Phone", value: client.phone || null },
+    { label: "Website", value: client.website || null },
+    { label: "Terms", value: `Net ${Number(client.paymentTermsDays ?? 30)}` },
+    {
+      label: "Client since",
+      value:
+        client.registeredAt != null
+          ? formatDate(Number(client.registeredAt))
+          : null,
+    },
+  ];
 
   return (
     <div className="space-y-4">
       <PageHeader
-        title={
-          <span className="inline-flex flex-wrap items-center gap-2">
-            {name}
-            <StatusChip status={String(client.status)} />
-          </span>
-        }
-        lead={
-          <span className="text-base">
-            {profileLine}
-            {" · "}
-            <Link className="text-link" to={CLIENTS_ROUTES.root}>
+        eyebrow={
+          <>
+            <ReturnToListLink
+              fallback={CLIENTS_ROUTES.root}
+              className="hover:underline"
+            >
               All clients
-            </Link>
-          </span>
+            </ReturnToListLink>
+            {" / "}
+            <b>{formatStatusLabel(String(client.status))}</b>
+          </>
         }
+        title={name}
+        facts={facts}
         actions={
           <>
             {actions.map((action) => (
@@ -350,7 +368,11 @@ export function ClientDetailPage() {
       />
 
       <ClientCommunicationPanel
-        target={{ kind: "contacts", contacts: clientContacts }}
+        target={{
+          kind: "contacts",
+          contacts: clientContacts,
+          clientId: client._id,
+        }}
       />
 
       <form className="supply-form" onSubmit={submitAccountContact}>
@@ -393,6 +415,14 @@ export function ClientDetailPage() {
         </button>
       </form>
 
+      <ClientEmailPreferencePanel
+        key={`email-${client.version}`}
+        client={client}
+        busy={busy}
+        run={run}
+        onSaved={setNotice}
+      />
+
       <ClientProfilePanel
         key={`profile-${client.version}`}
         client={{ ...client, status: String(client.status) }}
@@ -400,6 +430,8 @@ export function ClientDetailPage() {
         run={run}
         onSaved={setNotice}
       />
+
+      <ClientSourceProvenancePanel clientId={client._id} />
 
       <AttachmentsSection parentType="client" parentId={client._id} />
     </div>

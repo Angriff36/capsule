@@ -1,23 +1,26 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AllergenBriefingButton } from "./AllergenBriefingButton";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatCount,
   formatDate,
-  formatMoney,
-  formatTime,
   normalizeCurrencyCode,
-  relativeDays,
 } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useEventApprove,
   useEventArchive,
   useEventBeginExecution,
   useEventCancel,
-  useEventChangeHeadcount,
   useEventChangePricing,
   useEventChangePrimaryContact,
   useEventChangeRequirements,
@@ -33,52 +36,48 @@ import {
   useGetEvent,
   useListClient,
   useListOrganization,
-  useListDish,
-  useListEventDish,
-  useListEventTimelineActivity,
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds } from "../../lib/useDishesByIds";
+import { useEventTimelineActivities } from "../../lib/useEventRows";
 import {
   useEventAssignmentRows,
   useEventShiftRows,
   useEventStaffNeedRows,
 } from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
-import {
-  ArrowLeftIcon,
-  BuildingIcon,
-  CalendarIcon,
-  ClockIcon,
-  DownloadIcon,
-  UsersIcon,
-} from "../../ui/icons";
-import { MapPinIcon, TagIcon } from "./eventDetailIcons";
-import { eventCommercialQuotedPrice } from "./eventCommercialSeed";
+import { DownloadIcon } from "../../ui/icons";
 import { eventVenueLabel } from "./eventVenueLabel";
+import { useCascadeReceiptToast } from "./useCascadeReceiptToast";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import {
-  ActionMenu,
-  ActionMenuRule,
-  ErrorState,
-  StatusChip,
-} from "../../ui/primitives";
+import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
+import { WalkieToggle } from "../chat/WalkieToggle";
+import { useWalkieReceiver } from "../chat/useWalkieReceiver";
+import { useChatIdentity } from "../chat/useTeamChat";
+import { chatChannelKey, type ChatChannel } from "../chat/chatTypes";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { downloadBeoPdf } from "./beoPdf";
+import { venueLogisticsLines } from "../facilities/venueLogistics";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
 import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
 import { EventDuplicateMenuItem } from "./EventDuplicateMenuItem";
-import { EventDetailTabs } from "./EventDetailTabs";
+import { EventDashboard } from "./dashboard/EventDashboard";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
+import { EventRentalOrdersPanel } from "./EventRentalOrdersPanel";
+import { EventRequirementsPanel } from "./EventRequirementsPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
 import { EventIncidentPanel } from "./EventIncidentPanel";
 import { EventInventoryPanel } from "./EventInventoryPanel";
@@ -89,7 +88,8 @@ import {
 } from "./EventLifecyclePolicy";
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
-import { EventOverviewTab } from "./EventOverviewTab";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
+import { CascadePreviewDialog } from "./CascadePreviewDialog";
 import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
@@ -98,10 +98,10 @@ import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
 import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
+import { EventTodosTab } from "./EventTodosTab";
+import { EventHistoryTab } from "./EventHistoryTab";
 import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
-import { MobileEventOverview } from "./mobile/MobileEventOverview";
-import { RecurringEventPanel } from "./RecurringEventPanel";
 import {
   eventDetailPath,
   type EventDetailTab,
@@ -111,19 +111,6 @@ import { rememberLastViewedEvent } from "./lastViewedEvent";
 import type { Doc } from "../../lib/api";
 import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
 
-function HeroFact({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="min-w-0">
-      <dt className="text-xs font-semibold tracking-[0.04em] text-ink-2 uppercase">
-        {label}
-      </dt>
-      <dd className="mt-0.5 text-base font-semibold break-words text-ink">
-        {children}
-      </dd>
-    </div>
-  );
-}
-
 export function EventDetailPage() {
   const { id } = useParams();
   const event = useRouteRecord(useGetEvent, id);
@@ -132,8 +119,8 @@ export function EventDetailPage() {
   if (event === undefined) {
     return (
       <QueryLoadState
-        title="Event data is not loading"
-        detail="The workspace did not return this event. Check the session or backend connection, then retry."
+        title="This event isn't loading"
+        detail="We couldn't load this event. Check your connection, then refresh the page."
         loadingTooLong={loadingTooLong}
       />
     );
@@ -142,7 +129,7 @@ export function EventDetailPage() {
     return (
       <ErrorState
         title="Event unavailable"
-        detail="It may not exist, may have been deleted, or your role may not permit access."
+        detail="It may have been deleted, or you may not have access to it."
         onRetry={() => window.location.reload()}
       />
     );
@@ -158,13 +145,26 @@ function EventDetailContent({
   event: Doc<"events">;
   id: string | undefined;
 }) {
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
-  // Phones get the nine-card overview; `full=1` opens the desktop overview
-  // (edit panels, planning notes) on a phone via "Edit" / "See all".
-  const mobileOverview =
-    mobile && activeTab === "overview" && searchParams.get("full") !== "1";
+  const identity = useChatIdentity();
+  // The walkie receiver lives at the dossier level, not inside the chat tab:
+  // an armed device must speak takes no matter which tab is open (Timeline,
+  // Staffing, anywhere). The header WalkieToggle shares its arm state.
+  const eventChannel = useMemo<ChatChannel>(
+    () => ({ kind: "event", eventId: event._id }),
+    [event._id],
+  );
+  const eventChannelKey = chatChannelKey(eventChannel);
+  const { receiving } = useWalkieReceiver({
+    channel: eventChannel,
+    channelKey: eventChannelKey,
+    myPersonId: identity.personId,
+  });
   const clients = useHeldQueryRows("clients", useListClient());
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
@@ -173,19 +173,26 @@ function EventDetailContent({
     "USD",
   );
   useTrackRecent("Event", event?.title);
+  useCascadeReceiptToast(event._id);
   useEffect(() => {
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
-  const dishes = useHeldQueryRows("dishes", useListDish());
   const eventId = event?._id ?? "skip";
   const eventAssignments = useEventAssignmentRows(eventId);
   const staffNeeds = useEventStaffNeedRows(eventId);
   const shifts = useEventShiftRows(eventId);
-  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
+  const eventDishes = useHeldQueryRows(
+    `eventDishes:${event._id}`,
+    useEventMenuLines(event._id),
+  );
+  const dishes = useHeldQueryRows(
+    `dishes:${event._id}`,
+    useDishesByIds(eventDishes?.map((row) => row.dishId)),
+  );
   const timelineActivities = useHeldQueryRows(
-    "eventTimelineActivities",
-    useListEventTimelineActivity(),
+    `eventTimelineActivities:${event._id}`,
+    useEventTimelineActivities(event._id),
   );
   const people = useHeldQueryRows("people", useListPerson());
   const venues = useHeldQueryRows("venues", useListVenue());
@@ -201,7 +208,7 @@ function EventDetailContent({
   const cancel = useEventCancel();
   const archive = useEventArchive();
   const returnToPlanning = useEventReturnToPlanning();
-  const changeHeadcount = useEventChangeHeadcount();
+  const applyDemandHeadcount = useApplyDemandHeadcount();
   const changePricing = useEventChangePricing();
   const changePrimaryContact = useEventChangePrimaryContact();
   const changeRequirements = useEventChangeRequirements();
@@ -214,6 +221,13 @@ function EventDetailContent({
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
+  const [headcountPreview, setHeadcountPreview] = useState<{
+    newHeadcount: number;
+    version?: number;
+  } | null>(null);
+  const [cascadePreview, setCascadePreview] = useState<
+    "approve" | "closeOut" | null
+  >(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
@@ -222,10 +236,10 @@ function EventDetailContent({
   );
   const reviseBlockedReason = canRevise
     ? undefined
-    : `Planning revisions are disabled while the event is ${String(event.stage).replaceAll("_", " ")}.`;
+    : `This event is ${String(event.stage).replaceAll("_", " ")}, so its planning details can't be changed now.`;
   const headcountBlockedReason = canChangeHeadcount
     ? undefined
-    : `Headcount changes are not permitted while the event is ${String(event.stage).replaceAll("_", " ")}.`;
+    : `This event is ${String(event.stage).replaceAll("_", " ")}, so its guest count can't be changed now.`;
   const activeVenues = (venues ?? []).filter(
     (venue) =>
       venue.status === "active" &&
@@ -244,7 +258,7 @@ function EventDetailContent({
     const next = new URLSearchParams(searchParams);
     next.set("tab", tab);
     next.delete("full");
-    setSearchParams(next, { replace: true });
+    setSearchParams(next, { replace: true, state: location.state });
   };
 
   const run = async (
@@ -275,20 +289,13 @@ function EventDetailContent({
     const done = "Stage updated";
     if (key === "submitForApproval")
       void run(() => submitForApproval(args), done);
-    if (key === "approve")
-      void run(async () => {
-        await approve(args);
-        new AutomationCascadeFeedbackManager(notifySuccess).eventApproved(
-          event._id,
-        );
-      }, null);
+    if (key === "approve" || key === "closeOut") setCascadePreview(key);
     if (key === "lockForSales") void run(() => lockForSales(args), done);
     if (key === "confirmSalesLock")
       void run(() => confirmSalesLock(args), done);
     if (key === "finalizeEvent") void run(() => finalizeEvent(args), done);
     if (key === "beginExecution") void run(() => beginExecution(args), done);
     if (key === "complete") void run(() => complete(args), done);
-    if (key === "closeOut") void run(() => closeOut(args), done);
   };
 
   // One obvious next step: the first primary lifecycle action. Other stage
@@ -354,6 +361,7 @@ function EventDetailContent({
           activity.deletedAt == null,
       ),
       staff: staffingRoster,
+      venueLogistics: venue ? venueLogisticsLines(venue) : undefined,
       branding,
     })
       .then(() => {
@@ -376,6 +384,7 @@ function EventDetailContent({
   ).length;
 
   const headerActions = [
+    <WalkieToggle key="walkie" channelKey={eventChannelKey} />,
     ...(headerPrimary
       ? [
           <button
@@ -403,7 +412,7 @@ function EventDetailContent({
       {mobile ? (
         <Link
           key="edit-details"
-          to={`${eventDetailPath(event._id, "overview")}&full=1`}
+          to={`${eventDetailPath(event._id, "overview")}#event-setup-basics`}
         >
           Edit event details
         </Link>
@@ -434,12 +443,20 @@ function EventDetailContent({
       >
         Save as template
       </Link>
+      <AllergenBriefingButton key="allergen-briefing" />
       <Link
-        key="allergen-briefing"
+        key="print-map"
         className="btn btn-ghost"
-        to={`/events/${event._id}/allergen-briefing`}
+        to={`/events/${event._id}/map?print=1`}
       >
-        Allergen briefing
+        Print map
+      </Link>
+      <Link
+        key="map-to-chat"
+        className="btn btn-ghost"
+        to={`/events/${event._id}/map`}
+      >
+        Send map and layouts to team chat
       </Link>
       {dangerActions.length > 0 ? <ActionMenuRule /> : null}
       {dangerActions.map((action) => (
@@ -467,144 +484,60 @@ function EventDetailContent({
     </ActionMenu>,
   ];
 
-  return (
-    <div className="space-y-5">
-      {mobile ? (
-        <section
-          className="card px-4 py-4"
-          data-testid="event-context-header-mobile"
-        >
-          <div className="flex items-start gap-2">
-            <Link
-              to="/events"
-              aria-label="All events"
-              className="-ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-inset"
-            >
-              <ArrowLeftIcon width={18} height={18} />
-            </Link>
-            <div className="min-w-0 flex-1">
-              <h1 className="text-xl leading-tight font-bold text-ink">
-                {event.title}
-              </h1>
-              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
-                <StatusChip status={String(event.stage)} />
-                <span>{formatStatusLabel(event.eventType)}</span>
-                {event.startsAt != null ? (
-                  <span>· {relativeDays(event.startsAt)}</span>
-                ) : null}
-              </div>
-            </div>
-          </div>
-          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
-            <HeroFact label="Date">
-              {formatDate(event.startsAt)}
-              <span className="block text-sm font-medium text-ink-2">
-                {event.startsAt != null
-                  ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
-                  : "—"}
-              </span>
-            </HeroFact>
-            <HeroFact label="Headcount">
-              {formatCount(event.expectedHeadcount)} guests
-            </HeroFact>
-            <HeroFact label="Venue">{venueLabel}</HeroFact>
-            <HeroFact label="Client">
-              {clientDisplayName(event.clientId, clients)}
-            </HeroFact>
-          </dl>
-          <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
-            <span className="font-semibold text-ink">Budget / quoted</span>{" "}
-            {formatMoney(event.budgetAmount, currencyCode)} /{" "}
-            {formatMoney(
-              eventCommercialQuotedPrice({ quotedPrice: event.quotedPrice }),
-              currencyCode,
-            )}
-          </p>
-          <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
-            {headerActions}
-          </div>
-        </section>
-      ) : (
-        <section className="card px-6 py-5" data-testid="event-context-header">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <Link
-                to="/events"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink"
-              >
-                <ArrowLeftIcon width={13} height={13} /> All events
-              </Link>
-              <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-bold tracking-tight text-ink">
-                  {event.title}
-                </h1>
-                <StatusChip status={String(event.stage)} />
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-base text-ink-2">
-                <span className="inline-flex min-w-0 items-center gap-1.5">
-                  <BuildingIcon width={14} height={14} />
-                  {(() => {
-                    const client = clients?.find(
-                      (c) => c._id === event.clientId,
-                    );
-                    const name = clientDisplayName(event.clientId, clients);
-                    if (!client) return name;
-                    return (
-                      <HoverPreview
-                        card={<ClientPreviewCard client={client} />}
-                      >
-                        <Link
-                          to={`/clients/${client._id}`}
-                          className="hover:underline"
-                        >
-                          {name}
-                        </Link>
-                      </HoverPreview>
-                    );
-                  })()}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarIcon width={14} height={14} />
-                  {formatDate(event.startsAt)}
-                  {event.startsAt != null
-                    ? ` · ${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
-                    : ""}
-                </span>
-                <span className="inline-flex min-w-0 items-center gap-1.5">
-                  <MapPinIcon width={14} height={14} />
-                  {event.venueId ? (
-                    <Link to="/facilities" className="hover:underline">
-                      {venueLabel}
-                    </Link>
-                  ) : (
-                    venueLabel
-                  )}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <UsersIcon width={14} height={14} />
-                  {formatCount(event.expectedHeadcount)} guests
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <TagIcon width={14} height={14} />
-                  {formatStatusLabel(event.eventType)}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-              {typeof event.updatedAt === "number" ? (
-                <span className="inline-flex items-center gap-1.5 text-sm text-ink-3">
-                  <ClockIcon width={13} height={13} />
-                  Last updated {relativeDays(event.updatedAt)}
-                </span>
-              ) : null}
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                {headerActions}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
+  const overviewProps = {
+    eventId: event._id,
+    event: event,
+    version: version,
+    busy: busy,
+    canRevise: canRevise,
+    canChangeHeadcount: canChangeHeadcount,
+    reviseBlockedReason: reviseBlockedReason,
+    headcountBlockedReason: headcountBlockedReason,
+    venuesLoading: venues === undefined,
+    activeVenues: activeVenues,
+    venue: venue,
+    clients: clients,
+    clientId: event.clientId,
+    startsAt: event.startsAt,
+    endsAt: event.endsAt,
+    expectedHeadcount: event.expectedHeadcount,
+    venueId: event.venueId,
+    budgetAmount: event.budgetAmount,
+    quotedPrice: event.quotedPrice,
+    primaryContactName: event.primaryContactName,
+    primaryContactEmail: event.primaryContactEmail,
+    primaryContactPhone: event.primaryContactPhone,
+    accessibilityNeeds: event.accessibilityNeeds,
+    serviceRequirements: event.serviceRequirements,
+    operationalRequirements: event.operationalRequirements,
+    stage: String(event.stage),
+    currencyCode: currencyCode,
+    lifecycleActions: lifecycle,
+    blockedLifecycleActions: eventLifecyclePolicy.blockedActions(
+      String(event.stage),
+      event,
+    ),
+    onAction: runAction,
+    people: people,
+    dishCount: dishCount,
+    staffCount: staffCount,
+    timelineCount: timelineCount,
+    run: run,
+    onReschedule: reschedule,
+    onPreviewHeadcount: ({
+      newHeadcount,
+      version: nextVersion,
+    }: {
+      newHeadcount: number;
+      version: number | undefined;
+    }) => setHeadcountPreview({ newHeadcount, version: nextVersion }),
+    onChangeVenue: changeVenue,
+    onChangePricing: changePricing,
+    onChangePrimaryContact: changePrimaryContact,
+    onChangeRequirements: changeRequirements,
+  };
+  const notices = (
+    <>
       {savedToast}
       {pdfNotice ? (
         <p className="banner banner-ok" role="status">
@@ -681,72 +614,10 @@ function EventDetailContent({
       {event.stage === "planning" && event.plannedAt == null ? (
         <CompleteDraftPlanningPanel event={event} clients={clients} />
       ) : null}
-
-      <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
-
-      {mobileOverview ? (
-        <EventTabErrorBoundary tabLabel="Overview" key="mobile-overview">
-          <MobileEventOverview
-            event={event}
-            venue={venue}
-            clients={clients}
-            dishes={dishes}
-            eventDishes={eventDishes}
-            activities={timelineActivities}
-            staffingRoster={staffingRoster}
-            people={people}
-          />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "overview" && !mobileOverview ? (
-        <EventTabErrorBoundary tabLabel="Overview" key="overview">
-          <EventOverviewTab
-            eventId={event._id}
-            event={event}
-            version={version}
-            busy={busy}
-            canRevise={canRevise}
-            canChangeHeadcount={canChangeHeadcount}
-            reviseBlockedReason={reviseBlockedReason}
-            headcountBlockedReason={headcountBlockedReason}
-            venuesLoading={venues === undefined}
-            activeVenues={activeVenues}
-            venue={venue}
-            clients={clients}
-            clientId={event.clientId}
-            startsAt={event.startsAt}
-            endsAt={event.endsAt}
-            expectedHeadcount={event.expectedHeadcount}
-            venueId={event.venueId}
-            budgetAmount={event.budgetAmount}
-            quotedPrice={event.quotedPrice}
-            primaryContactName={event.primaryContactName}
-            primaryContactEmail={event.primaryContactEmail}
-            primaryContactPhone={event.primaryContactPhone}
-            accessibilityNeeds={event.accessibilityNeeds}
-            serviceRequirements={event.serviceRequirements}
-            operationalRequirements={event.operationalRequirements}
-            stage={String(event.stage)}
-            currencyCode={currencyCode}
-            lifecycleActions={lifecycle}
-            onAction={runAction}
-            people={people}
-            dishCount={dishCount}
-            staffCount={staffCount}
-            timelineCount={timelineCount}
-            run={run}
-            onReschedule={reschedule}
-            onChangeHeadcount={changeHeadcount}
-            onChangeVenue={changeVenue}
-            onChangePricing={changePricing}
-            onChangePrimaryContact={changePrimaryContact}
-            onChangeRequirements={changeRequirements}
-          />
-          <div className="mt-5">
-            <EventSourceProvenancePanel capsuleId={event._id} />
-          </div>
-        </EventTabErrorBoundary>
-      ) : null}
+    </>
+  );
+  const otherTabs = (
+    <>
       {activeTab === "chat" ? (
         <EventTabErrorBoundary tabLabel="Team Chat" key="chat">
           <EventChatTab eventId={event._id} eventTitle={String(event.title)} />
@@ -762,16 +633,24 @@ function EventDetailContent({
       ) : null}
       {activeTab === "prep" ? (
         <EventTabErrorBoundary tabLabel="Prep" key="prep">
-          <EventPrepTab eventId={event._id} eventStage={String(event.stage)} />
+          <EventPrepTab
+            eventId={event._id}
+            eventStage={String(event.stage)}
+            serviceStyleId={event.serviceStyleId ?? null}
+          />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "equipment" ? (
         <EventTabErrorBoundary tabLabel="Equipment" key="equipment">
-          <EventEquipmentPanel
-            eventId={event._id}
-            startsAt={event.startsAt}
-            endsAt={event.endsAt}
-          />
+          <div className="space-y-6">
+            <EventRequirementsPanel eventId={event._id} />
+            <EventEquipmentPanel
+              eventId={event._id}
+              startsAt={event.startsAt}
+              endsAt={event.endsAt}
+            />
+            <EventRentalOrdersPanel eventId={event._id} />
+          </div>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "client" ? (
@@ -794,7 +673,7 @@ function EventDetailContent({
           <section className="space-y-4" data-testid="event-guests-tab">
             <EventTabIntro
               title="Guests"
-              description="Invite guests, track RSVPs and table assignments, and note dietary needs so they show up on the allergen briefing."
+              description="Invite guests, track RSVPs, tables, seats and entrée picks, and note dietary needs so they show up on the allergen briefing."
             />
             <EventGuestPanel
               eventId={event._id}
@@ -813,30 +692,19 @@ function EventDetailContent({
           <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
         </EventTabErrorBoundary>
       ) : null}
+      {activeTab === "todos" ? (
+        <EventTabErrorBoundary tabLabel="To-dos" key="todos">
+          <EventTodosTab eventId={event._id} startsAt={event.startsAt} />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "history" ? (
+        <EventTabErrorBoundary tabLabel="History" key="history">
+          <EventHistoryTab eventId={event._id} />
+        </EventTabErrorBoundary>
+      ) : null}
       {activeTab === "layouts" ? (
         <EventTabErrorBoundary tabLabel="Layouts" key="layouts">
           <EventLayoutsTab eventId={event._id} />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "recurring" ? (
-        <EventTabErrorBoundary tabLabel="Recurring Schedule" key="recurring">
-          <RecurringEventPanel
-            eventId={event._id}
-            startsAt={event.startsAt}
-            version={version}
-            canConfigure={canRevise}
-            recurrenceFrequency={event.recurrenceFrequency}
-            recurrenceEndCondition={event.recurrenceEndCondition}
-            recurrenceEndsAt={event.recurrenceEndsAt}
-            recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
-            recurrenceNextStartsAt={event.recurrenceNextStartsAt}
-            recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-            recurrenceActive={event.recurrenceActive ?? undefined}
-            recurrenceStoppedAt={event.recurrenceStoppedAt}
-            recurrenceCompletedAt={event.recurrenceCompletedAt}
-            recurrenceTemplateEventId={event.recurrenceTemplateEventId}
-            recurrenceSequence={event.recurrenceSequence}
-          />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "staffing" ? (
@@ -882,6 +750,114 @@ function EventDetailContent({
         <EventTabErrorBoundary tabLabel="Margin" key="margin">
           <EventMarginTab eventId={event._id} />
         </EventTabErrorBoundary>
+      ) : null}
+    </>
+  );
+
+  return (
+    <div ref={sectionScopeRef}>
+      <ReturnToListLink
+        fallback="/events"
+        className="text-link mb-4 inline-flex"
+      >
+        ← Back to events
+      </ReturnToListLink>
+      <StickyRecordHeader
+        title={event.title}
+        facts={[
+          { label: "Date", value: formatDate(event.startsAt) },
+          {
+            label: "Headcount",
+            value: `${formatCount(event.expectedHeadcount)} guests`,
+          },
+          { label: "Status", value: formatStatusLabel(String(event.stage)) },
+        ]}
+        actions={headerActions.filter(
+          (action) => action.key !== headerPrimary?.key,
+        )}
+        primaryAction={
+          primaryAction ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => runAction(primaryAction.key)}
+              className="btn btn-primary"
+            >
+              {primaryAction.label}
+            </button>
+          ) : undefined
+        }
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        sectionKey={activeTab}
+        headingId="event-detail-title"
+      />
+      <EventDashboard
+        title={String(event.title)}
+        updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
+        client={(() => {
+          const client = clients?.find((c) => c._id === event.clientId);
+          const name = clientDisplayName(event.clientId, clients);
+          if (!client) return name;
+          return (
+            <HoverPreview card={<ClientPreviewCard client={client} />}>
+              <Link to={`/clients/${client._id}`} className="hover:underline">
+                {name}
+              </Link>
+            </HoverPreview>
+          );
+        })()}
+        venue={
+          event.venueId ? (
+            <Link to="/facilities">{venueLabel}</Link>
+          ) : (
+            venueLabel
+          )
+        }
+        actions={headerActions}
+        activeTab={activeTab}
+        onTab={setTab}
+        overview={overviewProps}
+        notices={notices}
+        heroSentinelRef={headerSentinelRef}
+      >
+        {otherTabs}
+      </EventDashboard>
+      {headcountPreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: event._id,
+            kind: "headcount",
+            newHeadcount: headcountPreview.newHeadcount,
+          }}
+          onClose={() => setHeadcountPreview(null)}
+          onApply={(expectedFingerprint) =>
+            applyDemandHeadcount({
+              eventId: event._id,
+              newHeadcount: headcountPreview.newHeadcount,
+              version: headcountPreview.version,
+              expectedFingerprint,
+            })
+          }
+        />
+      ) : null}
+      {cascadePreview ? (
+        <CascadePreviewDialog
+          eventId={event._id}
+          action={cascadePreview}
+          onClose={() => setCascadePreview(null)}
+          onConfirm={() => {
+            const args = { docId: event._id, version };
+            if (cascadePreview === "approve")
+              void run(async () => {
+                await approve(args);
+                new AutomationCascadeFeedbackManager(
+                  notifySuccess,
+                ).eventApproved(event._id);
+              }, null);
+            else void run(() => closeOut(args), "Stage updated");
+          }}
+        />
       ) : null}
     </div>
   );

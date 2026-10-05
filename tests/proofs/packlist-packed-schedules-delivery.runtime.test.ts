@@ -1,6 +1,7 @@
 /**
- * Runtime proof: PackList.markPacked ensures a Delivery via Manifest reaction
- * (match else create Delivery.schedule).
+ * Runtime proof: PackList.markPacked ensures a Delivery (match else create
+ * Delivery.schedule) for a Drop Off event or one with no style yet
+ * (convex/lib/dropOffDelivery.ts).
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -135,5 +136,66 @@ describe("runtime proof: PackList.markPacked → Delivery.schedule", () => {
     expect((still[0] as { destination?: string }).destination).toBe(
       "100 Pier Road",
     );
+  });
+
+  // #377: a delivery is the Drop Off service style, not every truck trip.
+  it.each([
+    ["Full Service", 0],
+    ["Drop-Off", 1],
+  ])("a %s event gets %i deliveries when packed", async (style, expected) => {
+    const proof = harness();
+    const sales = proof.asRole({
+      subject: "sales-delivery-style",
+      role: "sales_manager",
+      tenantId: S.tenantId,
+    });
+    const logistics = proof.asRole({
+      subject: "logistics-delivery-style",
+      role: "logistics_manager",
+      tenantId: S.tenantId,
+    });
+    const client = (await proof.executeCommand(
+      sales,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Style client" },
+    )) as { docId: string };
+    const event = (await proof.executeCommand(
+      sales,
+      api.mutations.Event_createViaPlanEngagement,
+      {
+        clientId: client.docId,
+        title: `${style} party`,
+        eventType: "catering",
+        startsAt: S.startsAt,
+        endsAt: S.endsAt,
+        expectedHeadcount: 30,
+        primaryContactName: "Sam Style",
+        venueAddress: "5 Elm Street",
+        budgetAmount: 1000,
+        quotedPrice: 1500,
+      },
+    )) as { docId: string };
+    await logistics.run(async (ctx) => {
+      await ctx.db.patch(event.docId as never, { serviceStyleName: style });
+    });
+    const pack = (await proof.executeCommand(
+      logistics,
+      api.mutations.PackList_createViaOpen,
+      { eventId: event.docId, name: "Style load" },
+    )) as { docId: string };
+    await proof.executeCommand(logistics, api.mutations.PackList_startPacking, {
+      docId: pack.docId,
+      version: 1,
+    });
+    await proof.executeCommand(logistics, api.mutations.PackList_markPacked, {
+      docId: pack.docId,
+      version: 2,
+    });
+    const forPack = (
+      await logistics.run(async (ctx) => ctx.db.query("deliveries").collect())
+    ).filter(
+      (row) => (row as { packListId?: string }).packListId === pack.docId,
+    );
+    expect(forPack).toHaveLength(expected);
   });
 });

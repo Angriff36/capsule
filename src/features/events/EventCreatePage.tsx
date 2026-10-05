@@ -32,6 +32,7 @@ import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
 import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { EventCreateStandardList } from "./EventCreateStandardList";
 import { SERVICE_STYLE_CATALOG } from "./serviceStyleCatalog";
 import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
@@ -44,6 +45,7 @@ import {
 } from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
   InlineClientForm,
@@ -54,6 +56,8 @@ import {
 } from "./EventCreateInlineForms";
 import { findLikelyDuplicates } from "./inlineRecordDuplicates";
 import { venueAddress, venueSummary } from "./venuePickerSummary";
+import { EventCreateWizard } from "./EventCreateWizard";
+import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
 import {
   coordinatesFromFields,
   formatCoordinates,
@@ -68,13 +72,24 @@ function optional(value: string): string | undefined {
   return trimmed || undefined;
 }
 
+const EVENT_DEFAULT_HOURS = 4;
+
 function eventFieldRules(data: FormData): Record<string, string> {
   const start = String(data.get("startsAt") ?? "");
   const end = String(data.get("endsAt") ?? "");
   if (start && end && new Date(end).getTime() <= new Date(start).getTime()) {
-    return { endsAt: "End must be after the start time." };
+    return { endsAt: "This event's end time has to be after its start time." };
   }
   return {};
+}
+
+/** Proposal, client and template bookings retain their established long-form carryover. */
+export function guidedEventCreateAvailable(params: {
+  clientId: string;
+  templateId: string;
+  proposalId: string;
+}): boolean {
+  return !params.clientId && !params.templateId && !params.proposalId;
 }
 
 // Collapsible form block (native <details>) styled like Section. Uncontrolled:
@@ -144,12 +159,27 @@ function revealInvalidSections(form: HTMLFormElement) {
 export function EventCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [creationMode, setCreationMode] = useState<"form" | "guided">(() => {
+    try {
+      return localStorage.getItem("capsule.event-create.mode") === "guided"
+        ? "guided"
+        : "form";
+    } catch {
+      return "form";
+    }
+  });
+  const [wizardBusy, setWizardBusy] = useState(false);
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const templateId = searchParams.get("templateId")?.trim() || "";
   // Accepted proposal to book (issue #141): pre-fills the form; when the
   // proposal is still unlinked, submit goes through the proposal-booking seam
   // so the new event is linked and the accepted menu copies onto it.
   const proposalId = searchParams.get("proposalId")?.trim() || "";
+  const guidedAvailable = guidedEventCreateAvailable({
+    clientId: prefillClientId,
+    templateId,
+    proposalId,
+  });
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
   const proposalEnhancements = useListProposalEnhancement();
@@ -190,6 +220,22 @@ export function EventCreatePage() {
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
   const proposalPrefill = proposalEventPrefill.values(proposal);
+  const [startsAtValue, setStartsAtValue] = useState(
+    proposalPrefill.startsAtLocal,
+  );
+  const [endsAtValue, setEndsAtValue] = useState(proposalPrefill.endsAtLocal);
+  const [endWasEdited, setEndWasEdited] = useState(
+    Boolean(proposalPrefill.endsAtLocal),
+  );
+  useEffect(() => {
+    if (!startsAtValue && proposalPrefill.startsAtLocal) {
+      setStartsAtValue(proposalPrefill.startsAtLocal);
+    }
+    if (!endsAtValue && proposalPrefill.endsAtLocal) {
+      setEndsAtValue(proposalPrefill.endsAtLocal);
+      setEndWasEdited(true);
+    }
+  }, [proposalPrefill.endsAtLocal, proposalPrefill.startsAtLocal]);
   const proposalLinkable = proposalEventPrefill.canLinkOnCreate(proposal);
   const proposalMenuCount = proposalId
     ? (proposalDishSelections ?? []).filter(
@@ -354,7 +400,9 @@ export function EventCreatePage() {
     if (!Number.isFinite(capacity) || capacity < 0) {
       setFailure(
         classifyCommandFailure(
-          new Error("Venue capacity must be zero or greater."),
+          new Error(
+            "This venue's capacity can't be negative. Use zero or more.",
+          ),
         ),
       );
       return;
@@ -435,6 +483,11 @@ export function EventCreatePage() {
     const saved = draftForm.restore();
     if (!saved) return;
     const pick = (key: string) => saved.values[key]?.trim() ?? "";
+    if (pick("startsAt")) setStartsAtValue(pick("startsAt"));
+    if (pick("endsAt")) {
+      setEndsAtValue(pick("endsAt"));
+      setEndWasEdited(true);
+    }
     if (pick("clientId")) setClientId(pick("clientId"));
     if (pick("venueId")) setVenueId(pick("venueId"));
     if (pick("occasionId")) setOccasionId(pick("occasionId"));
@@ -556,6 +609,43 @@ export function EventCreatePage() {
     clientId,
   });
 
+  const switchCreationMode = (mode: "form" | "guided") => {
+    setCreationMode(mode);
+    try {
+      localStorage.setItem("capsule.event-create.mode", mode);
+    } catch {
+      // The choice remains active for this page in private browsing.
+    }
+  };
+
+  if (creationMode === "guided" && guidedAvailable) {
+    return (
+      <div className="space-y-4">
+        <Link
+          to={eventsIndexPath()}
+          className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
+        >
+          <ArrowLeftIcon width={12} height={12} /> All events
+        </Link>
+        <PageHeader
+          title="New event"
+          lead="Build a booking step by step, then create it once you have reviewed the operational consequences."
+          actions={
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              disabled={wizardBusy}
+              onClick={() => switchCreationMode("form")}
+            >
+              Use long form
+            </button>
+          }
+        />
+        <EventCreateWizard onBusyChange={setWizardBusy} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <Link
@@ -568,11 +658,28 @@ export function EventCreatePage() {
         title="New event"
         lead="The essentials for a new booking — who it's for, where, when, and the budget."
         actions={
-          <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
-            Have a BEO? Import it instead
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            {guidedAvailable ? (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => switchCreationMode("guided")}
+              >
+                Use guided setup
+              </button>
+            ) : null}
+            <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
+              Have a BEO? Import it instead
+            </Link>
+          </div>
         }
       />
+
+      {!guidedAvailable ? (
+        <p className="banner banner-warn">
+          Guided setup isn't available when booking from a proposal or template.
+        </p>
+      ) : null}
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
@@ -665,6 +772,12 @@ export function EventCreatePage() {
                     fills in here right away.
                   </p>
                 ) : null}
+                {occasionsEmpty ? (
+                  <EventCreateStandardList
+                    singular="occasion"
+                    existing={occasions}
+                  />
+                ) : null}
               </div>
               <label className="field-label">
                 Expected headcount *
@@ -691,19 +804,37 @@ export function EventCreatePage() {
                 Starts *
                 <BoundedDateTimeLocalInput
                   name="startsAt"
-                  defaultValue={proposalPrefill.startsAtLocal}
+                  value={startsAtValue}
                   className="input"
                   required
+                  onResolvedValue={(next) => {
+                    setStartsAtValue(next);
+                    if (!endsAtValue || !endWasEdited) {
+                      setEndsAtValue(
+                        addLocalDateTimeHours(next, EVENT_DEFAULT_HOURS),
+                      );
+                    }
+                  }}
                 />
                 <FieldError name="startsAt" errors={errors} touched={touched} />
               </label>
+              <div className="sm:col-span-2">
+                <DateHoldCollisionNotice
+                  dateKey={(startsAtValue ?? "").slice(0, 10)}
+                />
+              </div>
               <label className="field-label">
                 Ends *
                 <BoundedDateTimeLocalInput
                   name="endsAt"
-                  defaultValue={proposalPrefill.endsAtLocal}
+                  value={endsAtValue}
                   className="input"
                   required
+                  naturalDateAnchor={startsAtValue}
+                  onResolvedValue={(next) => {
+                    setEndsAtValue(next);
+                    setEndWasEdited(true);
+                  }}
                 />
                 <FieldError name="endsAt" errors={errors} touched={touched} />
               </label>
@@ -784,7 +915,7 @@ export function EventCreatePage() {
 
           <FormSection
             title="Money"
-            hint="Budget and quoted price for the engagement."
+            hint="Budget and quoted price for this event."
             count={2}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
@@ -827,28 +958,26 @@ export function EventCreatePage() {
 
           <FormSection
             title="Details"
-            hint="Sales attribution — salesperson and referral source."
+            hint="Who sold it and how the client found us."
             count={2}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label">
                 Salesperson
-                <select
+                <SearchSelect
                   name="salespersonId"
                   value={salespersonId}
-                  onChange={(event) => setSalespersonId(event.target.value)}
-                  className="input"
+                  onChange={(id) => setSalespersonId(id)}
                   form="event-create-form"
-                >
-                  <option value="">Select a salesperson</option>
-                  {salespeople.map((person) => (
-                    <option key={person._id} value={person._id}>
-                      {[person.givenName, person.familyName]
-                        .filter(Boolean)
-                        .join(" ")}
-                    </option>
-                  ))}
-                </select>
+                  recentsKey="staff"
+                  placeholder="Search salespeople…"
+                  options={salespeople.map((person) => ({
+                    id: person._id,
+                    label: [person.givenName, person.familyName]
+                      .filter(Boolean)
+                      .join(" "),
+                  }))}
+                />
                 {people !== undefined && salespeople.length === 0 ? (
                   <span
                     className="field-hint"
@@ -884,7 +1013,33 @@ export function EventCreatePage() {
                     </option>
                   ))}
                 </select>
+                {referralSources !== undefined &&
+                activeReferralSources.length === 0 ? (
+                  <span
+                    className="field-hint"
+                    data-testid="referral-empty-hint"
+                  >
+                    No referral sources yet. You can leave this blank, or add
+                    them in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      target="_blank"
+                      rel="noopener"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>{" "}
+                    (new tab; this form stays put and the list fills in here).
+                  </span>
+                ) : null}
               </label>
+              {referralSources !== undefined &&
+              activeReferralSources.length === 0 ? (
+                <EventCreateStandardList
+                  singular="referral source"
+                  existing={referralSources}
+                />
+              ) : null}
             </div>
           </FormSection>
         </form>
@@ -1013,6 +1168,7 @@ export function EventCreatePage() {
                       placeholder={`Search ${activeClients.length} clients by name or email…`}
                       emptyText="No client matches — create one below."
                       testId="event-create-client"
+                      recentsKey="client"
                       options={activeClients.map((client) => ({
                         id: client._id,
                         label: clientDisplayName(client._id, activeClients),
@@ -1030,7 +1186,7 @@ export function EventCreatePage() {
                   ) : null}
                   {!clientId ? (
                     <p className="text-sm text-ink-3" role="status">
-                      Client is required
+                      Pick a client for this event.
                     </p>
                   ) : null}
                 </>
@@ -1040,7 +1196,7 @@ export function EventCreatePage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowClient((value) => !value)}
               >
-                {showClient ? "Dismiss client form" : "Create client inline"}
+                {showClient ? "Close new client form" : "Add a new client"}
               </button>
             </div>
             {showClient ? (
@@ -1103,7 +1259,7 @@ export function EventCreatePage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowVenue((value) => !value)}
               >
-                {showVenue ? "Dismiss venue form" : "Create venue inline"}
+                {showVenue ? "Close new venue form" : "Add a new venue"}
               </button>
             </div>
             {showVenue ? (

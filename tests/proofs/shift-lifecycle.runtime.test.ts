@@ -49,6 +49,7 @@ async function hireWorkforceStaff(
       email: `avery-${tenantId}@proof.example`,
       role: "workforce_staff",
       employmentType: "part_time",
+      authSubjectId: `avery-${tenantId}`,
     },
   )) as { docId: string };
   return { manager, personId: result.docId };
@@ -71,8 +72,10 @@ describe("runtime proof: Shift schedule -> start -> complete", () => {
       },
     )) as { docId: string };
 
+    // Signs in through the staff profile link (spec 6.1 item 4), not with
+    // the profile id as the sign-in id.
     const person = proof.asRole({
-      subject: personId,
+      subject: `avery-${S.tenantA}`,
       role: "workforce_staff",
       tenantId: S.tenantA,
     });

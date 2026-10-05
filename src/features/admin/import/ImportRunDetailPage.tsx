@@ -14,10 +14,14 @@ import { formatDate, formatTime } from "../../../lib/format";
 import { useRouteRecord } from "../../../lib/routeRecord";
 import { importRunsListPath } from "./importRoutes";
 import { ImportProvenancePanel } from "./ImportProvenancePanel";
+import { ArchiveIntakePanel } from "./ArchiveIntakePanel";
+import { SourceRowsFilePicker } from "./SourceRowsFilePicker";
 import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { classifyCommandFailure } from "../../events/CommandFailure";
+import { ReturnToListLink } from "../../list-state/listOrigin";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -35,6 +39,8 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
+  stock: "Opening stock",
 };
 
 // Status labels
@@ -53,7 +59,7 @@ const STATUS_LABELS: Record<string, string> = {
 const DISPOSITION_LABELS: Record<string, string> = {
   pending: "Pending",
   normalized: "Normalized",
-  linked_reference: "Linked reference",
+  linked_reference: "Linked to existing",
   duplicate_view: "Duplicate view",
   needs_mapping: "Needs a match",
   unsupported: "Unsupported",
@@ -78,11 +84,44 @@ const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
     { next: "committing", label: "Approve & Commit" },
     { next: "failed", label: "Fail" },
   ],
-  committing: [{ next: "completed", label: "Complete Commit" }],
+  committing: [
+    { next: "completed", label: "Complete Commit" },
+    // AC-631: stops part-way and takes back what nobody changed yet.
+    { next: "stopped", label: "Stop this import" },
+  ],
   completed: [{ next: "reverted", label: "Revert" }],
   failed: [],
   reverted: [],
 };
+
+/** What Stop this import did, saved on the run (AC-056). */
+function readStopReport(
+  raw: string | null | undefined,
+): { removed: number; kept: string[]; done: boolean } | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as {
+      removed?: unknown;
+      kept?: unknown;
+      done?: unknown;
+    };
+    return {
+      removed: typeof parsed.removed === "number" ? parsed.removed : 0,
+      kept: Array.isArray(parsed.kept)
+        ? parsed.kept.filter((name): name is string => typeof name === "string")
+        : [],
+      done: parsed.done === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Server refusals in plain words: a stale run says someone else changed it. */
+function failureText(cause: unknown): string {
+  const failure = classifyCommandFailure(cause);
+  return `${failure.title}: ${failure.detail}`;
+}
 
 export function ImportRunDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -100,6 +139,7 @@ export function ImportRunDetailPage() {
   // see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
+  const cancelImportRun = useAction(api.importCancel.cancelImportRun);
 
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
@@ -130,12 +170,12 @@ export function ImportRunDetailPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center text-ink-3">
           <p>Import not found</p>
-          <Link
-            to={importRunsListPath()}
+          <ReturnToListLink
+            fallback={importRunsListPath()}
             className="text-brand hover:text-brand"
           >
             Back to imports
-          </Link>
+          </ReturnToListLink>
         </div>
       </div>
     );
@@ -150,7 +190,8 @@ export function ImportRunDetailPage() {
     importRun.datasetType === "leads" ||
     importRun.datasetType === "payments" ||
     importRun.datasetType === "menus" ||
-    importRun.datasetType === "pack_list";
+    importRun.datasetType === "pack_list" ||
+    importRun.datasetType === "history";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
@@ -164,7 +205,9 @@ export function ImportRunDetailPage() {
               ? "menu"
               : importRun.datasetType === "pack_list"
                 ? "pack list"
-                : "venue";
+                : importRun.datasetType === "history"
+                  ? "message or task"
+                  : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -178,7 +221,7 @@ export function ImportRunDetailPage() {
       await work();
       setNotice("Action completed successfully.");
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Operation failed");
+      setError(failureText(cause));
     } finally {
       setBusy(null);
     }
@@ -259,11 +302,16 @@ export function ImportRunDetailPage() {
       const parsed = JSON.parse(sourceRowsInput);
       rows = Array.isArray(parsed) ? parsed : [];
     } catch {
-      setError(`Invalid JSON for ${commitNoun} source rows`);
+      setError(
+        `Those ${commitNoun} rows can't be read. Paste them exactly as exported, as a list in square brackets.`,
+      );
       return;
     }
-    if (rows.length === 0) {
-      setError(`Paste at least one ${commitNoun} source row (JSON array)`);
+    // A report-archive run may finish on its file accounting alone.
+    const archiveOnly =
+      rows.length === 0 && Boolean(importRun.archiveStorageId);
+    if (rows.length === 0 && !archiveOnly) {
+      setError(`Paste at least one ${commitNoun} row to bring in.`);
       return;
     }
     setError(null);
@@ -276,15 +324,27 @@ export function ImportRunDetailPage() {
       });
       setShowSourceForm(false);
       setSourceRowsInput("[]");
+      if (archiveOnly) {
+        setNotice(
+          "Import finished. Every archive file is accounted for; no new records were made.",
+        );
+        return;
+      }
       setNotice(
         `Imported ${result.committed} ${commitNoun}(s)` +
           (result.skipped ? `, ${result.skipped} already linked` : "") +
+          (result.updated
+            ? `, ${result.updated} updated from the old system`
+            : "") +
+          (result.conflicted
+            ? `, ${result.conflicted} also changed in Capsule (see Match leftover items)`
+            : "") +
           (result.pending ? `, ${result.pending} pending review` : "") +
           (result.parseErrors ? `, ${result.parseErrors} parse error(s)` : "") +
           ".",
       );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Commit failed");
+      setError(failureText(cause));
     } finally {
       setBusy(null);
     }
@@ -310,6 +370,62 @@ export function ImportRunDetailPage() {
     });
   };
 
+  // AC-056: a run keeps its rows on the server, so anyone can finish it after
+  // the browser that started it closed.
+  const handleContinue = async () => {
+    setError(null);
+    setNotice(null);
+    setBusy("continue");
+    try {
+      const result = await commitImportRun({
+        importRunId: importRun._id,
+        rawRows: [],
+      });
+      setNotice(
+        `Import finished: ${result.committed} more ${commitNoun}(s) brought in.`,
+      );
+    } catch (cause) {
+      setError(failureText(cause));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleStop = async () => {
+    const reason = await prompt.askReason({
+      title: "Stop this import",
+      description:
+        "Nothing more is brought in. Items this import already added are removed again, unless someone has changed them since — those stay.",
+      label: "Why are you stopping it?",
+      placeholder: "For example: wrong file",
+      confirmLabel: "Stop import",
+      tone: "danger",
+    });
+    if (!reason?.trim()) return;
+    setError(null);
+    setNotice(null);
+    setBusy("stopped");
+    void (async () => {
+      try {
+        const result = await cancelImportRun({
+          importRunId: importRun._id,
+          reason: reason.trim(),
+        });
+        setNotice(
+          `Stopped. ${result.removed} item(s) removed again` +
+            (result.kept.length > 0
+              ? `; kept because someone changed them: ${result.kept.join(", ")}`
+              : "") +
+            ".",
+        );
+      } catch (cause) {
+        setError(failureText(cause));
+      } finally {
+        setBusy(null);
+      }
+    })();
+  };
+
   const handleRevert = async () => {
     const confirmed = await prompt.askConfirm({
       title: "Revert Import",
@@ -329,7 +445,7 @@ export function ImportRunDetailPage() {
           `Reverted — ${result.rolledBack} match(es) marked as replaced.`,
         );
       } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Revert failed");
+        setError(failureText(cause));
       } finally {
         setBusy(null);
       }
@@ -346,6 +462,7 @@ export function ImportRunDetailPage() {
   };
 
   const counts = parseRecordCounts(importRun.recordCounts);
+  const stopReport = readStopReport(importRun.stopReport);
   const dispositionSummary = parseRecordCounts(
     importRun.dispositionCounts ?? "{}",
   );
@@ -369,12 +486,12 @@ export function ImportRunDetailPage() {
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div className="flex items-center gap-4">
-          <Link
-            to={importRunsListPath()}
+          <ReturnToListLink
+            fallback={importRunsListPath()}
             className="text-ink-2 hover:text-ink text-xs"
           >
             ← Imports
-          </Link>
+          </ReturnToListLink>
           <div className="h-6 w-px bg-line" />
         </div>
         <div className="mt-2">
@@ -458,6 +575,9 @@ export function ImportRunDetailPage() {
                 case "reverted":
                   void handleRevert();
                   break;
+                case "stopped":
+                  void handleStop();
+                  break;
               }
             };
             return (
@@ -467,7 +587,9 @@ export function ImportRunDetailPage() {
                 onClick={handleClick}
                 disabled={isBusy}
                 className={`btn ${
-                  transition.next === "failed" || transition.next === "reverted"
+                  transition.next === "failed" ||
+                  transition.next === "reverted" ||
+                  transition.next === "stopped"
                     ? "btn-ghost"
                     : "btn-primary"
                 }`}
@@ -476,13 +598,36 @@ export function ImportRunDetailPage() {
               </button>
             );
           })}
+          {importRun.status === "committing" &&
+          importRun.sourceRowsStorageId ? (
+            <button
+              type="button"
+              onClick={() => void handleContinue()}
+              disabled={busy === "continue"}
+              className="btn btn-primary"
+            >
+              {busy === "continue" ? "Processing..." : "Continue import"}
+            </button>
+          ) : null}
           {availableTransitions.length === 0 ? (
             <span className="text-ink-2 text-xs">
               No actions available for this status
             </span>
           ) : null}
         </div>
+        {stopReport ? (
+          <p className="border-t border-line px-4 py-3 text-xs text-ink-2">
+            {stopReport.done ? "Stopped. " : "Stopping… "}
+            {stopReport.removed} item(s) removed again.
+            {stopReport.kept.length > 0
+              ? ` Kept because someone changed them: ${stopReport.kept.join(", ")}.`
+              : ""}
+          </p>
+        ) : null}
       </div>
+
+      {/* Report archive intake: upload, list, sort, explain (PL-ARCHIVE) */}
+      <ArchiveIntakePanel run={importRun} />
 
       {/* Record Counts Form */}
       {showRecordCountsForm ? (
@@ -590,11 +735,19 @@ export function ImportRunDetailPage() {
             </h2>
           </div>
           <div className="p-4">
+            <SourceRowsFilePicker
+              datasetType={importRun.datasetType}
+              noun={commitNoun}
+              onRows={(rows) =>
+                setSourceRowsInput(JSON.stringify(rows, null, 1))
+              }
+            />
             <label
               htmlFor="sourceRows"
               className="block text-xs font-medium text-ink mb-2"
             >
-              {commitNounLabel} source rows (JSON array)
+              {commitNounLabel} source rows (filled from the file, or pasted as
+              a JSON array)
             </label>
             <textarea
               id="sourceRows"
@@ -627,7 +780,7 @@ export function ImportRunDetailPage() {
                   : commitNoun === "lead"
                     ? "Lead (an inquiry — it links to a client if it converts)"
                     : commitNoun === "payment"
-                      ? "payment reference in the leftover match list (it gets matched to a Capsule payment later)"
+                      ? "payment sitting in the leftover match list (it gets matched to a Capsule payment later)"
                       : commitNoun === "menu"
                         ? "Dish in your menu catalog (needs kitchen access; the old price is kept with the import details)"
                         : commitNoun === "pack list"
@@ -635,6 +788,9 @@ export function ImportRunDetailPage() {
                           : "Venue"}
               , and tied to this import. Running it again is safe (rows already
               brought in are skipped).
+              {importRun.archiveStorageId
+                ? " To finish with only the report archive, leave the rows as [] — no new records are made."
+                : ""}
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -853,7 +1009,7 @@ export function ImportRunDetailPage() {
             )}
             <p className="mt-3 text-xs text-ink-3">
               Dispositions describe the source archive, not live kitchen or
-              office items — unsupported, duplicate and linked-reference content
+              office items — unsupported, duplicate, and already-linked content
               stays listed here after commit.
             </p>
           </div>
@@ -904,8 +1060,8 @@ export function ImportRunDetailPage() {
             <li>
               • <strong>Approve &amp; Commit</strong>: Confirm the counts, then
               paste rows from your old system to create the real items — venues,
-              client accounts, events, leads, payment references, menu dishes,
-              and pack lists — all tied to this import
+              client accounts, events, leads, payment entries, menu dishes, and
+              pack lists — all tied to this import
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires

@@ -1,15 +1,13 @@
 export type ActionResultKind = "ok" | "fail";
 
-export type ActionResultAction = {
-  label: string;
-  to: string;
-};
+/** A record the action made or changed, shown as a link on the result. */
+export type ActionResultLink = { label: string; href: string };
 
 export type ActionResult = {
   id: number;
   kind: ActionResultKind;
   message: string;
-  actions?: readonly ActionResultAction[];
+  links?: readonly ActionResultLink[];
 };
 
 type Listener = (result: ActionResult | null) => void;
@@ -42,8 +40,8 @@ export class ActionResultStore {
     return this.result;
   }
 
-  ok(message: string, actions?: readonly ActionResultAction[]): void {
-    this.publish(message.trim(), "ok", OK_DISMISS_MS, actions);
+  ok(message: string, links?: readonly ActionResultLink[]): void {
+    this.publish(message.trim(), "ok", OK_DISMISS_MS, links);
   }
 
   fail(message: string): void {
@@ -60,11 +58,16 @@ export class ActionResultStore {
     message: string,
     kind: ActionResultKind,
     dismissMs: number,
-    actions?: readonly ActionResultAction[],
+    links?: readonly ActionResultLink[],
   ): void {
     if (!message) return;
     this.clearTimer();
-    this.result = { id: this.nextId++, kind, message, actions };
+    this.result = {
+      id: this.nextId++,
+      kind,
+      message,
+      ...(links?.length ? { links } : {}),
+    };
     this.emit();
     const publishedId = this.result.id;
     this.dismissTimer = setTimeout(() => {
@@ -84,9 +87,9 @@ export class ActionResultStore {
 
 export function reportActionOk(
   message: string,
-  actions?: readonly ActionResultAction[],
+  links?: readonly ActionResultLink[],
 ): void {
-  ActionResultStore.shared.ok(message, actions);
+  ActionResultStore.shared.ok(message, links);
 }
 
 export function reportActionFail(message: string): void {

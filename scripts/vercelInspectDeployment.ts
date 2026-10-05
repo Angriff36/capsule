@@ -59,6 +59,27 @@ async function apiDeployment(
   }
 }
 
+/** The commit the deployment itself serves: every build writes
+ *  <deployment>/version.json (scripts/verify-vercel-release.ts reads the same
+ *  file). Used when neither the CLI nor the token-gated API gives the sha. */
+async function servedCommit(url: string): Promise<string | null> {
+  const base = /^https?:\/\//.test(url) ? url : `https://${url}`;
+  try {
+    const response = await fetch(`${base.replace(/\/+$/, "")}/version.json`, {
+      cache: "no-store",
+      redirect: "manual",
+    });
+    if (!response.ok) return null;
+    const body = (await response.json()) as { commit?: unknown };
+    return typeof body.commit === "string" &&
+      /^[0-9a-f]{40}$/i.test(body.commit)
+      ? body.commit
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -99,6 +120,9 @@ export async function inspectVercelDeployment(
           readyState: snapshot.readyState ?? vercelReadyState(api),
         };
       }
+    }
+    if (snapshot && !snapshot.commitSha && snapshot.url) {
+      snapshot = { ...snapshot, commitSha: await servedCommit(snapshot.url) };
     }
     return snapshot;
   };

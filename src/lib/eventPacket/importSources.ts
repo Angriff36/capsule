@@ -1,5 +1,5 @@
 import { fingerprintBytes, type SourceArtifact } from "./model";
-import { recognizeSource } from "./recognizeSource";
+import { PARSER_VERSION, recognizeSource } from "./recognizeSource";
 import {
   groupSources,
   type ExtractedSource,
@@ -49,6 +49,18 @@ export function parseCsv(text: string): string[][] {
   }
   return rows;
 }
+/** The picture type the file's first bytes show, whatever its name says. */
+export function pictureType(bytes: Uint8Array): string | undefined {
+  const head = Array.from(bytes.slice(0, 12));
+  const ascii = String.fromCharCode(...head);
+  if (head[0] === 0x89 && ascii.slice(1, 4) === "PNG") return "image/png";
+  if (head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff)
+    return "image/jpeg";
+  if (ascii.startsWith("GIF8")) return "image/gif";
+  if (ascii.startsWith("RIFF") && ascii.slice(8, 12) === "WEBP")
+    return "image/webp";
+  return undefined;
+}
 export async function importSources(
   inputs: ImportInput[],
   options: ImportOptions,
@@ -62,9 +74,25 @@ export async function importSources(
       (a) => a.fingerprint === fingerprint,
     );
     const isPdf = new TextDecoder().decode(input.bytes.slice(0, 5)) === "%PDF-";
+    const picture = pictureType(input.bytes);
     let pages: SourcePage[] = [],
       rows: string[][] | undefined,
-      mimeType = input.mimeType;
+      mimeType = picture ?? input.mimeType;
+    if (picture) {
+      // A setup or load-in diagram is kept as it is; nothing is read from it.
+      const artifact: SourceArtifact = {
+        fingerprint,
+        name: input.name,
+        mimeType,
+        kind: "diagram",
+        parserVersion: PARSER_VERSION,
+        recognitionEvidence: [`Picture file (${picture})`],
+        importedAt: existing?.importedAt ?? options.importedAt,
+      };
+      sources.push({ artifact, tenantId: options.tenantId, pages });
+      artifactBytes.push({ artifact, bytes: input.bytes });
+      continue;
+    }
     if (isPdf) {
       const extract =
         options.extractPdfPages ??

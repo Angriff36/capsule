@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListRevenueAttribution,
-  useListEvent,
   useRevenueAttributionApprove,
   useRevenueAttributionReject,
   useRevenueAttributionRequestApproval,
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "../facilities/useEventsById";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
@@ -16,6 +16,7 @@ import {
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { RevenueSplitSummary } from "./RevenueSplitSummary";
 // This page renders tax-workspace surfaces (tax-period-stamp). Routes are lazy
 // chunks, so landing directly on this page without this import gets no styles
 // and the header stat runs together ("Pending approval00 total").
@@ -42,7 +43,7 @@ const attributionTypeLabel = (type: string) => {
 
 export function RevenueAttributionsPage() {
   const attributions = useListRevenueAttribution();
-  const events = useListEvent();
+  const events = useAllEventReportRows();
   const approve = useRevenueAttributionApprove();
   const reject = useRevenueAttributionReject();
   const requestApproval = useRevenueAttributionRequestApproval();
@@ -172,6 +173,9 @@ export function RevenueAttributionsPage() {
             Review and approve revenue splits to venues, salespeople, and
             partners. Attribution applies to event revenue after approval.
           </p>
+          <Link to="/finance/attribution/new" className="btn btn-primary mt-3">
+            Add revenue split
+          </Link>
         </div>
         <div className="tax-period-stamp" aria-label="Attribution status">
           <span>Pending approval</span>
@@ -194,12 +198,20 @@ export function RevenueAttributionsPage() {
       ) : null}
       {host}
 
+      <RevenueSplitSummary
+        events={events.map((event) => ({ ...event, _id: String(event._id) }))}
+        splits={configuredAttributions.map((attr) => ({
+          ...attr,
+          eventId: String(attr.eventId),
+        }))}
+      />
+
       {configuredAttributions.length === 0 ? (
         <div className="document-empty">
           <p>No revenue attributions yet.</p>
           <span>
-            Create attributions from event detail pages to track commissions and
-            splits.
+            Use Add revenue split to track a venue commission, a sales
+            commission or a partner split for an event.
           </span>
         </div>
       ) : (

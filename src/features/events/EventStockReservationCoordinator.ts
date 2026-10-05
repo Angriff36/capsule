@@ -1,3 +1,5 @@
+import { freeStock } from "../../lib/stockBalance";
+
 export type EventStockDemand = {
   id: string;
   eventId: string;
@@ -473,20 +475,10 @@ export class EventStockReservationCoordinator {
   ): ItemAvailability[] {
     return items
       .filter((item) => item.stockedAt != null && item.deletedAt == null)
-      .map((item) => {
-        const reserved = reservations
-          .filter(
-            (reservation) =>
-              reservation.inventoryItemId === item.id &&
-              reservation.status === "active" &&
-              reservation.deletedAt == null,
-          )
-          .reduce((sum, reservation) => sum + reservation.quantity, 0);
-        return {
-          item,
-          available: Math.max(0, item.quantityOnHand - reserved),
-        };
-      });
+      .map((item) => ({
+        item,
+        available: freeStock(item.id, item.quantityOnHand, reservations),
+      }));
   }
 
   private lotAvailability(

@@ -1,0 +1,71 @@
+// Capsule logistics — sending a truck out while the dispatch board still
+// shows open items. Nothing stops the truck: the person sending it says why,
+// and this row keeps the reason, who said it and what was open at that
+// moment. One row per send-out and a row is never edited.
+
+use "../foundation/base.manifest"
+
+entity DepartureOverride mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  // The pack list that was sent out, when one was.
+  property packListId: uuid?
+  property required reason: string = ""
+  // The open items as the board showed them, one per line.
+  property openItems: string?
+  property recordedAt: datetime?
+  // Staff profile that sent the truck. Missing when that account is not
+  // linked to a profile; the reason is still saved.
+  property recordedByPersonId: uuid?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
+
+  constraint departureOverrideReasonPresent: self.recordedAt == null or length(trim(self.reason)) > 0 "Say why it is fine to leave."
+
+  // Read wide: the crew sees why the truck left. The same people who may send
+  // a pack list out may record the reason.
+  default policy departureOverrideRead read: roleAllows(user.role, "staffAccess") "Staff may see why a truck left with open items"
+  default policy departureOverrideWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may send a truck out with open items"
+  default policy departureOverrideExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may send a truck out with open items"
+
+  command record(
+    eventId: uuid,
+    reason: string,
+    optional openItems: string,
+    optional packListId: uuid
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only.
+    guard self.event != null and self.event.deletedAt == null
+    guard packListId == null or (self.packList != null and self.packList.eventId == eventId)
+    constraint recordDepartureEventMatch: eventId == self.eventId "This reason is for a different event. Pick the event already on it."
+    constraint recordDepartureReason: length(trim(reason)) > 0 "Say why it is fine to leave."
+    mutate packListId = packListId
+    mutate reason = trim(reason)
+    mutate openItems = openItems
+    mutate recordedAt = now()
+    mutate recordedByPersonId = user.personId
+    emit DepartureOverrideRecorded {
+      departureOverrideId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      packListId: packListId
+      reason: trim(reason)
+    }
+  }
+
+  store DepartureOverride in durable
+}
+
+event DepartureOverrideRecorded: "departure_override.recorded" {
+  departureOverrideId: string
+  tenantId: string
+  eventId: string
+  packListId: string?
+  reason: string
+}
