@@ -478,9 +478,11 @@ export const PAGE_GUIDES: PageGuide[] = [
   {
     prefix: "/staff/training",
     title: "Training",
-    purpose: "Completed trainings that unlock certain shift types.",
+    purpose:
+      "Completed trainings that unlock certain shift types, and each person's skill level per area.",
     steps: [
       "Note who's finished training so they can be scheduled for those roles.",
+      "In the skills matrix, rate each person 0 to 4 per area; level 4 people are the trainers.",
     ],
   },
   {

@@ -17,29 +17,10 @@ import {
 } from "./TrainingLifecycleActions";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { SkillsMatrixPanel } from "./SkillsMatrixPanel";
+import { starterModules } from "./trainingStarters";
 import "./TrainingPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
-
-const starterModules = [
-  {
-    name: "Food safety basics",
-    category: "food_safety",
-    passingScore: 80,
-    description: "Safe handling, cross-contamination, and temperature control.",
-  },
-  {
-    name: "Equipment operation",
-    category: "equipment_operation",
-    passingScore: 85,
-    description: "Safe setup, operation, shutdown, and incident response.",
-  },
-  {
-    name: "Service standards",
-    category: "service_standards",
-    passingScore: 80,
-    description: "Guest care, service sequence, and event-floor expectations.",
-  },
-] as const;
 
 const categoryLabels: Record<string, string> = {
   food_safety: "Food safety",
@@ -501,6 +482,14 @@ export function TrainingPage() {
           </div>
         )}
       </section>
+
+      <SkillsMatrixPanel
+        people={activePeople}
+        modules={activeModules}
+        prompt={prompt}
+        busy={busy}
+        run={run}
+      />
 
       <div className="training-ledger-grid">
         <section className="working-ledger">
