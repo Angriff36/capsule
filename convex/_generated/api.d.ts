@@ -22,6 +22,7 @@ import type * as automaticExplanations from "../automaticExplanations.js";
 import type * as brandLogo from "../brandLogo.js";
 import type * as candidateHireRevocation from "../candidateHireRevocation.js";
 import type * as candidateToTeam from "../candidateToTeam.js";
+import type * as cascadePreview from "../cascadePreview.js";
 import type * as catalogReclassification from "../catalogReclassification.js";
 import type * as chatNotifyPreference from "../chatNotifyPreference.js";
 import type * as clientPortal from "../clientPortal.js";
@@ -350,6 +351,7 @@ declare const fullApi: ApiFromModules<{
   brandLogo: typeof brandLogo;
   candidateHireRevocation: typeof candidateHireRevocation;
   candidateToTeam: typeof candidateToTeam;
+  cascadePreview: typeof cascadePreview;
   catalogReclassification: typeof catalogReclassification;
   chatNotifyPreference: typeof chatNotifyPreference;
   clientPortal: typeof clientPortal;
