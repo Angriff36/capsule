@@ -2294,7 +2294,7 @@ export default defineSchema({
     weightLb: v.optional(v.union(v.number(), v.null())),
     estimatedValue: v.optional(v.union(v.number(), v.null())),
     recipientOrganization: v.optional(v.union(v.string(), v.null())),
-    recipientTaxId: v.optional(v.union(v.string(), v.null())),
+    recipientEin: v.optional(v.union(v.string(), v.null())),
     recipientAddress: v.optional(v.union(v.string(), v.null())),
     recipientContact: v.optional(v.union(v.string(), v.null())),
     receiptReference: v.optional(v.union(v.string(), v.null())),

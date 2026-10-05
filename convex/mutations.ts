@@ -36649,7 +36649,7 @@ export const LeadershipItem_revise = mutation({
   },
 });
 
-async function __runLeftoverDispositionRecord(ctx: MutationCtx, { docId, eventId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientTaxId, recipientAddress, recipientContact, receiptReference, handlingNote, note, version }: any, __creation = false) {
+async function __runLeftoverDispositionRecord(ctx: MutationCtx, { docId, eventId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientEin, recipientAddress, recipientContact, receiptReference, handlingNote, note, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -36658,12 +36658,12 @@ async function __runLeftoverDispositionRecord(ctx: MutationCtx, { docId, eventId
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may see what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((eventId === doc.eventId))) throw new Error("This record is for a different event. Pick the event already on it.");
+    if (!((eventId === doc.eventId))) throw new Error("These leftovers are for a different event. Pick the event already on them.");
     if (!((((itemDescription).trim()).length > 0))) throw new Error("Say what food this is.");
     if (!((((dispositionDate).trim()).length > 0))) throw new Error("Pick the day the food left.");
     if (!(((disposition !== "donated") || (((((recipientOrganization != null) ? recipientOrganization : "")).trim()).length > 0)))) throw new Error("Name the organization that took the donated food.");
@@ -36679,7 +36679,7 @@ async function __runLeftoverDispositionRecord(ctx: MutationCtx, { docId, eventId
       weightLb: weightLb,
       estimatedValue: estimatedValue,
       recipientOrganization: recipientOrganization,
-      recipientTaxId: recipientTaxId,
+      recipientEin: recipientEin,
       recipientAddress: recipientAddress,
       recipientContact: recipientContact,
       receiptReference: receiptReference,
@@ -36708,7 +36708,7 @@ export const LeftoverDisposition_record = mutation({
     weightLb: v.optional(v.number()),
     estimatedValue: v.optional(v.number()),
     recipientOrganization: v.optional(v.string()),
-    recipientTaxId: v.optional(v.string()),
+    recipientEin: v.optional(v.string()),
     recipientAddress: v.optional(v.string()),
     recipientContact: v.optional(v.string()),
     receiptReference: v.optional(v.string()),
@@ -36742,7 +36742,7 @@ export const LeftoverDisposition_createViaRecord = mutation({
     weightLb: v.optional(v.number()),
     estimatedValue: v.optional(v.number()),
     recipientOrganization: v.optional(v.string()),
-    recipientTaxId: v.optional(v.string()),
+    recipientEin: v.optional(v.string()),
     recipientAddress: v.optional(v.string()),
     recipientContact: v.optional(v.string()),
     receiptReference: v.optional(v.string()),
@@ -36760,7 +36760,7 @@ export const LeftoverDisposition_createViaRecord = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"eventId","table":"events"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { eventId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientTaxId, recipientAddress, recipientContact, receiptReference, handlingNote, note } = args;
+    const { eventId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientEin, recipientAddress, recipientContact, receiptReference, handlingNote, note } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
@@ -36775,18 +36775,18 @@ export const LeftoverDisposition_createViaRecord = mutation({
       receiptReference: args.receiptReference,
       recipientAddress: args.recipientAddress,
       recipientContact: args.recipientContact,
+      recipientEin: args.recipientEin,
       recipientOrganization: args.recipientOrganization,
-      recipientTaxId: args.recipientTaxId,
       weightLb: args.weightLb
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may see what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.deletedAt == null)))) throw new Error("Guard 2 failed");
-    if (!((eventId === __draft.eventId))) throw new Error("This record is for a different event. Pick the event already on it.");
+    if (!((eventId === __draft.eventId))) throw new Error("These leftovers are for a different event. Pick the event already on them.");
     if (!((((itemDescription).trim()).length > 0))) throw new Error("Say what food this is.");
     if (!((((dispositionDate).trim()).length > 0))) throw new Error("Pick the day the food left.");
     if (!(((disposition !== "donated") || (((((recipientOrganization != null) ? recipientOrganization : "")).trim()).length > 0)))) throw new Error("Name the organization that took the donated food.");
@@ -36802,7 +36802,7 @@ export const LeftoverDisposition_createViaRecord = mutation({
     doc.weightLb = weightLb;
     doc.estimatedValue = estimatedValue;
     doc.recipientOrganization = recipientOrganization;
-    doc.recipientTaxId = recipientTaxId;
+    doc.recipientEin = recipientEin;
     doc.recipientAddress = recipientAddress;
     doc.recipientContact = recipientContact;
     doc.receiptReference = receiptReference;
@@ -36830,8 +36830,8 @@ async function __runLeftoverDispositionRemove(ctx: MutationCtx, { docId, version
     if (!doc) throw new Error("LeftoverDisposition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("LeftoverDisposition not found");
     if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may see what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -36841,6 +36841,11 @@ async function __runLeftoverDispositionRemove(ctx: MutationCtx, { docId, version
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, leftoverDispositionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, _subject: { entity: "LeftoverDisposition", command: "remove", id: docId } };
+    const __manifestEvent0 = { type: "LeftoverDispositionRemoved", entity: "LeftoverDisposition", entityId: docId, payload: { leftoverDispositionId: docId, tenantId: __after.tenantId, eventId: __after.eventId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "remove", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -36866,15 +36871,15 @@ export const LeftoverDisposition_remove = mutation({
   },
 });
 
-async function __runLeftoverDispositionRevise(ctx: MutationCtx, { docId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientTaxId, recipientAddress, recipientContact, receiptReference, handlingNote, note, version }: any, __creation = false) {
+async function __runLeftoverDispositionRevise(ctx: MutationCtx, { docId, disposition, itemDescription, dispositionDate, weightLb, estimatedValue, recipientOrganization, recipientEin, recipientAddress, recipientContact, receiptReference, handlingNote, note, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("LeftoverDisposition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("LeftoverDisposition not found");
     if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may see what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
-    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may record what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
+    if (!((((checkRole(user, "financeAccess") || checkRole(user, "eventAccess")) || checkRole(user, "kitchenAccess")) || checkRole(user, "manageAccess")))) throw new Error("Finance, event and kitchen staff may log what happened to leftover food");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((itemDescription).trim()).length > 0))) throw new Error("Say what food this is.");
@@ -36892,7 +36897,7 @@ async function __runLeftoverDispositionRevise(ctx: MutationCtx, { docId, disposi
       weightLb: weightLb,
       estimatedValue: estimatedValue,
       recipientOrganization: recipientOrganization,
-      recipientTaxId: recipientTaxId,
+      recipientEin: recipientEin,
       recipientAddress: recipientAddress,
       recipientContact: recipientContact,
       receiptReference: receiptReference,
@@ -36901,6 +36906,11 @@ async function __runLeftoverDispositionRevise(ctx: MutationCtx, { docId, disposi
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, leftoverDispositionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, disposition: disposition, dispositionDate: dispositionDate, weightLb: weightLb, recipientOrganization: recipientOrganization, _subject: { entity: "LeftoverDisposition", command: "revise", id: docId } };
+    const __manifestEvent0 = { type: "LeftoverDispositionRevised", entity: "LeftoverDisposition", entityId: docId, payload: { leftoverDispositionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, disposition: disposition, dispositionDate: dispositionDate, weightLb: weightLb, recipientOrganization: recipientOrganization }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "revise", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 
@@ -36913,7 +36923,7 @@ export const LeftoverDisposition_revise = mutation({
     weightLb: v.optional(v.number()),
     estimatedValue: v.optional(v.number()),
     recipientOrganization: v.optional(v.string()),
-    recipientTaxId: v.optional(v.string()),
+    recipientEin: v.optional(v.string()),
     recipientAddress: v.optional(v.string()),
     recipientContact: v.optional(v.string()),
     receiptReference: v.optional(v.string()),

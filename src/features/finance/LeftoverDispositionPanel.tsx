@@ -7,6 +7,7 @@ import {
   useListLeftoverDisposition,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import {
@@ -220,9 +221,8 @@ function LeftoverForm({
         </label>
         <label className="field-label">
           Date *
-          <input
+          <BoundedDateInput
             name="dispositionDate"
-            type="date"
             className="input"
             required
             defaultValue={row?.dispositionDate ?? todayDateKey()}
@@ -266,9 +266,9 @@ function LeftoverForm({
             <label className="field-label">
               Recipient tax ID (EIN)
               <input
-                name="recipientTaxId"
+                name="recipientEin"
                 className="input"
-                defaultValue={row?.recipientTaxId ?? ""}
+                defaultValue={row?.recipientEin ?? ""}
               />
             </label>
             <label className="field-label">

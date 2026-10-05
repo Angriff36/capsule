@@ -20,7 +20,7 @@ export interface LeftoverDispositionValues {
   weightLb?: number;
   estimatedValue?: number;
   recipientOrganization?: string;
-  recipientTaxId?: string;
+  recipientEin?: string;
   recipientAddress?: string;
   recipientContact?: string;
   receiptReference?: string;
@@ -60,7 +60,7 @@ export function leftoverValuesFromForm(
     recipientOrganization: donated
       ? text(data, "recipientOrganization")
       : undefined,
-    recipientTaxId: donated ? text(data, "recipientTaxId") : undefined,
+    recipientEin: donated ? text(data, "recipientEin") : undefined,
     recipientAddress: donated ? text(data, "recipientAddress") : undefined,
     recipientContact: donated ? text(data, "recipientContact") : undefined,
     receiptReference: donated ? text(data, "receiptReference") : undefined,
@@ -134,7 +134,7 @@ export function donationYearSummary(
     total.weightLb += Number(row.weightLb ?? 0);
     total.estimatedValue += Number(row.estimatedValue ?? 0);
     if (!row.receiptReference) total.missingReceipts += 1;
-    total.taxId ??= row.recipientTaxId ?? undefined;
+    total.taxId ??= row.recipientEin ?? undefined;
     total.address ??= row.recipientAddress ?? undefined;
     total.contact ??= row.recipientContact ?? undefined;
     byRecipient.set(key, total);
