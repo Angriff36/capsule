@@ -9,6 +9,8 @@ import { parseBattleBoard } from "./parseBattleBoard";
 import { parseBeoText } from "./parseBeoText";
 import { beoPdfText, isBeoPdf } from "./beoPdfText";
 import { bundlePartFromSheets } from "./bundlePartFromSheets";
+import { parseEventWorksheet } from "./parseEventWorksheet";
+import { isEventWorksheetPdf, worksheetPdfRows } from "./worksheetPdfRows";
 import { readPdfTextLines } from "./pdfTextReader";
 import { readXlsxWorkbook } from "./xlsxReader";
 import { XlsxReportGrid } from "./xlsxReportGrid";
@@ -49,8 +51,11 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
 
   if (lower.endsWith(".pdf")) {
     const lines = readPdfTextLines(file.contents);
-    // TPP prints the BEO as PDF too; any other PDF is the battle board.
+    // TPP prints the BEO and the event worksheet as PDF too; any other PDF
+    // is the battle board.
     if (isBeoPdf(lines)) return parseBeoText(beoPdfText(lines));
+    if (isEventWorksheetPdf(lines))
+      return parseEventWorksheet(worksheetPdfRows(lines));
     return parseBattleBoard(lines);
   }
   if (lower.endsWith(".xlsx")) {

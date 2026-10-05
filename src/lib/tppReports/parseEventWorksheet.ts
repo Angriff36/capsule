@@ -32,6 +32,12 @@ import {
 const PRINTED_FOOTER = /^printed date:/i;
 const SECTION_TIMELINE = "timeline";
 const SECTION_FOOD = "food";
+const AFTER_FOOD = new Set([
+  "rental / equipment",
+  "miscellaneous event expenses",
+  "setup",
+  "event labor",
+]);
 
 function sectionOf(row: readonly string[]): string | undefined {
   const filled = row.filter((cell) => cell.length > 0);
@@ -87,6 +93,8 @@ function readMenu(rows: readonly string[][]): BundleMenuItem[] {
       continue;
     }
     if (!active) continue;
+    // Gear, charges, setup prose and crew follow the food; none is a dish.
+    if (section !== undefined && AFTER_FOOD.has(section)) break;
     if (PRINTED_FOOTER.test(row[0] ?? "")) continue;
     if (row[0] === "Menu Item:") continue;
     if (isBlankRow(row)) continue;
@@ -250,7 +258,13 @@ function readEquipment(rows: readonly string[][]): BundlePackListItem[] {
       continue;
     }
     if (!active) continue;
-    if (section === "setup" || section === "event labor") break;
+    // "Miscellaneous Event Expenses" (the travel fee) is a charge, not gear.
+    if (
+      section === "setup" ||
+      section === "event labor" ||
+      section === "miscellaneous event expenses"
+    )
+      break;
     if (PRINTED_FOOTER.test(row[0] ?? "")) continue;
     const filled = row.map((cell) => cell.trim()).filter(Boolean);
     if (filled.length === 0 || /^(Vendor|Item|Qty)$/i.test(filled[0]!))
@@ -317,10 +331,16 @@ function readStaff(rows: readonly string[][]): BundleStaffAssignment[] {
       name: /^unassigned$/i.test(name) ? "Unassigned" : name,
       ...(role ? { role } : {}),
     };
-    const start = excelSerialMinutes(cells[1]);
-    const end = elapsedHoursMinutes(
-      cells.slice(2).find((cell) => /\d+:\d{2}/.test(cell)),
-    );
+    // The PDF print shows the shift as clock times ("4:15 PM", "8:00 PM").
+    const clocks = cells
+      .slice(1)
+      .map((cell) => parseClockMinutes(cell))
+      .filter((minutes) => minutes !== undefined);
+    const start = excelSerialMinutes(cells[1]) ?? clocks[0];
+    const end =
+      elapsedHoursMinutes(
+        cells.slice(2).find((cell) => /\d+:\d{2}/.test(cell)),
+      ) ?? clocks[1];
     if (start !== undefined) entry.startMinutes = start;
     if (end !== undefined) entry.endMinutes = end;
     staff.push(entry);
