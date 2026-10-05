@@ -1,10 +1,17 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import { formatCountNoun } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateEvent,
+  useDateHoldConvert,
   useGetEventTemplate,
   useGetProposal,
   useListClient,
@@ -71,8 +78,14 @@ export function guidedEventCreateAvailable(params: {
   clientId: string;
   templateId: string;
   proposalId: string;
+  holdDate?: string;
 }): boolean {
-  return !params.clientId && !params.templateId && !params.proposalId;
+  return (
+    !params.clientId &&
+    !params.templateId &&
+    !params.proposalId &&
+    !params.holdDate
+  );
 }
 
 // Collapsible form block (native <details>) styled like Section. Uncontrolled:
@@ -158,10 +171,17 @@ export function EventCreatePage() {
   // proposal is still unlinked, submit goes through the proposal-booking seam
   // so the new event is linked and the accepted menu copies onto it.
   const proposalId = searchParams.get("proposalId")?.trim() || "";
+  // Booking from a date hold: start on the held day, then mark the hold booked.
+  const holdDate = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.get("date") ?? "")
+    ? (searchParams.get("date") as string)
+    : "";
+  const holdId = searchParams.get("holdId")?.trim() || "";
+  const convertHold = useDateHoldConvert();
   const guidedAvailable = guidedEventCreateAvailable({
     clientId: prefillClientId,
     templateId,
     proposalId,
+    holdDate,
   });
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
@@ -183,6 +203,25 @@ export function EventCreatePage() {
   const canCreateVenue = useCanCreateInlineReference("venue");
   const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [clientId, setClientId] = useState(prefillClientId);
+  const contactNameRef = useRef<HTMLInputElement>(null);
+  const contactEmailRef = useRef<HTMLInputElement>(null);
+  // Start the day-of contact as the chosen client; the boxes stay editable
+  // and a value the user typed is never replaced.
+  useEffect(() => {
+    // Proposal bookings carry their own contact over (ProposalEventPrefill).
+    const client = proposalId
+      ? undefined
+      : clients?.find((row) => row._id === clientId);
+    if (!client) return;
+    if (contactNameRef.current && !contactNameRef.current.value)
+      contactNameRef.current.value = clientDisplayName(client._id, [client]);
+    if (
+      contactEmailRef.current &&
+      !contactEmailRef.current.value &&
+      client.email
+    )
+      contactEmailRef.current.value = client.email;
+  }, [clientId, clients, proposalId]);
   const [venueId, setVenueId] = useState("");
   const [inlineCreate, setInlineCreate] = useState<{
     kind: "client" | "venue";
@@ -207,7 +246,7 @@ export function EventCreatePage() {
   const draftForm = useFormDraft("event-create");
   const proposalPrefill = proposalEventPrefill.values(proposal);
   const [startsAtValue, setStartsAtValue] = useState(
-    proposalPrefill.startsAtLocal,
+    proposalPrefill.startsAtLocal || (holdDate ? `${holdDate}T09:00` : ""),
   );
   const [endsAtValue, setEndsAtValue] = useState(proposalPrefill.endsAtLocal);
   const [endWasEdited, setEndWasEdited] = useState(
@@ -460,6 +499,13 @@ export function EventCreatePage() {
     void run("event", async () => {
       const created = await createEvent(await buildArgs());
       draftForm.clear();
+      if (holdId) {
+        // The event exists either way; a hold that already lapsed or was
+        // released simply stays as it is.
+        await convertHold({ docId: holdId, eventId: created.docId }).catch(
+          () => undefined,
+        );
+      }
       navigate(eventDetailPath(created.docId));
     });
   };
@@ -534,12 +580,6 @@ export function EventCreatePage() {
           </div>
         }
       />
-
-      {!guidedAvailable ? (
-        <p className="banner banner-warn">
-          Guided setup isn't available when booking from a proposal or template.
-        </p>
-      ) : null}
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
@@ -639,7 +679,7 @@ export function EventCreatePage() {
                   />
                 ) : null}
               </div>
-              <label className="field-label">
+              <label className="field-label self-start">
                 Expected headcount *
                 <input
                   name="expectedHeadcount"
@@ -681,6 +721,7 @@ export function EventCreatePage() {
               <div className="sm:col-span-2">
                 <DateHoldCollisionNotice
                   dateKey={(startsAtValue ?? "").slice(0, 10)}
+                  ignoreHoldId={holdId || undefined}
                 />
               </div>
               <label className="field-label">
@@ -704,7 +745,12 @@ export function EventCreatePage() {
                 </p>
                 <label className="field-label">
                   Name *
-                  <input name="primaryContactName" className="input" required />
+                  <input
+                    ref={contactNameRef}
+                    name="primaryContactName"
+                    className="input"
+                    required
+                  />
                   <FieldError
                     name="primaryContactName"
                     errors={errors}
@@ -714,6 +760,7 @@ export function EventCreatePage() {
                 <label className="field-label">
                   Email
                   <input
+                    ref={contactEmailRef}
                     name="primaryContactEmail"
                     type="email"
                     className="input"

@@ -26,7 +26,12 @@ const MONTHS = new Map(
     "october",
     "november",
     "december",
-  ].map((month, index) => [month, index]),
+  ].flatMap((month, index) => [
+    [month, index] as const,
+    // Short forms: "oct", "sept", "dec".
+    [month.slice(0, 3), index] as const,
+    ...(month === "september" ? [["sept", index] as const] : []),
+  ]),
 );
 const WEEKDAYS = new Map(
   [
@@ -61,7 +66,10 @@ export function addLocalDateTimeHours(value: string, hours: number) {
 
 function localDateFromValue(value: string | undefined) {
   if (!value) return undefined;
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/);
+  // Callers lower-case typed text, so accept "t" as well as "T".
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:[Tt ](\d{2}):(\d{2}))?$/,
+  );
   if (!match) return undefined;
   const date = new Date(
     Number(match[1]),
@@ -105,6 +113,13 @@ function parseTime(
   raw: string | undefined,
 ): readonly [number, number] | undefined {
   if (!raw) return undefined;
+  const clock = raw.trim().match(/^(?:at\s+)?(\d{1,2}):(\d{2})$/);
+  if (clock) {
+    // 24-hour time such as "18:00".
+    const hour = Number(clock[1]);
+    const minute = Number(clock[2]);
+    return hour <= 23 && minute <= 59 ? ([hour, minute] as const) : undefined;
+  }
   const match = raw
     .trim()
     .toLowerCase()
@@ -155,7 +170,11 @@ export function parseNaturalDate(
   let preserveTime = false;
 
   const iso = localDateFromValue(text);
-  if (iso) value = iso;
+  if (iso) {
+    value = iso;
+    // A stored date-time keeps its own time instead of the 9:00 default.
+    preserveTime = /\d[t ]\d/.test(text);
+  }
 
   const relative = text.match(
     /^(?:in\s+|\+)(\d+)\s*(h|hours?|d|days?|w|weeks?)$/,
@@ -181,10 +200,12 @@ export function parseNaturalDate(
   }
 
   const weekday = text.match(
-    /^(next\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)(?:\s+(.+))?$/,
+    /^(next\s+)?(sun|mon|tue|wed|thu|fri|sat)(?:day|sday|nesday|rsday|urday|s|rs|ur|n)?(?:\s+(.+))?$/,
   );
   if (!value && weekday) {
-    value = nextWeekday(now, WEEKDAYS.get(weekday[2])!, Boolean(weekday[1]));
+    // "fri", "thurs" and "friday" all name the same day.
+    const day = [...WEEKDAYS].find(([name]) => name.startsWith(weekday[2]));
+    value = nextWeekday(now, day![1], Boolean(weekday[1]));
     explicitTime = parseTime(weekday[3]);
     if (weekday[3] && !explicitTime)
       return { ok: false, reason: "unparseable" };

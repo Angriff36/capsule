@@ -5,6 +5,7 @@ import {
   useState,
   type InputHTMLAttributes,
 } from "react";
+import { CalendarIcon } from "./icons";
 import { parseNaturalDate, type NaturalDateKind } from "./naturalDate";
 
 /**
@@ -54,8 +55,15 @@ function NaturalDateInput({
   ...rest
 }: BoundedDateInputProps & { kind: NaturalDateKind }) {
   const nativeRef = useRef<HTMLInputElement>(null);
+  // The box shows the resolved date in words; the hidden picker holds the
+  // machine value the form submits.
+  const display = (raw: string) => {
+    if (!raw) return "";
+    const parsed = parseNaturalDate(raw, { kind });
+    return parsed.ok ? parsed.echo : raw;
+  };
   const initialValue = String(value ?? defaultValue ?? "");
-  const [text, setText] = useState(initialValue);
+  const [text, setText] = useState(() => display(initialValue));
   const [message, setMessage] = useState("");
   const messageId = useId();
   const pickerId = id ? `${id}-picker` : undefined;
@@ -63,7 +71,7 @@ function NaturalDateInput({
     kind === "date" ? MAX_DATE_INPUT_VALUE : MAX_DATETIME_LOCAL_INPUT_VALUE;
 
   useEffect(() => {
-    if (value !== undefined) setText(String(value ?? ""));
+    if (value !== undefined) setText(display(String(value ?? "")));
   }, [value]);
 
   const writeNative = (next: string) => {
@@ -79,6 +87,8 @@ function NaturalDateInput({
   };
 
   const commit = () => {
+    const current = nativeRef.current?.value ?? "";
+    if (current && text === display(current)) return true;
     const parsed = parseNaturalDate(text, {
       kind,
       anchor: naturalDateAnchor,
@@ -91,9 +101,9 @@ function NaturalDateInput({
       );
       return false;
     }
-    setText(parsed.value);
+    setText(parsed.echo);
     writeNative(parsed.value);
-    setMessage(`→ ${parsed.echo}`);
+    setMessage("");
     return true;
   };
 
@@ -105,6 +115,12 @@ function NaturalDateInput({
         className={className}
         type="text"
         inputMode="text"
+        placeholder={
+          rest.placeholder ??
+          (kind === "date"
+            ? "e.g. Dec 1 or next Friday"
+            : "e.g. next Friday 6pm")
+        }
         value={text}
         aria-describedby={message ? messageId : undefined}
         onChange={(event) => {
@@ -118,7 +134,7 @@ function NaturalDateInput({
           }
           if (event.key === "Escape") {
             event.preventDefault();
-            setText(String(value ?? defaultValue ?? ""));
+            setText(display(nativeRef.current?.value ?? ""));
             setMessage("");
           }
           onKeyDown?.(event);
@@ -130,8 +146,29 @@ function NaturalDateInput({
           onBlur?.(event);
         }}
       />
+      {/* One box to type in; the calendar button opens the browser's picker,
+          whose hidden input is the value the form actually submits. */}
+      <button
+        type="button"
+        className="natural-date-button"
+        aria-label={`Choose ${kind === "date" ? "date" : "date and time"} from calendar`}
+        disabled={rest.disabled}
+        onClick={() => {
+          const native = nativeRef.current;
+          if (!native) return;
+          try {
+            native.showPicker();
+          } catch {
+            native.focus();
+          }
+        }}
+      >
+        <CalendarIcon />
+      </button>
       <input
         {...rest}
+        tabIndex={-1}
+        aria-hidden="true"
         ref={nativeRef}
         id={pickerId}
         name={name}
@@ -140,9 +177,8 @@ function NaturalDateInput({
         max={boundedMax(max, cap)}
         defaultValue={value === undefined ? defaultValue : undefined}
         value={value}
-        aria-label={`Choose ${kind === "date" ? "date" : "date and time"} from calendar`}
         onChange={(event) => {
-          setText(event.target.value);
+          setText(display(event.target.value));
           setMessage("");
           onResolvedValue?.(event.target.value);
           onChange?.(event);

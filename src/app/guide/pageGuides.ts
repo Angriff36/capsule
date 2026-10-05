@@ -56,7 +56,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose: "Book a new event — only the Basics section is needed to start.",
     steps: [
       "Fill in the title, client, date, and headcount.",
-      "Pick the client and venue in the side panel — create them right there if they're new.",
+      "Pick the client and venue — create them right there if they're new.",
       "Open the other sections later; you can always come back.",
     ],
   },
