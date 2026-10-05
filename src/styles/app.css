@@ -4663,7 +4663,9 @@ div.tpp-parameter-wide {
 
 /* Export PDF = browser print-to-PDF of the .print-sheet region only. */
 @media print {
-  body * {
+  /* Only a page that shows a sheet hides the rest; any other page (lot
+     trace, for one) printed blank. */
+  body:where(:has(.print-sheet)) * {
     visibility: hidden;
   }
   .print-sheet,
@@ -4682,16 +4684,24 @@ div.tpp-parameter-wide {
     border: none;
     box-shadow: none;
   }
-  /* The app frame is one screen tall and clips or scrolls the rest; on paper
-     that kept a long sheet to its first page, so the frames grow to fit. A
-     frame's slide-in animation also pinned the sheet below the page title. */
+  /* A frame's slide-in animation pinned the sheet below the page title. */
   *:has(.print-sheet) {
     position: static !important;
     transform: none !important;
     animation: none !important;
+  }
+  /* The app frame is one screen tall and clips or scrolls the rest; on paper
+     that kept every long page to its first sheet, so the frame grows to fit. */
+  *:has(.app-canvas),
+  .app-canvas {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
+  }
+  /* The menu rail and top bar are for the screen, not the paper. */
+  .app-shell-sidebar,
+  .app-shell-header {
+    display: none !important;
   }
   .print-sheet .supply-table-wrap {
     overflow: visible;
