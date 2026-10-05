@@ -4582,6 +4582,8 @@ export default defineSchema({
     partnerSince: v.optional(v.union(v.number(), v.null())),
     opsEaseScore: v.optional(v.union(v.number(), v.null())),
     relationshipScore: v.optional(v.union(v.number(), v.null())),
+    logoStorageId: v.optional(v.union(v.string(), v.null())),
+    brandColor: v.optional(v.union(v.string(), v.null())),
     status: v.union(v.literal("active"), v.literal("inactive")),
     registeredAt: v.optional(v.union(v.number(), v.null())),
     deactivatedAt: v.optional(v.union(v.number(), v.null())),

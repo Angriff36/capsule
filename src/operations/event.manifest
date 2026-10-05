@@ -430,6 +430,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property partnerSince: datetime?
   property opsEaseScore: int?
   property relationshipScore: int?
+  // Co-branded proposals (playbook section 06): the venue's logo (Convex
+  // storage id) and its brand colour, shown next to the company's on a
+  // proposal for an event at a partner venue. Set by setBrand only.
+  property logoStorageId: string?
+  property brandColor: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
@@ -667,6 +672,19 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate partnerOwnerPersonId = partnerOwnerPersonId
     mutate opsEaseScore = opsEaseScore
     mutate relationshipScore = relationshipScore
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Venue logo and brand colour for co-branded proposals. Each call states
+  // both; a blank clears that one. A replaced logo file is kept, because
+  // proposals already sent still show it.
+  command setBrand(optional logoStorageId: string, optional brandColor: string) {
+    guard self.deletedAt == null
+    mutate logoStorageId = logoStorageId != null and length(trim(logoStorageId)) > 0 ? trim(logoStorageId) : null
+    mutate brandColor = brandColor != null and length(trim(brandColor)) > 0 ? trim(brandColor) : null
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

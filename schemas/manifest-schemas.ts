@@ -4930,6 +4930,8 @@ export const VenueSchema = z.object({
   partnerSince: z.coerce.date().nullable().optional(),
   opsEaseScore: z.number().int().nullable().optional(),
   relationshipScore: z.number().int().nullable().optional(),
+  logoStorageId: z.string().nullable().optional(),
+  brandColor: z.string().nullable().optional(),
   status: z.enum(["active", "inactive"]).default("active"),
   registeredAt: z.coerce.date().nullable().optional(),
   deactivatedAt: z.coerce.date().nullable().optional(),
@@ -12998,6 +13000,14 @@ export const VenueRegisterParamsSchema = z.object({
 });
 
 export type VenueRegisterParams = z.infer<typeof VenueRegisterParamsSchema>;
+
+// Command: setBrand on Venue
+export const VenueSetBrandParamsSchema = z.object({
+  logoStorageId: z.string().optional(),
+  brandColor: z.string().optional(),
+});
+
+export type VenueSetBrandParams = z.infer<typeof VenueSetBrandParamsSchema>;
 
 // Command: setPartnership on Venue
 export const VenueSetPartnershipParamsSchema = z.object({

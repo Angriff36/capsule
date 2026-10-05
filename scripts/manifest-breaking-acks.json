@@ -2790,6 +2790,18 @@
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "After-event venue follow-up: VenueNote.post takes an optional client score; existing callers send none."
+    },
+    {
+      "path": "Venue.logoStorageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Co-branded proposals: optional venue logo file; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.brandColor",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Co-branded proposals: optional venue brand colour; existing venues stay valid with none."
     }
   ]
 }
