@@ -4,12 +4,16 @@
 // that name, and adds one to the company's list when it has none yet (the old
 // system's lists are the company's real lists). The sales person is the one
 // active person with that exact name; a person is never made up, so with no
-// single match the event keeps the printed name only.
+// single match the event keeps the printed name only. A printed venue name
+// joins the one saved venue of that name that has an address to drive to
+// (the website-inquiry rule, lib/quoteInquiryVenue); otherwise the event keeps
+// the printed venue name only.
 
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { internalQuery, type ActionCtx } from "./_generated/server";
 import { plainName } from "./importClientByName";
+import { type InquiryVenueRow } from "./lib/quoteInquiryVenue";
 
 export type LookupRow = { id: string; keys: string[] };
 
@@ -17,6 +21,7 @@ export type EventLookups = {
   occasions: LookupRow[];
   referralSources: LookupRow[];
   people: LookupRow[];
+  venues: InquiryVenueRow[];
 };
 
 /** "Corporate Event" -> "corporate_event": the code a new list row gets. */
@@ -33,11 +38,11 @@ export function findLookup(
   return hits.length === 1 ? hits[0]!.id : null;
 }
 
-/** The company's active occasions, referral sources and people, by name. */
+/** The company's active occasions, referral sources, people and venues. */
 export const eventLookups = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, { tenantId }): Promise<EventLookups> => {
-    const [occasions, referralSources, people] = await Promise.all([
+    const [occasions, referralSources, people, venues] = await Promise.all([
       ctx.db
         .query("occasions")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -48,6 +53,10 @@ export const eventLookups = internalQuery({
         .collect(),
       ctx.db
         .query("people")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .collect(),
+      ctx.db
+        .query("venues")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .collect(),
     ]);
@@ -72,6 +81,16 @@ export const eventLookups = internalQuery({
           id: p._id,
           keys: [plainName(`${p.givenName} ${p.familyName}`)],
         })),
+      venues: venues.map((venue) => ({
+        _id: venue._id,
+        name: venue.name,
+        status: venue.status,
+        deletedAt: venue.deletedAt,
+        addressLine1: venue.addressLine1,
+        city: venue.city,
+        latitude: venue.latitude,
+        longitude: venue.longitude,
+      })),
     };
   },
 });
