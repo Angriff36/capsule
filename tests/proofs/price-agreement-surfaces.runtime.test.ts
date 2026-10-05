@@ -174,6 +174,13 @@ describe("every client surface shows the same prices (AC-094)", () => {
       { token: request.docId },
     )) as any;
     expect(signing.proposal.total).toBe(expected.total);
+    // The client sees the menu and the priced lines they accept.
+    expect(
+      signing.lines.reduce((sum: number, l: any) => sum + l.amount, 0),
+    ).toBe(expected.subtotal);
+    expect(signing.dishes.map((d: any) => d.name).sort()).toEqual(
+      shown.dishes.map((d: any) => d.name).sort(),
+    );
 
     // Accepted → client portal.
     await proof.executeCommand(owner, M.Proposal_markViewed, {

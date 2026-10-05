@@ -237,6 +237,15 @@ describe("proposal public renderers", () => {
         visibleSections: ["pricing_summary"],
       },
       enhancements: [],
+      dishes: [{ name: "Harvest salad", description: "Greens and pears" }],
+      lines: [
+        {
+          description: "Dinner buffet",
+          pricingBasis: "per_person",
+          unit: null,
+          amount: 108,
+        },
+      ],
     };
     const text = await mountedText(
       createElement(ProposalAcceptancePage, {
@@ -244,6 +253,10 @@ describe("proposal public renderers", () => {
       }),
       async (element) => {
         expect(element.textContent).not.toContain("Hidden terms");
+        // The client sees what they accept: the menu and the priced lines.
+        expect(element.textContent).toContain("Harvest salad");
+        expect(element.textContent).toContain("Dinner buffet");
+        expect(element.textContent).toContain("Per person");
         const accept = Array.from(element.querySelectorAll("button")).find(
           (button) => button.textContent === "Accept Proposal",
         );
