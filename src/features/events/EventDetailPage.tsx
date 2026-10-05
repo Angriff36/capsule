@@ -61,6 +61,7 @@ import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { downloadBeoPdf } from "./beoPdf";
+import { venueLogisticsLines } from "../facilities/venueLogistics";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
@@ -344,6 +345,7 @@ function EventDetailContent({
           activity.deletedAt == null,
       ),
       staff: staffingRoster,
+      venueLogistics: venue ? venueLogisticsLines(venue) : undefined,
       branding,
     })
       .then(() => {

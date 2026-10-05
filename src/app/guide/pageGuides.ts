@@ -593,6 +593,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Reply, and convert real inquiries into pipeline leads."],
   },
   {
+    prefix: "/clients/date-holds",
+    title: "Date holds",
+    purpose:
+      "Soft holds on dates for prospects, and who is waiting if a date opens.",
+    steps: [
+      "Hold a date for a prospect; it lapses on its own at the expiry.",
+      "When a held date opens, call the next client on its waitlist.",
+    ],
+  },
+  {
     prefix: "/finance",
     title: "Finance",
     purpose: "Money owed, money collected, and where to act next.",

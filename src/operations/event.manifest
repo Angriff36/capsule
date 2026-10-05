@@ -431,6 +431,18 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property wasteRules: string?
   property permitsInsuranceNotes: string?
   property restrictions: string?
+  // Logistics profile (site survey): what the crew must know before arriving
+  // at this venue, shown on every event there and on its BEO. The day-of
+  // contact is the person who opens doors on the day, not the sales contact.
+  // Set by setLogisticsProfile only, so the details form never clears them.
+  property loadingDock: string?
+  property elevatorNotes: string?
+  property kitchenEquipment: string?
+  property powerDetails: string?
+  property parkingDetails: string?
+  property arrivalRestrictions: string?
+  property encrypted dayOfContactName: string?
+  property encrypted dayOfContactPhone: string?
   // Venue partner program (Mangia Venue Partner Playbook): the partnership
   // tier, the one person who owns the relationship, when it started, and the
   // owner's 1-10 ratings for ease of work and relationship health. No tier =
@@ -680,6 +692,32 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate hasRefrigeration = hasRefrigeration
     mutate loadInFrom = loadInFrom != null and length(trim(loadInFrom)) > 0 ? trim(loadInFrom) : null
     mutate loadOutBy = loadOutBy != null and length(trim(loadOutBy)) > 0 ? trim(loadOutBy) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The logistics profile. Each call states all eight; a blank clears it.
+  command setLogisticsProfile(
+    optional loadingDock: string,
+    optional elevatorNotes: string,
+    optional kitchenEquipment: string,
+    optional powerDetails: string,
+    optional parkingDetails: string,
+    optional arrivalRestrictions: string,
+    optional dayOfContactName: string,
+    optional dayOfContactPhone: string
+  ) {
+    guard self.deletedAt == null
+    mutate loadingDock = loadingDock
+    mutate elevatorNotes = elevatorNotes
+    mutate kitchenEquipment = kitchenEquipment
+    mutate powerDetails = powerDetails
+    mutate parkingDetails = parkingDetails
+    mutate arrivalRestrictions = arrivalRestrictions
+    mutate dayOfContactName = dayOfContactName
+    mutate dayOfContactPhone = dayOfContactPhone
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

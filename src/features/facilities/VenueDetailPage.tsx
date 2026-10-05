@@ -28,6 +28,7 @@ import { VenuePartnershipPanel } from "./VenuePartnershipPanel";
 import { VenueSellingProfilePanel } from "./VenueSellingProfilePanel";
 import { VenueExclusiveDishesPanel } from "./VenueExclusiveDishesPanel";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
+import { VenueLogisticsProfilePanel } from "./VenueLogisticsProfilePanel";
 import { VenueOperatingFactsPanel } from "./VenueOperatingFactsPanel";
 import { VenueSiteVisitPanel } from "./VenueSiteVisitPanel";
 import { VenueEventGalleryPanel } from "./VenueEventGalleryPanel";
@@ -877,6 +878,8 @@ export function VenueDetailPage() {
       </div>
 
       <VenueOperatingFactsPanel venue={venue} />
+
+      <VenueLogisticsProfilePanel venue={venue} />
 
       {/* Venue Rooms & Spaces */}
       <VenueScorecardPanel venueId={venue._id} />

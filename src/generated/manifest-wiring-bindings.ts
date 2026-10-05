@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0be6b50b59cb4405ceec66107fb813b3bef06b9640be7c651ef86466b34050d3:0de9704fea65de3dd0507201f452122ffe8da95472a64f22516f2c1a35cdfef8:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:266219a20c85bcddabf837083f7946119556cb9e1618bc781dabf73c8a183f07:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2e796a81fddaf309979e338ba3628067b5b7e9423ad15a9add3879866ea7ff0d:3306ebabf219c0cc21ad6e7bba1de138890a236c04f809451dbce4023259c19c:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a1d713bbed83912442bea89431772bd59b8b1018b9fb961e9bef0f553c899b9:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:4893e04eddaa02faa66dd68efa3a2d2cdde7f575b3a07103f7f9f45cc4bc12ad:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4dd0f7d4d8b351c5060d0e1dbab0c6453c90be2fd5b0647a34fa06912a9be95d:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5596f820716ad9ea502ff771902f0ed450c21f88551ec4b00fd85156f3e1fe13:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:56f4459d4e1dbca44eded864fcdd82d2972967bc744b1a77003b44d2902d3c71:5860168b413a48233df8025f61a7392d76203d14e2c8bb11928dcae337249c79:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:62de9818c368bcad3552fe66b86a4f0ab8d33e817c1b3a44bf2dcc042b72bb82:62fd4928e5617660143a936f4488da549d9549d8169c5c2c1b7eb399ab02ebad:657f7d679212dcccc4a8235419fdd1194c09e9911f37c125244a8cbad8947c70:6598d6818e668be874ad2f94c6aff0a448eae0974d97c8148bc20a29cb11c6f9:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:69c7ab127ec451978df4c40faec592c9f76c7a0e2938e451dfd0b1fc11de0fef:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:71eac31104529dc564ecb61beb7032d2db805e6107d6eef3704c64a6a659f4c6:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:79f46428192658c8673f4172030958646db2b132410c465350dc52d48a8f0700:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7e595b0b5bf54974b5cec7c15a38738b95850e23fb8e8506d0b7203c8be12b85:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8a9ebe36819523092f836ea0364594b56fa31acf8773df5417aeeede55e0d9be:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8c7f0296f1685ad02bf6bbf430cba6b9ddb38e411da31efa5f8c227e67368729:8cb80a737f9ab433cb84d4d92d966e632ff795ce6462c8408df3312ea23291a4:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a8c4ca758911e45a7ba884f109d86333b8f692e62091f8cc28ccc09e8ce52f95:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b850eb7ba1dd4b3df63dd238434fa4e43f3efe4796a1dd7234e32b26b0bbd2ca:b89f15fec1dc869221ea412eb407eb88f0862769308126bdb1f9c58d251ce25e:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:da02086bab66b6571d8ef188ead9741931437eb4762484f276fa51f71677fb91:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:defdfb0e89f2ce4997de29156c91f602d924f9a55e614d3c15e20a87b9f94086:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e2efecbfb0d96bd763e8cde930dc50d60ad54c998e1380044e46f7ef5c2bab33:e31fe1e1e09c5145cf42a284c6b2feb57d3074397792bc94ad0f579ad1de54ab:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e50b3d0372bf29efef870f880714426dd3381160693fdf99785bb285a3747515:e772a70799a342388bbb02a869d09a33143b497ba7bcad3937567a39938a359f:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe0a107f4e0c4b2d1519b30f851dc8a3b7ea6adfb67c25dbc9c02c0047d5e1:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c:ff89af3904c56b41ff0b81f79ec54ac78bc0f6e353a56ed3f3d0b52ae8b4c88c";
+export const WIRING_CONTRACT_HASH = "01f125efe16c5e5ded5b4cabf63c4a88954b36445c3cab84802f64520d202399:0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0be6b50b59cb4405ceec66107fb813b3bef06b9640be7c651ef86466b34050d3:0de9704fea65de3dd0507201f452122ffe8da95472a64f22516f2c1a35cdfef8:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:266219a20c85bcddabf837083f7946119556cb9e1618bc781dabf73c8a183f07:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2e796a81fddaf309979e338ba3628067b5b7e9423ad15a9add3879866ea7ff0d:3306ebabf219c0cc21ad6e7bba1de138890a236c04f809451dbce4023259c19c:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a1d713bbed83912442bea89431772bd59b8b1018b9fb961e9bef0f553c899b9:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:4893e04eddaa02faa66dd68efa3a2d2cdde7f575b3a07103f7f9f45cc4bc12ad:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4dd0f7d4d8b351c5060d0e1dbab0c6453c90be2fd5b0647a34fa06912a9be95d:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5596f820716ad9ea502ff771902f0ed450c21f88551ec4b00fd85156f3e1fe13:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:56f4459d4e1dbca44eded864fcdd82d2972967bc744b1a77003b44d2902d3c71:5860168b413a48233df8025f61a7392d76203d14e2c8bb11928dcae337249c79:5879331d7c586ae769fcba6d0749475efc02a1d7743e6fe524a269f40d9c735c:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:62de9818c368bcad3552fe66b86a4f0ab8d33e817c1b3a44bf2dcc042b72bb82:62fd4928e5617660143a936f4488da549d9549d8169c5c2c1b7eb399ab02ebad:657f7d679212dcccc4a8235419fdd1194c09e9911f37c125244a8cbad8947c70:6598d6818e668be874ad2f94c6aff0a448eae0974d97c8148bc20a29cb11c6f9:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:69c7ab127ec451978df4c40faec592c9f76c7a0e2938e451dfd0b1fc11de0fef:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:71eac31104529dc564ecb61beb7032d2db805e6107d6eef3704c64a6a659f4c6:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:79f46428192658c8673f4172030958646db2b132410c465350dc52d48a8f0700:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7e595b0b5bf54974b5cec7c15a38738b95850e23fb8e8506d0b7203c8be12b85:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8a9ebe36819523092f836ea0364594b56fa31acf8773df5417aeeede55e0d9be:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8c7f0296f1685ad02bf6bbf430cba6b9ddb38e411da31efa5f8c227e67368729:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a8c4ca758911e45a7ba884f109d86333b8f692e62091f8cc28ccc09e8ce52f95:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b850eb7ba1dd4b3df63dd238434fa4e43f3efe4796a1dd7234e32b26b0bbd2ca:b89f15fec1dc869221ea412eb407eb88f0862769308126bdb1f9c58d251ce25e:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:da02086bab66b6571d8ef188ead9741931437eb4762484f276fa51f71677fb91:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:defdfb0e89f2ce4997de29156c91f602d924f9a55e614d3c15e20a87b9f94086:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e2efecbfb0d96bd763e8cde930dc50d60ad54c998e1380044e46f7ef5c2bab33:e31fe1e1e09c5145cf42a284c6b2feb57d3074397792bc94ad0f579ad1de54ab:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e50b3d0372bf29efef870f880714426dd3381160693fdf99785bb285a3747515:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f11720088f459089868450ef0aa95e191b4a3226027d74ccaa10ebf6b1334451:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe0a107f4e0c4b2d1519b30f851dc8a3b7ea6adfb67c25dbc9c02c0047d5e1:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c:ff89af3904c56b41ff0b81f79ec54ac78bc0f6e353a56ed3f3d0b52ae8b4c88c";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -1732,6 +1732,34 @@ export const ClientArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -2024,6 +2052,34 @@ export const ClientAssignOwnerInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -2299,6 +2355,34 @@ export const ClientChangeBillingProfileInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -2593,6 +2677,34 @@ export const ClientChangeContactInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -2913,6 +3025,34 @@ export const ClientMarkMergedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -3199,6 +3339,34 @@ export const ClientReactivateInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -3504,6 +3672,34 @@ export const ClientRegisterInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -3879,6 +4075,34 @@ export const ClientSetBirthdayInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Event",
     "queryKeyHint": "queryKeys.event.lists()",
     "readId": "Event.list",
@@ -4153,6 +4377,34 @@ export const ClientSetEmailPreferenceInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -4449,6 +4701,34 @@ export const ClientStageClientMergeInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -18417,6 +18697,1110 @@ export const CutoverDecisionSetTppReadOnlyAction = {
     }
   ]
 } as const;
+
+// --- DateHold.convert ---
+export interface DateHoldConvertClientInput {
+  eventId: string;
+}
+
+export const DateHoldConvertCapability = {
+  capabilityId: "DateHold.convert",
+  entity: "DateHold",
+  command: "convert",
+  route: "/api/manifest/DateHold/commands/convert",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["eventId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateHold not found"}],
+  emits: [],
+} as const;
+
+export type DateHoldConvertResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateHold.convert.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateHoldConvertInput(client: DateHoldConvertClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateHold.convert. */
+export const DateHoldConvertInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateHold.convert. Not a rendered control. */
+export const DateHoldConvertAction = {
+  "exposure": "human",
+  "label": "Convert",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": true
+    }
+  ],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "held"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for DateHold.convert. */
+export const DateHoldConvertLifecycle = [
+  {
+    "property": "status",
+    "from": "held",
+    "to": "converted",
+    "proven": true
+  }
+] as const;
+
+// --- DateHold.expire ---
+export type DateHoldExpireClientInput = Record<string, never>;
+
+export const DateHoldExpireCapability = {
+  capabilityId: "DateHold.expire",
+  entity: "DateHold",
+  command: "expire",
+  route: "/api/manifest/DateHold/commands/expire",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateHold not found"}],
+  emits: [],
+} as const;
+
+export type DateHoldExpireResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateHold.expire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateHoldExpireInput(client: DateHoldExpireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateHold.expire. */
+export const DateHoldExpireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateHold.expire. Not a rendered control. */
+export const DateHoldExpireAction = {
+  "exposure": "human",
+  "label": "Expire",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "held"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for DateHold.expire. */
+export const DateHoldExpireLifecycle = [
+  {
+    "property": "status",
+    "from": "held",
+    "to": "expired",
+    "proven": true
+  }
+] as const;
+
+// --- DateHold.extend ---
+export interface DateHoldExtendClientInput {
+  expiresAt: number;
+}
+
+export const DateHoldExtendCapability = {
+  capabilityId: "DateHold.extend",
+  entity: "DateHold",
+  command: "extend",
+  route: "/api/manifest/DateHold/commands/extend",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["expiresAt"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick a hold expiry in the future."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateHold not found"}],
+  emits: [],
+} as const;
+
+export type DateHoldExtendResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateHold.extend.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateHoldExtendInput(client: DateHoldExtendClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateHold.extend. */
+export const DateHoldExtendInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateHold.extend. Not a rendered control. */
+export const DateHoldExtendAction = {
+  "exposure": "human",
+  "label": "Extend",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "expiresAt",
+      "label": "Expires at",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- DateHold.place ---
+export interface DateHoldPlaceClientInput {
+  holdDate: string;
+  expiresAt: number;
+  clientId?: string;
+  leadId?: string;
+  venueId?: string;
+  note?: string;
+}
+
+export const DateHoldPlaceCapability = {
+  capabilityId: "DateHold.place",
+  entity: "DateHold",
+  command: "place",
+  route: "/api/manifest/DateHold/commands/place",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["holdDate","expiresAt","clientId","leadId","venueId","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Pick a hold expiry in the future."}],
+  emits: [],
+} as const;
+
+export type DateHoldPlaceResult = { docId: string };
+
+/**
+ * Build command input for DateHold.place.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateHoldPlaceInput(client: DateHoldPlaceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateHold.place. */
+export const DateHoldPlaceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateHold.place. Not a rendered control. */
+export const DateHoldPlaceAction = {
+  "exposure": "human",
+  "label": "Place",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "holdDate",
+      "label": "Hold date",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "label": "Expires at",
+      "required": true
+    },
+    {
+      "name": "clientId",
+      "label": "Client id",
+      "required": false
+    },
+    {
+      "name": "leadId",
+      "label": "Lead id",
+      "required": false
+    },
+    {
+      "name": "venueId",
+      "label": "Venue id",
+      "required": false
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- DateHold.release ---
+export type DateHoldReleaseClientInput = Record<string, never>;
+
+export const DateHoldReleaseCapability = {
+  capabilityId: "DateHold.release",
+  entity: "DateHold",
+  command: "release",
+  route: "/api/manifest/DateHold/commands/release",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"policy_denial","message":"Sales staff may manage prospective date holds"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateHold not found"}],
+  emits: [],
+} as const;
+
+export type DateHoldReleaseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateHold.release.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateHoldReleaseInput(client: DateHoldReleaseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateHold.release. */
+export const DateHoldReleaseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateHold.release. Not a rendered control. */
+export const DateHoldReleaseAction = {
+  "exposure": "human",
+  "label": "Release",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "held"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for DateHold.release. */
+export const DateHoldReleaseLifecycle = [
+  {
+    "property": "status",
+    "from": "held",
+    "to": "released",
+    "proven": true
+  }
+] as const;
+
+// --- DateWaitlistEntry.join ---
+export interface DateWaitlistEntryJoinClientInput {
+  holdDate: string;
+  clientId?: string;
+  leadId?: string;
+  note?: string;
+}
+
+export const DateWaitlistEntryJoinCapability = {
+  capabilityId: "DateWaitlistEntry.join",
+  entity: "DateWaitlistEntry",
+  command: "join",
+  route: "/api/manifest/DateWaitlistEntry/commands/join",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["holdDate","clientId","leadId","note"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"}],
+  emits: [],
+} as const;
+
+export type DateWaitlistEntryJoinResult = { docId: string };
+
+/**
+ * Build command input for DateWaitlistEntry.join.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateWaitlistEntryJoinInput(client: DateWaitlistEntryJoinClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateWaitlistEntry.join. */
+export const DateWaitlistEntryJoinInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateWaitlistEntry.join. Not a rendered control. */
+export const DateWaitlistEntryJoinAction = {
+  "exposure": "human",
+  "label": "Join",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "holdDate",
+      "label": "Hold date",
+      "required": true
+    },
+    {
+      "name": "clientId",
+      "label": "Client id",
+      "required": false
+    },
+    {
+      "name": "leadId",
+      "label": "Lead id",
+      "required": false
+    },
+    {
+      "name": "note",
+      "label": "Note",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- DateWaitlistEntry.offer ---
+export type DateWaitlistEntryOfferClientInput = Record<string, never>;
+
+export const DateWaitlistEntryOfferCapability = {
+  capabilityId: "DateWaitlistEntry.offer",
+  entity: "DateWaitlistEntry",
+  command: "offer",
+  route: "/api/manifest/DateWaitlistEntry/commands/offer",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateWaitlistEntry not found"}],
+  emits: [],
+} as const;
+
+export type DateWaitlistEntryOfferResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateWaitlistEntry.offer.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateWaitlistEntryOfferInput(client: DateWaitlistEntryOfferClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateWaitlistEntry.offer. */
+export const DateWaitlistEntryOfferInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateWaitlistEntry.offer. Not a rendered control. */
+export const DateWaitlistEntryOfferAction = {
+  "exposure": "human",
+  "label": "Offer",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "waiting"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for DateWaitlistEntry.offer. */
+export const DateWaitlistEntryOfferLifecycle = [
+  {
+    "property": "status",
+    "from": "waiting",
+    "to": "offered",
+    "proven": true
+  }
+] as const;
+
+// --- DateWaitlistEntry.promote ---
+export type DateWaitlistEntryPromoteClientInput = Record<string, never>;
+
+export const DateWaitlistEntryPromoteCapability = {
+  capabilityId: "DateWaitlistEntry.promote",
+  entity: "DateWaitlistEntry",
+  command: "promote",
+  route: "/api/manifest/DateWaitlistEntry/commands/promote",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateWaitlistEntry not found"}],
+  emits: [],
+} as const;
+
+export type DateWaitlistEntryPromoteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateWaitlistEntry.promote.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateWaitlistEntryPromoteInput(client: DateWaitlistEntryPromoteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateWaitlistEntry.promote. */
+export const DateWaitlistEntryPromoteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateWaitlistEntry.promote. Not a rendered control. */
+export const DateWaitlistEntryPromoteAction = {
+  "exposure": "human",
+  "label": "Promote",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "offered",
+      "waiting"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for DateWaitlistEntry.promote. */
+export const DateWaitlistEntryPromoteLifecycle = [
+  {
+    "property": "status",
+    "from": "waiting",
+    "to": "promoted",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "offered",
+    "to": "promoted",
+    "proven": true
+  }
+] as const;
+
+// --- DateWaitlistEntry.withdraw ---
+export type DateWaitlistEntryWithdrawClientInput = Record<string, never>;
+
+export const DateWaitlistEntryWithdrawCapability = {
+  capabilityId: "DateWaitlistEntry.withdraw",
+  entity: "DateWaitlistEntry",
+  command: "withdraw",
+  route: "/api/manifest/DateWaitlistEntry/commands/withdraw",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales and event staff may see date availability"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"policy_denial","message":"Sales staff may manage the date waitlist"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DateWaitlistEntry not found"}],
+  emits: [],
+} as const;
+
+export type DateWaitlistEntryWithdrawResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DateWaitlistEntry.withdraw.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDateWaitlistEntryWithdrawInput(client: DateWaitlistEntryWithdrawClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DateWaitlistEntry.withdraw. */
+export const DateWaitlistEntryWithdrawInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.lists()",
+    "readId": "Client.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Client",
+    "queryKeyHint": "queryKeys.client.detail(id)",
+    "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DateWaitlistEntry.withdraw. Not a rendered control. */
+export const DateWaitlistEntryWithdrawAction = {
+  "exposure": "human",
+  "label": "Withdraw",
+  "confirm": false,
+  "fields": [],
+  "availableFrom": {
+    "property": "status",
+    "values": [
+      "offered",
+      "waiting"
+    ]
+  }
+} as const;
+
+/** Proven lifecycle transitions for DateWaitlistEntry.withdraw. */
+export const DateWaitlistEntryWithdrawLifecycle = [
+  {
+    "property": "status",
+    "from": "waiting",
+    "to": "withdrawn",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "offered",
+    "to": "withdrawn",
+    "proven": true
+  }
+] as const;
 
 // --- DeckShareLink.create ---
 export interface DeckShareLinkCreateClientInput {
@@ -33893,6 +35277,20 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -34908,6 +36306,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -35939,6 +37351,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -36953,6 +38379,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -37954,6 +39394,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -38961,6 +40415,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -39975,6 +41443,20 @@ export const EventCancelInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -41063,6 +42545,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -42187,6 +43683,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -43190,6 +44700,20 @@ export const EventChangePricingInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -44201,6 +45725,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -45221,6 +46759,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -46236,6 +47788,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -47245,6 +48811,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -48268,6 +49848,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -49270,6 +50864,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -50262,6 +51870,20 @@ export const EventCloseOutInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -51274,6 +52896,20 @@ export const EventCompleteInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -52304,6 +53940,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -53375,6 +55025,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -54417,6 +56081,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -55435,6 +57113,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -56443,6 +58135,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -57463,6 +59169,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -58471,6 +60191,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -59487,6 +61221,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -60484,6 +62232,20 @@ export const EventMoveToClientInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -61501,6 +63263,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -62530,6 +64306,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -63684,6 +65474,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -64676,6 +66480,20 @@ export const EventReassignClientInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -65678,6 +67496,20 @@ export const EventRecordFinalVenueFactsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -66676,6 +68508,20 @@ export const EventRecordPastCompletionInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -67704,6 +69550,20 @@ export const EventRescheduleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -68709,6 +70569,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -69740,6 +71614,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -70744,6 +72632,20 @@ export const EventSetTravelFeeInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -71763,6 +73665,20 @@ export const EventStageClientMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -72770,6 +74686,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -73762,6 +75692,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -74778,6 +76722,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -75787,6 +77745,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -76892,6 +78864,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -78023,6 +80009,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -79075,6 +81075,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Delivery",
     "queryKeyHint": "queryKeys.delivery.lists()",
     "readId": "Delivery.list",
@@ -80116,6 +82130,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "CreditMemo",
     "queryKeyHint": "queryKeys.creditMemo.detail(id)",
     "readId": "CreditMemo.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
     "label": "related entity detail"
   },
   {
@@ -116892,6 +118920,34 @@ export const LeadCaptureInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "MessageThread",
     "queryKeyHint": "queryKeys.messageThread.lists()",
     "readId": "MessageThread.list",
@@ -117128,6 +119184,34 @@ export const LeadConfirmConversionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "MessageThread",
     "queryKeyHint": "queryKeys.messageThread.lists()",
     "readId": "MessageThread.list",
@@ -117298,6 +119382,34 @@ export const LeadConfirmProposalSentInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "MessageThread",
     "queryKeyHint": "queryKeys.messageThread.lists()",
     "readId": "MessageThread.list",
@@ -117464,6 +119576,34 @@ export const LeadReassignClientInvalidation = [
     "entity": "ClientMerge",
     "queryKeyHint": "queryKeys.clientMerge.detail(id)",
     "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -117640,6 +119780,34 @@ export const LeadRecordSourceHistoryInvalidation = [
     "entity": "ClientMerge",
     "queryKeyHint": "queryKeys.clientMerge.detail(id)",
     "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -117860,6 +120028,34 @@ export const LeadReviseDetailsInvalidation = [
     "entity": "ClientMerge",
     "queryKeyHint": "queryKeys.clientMerge.detail(id)",
     "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -118093,6 +120289,34 @@ export const LeadStageClientMergeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "MessageThread",
     "queryKeyHint": "queryKeys.messageThread.lists()",
     "readId": "MessageThread.list",
@@ -118273,6 +120497,34 @@ export const LeadStageConversionInvalidation = [
     "entity": "ClientMerge",
     "queryKeyHint": "queryKeys.clientMerge.detail(id)",
     "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -118460,6 +120712,34 @@ export const LeadStageProposalInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "MessageThread",
     "queryKeyHint": "queryKeys.messageThread.lists()",
     "readId": "MessageThread.list",
@@ -118639,6 +120919,34 @@ export const LeadUpdatePipelineInvalidation = [
     "entity": "ClientMerge",
     "queryKeyHint": "queryKeys.clientMerge.detail(id)",
     "readId": "ClientMerge.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.lists()",
+    "readId": "DateWaitlistEntry.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateWaitlistEntry",
+    "queryKeyHint": "queryKeys.dateWaitlistEntry.detail(id)",
+    "readId": "DateWaitlistEntry.get",
     "label": "related entity detail"
   },
   {
@@ -203095,14 +205403,14 @@ export const VenueActivateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueActivated"],
 } as const;
 
-export type VenueActivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueActivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.activate.
@@ -203127,6 +205435,20 @@ export const VenueActivateInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -203312,14 +205634,14 @@ export const VenueChangeCapacityCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["capacity"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Venue capacity can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueCapacityChanged"],
 } as const;
 
-export type VenueChangeCapacityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueChangeCapacityResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.changeCapacity.
@@ -203344,6 +205666,20 @@ export const VenueChangeCapacityInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -203518,14 +205854,14 @@ export const VenueDeactivateCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["reason"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Say why you're taking this venue out of service."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDeactivated"],
 } as const;
 
-export type VenueDeactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueDeactivateResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.deactivate.
@@ -203550,6 +205886,20 @@ export const VenueDeactivateInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -203802,6 +206152,20 @@ export const VenueRegisterInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -204143,14 +206507,14 @@ export const VenueSetBrandCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["logoStorageId","brandColor"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetBrandResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetBrandResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setBrand.
@@ -204175,6 +206539,20 @@ export const VenueSetBrandInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -204354,14 +206732,14 @@ export const VenueSetGalleryTokenCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["galleryToken"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"This gallery link is too short. Make a new link."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetGalleryTokenResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetGalleryTokenResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setGalleryToken.
@@ -204386,6 +206764,20 @@ export const VenueSetGalleryTokenInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -204543,6 +206935,268 @@ export const VenueSetGalleryTokenAction = {
   ]
 } as const;
 
+// --- Venue.setLogisticsProfile ---
+export interface VenueSetLogisticsProfileClientInput {
+  loadingDock?: string;
+  elevatorNotes?: string;
+  kitchenEquipment?: string;
+  powerDetails?: string;
+  parkingDetails?: string;
+  arrivalRestrictions?: string;
+  dayOfContactName?: string;
+  dayOfContactPhone?: string;
+}
+
+export const VenueSetLogisticsProfileCapability = {
+  capabilityId: "Venue.setLogisticsProfile",
+  entity: "Venue",
+  command: "setLogisticsProfile",
+  route: "/api/manifest/Venue/commands/setLogisticsProfile",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["loadingDock","elevatorNotes","kitchenEquipment","powerDetails","parkingDetails","arrivalRestrictions","dayOfContactName","dayOfContactPhone"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
+  emits: ["VenueDetailsUpdated"],
+} as const;
+
+export type VenueSetLogisticsProfileResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Venue.setLogisticsProfile.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVenueSetLogisticsProfileInput(client: VenueSetLogisticsProfileClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Venue.setLogisticsProfile. */
+export const VenueSetLogisticsProfileInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.lists()",
+    "readId": "Venue.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Venue",
+    "queryKeyHint": "queryKeys.venue.detail(id)",
+    "readId": "Venue.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.lists()",
+    "readId": "ReferralSource.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReferralSource",
+    "queryKeyHint": "queryKeys.referralSource.detail(id)",
+    "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "readId": "RevenueAttribution.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "readId": "RevenueAttribution.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.lists()",
+    "readId": "VenueCommissionTerm.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.detail(id)",
+    "readId": "VenueCommissionTerm.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VenueLayoutTemplate",
+    "queryKeyHint": "queryKeys.venueLayoutTemplate.lists()",
+    "readId": "VenueLayoutTemplate.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueLayoutTemplate",
+    "queryKeyHint": "queryKeys.venueLayoutTemplate.detail(id)",
+    "readId": "VenueLayoutTemplate.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VenueNote",
+    "queryKeyHint": "queryKeys.venueNote.lists()",
+    "readId": "VenueNote.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueNote",
+    "queryKeyHint": "queryKeys.venueNote.detail(id)",
+    "readId": "VenueNote.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VenueRoom",
+    "queryKeyHint": "queryKeys.venueRoom.lists()",
+    "readId": "VenueRoom.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueRoom",
+    "queryKeyHint": "queryKeys.venueRoom.detail(id)",
+    "readId": "VenueRoom.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VenueVendorRelationship",
+    "queryKeyHint": "queryKeys.venueVendorRelationship.lists()",
+    "readId": "VenueVendorRelationship.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueVendorRelationship",
+    "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
+    "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Venue.setLogisticsProfile. Not a rendered control. */
+export const VenueSetLogisticsProfileAction = {
+  "exposure": "human",
+  "label": "Set logistics profile",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "loadingDock",
+      "label": "Loading dock",
+      "required": false
+    },
+    {
+      "name": "elevatorNotes",
+      "label": "Elevator notes",
+      "required": false
+    },
+    {
+      "name": "kitchenEquipment",
+      "label": "Kitchen equipment",
+      "required": false
+    },
+    {
+      "name": "powerDetails",
+      "label": "Power details",
+      "required": false
+    },
+    {
+      "name": "parkingDetails",
+      "label": "Parking details",
+      "required": false
+    },
+    {
+      "name": "arrivalRestrictions",
+      "label": "Arrival restrictions",
+      "required": false
+    },
+    {
+      "name": "dayOfContactName",
+      "label": "Day of contact name",
+      "required": false
+    },
+    {
+      "name": "dayOfContactPhone",
+      "label": "Day of contact phone",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- Venue.setPartnership ---
 export interface VenueSetPartnershipClientInput {
   /** Allowed: "catering_only" | "catering_rentals" | "full_event" */
@@ -204566,14 +207220,14 @@ export const VenueSetPartnershipCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["partnerTier","partnerOwnerPersonId","opsEaseScore","relationshipScore"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Rate ease of work from 1 to 10"},{"kind":"constraint_block","message":"Rate the relationship from 1 to 10"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetPartnershipResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetPartnershipResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setPartnership.
@@ -204598,6 +207252,20 @@ export const VenueSetPartnershipInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -204809,14 +207477,14 @@ export const VenueSetSellingProfileCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["vibe","vibeWords","topFeature","otherFeatures","targetClient","competitivePosition","photoFocus","exclusiveItemIdea"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetSellingProfileResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetSellingProfileResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setSellingProfile.
@@ -204841,6 +207509,20 @@ export const VenueSetSellingProfileInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -205083,14 +207765,14 @@ export const VenueSetSiteFactsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["seatedCapacity","standingCapacity","hasOven","hasRefrigeration","loadInFrom","loadOutBy"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"constraint_block","message":"Seated capacity can't be negative. Use zero or more."},{"kind":"constraint_block","message":"Standing capacity can't be negative. Use zero or more."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetSiteFactsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetSiteFactsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setSiteFacts.
@@ -205115,6 +207797,20 @@ export const VenueSetSiteFactsInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -205314,14 +208010,14 @@ export const VenueSetSocialHandleCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["socialHandle"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetSocialHandleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetSocialHandleResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setSocialHandle.
@@ -205346,6 +208042,20 @@ export const VenueSetSocialHandleInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -205520,14 +208230,14 @@ export const VenueSetTimeZoneCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["timeZone"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueSetTimeZoneResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueSetTimeZoneResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.setTimeZone.
@@ -205552,6 +208262,20 @@ export const VenueSetTimeZoneInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -205754,14 +208478,14 @@ export const VenueUpdateDetailsCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["name","venueType","onPremise","kitchenAccess","parkingAvailable","hasFreightElevator","storageAvailable","logisticsNotes","loadInInstructions","powerAvailable","waterAccess","hasStairs","wasteRules","permitsInsuranceNotes","restrictions","addressLine1","addressLine2","city","region","postalCode","countryCode","latitude","longitude","contactName","contactEmail","contactPhone","accessNotes","cateringNotes"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Staff may see venues"},{"kind":"policy_denial","message":"Event staff may update venues"},{"kind":"policy_denial","message":"Event staff may change venues"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this venue a name."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Venue not found"}],
   emits: ["VenueDetailsUpdated"],
 } as const;
 
-export type VenueUpdateDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
+export type VenueUpdateDetailsResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for Venue.updateDetails.
@@ -205786,6 +208510,20 @@ export const VenueUpdateDetailsInvalidation = [
     "queryKeyHint": "queryKeys.venue.detail(id)",
     "readId": "Venue.get",
     "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.lists()",
+    "readId": "DateHold.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DateHold",
+    "queryKeyHint": "queryKeys.dateHold.detail(id)",
+    "readId": "DateHold.get",
+    "label": "related entity detail"
   },
   {
     "kind": "entityList",
@@ -210067,6 +212805,15 @@ export const ALL_CAPABILITY_IDS = [
   "CutoverDecision.recordApprovals",
   "CutoverDecision.rollback",
   "CutoverDecision.setTppReadOnly",
+  "DateHold.convert",
+  "DateHold.expire",
+  "DateHold.extend",
+  "DateHold.place",
+  "DateHold.release",
+  "DateWaitlistEntry.join",
+  "DateWaitlistEntry.offer",
+  "DateWaitlistEntry.promote",
+  "DateWaitlistEntry.withdraw",
   "DeckShareLink.create",
   "DeckShareLink.revoke",
   "Delivery.cancel",
@@ -210889,6 +213636,7 @@ export const ALL_CAPABILITY_IDS = [
   "Venue.register",
   "Venue.setBrand",
   "Venue.setGalleryToken",
+  "Venue.setLogisticsProfile",
   "Venue.setPartnership",
   "Venue.setSellingProfile",
   "Venue.setSiteFacts",
@@ -211065,6 +213813,20 @@ export const ALL_READ_IDS = [
   "CutoverDecision.byTenantId",
   "CutoverDecision.get",
   "CutoverDecision.list",
+  "DateHold.byClientId",
+  "DateHold.byEventId",
+  "DateHold.byHoldDate",
+  "DateHold.byLeadId",
+  "DateHold.byTenantId",
+  "DateHold.byVenueId",
+  "DateHold.get",
+  "DateHold.list",
+  "DateWaitlistEntry.byClientId",
+  "DateWaitlistEntry.byHoldDate",
+  "DateWaitlistEntry.byLeadId",
+  "DateWaitlistEntry.byTenantId",
+  "DateWaitlistEntry.get",
+  "DateWaitlistEntry.list",
   "DeckShareLink.byAttachmentId",
   "DeckShareLink.byTenantId",
   "DeckShareLink.get",
@@ -212398,6 +215160,48 @@ export type getCutoverDecisionResult = { _id: string; _creationTime: number; ten
 
 export const listCutoverDecisionRead = {"entity":"CutoverDecision","readId":"CutoverDecision.list","exportName":"listCutoverDecision","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; status: \"not_started\" | \"validating\" | \"ready_for_go\" | \"go\" | \"no_go\" | \"rolled_back\"; decidedAt: number; decidedBy: string; reason: string; rollbackPlan: string; businessApproved: boolean; tppReadOnlyAt: number | null; businessApprovedById: string | null; businessApprovedAt: number | null; businessEvidence: string | null; sourceFrozenAt: number | null; openingStockAsOf: number | null; openingStockCount: number | null; openingStockConfirmedById: string | null; financialMode: \"reference_history\" | \"ledger_reconstruction\" | null; backupEvidence: string | null; finalImportRuns: string | null; scheduledImportsDisabledAt: number | null; scheduledImportsNote: string | null }>"} as const;
 export type listCutoverDecisionResult = Array<{ _id: string; _creationTime: number; tenantId: string; status: "not_started" | "validating" | "ready_for_go" | "go" | "no_go" | "rolled_back"; decidedAt: number; decidedBy: string; reason: string; rollbackPlan: string; businessApproved: boolean; tppReadOnlyAt: number | null; businessApprovedById: string | null; businessApprovedAt: number | null; businessEvidence: string | null; sourceFrozenAt: number | null; openingStockAsOf: number | null; openingStockCount: number | null; openingStockConfirmedById: string | null; financialMode: "reference_history" | "ledger_reconstruction" | null; backupEvidence: string | null; finalImportRuns: string | null; scheduledImportsDisabledAt: number | null; scheduledImportsNote: string | null }>;
+
+export const listDateHoldByClientIdRead = {"entity":"DateHold","readId":"DateHold.byClientId","exportName":"listDateHoldByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateHoldByEventIdRead = {"entity":"DateHold","readId":"DateHold.byEventId","exportName":"listDateHoldByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateHoldByHoldDateRead = {"entity":"DateHold","readId":"DateHold.byHoldDate","exportName":"listDateHoldByHoldDate","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"holdDate","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldByHoldDateResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateHoldByLeadIdRead = {"entity":"DateHold","readId":"DateHold.byLeadId","exportName":"listDateHoldByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateHoldByTenantIdRead = {"entity":"DateHold","readId":"DateHold.byTenantId","exportName":"listDateHoldByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateHoldByVenueIdRead = {"entity":"DateHold","readId":"DateHold.byVenueId","exportName":"listDateHoldByVenueId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"venueId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldByVenueIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getDateHoldRead = {"entity":"DateHold","readId":"DateHold.get","exportName":"getDateHold","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getDateHoldResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listDateHoldRead = {"entity":"DateHold","readId":"DateHold.list","exportName":"listDateHold","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: \"held\" | \"released\" | \"expired\" | \"converted\"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateHoldResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; eventId: string | null; venueId: string | null; ownerPersonId: string | null; status: "held" | "released" | "expired" | "converted"; expiresAt: number; note: string | null; placedAt: number | null; releasedAt: number | null; convertedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateWaitlistEntryByClientIdRead = {"entity":"DateWaitlistEntry","readId":"DateWaitlistEntry.byClientId","exportName":"listDateWaitlistEntryByClientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"clientId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateWaitlistEntryByClientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateWaitlistEntryByHoldDateRead = {"entity":"DateWaitlistEntry","readId":"DateWaitlistEntry.byHoldDate","exportName":"listDateWaitlistEntryByHoldDate","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"holdDate","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateWaitlistEntryByHoldDateResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateWaitlistEntryByLeadIdRead = {"entity":"DateWaitlistEntry","readId":"DateWaitlistEntry.byLeadId","exportName":"listDateWaitlistEntryByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateWaitlistEntryByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDateWaitlistEntryByTenantIdRead = {"entity":"DateWaitlistEntry","readId":"DateWaitlistEntry.byTenantId","exportName":"listDateWaitlistEntryByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateWaitlistEntryByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getDateWaitlistEntryRead = {"entity":"DateWaitlistEntry","readId":"DateWaitlistEntry.get","exportName":"getDateWaitlistEntry","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getDateWaitlistEntryResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listDateWaitlistEntryRead = {"entity":"DateWaitlistEntry","readId":"DateWaitlistEntry.list","exportName":"listDateWaitlistEntry","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: \"waiting\" | \"offered\" | \"promoted\" | \"withdrawn\"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDateWaitlistEntryResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; holdDate: string; clientId: string | null; leadId: string | null; ownerPersonId: string | null; status: "waiting" | "offered" | "promoted" | "withdrawn"; note: string | null; queuedAt: number | null; offeredAt: number | null; promotedAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listDeckShareLinkByAttachmentIdRead = {"entity":"DeckShareLink","readId":"DeckShareLink.byAttachmentId","exportName":"listDeckShareLinkByAttachmentId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"attachmentId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; attachmentId: string; audience: \"anyone\" | \"staff\"; status: \"active\" | \"revoked\"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listDeckShareLinkByAttachmentIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; attachmentId: string; audience: "anyone" | "staff"; status: "active" | "revoked"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }>;
@@ -215015,20 +217819,20 @@ export type getVendorOrderLineDemandResult = { _id: string; _creationTime: numbe
 export const listVendorOrderLineDemandRead = {"entity":"VendorOrderLineDemand","readId":"VendorOrderLineDemand.list","exportName":"listVendorOrderLineDemand","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; ingredientDemandId: string; vendorOrderId: string; contributionQuantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; linkedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVendorOrderLineDemandResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; ingredientDemandId: string; vendorOrderId: string; contributionQuantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; linkedAt: number | null; removedAt: number | null; createdAt: number; updatedAt: number }>;
 
-export const listVenueByGalleryTokenRead = {"entity":"Venue","readId":"Venue.byGalleryToken","exportName":"listVenueByGalleryToken","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"galleryToken","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVenueByGalleryTokenResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listVenueByGalleryTokenRead = {"entity":"Venue","readId":"Venue.byGalleryToken","exportName":"listVenueByGalleryToken","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"galleryToken","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVenueByGalleryTokenResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listVenueByPartnerOwnerPersonIdRead = {"entity":"Venue","readId":"Venue.byPartnerOwnerPersonId","exportName":"listVenueByPartnerOwnerPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"partnerOwnerPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVenueByPartnerOwnerPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listVenueByPartnerOwnerPersonIdRead = {"entity":"Venue","readId":"Venue.byPartnerOwnerPersonId","exportName":"listVenueByPartnerOwnerPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"partnerOwnerPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVenueByPartnerOwnerPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const listVenueByTenantIdRead = {"entity":"Venue","readId":"Venue.byTenantId","exportName":"listVenueByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVenueByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listVenueByTenantIdRead = {"entity":"Venue","readId":"Venue.byTenantId","exportName":"listVenueByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVenueByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
 
-export const getVenueRead = {"entity":"Venue","readId":"Venue.get","exportName":"getVenue","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getVenueResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number } | null;
+export const getVenueRead = {"entity":"Venue","readId":"Venue.get","exportName":"getVenue","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getVenueResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number } | null;
 
-export const listVenueRead = {"entity":"Venue","readId":"Venue.list","exportName":"listVenue","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listVenueResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
+export const listVenueRead = {"entity":"Venue","readId":"Venue.list","exportName":"listVenue","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: \"client_site\" | \"banquet_hall\" | \"outdoor\" | \"office\" | \"private_home\" | \"other\"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: \"catering_only\" | \"catering_rentals\" | \"full_event\" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: \"rustic\" | \"modern_industrial\" | \"garden_outdoor\" | \"grand_ballroom\" | \"brewery_winery\" | \"warehouse_raw\" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: \"active\" | \"inactive\"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVenueResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; venueType: "client_site" | "banquet_hall" | "outdoor" | "office" | "private_home" | "other"; addressLine1: string | null; addressLine2: string | null; city: string | null; region: string | null; postalCode: string | null; countryCode: string | null; latitude: number | null; longitude: number | null; timeZone: string | null; contactName: string | null; contactEmail: string | null; contactPhone: string | null; accessNotes: string | null; cateringNotes: string | null; capacity: number; onPremise: boolean | null; kitchenAccess: string | null; parkingAvailable: boolean | null; hasFreightElevator: boolean | null; storageAvailable: boolean | null; logisticsNotes: string | null; loadInInstructions: string | null; powerAvailable: boolean | null; waterAccess: boolean | null; hasStairs: boolean | null; seatedCapacity: number | null; standingCapacity: number | null; hasOven: boolean | null; hasRefrigeration: boolean | null; loadInFrom: string | null; loadOutBy: string | null; wasteRules: string | null; permitsInsuranceNotes: string | null; restrictions: string | null; loadingDock: string | null; elevatorNotes: string | null; kitchenEquipment: string | null; powerDetails: string | null; parkingDetails: string | null; arrivalRestrictions: string | null; dayOfContactName: string | null; dayOfContactPhone: string | null; partnerTier: "catering_only" | "catering_rentals" | "full_event" | null; partnerOwnerPersonId: string | null; partnerSince: number | null; opsEaseScore: number | null; relationshipScore: number | null; logoStorageId: string | null; brandColor: string | null; socialHandle: string | null; galleryToken: string | null; vibe: "rustic" | "modern_industrial" | "garden_outdoor" | "grand_ballroom" | "brewery_winery" | "warehouse_raw" | null; vibeWords: string | null; topFeature: string | null; otherFeatures: string | null; targetClient: string | null; competitivePosition: string | null; photoFocus: string | null; exclusiveItemIdea: string | null; status: "active" | "inactive"; registeredAt: number | null; deactivatedAt: number | null; deactivationReason: string | null; createdAt: number; updatedAt: number }>;
 
 export const listVenueCommissionTermByTenantIdRead = {"entity":"VenueCommissionTerm","readId":"VenueCommissionTerm.byTenantId","exportName":"listVenueCommissionTermByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; venueId: string; commissionPercent: number; effectiveStartDate: number; effectiveEndDate: number | null; notes: string | null; definedAt: number | null; retiredAt: number | null; status: \"active\" | \"retired\"; createdAt: number; updatedAt: number }>"} as const;
 export type listVenueCommissionTermByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; venueId: string; commissionPercent: number; effectiveStartDate: number; effectiveEndDate: number | null; notes: string | null; definedAt: number | null; retiredAt: number | null; status: "active" | "retired"; createdAt: number; updatedAt: number }>;

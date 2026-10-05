@@ -57,6 +57,7 @@ import {
 import { findLikelyDuplicates } from "./inlineRecordDuplicates";
 import { venueAddress, venueSummary } from "./venuePickerSummary";
 import { EventCreateWizard } from "./EventCreateWizard";
+import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
 import {
   coordinatesFromFields,
   formatCoordinates,
@@ -817,6 +818,11 @@ export function EventCreatePage() {
                 />
                 <FieldError name="startsAt" errors={errors} touched={touched} />
               </label>
+              <div className="sm:col-span-2">
+                <DateHoldCollisionNotice
+                  dateKey={(startsAtValue ?? "").slice(0, 10)}
+                />
+              </div>
               <label className="field-label">
                 Ends *
                 <BoundedDateTimeLocalInput

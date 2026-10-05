@@ -139,3 +139,12 @@ projections:
             name: by_tenantId_and_cancelledAt
           - fields: [tenantId, closedOutAt]
             name: by_tenantId_and_closedOutAt
+        # A hold lookup and the expiry worker both begin with the tenant's
+        # local calendar date. Status remains an in-memory filter so release
+        # and expiry do not require a separate index per lifecycle state.
+        DateHold:
+          - fields: [tenantId, holdDate, expiresAt]
+            name: by_tenantId_and_holdDate_and_expiresAt
+        DateWaitlistEntry:
+          - fields: [tenantId, holdDate, queuedAt]
+            name: by_tenantId_and_holdDate_and_queuedAt
