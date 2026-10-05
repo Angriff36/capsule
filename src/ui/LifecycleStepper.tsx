@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { formatStatusLabel } from "../lib/statusLabels";
 import type {
   LifecycleAction,
@@ -31,6 +32,29 @@ export function LifecycleStepper({
     { ...definition, actions: [...actions, ...blockedActions] },
     status,
   );
+  // A narrow box scrolls the steps; bring the current one into view (a
+  // closed-out event otherwise showed only its first stages).
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const reveal = () => {
+      const step = section
+        .querySelector('[aria-current="step"]')
+        ?.closest(".lifecycle-step");
+      if (!step) return;
+      const box = section.getBoundingClientRect();
+      const rect = step.getBoundingClientRect();
+      if (rect.right > box.right) section.scrollLeft += rect.right - box.right;
+      else if (rect.left < box.left) section.scrollLeft -= box.left - rect.left;
+    };
+    reveal();
+    if (typeof ResizeObserver === "undefined") return;
+    // In a closed dialog the box has no size yet; reveal once it shows.
+    const observer = new ResizeObserver(reveal);
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [status]);
   const renderAction = (action: LifecycleAction, className: string) => {
     const reasonId = action.disabledReason
       ? `lifecycle-reason-${action.key}`
@@ -59,6 +83,7 @@ export function LifecycleStepper({
 
   return (
     <section
+      ref={sectionRef}
       className="lifecycle-stepper"
       aria-label={model.label}
       data-testid="lifecycle-stepper"
