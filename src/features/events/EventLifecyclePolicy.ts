@@ -85,10 +85,15 @@ const ACTIONS: ReadonlyArray<
     lifecycle: EventBeginExecutionLifecycle,
   },
   {
+    // The generated lifecycle lists every transition into "completed",
+    // including planning → completed, which belongs to recordPastCompletion
+    // (OldSystemStatusAction). complete itself only runs from final.
     key: "complete",
     label: "Complete",
     kind: "primary",
-    lifecycle: EventCompleteLifecycle,
+    lifecycle: EventCompleteLifecycle.filter(
+      (transition) => transition.from !== "planning",
+    ),
   },
   {
     key: "closeOut",
