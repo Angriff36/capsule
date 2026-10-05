@@ -70,6 +70,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
   // (convex/lib/proposalPricing.ts assertValidRentalLink) check the item is the
   // same company's, and the frozen revision records the item's name.
   property equipmentId: uuid?
+  // The event's travel & delivery fee line (convex/travelFees.ts keeps one
+  // per proposal and reprices it from the event's distance).
+  property travelFee: boolean?
   property addedAt: datetime?
   property removedAt: datetime?
 
@@ -97,7 +100,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional notes: string,
     optional menuDishId: uuid,
     optional overrideReason: string,
-    optional equipmentId: uuid
+    optional equipmentId: uuid,
+    optional travelFee: boolean
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -118,6 +122,7 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate menuDishId = menuDishId
     mutate overrideReason = overrideReason
     mutate equipmentId = equipmentId
+    mutate travelFee = travelFee
     mutate addedAt = now()
     emit ProposalLineItemAdded {
       lineItemId: self.id

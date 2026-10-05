@@ -3,6 +3,8 @@ import { useQuery } from "convex/react";
 import { api, type Id } from "../../lib/api";
 
 import {
+  useEventDishAdjustServings,
+  useEventGuestAssignMeal,
   useEventGuestAssignTable,
   useEventGuestCheckIn,
   useEventGuestRsvpConfirm,
@@ -20,6 +22,11 @@ import {
 } from "./GuestListCoverageNotice";
 import { EventGuestInviteForm } from "./EventGuestInviteForm";
 import { EventGuestRow, type GuestRowAction } from "./EventGuestRow";
+import { EventGuestMealCard } from "./EventGuestMealCard";
+import { countGuestMeals, type EntreeLine } from "./guestMealCounts";
+import { eventDishLabel } from "./eventDishLabel";
+import { useEventMenuLines } from "../../lib/useEventMenuLines";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { EventGuestSidebar } from "./EventGuestSidebar";
 import {
   GUEST_FILTERS,
@@ -88,6 +95,10 @@ export function EventGuestPanel({
   const checkIn = useEventGuestCheckIn();
   const assignTable = useEventGuestAssignTable();
   const withdraw = useEventGuestWithdraw();
+  const assignMeal = useEventGuestAssignMeal();
+  const adjustServings = useEventDishAdjustServings();
+  const menuLines = useEventMenuLines(eventId);
+  const menuDishes = useDishesByIds(menuLines?.map((line) => line.dishId));
   const [showInvite, setShowInvite] = useState(false);
   const [action, setAction] = useState<GuestAction>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -108,6 +119,29 @@ export function EventGuestPanel({
     [filter, guests, search],
   );
   const headcount = Number(expectedHeadcount) || 0;
+  const entreeLines = useMemo<EntreeLine[]>(
+    () =>
+      (menuLines ?? [])
+        .filter((line) => line.deletedAt == null && line.eventId === eventId)
+        .map((line) => ({
+          id: line._id,
+          name: eventDishLabel({
+            dishId: line.dishId,
+            dishName: line.dishName,
+            liveName:
+              menuDishes?.find((dish) => dish._id === line.dishId)?.name ?? "",
+            dishesLoading: menuDishes === undefined,
+          }),
+          course: line.course,
+          quantityServings: line.quantityServings,
+          version: line.version,
+        })),
+    [eventId, menuDishes, menuLines],
+  );
+  const mealCounts = useMemo(
+    () => countGuestMeals(guests, entreeLines),
+    [entreeLines, guests],
+  );
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -185,6 +219,27 @@ export function EventGuestPanel({
             note="day-of arrival"
           />
         </div>
+
+        {guests.length > 0 && menuLines !== undefined ? (
+          <EventGuestMealCard
+            counts={mealCounts}
+            guests={guests}
+            lines={entreeLines}
+            busy={busy === "meal-counts"}
+            onApplyCounts={() =>
+              void run("meal-counts", async () => {
+                for (const row of mealCounts.rows) {
+                  if (!row.outOfSync) continue;
+                  await adjustServings({
+                    docId: row.line.id,
+                    quantityServings: row.count,
+                    version: row.line.version,
+                  });
+                }
+              })
+            }
+          />
+        ) : null}
 
         <div className="card flex flex-wrap items-center gap-2 p-3">
           {GUEST_FILTERS.map((option) => (
@@ -268,6 +323,7 @@ export function EventGuestPanel({
                   <th className="th">Allergens</th>
                   <th className="th">Special meal</th>
                   <th className="th">Table</th>
+                  <th className="th">Entrée</th>
                   <th className="th" />
                 </tr>
               </thead>
@@ -282,6 +338,7 @@ export function EventGuestPanel({
                       key={guest._id}
                       guest={guest}
                       isBusy={busy?.endsWith(guest._id) ?? false}
+                      entreeLines={entreeLines}
                       openAction={
                         action != null && action.guestId === guest._id
                           ? action.kind
@@ -301,6 +358,11 @@ export function EventGuestPanel({
                         setAction({ kind, guestId: guest._id })
                       }
                       onCloseAction={() => setAction(null)}
+                      onSubmitMeal={(values) =>
+                        void run(`meal-${guest._id}`, () =>
+                          assignMeal({ docId: guest._id, version, ...values }),
+                        )
+                      }
                       onSubmitAction={(kind, value) => {
                         if (kind === "decline")
                           void run(`decline-${guest._id}`, () =>

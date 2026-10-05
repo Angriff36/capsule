@@ -35,6 +35,7 @@ import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 import { useWorkingEventId } from "../events/workingEvent";
+import { FieldHelp } from "../../ui/FieldHelp";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   reservedOn,
@@ -341,7 +342,8 @@ export function StockBookPage() {
             name: "quantity",
             label:
               action === "receive" ? "Quantity received" : "Actual quantity",
-            inputType: "number",
+            unit: unitFor(item),
+            allowZero: action === "recount",
             required: true,
           },
         ],
@@ -413,6 +415,7 @@ export function StockBookPage() {
           {
             name: "parLevel",
             label: `PAR level (${unitFor(item)})`,
+            help: "parLevel",
             defaultValue: String(item.parLevel),
             inputType: "number",
             required: true,
@@ -520,7 +523,9 @@ export function StockBookPage() {
             name: "quantity",
             label: "Amount that came back",
             defaultValue: String(unusedLeft(reservation)),
-            inputType: "number",
+            ...(item
+              ? { unit: unitFor(item) }
+              : { inputType: "number" as const }),
             required: true,
           },
           {
@@ -1267,16 +1272,19 @@ function SupplyStockForm({
             {["quantityOnHand", "parLevel", "reorderThreshold", "unitCost"].map(
               (name) => (
                 <label key={name} className="field-label">
-                  {
-                    (
-                      {
-                        quantityOnHand: "Opening quantity",
-                        parLevel: "PAR level",
-                        reorderThreshold: "Reorder threshold",
-                        unitCost: "Unit cost",
-                      } as Record<string, string>
-                    )[name]
-                  }
+                  <span className="field-label-row">
+                    {
+                      (
+                        {
+                          quantityOnHand: "Opening quantity",
+                          parLevel: "PAR level",
+                          reorderThreshold: "Reorder threshold",
+                          unitCost: "Unit cost",
+                        } as Record<string, string>
+                      )[name]
+                    }
+                    {name === "parLevel" ? <FieldHelp term="parLevel" /> : null}
+                  </span>
                   <input
                     name={name}
                     className="input"

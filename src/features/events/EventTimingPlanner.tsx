@@ -10,6 +10,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { EventDriveTimePanel } from "./EventDriveTimePanel";
+import { EventTravelFeePanel } from "./EventTravelFeePanel";
 import { EventRouteLegsPanel } from "./EventRouteLegsPanel";
 import { EventTimingRulesPanel } from "./EventTimingRulesPanel";
 import {
@@ -157,6 +158,7 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
         version={plan.event.version}
         canChange={plan.event.timingCanRecalculate}
       />
+      <EventTravelFeePanel eventId={eventId} />
       <EventTimingRulesPanel
         eventId={eventId}
         version={plan.event.version}

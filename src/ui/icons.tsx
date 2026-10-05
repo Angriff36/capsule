@@ -153,3 +153,9 @@ export const FileTextIcon = icon(
     <path d="M9.5 1.8V5h3M6 8h4M6 10.5h4" />
   </>,
 );
+export const InfoIcon = icon(
+  <>
+    <circle cx="8" cy="8" r="6.2" />
+    <path d="M8 7.3v3.9M8 4.9v.1" />
+  </>,
+);

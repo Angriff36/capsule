@@ -80,6 +80,7 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "workforceManageAccess")
     mutate steps = steps != null and length(trim(steps)) > 0 ? steps : null
     mutate quiz = quiz != null and length(trim(quiz)) > 0 ? quiz : null
+    emit TrainingDocSet { trainingModuleId: self.id tenantId: self.tenantId }
   }
 
   command retire() {
@@ -302,6 +303,7 @@ entity TrainingSignOff mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
     mutate initialledSteps = length(trim(initialledSteps)) > 0 ? initialledSteps : null
+    emit TrainingStepsInitialled { trainingSignOffId: self.id tenantId: self.tenantId personId: self.personId }
   }
 
   command finishTraining(finishedAt: datetime, quizDone: boolean, optional note: string) {
@@ -325,6 +327,7 @@ entity TrainingSignOff mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
     mutate finishedAt = null
+    emit TrainingSignOffReopened { trainingSignOffId: self.id tenantId: self.tenantId personId: self.personId }
   }
 
   store TrainingSignOff in durable
@@ -476,3 +479,7 @@ event ShiftTypeReactivated: "shift_type.reactivated" {
   tenantId: string
   name: string
 }
+
+event TrainingDocSet: "training_module.doc_set" { trainingModuleId: string tenantId: string }
+event TrainingStepsInitialled: "training_sign_off.steps_initialled" { trainingSignOffId: string tenantId: string personId: string }
+event TrainingSignOffReopened: "training_sign_off.reopened" { trainingSignOffId: string tenantId: string personId: string }

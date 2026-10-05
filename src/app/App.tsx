@@ -346,6 +346,11 @@ const CloseoutPage = lazy(() =>
     default: module.CloseoutPage,
   })),
 );
+const DonationSummaryPage = lazy(() =>
+  import("../features/finance/DonationSummaryPage").then((module) => ({
+    default: module.DonationSummaryPage,
+  })),
+);
 const PayrollPage = lazy(() =>
   import("../features/finance/PayrollPage").then((module) => ({
     default: module.PayrollPage,
@@ -410,6 +415,11 @@ const ClientDetailPage = lazy(() =>
     default: module.ClientDetailPage,
   })),
 );
+const TastingsPage = lazy(() =>
+  import("../features/clients/TastingsPage").then((module) => ({
+    default: module.TastingsPage,
+  })),
+);
 const ProposalsPage = lazy(() =>
   import("../features/clients/ProposalsPage").then((module) => ({
     default: module.ProposalsPage,
@@ -428,6 +438,11 @@ const ContractsPage = lazy(() =>
 const LeadPipelinePage = lazy(() =>
   import("../features/clients/LeadPipelinePage").then((module) => ({
     default: module.LeadPipelinePage,
+  })),
+);
+const DateHoldsPage = lazy(() =>
+  import("../features/sales/DateHoldsPage").then((module) => ({
+    default: module.DateHoldsPage,
   })),
 );
 const QuoteSubmissionsReviewPage = lazy(() =>
@@ -1339,6 +1354,14 @@ export function App() {
               }
             />
             <Route
+              path="/finance/donations"
+              element={
+                <SupplyRoute>
+                  <DonationSummaryPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/finance/payroll"
               element={
                 <SupplyRoute>
@@ -1451,6 +1474,14 @@ export function App() {
               }
             />
             <Route
+              path="/clients/tastings"
+              element={
+                <SupplyRoute>
+                  <TastingsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/clients/contracts"
               element={
                 <SupplyRoute>
@@ -1479,6 +1510,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <QuoteSubmissionsReviewPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/date-holds"
+              element={
+                <SupplyRoute>
+                  <DateHoldsPage />
                 </SupplyRoute>
               }
             />

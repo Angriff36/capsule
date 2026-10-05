@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useStorageUrls } from "../../lib/fileStorageClient";
+import {
+  InlineReferenceCreateSheet,
+  useCanCreateInlineReference,
+} from "../../ui/InlineReferenceCreateSheet";
+import {
+  pinRecents,
+  rankBySearch,
+  readRecents,
+  rememberRecent,
+} from "../../ui/pickerSearch";
 import type { IngredientCatalogRow } from "./IngredientCatalogLabel";
+import { IngredientQuickCreate } from "./IngredientQuickCreate";
 
 const THUMB_CLASS =
   "h-14 w-14 rounded-xs object-cover flex items-center justify-center border border-dashed border-line bg-inset text-xs text-ink-3";
@@ -11,6 +22,8 @@ type Props = {
   required?: boolean;
   value?: string;
   onChange?: (ingredientId: string) => void;
+  /** Show "+ New ingredient" so a missing catalog row is made in place. */
+  allowCreate?: boolean;
 };
 
 function IngredientPickerThumb({
@@ -62,24 +75,46 @@ export function IngredientOptionPicker({
   required = false,
   value: controlledValue,
   onChange,
+  allowCreate = false,
 }: Props) {
   const [internalValue, setInternalValue] = useState("");
   const [filter, setFilter] = useState("");
-  const selectedId = controlledValue ?? internalValue;
-  const rows = useMemo(
-    () =>
-      (ingredients ?? []).filter(
-        (row) =>
-          row.deletedAt == null &&
-          (row.status == null || row.status === "active"),
-      ),
-    [ingredients],
+  const [createName, setCreateName] = useState<string | null>(null);
+  const canCreateIngredient = useCanCreateInlineReference("ingredient");
+  const [recentIds, setRecentIds] = useState(() => readRecents("ingredient"));
+  // A just-created ingredient, kept until the live catalog list catches up so
+  // the hidden select can hold its id.
+  const [justCreated, setJustCreated] = useState<IngredientCatalogRow | null>(
+    null,
   );
-  const filteredRows = useMemo(() => {
-    const query = filter.trim().toLowerCase();
-    if (!query) return rows;
-    return rows.filter((row) => row.name.toLowerCase().includes(query));
-  }, [filter, rows]);
+  const selectedId = controlledValue ?? internalValue;
+  const rows = useMemo(() => {
+    const active = (ingredients ?? []).filter(
+      (row) =>
+        row.deletedAt == null &&
+        (row.status == null || row.status === "active"),
+    );
+    if (justCreated && !active.some((row) => row._id === justCreated._id)) {
+      return [justCreated, ...active];
+    }
+    return active;
+  }, [ingredients, justCreated]);
+  // Typing ranks fuzzy matches; an empty filter pins the five recent picks.
+  const { recentCount, filteredRows } = useMemo(() => {
+    if (filter.trim()) {
+      return {
+        recentCount: 0,
+        filteredRows: rankBySearch(rows, filter, (row) => ({
+          label: row.name,
+        })),
+      };
+    }
+    const pinned = pinRecents(rows, recentIds, (row) => row._id);
+    return {
+      recentCount: pinned.recent.length,
+      filteredRows: [...pinned.recent, ...pinned.rest],
+    };
+  }, [filter, rows, recentIds]);
   const storageIds = useMemo(
     () =>
       filteredRows
@@ -90,6 +125,7 @@ export function IngredientOptionPicker({
   const imageUrls = useStorageUrls(storageIds);
 
   const pick = (id: string) => {
+    if (id) setRecentIds(rememberRecent("ingredient", id));
     if (onChange) onChange(id);
     else setInternalValue(id);
   };
@@ -139,10 +175,21 @@ export function IngredientOptionPicker({
         role="listbox"
         aria-label="Choose ingredient"
       >
-        {filteredRows.map((row) => {
+        {filteredRows.map((row, index) => {
           const selected = row._id === selectedId;
+          const header =
+            recentCount && index === 0
+              ? "Recent"
+              : recentCount && index === recentCount
+                ? "All"
+                : null;
           return (
             <li key={row._id}>
+              {header ? (
+                <p className="px-2 pt-1.5 pb-0.5 text-xs font-medium tracking-wide text-ink-3 uppercase">
+                  {header}
+                </p>
+              ) : null}
               <button
                 type="button"
                 role="option"
@@ -164,6 +211,20 @@ export function IngredientOptionPicker({
             </li>
           );
         })}
+        {filteredRows.length === 0 &&
+        filter.trim() &&
+        canCreateIngredient &&
+        !allowCreate ? (
+          <li>
+            <button
+              type="button"
+              className="w-full rounded-xs px-2 py-2 text-left text-sm font-semibold text-brand hover:bg-accent-soft"
+              onClick={() => setCreateName(filter.trim())}
+            >
+              + Create ingredient “{filter.trim()}”
+            </button>
+          </li>
+        ) : null}
       </ul>
       {!rows.length ? (
         <p className="text-sm text-ink-3">
@@ -171,6 +232,38 @@ export function IngredientOptionPicker({
         </p>
       ) : filteredRows.length === 0 ? (
         <p className="text-sm text-ink-3">No ingredients match that filter.</p>
+      ) : null}
+      {createName ? (
+        <InlineReferenceCreateSheet
+          kind="ingredient"
+          open
+          initialName={createName}
+          existingOptions={rows.map((row) => ({
+            id: row._id,
+            label: row.name,
+          }))}
+          onClose={() => setCreateName(null)}
+          onUseExisting={(id) => {
+            pick(id);
+            setCreateName(null);
+          }}
+          onCreated={(record) => {
+            setJustCreated({ _id: record.id, name: record.label });
+            pick(record.id);
+            setFilter("");
+            setCreateName(null);
+          }}
+        />
+      ) : null}
+      {allowCreate ? (
+        <IngredientQuickCreate
+          initialName={filter}
+          onCreated={({ id, name: createdName }) => {
+            setJustCreated({ _id: id, name: createdName });
+            setFilter("");
+            pick(id);
+          }}
+        />
       ) : null}
     </div>
   );

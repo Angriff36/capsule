@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { CheckCircleIcon, XCircleIcon, XIcon } from "../icons";
 import { ActionResultStore, type ActionResult } from "./ActionResultStore";
 
@@ -41,6 +42,20 @@ export function ActionResultHost() {
           role={ok ? "status" : "alert"}
         >
           {result.message}
+          {result.links?.length ? (
+            <span className="ml-2 inline-flex flex-wrap gap-x-3">
+              {result.links.map((link) => (
+                <Link
+                  key={`${link.href}:${link.label}`}
+                  to={link.href}
+                  className="font-semibold text-accent underline-offset-2 hover:underline"
+                  onClick={() => ActionResultStore.shared.dismiss()}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </span>
+          ) : null}
         </output>
         <button
           type="button"

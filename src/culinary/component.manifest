@@ -86,7 +86,7 @@ entity Component mixin TenantScoped, SoftDeletable {
   transition status from "published" to ["draft", "retired"]
   transition status from "retired" to []
 
-  default policy componentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipes"
+  default policy componentRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") "Kitchen and inventory staff may see recipes"
   default policy componentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipes"
   default policy componentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipes"
 

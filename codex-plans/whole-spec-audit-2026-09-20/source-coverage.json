@@ -4556,7 +4556,7 @@
         "acceptance/coverage consumers"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "861d8884"
+      "sha": "1e58f18b"
     },
     {
       "id": "AC-161",
@@ -5055,21 +5055,21 @@
       "key": "CF-1-one-system-path",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§1 'Product outcome' bold path",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-NATIVE-JOURNEY"],
-      "gap": "Payments and commission legs paused; venue attribution leg not yet asserted in the chain proof.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: extend tests/proofs/quote-to-booked-event.runtime.test.ts with post-booking operational legs (staffing/pack/cost) to prove the chain continues past booking"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/proofs/backend-golden-event.runtime.test.ts — one inquiry from a partner venue's lead source walks booking, staffing, kitchen, pack/equipment, invoice/payment, closeout and reporting on one event (steps 01-22); step 01 proves venue attribution (lead and event keep the source, the venue's referral figures count the booked lead, a report filtered by that source holds that event only)"
       ],
-      "waitsOn": "no-money-rule",
+      "waitsOn": null,
       "owners": [
         "tests/proofs/",
         "authenticated existing product routes",
         "qualification scripts and docs"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "9d89b152"
     },
     {
       "id": "AC-185",

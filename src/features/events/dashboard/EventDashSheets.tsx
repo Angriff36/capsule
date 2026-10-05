@@ -9,11 +9,14 @@ import { EventDetailRevisePanels } from "../EventDetailRevisePanels";
 import { EventDetailsCard } from "../EventDetailsCard";
 import { EventInvoiceCard } from "../EventInvoiceCard";
 import { EventMapPanel } from "../EventMapPanel";
+import { EventVenueLogisticsCard } from "../EventVenueLogisticsCard";
 import { EventOverviewRail } from "../EventOverviewRail";
 import { EventReadinessCard } from "../EventReadinessCard";
 import { EventAutomaticWhyCard } from "../EventAutomaticWhyCard";
 import { EventSetupProgress } from "../EventSetupProgress";
-import { EventStageActionsCard } from "../EventStageActionsCard";
+import { EventOverviewCard } from "../EventOverviewCard";
+import { LifecycleStepper } from "../../../ui/LifecycleStepper";
+import { eventLifecycle } from "../../../lib/lifecycle/lifecycleDefinitions";
 import { EventTimelineCommentsPanel } from "../EventTimelineCommentsPanel";
 import { EventWeatherChip } from "../EventWeatherChip";
 import { eventDetailPath } from "../eventRoutes";
@@ -59,6 +62,7 @@ export function EventDashSheetBody({
     stage,
     currencyCode,
     lifecycleActions,
+    blockedLifecycleActions,
     onAction,
     people,
     dishCount,
@@ -125,6 +129,7 @@ export function EventDashSheetBody({
             <EventMapPanel venue={venue} startsAt={startsAt}>
               <EventWeatherChip venue={venue} startsAt={startsAt} />
             </EventMapPanel>
+            <EventVenueLogisticsCard venue={venue} />
             <div className="evd-center">
               <button
                 type="button"
@@ -301,11 +306,28 @@ export function EventDashSheetBody({
             }
           />
           <div className="evd-sheet-body">
-            <EventStageActionsCard
-              actions={lifecycleActions}
-              busy={reviseProps.busy}
-              onAction={onAction}
-            />
+            <EventOverviewCard
+              title="Stage actions"
+              testId="event-stage-actions"
+            >
+              <LifecycleStepper
+                definition={eventLifecycle}
+                status={stage}
+                actions={eventLifecycle.actions.filter((action) =>
+                  lifecycleActions.some(
+                    (available) => available.key === action.key,
+                  ),
+                )}
+                blocked={blockedLifecycleActions}
+                busy={reviseProps.busy}
+                onAction={(key) => {
+                  const action = lifecycleActions.find(
+                    (item) => item.key === key,
+                  );
+                  if (action) onAction(action.key);
+                }}
+              />
+            </EventOverviewCard>
             <EventReviewFlagsSection eventId={eventId} />
             <EventChangeHistoryCard eventId={eventId} />
           </div>

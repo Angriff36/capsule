@@ -92,6 +92,58 @@ export function useReconcileEventDemand() {
   return (eventId: string) => mutate({ eventId: eventId as Id<"events"> });
 }
 
+export type DemandChangeRequest = {
+  eventId: string;
+  kind: "recalculate" | "headcount" | "supersede";
+  newHeadcount?: number;
+  demandId?: string;
+};
+
+export function useDemandChangePreview(request: DemandChangeRequest) {
+  return useQuery(api.culinaryDemand.previewDemandChange, {
+    eventId: request.eventId as Id<"events">,
+    kind: request.kind,
+    newHeadcount: request.newHeadcount,
+    demandId: request.demandId as Id<"ingredientDemands"> | undefined,
+  });
+}
+
+export function useApplyDemandRecalculation() {
+  const mutate = useMutation(api.culinaryDemand.applyDemandRecalculation);
+  return (eventId: string, expectedFingerprint: string) =>
+    mutate({ eventId: eventId as Id<"events">, expectedFingerprint });
+}
+
+export function useApplyDemandHeadcount() {
+  const mutate = useMutation(api.culinaryDemand.applyDemandHeadcount);
+  return (args: {
+    eventId: string;
+    newHeadcount: number;
+    version?: number;
+    expectedFingerprint: string;
+  }) =>
+    mutate({
+      ...args,
+      eventId: args.eventId as Id<"events">,
+    });
+}
+
+export function useApplyDemandSupersede() {
+  const mutate = useMutation(api.culinaryDemand.applyDemandSupersede);
+  return (args: {
+    eventId: string;
+    demandId: string;
+    version?: number;
+    reason: string;
+    expectedFingerprint: string;
+  }) =>
+    mutate({
+      ...args,
+      eventId: args.eventId as Id<"events">,
+      demandId: args.demandId as Id<"ingredientDemands">,
+    });
+}
+
 export function useAddNestedRecipeLine() {
   const mutate = useMutation(api.culinaryDemand.addNestedRecipeLine);
   return (args: {

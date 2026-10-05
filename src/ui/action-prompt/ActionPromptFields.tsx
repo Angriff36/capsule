@@ -4,6 +4,8 @@ import type {
   ActionPromptRequest,
 } from "./ActionPromptTypes";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
+import { FieldHelp } from "../FieldHelp";
+import { UnitQuantityInput } from "../UnitQuantityInput";
 
 interface ActionPromptFieldsProps {
   request: ActionPromptRequest;
@@ -30,7 +32,14 @@ export function ActionPromptFields({
     return (
       <div className="grid gap-1">
         <label className="field-label" htmlFor={reasonId}>
-          {request.label}
+          {request.help ? (
+            <span className="field-label-row">
+              {request.label}
+              <FieldHelp term={request.help} />
+            </span>
+          ) : (
+            request.label
+          )}
         </label>
         <textarea
           id={reasonId}
@@ -85,14 +94,32 @@ function PromptField({
   return (
     <div className="grid gap-1">
       <label className="field-label" htmlFor={fieldId}>
-        {field.label}
+        {field.help ? (
+          <span className="field-label-row">
+            {field.label}
+            <FieldHelp term={field.help} />
+          </span>
+        ) : (
+          field.label
+        )}
       </label>
       {field.helper ? (
         <p id={helperId} className="text-xs text-ink-3">
           {field.helper}
         </p>
       ) : null}
-      {field.options ? (
+      {field.unit ? (
+        <UnitQuantityInput
+          id={fieldId}
+          entryName={field.name}
+          storeUnit={field.unit}
+          defaultAmount={field.defaultValue}
+          allowZero={field.allowZero}
+          required={field.required ?? true}
+          aria-describedby={helperId}
+          onChange={(amount) => onChange(amount == null ? "" : String(amount))}
+        />
+      ) : field.options ? (
         <select
           {...common}
           className="input"

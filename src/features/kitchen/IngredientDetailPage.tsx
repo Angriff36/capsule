@@ -23,6 +23,7 @@ import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { IngredientPrimaryImageUploader } from "../attachments/IngredientPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   latestPriceByIngredient,
   resolveIngredientPrice,
@@ -388,12 +389,12 @@ export function IngredientDetailPage() {
 
   return (
     <article className="culinary-document culinary-document-compact culinary-studio">
-      <Link
-        to={kitchenCatalogPath("ingredients")}
+      <ReturnToListLink
+        fallback={kitchenCatalogPath("ingredients")}
         className="culinary-studio-back"
       >
         ← Ingredient index
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {host}
       {failure ? (

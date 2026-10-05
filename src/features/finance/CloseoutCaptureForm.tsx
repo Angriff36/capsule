@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import type { CloseoutSources } from "../facilities/useCloseoutSources";
 import { CloseoutSourcesPanel } from "./CloseoutSourcesPanel";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 type EventOption = {
   _id: string;
@@ -42,7 +43,10 @@ export function CloseoutCaptureForm({
         <div className="supply-form-heading">
           <div>
             <p className="eyebrow">Capture</p>
-            <h2>Event closeout</h2>
+            <h2 className="field-label-row">
+              Event closeout
+              <FieldHelp term="closeout" />
+            </h2>
           </div>
         </div>
         <p className="text-base text-ink-2">
@@ -65,7 +69,10 @@ export function CloseoutCaptureForm({
       <div className="supply-form-heading">
         <div>
           <p className="eyebrow">{draft ? "Reconcile" : "Capture"}</p>
-          <h2>Event closeout</h2>
+          <h2 className="field-label-row">
+            Event closeout
+            <FieldHelp term="closeout" />
+          </h2>
         </div>
       </div>
       <label className="field-label">

@@ -12,6 +12,7 @@ export const CLIENTS_SECTIONS = [
     label: "Proposal Templates",
     path: "/clients/proposals/templates",
   },
+  { key: "tastings", label: "Tastings", path: "/clients/tastings" },
   { key: "contracts", label: "Contracts", path: "/clients/contracts" },
   { key: "retention", label: "Retention", path: "/clients/retention" },
   {
@@ -20,6 +21,7 @@ export const CLIENTS_SECTIONS = [
     path: "/clients/quote-requests",
   },
   { key: "inbox", label: "Inbox", path: "/clients/inbox" },
+  { key: "dateHolds", label: "Date Holds", path: "/clients/date-holds" },
 ] as const;
 
 export type ClientsSection = (typeof CLIENTS_SECTIONS)[number]["key"];
@@ -33,9 +35,11 @@ export const CLIENTS_ROUTES = {
   // that proposal's detail panels and scrolls the row into view.
   proposal: (id: string) => `/clients/proposals?proposal=${id}`,
   proposalTemplates: "/clients/proposals/templates",
+  tastings: "/clients/tastings",
   contracts: "/clients/contracts",
   retention: "/clients/retention",
   quoteRequests: "/clients/quote-requests",
   inbox: "/clients/inbox",
+  dateHolds: "/clients/date-holds",
   contractDocument: (id: string) => `/clients/contracts/${id}/document`,
 } as const;

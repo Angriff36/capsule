@@ -25,6 +25,7 @@ import { CandidateRevokeHireControl } from "./CandidateRevokeHireControl";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 // ponytail: a focused set of hireable operational roles for the create-form
 // picker. roleAppliedFor is a free CapsuleRole, so a KM-sourced value outside
@@ -735,14 +736,15 @@ export function CandidatesPage() {
                 >
                   <label className="field-label">
                     Interviewer
-                    <select name="interviewerPersonId" className="input">
-                      <option value="">Unassigned</option>
-                      {activePeople.map((person) => (
-                        <option key={person._id} value={person._id}>
-                          {person.givenName} {person.familyName}
-                        </option>
-                      ))}
-                    </select>
+                    <SearchSelect
+                      name="interviewerPersonId"
+                      recentsKey="staff"
+                      placeholder="Unassigned"
+                      options={activePeople.map((person) => ({
+                        id: person._id,
+                        label: `${person.givenName} ${person.familyName}`,
+                      }))}
+                    />
                   </label>
                   <label className="field-label">
                     Scheduled for (optional)

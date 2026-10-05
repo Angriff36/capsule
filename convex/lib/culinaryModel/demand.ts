@@ -110,6 +110,25 @@ export interface DemandLookups {
 
 export type Ownership = "event_dish" | "batch_allocation" | "batch_surplus";
 
+export type CalculationSnapshot = {
+  version: 1;
+  kind: "direct_dish" | "component_recipe" | "nested_recipe" | "shared_batch";
+  /** Stable keys preserve additions and removals in historical comparisons. */
+  inputValues?: Record<string, { label: string; value: string }>;
+  /** Ordered arithmetic as it was applied to this saved contribution. */
+  steps?: Array<{ operator: "start" | "multiply" | "divide" | "convert" | "round" | "allocate"; label: string; value: number | string; unit?: UnitCode }>;
+  /** Plain-language formula this contribution used. */
+  formula?: string;
+  recipeLineQuantity: number;
+  wasteFactor: number;
+  batchMultiplier: number;
+  servings: number;
+  yieldQuantity: number;
+  resultQuantity: number;
+  resultUnit: UnitCode;
+  componentPath: string[];
+};
+
 export interface Contribution {
   sourceKey: string;
   eventId: string;
@@ -132,6 +151,7 @@ export interface Contribution {
   sourceDishIngredientId: string | null;
   sourceDishComponentId: string | null;
   servings: number;
+  calculationSnapshot: CalculationSnapshot;
   /** true when the row can enter the finalized purchasing total */
   purchasable: boolean;
 }
@@ -378,6 +398,12 @@ function expandComponent(
       lookups,
       out,
       servings: args.servings,
+      formulaInputs: {
+        recipeLineQuantity: line.quantity,
+        wasteFactor: line.wasteFactor ?? 1,
+        batchMultiplier: batches,
+        yieldQuantity: 1,
+      },
     });
   }
   for (const line of component.componentLines) {
@@ -418,6 +444,12 @@ function pushContribution(args: {
   lookups: DemandLookups;
   out: EventDishDemand;
   servings: number;
+  formulaInputs: {
+    recipeLineQuantity: number;
+    wasteFactor: number;
+    batchMultiplier: number;
+    yieldQuantity: number;
+  };
 }): void {
   const { ingredient, lookups, out, eventDish, dish } = args;
   const scope = { itemKind: "ingredient" as const, itemId: ingredient.id };
@@ -444,6 +476,36 @@ function pushContribution(args: {
     sourceDishIngredientId: args.sourceDishIngredientId,
     sourceDishComponentId: args.sourceDishComponentId,
     servings: args.servings,
+    calculationSnapshot: {
+      version: 1,
+      kind: args.path.length > 1 ? "nested_recipe" : args.path.length ? "component_recipe" : "direct_dish",
+      inputValues: {
+        recipeLineQuantity: { label: "Recipe line", value: String(args.formulaInputs.recipeLineQuantity) },
+        wasteFactor: { label: "Waste factor", value: String(args.formulaInputs.wasteFactor) },
+        batchMultiplier: { label: "Batch multiplier", value: String(args.formulaInputs.batchMultiplier) },
+        servings: { label: "Servings", value: String(args.servings) },
+        yieldQuantity: { label: "Yield", value: String(args.formulaInputs.yieldQuantity) },
+      },
+      steps: [
+        { operator: "start", label: "Recipe line", value: args.formulaInputs.recipeLineQuantity, unit: args.statedUnit },
+        { operator: "multiply", label: "Waste factor", value: args.formulaInputs.wasteFactor },
+        ...(args.path.length ? [{ operator: "multiply" as const, label: "Batch multiplier", value: args.formulaInputs.batchMultiplier }] : [{ operator: "multiply" as const, label: "Servings", value: args.servings }]),
+        ...(args.path.length ? [{ operator: "divide" as const, label: "Yield", value: args.formulaInputs.yieldQuantity }] : []),
+        ...(converted.status === "resolved" && converted.unit !== args.statedUnit ? [{ operator: "convert" as const, label: "Convert to catalog unit", value: converted.quantity, unit: converted.unit }] : []),
+        { operator: "round", label: "Saved contribution", value: roundTo(purchasable ? converted.quantity : args.stated), unit: purchasable ? converted.unit : args.statedUnit },
+      ],
+      formula: args.path.length
+        ? "recipe line × waste factor × batch multiplier"
+        : "recipe line × waste factor × servings",
+      recipeLineQuantity: args.formulaInputs.recipeLineQuantity,
+      wasteFactor: args.formulaInputs.wasteFactor,
+      batchMultiplier: args.formulaInputs.batchMultiplier,
+      servings: args.servings,
+      yieldQuantity: args.formulaInputs.yieldQuantity,
+      resultQuantity: roundTo(args.stated),
+      resultUnit: args.statedUnit,
+      componentPath: args.path,
+    },
     purchasable,
   };
   out.contributions.push(contribution);
@@ -521,6 +583,12 @@ export function expandEventDish(eventDish: EventDishLike, lookups: DemandLookups
       lookups,
       out,
       servings: line.portions,
+      formulaInputs: {
+        recipeLineQuantity: line.quantity,
+        wasteFactor: line.wasteFactor ?? 1,
+        batchMultiplier: 1,
+        yieldQuantity: 1,
+      },
     });
   }
   for (const line of componentLines) {

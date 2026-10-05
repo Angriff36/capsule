@@ -8,7 +8,7 @@
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "4eb2de27892a77c6b6613243306ac09839b57df0dbee8122d506087c589ac9ee"
+      "sha256": "f4d2dfe46549827238fd27c6a9ae86e4da1c318da8005da8ed74a64b62dbf5fe"
     },
     "convex/lib/authContext.ts": {
       "sha256": "d18a22d82b44ddb5dbd519947c031b9d9ac0a50268b6c4603478b152a477be77",
@@ -18,19 +18,19 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "4240bfff33b150b634132947dfcc30bbeb86e8f4ce4d53c9d67ef5795a530f43"
+      "sha256": "1b4c7e4f582458341150fe82e2e88680247865d66fd0ff58324aaff9779d3a91"
     },
     "convex/queries.ts": {
-      "sha256": "ac34c32a50bbf177666d37d69c34b042fdf267452951d5a2ad5b5c6b9d50c227"
+      "sha256": "b31c53634ea28fd730706f7bb2c39ee1fd31429d6e8cfa9b5f84f7d562abc60f"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "8acc8a7ee4bd85421556dfef81f071ce3baea904ef4d20605c06a57c628eac2f"
+      "sha256": "5c06dc991337a26d8eacb53f018e9167e7c215d97288a4cab1946ff81725e7c9"
     },
     "manifest-context-summary.json": {
-      "sha256": "f67625fe7aa3a053bd475bd3151559f4343783c93a536c19c4a0fe74cd038e25"
+      "sha256": "ff27bb1c2cdda7447f0628ac29133eeec6a5d278aa40c59772dcac0d8ce89d1a"
     },
     "package.json": {
       "sha256": "8eaec7fa603c3cd1025cac03266f180f8bc33a69369ac3cb861bb3849981aa1c"
@@ -39,25 +39,25 @@
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "bf48e5ce87b5e347b6b82270e9089e0837d7bf7290b71ce631c6bcd421aa18da"
+      "sha256": "e148dd809351f5acb2b4e6474f7e1130a84af8b03edb756cc1fee781b925d2d0"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "f8fdda41f01215ac558489ae7316b7ef5e96afd35e216d102e628d4fbf9c39d9"
+      "sha256": "a7f4abe86f06f54fd5400b7e8aaef07c9e11f0fa8aea6823c2ddf6d376052444"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "91ba849ee86994da26eead5deefa2d6d5d99ca23317f02c272f179ac185d4fce"
+      "sha256": "ae94ac4f380a8e7fc2f0c16f33a240e11548f561d01cb26b56b747a41c42084e"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "a5b031f35be55c8bc2da9429624f7612eec989dcac9c65a15ee5eee084bd60bc"
+      "sha256": "7898a472f03f1d5cb1189fb099a43b3fa175d21fe3f5a8d6ee45163d9d4c14dd"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "5134fb3e97bd65f75a0f7f4efc3fb9ead41e40c9e70625786aadebefe4571704"
+      "sha256": "14a7302b007fd3ff133608075ba73169ed7fbb0e881848247a303bfa4eaf27e2"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "cc2f802d8ac6b0c1e0bf7881baf0b3d9501c97e479d54244462df611e975b63b"
+      "sha256": "655bc03773494742d5479d68e3a6ac50cde4d89a2372fbd1566c8127222bc757"
     }
   },
   "package": {
@@ -102,6 +102,7 @@
       "src/facilities/operating-location.manifest",
       "src/finance/closeout.manifest",
       "src/finance/event-closeout.manifest",
+      "src/finance/leftover-disposition.manifest",
       "src/finance/payroll-input.manifest",
       "src/finance/revenue-attribution.manifest",
       "src/foundation/base.manifest",
@@ -171,6 +172,7 @@
       "src/sales/contact.manifest",
       "src/sales/contract.manifest",
       "src/sales/credit-memo.manifest",
+      "src/sales/date-holds.manifest",
       "src/sales/deck-share-link.manifest",
       "src/sales/invoice-core.manifest",
       "src/sales/invoice-number-sequence.manifest",
@@ -191,6 +193,8 @@
       "src/sales/share-link.manifest",
       "src/sales/signature-request.manifest",
       "src/sales/sync-error.manifest",
+      "src/sales/tasting-dish.manifest",
+      "src/sales/tasting.manifest",
       "src/sales/tax-rate.manifest",
       "src/workforce/assignment.manifest",
       "src/workforce/availability.manifest",

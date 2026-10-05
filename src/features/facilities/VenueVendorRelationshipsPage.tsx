@@ -24,6 +24,7 @@ import {
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 // Enum values from manifest
 const CATEGORIES = [
@@ -411,18 +412,16 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Vendor *
               </label>
-              <select
+              <SearchSelect
                 name="vendorId"
                 required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
-              >
-                <option value="">Select vendor...</option>
-                {filteredVendors.map((v) => (
-                  <option key={v._id} value={v._id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+                recentsKey="vendor"
+                placeholder="Search vendors…"
+                options={filteredVendors.map((v) => ({
+                  id: v._id,
+                  label: v.name,
+                }))}
+              />
             </div>
 
             <div>

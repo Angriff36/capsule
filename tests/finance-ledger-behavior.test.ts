@@ -100,9 +100,10 @@ it("updates invoice-detail send eligibility with the live balance and links to t
   expect(
     container.querySelector('a[href="/events/event-a"]')?.textContent,
   ).toContain("Spring banquet");
+  // With nothing due, the lifecycle map shows "Mark sent" disabled with its reason.
   expect(
     [...container.querySelectorAll("button")].some(
-      (node) => node.textContent === "Mark sent",
+      (node) => node.textContent === "Mark sent" && !node.disabled,
     ),
   ).toBe(false);
   backend.values.set("useGetInvoice", {

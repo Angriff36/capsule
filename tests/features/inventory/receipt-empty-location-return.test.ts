@@ -19,6 +19,13 @@ import {
   findByName,
 } from "../../../src/features/inventory/inlineCatalogChoice";
 
+// No Convex client here; without the create-sheet permission the order form
+// keeps its "New vendor…" name-box path, which these tests cover.
+vi.mock("../../../src/ui/InlineReferenceCreateSheet", () => ({
+  InlineReferenceCreateSheet: () => null,
+  useCanCreateInlineReference: () => false,
+}));
+
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
@@ -181,10 +188,18 @@ describe("opening an order with no vendors adds one inline and keeps the order f
       '[name="orderNumber"]',
     )!;
     setValue(orderNumber, "PO-77");
-    setValue(
-      container.querySelector<HTMLSelectElement>('[name="vendorId"]')!,
-      ADD_NEW_CHOICE,
+    // The vendor field is a search picker: open it and choose "New vendor…".
+    act(() =>
+      container.querySelector<HTMLInputElement>('[role="combobox"]')!.click(),
     );
+    const newVendor = [...container.querySelectorAll('[role="option"]')].find(
+      (option) => option.textContent?.includes("New vendor…"),
+    ) as HTMLElement | undefined;
+    act(() => {
+      newVendor?.dispatchEvent(
+        new MouseEvent("pointerdown", { bubbles: true, cancelable: true }),
+      );
+    });
     expect(
       container.querySelector(`[name="${NEW_VENDOR_FIELD}"]`),
     ).not.toBeNull();

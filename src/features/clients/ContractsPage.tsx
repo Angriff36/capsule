@@ -12,6 +12,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -247,16 +248,17 @@ export function ContractsPage() {
               </label>
               <label>
                 Client
-                <select name="clientId" required defaultValue="">
-                  <option value="" disabled>
-                    Select client
-                  </option>
-                  {activeClients.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {clientDisplayName(row._id, clients)}
-                    </option>
-                  ))}
-                </select>
+                <SearchSelect
+                  name="clientId"
+                  required
+                  defaultValue=""
+                  recentsKey="client"
+                  placeholder="Search clients…"
+                  options={activeClients.map((row) => ({
+                    id: row._id,
+                    label: clientDisplayName(row._id, clients),
+                  }))}
+                />
               </label>
               <label>
                 Title
