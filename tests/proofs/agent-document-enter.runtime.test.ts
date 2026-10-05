@@ -202,6 +202,6 @@ describe("runtime proof: agent document enter", () => {
         sourceText: SOURCE,
         approveUnresolvedAsNew: true,
       }),
-    ).rejects.toThrow(/Kitchen staff/i);
+    ).rejects.toThrow(/Kitchen, inventory and managers may/i);
   });
 });

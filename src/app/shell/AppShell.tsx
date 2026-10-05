@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
@@ -8,12 +8,16 @@ import { WorkingEventErrorBoundary } from "../../features/events/WorkingEventErr
 import { WorkingEventReports } from "../../features/home/WorkingEventReports";
 import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
+import { NewVersionBanner } from "./NewVersionBanner";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
 import { Sidebar } from "./Sidebar";
+import { SwitchedOffAreaGuard } from "./SwitchedOffAreaGuard";
 import { isBrowserRefreshChord, shouldFireSingleKeyNav } from "./singleKeyNav";
 import { Topbar } from "./Topbar";
+import { ListScrollCoordinator } from "../../features/list-state/ListScrollCoordinator";
+import { ListNavigationManager } from "../../features/list-state/ListNavigationManager";
 
 const onlineMonitor = new ShellOnlineMonitor();
 
@@ -34,6 +38,8 @@ export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const mainScrollRef = useRef<HTMLElement>(null);
+  const workspaceSheetRef = useRef<HTMLDivElement>(null);
   const online = useOnline();
 
   useEffect(() => {
@@ -79,17 +85,31 @@ export function AppShell() {
           {!online && (
             <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
               <WifiOffIcon width={13} height={13} />
-              Offline — showing the last synced data. Changes will fail until
-              the connection returns.
+              You're offline — showing what was last loaded. Changes won't save
+              until you're back online.
             </div>
           )}
+          <NewVersionBanner />
           <AnnouncementBanner />
           <ActionResultHost />
-          <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
-            <div className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3">
+          <main
+            ref={mainScrollRef}
+            className="app-canvas min-h-0 flex-1 overflow-y-auto"
+          >
+            <ListNavigationManager />
+            <ListScrollCoordinator
+              scrollRef={mainScrollRef}
+              contentRef={workspaceSheetRef}
+            />
+            <div
+              ref={workspaceSheetRef}
+              className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3"
+            >
               <PageGuide />
               <RouteErrorBoundary>
-                <Outlet />
+                <SwitchedOffAreaGuard>
+                  <Outlet />
+                </SwitchedOffAreaGuard>
               </RouteErrorBoundary>
             </div>
           </main>

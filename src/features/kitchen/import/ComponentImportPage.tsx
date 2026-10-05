@@ -6,9 +6,13 @@ import {
   useCreateComponentIngredient,
   useGetComponentImport,
   useListComponentImport,
+  useListComponent,
   useListComponentImportLine,
   useListIngredient,
+  useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
+import type { ServiceStyleOption } from "../stylePackaging";
+import { isRecipeSheet, recipeSheetSave } from "./RecipeSheetParser";
 import {
   useCreateComponentImportReview,
   useImportComponentSafely,
@@ -76,6 +80,9 @@ export function ComponentImportPage() {
   const importIdParam = searchParams.get("importId");
   const liveRef = useRef<HTMLDivElement>(null);
   const ingredients = useListIngredient();
+  const components = useListComponent();
+  const serviceStyles = useListServiceStyle() as
+    ServiceStyleOption[] | undefined;
   const allImports = useListComponentImport();
   const allImportLines = useListComponentImportLine();
   // Generated id queries throw on malformed ids, so an implausible ?importId
@@ -162,6 +169,14 @@ export function ComponentImportPage() {
           deletedAt: item.deletedAt as number | null | undefined,
         })),
     [ingredients],
+  );
+  const recipes = useMemo(
+    () =>
+      (components ?? [])
+        .filter((item) => item.deletedAt == null)
+        .map((item) => ({ id: String(item._id), name: String(item.name) }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [components],
   );
 
   const resumableImports = useMemo(
@@ -279,15 +294,38 @@ export function ComponentImportPage() {
           catalog,
           sheetFilename,
           linesFilename,
+          recipes,
         );
       } else if (readiness.kind === "text_file") {
         next = coordinator.parseTextFile(
           source,
           textFilename ?? "component.txt",
           catalog,
+          recipes,
         );
       } else {
-        next = coordinator.parseText(source, catalog, "pasted_text");
+        next = coordinator.parseText(
+          source,
+          catalog,
+          "pasted_text",
+          undefined,
+          recipes,
+        );
+      }
+      // The one-file recipe sheet says more than the review holds: list what
+      // else will be saved with the recipe so nothing is a surprise.
+      const sheetSave =
+        readiness.kind === "csv_bundle"
+          ? null
+          : recipeSheetSave(source, serviceStyles);
+      if (sheetSave) {
+        next = {
+          ...next,
+          warnings: [
+            ...next.warnings,
+            ...sheetSave.notes.map((note) => `Saved with the recipe: ${note}`),
+          ],
+        };
       }
       setReview(next);
       markClean();
@@ -463,7 +501,15 @@ export function ComponentImportPage() {
       });
       const scope = "component-import";
       const pending = beginPendingOperation(scope, current);
-      const saved = await finalizer.finalize(pending.payload, pending.key);
+      const sheet = recipeSheetSave(
+        current.rawSourceText ?? source,
+        serviceStyles,
+      )?.sheet;
+      const saved = await finalizer.finalize(
+        pending.payload,
+        pending.key,
+        sheet,
+      );
       confirmPendingOperation(scope);
       const outcome = componentImportOutcome({
         ...saved,
@@ -504,8 +550,8 @@ export function ComponentImportPage() {
           <p className="eyebrow">Culinary book · Import</p>
           <h1 className="display-title mt-2">Import recipe</h1>
           <p className="mt-3 max-w-150 text-ink-2">
-            Paste text or upload `.txt` / CSV exports, review ingredient
-            matches, then save the review and open the recipe.
+            Paste the recipe or upload a text or CSV file, check the ingredient
+            matches, then save and open the recipe.
           </p>
         </div>
         <div className="component-import-actions">
@@ -611,6 +657,11 @@ export function ComponentImportPage() {
                   status={
                     storedImport == null ? undefined : storedImport.status
                   }
+                  duplicateOutcome={
+                    storedImport == null
+                      ? undefined
+                      : (storedImport.duplicateOutcome ?? undefined)
+                  }
                 />
               ) : (
                 <ComponentImportSourcePane
@@ -635,6 +686,15 @@ export function ComponentImportPage() {
                     setSourceHint(null);
                   }}
                   onSheetChange={(value, filename) => {
+                    // The one-file recipe sheet needs no lines file.
+                    if (isRecipeSheet(value)) {
+                      setSource(value);
+                      setTextFilename(filename);
+                      setSheetCsv("");
+                      setSheetFilename(undefined);
+                      setSourceHint(null);
+                      return;
+                    }
                     setSheetCsv(value);
                     setSheetFilename(filename);
                     setSourceHint(null);
@@ -692,6 +752,7 @@ export function ComponentImportPage() {
                   review={review}
                   coordinator={coordinator}
                   catalog={catalog}
+                  recipes={recipes}
                   busy={busy}
                   unresolvedCount={unresolvedCount}
                   saveState={saveState}

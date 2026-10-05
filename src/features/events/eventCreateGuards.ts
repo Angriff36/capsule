@@ -4,6 +4,6 @@ export function eventCreateDisabledReason(input: {
   clientId: string;
 }): string | null {
   if (input.busy) return null;
-  if (!input.clientId.trim()) return "Client is required";
+  if (!input.clientId.trim()) return "Pick a client for this event.";
   return null;
 }

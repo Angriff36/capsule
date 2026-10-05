@@ -56,8 +56,8 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   // commands below carry the enforced copies. A file-only message (empty
   // body, attachmentCount > 0) exists only through the send seam.
   constraint staffMessageTarget: (self.recipientPersonId != null or self.eventId != null) and (self.recipientPersonId == null or self.eventId == null) "A message goes to exactly one place: a teammate or an event channel"
-  constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
-  constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
+  constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Add message text or a file."
+  constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "The sender and recipient can't be the same person."
 
   // A DM party is identified ONLY by Person — the caller's current linked
   // profile (the same rule the chat seam uses). The copied auth subjects are
@@ -96,7 +96,7 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     guard self.eventId == null or self.event != null
     guard self.recipientPersonId == null or self.recipient != null
     constraint sendTarget: (recipientPersonId != null or eventId != null) and (recipientPersonId == null or eventId == null) "Pick a teammate or an event channel, not both"
-    constraint sendBodyPresent: length(trim(body)) > 0 "Message text is required"
+    constraint sendBodyPresent: length(trim(body)) > 0 "Add message text."
     constraint sendDistinctParties: recipientPersonId == null or recipientPersonId != user.personId "You cannot message yourself"
     mutate senderPersonId = user.personId
     mutate senderAuthSubjectId = user.id
@@ -139,7 +139,7 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     guard user.id != null
     // The author is the current linked Person, never the copied sign-in.
     guard user.personId != null and self.senderPersonId == user.personId
-    constraint editBodyOrFiles: length(trim(body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
+    constraint editBodyOrFiles: length(trim(body)) > 0 or self.attachmentCount > 0 "Add message text or a file."
     mutate body = body
     // Omitting the mention list keeps the existing one (and its notifications).
     mutate mentionedPersonIds = mentionedPersonIds != null ? mentionedPersonIds : self.mentionedPersonIds
@@ -197,9 +197,9 @@ entity StaffChatReadCursor mixin TenantScoped {
   command open(channelKey: string, readUpTo: float) {
     guard user.id != null
     // Creation only — never re-point an existing cursor at another account.
-    guard self.authSubjectId == null "Cursors are opened once; use touch to move one"
-    constraint openChannelKey: length(trim(channelKey)) > 0 "Channel is required"
-    constraint openNotFuture: readUpTo <= now() "Read position cannot be in the future"
+    guard self.authSubjectId == null "This chat's read position is already set. It updates automatically after that."
+    constraint openChannelKey: length(trim(channelKey)) > 0 "Pick a channel."
+    constraint openNotFuture: readUpTo <= now() "You can't mark a chat read before now."
     mutate channelKey = channelKey
     mutate authSubjectId = user.id
     mutate lastReadAt = readUpTo
@@ -215,7 +215,7 @@ entity StaffChatReadCursor mixin TenantScoped {
   command touch(readUpTo: float) {
     guard user.id != null
     guard self.authSubjectId == user.id
-    constraint touchNotFuture: readUpTo <= now() "Read position cannot be in the future"
+    constraint touchNotFuture: readUpTo <= now() "You can't mark a chat read before now."
     mutate lastReadAt = readUpTo > self.lastReadAt ? readUpTo : self.lastReadAt
     emit StaffChatChannelRead {
       staffChatReadCursorId: self.id

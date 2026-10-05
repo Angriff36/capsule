@@ -3,7 +3,9 @@
     "wedding": "2026 Full Service Wedding Catering Book.pdf",
     "hors": "2026 Full Service Horsd'oeuvres Menu.pdf",
     "holiday": "Holiday Catering Book 2025.pdf",
-    "pizza": "2026 Wedding Pizza Book.pdf"
+    "pizza": "2026 Wedding Pizza Book.pdf",
+    "express": "2026 Limited Service Catering Book (Express Menu).pdf",
+    "wedding-express": "2026 Limited Service Wedding Catering Book (Wedding Express Menu).pdf"
   },
   "recipes": [
     {
@@ -2429,6 +2431,622 @@
       "book": "holiday",
       "page": 13,
       "course": "Beverage"
+    },
+    {
+      "id": "express-3-chefs-choice-hot-breakfast",
+      "name": "Chef’s Choice Hot Breakfast",
+      "description": "scrambled eggs, chef’s choice breakfast meat, fresh baked bread and pastries, breakfast potato, orange juice and bottled water.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-continental-breakfast",
+      "name": "Continental Breakfast",
+      "description": "freshly baked mini bagels, muffins and orange rolls, served with butter, cream cheese and fresh made jelly. Accompanied with fresh fruit and orange juice.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-breakfast-sandwich-platter",
+      "name": "Breakfast Sandwich Platter",
+      "description": "warm English muffin or buttermilk biscuit, sliced ham, bacon or sausage patty, cream cheese, egg and sliced Tillamook cheddar cheese.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-build-your-own-yogurt-parfait-bar",
+      "name": "Build-Your-Own Yogurt Parfait Bar",
+      "description": "strawberry and vanilla yogurts, fresh strawberries, blueberries and pecan-granola. Serves 10.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-veggie-breakfast-burrito",
+      "name": "Veggie Breakfast Burrito",
+      "description": "sautéed veggies, Monterey Jack cheese; 12-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-bacon-breakfast-burrito",
+      "name": "Bacon Breakfast Burrito",
+      "description": "hickory smoked bacon, Tillamook cheddar cheese; 12-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-chorizo-breakfast-burrito",
+      "name": "Chorizo Breakfast Burrito",
+      "description": "house made chorizo sausage, fire roasted green chilies, Monterey Jack cheese; 12-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-meat-lovers-breakfast-burrito",
+      "name": "Meat Lovers Breakfast Burrito",
+      "description": "bacon, ham, sausage and shredded Tillamook cheddar cheese; 12-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "express",
+      "page": 3,
+      "course": "Breakfast"
+    },
+    {
+      "id": "express-3-coffee-carafe",
+      "name": "Coffee Carafe",
+      "description": "serves 10; includes cups, creamer and sweeteners.",
+      "book": "express",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "express-3-bottled-tropicana-orange-juice",
+      "name": "Bottled Tropicana Orange Juice",
+      "description": "",
+      "book": "express",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "express-3-dasani-bottled-water",
+      "name": "Dasani Bottled Water",
+      "description": "",
+      "book": "express",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "express-4-spinach-cranberry-and-feta-salad",
+      "name": "Spinach, Cranberry and Feta Salad",
+      "description": "spinach, pine nuts, feta, croutons, dried cranberries, raspberry vinaigrette.",
+      "book": "express",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "express-4-chicken-caesar-salad",
+      "name": "Chicken Caesar Salad",
+      "description": "chopped romaine, grilled chicken, croutons, pine nuts, Parmesan and Caesar dressing.",
+      "book": "express",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "express-4-chopped-chef-salad",
+      "name": "Chopped Chef Salad",
+      "description": "ham, turkey, cheddar, bacon, croutons, tomato, red onions, cucumbers and hard-boiled egg, with your choice of one house made dressing.",
+      "book": "express",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "express-4-autumn-salad",
+      "name": "Autumn Salad",
+      "description": "romaine, grilled pears, Gorgonzola cheese, candied walnuts, cherry tomatoes, hickory-smoked bacon and red wine vinaigrette.",
+      "book": "express",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "express-4-charcuterie-platter",
+      "name": "Charcuterie Platter",
+      "description": "assorted Italian meats and cheeses with roasted peppers, assorted olives, artichoke hearts, grilled veggies and toasted artisan bread.",
+      "book": "express",
+      "page": 4,
+      "course": "Platter"
+    },
+    {
+      "id": "express-4-gourmet-cheese-platter",
+      "name": "Gourmet Cheese Platter",
+      "description": "local, imported and domestic cheese with fresh baked breads, crackers, berries and grapes.",
+      "book": "express",
+      "page": 4,
+      "course": "Platter"
+    },
+    {
+      "id": "express-4-fruit-and-veggie-platter",
+      "name": "Fruit and Veggie Platter",
+      "description": "seasonal selection; serves 10-12 guests.",
+      "book": "express",
+      "page": 4,
+      "course": "Platter"
+    },
+    {
+      "id": "express-4-chips-and-salsa-platter",
+      "name": "Chips and Salsa Platter",
+      "description": "hand cut tortilla chips and hand made fresh salsa.",
+      "book": "express",
+      "page": 4,
+      "course": "Platter"
+    },
+    {
+      "id": "express-4-assorted-croissant-sandwiches",
+      "name": "Assorted Croissant Sandwiches",
+      "description": "served on a fresh baked croissant topped with fresh veggies, with chef’s choice pasta salad, kettle chips, pickle spear and fresh baked goodies.",
+      "book": "express",
+      "page": 4,
+      "course": "Entree"
+    },
+    {
+      "id": "express-4-traditional-sandwich-platter",
+      "name": "Traditional Sandwich Platter",
+      "description": "oven roasted turkey breast, roast beef or ham with cheddar, Swiss and provolone cheese on assorted bakery fresh breads; veggies and condiments on the side.",
+      "book": "express",
+      "page": 4,
+      "course": "Entree"
+    },
+    {
+      "id": "express-4-deluxe-sandwich-platter",
+      "name": "Deluxe Sandwich Platter",
+      "description": "turkey bacon and avocado, tuna salad, chicken salad, club (roast beef, turkey, ham, bacon), Italian club (capicola, salami, pepperoni) or pastrami on assorted bakery breads; veggies and condiments on the side.",
+      "book": "express",
+      "page": 4,
+      "course": "Entree"
+    },
+    {
+      "id": "express-4-cold-wrap-platter",
+      "name": "Cold Wrap Platter",
+      "description": "flour, whole wheat or spinach tortillas: chicken Caesar, buffalo chicken, club, turkey, or spinach, feta, veggie and chicken bacon ranch. 10 wraps / 20 pieces.",
+      "book": "express",
+      "page": 4,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-idaho-baked-potato-bar",
+      "name": "Idaho Baked Potato Bar",
+      "description": "guest’s choice of toppings: seasoned ground beef, bean chili, warm nacho cheese, shredded cheese, hand made salsa, diced bacon, steamed broccoli, green onions and whipped butter.",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-green-salad",
+      "name": "Green Salad",
+      "description": "guest’s choice of dressing.",
+      "book": "express",
+      "page": 6,
+      "course": "Salad"
+    },
+    {
+      "id": "express-6-smoked-pulled-pork",
+      "name": "Smoked Pulled Pork",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-grilled-chicken",
+      "name": "Grilled Chicken",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-chicken-breast",
+      "name": "Chicken Breast",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-salmon",
+      "name": "Salmon",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-beef",
+      "name": "Beef",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-pork",
+      "name": "Pork",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "express-6-seasonal-salad",
+      "name": "Seasonal Salad",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Salad"
+    },
+    {
+      "id": "express-6-seasonal-vegetable",
+      "name": "Seasonal Vegetable",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Vegetable"
+    },
+    {
+      "id": "express-6-wild-rice-pilaf",
+      "name": "Wild Rice Pilaf",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Starch"
+    },
+    {
+      "id": "express-6-potato",
+      "name": "Potato",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Starch"
+    },
+    {
+      "id": "express-6-cous-cous",
+      "name": "Cous Cous",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Starch"
+    },
+    {
+      "id": "express-6-quinoa",
+      "name": "Quinoa",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Starch"
+    },
+    {
+      "id": "express-6-gourmet-mac-n-cheese",
+      "name": "Gourmet Mac n’ Cheese",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Starch"
+    },
+    {
+      "id": "express-6-whipped-mashed-potato",
+      "name": "Whipped Mashed Potato",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Starch"
+    },
+    {
+      "id": "express-6-baked-goodie",
+      "name": "Baked Goodie",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Dessert"
+    },
+    {
+      "id": "express-6-bottled-water",
+      "name": "Bottled Water",
+      "description": "",
+      "book": "express",
+      "page": 6,
+      "course": "Beverage"
+    },
+    {
+      "id": "express-7-red-potato-salad",
+      "name": "Red Potato Salad",
+      "description": "tender potato, diced celery, red onion and hard boiled egg mixed in our house made dressing.",
+      "book": "express",
+      "page": 7,
+      "course": "Side"
+    },
+    {
+      "id": "express-7-baked-beans",
+      "name": "Baked Beans",
+      "description": "slow roasted beans, simmered white onions, bacon, Dijon, brown sugar and apple cider vinegar.",
+      "book": "express",
+      "page": 7,
+      "course": "Side"
+    },
+    {
+      "id": "express-7-grilled-tri-tip",
+      "name": "Grilled Tri Tip",
+      "description": "",
+      "book": "express",
+      "page": 7,
+      "course": "Entree"
+    },
+    {
+      "id": "express-7-pulled-pork-sandwich",
+      "name": "Pulled Pork Sandwich",
+      "description": "slow roasted pulled pork served on a kaiser roll topped with apple cider slaw.",
+      "book": "express",
+      "page": 7,
+      "course": "Entree"
+    },
+    {
+      "id": "express-7-huckleberry-bbq-chicken",
+      "name": "Huckleberry BBQ Chicken",
+      "description": "brined and grilled chicken leg, thighs and breast.",
+      "book": "express",
+      "page": 7,
+      "course": "Entree"
+    },
+    {
+      "id": "express-7-bread-roll",
+      "name": "Bread Roll",
+      "description": "fresh baked roll served with a whipped honey-cinnamon butter.",
+      "book": "express",
+      "page": 7,
+      "course": "Bread"
+    },
+    {
+      "id": "express-8-basic-pasta-bar",
+      "name": "Basic Pasta Bar",
+      "description": "choose from penne, bowtie or spaghetti, with scratch-made Parmesan alfredo and pomodoro marinara sauces.",
+      "book": "express",
+      "page": 8,
+      "course": "Pasta"
+    },
+    {
+      "id": "express-8-5-layer-lasagna",
+      "name": "5 Layer Lasagna",
+      "description": "filled with meat ragu, creamy white sauce and our house made cheese blend, topped with melted mozzarella.",
+      "book": "express",
+      "page": 8,
+      "course": "Pasta"
+    },
+    {
+      "id": "express-8-baked-ziti",
+      "name": "Baked Ziti",
+      "description": "hearty meat sauce (beef and pork) tossed with ziti, finished in the oven with our house blend of cheese and Italian herbs.",
+      "book": "express",
+      "page": 8,
+      "course": "Pasta"
+    },
+    {
+      "id": "express-8-caesar-salad",
+      "name": "Caesar Salad",
+      "description": "romaine, house made Caesar dressing, herb croutons and imported Parmesan cheese.",
+      "book": "express",
+      "page": 8,
+      "course": "Salad"
+    },
+    {
+      "id": "express-8-garlic-parmesan-rolls",
+      "name": "Garlic Parmesan Rolls",
+      "description": "",
+      "book": "express",
+      "page": 8,
+      "course": "Bread"
+    },
+    {
+      "id": "express-9-corn",
+      "name": "Corn",
+      "description": "steamed and finished with butter.",
+      "book": "express",
+      "page": 9,
+      "course": "Vegetable"
+    },
+    {
+      "id": "express-9-house-salad",
+      "name": "House Salad",
+      "description": "chopped romaine, diced tomato, cucumber, red onion, garlic-herb crouton and cheese.",
+      "book": "express",
+      "page": 9,
+      "course": "Salad"
+    },
+    {
+      "id": "express-9-fresh-baked-roll",
+      "name": "Fresh Baked Roll",
+      "description": "",
+      "book": "express",
+      "page": 9,
+      "course": "Bread"
+    },
+    {
+      "id": "express-9-oven-roasted-turkey-breast",
+      "name": "Oven Roasted Turkey Breast",
+      "description": "",
+      "book": "express",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "express-9-mashed-potatoes",
+      "name": "Mashed Potatoes",
+      "description": "Yukon Gold potatoes served with scratch-made gravy.",
+      "book": "express",
+      "page": 9,
+      "course": "Starch"
+    },
+    {
+      "id": "express-9-house-made-stuffing",
+      "name": "House Made Stuffing",
+      "description": "diced bread, slow-roasted onions, carrots and celery.",
+      "book": "express",
+      "page": 9,
+      "course": "Side"
+    },
+    {
+      "id": "express-9-apple-cider-glazed-chicken",
+      "name": "Apple Cider Glazed Chicken",
+      "description": "tender chicken simmered in Dijon and apple cider vinegar, garnished with roasted pecans.",
+      "book": "express",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "express-9-glazed-ham",
+      "name": "Glazed Ham",
+      "description": "finished with brown sugar-honey glaze.",
+      "book": "express",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "express-9-cheesy-pasta",
+      "name": "Cheesy Pasta",
+      "description": "elbow pasta simmered in creamy cheese sauce.",
+      "book": "express",
+      "page": 9,
+      "course": "Starch"
+    },
+    {
+      "id": "express-10-taco-bar",
+      "name": "Taco Bar",
+      "description": "warm flour tortillas with your choice of shredded pork, shredded chicken or seasoned ground beef. Toppings: shredded cheese, sour cream, red salsa, shredded lettuce and pico de gallo.",
+      "book": "express",
+      "page": 10,
+      "course": "Entree"
+    },
+    {
+      "id": "express-10-enchiladas",
+      "name": "Enchiladas",
+      "description": "filled with your choice of cheese, shredded pork, beef or chicken, rolled in our house made green sauce, topped with Monterey Jack cheese. Served with sour cream.",
+      "book": "express",
+      "page": 10,
+      "course": "Entree"
+    },
+    {
+      "id": "express-10-mexican-grill-bar",
+      "name": "Mexican Grill Bar",
+      "description": "premium option: street tacos or burritos with carne asada, pollo asado or carnitas. Toppings: pico de gallo, sour cream, hand made red and green salsa, cotija cheese, cilantro and onions.",
+      "book": "express",
+      "page": 10,
+      "course": "Entree"
+    },
+    {
+      "id": "express-10-cilantro-lime-rice",
+      "name": "Cilantro Lime Rice",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Side"
+    },
+    {
+      "id": "express-10-mexican-rice",
+      "name": "Mexican Rice",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Side"
+    },
+    {
+      "id": "express-10-brown-rice",
+      "name": "Brown Rice",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Side"
+    },
+    {
+      "id": "express-10-black-beans",
+      "name": "Black Beans",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Side"
+    },
+    {
+      "id": "express-10-pinto-beans",
+      "name": "Pinto Beans",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Side"
+    },
+    {
+      "id": "express-10-refried-beans",
+      "name": "Refried Beans",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Side"
+    },
+    {
+      "id": "express-10-chips-salsa-and-guacamole",
+      "name": "Chips, Salsa and Guacamole",
+      "description": "",
+      "book": "express",
+      "page": 10,
+      "course": "Accompaniments"
+    },
+    {
+      "id": "wedding-express-7-mexican-grill-bar",
+      "name": "Mexican Grill Bar",
+      "description": "choose a burrito, bowl or street tacos filled with carne asada, pollo asado or carnitas. Toppings: pico de gallo, sour cream, hand made red and green salsa, cotija cheese, cilantro and onions.",
+      "book": "wedding-express",
+      "page": 7,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-express-9-mini-quiche-breakfast-platter",
+      "name": "Mini Quiche Breakfast Platter",
+      "description": "8 Denver, 8 bacon and cheese, and 8 veggie quiche.",
+      "book": "wedding-express",
+      "page": 9,
+      "course": "Breakfast"
+    },
+    {
+      "id": "wedding-express-9-veggie-breakfast-burrito",
+      "name": "Veggie Breakfast Burrito",
+      "description": "sautéed veggies, Monterey Jack cheese; 14-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "wedding-express",
+      "page": 9,
+      "course": "Breakfast"
+    },
+    {
+      "id": "wedding-express-9-bacon-breakfast-burrito",
+      "name": "Bacon Breakfast Burrito",
+      "description": "hickory smoked bacon, Tillamook cheddar cheese; 14-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "wedding-express",
+      "page": 9,
+      "course": "Breakfast"
+    },
+    {
+      "id": "wedding-express-9-chorizo-breakfast-burrito",
+      "name": "Chorizo Breakfast Burrito",
+      "description": "house made chorizo sausage, fire roasted green chilies, Monterey Jack cheese; 14-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "wedding-express",
+      "page": 9,
+      "course": "Breakfast"
+    },
+    {
+      "id": "wedding-express-9-meat-lovers-breakfast-burrito",
+      "name": "Meat Lovers Breakfast Burrito",
+      "description": "bacon, ham, sausage and shredded Tillamook cheddar cheese; 14-inch flour or whole wheat tortilla, roasted red potato hash and eggs, served with salsa and sour cream packets.",
+      "book": "wedding-express",
+      "page": 9,
+      "course": "Breakfast"
     }
   ],
   "packages": [
@@ -4415,6 +5033,789 @@
         }
       ],
       "notes": "Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional."
+    },
+    {
+      "id": "express-breakfast",
+      "name": "Breakfast",
+      "book": "express",
+      "page": 3,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose breakfast",
+          "recipeIds": [
+            "express-3-chefs-choice-hot-breakfast",
+            "express-3-continental-breakfast",
+            "express-3-breakfast-sandwich-platter",
+            "express-3-build-your-own-yogurt-parfait-bar",
+            "express-3-veggie-breakfast-burrito",
+            "express-3-bacon-breakfast-burrito",
+            "express-3-chorizo-breakfast-burrito",
+            "express-3-meat-lovers-breakfast-burrito"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Add drinks",
+          "recipeIds": [
+            "express-3-coffee-carafe",
+            "express-3-bottled-tropicana-orange-juice",
+            "express-3-dasani-bottled-water"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Grande breakfast burritos: choose a flour or whole wheat tortilla. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-cold-lunch-salads",
+      "name": "Cold Lunch Salads",
+      "book": "express",
+      "page": 4,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose salads",
+          "recipeIds": [
+            "express-4-spinach-cranberry-and-feta-salad",
+            "express-4-chicken-caesar-salad",
+            "express-4-chopped-chef-salad",
+            "express-4-autumn-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        }
+      ],
+      "notes": "Salads serve 10-12 guests. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-platters",
+      "name": "Platters",
+      "book": "express",
+      "page": 4,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose platters",
+          "recipeIds": [
+            "express-4-charcuterie-platter",
+            "express-4-gourmet-cheese-platter",
+            "express-4-fruit-and-veggie-platter",
+            "express-4-chips-and-salsa-platter"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-deli-menu",
+      "name": "Deli Menu",
+      "book": "express",
+      "page": 4,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose sandwiches or wraps",
+          "recipeIds": [
+            "express-4-assorted-croissant-sandwiches",
+            "express-4-traditional-sandwich-platter",
+            "express-4-deluxe-sandwich-platter",
+            "express-4-cold-wrap-platter"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        }
+      ],
+      "notes": "Make it a deluxe boxed lunch with a deli spear pickle, fresh baked goodie, chips and a soda for an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-idaho-baked-potato-bar",
+      "name": "Idaho Baked Potato Bar",
+      "book": "express",
+      "page": 6,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Potato bar",
+          "recipeIds": [
+            "express-6-idaho-baked-potato-bar",
+            "express-6-green-salad"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancements",
+          "recipeIds": [
+            "express-6-smoked-pulled-pork",
+            "express-6-grilled-chicken"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Enhancements are an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-chefs-choice-hot-lunch-or-dinner",
+      "name": "Chef’s Choice Hot Lunch or Dinner",
+      "book": "express",
+      "page": 6,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Premium protein (chef’s choice)",
+          "recipeIds": [
+            "express-6-chicken-breast",
+            "express-6-salmon",
+            "express-6-beef",
+            "express-6-pork"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Seasonal salad and vegetable",
+          "recipeIds": [
+            "express-6-seasonal-salad",
+            "express-6-seasonal-vegetable"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Hand-crafted starch (chef’s choice)",
+          "recipeIds": [
+            "express-6-wild-rice-pilaf",
+            "express-6-potato",
+            "express-6-cous-cous",
+            "express-6-quinoa",
+            "express-6-gourmet-mac-n-cheese",
+            "express-6-whipped-mashed-potato"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Dessert and water",
+          "recipeIds": ["express-6-baked-goodie", "express-6-bottled-water"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Chef chooses the protein, sides and dessert. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-bbq-menu-pulled-pork",
+      "name": "BBQ Menu - Pulled Pork",
+      "book": "express",
+      "page": 7,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Entree",
+          "recipeIds": ["express-7-pulled-pork-sandwich"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": ["express-7-red-potato-salad", "express-7-baked-beans"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancement",
+          "recipeIds": ["express-7-grilled-tri-tip"],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Grilled tri tip is an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-bbq-menu-huckleberry-bbq-chicken",
+      "name": "BBQ Menu - Huckleberry BBQ Chicken",
+      "book": "express",
+      "page": 7,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Entree",
+          "recipeIds": ["express-7-huckleberry-bbq-chicken"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": ["express-7-red-potato-salad", "express-7-baked-beans"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Bread",
+          "recipeIds": ["express-7-bread-roll"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancement",
+          "recipeIds": ["express-7-grilled-tri-tip"],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Grilled tri tip is an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-italian-menu",
+      "name": "Italian Menu",
+      "book": "express",
+      "page": 8,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one main",
+          "recipeIds": [
+            "express-8-basic-pasta-bar",
+            "express-8-5-layer-lasagna",
+            "express-8-baked-ziti"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Salad and bread",
+          "recipeIds": [
+            "express-8-caesar-salad",
+            "express-8-garlic-parmesan-rolls"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-traditional-menu-turkey",
+      "name": "Traditional Menu - Turkey",
+      "book": "express",
+      "page": 9,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Option 1",
+          "recipeIds": [
+            "express-9-oven-roasted-turkey-breast",
+            "express-9-mashed-potatoes",
+            "express-9-house-made-stuffing"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Included with every option",
+          "recipeIds": [
+            "express-9-corn",
+            "express-9-house-salad",
+            "express-9-fresh-baked-roll"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-traditional-menu-apple-cider-glazed-chicken",
+      "name": "Traditional Menu - Apple Cider Glazed Chicken",
+      "book": "express",
+      "page": 9,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Option 2",
+          "recipeIds": ["express-9-apple-cider-glazed-chicken"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Included with every option",
+          "recipeIds": [
+            "express-9-corn",
+            "express-9-house-salad",
+            "express-9-fresh-baked-roll"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-traditional-menu-glazed-ham",
+      "name": "Traditional Menu - Glazed Ham",
+      "book": "express",
+      "page": 9,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Option 3",
+          "recipeIds": ["express-9-glazed-ham", "express-9-cheesy-pasta"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Included with every option",
+          "recipeIds": [
+            "express-9-corn",
+            "express-9-house-salad",
+            "express-9-fresh-baked-roll"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "express-mexican-menu",
+      "name": "Mexican Menu",
+      "book": "express",
+      "page": 10,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one option",
+          "recipeIds": [
+            "express-10-taco-bar",
+            "express-10-enchiladas",
+            "express-10-mexican-grill-bar"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Choose rice",
+          "recipeIds": [
+            "express-10-cilantro-lime-rice",
+            "express-10-mexican-rice",
+            "express-10-brown-rice"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose beans",
+          "recipeIds": [
+            "express-10-black-beans",
+            "express-10-pinto-beans",
+            "express-10-refried-beans"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Optional add-on",
+          "recipeIds": ["express-10-chips-salsa-and-guacamole"],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Chips, salsa and guacamole are an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-bbq-menu-pulled-pork",
+      "name": "BBQ Menu - Pulled Pork",
+      "book": "wedding-express",
+      "page": 3,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Entree",
+          "recipeIds": ["express-7-pulled-pork-sandwich"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": ["express-7-red-potato-salad", "express-7-baked-beans"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancement",
+          "recipeIds": ["express-7-grilled-tri-tip"],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Grilled tri tip is an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-bbq-menu-huckleberry-bbq-chicken",
+      "name": "BBQ Menu - Huckleberry BBQ Chicken",
+      "book": "wedding-express",
+      "page": 3,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Entree",
+          "recipeIds": ["express-7-huckleberry-bbq-chicken"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": ["express-7-red-potato-salad", "express-7-baked-beans"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Bread",
+          "recipeIds": ["express-7-bread-roll"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancement",
+          "recipeIds": ["express-7-grilled-tri-tip"],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Grilled tri tip is an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-italian-menu",
+      "name": "Italian Menu",
+      "book": "wedding-express",
+      "page": 4,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one main",
+          "recipeIds": [
+            "express-8-basic-pasta-bar",
+            "express-8-5-layer-lasagna",
+            "express-8-baked-ziti"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Salad and bread",
+          "recipeIds": [
+            "express-8-caesar-salad",
+            "express-8-garlic-parmesan-rolls"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-traditional-menu-turkey",
+      "name": "Traditional Menu - Turkey",
+      "book": "wedding-express",
+      "page": 6,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Option 1",
+          "recipeIds": [
+            "express-9-oven-roasted-turkey-breast",
+            "express-9-mashed-potatoes",
+            "express-9-house-made-stuffing"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Included with every option",
+          "recipeIds": [
+            "express-9-corn",
+            "express-9-house-salad",
+            "express-9-fresh-baked-roll"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-traditional-menu-apple-cider-glazed-chicken",
+      "name": "Traditional Menu - Apple Cider Glazed Chicken",
+      "book": "wedding-express",
+      "page": 6,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Option 2",
+          "recipeIds": ["express-9-apple-cider-glazed-chicken"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Included with every option",
+          "recipeIds": [
+            "express-9-corn",
+            "express-9-house-salad",
+            "express-9-fresh-baked-roll"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-traditional-menu-glazed-ham",
+      "name": "Traditional Menu - Glazed Ham",
+      "book": "wedding-express",
+      "page": 6,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Option 3",
+          "recipeIds": ["express-9-glazed-ham", "express-9-cheesy-pasta"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Included with every option",
+          "recipeIds": [
+            "express-9-corn",
+            "express-9-house-salad",
+            "express-9-fresh-baked-roll"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-idaho-baked-potato-bar",
+      "name": "Idaho Baked Potato Bar",
+      "book": "wedding-express",
+      "page": 8,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Potato bar",
+          "recipeIds": [
+            "express-6-idaho-baked-potato-bar",
+            "express-6-green-salad"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancements",
+          "recipeIds": [
+            "express-6-smoked-pulled-pork",
+            "express-6-grilled-chicken"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Enhancements are an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-chefs-choice-hot-lunch-or-dinner",
+      "name": "Chef’s Choice Hot Lunch or Dinner",
+      "book": "wedding-express",
+      "page": 8,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Premium protein (chef’s choice)",
+          "recipeIds": [
+            "express-6-chicken-breast",
+            "express-6-salmon",
+            "express-6-beef",
+            "express-6-pork"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Seasonal salad and vegetable",
+          "recipeIds": [
+            "express-6-seasonal-salad",
+            "express-6-seasonal-vegetable"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Hand-crafted starch (chef’s choice)",
+          "recipeIds": [
+            "express-6-wild-rice-pilaf",
+            "express-6-potato",
+            "express-6-cous-cous",
+            "express-6-quinoa",
+            "express-6-gourmet-mac-n-cheese",
+            "express-6-whipped-mashed-potato"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Dessert and water",
+          "recipeIds": ["express-6-baked-goodie", "express-6-bottled-water"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Chef chooses the protein, sides and dessert. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-mexican-menu",
+      "name": "Mexican Menu",
+      "book": "wedding-express",
+      "page": 7,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one option",
+          "recipeIds": [
+            "express-10-taco-bar",
+            "express-10-enchiladas",
+            "wedding-express-7-mexican-grill-bar"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Choose rice",
+          "recipeIds": [
+            "express-10-cilantro-lime-rice",
+            "express-10-mexican-rice",
+            "express-10-brown-rice"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose beans",
+          "recipeIds": [
+            "express-10-black-beans",
+            "express-10-pinto-beans",
+            "express-10-refried-beans"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Optional add-on",
+          "recipeIds": ["express-10-chips-salsa-and-guacamole"],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Chips, salsa and guacamole are an additional cost. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
+    },
+    {
+      "id": "wedding-express-post-wedding-brunch",
+      "name": "Post-Wedding Brunch",
+      "book": "wedding-express",
+      "page": 9,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose breakfast",
+          "recipeIds": [
+            "express-3-chefs-choice-hot-breakfast",
+            "express-3-continental-breakfast",
+            "express-3-build-your-own-yogurt-parfait-bar",
+            "express-3-breakfast-sandwich-platter",
+            "wedding-express-9-mini-quiche-breakfast-platter",
+            "wedding-express-9-veggie-breakfast-burrito",
+            "wedding-express-9-bacon-breakfast-burrito",
+            "wedding-express-9-chorizo-breakfast-burrito",
+            "wedding-express-9-meat-lovers-breakfast-burrito"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Add drinks",
+          "recipeIds": [
+            "express-3-coffee-carafe",
+            "express-3-bottled-tropicana-orange-juice",
+            "express-3-dasani-bottled-water"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Grande breakfast burritos: choose a flour or whole wheat tortilla. Coffee carafe $24 (serves 10), bottled orange juice $3, bottled water $2. Drop Off: delivery, set up and disposable serving utensils, plates, cutlery and napkins. Limited Service: buffet set up and take down, staff, linens, chafing dishes and disposable place settings. Drop Off is best for bridal showers, small rehearsal dinners and post-wedding brunch; Limited Service for small, casual weddings and rehearsal dinners. 12 guest minimum; individually boxed menus available. 21% service charge and local sales tax are additional; Limited Service also adds a staffing fee."
     }
   ]
 }

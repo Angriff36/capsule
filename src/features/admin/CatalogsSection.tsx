@@ -88,7 +88,7 @@ export function CatalogsSection({
     const name = String(data.get("name") ?? "").trim();
     const code = String(data.get("code") ?? "").trim();
     if (!name || !code) {
-      setError("Name and code are required.");
+      setError(`Give this ${singular} a name and a code.`);
       return;
     }
     const sortRaw = String(data.get("sortOrder") ?? "").trim();
@@ -111,12 +111,19 @@ export function CatalogsSection({
         sorted.reduce((max, row) => Math.max(max, row.sortOrder ?? 0), -1) + 1;
       let added = 0;
       for (const [index, row] of missing.entries()) {
-        await commands.register({
-          name: row.name,
-          code: row.code,
-          sortOrder: nextOrder + index,
-          description: row.description,
-        });
+        try {
+          await commands.register({
+            name: row.name,
+            code: row.code,
+            sortOrder: nextOrder + index,
+            description: row.description,
+          });
+        } catch (cause) {
+          const reason = cause instanceof Error ? cause.message : "";
+          throw new Error(
+            `Added ${added} of ${missing.length}; ${row.name} could not be added. Press the button again to add the rest. ${reason}`.trim(),
+          );
+        }
         added += 1;
       }
       setNotice(
@@ -130,7 +137,7 @@ export function CatalogsSection({
       const values = await prompt.askFields({
         title: `Rename ${row.name}`,
         description:
-          "The label people see. Existing records keep their link to this row.",
+          "The label people see. Anything already saved stays linked to this row.",
         fields: [
           {
             name: "name",
@@ -297,13 +304,9 @@ export function CatalogsSection({
                       #{row.sortOrder ?? 0}
                     </span>
                     {active ? (
-                      <span className="chip border-ok/30 bg-ok-soft text-ok">
-                        Active
-                      </span>
+                      <span className="chip chip-tone-ok">Active</span>
                     ) : (
-                      <span className="chip border-line-2 bg-inset text-ink-3">
-                        Retired
-                      </span>
+                      <span className="chip chip-tone-mute">Retired</span>
                     )}
                   </p>
                   {row.description ? (

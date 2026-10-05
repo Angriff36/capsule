@@ -1,0 +1,23 @@
+{
+  "acceptance": "AC-331",
+  "at": "2026-10-03T05:14:30.893Z",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "browserRun": "scripts/loop-browser-check.mjs .artifacts/browser-checks/ac331-staffing.mjs, signed in, 360x740 and 1280x800, all steps PASS",
+  "base": "UX-01, catering staffing app, 360px phone width. Audience: event managers staffing events, and servers checking their own work. Judge only this screen's own job. FAIL only on clipped or overlapping text that hides meaning, broken layout, raw codes or jargon, or no clear next action for this screen's job. A tab strip that scrolls sideways is the app's normal pattern and is fine.",
+  "results": {
+    "phone-02-roster.png": {
+      "job": "Manager roster. Job: see which spots are still open and which people are double booked, and act on an open spot.",
+      "pass": true
+    },
+    "phone-03-fill-target.png": {
+      "job": "One event's staffing tab. Job: see how many are booked and how many shifts are open, and add or suggest staff.",
+      "pass": true
+    },
+    "phone-09-my-day.png": {
+      "job": "A server's My Day (full page). Job: see my next shift with call time and place, clock in, and find open shifts.",
+      "pass": true
+    }
+  },
+  "earlierRound": "A first judge pass with one shared rule list for all screens failed the roster because open spots had no action. Fixed: each open spot now has a 'Fill this spot' link to that event's staffing tab."
+}

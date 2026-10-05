@@ -20,10 +20,10 @@ import type { Id } from "../../../lib/api";
 import { useAttachPacketSources } from "../../../lib/eventPacket/useEventPacket";
 import type { EventBundle } from "../../../lib/tppReports/eventBundle";
 import {
-  useListEvent,
   useListInvoice,
   useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
+import { useAllEventReportRows } from "../../facilities/useEventsById";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { useEventImportCommandExecutor } from "./useEventImportCommandExecutor";
@@ -64,7 +64,9 @@ export function useEventImportRunner(input: {
   const commands = useEventImportCommandExecutor();
   const tenantId = useAuthStatus()?.tenantId ?? null;
   const serviceStyleRows = useListServiceStyle();
-  const eventRows = useListEvent();
+  // Light rows of every live event, read in pages (PL-SCALE): the match
+  // below needs only number, client, title, date and stage.
+  const eventRows = useAllEventReportRows();
   const invoiceRows = useListInvoice();
   const attachPacketSources = useAttachPacketSources();
   const loadExistingRows = useLoadExistingEventRows();

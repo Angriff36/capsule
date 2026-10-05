@@ -29,7 +29,9 @@ import {
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import { RunAlertLoopLedger } from "./lib/runOfShowAlertLoop";
 import { live, tenantPerson } from "./lib/teamChatRead";
+import { recordPushFailures } from "./pushDeviceHealth";
 import type { PushPayload, PushTarget } from "./teamChatPush";
+import { insertStepEvent } from "./lib/commandAudit";
 
 const SENT_ENTITY = "RunAlert";
 const SCAN_INTERVAL_MS = 60_000;
@@ -340,6 +342,8 @@ export const recordRunPushResults = internalMutation({
     gone: v.array(
       v.object({ id: v.id("pushSubscriptions"), version: v.number() }),
     ),
+    // Devices the push service refused for another reason; kept for managers.
+    failed: v.optional(v.array(v.id("pushSubscriptions"))),
     now: v.number(),
   },
   handler: async (ctx, args) => {
@@ -347,6 +351,7 @@ export const recordRunPushResults = internalMutation({
       const row = await ctx.db.get(id);
       if (row && live(row)) await ctx.db.patch(id, { lastUsedAt: args.now });
     }
+    await recordPushFailures(ctx, args.failed ?? [], args.now);
     // 404/410 from the push service: the browser dropped the subscription.
     // Prune only the exact row version the delivery held.
     for (const { id, version } of args.gone) {
@@ -363,7 +368,7 @@ export const recordRunPushResults = internalMutation({
     // full soft failure (network, 5xx on every target) must stay unsent so
     // the next scan retries it inside the fire window.
     if (args.used.length > 0) {
-      await ctx.db.insert("manifestEvents", {
+      await insertStepEvent(ctx, {
         type: "RunAlertSent",
         entity: SENT_ENTITY,
         entityId: args.alertKey.activityId,

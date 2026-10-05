@@ -1,6 +1,26 @@
 export type CommandFailureCategory =
   "denied" | "validation" | "guard_blocked" | "conflict" | "unexpected";
 
+/**
+ * Stable failure code (backend end-state spec BE-18.3). Read from the same
+ * generated/authored error text the banner uses; it is not a second error
+ * envelope. A refused other-company record and a missing one share
+ * NOT_FOUND_OR_FORBIDDEN so the code never tells a caller which it was.
+ */
+export type CommandFailureCode =
+  | "NOT_FOUND_OR_FORBIDDEN"
+  | "STALE_VERSION"
+  | "INVALID_STATE"
+  | "VALIDATION_FAILED"
+  | "MISSING_REQUIRED_FACT"
+  | "UNIT_CONVERSION_UNRESOLVED"
+  | "INSUFFICIENT_STOCK"
+  | "SCHEDULE_CONFLICT"
+  | "PROVIDER_RETRYING"
+  | "PROVIDER_ACTION_REQUIRED"
+  | "RECONCILIATION_REQUIRED"
+  | "UNEXPECTED";
+
 /** A corrective step the user can take directly from the failure banner. */
 export interface CommandFailureAction {
   label: string;
@@ -10,6 +30,7 @@ export interface CommandFailureAction {
 
 export interface CommandFailure {
   category: CommandFailureCategory;
+  code: CommandFailureCode;
   title: string;
   detail: string;
   action?: CommandFailureAction;
@@ -31,7 +52,9 @@ function humanizeState(token: string): string {
  * allowed. Allowed from 'A': ['B', 'C']  (placeholder tokens - the real
  * stage names come from the generated guard message at runtime)
  */
-function stateTransitionFailure(detail: string): CommandFailure | null {
+function stateTransitionFailure(
+  detail: string,
+): Omit<CommandFailure, "code"> | null {
   const match = detail.match(
     /Invalid state transition for '[^']+':\s*'([^']+)'\s*->\s*'([^']+)'[^.]*\.\s*Allowed from '[^']+':\s*\[([^\]]*)\]/i,
   );
@@ -79,8 +102,10 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
   const operation = raw.match(/mutations:([A-Za-z0-9_]+)/)?.[1];
   const requestId = raw.match(/\[Request ID:\s*([^\]]+)\]/i)?.[1];
   // WebCrypto failures arrive as OperationError, not Error — must not drop them.
+  // [ \t]* not \s*: an empty server message must stay empty, not borrow the
+  // first stack line below it.
   const uncaught = raw.match(
-    /Uncaught (?:DOMException|OperationError|Error):\s*([^\r\n]+)/i,
+    /Uncaught (?:DOMException|OperationError|Error):[ \t]*([^\r\n]*)/i,
   )?.[1];
   const argumentValidation = raw.match(
     /ArgumentValidationError:\s*([^\r\n]+)/i,
@@ -88,13 +113,18 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
   const schemaValidation = raw.match(
     /(?:DocumentDoesNotMatchSchema|does not match the schema):\s*([^\r\n]+)/i,
   )?.[1];
-  const detail = (uncaught ?? argumentValidation ?? schemaValidation ?? raw)
+  const detail = (
+    (uncaught?.trim() ? uncaught : undefined) ??
+    argumentValidation ??
+    schemaValidation ??
+    (uncaught !== undefined ? "" : raw)
+  )
     .replace(/^\[CONVEX [^\]]+\]\s*/, "")
     .replace(/\[Request ID:\s*[^\]]+\]\s*/gi, "")
     .replace(/^Server Error\s*/i, "")
     .replace(/^Uncaught (?:DOMException|OperationError|Error):\s*/i, "")
     .replace(/^Error:\s*/i, "")
-    .replace(/\s+Called by client\s*$/i, "")
+    .replace(/\s*Called by client\s*$/i, "")
     .trim();
   return { detail, operation, requestId };
 }
@@ -117,7 +147,89 @@ function isZodError(
   );
 }
 
+const DENIED_TEXT =
+  /staff may|permission|not allowed|policy|\bonly an? [^.]{0,60}\bmay\b|\bmay (see|update|change|create|add|remove|record|run|correct|reconcile|view|use|approve|manage)\b|sign in/i;
+
+/** The spec code for a failure, read from its category and server text. */
+function failureCode(
+  category: CommandFailureCategory,
+  detail: string,
+): CommandFailureCode {
+  if (/ConcurrencyConflict|VERSION_MISMATCH/i.test(detail))
+    return "STALE_VERSION";
+  if (
+    category === "denied" ||
+    /\bnot found\b|No tenant|authentication context|not authenticated/i.test(
+      detail,
+    ) ||
+    DENIED_TEXT.test(detail)
+  )
+    return "NOT_FOUND_OR_FORBIDDEN";
+  if (
+    /not enough (free )?stock|short (by|of) \d|only \d+ (left|free)/i.test(
+      detail,
+    )
+  )
+    return "INSUFFICIENT_STOCK";
+  if (
+    /already out for|is already (out|on|working|booked|assigned)\b|in the shop|out of service|on leave|same time|overlap/i.test(
+      detail,
+    )
+  )
+    return "SCHEDULE_CONFLICT";
+  if (
+    /doesn't convert|does not convert|no conversion|unit (differs|mapping)|unit from the container/i.test(
+      detail,
+    )
+  )
+    return "UNIT_CONVERSION_UNRESOLVED";
+  if (/rate limit|retry after|will try again|trying again/i.test(detail))
+    return "PROVIDER_RETRYING";
+  if (
+    /reconnect|is missing on this deployment|provider (turned|did not|rejected|declined)|signing secret/i.test(
+      detail,
+    )
+  )
+    return "PROVIDER_ACTION_REQUIRED";
+  if (
+    /^reconcile\b|\breconcile [^.]{0,60}\bbefore\b|until reviewed|review (it|this|them) first|sort (those|that|it|them) out first/i.test(
+      detail,
+    )
+  )
+    return "RECONCILIATION_REQUIRED";
+  if (category === "guard_blocked") return "INVALID_STATE";
+  if (
+    /\bis missing\b|\bmissing\b|\bfirst\.?$|\bneeds? (a|an|the|its) /i.test(
+      detail,
+    )
+  )
+    return "MISSING_REQUIRED_FACT";
+  if (
+    category === "validation" ||
+    /Validator error|ArgumentValidationError/i.test(detail)
+  )
+    return "VALIDATION_FAILED";
+  return "UNEXPECTED";
+}
+
+function rootCause(error: unknown): unknown {
+  return typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    error.name === "BulkRunFailure" &&
+    "cause" in error
+    ? rootCause(error.cause)
+    : error;
+}
+
 export function classifyCommandFailure(error: unknown): CommandFailure {
+  const failure = classifyWithoutCode(error);
+  const cause = rootCause(error);
+  const detail = isZodError(cause) ? "" : normalizeCommandError(cause).detail;
+  return { ...failure, code: failureCode(failure.category, detail) };
+}
+
+function classifyWithoutCode(error: unknown): Omit<CommandFailure, "code"> {
   const bulk =
     typeof error === "object" &&
     error !== null &&
@@ -174,9 +286,9 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
   if (/No tenant|authentication context|not authenticated/i.test(detail)) {
     return {
       category: "denied",
-      title: "Workspace access required",
+      title: "Sign in again",
       detail:
-        "Your session does not include the workspace access this action requires.",
+        "We couldn't tell which workspace you're in. Sign out, sign back in, then try again.",
     };
   }
   if (
@@ -186,7 +298,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
   ) {
     return {
       category: "unexpected",
-      title: "Secure field storage failed",
+      title: "Contact details couldn't be read",
       detail: requestId
         ? `Contact and address details could not be read (ask the office with this code: ${requestId}). Refresh once. If it happens again, ask the office to check Capsule's secure storage.`
         : "Contact and address details could not be read. Refresh once. If it happens again, ask the office to check Capsule's secure storage.",
@@ -206,18 +318,46 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
     return {
       category: "guard_blocked",
       title: `${subject[0]?.toUpperCase() ?? "R"}${subject.slice(1)} wasn't created`,
-      detail: `The ${subject} could not be created because one of its requirements was not met. Nothing was saved.${requestId ? ` Request ID: ${requestId}.` : ""}`,
+      detail: `Something about this new ${subject}, or what it belongs to, isn't allowed right now. Nothing was saved. Check the details, then try again.`,
     };
   }
   if (/Guard \d+ failed|Invalid state transition/i.test(detail)) {
     return {
       category: "guard_blocked",
-      title: "Action could not be completed",
-      detail: `One of this action's requirements was not met. No changes were saved.${requestId ? ` Request ID: ${requestId}.` : ""}`,
+      title: "Not allowed right now",
+      detail:
+        "That change isn't allowed for this one right now. Nothing was saved. Check its details, then try again.",
+    };
+  }
+  if (/rate limit|retry after \d/i.test(detail)) {
+    return {
+      category: "unexpected",
+      title: "Too many at once",
+      detail:
+        "That was a lot of changes at once. Nothing is lost. Wait a few seconds, then try again.",
     };
   }
   if (
-    /required|must be|cannot be|between|after its start|two characters|Invalid argument|ArgumentValidation|does not match the schema|before parsing|Reading the selected file|Select a |Headcount|Budget and quoted/i.test(
+    /Validator error|ArgumentValidation|does not match the schema|Invalid argument/i.test(
+      detail,
+    )
+  ) {
+    return {
+      category: "validation",
+      title: "Check the entered details",
+      detail:
+        "One of the values isn't the right kind (for example a date where a number goes). Check what you entered, then try again.",
+    };
+  }
+  if (DENIED_TEXT.test(detail)) {
+    return {
+      category: "denied",
+      title: "You can't do this",
+      detail: `${sentence(detail)} Ask someone who can to make this change.`,
+    };
+  }
+  if (
+    /required|must be|cannot be|between|after its start|two characters|Invalid argument|ArgumentValidation|does not match the schema|before parsing|Reading the selected file|Select a |Pick a |Give this |Headcount|Budget and quoted/i.test(
       detail,
     )
   ) {
@@ -232,14 +372,32 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
       category: "unexpected",
       title: "Action failed unexpectedly",
       detail: requestId
-        ? `The server rejected this action without a usable reason (Request ID: ${requestId}). Confirm you are signed into a workspace, refresh, and retry. If it keeps failing, share that request ID.`
-        : "The server rejected this action without a usable reason. Refresh and retry.",
+        ? `Something went wrong on our side and nothing was saved. It is safe to refresh and try again. If it keeps happening, tell the office this code: ${requestId}.`
+        : "Something went wrong on our side and nothing was saved. It is safe to refresh and try again.",
       action: REFRESH_ACTION,
     };
   }
+  // A plain sentence written for people by the server: show it as it is,
+  // with the next step when the sentence does not already give one.
+  const text = sentence(detail);
+  const hasNextStep =
+    /\b(try again|use |add |give |pick |choose |lower |raise |turn |ask |sort |fill |set |change |remove |move |enter )/i.test(
+      text,
+    );
+  const nextStep = hasNextStep
+    ? ""
+    : /\bmissing\b|\bneeds?\b/i.test(text)
+      ? " Fill that in, then try again."
+      : " Nothing was saved. Fix that, then try again.";
   return {
     category: "unexpected",
-    title: "Action failed unexpectedly",
-    detail: requestId ? `${detail} (Request ID: ${requestId})` : detail,
+    title: "Couldn't save this",
+    detail: `${text}${nextStep}`,
   };
+}
+
+/** End a server sentence with a full stop. */
+function sentence(text: string): string {
+  const trimmed = text.trim();
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }

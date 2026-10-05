@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
+import { useSendEmailReply } from "../../lib/messageReplyActions";
 import {
   useCreateMessage,
   useListClientContact,
@@ -21,6 +22,9 @@ import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
 import { useActionNotice } from "../../ui/action-result";
 import { deliveryStatusLabel, replyDisposition } from "./deliveryHonesty";
+import { messageTime } from "./messageOrder";
+import { MessageMedia } from "./MessageMedia";
+import { ThreadLinksBar } from "./ThreadLinksBar";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -44,7 +48,7 @@ function threadTitle(t: Thread): string {
   return (
     t.subject?.trim() ||
     t.senderIdentity?.trim() ||
-    (t.providerThreadId ? `Thread ${t.providerThreadId}` : "Untitled thread")
+    "Conversation with no subject"
   );
 }
 
@@ -67,6 +71,10 @@ export function MessageInboxPage() {
   const linkLead = useMessageThreadLinkLead();
   const setStatus = useMessageThreadSetStatus();
   const qualify = useAction(api.messageInbox.qualifyThreadAsLead);
+  const sendEmailReply = useSendEmailReply();
+  // One id per typed email reply: pressing Send again after a failure or a
+  // lost answer never emails the client twice.
+  const replyRequestId = useRef<{ threadId: string; id: string } | null>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
@@ -100,15 +108,18 @@ export function MessageInboxPage() {
   );
   const selected = visibleThreads.find((t) => t._id === selectedId) ?? null;
 
-  const threadMessages = useMemo(
-    () =>
-      selected
-        ? (messages ?? [])
-            .filter((m) => m.threadId === selected._id && m.deletedAt == null)
-            .sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0))
-        : [],
-    [messages, selected],
-  );
+  // A thread shows its own messages plus those of threads merged into it
+  // (AC-248: merging never moves or deletes source history).
+  const threadMessages = useMemo(() => {
+    if (!selected) return [];
+    const shown = new Set<string>([selected._id]);
+    for (const t of visibleThreads) {
+      if (t.mergedIntoThreadId === selected._id) shown.add(t._id);
+    }
+    return (messages ?? [])
+      .filter((m) => shown.has(m.threadId) && m.deletedAt == null)
+      .sort((a, b) => messageTime(a) - messageTime(b));
+  }, [messages, selected, visibleThreads]);
 
   const leadName = (leadId: string | null | undefined) => {
     if (!leadId) return null;
@@ -158,7 +169,12 @@ export function MessageInboxPage() {
     setNotice(null);
     const disposition = replyDisposition(selected.provider);
     if (!disposition.canRecord) {
-      fail(new Error(disposition.notice ?? "Cannot send this message."));
+      fail(
+        new Error(
+          disposition.notice ??
+            "Capsule cannot send in this conversation. Copy the reply and send it from the app the client used.",
+        ),
+      );
       return;
     }
     setSending(true);
@@ -178,6 +194,34 @@ export function MessageInboxPage() {
     }
   };
 
+  const submitEmailReply = async () => {
+    if (!selected || sending) return;
+    const body = reply.trim();
+    if (!body) return;
+    setFailure(null);
+    setNotice(null);
+    const threadId = String(selected._id);
+    if (replyRequestId.current?.threadId !== threadId) {
+      replyRequestId.current = { threadId, id: crypto.randomUUID() };
+    }
+    setSending(true);
+    try {
+      const result = await sendEmailReply({
+        threadId,
+        bodyText: body,
+        requestId: replyRequestId.current.id,
+      });
+      replyRequestId.current = null;
+      setReply("");
+      setNotice(`Reply emailed to ${result.to} just now.`);
+    } catch (e) {
+      // The typed reply stays; Send again reuses the same id.
+      fail(e);
+    } finally {
+      setSending(false);
+    }
+  };
+
   const copyExternalDraft = async () => {
     const body = reply.trim();
     if (!body || sending) return;
@@ -187,7 +231,7 @@ export function MessageInboxPage() {
     try {
       await navigator.clipboard.writeText(body);
       setNotice(
-        "Draft copied. Send it from your email, SMS, or social provider; Capsule did not create an outbound message.",
+        "Reply copied. Paste it into the app the client used and send it from there; Capsule did not send it.",
       );
     } catch (e) {
       fail(e);
@@ -205,7 +249,7 @@ export function MessageInboxPage() {
     if (!selected.providerThreadId) {
       setFailure(
         classifyCommandFailure(
-          new Error("This thread has no provider thread id to ingest against"),
+          new Error("This thread has no provider thread id to log against"),
         ),
       );
       return;
@@ -213,7 +257,7 @@ export function MessageInboxPage() {
     if (!providerMessageId || !body) {
       setFailure(
         classifyCommandFailure(
-          new Error("Provider message id and body are required"),
+          new Error("Give this message a provider message id and some text"),
         ),
       );
       return;
@@ -410,7 +454,7 @@ export function MessageInboxPage() {
         <div className="empty-state">
           <strong>No message threads yet</strong>
           <span>
-            Open a thread to start, or ingest an inbound provider message.
+            Open a thread to start, or log an incoming provider message.
           </span>
         </div>
       ) : (
@@ -422,7 +466,7 @@ export function MessageInboxPage() {
             {visibleThreads.map((t) => {
               const lastAt = (messages ?? [])
                 .filter((m) => m.threadId === t._id)
-                .reduce((max, m) => Math.max(max, m.createdAt ?? 0), 0);
+                .reduce((max, m) => Math.max(max, messageTime(m)), 0);
               return (
                 <li key={t._id}>
                   <button
@@ -446,7 +490,13 @@ export function MessageInboxPage() {
                     <p className="text-xs text-ink-3">
                       {contactName(t.contactId) ?? t.senderIdentity ?? "—"}
                       {leadName(t.leadId) ? ` · ${leadName(t.leadId)}` : ""}
-                      {t.status === "archived" ? " · archived" : ""}
+                      {t.mergedIntoThreadId
+                        ? " · merged"
+                        : t.status === "archived"
+                          ? " · archived"
+                          : t.status === "non_lead"
+                            ? " · not a lead"
+                            : ""}
                     </p>
                     {lastAt > 0 ? (
                       <p className="text-2xs text-ink-3">
@@ -462,7 +512,7 @@ export function MessageInboxPage() {
           <div className="flex min-h-100 flex-col">
             {selected == null ? (
               <div className="empty-state m-4">
-                <strong>Pick a thread</strong>
+                <strong>Pick a conversation</strong>
                 <span>Select a conversation to read and reply.</span>
               </div>
             ) : (
@@ -529,8 +579,8 @@ export function MessageInboxPage() {
                     disabled={!selected.providerThreadId}
                     title={
                       selected.providerThreadId
-                        ? "Log an inbound provider message"
-                        : "Only provider threads (with a provider thread id) can ingest inbound"
+                        ? "Log an incoming provider message"
+                        : "Only provider threads (with a provider thread id) can log incoming messages"
                     }
                   >
                     {showLog ? "Cancel" : "Log incoming message"}
@@ -545,6 +595,14 @@ export function MessageInboxPage() {
                   </button>
                 </div>
 
+                <ThreadLinksBar
+                  thread={selected}
+                  threads={visibleThreads}
+                  threadTitle={threadTitle}
+                  onFailure={fail}
+                  onNotice={setNotice}
+                />
+
                 {showLog ? (
                   <form
                     className="grid gap-2 border-b border-line-2 bg-inset px-4 py-3 md:grid-cols-[1fr_auto]"
@@ -556,7 +614,7 @@ export function MessageInboxPage() {
                     <div className="grid gap-2">
                       <input
                         className="input"
-                        placeholder="Provider message id (dedup key)"
+                        placeholder="Provider message id (stops duplicates)"
                         value={liMsgId}
                         onChange={(e) => setLiMsgId(e.target.value)}
                       />
@@ -583,7 +641,7 @@ export function MessageInboxPage() {
                 <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                   {threadMessages.length === 0 ? (
                     <p className="text-sm text-ink-3">
-                      No messages yet. Reply or log an inbound below.
+                      No messages yet. Reply, or log an incoming message below.
                     </p>
                   ) : (
                     threadMessages.map((m) => {
@@ -601,26 +659,45 @@ export function MessageInboxPage() {
                             {m.bodyText}
                           </p>
                           <p className="mt-1 text-2xs text-ink-3">
-                            {m.createdAt ? formatTime(m.createdAt) : ""}
+                            {messageTime(m) ? formatTime(messageTime(m)) : ""}
                             {m.senderIdentity ? ` · ${m.senderIdentity}` : ""}
-                            {mine && deliveryStatusLabel(String(m.status))
-                              ? ` · ${deliveryStatusLabel(String(m.status))}`
+                            {mine &&
+                            deliveryStatusLabel(
+                              String(m.status),
+                              selected.provider,
+                            )
+                              ? ` · ${deliveryStatusLabel(String(m.status), selected.provider)}`
                               : ""}
                           </p>
+                          <MessageMedia
+                            mediaJson={m.mediaJson}
+                            providerLabel={
+                              PROVIDER_LABEL[selected.provider] ??
+                              selected.provider
+                            }
+                          />
                         </div>
                       );
                     })
                   )}
                 </div>
 
-                {selected.provider !== "internal" ? (
+                {selected.provider === "email" ? (
                   <p
                     className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
                     role="status"
                   >
-                    No external delivery provider is connected. Keep editing
-                    here, then copy the draft into your email, SMS, or social
-                    provider.
+                    Send email answers the client's last email from your company
+                    address.
+                  </p>
+                ) : selected.provider !== "internal" ? (
+                  <p
+                    className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
+                    role="status"
+                  >
+                    Capsule cannot send text or social messages yet. Keep
+                    editing here, then copy the draft into the app the client
+                    used.
                   </p>
                 ) : null}
                 <form
@@ -629,6 +706,8 @@ export function MessageInboxPage() {
                     e.preventDefault();
                     if (selected.provider === "internal") {
                       void submitReply();
+                    } else if (selected.provider === "email") {
+                      void submitEmailReply();
                     } else {
                       void copyExternalDraft();
                     }
@@ -639,17 +718,35 @@ export function MessageInboxPage() {
                     className="input min-w-0 flex-1"
                     placeholder="Reply to this thread…"
                     value={reply}
-                    onChange={(e) => setReply(e.target.value)}
+                    onChange={(e) => {
+                      // A changed reply is a new email.
+                      replyRequestId.current = null;
+                      setReply(e.target.value);
+                    }}
                     aria-label="Reply text"
                   />
+                  {selected.provider === "email" ? (
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      disabled={sending || reply.trim().length === 0}
+                      onClick={() => void copyExternalDraft()}
+                    >
+                      Copy draft
+                    </button>
+                  ) : null}
                   <button
                     type={
-                      selected.provider === "internal" ? "submit" : "button"
+                      selected.provider === "internal" ||
+                      selected.provider === "email"
+                        ? "submit"
+                        : "button"
                     }
                     className="btn btn-primary"
                     disabled={sending || reply.trim().length === 0}
                     onClick={
-                      selected.provider === "internal"
+                      selected.provider === "internal" ||
+                      selected.provider === "email"
                         ? undefined
                         : () => void copyExternalDraft()
                     }
@@ -657,10 +754,14 @@ export function MessageInboxPage() {
                     {sending
                       ? selected.provider === "internal"
                         ? "Logging…"
-                        : "Copying…"
+                        : selected.provider === "email"
+                          ? "Sending…"
+                          : "Copying…"
                       : selected.provider === "internal"
                         ? "Log note"
-                        : "Copy draft"}
+                        : selected.provider === "email"
+                          ? "Send email"
+                          : "Copy draft"}
                   </button>
                 </form>
               </>

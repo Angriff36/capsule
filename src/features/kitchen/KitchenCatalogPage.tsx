@@ -11,7 +11,6 @@ import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
 import type { Id } from "../../lib/api";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import {
-  useCreateDish,
   useCreateIngredient,
   useCreateMenu,
   useCreateComponent,
@@ -22,7 +21,6 @@ import {
   useDishReinstate,
   useIngredientPurge,
   useIngredientReinstate,
-  useListDish,
   useListIngredient,
   useListMenu,
   useListComponent,
@@ -32,22 +30,24 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
+import { useWholeDishList } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
+import { mainDishRows } from "./dishVersions";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards, type CatalogItem } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
+import { NewDishPanel } from "./NewDishPanel";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   KITCHEN_SECTIONS,
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
-  dishPath,
   componentPath,
   ingredientPath,
   type KitchenSection,
@@ -60,20 +60,15 @@ import {
   useIngredientLookupApplyCostToIngredient,
 } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
+import { useListViewState } from "../list-state/useListViewState";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListOrigin } from "../list-state/listOrigin";
 
 const UNITS = UNIT_OF_MEASURE;
 
 function optional(value: FormDataEntryValue | null) {
   const result = String(value ?? "").trim();
   return result || undefined;
-}
-
-function csv(value: FormDataEntryValue | null) {
-  const result = String(value ?? "")
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return result.length ? result : undefined;
 }
 
 export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
@@ -104,11 +99,13 @@ function ComponentCatalogPage() {
 }
 
 function DishCatalogPage() {
-  const data = useListDish();
+  const data = useWholeDishList();
+  // Versions show as tabs on their main dish, not as rows of their own.
+  const mains = useMemo(() => (data ? mainDishRows(data) : undefined), [data]);
   return (
     <KitchenCatalogPageContent
       section="dishes"
-      data={data as CatalogItem[] | undefined}
+      data={mains as CatalogItem[] | undefined}
     />
   );
 }
@@ -123,6 +120,39 @@ function MenuCatalogPage() {
   );
 }
 
+const kitchenListState = new ListStateManager<{
+  search: string;
+  category: string;
+  sort: "name-asc" | "name-desc" | "category";
+  showHidden: boolean;
+}>({
+  search: {
+    key: "q",
+    defaultValue: "",
+    parse: (value) => value ?? "",
+    serialize: (value) => value || null,
+  },
+  category: {
+    key: "category",
+    defaultValue: "all",
+    parse: (value) => value ?? "all",
+    serialize: (value) => (value === "all" ? null : value),
+  },
+  sort: {
+    key: "sort",
+    defaultValue: "name-asc",
+    parse: (value) =>
+      value === "name-desc" || value === "category" ? value : "name-asc",
+    serialize: (value) => (value === "name-asc" ? null : value),
+  },
+  showHidden: {
+    key: "hidden",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+});
+
 function KitchenCatalogPageContent({
   section,
   data,
@@ -132,9 +162,9 @@ function KitchenCatalogPageContent({
 }) {
   const tenantId = useAuthStatus()?.tenantId ?? null;
   const navigate = useNavigate();
+  const listOrigin = useListOrigin();
   const createIngredient = useCreateIngredient();
   const createComponent = useCreateComponent();
-  const createDish = useCreateDish();
   const createMenu = useCreateMenu();
   const generateUploadUrl = useGenerateUploadUrl();
   const createAttachment = useCreateAttachment();
@@ -151,12 +181,8 @@ function KitchenCatalogPageContent({
   const unpublishMenu = useMenuUnpublish();
   const archiveMenu = useMenuArchive();
   const restoreMenu = useMenuRestore();
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [sort, setSort] = useState<"name-asc" | "name-desc" | "category">(
-    "name-asc",
-  );
-  const [showHidden, setShowHidden] = useState(false);
+  const [listState, setListState] = useListViewState(kitchenListState);
+  const { search, category, sort, showHidden } = listState;
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -193,16 +219,13 @@ function KitchenCatalogPageContent({
   }, [visibleRows]);
 
   useEffect(() => {
-    setCategory("all");
-    setSearch("");
-    setSort("name-asc");
-  }, [section]);
-
-  useEffect(() => {
-    if (!categories.some((option) => option.value === category)) {
-      setCategory("all");
+    if (
+      data !== undefined &&
+      !categories.some((option) => option.value === category)
+    ) {
+      setListState({ category: "all" });
     }
-  }, [categories, category]);
+  }, [categories, category, data, setListState]);
 
   const rows = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase();
@@ -222,6 +245,7 @@ function KitchenCatalogPageContent({
           item.description,
           item.cuisine,
           item.course,
+          item.versionNames,
         ].some((value) =>
           String(value ?? "")
             .toLowerCase()
@@ -411,38 +435,6 @@ function KitchenCatalogPageContent({
         });
         navigate(componentPath(created.docId));
         return;
-      } else if (section === "dishes") {
-        const name = String(data.get("name") ?? "").trim();
-        const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
-          visibleRows,
-          name,
-        );
-        if (
-          duplicate &&
-          !(await prompt.askConfirm({
-            title: "Possible duplicate dish",
-            description: `A dish named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Use dish detail → Create new edition for a versioned edition.`,
-            confirmLabel: "Create anyway",
-          }))
-        ) {
-          return;
-        }
-        const created = await createDish({
-          name,
-          portionSize: Number(data.get("portionSize")),
-          portionUnit: String(
-            data.get("portionUnit"),
-          ) as (typeof UNITS)[number],
-          description: optional(data.get("description")),
-          category: optional(data.get("category")),
-          course: optional(data.get("course")),
-          serviceStyle: optional(data.get("serviceStyle")),
-          dietaryTags: csv(data.get("dietaryTags")),
-        });
-        // Prep templates, containers and components all live on the detail page,
-        // and adding them is always the next step. Land there like components do.
-        navigate(dishPath(created.docId));
-        return;
       } else {
         const name = String(data.get("name") ?? "").trim();
         const minGuests = Number(data.get("minGuests"));
@@ -451,7 +443,7 @@ function KitchenCatalogPageContent({
         // Validate guest range before submission (matches Manifest constraint wording)
         if (minGuests > 0 && maxGuests > 0 && minGuests > maxGuests) {
           throw new Error(
-            "Menu max guests must be zero (unlimited) or at least min guests",
+            "This menu's max guests can't be less than min guests. Set it to zero for no limit, or raise it to match min guests.",
           );
         }
 
@@ -521,7 +513,9 @@ function KitchenCatalogPageContent({
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
-      {showCreate ? (
+      {showCreate && section === "dishes" ? (
+        <NewDishPanel onClose={() => setShowCreate(false)} />
+      ) : showCreate ? (
         <KitchenCatalogCreateForm
           section={section}
           busy={busy === "create"}
@@ -543,7 +537,7 @@ function KitchenCatalogPageContent({
             <span aria-hidden="true">⌕</span>
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => setListState({ search: event.target.value })}
               placeholder={`Search ${sectionLabel.toLowerCase()} by name or category…`}
               aria-label={`Search ${sectionLabel.toLowerCase()}`}
             />
@@ -552,7 +546,9 @@ function KitchenCatalogPageContent({
             <span>Category</span>
             <select
               value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              onChange={(event) =>
+                setListState({ category: event.target.value })
+              }
             >
               {categories.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -566,9 +562,10 @@ function KitchenCatalogPageContent({
             <select
               value={sort}
               onChange={(event) =>
-                setSort(
-                  event.target.value as "name-asc" | "name-desc" | "category",
-                )
+                setListState({
+                  sort: event.target.value as
+                    "name-asc" | "name-desc" | "category",
+                })
               }
             >
               <option value="name-asc">Name A–Z</option>
@@ -583,7 +580,9 @@ function KitchenCatalogPageContent({
               <input
                 type="checkbox"
                 checked={showHidden}
-                onChange={(event) => setShowHidden(event.target.checked)}
+                onChange={(event) =>
+                  setListState({ showHidden: event.target.checked })
+                }
               />
               Show deleted / retired
             </label>
@@ -601,7 +600,11 @@ function KitchenCatalogPageContent({
             </div>
           ) : (
             <div className="component-empty-state">
-              <div className="component-book-mark" aria-hidden="true">
+              <div
+                className="component-book-mark"
+                aria-hidden="true"
+                data-label={`HOUSE\n${sectionLabel.toUpperCase()}`}
+              >
                 <span />
               </div>
               <div>
@@ -622,11 +625,13 @@ function KitchenCatalogPageContent({
             viewKey={`${section}:${category}:${deferredSearch}:${sort}:${showHidden}`}
             categories={categories}
             activeCategory={category}
-            onCategoryChange={setCategory}
+            onCategoryChange={(next) => setListState({ category: next })}
             busy={busy}
             showHidden={showHidden}
             run={run}
             commands={lifecycleCommands}
+            origin={listOrigin}
+            loaded={data !== undefined}
           />
         )}
       </section>

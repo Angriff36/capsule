@@ -16,7 +16,8 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
 
   // Deduplication key - normalized email + event date + tenantId hash
   // Ensures submit-once behavior even if user submits multiple times
-  property dedupKey: string
+  // Set once by create; the dedup contract depends on it never moving.
+  property readonly dedupKey: string
 
   // Submission metadata
   property status: QuoteSubmissionStatus = "pending"
@@ -24,8 +25,9 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
 
   // Contact information (from form)
   property clientName: string
-  property email: string
-  property phone: string?
+  // The review queue is readable by any staff role; only sales works leads.
+  property masked(email) email: string unmask when roleAllows(user.role, "salesAccess")
+  property masked(phone) phone: string? unmask when roleAllows(user.role, "salesAccess")
 
   // Event details (from form)
   property eventDate: date
@@ -48,10 +50,38 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   // Menu preferences (from form - MVP uses text/categories)
   property menuPreferences: string?
   property dietaryRestrictions: string?
+  // The published menu the visitor picked from the public menu. Conversion
+  // prices the draft proposal from it through the catalog price rule.
+  property menuId: uuid?
+  // Structured picks (spec CF-4-3): dishes from the chosen menu with their
+  // quantities, and extras from other published menus, resolved at the
+  // catalog price in force when submitted (convex/lib/quoteSelections.ts).
+  property selectionsJson: string?
+  // The estimate the visitor was shown, with its assumptions. Always labelled
+  // an estimate; the formal price is the proposal staff publishes.
+  property estimateJson: string?
+
+  // Stable id the form makes once per visit: a repeat of the same request
+  // (double tap, lost response) returns the first submission.
+  property submissionKey: string?
+
+  // Attribution: how the visitor heard of us (a referral source row, or
+  // text when none fits) and the campaign/page that brought them.
+  property referralSourceId: uuid?
+  property howHeardText: string?
+  property utmSource: string?
+  property utmMedium: string?
+  property utmCampaign: string?
+  property referrer: string?
+  property landingPage: string?
 
   // Additional notes and consent
   property notes: string?
   property consentGrantedAt: datetime = now()
+  // The privacy words the visitor agreed to, and whether they also asked
+  // for offers and news.
+  property consentNotice: string?
+  property marketingConsent: boolean = false
 
   // Links to created entities (populated during processing)
   property clientId: uuid?
@@ -63,53 +93,86 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   property completedAt: datetime?
   property errorMessage: string?
   property processingErrors: string?
+  // A client merge moves the request to the client kept (PL-SOURCE-MERGE).
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
 
   // Relations to created entities
   ref client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref lead: Lead fields [tenantId, leadId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
   ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
   ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
+  ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
 
   // Constraints
-  constraint dedupKeyPresent: length(trim(self.dedupKey)) > 0 "Deduplication key is required"
-  constraint clientNamePresent: length(trim(self.clientName)) > 0 "Client name is required"
-  constraint emailPresent: length(trim(self.email)) > 0 "Email address is required"
-  constraint guestCountPositive: self.guestCount > 0 "Guest count must be positive"
-  constraint consentRequired: self.consentGrantedAt != null "Data processing consent is required"
+  constraint dedupKeyPresent: length(trim(self.dedupKey)) > 0 "This quote request is missing the ID used to catch duplicates"
+  constraint clientNamePresent: length(trim(self.clientName)) > 0 "Give the client's name"
+  constraint emailPresent: length(trim(self.email)) > 0 "Give an email address"
+  constraint guestCountPositive: self.guestCount > 0 "The guest count has to be more than zero"
+  constraint consentRequired: self.consentGrantedAt != null "The client needs to agree to how we use their information"
 
   // Policies - public access for quote submission
   default policy quoteSubmissionRead read: true "Anyone may check a quote request"
   default policy quoteSubmissionWrite write: roleAllows(user.role, "salesAccess") "Only sales staff may update quote submissions"
   default policy quoteSubmissionExecute execute: true "Anyone may send a quote request"
 
+  // Called only by the anonymous /quote ingress seam (convex/quoteBuilder.ts),
+  // which runs it as the tenant's system role after dedup. Blank form answers
+  // arrive as null, so every non-identifying field is optional and nullable.
   command create(
     dedupKey: string,
     clientName: string,
     email: string,
-    phone: string,
+    optional phone: string?,
     eventDate: date,
-    eventEndTime: date,
+    optional eventEndTime: date?,
     guestCount: number,
-    serviceStyleId: uuid,
-    occasionId: uuid,
-    serviceStyleText: string,
-    occasionText: string,
-    venueName: string,
-    venueAddress: string,
-    menuPreferences: string,
-    dietaryRestrictions: string,
-    notes: string
+    marketingConsent: boolean,
+    optional serviceStyleId: uuid?,
+    optional occasionId: uuid?,
+    optional serviceStyleText: string?,
+    optional occasionText: string?,
+    optional venueName: string?,
+    optional venueAddress: string?,
+    optional menuPreferences: string?,
+    optional dietaryRestrictions: string?,
+    optional notes: string?,
+    optional menuId: uuid?,
+    optional selectionsJson: string?,
+    optional estimateJson: string?,
+    optional submissionKey: string?,
+    optional referralSourceId: uuid?,
+    optional howHeardText: string?,
+    optional utmSource: string?,
+    optional utmMedium: string?,
+    optional utmCampaign: string?,
+    optional referrer: string?,
+    optional landingPage: string?,
+    optional consentNotice: string?
   ) {
+    // Abuse cap per submitter, not throttling: the ingress seam runs this as
+    // a system actor keyed on the SHA-256 of the submitter's normalized email,
+    // so one address flooding the form cannot use up anyone else's budget (a
+    // shared global bucket could). Repeat submits of the same request are
+    // deduped before this command runs and never spend the budget.
+    rateLimit {
+      maxRequests: 5
+      windowMs: 3600000
+      scope: user
+    }
+
     guard self.submittedAt == null "Quote submission already exists"
     guard self.deletedAt == null "Cannot create a deleted quote submission"
 
     // Validate inputs
-    constraint createDedupKey: length(trim(dedupKey)) > 0 "Deduplication key is required"
-    constraint createClientName: length(trim(clientName)) > 0 "Client name is required"
-    constraint createEmail: length(trim(email)) > 0 "Email address is required"
-    constraint createGuestCount: guestCount > 0 "Guest count must be positive"
+    constraint createDedupKey: length(trim(dedupKey)) > 0 "This quote request is missing the ID used to catch duplicates"
+    constraint createClientName: length(trim(clientName)) > 0 "Give the client's name"
+    constraint createEmail: length(trim(email)) > 0 "Give an email address"
+    constraint createGuestCount: guestCount > 0 "The guest count has to be more than zero"
 
     mutate dedupKey = dedupKey
     mutate clientName = clientName
@@ -127,9 +190,30 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate menuPreferences = menuPreferences
     mutate dietaryRestrictions = dietaryRestrictions
     mutate notes = notes
+    mutate menuId = menuId
+    mutate selectionsJson = selectionsJson
+    mutate estimateJson = estimateJson
+    mutate submissionKey = submissionKey
+    mutate referralSourceId = referralSourceId
+    mutate howHeardText = howHeardText
+    mutate utmSource = utmSource
+    mutate utmMedium = utmMedium
+    mutate utmCampaign = utmCampaign
+    mutate referrer = referrer
+    mutate landingPage = landingPage
+    mutate consentNotice = consentNotice
+    mutate marketingConsent = marketingConsent
     mutate submittedAt = now()
     mutate consentGrantedAt = now()
     mutate status = "pending"
+    // What processing made of the request is written by processing, not here.
+    mutate clientId = null
+    mutate leadId = null
+    mutate eventId = null
+    mutate proposalId = null
+    mutate completedAt = null
+    mutate errorMessage = null
+    mutate processingErrors = null
 
     emit QuoteSubmitted {
       submissionId: self.id
@@ -148,6 +232,10 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null "Cannot process a deleted quote submission"
 
     mutate status = "processing"
+    emit QuoteSubmissionProcessingStarted {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   command complete(
@@ -201,10 +289,14 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guard self.status == "pending" or self.status == "failed" "Only pending or failed submissions can be dismissed"
     guard self.deletedAt == null "Cannot dismiss a deleted quote submission"
 
-    constraint dismissReasonRequired: length(trim(reason)) > 0 "Dismissal reason is required"
+    constraint dismissReasonRequired: length(trim(reason)) > 0 "Give a reason for dismissing this"
 
     mutate status = "dismissed"
     mutate errorMessage = reason
+    emit QuoteSubmissionDismissed {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
   }
 
   // Staff retries a failed conversion: the row reopens as pending with the
@@ -218,9 +310,58 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate status = "pending"
     mutate errorMessage = null
     mutate processingErrors = null
+    emit QuoteSubmissionRetried {
+      quoteSubmissionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Quote request already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit QuoteSubmissionClientMergeStaged {
+      submissionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the quote request client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit QuoteSubmissionClientReassigned {
+      submissionId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
   }
 
   store QuoteSubmission in durable
+}
+
+event QuoteSubmissionClientMergeStaged: "quote.client_merge_staged" {
+  submissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionClientReassigned: "quote.client_reassigned" {
+  submissionId: string
+  tenantId: string
+  previousClientId: string?
+  clientId: string?
 }
 
 event QuoteSubmitted: "quote.submitted" {
@@ -246,4 +387,20 @@ event QuoteProcessingFailed: "quote.processing_failed" {
   submissionId: string
   tenantId: string
   errorMessage: string
+}
+
+// PL-AUDIT: every step leaves an event row (AC-193/AC-635).
+event QuoteSubmissionDismissed: "quote.submission.dismissed" {
+  quoteSubmissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionRetried: "quote.submission.retried" {
+  quoteSubmissionId: string
+  tenantId: string
+}
+
+event QuoteSubmissionProcessingStarted: "quote.submission.processing.started" {
+  quoteSubmissionId: string
+  tenantId: string
 }

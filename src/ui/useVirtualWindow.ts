@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type VirtualWindowOptions = {
   count: number;
@@ -70,5 +70,16 @@ export function useVirtualWindow({
     totalHeight: count * rowHeight,
     onScroll: (event: React.UIEvent<HTMLDivElement>) =>
       setScrollTop(event.currentTarget.scrollTop),
+    restoreScrollTop: useCallback(
+      (value: number) => {
+        const node = scrollRef.current;
+        if (!node) return { applied: 0, complete: false };
+        const maximum = Math.max(0, count * rowHeight - node.clientHeight);
+        node.scrollTop = Math.min(value, maximum);
+        setScrollTop(node.scrollTop);
+        return { applied: node.scrollTop, complete: maximum >= value };
+      },
+      [count, rowHeight],
+    ),
   };
 }

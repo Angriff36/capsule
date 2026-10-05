@@ -1,5 +1,6 @@
 import type {
   CatalogIngredient,
+  CatalogRecipe,
   IngredientMatchStatus,
   ParsedIngredientLine,
   ReviewIngredientLine,
@@ -37,16 +38,46 @@ function tokens(name: string): string[] {
  * Resolves parsed ingredient names against the live Ingredient catalog.
  */
 export class IngredientCatalogMatcher {
+  /**
+   * A line the source marks as a sub-recipe links a recipe-book recipe of the
+   * same name; an unmarked line does so only when no ingredient has that name.
+   * A marked line with no such recipe stays "Needs review" so the cook links
+   * one, or keeps the line as an ingredient.
+   */
   matchLine(
     line: ParsedIngredientLine,
     catalog: readonly CatalogIngredient[],
+    recipes: readonly CatalogRecipe[] = [],
   ): ReviewIngredientLine {
     const active = catalog.filter((item) => item.deletedAt == null);
-    const exact = active.find((item) =>
-      singularForms(item.name).some((form) =>
+    const sameName = (name: string) =>
+      singularForms(name).some((form) =>
         singularForms(line.name).some((needle) => needle === form),
-      ),
+      );
+    const exact = active.find((item) => sameName(item.name));
+    const recipe = recipes.find(
+      (item) => item.deletedAt == null && sameName(item.name),
     );
+    if (recipe && (line.subrecipeHint || !exact)) {
+      return {
+        ...line,
+        matchStatus: "subrecipe",
+        matchedComponentId: recipe.id,
+        matchedComponentName: recipe.name,
+        possibleMatchIds: [],
+        possibleMatchNames: [],
+        createNew: false,
+      };
+    }
+    if (line.subrecipeHint) {
+      return {
+        ...line,
+        matchStatus: "unresolved",
+        possibleMatchIds: [],
+        possibleMatchNames: [],
+        createNew: false,
+      };
+    }
     if (exact) {
       return {
         ...line,
@@ -91,8 +122,9 @@ export class IngredientCatalogMatcher {
   matchAll(
     lines: readonly ParsedIngredientLine[],
     catalog: readonly CatalogIngredient[],
+    recipes: readonly CatalogRecipe[] = [],
   ): ReviewIngredientLine[] {
-    return lines.map((line) => this.matchLine(line, catalog));
+    return lines.map((line) => this.matchLine(line, catalog, recipes));
   }
 
   private findPossible(
@@ -138,6 +170,8 @@ export class IngredientCatalogMatcher {
         return "Confirmed existing";
       case "confirmed_new":
         return "Confirmed new";
+      case "subrecipe":
+        return "Sub-recipe";
     }
   }
 }

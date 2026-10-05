@@ -84,7 +84,9 @@ export function PaymentMethodsPage() {
       return;
     }
     if (lastFour && lastFour.length > 4) {
-      setFailure(new Error("Last-four hint must be at most four characters."));
+      setFailure(
+        new Error("The last-four hint can only be up to four characters."),
+      );
       return;
     }
     void run("register-method", async () => {
@@ -115,7 +117,7 @@ export function PaymentMethodsPage() {
       if (key === "invalidate") {
         const reason = await prompt.askReason({
           title: "Invalidate payment method",
-          description: "Record why this instrument can no longer be used.",
+          description: "Say why this instrument can no longer be used.",
           label: "Invalidation reason",
           placeholder: "e.g. Card reported stolen",
           confirmLabel: "Invalidate",
@@ -156,7 +158,7 @@ export function PaymentMethodsPage() {
             Register a client payment instrument, set the default, then pick it
             when{" "}
             <Link className="text-link" to={FINANCE_ROUTES.payments}>
-              recording a payment
+              adding a payment
             </Link>
             .
           </p>

@@ -16,6 +16,7 @@ import { useIngredientLookupResolveCost } from "../../lib/ingredientLookupClient
 import { KITCHEN_SECTION_SINGULAR, type KitchenSection } from "./kitchenRoutes";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import type { NutritionFields } from "../../lib/nutritionUnitScale";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 const UNITS = SELECTABLE_UNITS;
 
@@ -337,7 +338,10 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
         {section === "components" ? (
           <>
             <label className="field-label">
-              Yield
+              <span className="field-label-row">
+                Yield
+                <FieldHelp term="yield" />
+              </span>
               <input
                 name="yieldQuantity"
                 type="number"
@@ -349,7 +353,10 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
             </label>
             <UnitField name="yieldUnit" label="Yield unit" />
             <label className="field-label">
-              Batch multiplier
+              <span className="field-label-row">
+                Batch multiplier
+                <FieldHelp term="batchMultiplier" />
+              </span>
               <input
                 name="batchMultiplier"
                 type="number"
@@ -375,47 +382,6 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
             <label className="field-label sm:col-span-2">
               Method
               <textarea name="instructions" className="input min-h-28 py-2" />
-            </label>
-          </>
-        ) : null}
-        {section === "dishes" ? (
-          <>
-            <label className="field-label">
-              Portion size
-              <input
-                name="portionSize"
-                type="number"
-                min={0.01}
-                step="0.01"
-                defaultValue={1}
-                className="input"
-                required
-              />
-            </label>
-            <UnitField name="portionUnit" label="Portion unit" />
-            <label className="field-label">
-              Category
-              <input name="category" className="input" />
-            </label>
-            <label className="field-label">
-              Course
-              <input name="course" className="input" />
-            </label>
-            <label className="field-label">
-              Service style
-              <input name="serviceStyle" className="input" />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Dietary tags
-              <input
-                name="dietaryTags"
-                className="input"
-                placeholder="vegan, gluten-free"
-              />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Description
-              <textarea name="description" className="input min-h-20 py-2" />
             </label>
           </>
         ) : null}

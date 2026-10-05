@@ -1,0 +1,116 @@
+/* Dispatch board: ruled rows, one per event going out. No cards: the state
+   of a row is a rule on its leading edge plus its status chip. */
+
+.dispatch-switch {
+  display: inline-flex;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-inset);
+  padding: 0.125rem;
+}
+.dispatch-switch > button {
+  min-height: 2rem;
+  padding: 0.25rem 0.875rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.dispatch-switch > button[data-active] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+.dispatch-board {
+  margin-top: 1.5rem;
+  border-top: 1.5px solid var(--color-ink);
+}
+.dispatch-row {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 0 1rem 1rem;
+  border-bottom: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-line-2);
+}
+.dispatch-row[data-tone="fix"] {
+  border-left-color: var(--color-danger);
+}
+.dispatch-row[data-tone="look"] {
+  border-left-color: var(--color-warn);
+}
+.dispatch-row[data-tone="ready"] {
+  border-left-color: var(--color-ok);
+}
+.dispatch-row[data-tone="left"] {
+  border-left-color: var(--color-info);
+}
+.dispatch-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.dispatch-row-when {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-ink-2);
+}
+.dispatch-row-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+.dispatch-row-title > a:hover {
+  text-decoration: underline;
+}
+
+.dispatch-open {
+  display: grid;
+  gap: 0.25rem;
+}
+.dispatch-open > li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  font-size: var(--text-base);
+  color: var(--color-ink-2);
+}
+.dispatch-open > li[data-severity="fix"] {
+  color: var(--color-danger);
+}
+.dispatch-open-mark {
+  flex: none;
+  min-width: 4.75rem;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dispatch-open a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 767px) {
+  .dispatch-row {
+    padding-left: 0.75rem;
+  }
+  .dispatch-row .btn {
+    min-height: 2.5rem;
+  }
+}
+
+/* Packing floor: how much of one list is packed. */
+.floor-bar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-inset);
+}
+.floor-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-ok);
+}

@@ -71,16 +71,18 @@ export class ComponentImportFinalizer {
   async finalize(
     review: ComponentImportReviewState,
     operationKey?: string,
+    /** Recipe-sheet extras saved with the recipe (times, steps, packaging…). */
+    sheet?: Record<string, unknown>,
   ): Promise<ComponentImportFinalizeResult> {
     const name = review.name.trim();
-    if (!name) throw new Error("Recipe name is required");
+    if (!name) throw new Error("Give this recipe a name.");
     const yieldQuantity = requireMeasuredQuantity(
       review.yieldQuantity,
-      "Recipe yield quantity must be positive",
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
     );
     const yieldUnit = requireMeasuredUnit(
       review.yieldUnit,
-      "Recipe yield unit is required",
+      "Pick a unit for this recipe's yield.",
     );
     if (review.lines.length === 0) {
       throw new Error("Add at least one ingredient line before saving");
@@ -88,20 +90,20 @@ export class ComponentImportFinalizer {
     const unresolved = countUnresolvedLines(review.lines);
     if (unresolved > 0) {
       throw new Error(
-        `${unresolved} ingredient line${unresolved === 1 ? "" : "s"} still need review`,
+        `${unresolved} recipe line${unresolved === 1 ? "" : "s"} still need review`,
       );
     }
     const measuredLines = review.lines.map((line) => ({
       line,
       quantity: requireMeasuredQuantity(
         line.quantity,
-        `Quantity must be positive for ${line.name}`,
+        `${line.name}'s quantity has to be more than zero.`,
       ),
-      unit: requireMeasuredUnit(line.unit, `Unit is required for ${line.name}`),
+      unit: requireMeasuredUnit(line.unit, `Pick a unit for ${line.name}.`),
     }));
     for (const { line } of measuredLines) {
       if (!isLineResolved(line)) {
-        throw new Error(`${line.name} is not resolved`);
+        throw new Error(`${line.name} still needs review.`);
       }
     }
 
@@ -125,14 +127,22 @@ export class ComponentImportFinalizer {
           cuisine: review.cuisine?.trim() || undefined,
           description: review.description?.trim() || undefined,
           instructions: review.instructions?.trim() || undefined,
+          ...(sheet ? { sheet } : {}),
           lines: measuredLines.map(({ line, quantity, unit }, index) => ({
             name: line.name.trim(),
+            componentId:
+              line.matchStatus === "subrecipe"
+                ? line.matchedComponentId
+                : undefined,
             ingredientId:
-              line.createNew || line.matchStatus === "confirmed_new"
+              line.matchStatus === "subrecipe" ||
+              line.createNew ||
+              line.matchStatus === "confirmed_new"
                 ? undefined
                 : line.matchedIngredientId,
             createNew:
-              line.createNew || line.matchStatus === "confirmed_new"
+              line.matchStatus !== "subrecipe" &&
+              (line.createNew || line.matchStatus === "confirmed_new")
                 ? true
                 : undefined,
             quantity,
@@ -147,6 +157,11 @@ export class ComponentImportFinalizer {
     const createdIngredientIds: string[] = [];
     const ingredientIds: string[] = [];
 
+    if (measuredLines.some(({ line }) => line.matchStatus === "subrecipe")) {
+      throw new Error(
+        "Save this review first; recipes with sub-recipes are finished from a saved review.",
+      );
+    }
     for (const { line, unit } of measuredLines) {
       if (line.createNew || line.matchStatus === "confirmed_new") {
         const created = await this.ports.createIngredient({
@@ -160,7 +175,7 @@ export class ComponentImportFinalizer {
       } else if (line.matchedIngredientId) {
         ingredientIds.push(line.matchedIngredientId);
       } else {
-        throw new Error(`${line.name} is missing a matched ingredient`);
+        throw new Error(`Pick an ingredient for ${line.name} before saving.`);
       }
     }
 

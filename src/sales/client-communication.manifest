@@ -4,6 +4,9 @@ enum ClientCommunicationMedium {
   call
   email
   meeting
+  // PL-SOURCE-HISTORY: old-system notes and tasks keep their own kind.
+  note
+  task
 }
 
 entity ClientCommunication mixin TenantScoped {
@@ -21,11 +24,28 @@ entity ClientCommunication mixin TenantScoped {
   // Readable snapshot so history remains useful if identity details change.
   property required authorName: string = ""
   property recordedAt: datetime?
+  // PL-SOURCE-HISTORY (AC-062, AC-111): history brought in from the old
+  // system sits under its client (or event) with the original date, author
+  // and task state. It is history only: nothing is sent and no reminder opens.
+  property clientId: uuid?
+  property importRunId: uuid?
+  property importedFrom: string?
+  property dueAt: datetime?
+  property completedAt: datetime?
+  // A task the old system marked done, even with no done date on file.
+  property taskDone: boolean?
+  // A client merge moves the history to the client kept.
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
 
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref importRun: ImportRun fields [tenantId, importRunId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   belongsTo clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint communicationComplete: self.recordedAt == null or (((self.clientContactId != null and self.eventId == null) or (self.clientContactId == null and self.eventId != null)) and self.occurredAt != null and length(trim(self.summary)) > 0 and self.authorId != null and length(trim(self.authorId)) > 0 and length(trim(self.authorName)) > 0) "A saved note needs one contact or event, date, summary, and author"
+  constraint communicationComplete: self.recordedAt == null or (self.importedFrom != null and (self.clientId != null or self.eventId != null) and self.occurredAt != null and length(trim(self.summary)) > 0 and length(trim(self.authorName)) > 0) or (((self.clientContactId != null and self.eventId == null) or (self.clientContactId == null and self.eventId != null)) and self.occurredAt != null and length(trim(self.summary)) > 0 and self.authorId != null and length(trim(self.authorId)) > 0 and length(trim(self.authorName)) > 0) "A saved note needs one contact or event, date, summary, and author"
 
   default policy clientCommunicationRead read: roleAllows(user.role, "staffAccess") "Staff may see client communication history"
   default policy clientCommunicationWrite write: roleAllows(user.role, "staffAccess") "Staff may add client notes"
@@ -36,22 +56,25 @@ entity ClientCommunication mixin TenantScoped {
     optional eventId: uuid,
     occurredAt: datetime,
     medium: ClientCommunicationMedium,
-    summary: string,
-    authorName: string
+    summary: string
   ) {
     guard self.recordedAt == null
+    // Only a sign-in linked to a staff profile can log a client note, so the
+    // note always shows that person's own name.
+    guard user.personId != null
     guard self.clientContactId == null or self.clientContact != null
     guard self.eventId == null or self.event != null
     constraint recordTarget: (clientContactId != null and eventId == null) or (clientContactId == null and eventId != null) "Choose one contact or event"
-    constraint recordSummary: length(trim(summary)) > 0 "Communication summary is required"
-    constraint recordAuthor: length(trim(authorName)) > 0 "Communication author is required"
+    constraint recordSummary: length(trim(summary)) > 0 "Give this note a summary"
     mutate clientContactId = clientContactId
     mutate eventId = eventId
     mutate occurredAt = occurredAt
     mutate medium = medium
     mutate summary = summary
     mutate authorId = user.id
-    mutate authorName = authorName
+    // The name comes from the signed-in person's staff profile, never from
+    // the caller.
+    mutate authorName = user.personName != null ? user.personName : ""
     mutate recordedAt = now()
     emit ClientCommunicationRecorded {
       clientCommunicationId: self.id
@@ -64,7 +87,49 @@ entity ClientCommunication mixin TenantScoped {
     }
   }
 
+  // Old-system history (importedFrom set) is written by the import seam
+  // convex/importHistory.ts: an entity has one create step, and `record`
+  // is the person-facing one.
+
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "History already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit ClientCommunicationClientMergeStaged {
+      clientCommunicationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the history client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    mutate clientId = self.mergeTargetClientId
+    emit ClientCommunicationClientReassigned {
+      clientCommunicationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   store ClientCommunication in durable
+}
+
+event ClientCommunicationClientMergeStaged: "client_communication.client_merge_staged" {
+  clientCommunicationId: string
+  tenantId: string
+}
+
+event ClientCommunicationClientReassigned: "client_communication.client_reassigned" {
+  clientCommunicationId: string
+  tenantId: string
 }
 
 event ClientCommunicationRecorded: "client_communication.recorded" {

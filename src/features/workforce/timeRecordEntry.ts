@@ -35,14 +35,22 @@ export type TimeRecordWriteApi = {
   clockOut: (args: {
     docId: string;
     version?: number;
+    breakMinutes?: number;
+    paidBreakMinutes?: number;
   }) => Promise<{ version?: number } | void>;
   correct: (args: {
     docId: string;
     version?: number;
     clockInAt: number;
     clockOutAt: number;
+    reason: string;
   }) => Promise<unknown>;
 };
+
+/** Correction reasons the time sheet writes when it saves typed times. */
+export const TYPED_WINDOW_REASON = "Hours typed in on the time sheet";
+export const TYPED_CLOCK_OUT_REASON =
+  "Clock-out time typed in on the time sheet";
 
 const SHIFT_SLACK_MS = 2 * 60 * 60 * 1000;
 
@@ -53,27 +61,43 @@ export function toEpoch(value: unknown): number | null {
   return Number.isFinite(time) ? time : null;
 }
 
-/** Best current shift for a person — same ±2h window Timesheet already used. */
-export function currentShiftFor(
+/**
+ * Best shift for a clock-in at `now`: one whose window covers it (±2h slack),
+ * else the person's first shift starting that same day. Time sheet and My Day
+ * both use this, so a clock-in carries the shift's event either way.
+ */
+export function currentShiftFor<T extends ShiftLike>(
   personId: string,
-  shifts: readonly ShiftLike[] | undefined,
+  shifts: readonly T[] | undefined,
   now = Date.now(),
-): ShiftLike | undefined {
-  return (shifts ?? [])
+): T | undefined {
+  const mine = (shifts ?? [])
     .filter(
       (shift) =>
         shift.deletedAt == null &&
         String(shift.personId) === personId &&
         ["scheduled", "started"].includes(String(shift.status)),
     )
-    .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0))
-    .find(
+    .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
+  const dayStart = new Date(now);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(now);
+  dayEnd.setHours(23, 59, 59, 999);
+  return (
+    mine.find(
       (shift) =>
         shift.startsAt != null &&
         shift.endsAt != null &&
         now >= shift.startsAt - SHIFT_SLACK_MS &&
         now <= shift.endsAt + SHIFT_SLACK_MS,
-    );
+    ) ??
+    mine.find(
+      (shift) =>
+        shift.startsAt != null &&
+        shift.startsAt >= dayStart.getTime() &&
+        shift.startsAt <= dayEnd.getTime(),
+    )
+  );
 }
 
 /** Explicit event wins; otherwise inherit the current shift's event. */
@@ -140,14 +164,30 @@ export async function persistPrimaryTimeRecord(
     stampNow?: boolean;
   },
 ): Promise<{ docId: string; eventId?: string; window: TimeWindow | null }> {
+  const wantsWindow = !input.stampNow && clockOutFilled(input.clockOutAt);
+  // The server stamps an open clock-in with the current time. A start time
+  // more than half an hour in the past only sticks when the clock-out is
+  // entered too, so say that instead of quietly saving "now".
+  const typedIn = toEpoch(input.clockInAt);
+  if (
+    !input.stampNow &&
+    !wantsWindow &&
+    typedIn != null &&
+    typedIn < Date.now() - 30 * 60_000
+  ) {
+    throw new Error(
+      "This clock-in is in the past. Enter the clock-out time too, or set clock-in to now.",
+    );
+  }
   const createArgs = buildClockInCreateArgs(input);
   const created = await api.clockIn(createArgs);
-  const wantsWindow = !input.stampNow && clockOutFilled(input.clockOutAt);
   const window = wantsWindow
     ? parseTimeWindow(input.clockInAt, input.clockOutAt)
     : null;
   if (wantsWindow && window == null) {
-    throw new Error("Clock-out must be at or after clock-in.");
+    throw new Error(
+      "The clock-out time has to be at or after the clock-in time.",
+    );
   }
   if (window) {
     const closed = await api.clockOut({
@@ -159,6 +199,7 @@ export async function persistPrimaryTimeRecord(
       ...(closed && closed.version != null ? { version: closed.version } : {}),
       clockInAt: window.clockInAt,
       clockOutAt: window.clockOutAt,
+      reason: TYPED_WINDOW_REASON,
     });
   }
   return {
@@ -179,22 +220,35 @@ export async function persistClockOut(
     version?: number;
     existingClockInAt: number;
     clockOutAt?: unknown;
+    /** Unpaid lunch minutes. */
+    breakMinutes?: number;
+    /** Other breaks; they stay paid. */
+    paidBreakMinutes?: number;
   },
 ): Promise<void> {
+  // Check before closing: a refused time must leave the entry open, not
+  // closed at "now" with an error on screen.
+  const desiredOut = toEpoch(input.clockOutAt);
+  if (desiredOut != null && desiredOut < input.existingClockInAt) {
+    throw new Error(
+      "The clock-out time has to be at or after the clock-in time.",
+    );
+  }
   const closed = await api.clockOut({
     docId: input.docId,
     version: input.version,
+    ...(input.breakMinutes ? { breakMinutes: input.breakMinutes } : {}),
+    ...(input.paidBreakMinutes
+      ? { paidBreakMinutes: input.paidBreakMinutes }
+      : {}),
   });
-  const desiredOut = toEpoch(input.clockOutAt);
   if (desiredOut == null) return;
-  if (desiredOut < input.existingClockInAt) {
-    throw new Error("Clock-out must be at or after clock-in.");
-  }
   await api.correct({
     docId: input.docId,
     ...(closed && closed.version != null ? { version: closed.version } : {}),
     clockInAt: input.existingClockInAt,
     clockOutAt: desiredOut,
+    reason: TYPED_CLOCK_OUT_REASON,
   });
 }
 
@@ -267,3 +321,26 @@ export const CLOCK_OUT_PROMPT_FIELDS = [
     required: true,
   },
 ];
+
+/** Lunch is unpaid; other breaks stay paid (spec §12.2). */
+export const BREAK_PROMPT_FIELDS = [
+  {
+    name: "breakMinutes",
+    label: "Lunch minutes (unpaid)",
+    inputType: "number" as const,
+    helper: "Taken off paid time.",
+  },
+  {
+    name: "paidBreakMinutes",
+    label: "Other break minutes (paid)",
+    inputType: "number" as const,
+    helper: "Kept in paid time.",
+  },
+];
+
+/** Minutes typed in a break box; blank or bad input reads as none. */
+export function breakMinutesInput(value: unknown): number | undefined {
+  const minutes = Math.trunc(Number(String(value ?? "").trim()));
+  if (!Number.isFinite(minutes) || minutes < 0) return undefined;
+  return minutes;
+}

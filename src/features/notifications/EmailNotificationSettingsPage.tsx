@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../lib/api";
 import {
@@ -78,13 +78,15 @@ const PREVIEW_CONTENT: Record<
   },
 };
 
+// Nothing saved yet = every summary off: email goes only to people who turned
+// a summary on here.
 const preferenceSnapshot = (
   row: EmailNotificationPreferences | null | undefined,
 ): Required<EmailNotificationPreferences> => ({
-  eventUpdates: row?.eventUpdates !== false,
-  invoiceReminders: row?.invoiceReminders !== false,
-  lowStockAlerts: row?.lowStockAlerts !== false,
-  shiftChanges: row?.shiftChanges !== false,
+  eventUpdates: row != null && row.eventUpdates !== false,
+  invoiceReminders: row != null && row.invoiceReminders !== false,
+  lowStockAlerts: row != null && row.lowStockAlerts !== false,
+  shiftChanges: row != null && row.shiftChanges !== false,
 });
 
 export function EmailNotificationSettingsPage() {
@@ -101,6 +103,8 @@ export function EmailNotificationSettingsPage() {
   const [busy, setBusy] = useState<EmailNotificationCategory | null>(null);
   const { notice, setNotice } = useActionNotice();
   const { error, setError } = useActionFailure();
+  const sendingStatus = useQuery(api.staffSummaries.status, {});
+  const ensureBooked = useMutation(api.staffSummaries.ensureBooked);
 
   const record = rows?.[0] ?? null;
   const preferences = optimistic ?? preferenceSnapshot(record);
@@ -143,6 +147,8 @@ export function EmailNotificationSettingsPage() {
           idempotencyKey: `email-notification-subscriptions:${authStatus.personId ?? `tenant:${authStatus.tenantId ?? "none"}`}:${user.id}`,
         });
       }
+      // Starts the daily morning run for the company if none is booked.
+      if (subscribed) await ensureBooked({});
       const label = EMAIL_NOTIFICATION_CATEGORY_DETAILS[category].label;
       setNotice(
         `${label} ${subscribed ? "enabled" : "paused"}. Your other email categories did not change.`,
@@ -172,8 +178,26 @@ export function EmailNotificationSettingsPage() {
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Email dispatches"
-        lead="Choose exactly which operational summaries reach your inbox. In-app notifications stay on, and changing one category never changes the others."
+        lead="Choose which summaries you want by email. In-app notifications stay on, and changing one category never changes the others."
       />
+
+      <p
+        className="rounded-xs border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-ink"
+        role="note"
+        data-testid="email-summaries-not-sent"
+      >
+        {sendingStatus?.emailReady === false
+          ? "Email sending is not set up for your company yet, so no summaries go out. Your choices are saved; summaries start the morning after email is set up."
+          : `Capsule emails each summary you turn on once a day at about 7 in the morning, only when there is something new.${
+              sendingStatus?.nextRunAt
+                ? ` Next run: ${new Date(sendingStatus.nextRunAt).toLocaleString()}.`
+                : ""
+            }`}{" "}
+        Invoice summaries go only to finance staff and managers; stock summaries
+        only to kitchen staff, stock staff and managers. Invoice emails to
+        clients, sign-in emails and proposal emails are sent from their own
+        pages.
+      </p>
 
       <section className="grid overflow-hidden rounded-sm border border-line-2 bg-panel shadow-[0_24px_70px_-52px_rgba(25,36,31,0.7)] xl:grid-cols-[minmax(0,0.88fr)_minmax(460px,1.12fr)]">
         <div className="border-line-2 p-6 xl:border-r">
@@ -193,7 +217,7 @@ export function EmailNotificationSettingsPage() {
                 {enabledCount}/4
               </strong>
               <span className="block text-2xs tracking-[0.12em] text-ink-3 uppercase">
-                channels live
+                turned on
               </span>
             </div>
           </div>
@@ -275,13 +299,13 @@ export function EmailNotificationSettingsPage() {
         <div className="min-w-0 bg-inset/60 p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="eyebrow">Branded HTML preview</p>
+              <p className="eyebrow">Example email, made-up details</p>
               <h2 className="mt-2 font-display text-xl">
                 {EMAIL_NOTIFICATION_CATEGORY_DETAILS[previewCategory].label}
               </h2>
             </div>
             <span className="rounded-full border border-line-2 bg-panel px-3 py-1.5 font-mono text-2xs tracking-[0.1em] text-ink-3 uppercase">
-              Server rendered
+              Example
             </span>
           </div>
           <div className="relative mt-5 min-h-[560px] overflow-hidden rounded-sm border border-line-2 bg-[#f3f0e9] shadow-[0_20px_52px_-34px_rgba(25,36,31,0.72)]">
@@ -307,11 +331,11 @@ export function EmailNotificationSettingsPage() {
                     OFF
                   </span>
                   <h3 className="mt-5 font-display text-xl">
-                    This email is paused
+                    This email is turned off
                   </h3>
                   <p className="mt-3 text-base leading-relaxed text-ink-2">
-                    Nothing is being sent for this category right now. Turn it
-                    back on whenever you want these summaries again.
+                    You will not get this summary. Turn it on whenever you want
+                    it.
                   </p>
                 </div>
               </div>

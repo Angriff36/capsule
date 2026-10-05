@@ -291,6 +291,67 @@ describe("runtime proof: safe culinary operations", () => {
     ]);
   });
 
+  it("a menu copy keeps its category and season; its dishes keep their tags (AC-050)", async () => {
+    const proof = harness();
+    const kitchen = proof.asRole({
+      subject: "season-chef",
+      role: "kitchen_manager",
+      tenantId: "season-tenant",
+    });
+    const source = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Menu_createViaDraft,
+      { name: "Summer grill", category: "Barbecue", isTemplate: true },
+    )) as { docId: string };
+    const from = Date.UTC(2026, 5, 1);
+    const until = Date.UTC(2026, 8, 1);
+    await proof.executeCommand(kitchen, api.mutations.Menu_setSeason, {
+      docId: source.docId,
+      availableFrom: from,
+      availableUntil: until,
+    });
+    const dish = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Dish_createViaIntroduce,
+      {
+        name: "Corn salad",
+        portionSize: 1,
+        portionUnit: "serving",
+        dietaryTags: ["vegan"],
+      },
+    )) as { docId: string };
+    await proof.executeCommand(kitchen, api.mutations.MenuDish_createViaAdd, {
+      menuId: source.docId,
+      dishId: dish.docId,
+      sortOrder: 1,
+    });
+
+    const copy = (await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.cloneMenu,
+      {
+        sourceMenuId: source.docId,
+        name: "Summer grill copy",
+        isTemplate: false,
+        operationKey: "menu-clone:season",
+      },
+    )) as { menuId: string };
+    const menus = (await kitchen.query(api.queries.listMenu, {})) as any[];
+    expect(menus.find((row) => row._id === copy.menuId)).toMatchObject({
+      category: "Barbecue",
+      availableFrom: from,
+      availableUntil: until,
+    });
+    // Dish tags live on the dish the copied line points at.
+    const lines = (await kitchen.query(api.queries.listMenuDish, {})) as any[];
+    const line = lines.find((row) => row.menuId === copy.menuId)!;
+    expect(line.dishId).toBe(dish.docId);
+    const dishes = (await kitchen.query(api.queries.listDish, {})) as any[];
+    expect(dishes.find((row) => row._id === line.dishId)?.dietaryTags).toEqual([
+      "vegan",
+    ]);
+  });
+
   it("atomically imports reviewed ingredients and rejects a foreign tenant match", async () => {
     const proof = harness();
     const kitchen = proof.asRole({
@@ -364,7 +425,7 @@ describe("runtime proof: safe culinary operations", () => {
           projection: createdProjection,
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     expect(await kitchen.query(api.queries.listComponent, {})).toEqual([]);
     expect(await kitchen.query(api.queries.listIngredient, {})).toEqual([]);
     const args = {
@@ -474,7 +535,6 @@ describe("runtime proof: safe culinary operations", () => {
         {
           componentId: component.docId,
           versionNumber: 1,
-          capturedByName: "Chef",
           changeSummary: name,
           snapshot: JSON.stringify({
             name,
@@ -504,7 +564,7 @@ describe("runtime proof: safe culinary operations", () => {
           operationKey,
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     const afterFailure = await kitchen.run(async (ctx) => ({
       component: await ctx.db.get(component.docId as never),
       lines: await ctx.db.query("componentIngredients").collect(),
@@ -604,7 +664,6 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         versionNumber: 1,
-        capturedByName: "Chef",
         changeSummary: "Exact",
         snapshot: JSON.stringify(capturedShape),
       },
@@ -663,7 +722,6 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         versionNumber: 2,
-        capturedByName: "Chef",
         changeSummary: "Different target",
         snapshot: JSON.stringify({ ...capturedShape, name: "Different" }),
       },
@@ -1034,7 +1092,7 @@ Warm oil gently and steep herbs.`;
           review: { importId: broken.importId, expectedRevision: 0 },
         },
       ),
-    ).rejects.toThrow(/positive/i);
+    ).rejects.toThrow(/more than zero/i);
     expect(await kitchen.query(api.queries.listComponent, {})).toHaveLength(1);
     expect(
       (await kitchen.query(api.queries.listIngredient, {})) as unknown[],
@@ -1046,6 +1104,8 @@ Warm oil gently and steep herbs.`;
     ).toMatchObject({ status: "ready" });
 
     // Recovery: correct the stored measurement, re-approve, finalize once.
+    // The same pasted text already finished as "House Herb Oil" with other
+    // amounts, so this finish is renamed (AC-067: rename or fix the lines).
     await proof.executeCommand(
       kitchen,
       api.mutations.ComponentImport_resumeReview,
@@ -1080,6 +1140,7 @@ Warm oil gently and steep herbs.`;
         operationKey: "durable-review:broken",
         projection: {
           ...brokenProjection,
+          name: "House Herb Oil (small batch)",
           lines: brokenProjection.lines.map((line) =>
             line.createNew ? { ...line, quantity: 0.5 } : line,
           ),

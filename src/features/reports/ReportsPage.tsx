@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   useCreateSavedReportDefinition,
   useListSavedReportDefinition,
@@ -9,6 +10,9 @@ import {
   useSavedReportDefinitionUpdateDefinition,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { formatDate } from "../../lib/format";
+import { readSavedReconciliation } from "../../lib/financeReconciliation";
+import { ReconciliationTables } from "../finance/ReconciliationTables";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -31,7 +35,17 @@ import {
   type SavedReportRow,
 } from "./liveReportModel";
 import { canEditSavedReportDefinition } from "./reportEditAccess";
+import { LETTER_TEXT_MARKER } from "./tpp/savedLetterTexts";
+import {
+  clearReportFiltersFromSearch,
+  reportFiltersFromSearch,
+  searchHasReportFilters,
+  writeReportFiltersToSearch,
+  type ReportFilters,
+} from "./reportFilters";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
+import { ReportSnapshots } from "./ReportSnapshots";
+import { useReportFreshness } from "./useReportFreshness";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
 import { TppReportCatalog } from "./tpp/TppReportCatalog";
 
@@ -39,7 +53,11 @@ const policy = new ReportLifecyclePolicy();
 const payloadBuilder = new ReportCreatePayloadBuilder();
 
 export function ReportsPage() {
-  const [view, setView] = useState<"catalog" | "saved">("catalog");
+  const [searchParams] = useSearchParams();
+  // A shared link (?report=…) opens the saved report it names.
+  const [view, setView] = useState<"catalog" | "saved">(() =>
+    searchParams.has("report") ? "saved" : "catalog",
+  );
   return (
     <>
       <nav className="report-view-switch" aria-label="Report views">
@@ -74,14 +92,27 @@ function SavedReportsPage() {
   const updateDefinition = useSavedReportDefinitionUpdateDefinition();
   const [showCreate, setShowCreate] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedId = searchParams.get("report");
+  const setSelectedId = (reportId: string | null) => {
+    const next = clearReportFiltersFromSearch(searchParams);
+    if (reportId) next.set("report", reportId);
+    else next.delete("report");
+    setSearchParams(next, { replace: true });
+  };
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const { currentRows, definedRows } = useMemo(() => {
-    const activeRows = (reports ?? []).filter((row) => row.deletedAt == null);
+    // Saved list views and saved letter texts share this record; not reports.
+    const activeRows = (reports ?? []).filter(
+      (row) =>
+        row.deletedAt == null &&
+        String(row.chartType) !== "list-view" &&
+        String(row.chartType) !== LETTER_TEXT_MARKER,
+    );
     const defined = activeRows.filter((row) => row.definedAt != null);
     return {
       currentRows: defined.filter((row) => String(row.status) !== "archived"),
@@ -177,7 +208,7 @@ function SavedReportsPage() {
       if (!values) return;
       const name = String(values.name || "").trim();
       if (!name) {
-        setFailure(new Error("Report name is required."));
+        setFailure(new Error("Give this report a name."));
         return;
       }
       void run(`${row._id}:rename`, async () => {
@@ -228,6 +259,7 @@ function SavedReportsPage() {
     row: SavedReportRow,
     dateWindow: ReportDateWindow,
     chartType: ReportChartType,
+    filters: ReportFilters,
   ) => {
     const definition = parseLiveReportDefinition(row.definition);
     void run(`${row._id}:apply`, async () => {
@@ -239,6 +271,7 @@ function SavedReportsPage() {
           version: 2,
           dateWindow,
           notes: definition.notes,
+          filters,
         },
       });
       setNotice("Live report settings applied.");
@@ -254,7 +287,7 @@ function SavedReportsPage() {
           <h1 className="display-title">Live reports</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Saved views of current Capsule operations. Open a report to see live
-            KPIs, a chart, and the source records behind every number.
+            KPIs, a chart, and the source rows behind every number.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -295,8 +328,13 @@ function SavedReportsPage() {
           <SelectedReport
             report={selectedReport}
             busy={busy === `${selectedReport._id}:apply`}
-            onApply={(dateWindow, chartType) =>
-              applyReportSettings(selectedReport, dateWindow, chartType)
+            onApply={(dateWindow, chartType, filters) =>
+              applyReportSettings(
+                selectedReport,
+                dateWindow,
+                chartType,
+                filters,
+              )
             }
           />
         ) : (
@@ -430,9 +468,23 @@ function SelectedReport({
 }: {
   report: SavedReportRow;
   busy: boolean;
-  onApply: (dateWindow: ReportDateWindow, chartType: ReportChartType) => void;
+  onApply: (
+    dateWindow: ReportDateWindow,
+    chartType: ReportChartType,
+    filters: ReportFilters,
+  ) => void;
 }) {
   const authStatus = useAuthStatus();
+  const freshness = useReportFreshness();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchKey = searchParams.toString();
+  // The page address wins, so a copied link opens the view it was sent with.
+  const filters = useMemo<ReportFilters>(() => {
+    const params = new URLSearchParams(searchKey);
+    return searchHasReportFilters(params)
+      ? reportFiltersFromSearch(params)
+      : (parseLiveReportDefinition(report.definition).filters ?? {});
+  }, [searchKey, report.definition]);
   // Same rule as the updateDefinition command: the owner, or manageAccess.
   // A team- / company-shared report opens for every reader who can see the
   // subject, and Apply used to stay live for them until the guard rejected it.
@@ -440,6 +492,18 @@ function SelectedReport({
     personId: authStatus?.personId,
     role: authStatus?.role,
   });
+  const savedCheck = readSavedReconciliation(report.definition);
+  if (savedCheck) {
+    return (
+      <section className="live-report" aria-label="Saved money check">
+        <p className="mb-3 text-base text-ink-2">
+          Saved copy made {formatDate(savedCheck.generatedAt)}. It shows the
+          money as it was then; open Finance, Money check for today's numbers.
+        </p>
+        <ReconciliationTables report={savedCheck} />
+      </section>
+    );
+  }
   const subject = normalizeReportSubject(report.subjectArea);
   if (!subject) {
     return (
@@ -457,8 +521,12 @@ function SelectedReport({
   const definition = parseLiveReportDefinition(report.definition);
   const chart = normalizeReportChart(report.chartType);
   return (
-    <LiveReportData subject={subject} dateWindow={definition.dateWindow}>
-      {({ model, loading, sourceAvailable }) => (
+    <LiveReportData
+      subject={subject}
+      dateWindow={definition.dateWindow}
+      filters={filters}
+    >
+      {({ model, loading, sourceAvailable, leftOut, sourceAsOf }) => (
         <LiveReportWorkspace
           report={report}
           subject={subject}
@@ -470,7 +538,31 @@ function SelectedReport({
           sourceAvailable={sourceAvailable}
           busy={busy}
           canEditSettings={canEditSettings}
-          onApply={onApply}
+          onApply={(dateWindow, chartType) =>
+            onApply(dateWindow, chartType, filters)
+          }
+          filters={filters}
+          onFiltersChange={(next) =>
+            setSearchParams(writeReportFiltersToSearch(searchParams, next), {
+              replace: true,
+            })
+          }
+          leftOut={leftOut}
+          sourceAsOf={sourceAsOf}
+          freshness={freshness}
+          snapshots={
+            <ReportSnapshots
+              report={report}
+              subject={subject}
+              model={model}
+              chartType={chart.chartType}
+              dateWindow={definition.dateWindow}
+              filters={filters}
+              leftOut={leftOut}
+              sourceAsOf={sourceAsOf}
+              canTake={!loading && sourceAvailable && freshness.live}
+            />
+          }
         />
       )}
     </LiveReportData>

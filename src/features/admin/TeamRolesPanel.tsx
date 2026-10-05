@@ -1,10 +1,12 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import { usePayRates } from "../facilities/useLaborSummary";
 import {
   useCreatePerson,
   usePersonAssignRole,
+  usePersonDeactivate,
+  usePersonReactivate,
   usePersonSetPayRate,
   usePersonUnlinkAccount,
 } from "../../lib/manifest-convex-react";
@@ -24,8 +26,19 @@ export function TeamRolesPanel({
   const createPerson = useCreatePerson();
   const assignRole = usePersonAssignRole();
   const unlinkAccount = usePersonUnlinkAccount();
+  const deactivate = usePersonDeactivate();
+  const reactivate = usePersonReactivate();
   const setPayRate = usePersonSetPayRate();
   const provisionSignIn = useAction(api.authProvision.provisionStaffSignIn);
+  const myPersonId = useQuery(api.authStatus.getAuthStatus, {})?.personId;
+  const signInEmails = useQuery(
+    api.staffSignInEmail.listSignInEmailStates,
+    canEdit ? {} : "skip",
+  );
+  const signInEmailByPersonId = useMemo(
+    () => new Map((signInEmails ?? []).map((row) => [row.personId, row])),
+    [signInEmails],
+  );
   const payRates = usePayRates();
   const rateByPersonId = useMemo(
     () =>
@@ -69,7 +82,7 @@ export function TeamRolesPanel({
     const role = String(data.get("role") ?? "staff");
     const employeeNumber = String(data.get("employeeNumber") ?? "").trim();
     if (!givenName || !familyName || !email) {
-      setError("First name, last name, and email are required.");
+      setError("Give this hire a first name, last name, and email.");
       return;
     }
     if (!PersonRoleDirectory.isAssignable(role)) {
@@ -141,6 +154,44 @@ export function TeamRolesPanel({
       );
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "Could not unlink.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function onPauseAccess(person: TeamPerson) {
+    if (!canEdit) return;
+    setBusy(person._id);
+    setError(null);
+    setNotice(null);
+    try {
+      await deactivate({ docId: person._id, version: person.version });
+      setNotice(
+        `Paused ${person.givenName} ${person.familyName}. They cannot open the app until you restore access. Their shifts, hours and pay records stay as they are.`,
+      );
+    } catch (error_) {
+      setError(
+        error_ instanceof Error ? error_.message : "Could not pause access.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function onRestoreAccess(person: TeamPerson) {
+    if (!canEdit) return;
+    setBusy(person._id);
+    setError(null);
+    setNotice(null);
+    try {
+      await reactivate({ docId: person._id, version: person.version });
+      setNotice(
+        `Restored ${person.givenName} ${person.familyName}. They can open the app with the same sign-in again.`,
+      );
+    } catch (error_) {
+      setError(
+        error_ instanceof Error ? error_.message : "Could not restore access.",
+      );
     } finally {
       setBusy(null);
     }
@@ -269,7 +320,11 @@ export function TeamRolesPanel({
         onSetPayRate={onSetPayRate}
         rateByPersonId={rateByPersonId}
         onSendSignIn={onSendSignIn}
+        signInEmailByPersonId={signInEmailByPersonId}
         onUnlinkAccount={onUnlinkAccount}
+        myPersonId={myPersonId ?? null}
+        onPauseAccess={onPauseAccess}
+        onRestoreAccess={onRestoreAccess}
         onNotice={setNotice}
         onError={setError}
         onBusy={setBusy}

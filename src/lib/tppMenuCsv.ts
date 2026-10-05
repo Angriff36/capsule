@@ -85,9 +85,18 @@ export function tppMenuCsvToRows(text: string): {
   rows: TppMenuFeedRow[];
   skipped: number;
 } {
-  const table = parseCsv(text);
+  return tppMenuTableToRows(parseCsv(text));
+}
+
+/** The same mapping for a sheet already read into rows (the TPP .xlsx export). */
+export function tppMenuTableToRows(
+  table: ReadonlyArray<ReadonlyArray<string>>,
+): {
+  rows: TppMenuFeedRow[];
+  skipped: number;
+} {
   if (table.length === 0) return { rows: [], skipped: 0 };
-  const headers = table[0].map(normalizeHeader);
+  const headers = table[0]!.map(normalizeHeader);
   const col = (...names: string[]): number => {
     for (const n of names) {
       const i = headers.indexOf(n);

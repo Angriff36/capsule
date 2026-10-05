@@ -66,6 +66,14 @@ export class OfflineAuthSnapshotStore {
     this.save(file);
   }
 
+  /** Drop one account's saved access (it was switched off or removed). */
+  forget(accountId: string): void {
+    const file = this.load();
+    if (!(accountId in file.byAccount)) return;
+    delete file.byAccount[accountId];
+    this.save(file);
+  }
+
   hasAny(now = Date.now()): boolean {
     const file = this.load();
     return Object.values(file.byAccount).some((row) =>

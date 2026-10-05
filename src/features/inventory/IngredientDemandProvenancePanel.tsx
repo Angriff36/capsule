@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useIngredientDemandProvenance } from "../facilities/useIngredientDemandProvenance";
+import { useDemandProvenance } from "../facilities/useDemandProvenance";
 
 const number = (value: unknown) =>
   typeof value === "number"
@@ -20,7 +20,7 @@ export function IngredientDemandProvenancePanel({
 }: {
   demandId: string;
 }) {
-  const provenance = useIngredientDemandProvenance(demandId);
+  const provenance = useDemandProvenance(demandId);
   if (provenance === undefined)
     return (
       <p className="demand-provenance-loading">Loading calculation trace.</p>

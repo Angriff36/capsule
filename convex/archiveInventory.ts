@@ -133,6 +133,14 @@ export const inventoryArchive = action({
       );
     }
 
+    // AC-177: knowing a storage id grants nothing — the bytes must be this
+    // company's own upload before anything reads them.
+    const claim = await ctx.runQuery(
+      internal.archiveInventoryStore.archiveStorageClaim,
+      { tenantId: auth.tenantId, storageId: args.storageId },
+    );
+    if (!claim.allowed) throw new ConvexError(claim.reason);
+
     const blob = await ctx.storage.get(args.storageId as Id<"_storage">);
     if (!blob) throw new ConvexError("Archive not found in file storage.");
     const archive = Buffer.from(await blob.arrayBuffer());

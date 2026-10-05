@@ -8,6 +8,14 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import {
+  approvedEvent,
+  drafts,
+  lineFor,
+  linkedEventIds,
+  rolesFor,
+  seedCatalog,
+} from "./weekly-purchasing.runtime.helpers";
 
 const S = {
   tenantId: "tenant-weekly-purchasing-e2e",
@@ -465,5 +473,61 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
       revisedFlourTotal - S.stockOnHand,
       4,
     );
+  });
+
+  // AC-469: stock on the shelf is counted once for the whole week.
+  it("a third event joining the week does not double-count the same on-hand stock", async () => {
+    const proof = harness();
+    const tenantId = "tenant-ac469-stock-once";
+    const roles = rolesFor(proof, tenantId);
+    const catalog = await seedCatalog(proof, tenantId, [
+      { name: "Flour", perServing: S.flourPerServing, stock: S.stockOnHand },
+    ]);
+    const [flourId] = catalog.ingredientIds as [string];
+    const eventIds: string[] = [];
+    for (const [title, headcount] of [
+      ["AC-469 first", 100],
+      ["AC-469 second", 50],
+    ] as const)
+      eventIds.push(
+        await approvedEvent(proof, tenantId, {
+          title,
+          headcount,
+          dishIds: catalog.dishIds,
+        }),
+      );
+    const [draft] = await drafts(roles.procurement, tenantId);
+    const before = await lineFor(
+      roles.procurement,
+      tenantId,
+      draft!._id,
+      flourId,
+    );
+    expect(Number(before!.orderedQuantity)).toBeCloseTo(15 - S.stockOnHand, 4);
+
+    eventIds.push(
+      await approvedEvent(proof, tenantId, {
+        title: "AC-469 third",
+        headcount: 30,
+        dishIds: catalog.dishIds,
+      }),
+    );
+
+    const open = await drafts(roles.procurement, tenantId);
+    expect(open).toHaveLength(1);
+    expect(open[0]!._id).toBe(draft!._id);
+    const after = await lineFor(
+      roles.procurement,
+      tenantId,
+      draft!._id,
+      flourId,
+    );
+    expect(after!._id).toBe(before!._id);
+    // 180 guests x 0.1 kg = 18 kg; the 5 kg on the shelf is used once.
+    expect(Number(after!.orderedQuantity)).toBeCloseTo(18 - S.stockOnHand, 4);
+    expect(Number(after!.stockAppliedQuantity)).toBeCloseTo(S.stockOnHand, 4);
+    expect(
+      await linkedEventIds(roles.procurement, tenantId, after!._id),
+    ).toEqual([...eventIds].sort());
   });
 });

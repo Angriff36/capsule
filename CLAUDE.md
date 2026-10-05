@@ -51,18 +51,28 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
 - Commit OFTEN.  One concern per commit; include proof (`bun run check` or a focused subset).
 - Never commit `.env.local`, credentials, or `.artifacts/` dumps.
 - Do not amend pushed history or force-push `main`.
-- **Branch and release rule (owner, 2026-08-25).** Nothing pushes to `main`
-  by hand; `.githooks/pre-push` blocks it. All work lives on a branch. Commit
-  and push to that branch at once and often — a branch push is a chore: Vercel
+- **ONE shared branch: `dev` (owner, 2026-09-20; replaces branch-per-task).**
+  Every agent and every session works on `dev`. Never create a branch, never
+  switch the checkout to another branch (the owner tests on this checkout), and
+  never make a worktree unless the owner asks. Start with
+  `git pull --no-rebase origin dev`; stage only your own paths; commit and push
+  to `dev` at once and often. Nothing pushes to `main` by hand;
+  `.githooks/pre-push` blocks it. A `dev` push is a chore: Vercel
   ignores non-`main` refs (`vercel.json` `ignoreCommand`), so it builds nothing
   and never runs `convex deploy`. Dev work talks to the LOCAL Convex backend.
-  ONE merge to `main` happens at the end of the branch, via
-  `bash scripts/release.sh --reviewer <model>` after the cross-model review APPROVES.
+  **Release only when the owner says "release" in the current conversation.**
+  Exception: the product builder's approved daily review releases on its own
+  (Ryan, 2026-09-28: "once the reviewer clears it it should go to production").
+  A release merges `dev` into `main`, via
+  `bash scripts/release.sh --reviewer <model>` after the cross-model review APPROVES
+  (only when the merge gate requires a review).
   That single push is the only Vercel production build, and the only Convex
   Cloud deploy unless the build runs in self-hosted backend mode
   (`CONVEX_SELF_HOSTED_URL` set → UI-only, no Convex Cloud deploy): Vercel
   builds `main` only for a `[release]` commit, so a merge
-  made on GitHub never deploys. The script then renames the branch to `archive/<branch>`.
+  made on GitHub never deploys. `dev` is permanent: the script moves it to the
+  release commit and never archives it (any other branch name is still renamed
+  to `archive/<branch>`).
 - **Production Convex is self-hosted on the owner's Linux box (`pop-os`).** The Vercel
   `main` build is UI-only, so a release that changes manifests or `convex/` is not complete
   until that box deploys the backend from the release commit. **ONE command does the whole
@@ -82,6 +92,24 @@ Prettier owns format (`bun run format` / `format:check`). It is part of `bun run
 ## Baseline
 
 See `BASELINE.md` for enforced vs N/A gates. Coverage thresholds in `vite.config.ts` may only move upward. Branch protection status: `.github/branch-protection.md`.
+
+PRESERVATION RULE:
+
+If an existing visual artifact, PDF page, form, image, UI component, or layout already exists, treat it as immutable unless I explicitly ask for a redesign.
+
+Do not:
+- recreate it
+- restyle it
+- re-typeset it
+- redraw it
+- simplify it
+- substitute a generated approximation
+- replace diagrams or graphics
+- change spacing, typography, proportions, or layout
+
+Reuse the original asset/component directly and modify only the specific fields or behavior I requested.
+
+If the requested change can be made by overlaying data or wiring existing components, do that instead of rebuilding the artifact.
 
 # === COGNILAYER (auto-generated, do not delete) ===
 
@@ -181,3 +209,12 @@ Convex agent skills for common tasks can be installed by running
 `npx convex ai-files install`.
 
 <!-- convex-ai-end -->
+
+## Component reuse
+
+Storybook is Capsule's reusable component catalog. Before building or changing UI,
+read `docs/design/component-catalog.md`, inspect the matching story and implementation,
+and reuse the existing component/variant. Follow AGENTS.md's "Component catalog and
+reuse" rules. Action dropdowns use `src/ui/DropdownMenu.tsx`; examples live in
+`src/ui/DropdownMenu.stories.tsx`. Add colocated stories and update the catalog when
+adding a reusable component. `DESIGN.md` remains presentation authority.

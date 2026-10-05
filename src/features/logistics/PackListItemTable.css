@@ -1,0 +1,42 @@
+/* Phone: each pack line becomes one short card (tick box on the left, then
+   name, Required, Packed, state and actions). As a wide table the names were
+   cut at the screen edge and every row grew very tall. Same pattern as the
+   event needs list; desktop unchanged. */
+@media (max-width: 767px) {
+  .supply-table-wrap table.pack-items-table {
+    min-width: 0;
+    overflow-x: visible;
+    white-space: normal;
+  }
+  .supply-table-wrap table.pack-items-table thead {
+    display: none;
+  }
+  .supply-table-wrap table.pack-items-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .supply-table-wrap table.pack-items-table tr {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .supply-table-wrap table.pack-items-table tbody tr:first-child {
+    border-top: 0;
+  }
+  .supply-table-wrap table.pack-items-table td {
+    display: block;
+    grid-column: 2;
+    padding: 0.1rem 0;
+    border-top: 0;
+  }
+  .supply-table-wrap table.pack-items-table td:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+    width: auto;
+  }
+  .supply-table-wrap table.pack-items-table td[data-label]::before {
+    content: attr(data-label) ": ";
+    color: var(--color-ink-3);
+  }
+}

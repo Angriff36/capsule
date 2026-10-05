@@ -175,16 +175,19 @@ describe("plain words on the kitchen recipe book", () => {
     expect(all).not.toContain("saved component import");
     expect(all).not.toContain("Save component again");
 
-    expect(page).toContain("then save the review and open the recipe.");
+    expect(page).toContain("then save and");
+    expect(page).toContain("open the recipe.");
+    expect(page).not.toContain("`.txt`");
+    expect(panes).not.toContain("`.txt`");
     expect(page).toContain("Open saved recipe");
     expect(page).toContain("The corrected formula lives on its recipe.");
     expect(panes).toContain("Recipe text");
     expect(panes).toContain("Recipe sheet CSV");
     expect(panes).toContain("Recipe lines CSV");
     expect(panes).toContain("Plain text recipe (.txt)");
-    expect(panes).toContain("Paste recipe text or choose");
+    expect(panes).toContain("Paste the recipe or choose");
     expect(panes).toContain("Recipe name");
-    expect(panes).toContain("<h3>Ingredients</h3>");
+    expect(panes).toContain("<h3>Ingredients and sub-recipes</h3>");
     expect(panes).toContain("Save and edit recipe");
     expect(readiness).toContain("Paste recipe text before parsing.");
     expect(readiness).toContain("Recipe sheet loaded");
@@ -239,17 +242,19 @@ describe("plain words on the kitchen recipe book", () => {
     expect(textParser).toContain("Paste a recipe to begin.");
     expect(csvParser).toContain('"Untitled recipe"');
     expect(csvParser).toContain('"Untitled import"');
-    expect(finalizer).toContain('"Recipe name is required"');
-    expect(finalizer).toContain('"Recipe yield quantity must be positive"');
-    expect(finalizer).toContain('"Recipe yield unit is required"');
+    expect(finalizer).toContain('"Give this recipe a name."');
+    expect(finalizer).toContain(
+      `"This recipe's yield has to be more than zero. Enter how much it makes."`,
+    );
+    expect(finalizer).toContain(`"Pick a unit for this recipe's yield."`);
     expect(repository).toContain('"Recipe import not found"');
 
     for (const fresh of [
       "Untitled recipe",
       "Paste a recipe to begin.",
-      "Recipe name is required",
-      "Recipe yield quantity must be positive",
-      "Recipe yield unit is required",
+      "Give this recipe a name.",
+      "This recipe's yield has to be more than zero. Enter how much it makes.",
+      "Pick a unit for this recipe's yield.",
       "Recipe import not found",
     ]) {
       expectPlain(fresh);

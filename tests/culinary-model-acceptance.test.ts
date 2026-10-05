@@ -18,6 +18,7 @@ import {
   type EventDishLike,
   type ExistingContributionRow,
 } from "../convex/lib/culinaryModel/demand";
+import { unresolvedText } from "../convex/lib/culinaryModel/unresolvedText";
 import {
   absenceDecision,
   assignOrdinal,
@@ -883,6 +884,106 @@ describe("nested recipes keep quantities and partial costs", () => {
       },
     );
     expect(demand.unresolved.some((u) => u.kind === "cycle")).toBe(true);
+  });
+  it("a cycle or a missing sub-recipe names only its own recipe and leaves the rest of the dish exact", () => {
+    const broken = component({
+      id: "cmp-broken",
+      name: "Broken",
+      yieldQuantity: 1,
+      yieldUnit: "batch",
+      stepCount: 1,
+      componentLines: [
+        { id: "m1", childComponentId: "cmp-gone", quantity: 1, unit: "batch" },
+      ],
+    });
+    const components = new Map(cl.components);
+    components.set(broken.id, broken);
+    const dish: DishLike = {
+      id: "d",
+      name: "Plate",
+      kind: "food",
+      ingredientLines: [],
+      componentLines: [
+        {
+          id: "dm",
+          componentId: "cmp-mac",
+          yieldQuantity: 10,
+          batchMultiplier: 1,
+        },
+        {
+          id: "dc",
+          componentId: "cmp-cyc",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+        },
+        {
+          id: "db",
+          componentId: "cmp-broken",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+        },
+      ],
+      tasks: [],
+    };
+    const demand = expandEventDish(
+      eventDish({ id: "ed", dishId: "d", quantityServings: 10 }),
+      {
+        ...lookups({ dishes: [dish] }),
+        components,
+        ingredients: cl.ingredients,
+      },
+    );
+    // The good recipe still asks for exactly 8 qt of cream, once.
+    const cream = demand.contributions.filter(
+      (c) => c.ingredientId === "ing-cream",
+    );
+    expect(cream).toHaveLength(1);
+    expect(cream[0].quantity).toBe(8);
+    // Only the looping and the broken recipes are reported, each by name/id.
+    const cycle = demand.unresolved.filter((u) => u.kind === "cycle");
+    expect(cycle).toHaveLength(1);
+    expect(cycle[0].detail).toContain("cmp-cyc -> cmp-cyc2 -> cmp-cyc");
+    const missing = demand.unresolved.filter(
+      (u) => u.kind === "missing_reference",
+    );
+    expect(missing).toHaveLength(1);
+    expect(missing[0]).toMatchObject({
+      refId: "cmp-gone",
+      detail: "sub-recipe not found",
+    });
+    // Screens get plain sentences with names, never record ids.
+    const names = { components, dishes: new Map([[dish.id, dish]]) };
+    expect(unresolvedText(cycle[0], names)).toBe(
+      "Cyclic ends up inside itself: Cyclic uses Cyclic 2, and Cyclic 2 uses Cyclic. Take one of those sub-recipes out. Until then nothing from this recipe is counted for ordering.",
+    );
+    expect(unresolvedText(missing[0], names)).toBe(
+      "A sub-recipe used on Plate was removed from the recipe book and its name is no longer on file, so it is not counted. The rest of the dish is.",
+    );
+    expect(
+      unresolvedText(missing[0], {
+        ...names,
+        removedNames: new Map([["cmp-gone", "Garlic confit"]]),
+      }),
+    ).toBe(
+      "Garlic confit, a sub-recipe used on Plate, was removed from the recipe book, so it is not counted. The rest of the dish is.",
+    );
+    for (const item of demand.unresolved)
+      expect(unresolvedText(item, names)).not.toMatch(/cmp-|ing-|_/);
+    // Nothing from the loop or the missing recipe reaches the shopping list.
+    expect(
+      demand.contributions.every((c) =>
+        (c.componentPath ?? []).every((id) =>
+          ["cmp-mac", "cmp-alfredo"].includes(id),
+        ),
+      ),
+    ).toBe(true);
+    // Costing flags the same recipes and still prices the good one.
+    expect(
+      componentBatchCost("cmp-broken", { ...cl, components }).confidence,
+    ).not.toBe("full");
+    expect(
+      componentBatchCost("cmp-alfredo", { ...cl, components }).knownSubtotal,
+    ).toBe(20);
   });
   it("prices a dish portion through a portion spec", () => {
     const dough = component({

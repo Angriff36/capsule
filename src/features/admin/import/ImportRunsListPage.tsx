@@ -13,6 +13,9 @@ import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 import { QuickFileImport } from "./QuickFileImport";
+import { listOriginState, useListOrigin } from "../../list-state/listOrigin";
+import { ListStateManager } from "../../list-state/ListStateManager";
+import { useListViewState } from "../../list-state/useListViewState";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 type DatasetType =
@@ -22,7 +25,8 @@ type DatasetType =
   | "menus"
   | "venues"
   | "payments"
-  | "pack_list";
+  | "pack_list"
+  | "history";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -40,6 +44,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   venues: "Venues",
   payments: "Payments",
   pack_list: "Pack Lists",
+  history: "Messages and tasks",
 };
 
 // Status labels
@@ -53,8 +58,32 @@ const STATUS_LABELS: Record<string, string> = {
   failed: "Failed",
   reverted: "Reverted",
 };
+const importRunsState = new ListStateManager({
+  source: {
+    key: "source",
+    defaultValue: "",
+    parse: (value: string | null) =>
+      value && Object.hasOwn(SOURCE_SYSTEM_LABELS, value) ? value : "",
+    serialize: (value: string) => value || null,
+  },
+  dataset: {
+    key: "dataset",
+    defaultValue: "",
+    parse: (value: string | null) =>
+      value && Object.hasOwn(DATASET_TYPE_LABELS, value) ? value : "",
+    serialize: (value: string) => value || null,
+  },
+  status: {
+    key: "status",
+    defaultValue: "",
+    parse: (value: string | null) =>
+      value && Object.hasOwn(STATUS_LABELS, value) ? value : "",
+    serialize: (value: string) => value || null,
+  },
+});
 
 export function ImportRunsListPage() {
+  const listOrigin = useListOrigin();
   const allRuns = useListImportRun();
   // Allocation goes through the authored importCoordinator seam: the generated
   // ImportRun_start is a transition command on an EXISTING run (requires docId),
@@ -70,9 +99,12 @@ export function ImportRunsListPage() {
   const { notice, setNotice } = useActionNotice();
 
   // Filters
-  const [sourceSystemFilter, setSourceSystemFilter] = useState<string>("");
-  const [datasetTypeFilter, setDatasetTypeFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [filters, setFilters] = useListViewState(importRunsState);
+  const {
+    source: sourceSystemFilter,
+    dataset: datasetTypeFilter,
+    status: statusFilter,
+  } = filters;
 
   // Filter runs
   const filteredRuns = useMemo(() => {
@@ -319,7 +351,7 @@ export function ImportRunsListPage() {
             <select
               id="source-filter"
               value={sourceSystemFilter}
-              onChange={(e) => setSourceSystemFilter(e.target.value)}
+              onChange={(e) => setFilters({ source: e.target.value })}
               className="min-w-40 px-3 py-2 border border-line rounded-sm text-xs"
             >
               <option value="">All Sources</option>
@@ -340,7 +372,7 @@ export function ImportRunsListPage() {
             <select
               id="dataset-filter"
               value={datasetTypeFilter}
-              onChange={(e) => setDatasetTypeFilter(e.target.value)}
+              onChange={(e) => setFilters({ dataset: e.target.value })}
               className="min-w-40 px-3 py-2 border border-line rounded-sm text-xs"
             >
               <option value="">All Types</option>
@@ -361,7 +393,7 @@ export function ImportRunsListPage() {
             <select
               id="status-filter"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => setFilters({ status: e.target.value })}
               className="min-w-40 px-3 py-2 border border-line rounded-sm text-xs"
             >
               <option value="">All Statuses</option>
@@ -380,8 +412,8 @@ export function ImportRunsListPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        <div className="overflow-x-auto max-md:px-3">
+          <table className="phone-cards w-full text-xs">
             <thead>
               <tr className="border-b border-line bg-inset">
                 <th className="text-left py-3 px-4 font-medium">Source</th>
@@ -427,22 +459,25 @@ export function ImportRunsListPage() {
                         {SOURCE_SYSTEM_LABELS[run.sourceSystem] ||
                           run.sourceSystem}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4" data-label="Dataset">
                         {DATASET_TYPE_LABELS[run.datasetType] ||
                           run.datasetType}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4" data-label="Status">
                         <StatusChip status={statusLabel} />
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4" data-label="Items">
                         {totalRecords > 0 ? totalRecords.toString() : "—"}
                       </td>
-                      <td className="py-3 px-4 text-ink-2">
+                      <td className="py-3 px-4 text-ink-2" data-label="Started">
                         {run.startTime
                           ? new Date(run.startTime).toLocaleString()
                           : "—"}
                       </td>
-                      <td className="py-3 px-4 text-ink-2">
+                      <td
+                        className="py-3 px-4 text-ink-2"
+                        data-label="Completed"
+                      >
                         {run.completionTime
                           ? new Date(run.completionTime).toLocaleString()
                           : "—"}
@@ -451,6 +486,7 @@ export function ImportRunsListPage() {
                         <div className="flex items-center gap-2">
                           <Link
                             to={importRunDetailPath(run._id)}
+                            state={listOriginState(listOrigin)}
                             className="text-brand hover:text-brand text-xs font-medium"
                           >
                             View

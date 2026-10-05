@@ -1,5 +1,6 @@
 import type { PricingBasis } from "../../lib/pricing";
 import type { ProposalPdfRecord } from "./proposalPdf";
+import { loadWindowLabel } from "../facilities/venueOperatingFacts";
 
 type Revision = { snapshot?: string | null } | null | undefined;
 export type ProposalPdfSource =
@@ -81,8 +82,18 @@ export function projectProposalPdf(
         visibleSections: Array.isArray(proposal.visibleSections)
           ? proposal.visibleSections
           : [],
+        sectionOrder: Array.isArray(proposal.sectionOrder)
+          ? proposal.sectionOrder
+          : [],
         dishSelections: Array.isArray(frozen.dishSelections)
           ? frozen.dishSelections
+          : [],
+        // AC-654: the pictures frozen at send; none on older sends.
+        menuPictures: Array.isArray(frozen.pictures)
+          ? frozen.pictures.map((picture: any) => ({
+              dishName: String(picture.dishName ?? ""),
+              storageId: picture.storageId ?? null,
+            }))
           : [],
         pricingLines: (frozen.lineItems ?? []).map((line: any) => ({
           description: line.description,
@@ -96,7 +107,10 @@ export function projectProposalPdf(
           : [],
         venueLogistics: frozen.venue
           ? {
-              loadIn: frozen.venue.loadInInstructions ?? undefined,
+              loadIn:
+                [loadWindowLabel(frozen.venue), frozen.venue.loadInInstructions]
+                  .filter(Boolean)
+                  .join(". ") || undefined,
               access: frozen.venue.kitchenAccess ?? undefined,
               restrictions: frozen.venue.restrictions ?? undefined,
             }

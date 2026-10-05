@@ -7,12 +7,22 @@ import {
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { venueDetailPath } from "./facilitiesRoutes";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
 import { coordinatesFromFields } from "./venueCoordinates";
+import { VenueListFilter } from "./VenueListFilter";
+import {
+  NO_VENUE_FILTER,
+  largestKnownCapacity,
+  venueMatchesFilter,
+  type VenueFilter,
+} from "./venueOperatingFacts";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 const VENUE_TYPES = [
   "client_site",
@@ -43,6 +53,40 @@ const LOGISTICS_BOOLEANS = [
   { name: "hasStairs", label: "Stairs (load-in)" },
 ] as const;
 
+const venuesState = new ListStateManager<VenueFilter>({
+  minGuests: {
+    key: "guests",
+    defaultValue: null,
+    parse: (value) =>
+      value != null && /^\d+$/.test(value) ? Number(value) : null,
+    serialize: (value) => (value == null ? null : String(value)),
+  },
+  premise: {
+    key: "premise",
+    defaultValue: "any",
+    parse: (value) => (value === "on" || value === "off" ? value : "any"),
+    serialize: (value) => (value === "any" ? null : value),
+  },
+  needsOven: {
+    key: "oven",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+  needsFridge: {
+    key: "fridge",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+  needsParking: {
+    key: "parking",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+});
+
 // Tri-state logistics booleans: "" = Unknown (unset), "true" = Yes, "false" = No.
 // A binary checkbox cannot express "unknown" vs "confirmed no", which mismarks
 // venues created before a field existed. A select gives the operator all three.
@@ -52,6 +96,7 @@ const triStateBoolean = (
   value === "true" ? true : value === "false" ? false : undefined;
 
 export function VenuesPage() {
+  const listOrigin = useListOrigin();
   const venues = useListVenue();
   const createVenue = useCreateVenue();
   const deactivate = useVenueDeactivate();
@@ -62,7 +107,9 @@ export function VenuesPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
 
+  const [filter, setFilter] = useListViewState(venuesState);
   const rows = (venues ?? []).filter((item) => item.deletedAt == null);
+  const shownRows = rows.filter((item) => venueMatchesFilter(item, filter));
   const activeRows = rows.filter(
     (item) => item.status === "active" || item.status === "inactive",
   );
@@ -445,82 +492,104 @@ export function VenuesPage() {
           No venues yet. Click "Add venue" to create one.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-sm border border-line">
-          <table className="min-w-full divide-y divide-line">
-            <thead className="bg-inset">
-              <tr>
-                <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
-                  Name
-                </th>
-                <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
-                  Type
-                </th>
-                <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
-                  Capacity
-                </th>
-                <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
-                  Location
-                </th>
-                <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-right text-2xs font-medium uppercase text-ink-3">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line bg-panel">
-              {rows.map((venue) => (
-                <tr key={venue._id} className="hover:bg-inset">
-                  <td className="px-4 py-3">
-                    <Link
-                      to={venueDetailPath(venue._id)}
-                      className="font-medium text-brand hover:underline"
-                    >
-                      {venue.name}
-                    </Link>
-                    {venue.contactName && (
-                      <div className="text-2xs text-ink-3">
-                        {venue.contactName}
-                        {venue.contactPhone && ` • ${venue.contactPhone}`}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-ink-2">
-                    {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
-                      venue.venueType}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-ink-2">
-                    {venue.capacity ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-ink-2">
-                    {[venue.city, venue.region].filter(Boolean).join(", ") ||
-                      "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusChip
-                      status={venue.status === "active" ? "active" : "inactive"}
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      className="btn btn-ghost text-xs"
-                      type="button"
-                      onClick={() => handleToggleStatus(venue)}
-                      disabled={busy === `${venue._id}:toggle`}
-                    >
-                      {busy === `${venue._id}:toggle`
-                        ? "..."
-                        : venue.status === "active"
-                          ? "Deactivate"
-                          : "Activate"}
-                    </button>
-                  </td>
+        <>
+          <VenueListFilter
+            filter={filter}
+            onChange={setFilter}
+            shown={shownRows.length}
+            total={rows.length}
+          />
+          <div className="overflow-hidden rounded-sm border border-line">
+            <table className="min-w-full divide-y divide-line">
+              <thead className="bg-inset">
+                <tr>
+                  <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
+                    Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
+                    Capacity
+                  </th>
+                  <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
+                    Location
+                  </th>
+                  <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-right text-2xs font-medium uppercase text-ink-3">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-line bg-panel">
+                {shownRows.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-6 text-center text-xs text-ink-3"
+                    >
+                      No venue on file fits. Clear a box, or add the missing
+                      facts on a venue's page.
+                    </td>
+                  </tr>
+                )}
+                {shownRows.map((venue) => (
+                  <tr key={venue._id} className="hover:bg-inset">
+                    <td className="px-4 py-3">
+                      <Link
+                        to={venueDetailPath(venue._id)}
+                        state={listOriginState(listOrigin)}
+                        className="font-medium text-brand hover:underline"
+                      >
+                        {venue.name}
+                      </Link>
+                      {venue.contactName && (
+                        <div className="text-2xs text-ink-3">
+                          {venue.contactName}
+                          {venue.contactPhone && ` • ${venue.contactPhone}`}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-ink-2">
+                      {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
+                        venue.venueType}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-ink-2">
+                      {largestKnownCapacity(venue) || "Not known"}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-ink-2">
+                      {[venue.city, venue.region].filter(Boolean).join(", ") ||
+                        "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusChip
+                        status={
+                          venue.status === "active" ? "active" : "inactive"
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        className="btn btn-ghost text-xs"
+                        type="button"
+                        onClick={() => handleToggleStatus(venue)}
+                        disabled={busy === `${venue._id}:toggle`}
+                      >
+                        {busy === `${venue._id}:toggle`
+                          ? "..."
+                          : venue.status === "active"
+                            ? "Deactivate"
+                            : "Activate"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

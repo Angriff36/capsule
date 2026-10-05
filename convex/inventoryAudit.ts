@@ -158,7 +158,12 @@ function normalizeEvent(
     };
   }
 
-  const quantityBefore = numberValue(payload.previousQuantity);
+  // An opening starts from nothing. Older opening events stored the opening
+  // amount as the "before" value, which hid it from the running total.
+  const quantityBefore =
+    event.type === "InventoryItemOpened"
+      ? 0
+      : numberValue(payload.previousQuantity);
   const quantityAfter = numberValue(payload.quantityOnHand);
   let action: string;
   let reason: string;
@@ -195,7 +200,9 @@ function normalizeEvent(
           ? "Waste"
           : normalizedReason === "reservation consumed"
             ? "Issued"
-            : "Adjustment";
+            : normalizedReason === "returned from event"
+              ? "Returned"
+              : "Adjustment";
       break;
     }
     default:

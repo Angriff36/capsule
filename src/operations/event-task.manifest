@@ -1,0 +1,381 @@
+// Capsule operations — event to-dos and the checklists they come from.
+//
+// A to-do is work around an event that is not a block on the day-of timeline:
+// book the permit, check the van, print the binder, count the linen back in.
+// It has an owner, a due time, a priority, an optional "wait for" to-do, and
+// an optional "needs proof" mark (a photo or file is attached to the event).
+//
+// A checklist is a reusable list of to-dos with due times counted from the
+// event's start ("2 days before", "1 hour after"). Putting a checklist on an
+// event makes one to-do per line; the same line on the same event stays one
+// to-do (convex side: the screen checks by checklist + line key).
+//
+// Nothing here stops other work. "Wait for" and "needs proof" are shown to
+// the crew; a to-do can still be ticked.
+
+use "../foundation/base.manifest"
+
+enum EventTaskStatus {
+  open
+  in_progress
+  done
+  skipped
+}
+
+enum EventTaskPriority {
+  critical
+  high
+  medium
+  low
+}
+
+entity EventTask mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  property required searchable title: string = ""
+  property details: string?
+  // Free text kind of work ("Warehouse", "Paperwork", "Closeout").
+  property category: string?
+  property ownerPersonId: uuid?
+  property dueAt: datetime?
+  property required priority: EventTaskPriority = "medium"
+  property required status: EventTaskStatus = "open"
+  // Another to-do on this event that should be done first.
+  property waitsForTaskId: uuid?
+  property proofRequired: boolean?
+  property doneNote: string?
+  property doneAt: datetime?
+  property doneByPersonId: uuid?
+  property skipReason: string?
+  // Where it came from: a checklist line, or a planning rule suggestion.
+  property checklistTemplateId: uuid?
+  property templateLineKey: string?
+  property suggestionKey: string?
+  property addedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
+  ref waitsFor: EventTask fields [tenantId, waitsForTaskId] references [tenantId, id]
+  belongsTo checklist: EventChecklist fields [tenantId, checklistTemplateId] references [tenantId, id]
+
+  constraint eventTaskTitled: self.addedAt == null or length(trim(self.title)) > 0 "Give this to-do a title."
+
+  transition status from "open" to ["in_progress", "done", "skipped"]
+  transition status from "in_progress" to ["open", "done", "skipped"]
+  transition status from "done" to ["open"]
+  transition status from "skipped" to ["open"]
+
+  // Read and tick wide: the whole crew works the list. Adding, changing and
+  // removing a to-do is for the people who plan events.
+  default policy eventTaskRead read: roleAllows(user.role, "staffAccess") "Staff may see event to-dos"
+  default policy eventTaskWrite write: roleAllows(user.role, "staffAccess") "Staff may update event to-dos"
+  default policy eventTaskExecute execute: roleAllows(user.role, "staffAccess") "Staff may work event to-dos"
+
+  command add(
+    eventId: uuid,
+    title: string,
+    optional details: string,
+    optional category: string,
+    optional ownerPersonId: uuid,
+    optional dueAt: datetime,
+    optional priority: EventTaskPriority,
+    optional waitsForTaskId: uuid,
+    optional proofRequired: boolean,
+    optional checklistTemplateId: uuid,
+    optional templateLineKey: string,
+    optional suggestionKey: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may add event to-dos"
+    // Relations resolve inside the caller's workspace only.
+    guard self.event != null and self.event.deletedAt == null
+    guard ownerPersonId == null or self.owner != null
+    constraint addTaskEventMatch: eventId == self.eventId "This to-do is for a different event. Pick the event already on it."
+    constraint addTaskTitle: length(trim(title)) > 0 "Give this to-do a title."
+    mutate title = trim(title)
+    mutate details = details
+    mutate category = category
+    mutate ownerPersonId = ownerPersonId
+    mutate dueAt = dueAt
+    mutate priority = priority != null ? priority : "medium"
+    mutate waitsForTaskId = waitsForTaskId
+    mutate proofRequired = proofRequired
+    mutate checklistTemplateId = checklistTemplateId
+    mutate templateLineKey = templateLineKey
+    mutate suggestionKey = suggestionKey
+    mutate addedAt = now()
+    emit EventTaskAdded {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      title: trim(title)
+    }
+  }
+
+  // Saves every answer; an empty one clears it. The owner is changed with
+  // giveTo.
+  command revise(
+    title: string,
+    optional details: string,
+    optional category: string,
+    optional dueAt: datetime,
+    optional priority: EventTaskPriority,
+    optional waitsForTaskId: uuid,
+    optional proofRequired: boolean
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may change event to-dos"
+    constraint reviseTaskTitle: length(trim(title)) > 0 "Give this to-do a title."
+    constraint reviseTaskNotItself: waitsForTaskId == null or waitsForTaskId != self.id "A to-do can't wait for itself."
+    mutate title = trim(title)
+    mutate details = details
+    mutate category = category
+    mutate dueAt = dueAt
+    mutate priority = priority != null ? priority : self.priority
+    mutate waitsForTaskId = waitsForTaskId
+    mutate proofRequired = proofRequired
+    emit EventTaskRevised {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Hand the to-do to a person, or to nobody (empty). Anyone on the crew may
+  // take one.
+  command giveTo(optional ownerPersonId: uuid) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    mutate ownerPersonId = ownerPersonId
+    emit EventTaskOwnerChanged {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command start() {
+    guard self.status == "open"
+    guard self.deletedAt == null
+    mutate status = "in_progress"
+    emit EventTaskStarted {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command complete(optional note: string) {
+    guard self.status == "open" or self.status == "in_progress"
+    guard self.deletedAt == null
+    mutate status = "done"
+    mutate doneNote = note != null and length(trim(note)) > 0 ? trim(note) : null
+    mutate doneAt = now()
+    mutate doneByPersonId = user.personId
+    emit EventTaskCompleted {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      title: self.title
+    }
+  }
+
+  command skip(reason: string) {
+    guard self.status == "open" or self.status == "in_progress"
+    guard self.deletedAt == null
+    constraint skipTaskReason: length(trim(reason)) > 0 "Say why this to-do is not needed."
+    mutate status = "skipped"
+    mutate skipReason = trim(reason)
+    emit EventTaskSkipped {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      reason: trim(reason)
+    }
+  }
+
+  command reopen() {
+    guard self.status == "done" or self.status == "skipped"
+    guard self.deletedAt == null
+    mutate status = "open"
+    mutate doneAt = null
+    mutate doneByPersonId = null
+    mutate doneNote = null
+    mutate skipReason = null
+    emit EventTaskReopened {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may remove event to-dos"
+    mutate deletedAt = now()
+    emit EventTaskRemoved {
+      eventTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  store EventTask in durable
+}
+
+event EventTaskAdded: "event_task.added" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+  title: string
+}
+
+event EventTaskRevised: "event_task.revised" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTaskOwnerChanged: "event_task.owner_changed" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTaskStarted: "event_task.started" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTaskCompleted: "event_task.completed" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+  title: string
+}
+
+event EventTaskSkipped: "event_task.skipped" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+  reason: string
+}
+
+event EventTaskReopened: "event_task.reopened" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTaskRemoved: "event_task.removed" {
+  eventTaskId: string
+  tenantId: string
+  eventId: string
+}
+
+enum EventChecklistStatus {
+  active
+  retired
+}
+
+entity EventChecklist mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property category: string?
+  // The lines, as a list (JSON) read by src/lib/eventChecklists.ts:
+  // {key, title, details, priority, proofRequired, dueMinutesFromStart}.
+  property required itemsJson: string = "[]"
+  property required status: EventChecklistStatus = "active"
+  property definedAt: datetime?
+
+  constraint eventChecklistNamed: self.definedAt == null or length(trim(self.name)) > 0 "Give this checklist a name."
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy eventChecklistRead read: roleAllows(user.role, "staffAccess") "Staff may see event checklists"
+  default policy eventChecklistWrite write: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may update event checklists"
+  default policy eventChecklistExecute execute: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may change event checklists"
+
+  command define(name: string, itemsJson: string, optional category: string) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    constraint defineChecklistName: length(trim(name)) > 0 "Give this checklist a name."
+    mutate name = trim(name)
+    mutate category = category
+    mutate itemsJson = itemsJson
+    mutate definedAt = now()
+    emit EventChecklistDefined {
+      eventChecklistId: self.id
+      tenantId: self.tenantId
+      name: trim(name)
+    }
+  }
+
+  command revise(name: string, itemsJson: string, optional category: string) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint reviseChecklistName: length(trim(name)) > 0 "Give this checklist a name."
+    mutate name = trim(name)
+    mutate category = category
+    mutate itemsJson = itemsJson
+    emit EventChecklistRevised {
+      eventChecklistId: self.id
+      tenantId: self.tenantId
+      name: trim(name)
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "retired"
+    emit EventChecklistRetired {
+      eventChecklistId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    emit EventChecklistReinstated {
+      eventChecklistId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store EventChecklist in durable
+}
+
+event EventChecklistDefined: "event_checklist.defined" {
+  eventChecklistId: string
+  tenantId: string
+  name: string
+}
+
+event EventChecklistRevised: "event_checklist.revised" {
+  eventChecklistId: string
+  tenantId: string
+  name: string
+}
+
+event EventChecklistRetired: "event_checklist.retired" {
+  eventChecklistId: string
+  tenantId: string
+}
+
+event EventChecklistReinstated: "event_checklist.reinstated" {
+  eventChecklistId: string
+  tenantId: string
+}

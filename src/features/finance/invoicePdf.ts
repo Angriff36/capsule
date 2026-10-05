@@ -251,7 +251,7 @@ export function buildInvoicePdf(input: InvoicePdfInput): jsPDF {
     `Payment is due within ${Number(invoice.paymentTermsDays ?? 30)} days of the issue date${
       invoice.dueDate != null ? `, by ${dateText(invoice.dueDate)}` : ""
     }.`,
-    `Please reference ${String(invoice.invoiceNumber || "this invoice")} with your payment${
+    `Please include ${String(invoice.invoiceNumber || "this invoice")} with your payment${
       branding.displayName ? `, payable to ${branding.displayName}` : ""
     }.`,
     ...(invoice.notes ? [String(invoice.notes)] : []),

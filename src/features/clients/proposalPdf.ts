@@ -15,6 +15,8 @@ import {
   PRICING_BASIS_LABELS,
   type PricingBasis,
 } from "../../lib/pricing";
+import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
+import { loadMenuPictures } from "../../lib/proposalMenuPictures";
 
 export interface ProposalPdfRecord {
   _id: string;
@@ -33,10 +35,17 @@ export interface ProposalPdfRecord {
   notes?: string | null;
   terms?: string | null;
   visibleSections?: string[];
+  // AC-259: staff section order; empty keeps the standard layout.
+  sectionOrder?: string[] | null;
   dishSelections?: Array<{
     dishName: string;
     dishDescription?: string | null;
   }>;
+  // AC-654: the dish pictures (stored file id -> address -> drawn picture).
+  // Unset on a draft: useProposalPictureUrls reads the draft's pictures live.
+  // A sent proposal carries the frozen list (empty on older sends).
+  // loadMenuPictures turns each address into imageDataUrl just before drawing.
+  menuPictures?: MenuPicture[];
   // Optional sections for timeline, logistics, enhancements
   timelineItems?: TimelineItem[];
   venueLogistics?: VenueLogistics;
@@ -48,6 +57,13 @@ export interface ProposalPdfRecord {
   pricingLines?: PricingLinePdf[];
   // Acceptance URL for CTA
   acceptanceUrl?: string;
+}
+
+export interface MenuPicture {
+  dishName: string;
+  storageId?: string | null;
+  imageUrl?: string | null;
+  imageDataUrl?: string | null;
 }
 
 export interface TimelineItem {
@@ -305,7 +321,9 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
         "To be confirmed",
     ],
   ] as const;
-  if (sectionVisible("event_summary")) {
+  const renderEventSummary = () => {
+    if (!sectionVisible("event_summary")) return;
+    ensureSpace(140);
     doc.setFillColor(...PAPER);
     doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 112, 8, 8, "F");
     let overviewY = y + 22;
@@ -323,14 +341,17 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
       overviewY += 19;
     }
     y += 140;
-  }
+  };
 
   // Menu and transparent per-person rate.
   const guestCount = Number(proposal.guestCount ?? 0);
   const perPerson =
     guestCount > 0 ? Number(proposal.subtotal ?? 0) / guestCount : null;
-  const menuItems = (proposal.dishSelections ?? []).map(
-    (item) => item.dishName,
+  // AC-260: each dish shows its customer-facing description when it has one.
+  const menuItems = (proposal.dishSelections ?? []).map((item) =>
+    item.dishDescription?.trim()
+      ? `${item.dishName} - ${item.dishDescription.trim()}`
+      : item.dishName,
   );
   const visibleMenuItems =
     menuItems.length > 0 ? menuItems : ["Menu details to be confirmed."];
@@ -341,332 +362,430 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     );
   }, 0);
   const menuHeight = Math.max(58, 28 + menuLineCount * 14);
-  if (sectionVisible("menu_sections")) {
-    ensureSpace(menuHeight + 38);
-    sectionLabel("Proposed menu");
-    doc.setFillColor(251, 250, 247);
-    doc.roundedRect(MARGIN, y - 8, CONTENT_WIDTH, menuHeight, 6, 6, "F");
-    if (sectionVisible("pricing_summary")) {
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.setTextColor(...brand);
-      doc.text(
-        perPerson == null ? "Custom pricing" : `${usd(perPerson)} / person`,
-        RIGHT - 14,
-        y + 12,
-        { align: "right" },
-      );
-    }
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(...INK);
-    let menuY = y + 12;
-    for (const item of visibleMenuItems) {
-      const lines = doc.splitTextToSize(item, CONTENT_WIDTH - 150) as string[];
-      doc.text("-", MARGIN + 14, menuY);
-      doc.text(lines, MARGIN + 28, menuY);
-      menuY += lines.length * 14;
-    }
-    y += menuHeight + 16;
-  }
-
-  if (proposal.notes?.trim()) {
-    sectionLabel("Notes");
-    writeParagraph(proposal.notes.trim());
-    y += 10;
-  }
-
-  // Venue logistics section (if provided).
-  if (sectionVisible("venue_logistics") && proposal.venueLogistics != null) {
-    sectionLabel("Venue logistics");
-    const logistics = [
-      ["Load-in", proposal.venueLogistics.loadIn ?? ""],
-      ["Access", proposal.venueLogistics.access ?? ""],
-      ["Restrictions", proposal.venueLogistics.restrictions ?? ""],
-      ["Special notes", proposal.venueLogistics.notes ?? ""],
-      ["Contact", proposal.venueLogistics.contact ?? ""],
-    ].filter(([, value]) => value.trim() !== "") as Array<[string, string]>;
-    if (logistics.length > 0) {
-      for (const [label, value] of logistics) {
-        ensureSpace(20);
-        doc.setFont("helvetica", "bold");
+  // AC-654: dishes with a picture show it under the menu, three to a row,
+  // each with the dish name under it.
+  const renderMenuPictures = () => {
+    const pictures = (proposal.menuPictures ?? []).filter(
+      (item) => item.imageDataUrl,
+    );
+    const columns = 3;
+    const gap = 12;
+    const cellWidth = (CONTENT_WIDTH - gap * (columns - 1)) / columns;
+    const pictureHeight = Math.round(cellWidth * 0.7);
+    const rowHeight = pictureHeight + 30;
+    for (let index = 0; index < pictures.length; index += columns) {
+      ensureSpace(rowHeight);
+      pictures.slice(index, index + columns).forEach((item, column) => {
+        const x = MARGIN + column * (cellWidth + gap);
+        try {
+          const image = doc.getImageProperties(item.imageDataUrl!);
+          // Fit inside the box, keep the picture's shape, centre it.
+          const scale = Math.min(
+            cellWidth / image.width,
+            pictureHeight / image.height,
+          );
+          const width = image.width * scale;
+          const height = image.height * scale;
+          doc.setFillColor(...PAPER);
+          doc.rect(x, y, cellWidth, pictureHeight, "F");
+          doc.addImage(
+            item.imageDataUrl!,
+            x + (cellWidth - width) / 2,
+            y + (pictureHeight - height) / 2,
+            width,
+            height,
+          );
+        } catch {
+          return;
+        }
+        doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(...MUTED);
-        doc.text(label.toUpperCase(), MARGIN, y);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(...INK);
-        const lines = doc.splitTextToSize(
-          value,
-          CONTENT_WIDTH - 80,
+        const caption = doc.splitTextToSize(
+          item.dishName,
+          cellWidth,
         ) as string[];
-        doc.text(lines, MARGIN + 80, y);
-        y += lines.length * 14 + 6;
+        doc.text(caption.slice(0, 2), x, y + pictureHeight + 12);
+      });
+      y += rowHeight;
+    }
+    if (pictures.length > 0) y += 6;
+  };
+  const renderMenu = () => {
+    if (sectionVisible("menu_sections")) {
+      ensureSpace(menuHeight + 38);
+      sectionLabel("Proposed menu");
+      doc.setFillColor(251, 250, 247);
+      doc.roundedRect(MARGIN, y - 8, CONTENT_WIDTH, menuHeight, 6, 6, "F");
+      if (sectionVisible("pricing_summary")) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(...brand);
+        doc.text(
+          perPerson == null ? "Custom pricing" : `${usd(perPerson)} / person`,
+          RIGHT - 14,
+          y + 12,
+          { align: "right" },
+        );
+      }
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      let menuY = y + 12;
+      for (const item of visibleMenuItems) {
+        const lines = doc.splitTextToSize(
+          item,
+          CONTENT_WIDTH - 150,
+        ) as string[];
+        doc.text("-", MARGIN + 14, menuY);
+        doc.text(lines, MARGIN + 28, menuY);
+        menuY += lines.length * 14;
+      }
+      y += menuHeight + 16;
+      renderMenuPictures();
+    }
+
+    if (proposal.notes?.trim()) {
+      sectionLabel("Notes");
+      writeParagraph(proposal.notes.trim());
+      y += 10;
+    }
+  };
+
+  // Venue logistics section (if provided).
+  const renderVenue = () => {
+    if (sectionVisible("venue_logistics") && proposal.venueLogistics != null) {
+      sectionLabel("Venue logistics");
+      const logistics = [
+        ["Load-in", proposal.venueLogistics.loadIn ?? ""],
+        ["Access", proposal.venueLogistics.access ?? ""],
+        ["Restrictions", proposal.venueLogistics.restrictions ?? ""],
+        ["Special notes", proposal.venueLogistics.notes ?? ""],
+        ["Contact", proposal.venueLogistics.contact ?? ""],
+      ].filter(([, value]) => value.trim() !== "") as Array<[string, string]>;
+      if (logistics.length > 0) {
+        for (const [label, value] of logistics) {
+          ensureSpace(20);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(8);
+          doc.setTextColor(...MUTED);
+          doc.text(label.toUpperCase(), MARGIN, y);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(...INK);
+          const lines = doc.splitTextToSize(
+            value,
+            CONTENT_WIDTH - 80,
+          ) as string[];
+          doc.text(lines, MARGIN + 80, y);
+          y += lines.length * 14 + 6;
+        }
+        y += 8;
+      }
+    }
+  };
+
+  // Timeline section (if provided).
+  const renderTimeline = () => {
+    if (
+      sectionVisible("timeline") &&
+      proposal.timelineItems != null &&
+      proposal.timelineItems.length > 0
+    ) {
+      sectionLabel("Timeline");
+      for (const item of proposal.timelineItems) {
+        // Calculate card height based on content.
+        let cardHeight = 24;
+        if (item.description != null && item.description.trim() !== "") {
+          const descLines = doc.splitTextToSize(
+            item.description,
+            CONTENT_WIDTH - 108,
+          ) as string[];
+          cardHeight = Math.max(24, 18 + descLines.length * 12);
+        }
+        ensureSpace(cardHeight + 12);
+        doc.setFillColor(251, 250, 247);
+        doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(...brand);
+        doc.text(item.time, MARGIN + 12, y + 10);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(...INK);
+        doc.text(item.activity, MARGIN + 96, y + 10);
+        if (item.description != null && item.description.trim() !== "") {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8);
+          doc.setTextColor(...MUTED);
+          const descLines = doc.splitTextToSize(
+            item.description,
+            CONTENT_WIDTH - 108,
+          ) as string[];
+          doc.text(descLines, MARGIN + 96, y + 22);
+          y += cardHeight + 6;
+        } else {
+          y += cardHeight + 6;
+        }
       }
       y += 8;
     }
-  }
-
-  // Timeline section (if provided).
-  if (
-    sectionVisible("timeline") &&
-    proposal.timelineItems != null &&
-    proposal.timelineItems.length > 0
-  ) {
-    sectionLabel("Timeline");
-    for (const item of proposal.timelineItems) {
-      // Calculate card height based on content.
-      let cardHeight = 24;
-      if (item.description != null && item.description.trim() !== "") {
-        const descLines = doc.splitTextToSize(
-          item.description,
-          CONTENT_WIDTH - 108,
-        ) as string[];
-        cardHeight = Math.max(24, 18 + descLines.length * 12);
-      }
-      ensureSpace(cardHeight + 12);
-      doc.setFillColor(251, 250, 247);
-      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(...brand);
-      doc.text(item.time, MARGIN + 12, y + 10);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(...INK);
-      doc.text(item.activity, MARGIN + 96, y + 10);
-      if (item.description != null && item.description.trim() !== "") {
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.setTextColor(...MUTED);
-        const descLines = doc.splitTextToSize(
-          item.description,
-          CONTENT_WIDTH - 108,
-        ) as string[];
-        doc.text(descLines, MARGIN + 96, y + 22);
-        y += cardHeight + 6;
-      } else {
-        y += cardHeight + 6;
-      }
-    }
-    y += 8;
-  }
+  };
 
   // Pricing breakdown — priced line items through the central calc (spec §5.4
   // "PDF/render"). Each line's amount is derived from the SAME engine the draft
   // form and the read panel use, so percentage fees resolve against the base
   // subtotal identically everywhere.
-  const pricingLines = proposal.pricingLines ?? [];
-  if (sectionVisible("pricing_summary") && pricingLines.length > 0) {
-    const priced = computeProposalPricing({
-      lines: pricingLines.map((line) => ({
-        pricingBasis: line.pricingBasis,
-        unitPrice: Number(line.unitPrice) || 0,
-        quantity: line.quantity != null ? Number(line.quantity) : undefined,
-      })),
-      guestCount,
-      discountAmount: Number(proposal.discountAmount ?? 0),
-      taxAmount: Number(proposal.taxAmount ?? 0),
-    });
-    sectionLabel("Pricing breakdown");
-    pricingLines.forEach((line, index) => {
-      // Recompute each line through the central calc (never trust a stored
-      // amount — the command-API path can write caller-supplied amounts that
-      // skip the authoritative recompute seam). For accepted proposals the
-      // line inputs are immutable (line commands guard status == "draft"), so
-      // this reproduces the accepted terms and stays byte-identical to the
-      // operator PDF (single source of truth).
-      const amount = priced.lines[index]?.amount ?? 0;
-      const basisLabel =
-        PRICING_BASIS_LABELS[line.pricingBasis] ?? line.pricingBasis;
-      const unit = Number(line.unitPrice) || 0;
-      const descLines = doc.splitTextToSize(
-        line.description || basisLabel,
-        CONTENT_WIDTH - 132,
-      ) as string[];
-      ensureSpace(descLines.length * 14 + 14);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(...INK);
-      doc.text(descLines, MARGIN, y);
-      doc.setFont("helvetica", "bold");
-      doc.text(usd(amount), RIGHT, y, { align: "right" });
-      y += descLines.length * 14;
-      // ponytail: muted basis/unit detail so the client sees how a line priced
-      // without exposing internal cost (spec §4.2 keeps cost/margin private).
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(...MUTED);
-      let detail = `${basisLabel}`;
-      if (line.pricingBasis === "per_person") {
-        detail = `Per person · ${usd(unit)} × ${formatCountNoun(guestCount, "guest")}`;
-      } else if (line.pricingBasis === "per_unit") {
-        const unitLabel = line.unit?.trim();
-        detail = `Per unit · ${usd(unit)} × ${Number(line.quantity ?? 0)}${
-          unitLabel ? ` ${unitLabel}` : ""
-        }`;
-      } else if (line.pricingBasis === "percentage") {
-        detail = `${unit}% of subtotal`;
-      } else {
-        detail = `${basisLabel} · ${usd(unit)}`;
-      }
-      doc.text(detail, MARGIN, y);
-      y += 14;
-    });
-    y += 6;
-  }
-
-  // Optional enhancements (if provided) — listed after pricing lines.
-  if (
-    sectionVisible("enhancements") &&
-    proposal.enhancements != null &&
-    proposal.enhancements.length > 0
-  ) {
-    sectionLabel("Optional Enhancements");
-    for (const enhancement of proposal.enhancements) {
-      let cardHeight = 24;
-      if (
-        enhancement.description != null &&
-        enhancement.description.trim() !== ""
-      ) {
+  const renderPricingBreakdown = () => {
+    const pricingLines = proposal.pricingLines ?? [];
+    if (sectionVisible("pricing_summary") && pricingLines.length > 0) {
+      const priced = computeProposalPricing({
+        lines: pricingLines.map((line) => ({
+          pricingBasis: line.pricingBasis,
+          unitPrice: Number(line.unitPrice) || 0,
+          quantity: line.quantity != null ? Number(line.quantity) : undefined,
+        })),
+        guestCount,
+        discountAmount: Number(proposal.discountAmount ?? 0),
+        taxAmount: Number(proposal.taxAmount ?? 0),
+      });
+      sectionLabel("Pricing breakdown");
+      pricingLines.forEach((line, index) => {
+        // Recompute each line through the central calc (never trust a stored
+        // amount — the command-API path can write caller-supplied amounts that
+        // skip the authoritative recompute seam). For accepted proposals the
+        // line inputs are immutable (line commands guard status == "draft"), so
+        // this reproduces the accepted terms and stays byte-identical to the
+        // operator PDF (single source of truth).
+        const amount = priced.lines[index]?.amount ?? 0;
+        const basisLabel =
+          PRICING_BASIS_LABELS[line.pricingBasis] ?? line.pricingBasis;
+        const unit = Number(line.unitPrice) || 0;
         const descLines = doc.splitTextToSize(
-          enhancement.description,
-          CONTENT_WIDTH - 24,
+          line.description || basisLabel,
+          CONTENT_WIDTH - 132,
         ) as string[];
-        cardHeight = Math.max(24, 18 + descLines.length * 12);
-      }
-      ensureSpace(cardHeight + 12);
-      doc.setFillColor(251, 250, 247);
-      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(...INK);
-      const nameWithPrice =
-        enhancement.price != null
-          ? `${enhancement.name} (+${usd(enhancement.price)})`
-          : enhancement.name;
-      doc.text(nameWithPrice, MARGIN + 12, y + 10);
-      if (
-        enhancement.description != null &&
-        enhancement.description.trim() !== ""
-      ) {
+        ensureSpace(descLines.length * 14 + 14);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(...INK);
+        doc.text(descLines, MARGIN, y);
+        doc.setFont("helvetica", "bold");
+        doc.text(usd(amount), RIGHT, y, { align: "right" });
+        y += descLines.length * 14;
+        // ponytail: muted basis/unit detail so the client sees how a line priced
+        // without exposing internal cost (spec §4.2 keeps cost/margin private).
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(...MUTED);
-        const descLines = doc.splitTextToSize(
-          enhancement.description,
-          CONTENT_WIDTH - 24,
-        ) as string[];
-        doc.text(descLines, MARGIN + 12, y + 22);
-        y += cardHeight + 6;
-      } else {
-        y += cardHeight + 6;
-      }
+        let detail = `${basisLabel}`;
+        if (line.pricingBasis === "per_person") {
+          detail = `Per person · ${usd(unit)} × ${formatCountNoun(guestCount, "guest")}`;
+        } else if (line.pricingBasis === "per_unit") {
+          const unitLabel = line.unit?.trim();
+          detail = `Per unit · ${usd(unit)} × ${Number(line.quantity ?? 0)}${
+            unitLabel ? ` ${unitLabel}` : ""
+          }`;
+        } else if (line.pricingBasis === "percentage") {
+          detail = `${unit}% of subtotal`;
+        } else {
+          detail = `${basisLabel} · ${usd(unit)}`;
+        }
+        doc.text(detail, MARGIN, y);
+        y += 14;
+      });
+      y += 6;
     }
-    y += 8;
-  }
+  };
+
+  // Optional enhancements (if provided) — listed after pricing lines.
+  const renderEnhancements = () => {
+    if (
+      sectionVisible("enhancements") &&
+      proposal.enhancements != null &&
+      proposal.enhancements.length > 0
+    ) {
+      sectionLabel("Optional Enhancements");
+      for (const enhancement of proposal.enhancements) {
+        let cardHeight = 24;
+        if (
+          enhancement.description != null &&
+          enhancement.description.trim() !== ""
+        ) {
+          const descLines = doc.splitTextToSize(
+            enhancement.description,
+            CONTENT_WIDTH - 24,
+          ) as string[];
+          cardHeight = Math.max(24, 18 + descLines.length * 12);
+        }
+        ensureSpace(cardHeight + 12);
+        doc.setFillColor(251, 250, 247);
+        doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(...INK);
+        const nameWithPrice =
+          enhancement.price != null
+            ? `${enhancement.name} (+${usd(enhancement.price)})`
+            : enhancement.name;
+        doc.text(nameWithPrice, MARGIN + 12, y + 10);
+        if (
+          enhancement.description != null &&
+          enhancement.description.trim() !== ""
+        ) {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8);
+          doc.setTextColor(...MUTED);
+          const descLines = doc.splitTextToSize(
+            enhancement.description,
+            CONTENT_WIDTH - 24,
+          ) as string[];
+          doc.text(descLines, MARGIN + 12, y + 22);
+          y += cardHeight + 6;
+        } else {
+          y += cardHeight + 6;
+        }
+      }
+      y += 8;
+    }
+  };
 
   // Estimate summary.
-  if (sectionVisible("pricing_summary")) {
-    sectionLabel("Estimate");
-    const summaryRows: Array<[string, string, boolean?]> = [
-      ["Catering subtotal", usd(proposal.subtotal)],
-    ];
-    if (Number(proposal.discountAmount ?? 0) > 0) {
-      summaryRows.push(["Discount", `-${usd(proposal.discountAmount)}`]);
+  const renderEstimate = () => {
+    if (sectionVisible("pricing_summary")) {
+      sectionLabel("Estimate");
+      const summaryRows: Array<[string, string, boolean?]> = [
+        ["Catering subtotal", usd(proposal.subtotal)],
+      ];
+      if (Number(proposal.discountAmount ?? 0) > 0) {
+        summaryRows.push(["Discount", `-${usd(proposal.discountAmount)}`]);
+      }
+      summaryRows.push(["Tax", usd(proposal.taxAmount)]);
+      summaryRows.push(["Total estimate", usd(proposal.total), true]);
+      for (const [label, value, bold] of summaryRows) {
+        ensureSpace(20);
+        doc.setFont("helvetica", bold ? "bold" : "normal");
+        doc.setFontSize(bold ? 12 : 10);
+        const rowColor = bold ? brand : INK;
+        doc.setTextColor(rowColor[0], rowColor[1], rowColor[2]);
+        doc.text(label, RIGHT - 210, y);
+        doc.text(value, RIGHT, y, { align: "right" });
+        y += bold ? 24 : 18;
+      }
+      doc.setDrawColor(...accent);
+      doc.setLineWidth(1.5);
+      doc.line(RIGHT - 218, y - 18, RIGHT, y - 18);
+      y += 12;
     }
-    summaryRows.push(["Tax", usd(proposal.taxAmount)]);
-    summaryRows.push(["Total estimate", usd(proposal.total), true]);
-    for (const [label, value, bold] of summaryRows) {
-      ensureSpace(20);
-      doc.setFont("helvetica", bold ? "bold" : "normal");
-      doc.setFontSize(bold ? 12 : 10);
-      const rowColor = bold ? brand : INK;
-      doc.setTextColor(rowColor[0], rowColor[1], rowColor[2]);
-      doc.text(label, RIGHT - 210, y);
-      doc.text(value, RIGHT, y, { align: "right" });
-      y += bold ? 24 : 18;
-    }
-    doc.setDrawColor(...accent);
-    doc.setLineWidth(1.5);
-    doc.line(RIGHT - 218, y - 18, RIGHT, y - 18);
-    y += 12;
-  }
+  };
 
   // Terms.
-  if (sectionVisible("terms")) {
-    sectionLabel("Terms");
-    const terms = String(proposal.terms ?? "").trim();
-    writeParagraph(
-      terms || "No additional terms were provided for this proposal.",
-    );
-  }
+  const renderTerms = () => {
+    if (sectionVisible("terms")) {
+      sectionLabel("Terms");
+      const terms = String(proposal.terms ?? "").trim();
+      writeParagraph(
+        terms || "No additional terms were provided for this proposal.",
+      );
+    }
+  };
 
   // Next steps / CTA section.
-  if (sectionVisible("acceptance_cta") && proposal.acceptanceUrl != null) {
-    sectionLabel("Next steps");
-    ensureSpace(70);
-    doc.setFillColor(251, 250, 247);
-    doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 64, 6, 6, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(...brand);
-    doc.text("To accept this proposal:", MARGIN + 14, y + 12);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(...INK);
-    const steps = [
-      "1. Review all details above",
-      "2. Contact us with any questions",
-      "3. Confirm your acceptance:",
-    ];
-    let stepY = y + 26;
-    for (const step of steps) {
-      doc.text(step, MARGIN + 14, stepY);
-      stepY += 11;
+  const renderNextSteps = () => {
+    if (sectionVisible("acceptance_cta") && proposal.acceptanceUrl != null) {
+      sectionLabel("Next steps");
+      ensureSpace(70);
+      doc.setFillColor(251, 250, 247);
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 64, 6, 6, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...brand);
+      doc.text("To accept this proposal:", MARGIN + 14, y + 12);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...INK);
+      const steps = [
+        "1. Review all details above",
+        "2. Contact us with any questions",
+        "3. Confirm your acceptance:",
+      ];
+      let stepY = y + 26;
+      for (const step of steps) {
+        doc.text(step, MARGIN + 14, stepY);
+        stepY += 11;
+      }
+      // Render acceptance URL as visible text.
+      doc.setTextColor(...accent);
+      doc.setFont("helvetica", "bold");
+      const displayUrl =
+        proposal.acceptanceUrl.length > 60
+          ? proposal.acceptanceUrl.slice(0, 57) + "..."
+          : proposal.acceptanceUrl;
+      doc.text(displayUrl, MARGIN + 30, stepY);
+      // Add clickable link annotation.
+      doc.link(MARGIN + 14, y - 6, CONTENT_WIDTH - 28, 64, {
+        url: proposal.acceptanceUrl,
+      });
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      doc.text(
+        "Click the link above or contact us to confirm your booking.",
+        MARGIN + 14,
+        stepY + 14,
+      );
+      y += 76;
+    } else if (sectionVisible("acceptance_cta")) {
+      // Generic next steps when no URL provided.
+      sectionLabel("Next steps");
+      ensureSpace(40);
+      doc.setFillColor(251, 250, 247);
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 34, 6, 6, "F");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...INK);
+      doc.text(
+        "To proceed with this proposal, please contact us to discuss details and confirm your booking.",
+        MARGIN + 14,
+        y + 10,
+      );
+      doc.text(
+        "We look forward to working with you on your event!",
+        MARGIN + 14,
+        y + 22,
+      );
+      y += 46;
     }
-    // Render acceptance URL as visible text.
-    doc.setTextColor(...accent);
-    doc.setFont("helvetica", "bold");
-    const displayUrl =
-      proposal.acceptanceUrl.length > 60
-        ? proposal.acceptanceUrl.slice(0, 57) + "..."
-        : proposal.acceptanceUrl;
-    doc.text(displayUrl, MARGIN + 30, stepY);
-    // Add clickable link annotation.
-    doc.link(MARGIN + 14, y - 6, CONTENT_WIDTH - 28, 64, {
-      url: proposal.acceptanceUrl,
-    });
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED);
-    doc.text(
-      "Click the link above or contact us to confirm your booking.",
-      MARGIN + 14,
-      stepY + 14,
-    );
-    y += 76;
-  } else if (sectionVisible("acceptance_cta")) {
-    // Generic next steps when no URL provided.
-    sectionLabel("Next steps");
-    ensureSpace(40);
-    doc.setFillColor(251, 250, 247);
-    doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 34, 6, 6, "F");
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(...INK);
-    doc.text(
-      "To proceed with this proposal, please contact us to discuss details and confirm your booking.",
-      MARGIN + 14,
-      y + 10,
-    );
-    doc.text(
-      "We look forward to working with you on your event!",
-      MARGIN + 14,
-      y + 22,
-    );
-    y += 46;
-  }
+  };
+
+  // AC-259: sections print in the order staff set on the template; with no
+  // saved order the standard layout is unchanged. Pricing keeps its breakdown
+  // and estimate together when moved; notes stay with the menu.
+  const blocks: Record<string, Array<() => void>> = {
+    event_summary: [renderEventSummary],
+    menu_sections: [renderMenu],
+    venue_logistics: [renderVenue],
+    timeline: [renderTimeline],
+    pricing_summary: [renderPricingBreakdown, renderEstimate],
+    enhancements: [renderEnhancements],
+    terms: [renderTerms],
+    acceptance_cta: [renderNextSteps],
+  };
+  const sequence = proposalSectionSequence(proposal.sectionOrder);
+  const steps = sequence
+    ? sequence.flatMap((id) => blocks[id] ?? [])
+    : [
+        renderEventSummary,
+        renderMenu,
+        renderVenue,
+        renderTimeline,
+        renderPricingBreakdown,
+        renderEnhancements,
+        renderEstimate,
+        renderTerms,
+        renderNextSteps,
+      ];
+  for (const step of steps) step();
 
   // Footer on every page, including pages introduced by long menu/terms copy.
   const pageCount = doc.getNumberOfPages();
@@ -691,11 +810,27 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   return doc;
 }
 
+/** The same file Download PDF saves, as base64 for "Email the proposal". */
+export async function proposalPdfBase64(
+  input: ProposalPdfInput,
+): Promise<{ base64: string; fileName: string }> {
+  const branding = await loadTenantBrandingForPdf(input.branding);
+  const proposal = await loadMenuPictures(input.proposal);
+  const dataUri = buildProposalPdf({ ...input, proposal, branding }).output(
+    "datauristring",
+  );
+  return {
+    base64: dataUri.slice(dataUri.indexOf(",") + 1),
+    fileName: proposalPdfFileName(input.proposal),
+  };
+}
+
 export async function downloadProposalPdf(
   input: ProposalPdfInput,
 ): Promise<void> {
   const branding = await loadTenantBrandingForPdf(input.branding);
-  buildProposalPdf({ ...input, branding }).save(
+  const proposal = await loadMenuPictures(input.proposal);
+  buildProposalPdf({ ...input, proposal, branding }).save(
     proposalPdfFileName(input.proposal),
   );
 }

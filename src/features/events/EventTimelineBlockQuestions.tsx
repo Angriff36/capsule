@@ -4,13 +4,14 @@ import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEventTimelineComment,
   useEventTimelineCommentRemove,
-  useListEventTimelineComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { useEventTimelineComments } from "../../lib/useEventRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { authorLabel } from "./timelineCommentAuthor";
 
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 
@@ -22,7 +23,7 @@ type Props = {
 /** Collapsible per-block questions thread for one timeline activity. */
 export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
   const authStatus = useAuthStatus();
-  const comments = useListEventTimelineComment();
+  const comments = useEventTimelineComments(eventId);
   const people = useListPerson();
   const postComment = useCreateEventTimelineComment();
   const removeComment = useEventTimelineCommentRemove();
@@ -103,8 +104,6 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
                   await postComment({
                     eventId,
                     activityId,
-                    authorPersonId: me._id,
-                    authorName: myName,
                     body: body.trim(),
                   });
                   setBody("");
@@ -134,7 +133,7 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
               <li key={comment._id} className="px-2.5 py-2">
                 <p className="text-sm text-ink">{comment.body}</p>
                 <p className="mt-1 font-mono text-2xs text-ink-3">
-                  {comment.authorName}
+                  {authorLabel(people, comment)}
                   {comment.postedAt
                     ? ` · ${formatDate(comment.postedAt)} ${formatTime(comment.postedAt)}`
                     : ""}

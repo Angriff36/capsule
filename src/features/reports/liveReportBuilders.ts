@@ -12,13 +12,19 @@ import type {
   ReportRow,
   ReportTrendSeries,
 } from "./liveReportModel";
+import { metricDefinition, type MetricId } from "./metricDefinitions";
+import { date, REPORT_DATE_OF } from "./liveReportDates";
+import { countLeftOut, NO_LEFT_OUT } from "./liveReportLeftOut";
+import { NOT_KNOWN } from "./dashboardRecordSets";
 
 type SourceRow = Record<string, unknown>;
 
+// Months follow the reader's own clock, like every dashboard and date on
+// screen (metricDefinitions timeBasis "device"). UTC months put an evening
+// event on the 31st into the next month.
 const MONTH_FORMAT = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "2-digit",
-  timeZone: "UTC",
 });
 
 /** "Last 12 months" covers this month and the eleven before it. */
@@ -26,7 +32,7 @@ const MONTHS_IN_YEAR = 12;
 
 const COUNT_SERIES: ReportTrendSeries = {
   dataKey: "value",
-  name: "Records",
+  name: "Total",
   color: "var(--color-brand)",
   valueKind: "count",
 };
@@ -34,9 +40,24 @@ const COUNT_SERIES: ReportTrendSeries = {
 export function buildLiveReportModel(
   subject: ReportSubjectArea,
   sourceRows: readonly unknown[],
-  dateWindow: ReportDateWindow,
+  window: ReportDateWindow,
+  /** From / To days (ms, [from, to)); either side replaces the date window. */
+  range: { from: number | null; to: number | null } = { from: null, to: null },
 ): LiveReportModel {
   const rows = sourceRows.filter(isSourceRow);
+  const dateWindow: ReportPeriod = { window, ...range };
+  const { from, to } = periodBounds(dateWindow, Date.now());
+  return {
+    ...buildSubjectReport(subject, rows, dateWindow),
+    leftOut: countLeftOut(subject, rows, from, to),
+  };
+}
+
+function buildSubjectReport(
+  subject: ReportSubjectArea,
+  rows: SourceRow[],
+  dateWindow: ReportPeriod,
+): LiveReportModel {
   switch (subject) {
     case "events":
       return buildEventsReport(rows, dateWindow);
@@ -57,38 +78,34 @@ export function buildLiveReportModel(
 
 function buildEventsReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const rows = filterRows(sourceRows, dateWindow, (row) =>
-    firstDate(row, "startsAt", "createdAt", "_creationTime"),
-  );
+  const rows = filterRows(sourceRows, dateWindow, REPORT_DATE_OF.events);
   const quoted = sum(rows, "quotedPrice");
   return model({
     subject: "events",
-    sourceLabel: "Event records",
+    sourceLabel: "Events",
     sourceDescription:
       "Current event plans supply guest counts, stages, budgets, and quoted revenue.",
     sourcePath: "/events",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Events", formatCount(rows.length)),
-      kpi("Expected guests", formatCount(sum(rows, "expectedHeadcount"))),
-      kpi("Quoted revenue", formatMoney(quoted)),
+      kpi("events.count", formatCount(rows.length)),
       kpi(
-        "Average quoted value",
+        "events.expected_guests",
+        formatCount(sum(rows, "expectedHeadcount")),
+      ),
+      kpi("events.quoted_revenue", formatMoney(quoted)),
+      kpi(
+        "events.average_quoted",
         formatMoney(rows.length ? quoted / rows.length : 0),
       ),
     ],
     breakdown: statusBreakdown(rows, "stage"),
-    trend: monthlyTrend(
-      rows,
-      dateWindow,
-      (row) => firstDate(row, "startsAt", "createdAt", "_creationTime"),
-      [
-        { key: "value", value: () => 1 },
-        { key: "quoted", value: (row) => number(row.quotedPrice) },
-      ],
-    ),
+    trend: monthlyTrend(rows, dateWindow, REPORT_DATE_OF.events, [
+      { key: "value", value: () => 1 },
+      { key: "quoted", value: (row) => number(row.quotedPrice) },
+    ]),
     trendSeries: [
       { ...COUNT_SERIES, name: "Events" },
       {
@@ -121,27 +138,32 @@ function buildEventsReport(
 
 function buildSalesReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const dateOf = (row: SourceRow) =>
-    firstDate(row, "eventDate", "sentAt", "createdAt", "_creationTime");
+  const dateOf = REPORT_DATE_OF.sales;
   const rows = filterRows(sourceRows, dateWindow, dateOf);
   const total = sum(rows, "total");
   const accepted = rows.filter((row) => row.status === "accepted");
   return model({
     subject: "sales",
-    sourceLabel: "Proposal records",
+    sourceLabel: "Proposals",
     sourceDescription:
       "Current proposals supply pipeline status, guest counts, and proposed value.",
     sourcePath: "/clients/proposals",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Proposals", formatCount(rows.length)),
-      kpi("Proposed value", formatMoney(total)),
-      kpi("Accepted value", formatMoney(sum(accepted, "total"))),
+      kpi("sales.proposals", formatCount(rows.length)),
+      kpi("sales.proposed_value", formatMoney(total)),
       kpi(
-        "Acceptance rate",
-        formatPercent(rows.length ? (accepted.length / rows.length) * 100 : 0),
+        "sales.accepted_value",
+        formatMoney(sum(accepted, "total")),
+        accepted,
+      ),
+      kpi(
+        "sales.acceptance_rate",
+        rows.length
+          ? formatPercent((accepted.length / rows.length) * 100)
+          : NOT_KNOWN,
       ),
     ],
     breakdown: statusBreakdown(rows, "status"),
@@ -179,35 +201,27 @@ function buildSalesReport(
 
 function buildInventoryReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const dateOf = (row: SourceRow) =>
-    firstDate(
-      row,
-      "purchasingWeekStart",
-      "confirmedAt",
-      "calculatedAt",
-      "createdAt",
-      "_creationTime",
-    );
+  const dateOf = REPORT_DATE_OF.inventory;
   const rows = filterRows(sourceRows, dateWindow, dateOf);
-  const confirmed = rows.filter((row) => row.status === "confirmed").length;
-  const fulfilled = rows.filter((row) => row.status === "fulfilled").length;
+  const confirmed = withStatus(rows, "confirmed");
+  const fulfilled = withStatus(rows, "fulfilled");
   const unresolved = rows.filter(
     (row) => row.status !== "fulfilled" && row.status !== "superseded",
-  ).length;
+  );
   return model({
     subject: "inventory",
-    sourceLabel: "Ingredient demand records",
+    sourceLabel: "Ingredient demand",
     sourceDescription:
-      "Demand lines supply quantities and purchasing status. Units stay separate; ingredient and event references remain permission-safe identifiers.",
+      "Demand lines supply quantities and purchasing status. Units stay separate, and the ingredient and event they belong to only show what you're allowed to see.",
     sourcePath: "/inventory/demand",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Demand lines", formatCount(rows.length)),
-      kpi("Confirmed", formatCount(confirmed)),
-      kpi("Fulfilled", formatCount(fulfilled)),
-      kpi("Unresolved", formatCount(unresolved)),
+      kpi("inventory.demand_lines", formatCount(rows.length)),
+      kpi("inventory.confirmed", formatCount(confirmed.length), confirmed),
+      kpi("inventory.fulfilled", formatCount(fulfilled.length), fulfilled),
+      kpi("inventory.unresolved", formatCount(unresolved.length), unresolved),
     ],
     breakdown: statusBreakdown(rows, "status"),
     trend: monthlyTrend(rows, dateWindow, dateOf, [
@@ -239,27 +253,30 @@ function buildInventoryReport(
 
 function buildProductionReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const dateOf = (row: SourceRow) =>
-    firstDate(row, "dueAt", "completedAt", "createdAt", "_creationTime");
+  const dateOf = REPORT_DATE_OF.production;
   const rows = filterRows(sourceRows, dateWindow, dateOf);
-  const completed = rows.filter((row) => row.status === "completed").length;
-  const blocked = rows.filter((row) => row.status === "blocked").length;
+  const completedRows = withStatus(rows, "completed");
+  const blockedRows = withStatus(rows, "blocked");
+  const completed = completedRows.length;
+  const blocked = blockedRows.length;
   return model({
     subject: "production",
-    sourceLabel: "Prep task records",
+    sourceLabel: "Prep tasks",
     sourceDescription:
       "Current prep tasks supply kitchen workload, stations, quantities, and completion status.",
     sourcePath: "/kitchen/prep",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Tasks", formatCount(rows.length)),
-      kpi("Completed", formatCount(completed)),
-      kpi("Blocked", formatCount(blocked)),
+      kpi("production.tasks", formatCount(rows.length)),
+      kpi("production.completed", formatCount(completed), completedRows),
+      kpi("production.blocked", formatCount(blocked), blockedRows),
       kpi(
-        "Completion rate",
-        formatPercent(rows.length ? (completed / rows.length) * 100 : 0),
+        "production.completion_rate",
+        rows.length
+          ? formatPercent((completed / rows.length) * 100)
+          : NOT_KNOWN,
       ),
     ],
     breakdown: statusBreakdown(rows, "status"),
@@ -302,29 +319,36 @@ function buildProductionReport(
 
 function buildWorkforceReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const dateOf = (row: SourceRow) =>
-    firstDate(row, "startsAt", "createdAt", "_creationTime");
+  const dateOf = REPORT_DATE_OF.workforce;
   const rows = filterRows(sourceRows, dateWindow, dateOf);
   const hours = rows.reduce((total, row) => total + shiftHours(row), 0);
-  const completed = rows.filter((row) => row.status === "completed").length;
-  const noShows = rows.filter((row) => row.status === "no_show").length;
+  const completedRows = withStatus(rows, "completed");
+  const noShowRows = withStatus(rows, "no_show");
+  // A shift with no usable start and end has unknown hours, not zero.
+  const timed = rows.filter((row) => shiftHours(row) > 0);
+  const untimed = rows.filter((row) => shiftHours(row) <= 0);
   return model({
     subject: "workforce",
-    sourceLabel: "Shift records",
+    sourceLabel: "Shifts",
     sourceDescription:
       "Current shifts supply scheduled hours, operational roles, and attendance status. Pay rates and labor cost are excluded.",
     sourcePath: "/staff/roster",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Shifts", formatCount(rows.length)),
+      kpi("workforce.shifts", formatCount(rows.length)),
       kpi(
-        "Scheduled hours",
-        hours.toLocaleString("en-US", { maximumFractionDigits: 1 }),
+        "workforce.scheduled_hours",
+        hoursWithCoverage(hours, untimed.length),
+        timed,
       ),
-      kpi("Completed", formatCount(completed)),
-      kpi("No-shows", formatCount(noShows)),
+      kpi(
+        "workforce.completed",
+        formatCount(completedRows.length),
+        completedRows,
+      ),
+      kpi("workforce.no_shows", formatCount(noShowRows.length), noShowRows),
     ],
     breakdown: statusBreakdown(rows, "status"),
     trend: monthlyTrend(rows, dateWindow, dateOf, [
@@ -364,29 +388,22 @@ function buildWorkforceReport(
 
 function buildLogisticsReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const dateOf = (row: SourceRow) =>
-    firstDate(
-      row,
-      "windowStartsAt",
-      "scheduledAt",
-      "createdAt",
-      "_creationTime",
-    );
+  const dateOf = REPORT_DATE_OF.logistics;
   const rows = filterRows(sourceRows, dateWindow, dateOf);
   return model({
     subject: "logistics",
-    sourceLabel: "Delivery records",
+    sourceLabel: "Deliveries",
     sourceDescription:
-      "Current deliveries supply schedule, destination, driver references, and delivery status. Notes and failure details are excluded.",
+      "Current deliveries supply schedule, destination, who's driving, and delivery status. Notes and failure details are excluded.",
     sourcePath: "/logistics/deliveries",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Deliveries", formatCount(rows.length)),
-      kpi("Delivered", formatCount(countStatus(rows, "delivered"))),
-      kpi("In transit", formatCount(countStatus(rows, "in_transit"))),
-      kpi("Failed", formatCount(countStatus(rows, "failed"))),
+      kpi("logistics.deliveries", formatCount(rows.length)),
+      statusKpi("logistics.delivered", rows, "delivered"),
+      statusKpi("logistics.in_transit", rows, "in_transit"),
+      statusKpi("logistics.failed", rows, "failed"),
     ],
     breakdown: statusBreakdown(rows, "status"),
     trend: monthlyTrend(rows, dateWindow, dateOf, [
@@ -422,28 +439,28 @@ function buildLogisticsReport(
 
 function buildFinanceReport(
   sourceRows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
 ): LiveReportModel {
-  const dateOf = (row: SourceRow) =>
-    firstDate(row, "issuedAt", "dueDate", "createdAt", "_creationTime");
+  const dateOf = REPORT_DATE_OF.finance;
   const rows = filterRows(sourceRows, dateWindow, dateOf);
   const ledger = new InvoiceMoneyLedger();
   const invoiced = ledger.sum(rows.map(recognizedInvoiceTotal));
   const collected = ledger.sum(rows.map(collectedInvoiceTotal));
   const outstanding = ledger.sum(rows.map(collectibleInvoiceDue));
-  const overdue = rows.filter(isOverdue).length;
+  const overdueRows = rows.filter(isOverdue);
+  const counted = rows.filter((row) => row.status !== "voided");
   return model({
     subject: "finance",
-    sourceLabel: "Invoice records",
+    sourceLabel: "Invoices",
     sourceDescription:
-      "Current invoices supply issued value, payments received, outstanding balances, and payment status in functional-currency amounts. Collected is the invoice payment total (Invoice.amountPaid), so applied credit memos and written-off balances lower Outstanding without counting as cash and Collected plus Outstanding can be less than Invoiced. Voided invoices stay visible as evidence but contribute $0 to the KPIs.",
+      "Current invoices supply issued value, payments received, outstanding balances, and payment status in functional-currency amounts. Collected is the total paid so far on the invoice, so applied credit memos and written-off balances lower Outstanding without counting as cash, and Collected plus Outstanding can be less than Invoiced. Voided invoices stay visible as evidence but contribute $0 to the KPIs.",
     sourcePath: "/finance/invoices",
-    effectiveWindow: dateWindow,
+    effectiveWindow: dateWindow.window,
     kpis: [
-      kpi("Invoiced", formatMoney(invoiced)),
-      kpi("Collected", formatMoney(collected)),
-      kpi("Outstanding", formatMoney(outstanding)),
-      kpi("Overdue invoices", formatCount(overdue)),
+      kpi("finance.invoiced", formatMoney(invoiced), counted),
+      kpi("finance.collected", formatMoney(collected), counted),
+      kpi("finance.outstanding", formatMoney(outstanding), counted),
+      kpi("finance.overdue", formatCount(overdueRows.length), overdueRows),
     ],
     breakdown: statusBreakdown(rows, "status"),
     trend: monthlyTrend(rows, dateWindow, dateOf, [
@@ -488,19 +505,45 @@ function buildFinanceReport(
   });
 }
 
-function model(value: Omit<LiveReportModel, "csvFilename">): LiveReportModel {
-  return { ...value, csvFilename: `${value.subject}-report` };
+function model(
+  value: Omit<LiveReportModel, "csvFilename" | "leftOut">,
+): LiveReportModel {
+  return {
+    ...value,
+    csvFilename: `${value.subject}-report`,
+    leftOut: NO_LEFT_OUT,
+  };
+}
+
+/** The saved date window, or From / To days that replace it. */
+interface ReportPeriod {
+  window: ReportDateWindow;
+  from: number | null;
+  to: number | null;
+}
+
+/** [from, to) plus the last instant the trend draws a month for. */
+function periodBounds(period: ReportPeriod, now: number) {
+  if (period.from != null || period.to != null) {
+    return {
+      from: period.from,
+      to: period.to,
+      lastDrawn: period.to != null ? period.to - 1 : now,
+    };
+  }
+  return { from: windowStart(period.window, now), to: null, lastDrawn: now };
 }
 
 function filterRows(
   rows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
   dateOf: (row: SourceRow) => number | null,
 ): SourceRow[] {
-  const threshold = windowStart(dateWindow, Date.now());
+  const { from, to } = periodBounds(dateWindow, Date.now());
   return rows
     .filter((row) => row.deletedAt == null)
-    .filter((row) => threshold == null || (dateOf(row) ?? 0) >= threshold)
+    .filter((row) => from == null || (dateOf(row) ?? 0) >= from)
+    .filter((row) => to == null || (dateOf(row) ?? 0) < to)
     .sort((left, right) => (dateOf(right) ?? 0) - (dateOf(left) ?? 0));
 }
 
@@ -512,22 +555,25 @@ function windowStart(dateWindow: ReportDateWindow, now: number): number | null {
   // (year - 1, same month) spanned thirteen month starts, so the trend drew 13
   // buckets and kept records from the same month one year ago.
   const date = new Date(now);
-  return Date.UTC(
-    date.getUTCFullYear(),
-    date.getUTCMonth() - (MONTHS_IN_YEAR - 1),
+  return new Date(
+    date.getFullYear(),
+    date.getMonth() - (MONTHS_IN_YEAR - 1),
     1,
-  );
+  ).getTime();
 }
 
 function monthlyTrend(
   rows: SourceRow[],
-  dateWindow: ReportDateWindow,
+  dateWindow: ReportPeriod,
   dateOf: (row: SourceRow) => number | null,
   metrics: Array<{ key: string; value: (row: SourceRow) => number }>,
 ): ReportChartPoint[] {
   const buckets = new Map<string, ReportChartPoint>();
-  const now = Date.now();
-  const threshold = windowStart(dateWindow, now);
+  const bounds = periodBounds(dateWindow, Date.now());
+  const threshold = bounds.from;
+  // "now" below = the last instant the chart draws: today for a date window,
+  // the day before To for a From / To range.
+  const now = bounds.lastDrawn;
   // A bounded window (30 days, 90 days, 12 months) pre-seeds exactly the
   // month buckets from windowStart's month through the current month —
   // earliestBucket/latestBucket below, computed once from that same
@@ -556,7 +602,7 @@ function monthlyTrend(
     while (cursor <= end) {
       const key = monthKey(cursor);
       buckets.set(key, emptyBucket(cursor, metrics));
-      cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+      cursor.setMonth(cursor.getMonth() + 1);
     }
   }
   for (const row of rows) {
@@ -591,11 +637,11 @@ function emptyBucket(
 
 function startOfMonth(timestamp: number): Date {
   const value = new Date(timestamp);
-  return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), 1));
+  return new Date(value.getFullYear(), value.getMonth(), 1);
 }
 
 function monthKey(date: Date): string {
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function statusBreakdown(rows: SourceRow[], key: string): ReportChartPoint[] {
@@ -631,8 +677,37 @@ function columns(
   return values.map(([key, label, kind]) => ({ key, label, kind }));
 }
 
-function kpi(label: string, value: string): ReportKpi {
-  return { label, value };
+/** `behind` = the rows the figure is made from; omit when it is every row. */
+function kpi(
+  metricId: MetricId,
+  value: string,
+  behind?: readonly SourceRow[],
+): ReportKpi {
+  return {
+    metricId,
+    label: metricDefinition(metricId).label,
+    value,
+    rowIds: behind ? behind.map(rowId) : null,
+  };
+}
+
+function withStatus(rows: SourceRow[], status: string): SourceRow[] {
+  return rows.filter((row) => row.status === status);
+}
+
+function hoursWithCoverage(hours: number, untimed: number): string {
+  const total = hours.toLocaleString("en-US", { maximumFractionDigits: 1 });
+  if (untimed === 0) return total;
+  return `${total} · ${formatCount(untimed)} ${untimed === 1 ? "shift" : "shifts"} not timed`;
+}
+
+function statusKpi(
+  metricId: MetricId,
+  rows: SourceRow[],
+  status: string,
+): ReportKpi {
+  const behind = withStatus(rows, status);
+  return kpi(metricId, formatCount(behind.length), behind);
 }
 
 function countStatus(rows: SourceRow[], status: string): number {
@@ -705,23 +780,6 @@ function isOverdue(row: SourceRow): boolean {
     row.status !== "voided" &&
     row.status !== "written_off"
   );
-}
-
-function firstDate(row: SourceRow, ...keys: string[]): number | null {
-  for (const key of keys) {
-    const value = date(row[key]);
-    if (value != null) return value;
-  }
-  return null;
-}
-
-function date(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Date.parse(value);
-    return Number.isNaN(parsed) ? null : parsed;
-  }
-  return null;
 }
 
 function number(value: unknown): number {

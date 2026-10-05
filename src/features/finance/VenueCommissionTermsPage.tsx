@@ -99,11 +99,13 @@ export function VenueCommissionTermsPage() {
       return;
     }
     if (!(commissionPercent >= 0 && commissionPercent <= 100)) {
-      setFailure(new Error("Commission percent must be between 0 and 100."));
+      setFailure(
+        new Error("This commission percentage has to be between 0 and 100."),
+      );
       return;
     }
     if (!effectiveStartDate) {
-      setFailure(new Error("Effective start date is required."));
+      setFailure(new Error("Give this term an effective start date."));
       return;
     }
 

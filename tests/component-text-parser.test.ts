@@ -47,7 +47,9 @@ describe("UnitOfMeasureMapper", () => {
   it("resolves strictly for imports: unknown units stay null, never each", () => {
     const mapper = new UnitOfMeasureMapper();
     expect(mapper.resolve("kg")).toBe("kilogram");
-    expect(mapper.resolve("fl oz")).toBeNull(); // no supported volume-oz unit
+    // fluid_ounce joined the unit list 2026-09-14: volume, never the mass ounce.
+    expect(mapper.resolve("fl oz")).toBe("fluid_ounce");
+    expect(mapper.resolve("oz")).toBe("ounce");
     expect(mapper.resolve("mystery-pack")).toBeNull();
     expect(mapper.resolve("medium")).toBeNull(); // size word, not a unit
     expect(mapper.resolve("")).toBeNull();
@@ -115,10 +117,10 @@ describe("ComponentTextParser", () => {
     });
     expect(parsed.lines[1]).toMatchObject({
       quantity: 2,
-      unit: null,
-      unitRaw: "",
+      unit: "fluid_ounce",
+      unitRaw: "fl oz",
+      name: "Lemon Juice",
     });
-    expect(parsed.lines[1].name).toContain("Lemon Juice");
     expect(parsed.lines[2]).toMatchObject({
       raw: "case tomatoes",
       quantity: null,

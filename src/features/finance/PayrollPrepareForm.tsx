@@ -38,7 +38,8 @@ export function PayrollPrepareForm({
   const [personId, setPersonId] = useState("");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
-  const [overtime, setOvertime] = useState(0);
+  // null = use the approved overtime (hours past 40 in a week).
+  const [overtimeOverride, setOvertime] = useState<number | null>(null);
   // Manual edit wins over the clocked prefill until person/period changes.
   const [regularOverride, setRegularOverride] = useState<string | null>(null);
 
@@ -82,7 +83,9 @@ export function PayrollPrepareForm({
 
   // Clocked minutes are the TOTAL; overtime is carved out of them, never
   // added on top (a 45h week is 45h split regular/OT, not 45h + OT).
-  const clockedTotal = clocked?.totalMinutes ?? 0;
+  // Only manager-approved time is paid; lunch is already taken off.
+  const clockedTotal = clocked?.approvedMinutes ?? 0;
+  const overtime = overtimeOverride ?? clocked?.approvedOvertimeMinutes ?? 0;
   const regularDefault = Math.max(0, clockedTotal - overtime);
   const rate = clocked?.hourlyRate ?? null;
 
@@ -104,6 +107,7 @@ export function PayrollPrepareForm({
           onChange={(event) => {
             setPersonId(event.target.value);
             setRegularOverride(null);
+            setOvertime(null);
           }}
         >
           <option value="" disabled>
@@ -127,6 +131,7 @@ export function PayrollPrepareForm({
             onChange={(event) => {
               setPeriodStart(event.target.value);
               setRegularOverride(null);
+              setOvertime(null);
             }}
           />
         </label>
@@ -140,10 +145,17 @@ export function PayrollPrepareForm({
             onChange={(event) => {
               setPeriodEnd(event.target.value);
               setRegularOverride(null);
+              setOvertime(null);
             }}
           />
         </label>
       </div>
+      {/* The approved entries this input is made from (paid once). */}
+      <input
+        type="hidden"
+        name="sourceTimeRecordIds"
+        value={JSON.stringify(clocked?.approvedTimeRecordIds ?? [])}
+      />
       <div className="supply-form-grid">
         <label className="field-label">
           Regular minutes
@@ -158,9 +170,12 @@ export function PayrollPrepareForm({
           />
           {clocked ? (
             <span className="text-xs text-ink-3">
-              {clocked.recordCount === 0
-                ? "No closed time entries in this period — enter minutes manually."
-                : `${clocked.recordCount} closed time ${clocked.recordCount === 1 ? "entry" : "entries"} · ${(clockedTotal / 60).toFixed(1)} h clocked total`}
+              {clocked.approvedCount === 0
+                ? "No approved time entries in this period — approve them on the time sheet, or enter minutes manually."
+                : `${clocked.approvedCount} approved time ${clocked.approvedCount === 1 ? "entry" : "entries"} · ${(clockedTotal / 60).toFixed(1)} h approved total`}
+              {clocked.waitingApprovalCount > 0
+                ? ` · ${clocked.waitingApprovalCount} still waiting for approval on the time sheet`
+                : ""}
             </span>
           ) : (
             <span className="text-xs text-ink-3">
@@ -184,8 +199,8 @@ export function PayrollPrepareForm({
             }
           />
           <span className="text-xs text-ink-3">
-            Overtime moves minutes out of regular — the clocked total stays the
-            same.
+            Filled in with hours past 40 in a week. Overtime moves minutes out
+            of regular — the approved total stays the same.
           </span>
         </label>
       </div>

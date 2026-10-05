@@ -1,4 +1,5 @@
 import { useAction, useQuery } from "convex/react";
+import { useState } from "react";
 import { api } from "../../lib/api";
 import { usePushNotifications } from "../chat/usePushNotifications";
 import { LEAD_MINUTE_CHOICES, type RunSettings } from "./runOfShowModel";
@@ -24,9 +25,19 @@ export function RunSettingsSheet({
   const runStatus = useQuery(api.runOfShowAlerts.getStatus, {});
   const enableLoop = useAction(api.runOfShowAlerts.enableAlerts);
 
+  const [loopError, setLoopError] = useState<string | null>(null);
   const turnOnBackground = async () => {
+    setLoopError(null);
     await push.enable();
-    if (runStatus != null && !runStatus.enabled) await enableLoop({});
+    if (runStatus != null && !runStatus.enabled) {
+      try {
+        await enableLoop({});
+      } catch (cause) {
+        setLoopError(
+          `Task calls could not be started. Try again. ${cause instanceof Error ? cause.message : ""}`.trim(),
+        );
+      }
+    }
   };
   // Personal switch only: the account preference gates this phone's
   // delivery. Turning it off must NOT stop the tenant-wide scanner the
@@ -38,7 +49,7 @@ export function RunSettingsSheet({
   const pushStatusHint = push.blocked
     ? "Notifications are blocked in this phone's settings"
     : push.keyMissing
-      ? "Not set up on this deployment yet"
+      ? "Not set up in Capsule yet"
       : push.accountEnabled
         ? push.deviceActive
           ? runStatus?.enabled
@@ -152,6 +163,11 @@ export function RunSettingsSheet({
                 </button>
               ) : null}
               {push.error ? <p className="evd-set-note">{push.error}</p> : null}
+              {loopError ? (
+                <p className="evd-set-note" role="alert">
+                  {loopError}
+                </p>
+              ) : null}
               <p className="evd-set-note">
                 Background alerts call the next task out on this phone even when
                 Capsule is closed — 5 minutes before, at the start, and once

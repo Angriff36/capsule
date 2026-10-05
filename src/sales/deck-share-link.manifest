@@ -1,0 +1,126 @@
+// Capsule sales — DeckShareLink (spec §4.6 social sharing / share links;
+// PL-DECK-SHARING, AC-253).
+//
+// Spec §4.6 (L238): "Published proposals and presentation decks receive
+// revocable share links. Links may be public-token or authenticated, based on
+// document sensitivity. Record version, expiry, revocation, first/last view,
+// and viewer identity when known. Sharing always points to an immutable
+// published revision, not a mutable draft."
+//
+// A presentation deck is a file the sales team already made (a PDF or slides
+// from Canva or PowerPoint) kept as an Attachment on a client or venue. Capsule
+// does not build decks; it shares the exact file. An Attachment is written once
+// and never changed in place (Attachment.attach is creation-only), so the
+// attachment IS the immutable published version: a new deck is a new upload
+// and needs a new link. Removing the file ends every link to it.
+//
+// Same posture as ShareLink: the row _id is the bearer token; revocation,
+// expiry (no end date = 90 days) and audience are read-time checks in the
+// authored seam convex/deckShareLinks.ts, which also writes view tracking.
+
+use "../documents/attachment.manifest"
+
+enum DeckShareStatus {
+  active
+  revoked
+}
+
+// Who may open the link. "staff" decks (internal price sheets, pitch notes)
+// open only for signed-in people of the same company.
+enum DeckShareAudience {
+  anyone
+  staff
+}
+
+entity DeckShareLink mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // The exact file shared.
+  property required attachmentId: uuid
+  property required audience: DeckShareAudience = "anyone"
+  property required status: DeckShareStatus = "active"
+  property expiresAt: datetime?
+
+  property revokedAt: datetime?
+  property revokedByPersonId: uuid?
+  property createdByPersonId: uuid?
+
+  // Written by the authored public seam, not by these commands.
+  property required viewCount: int = 0
+  property firstViewedAt: datetime?
+  property lastViewedAt: datetime?
+  property lastViewerIdentity: string?
+
+  belongsTo attachment: Attachment fields [tenantId, attachmentId] references [tenantId, id]
+
+  default policy deckShareLinkRead read: roleAllows(user.role, "salesAccess") "Sales staff may see deck links"
+  default policy deckShareLinkWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update deck links"
+  default policy deckShareLinkExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change deck links"
+
+  command create(
+    attachmentId: uuid,
+    audience: DeckShareAudience,
+    optional expiresAt: datetime
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint deckLinkExpiresFuture: expiresAt == null or expiresAt > now() "The end date must be in the future"
+    constraint deckLinkNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you share a deck."
+    mutate attachmentId = attachmentId
+    mutate audience = audience
+    mutate status = "active"
+    mutate expiresAt = expiresAt
+    mutate createdByPersonId = user.personId
+    mutate revokedAt = null
+    mutate revokedByPersonId = null
+    mutate viewCount = 0
+    mutate firstViewedAt = null
+    mutate lastViewedAt = null
+    mutate lastViewerIdentity = null
+    emit DeckShareLinkCreated {
+      deckShareLinkId: self.id
+      tenantId: self.tenantId
+      attachmentId: attachmentId
+      audience: audience
+      createdByPersonId: user.personId != null ? user.personId : ""
+      expiresAt: expiresAt
+    }
+  }
+
+  command revoke() {
+    guard self.deletedAt == null
+    guard self.status == "active" "This link is already switched off"
+    constraint deckRevokeNeedsStaffProfile: user.personId != null "Link your account to a staff profile before you switch off a deck link."
+    mutate status = "revoked"
+    mutate revokedAt = now()
+    mutate revokedByPersonId = user.personId
+    emit DeckShareLinkRevoked {
+      deckShareLinkId: self.id
+      tenantId: self.tenantId
+      attachmentId: self.attachmentId
+      revokedByPersonId: user.personId != null ? user.personId : ""
+      revokedAt: now()
+    }
+  }
+
+  store DeckShareLink in durable
+}
+
+event DeckShareLinkCreated: "deck_share_link.created" {
+  deckShareLinkId: string
+  tenantId: string
+  attachmentId: string
+  audience: string
+  createdByPersonId: string
+  expiresAt: datetime
+}
+
+event DeckShareLinkRevoked: "deck_share_link.revoked" {
+  deckShareLinkId: string
+  tenantId: string
+  attachmentId: string
+  revokedByPersonId: string
+  revokedAt: datetime
+}

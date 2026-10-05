@@ -5,10 +5,11 @@ import {
   useEventAssignmentCheckIn,
   useEventAssignmentCheckOut,
   useEventAssignmentConfirm,
+  useEventAssignmentDecline,
   useEventAssignmentMarkNoShow,
   useEventAssignmentUnassign,
-  useListEvent,
   useListEventAssignment,
+  useListEventStaffNeed,
   useListPerson,
   useListQualification,
   useListShift,
@@ -29,7 +30,9 @@ import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { runBulkItems } from "../../ui/bulk-select";
 import { useWorkingEventId } from "../events/workingEvent";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
   DEFAULT_OVERTIME_THRESHOLD_HOURS,
@@ -43,14 +46,22 @@ import {
 } from "./weeklySchedule";
 import { ShiftRescheduleAction } from "./ShiftRescheduleAction";
 import { SmsAlertOptInSection } from "./SmsAlertOptInSection";
+import { StaffSchedulingSection } from "./StaffSchedulingSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
+import {
+  RosterAttentionSection,
+  type OpenStaffNeed,
+} from "./RosterAttentionSection";
+import { findRosterConflicts } from "./rosterConflicts";
 
 const policy = new WorkforceLifecyclePolicy();
 const OVERTIME_THRESHOLD_STORAGE_KEY =
   "capsule.workforce.overtime-threshold-hours";
+const SHIFT_DEFAULT_HOURS = 8;
 
 const hours = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
@@ -83,7 +94,6 @@ export function RosterPage() {
   const assignments = useListEventAssignment();
   const shifts = useListShift();
   const scheduleNotices = useListWeeklyScheduleNotice();
-  const events = useListEvent();
   const people = useListPerson();
   const qualifications = useListQualification();
   const trainingModules = useListTrainingModule();
@@ -96,6 +106,20 @@ export function RosterPage() {
   const checkOut = useEventAssignmentCheckOut();
   const assignmentNoShow = useEventAssignmentMarkNoShow();
   const unassign = useEventAssignmentUnassign();
+  const decline = useEventAssignmentDecline();
+  const staffNeeds = useListEventStaffNeed();
+  const [assignEventId, setAssignEventId] = useState<string | null>(null);
+  const events = usePickerAndNamedEvents(
+    assignments && shifts && staffNeeds
+      ? [
+          workingId,
+          assignEventId,
+          ...assignments.map((row) => row.eventId),
+          ...shifts.map((row) => row.eventId),
+          ...staffNeeds.map((row) => row.eventId),
+        ]
+      : undefined,
+  );
   const scheduleShift = useScheduleShift();
   const createScheduleNotice = useCreateWeeklyScheduleNotice();
   const startShift = useShiftStart();
@@ -106,6 +130,9 @@ export function RosterPage() {
   const [showForm, setShowForm] = useState<"assignment" | "shift" | null>(null);
   const [shiftPersonId, setShiftPersonId] = useState("");
   const [shiftTypeId, setShiftTypeId] = useState("");
+  const [shiftStartsAt, setShiftStartsAt] = useState("");
+  const [shiftEndsAt, setShiftEndsAt] = useState("");
+  const [shiftEndWasEdited, setShiftEndWasEdited] = useState(false);
   const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
     startOfScheduleWeek(Date.now()),
   );
@@ -154,12 +181,52 @@ export function RosterPage() {
           selectedShiftType?.requiredTrainingModuleId,
     )
     .sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0))[0];
-  const eventName = (id: string | undefined) =>
+  const assignEventStage = events?.find(
+    (event) => event._id === (assignEventId ?? workingId),
+  )?.stage;
+  const assignEventFinished =
+    assignEventStage === "completed" || assignEventStage === "closed_out";
+  const eventName = (id: string | null | undefined) =>
     events?.find((event) => event._id === id)?.title ?? "—";
   const personName = (id: string) => {
     const person = people?.find((row) => row._id === id);
     return person ? `${person.givenName} ${person.familyName}` : "Unknown";
   };
+  const liveEventIds = new Set(
+    (events ?? [])
+      .filter(
+        (event) =>
+          event.deletedAt == null &&
+          !["cancelled", "completed", "closed_out"].includes(event.stage),
+      )
+      .map((event) => event._id as string),
+  );
+  const openNeeds: OpenStaffNeed[] = (staffNeeds ?? [])
+    .filter(
+      (need) =>
+        need.deletedAt == null &&
+        (need.status === "open" || need.status === "claimed") &&
+        liveEventIds.has(need.eventId),
+    )
+    .sort((a, b) => (a.startsAt ?? Infinity) - (b.startsAt ?? Infinity))
+    .map((need) => ({
+      id: need._id,
+      eventId: need.eventId,
+      eventTitle: eventName(need.eventId),
+      role: need.role,
+      startsAt: need.startsAt ?? null,
+      endsAt: need.endsAt ?? null,
+      claimedBy: need.claimedByPersonId
+        ? personName(need.claimedByPersonId)
+        : null,
+    }));
+  const rosterConflicts = findRosterConflicts({
+    shifts: activeShifts,
+    timeOff: timeOffRequests ?? [],
+    qualifications: qualifications ?? [],
+    eventTitle: eventName,
+    personName,
+  });
   const selectedWeekEndsAt = addScheduleWeeks(selectedWeekStartsAt, 1);
   const selectedWeekShifts = shiftsInScheduleWeek(
     activeShifts,
@@ -255,6 +322,8 @@ export function RosterPage() {
         startsAt,
         endsAt,
         notes: String(data.get("notes") || "") || undefined,
+        overrideReason:
+          String(data.get("overrideReason") || "").trim() || undefined,
       });
       form.reset();
       setShowForm(null);
@@ -332,14 +401,18 @@ export function RosterPage() {
         form.reset();
         setShiftPersonId("");
         setShiftTypeId("");
+        setShiftStartsAt("");
+        setShiftEndsAt("");
+        setShiftEndWasEdited(false);
         setShowForm(null);
       });
     })();
   };
 
   const publishSelectedWeek = () => {
+    // A stop part way says how many were published; pressing again is safe.
     void run("publish-week", async () => {
-      for (const row of unpublishedPublicationRows) {
+      await runBulkItems(unpublishedPublicationRows, async (row) => {
         const recipientAuthSubjectId = row.person?.authSubjectId ?? undefined;
         if (row.notice) {
           await republishScheduleNotice({
@@ -360,11 +433,28 @@ export function RosterPage() {
             idempotencyKey: `weekly-schedule:${selectedWeekStartsAt}:${row.personId}`,
           });
         }
-      }
+      });
     });
   };
 
   const invokeAssignment = (row: any, key: string) => {
+    if (key === "decline") {
+      void (async () => {
+        const reason = (
+          await prompt.askReason({
+            title: "Can't make it",
+            description: `${personName(row.personId)} can't work ${eventName(row.eventId)}. Their shift is freed so someone else can cover it.`,
+            label: "Why",
+            confirmLabel: "Free this work",
+          })
+        )?.trim();
+        if (!reason) return;
+        await run(`${row._id}:${key}`, async () => {
+          await decline({ docId: row._id, version: row.version, reason });
+        });
+      })();
+      return;
+    }
     void run(`${row._id}:${key}`, async () => {
       const args = { docId: row._id, version: row.version };
       if (key === "confirm") await confirm(args);
@@ -412,6 +502,7 @@ export function RosterPage() {
     trainingModules === undefined ||
     trainingCompletions === undefined ||
     shiftTypes === undefined ||
+    staffNeeds === undefined ||
     timeOffRequests === undefined;
 
   return (
@@ -430,9 +521,17 @@ export function RosterPage() {
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {host}
 
+      {loading ? null : (
+        <RosterAttentionSection
+          openNeeds={openNeeds}
+          conflicts={rosterConflicts}
+        />
+      )}
+
       <AvailabilityGridSection people={activePeople} />
 
       <SmsAlertOptInSection people={activePeople} />
+      <StaffSchedulingSection people={activePeople} />
 
       <section className="working-ledger">
         <div className="ledger-heading">
@@ -483,6 +582,7 @@ export function RosterPage() {
                   name="eventId"
                   className="input"
                   defaultValue={workingId ?? ""}
+                  onChange={(change) => setAssignEventId(change.target.value)}
                   required
                 >
                   <option value="">Select event</option>
@@ -527,6 +627,17 @@ export function RosterPage() {
                 Notes
                 <input name="notes" className="input" />
               </label>
+              {assignEventFinished ? (
+                <label className="field-label">
+                  This event is over. Why add someone now?
+                  <input
+                    name="overrideReason"
+                    className="input"
+                    placeholder="Covered the bar; recording it after"
+                    required
+                  />
+                </label>
+              ) : null}
             </div>
           </form>
         ) : null}
@@ -548,7 +659,7 @@ export function RosterPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Event</th>
@@ -564,10 +675,20 @@ export function RosterPage() {
                     <td>
                       <strong>{eventName(row.eventId)}</strong>
                     </td>
-                    <td>{personName(row.personId)}</td>
-                    <td>{row.role || "—"}</td>
-                    <td>
+                    <td data-label="Person">{personName(row.personId)}</td>
+                    <td data-label="Role">{row.role || "—"}</td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
+                      {row.declineReason ? (
+                        <div className="text-2xs text-ink-3">
+                          Can't make it: {row.declineReason}
+                        </div>
+                      ) : null}
+                      {row.overrideReason ? (
+                        <div className="text-2xs text-ink-3">
+                          Added after the event: {row.overrideReason}
+                        </div>
+                      ) : null}
                     </td>
                     <td>
                       <div className="supply-row-actions">
@@ -671,6 +792,15 @@ export function RosterPage() {
                   name="startsAt"
                   className="input"
                   required
+                  value={shiftStartsAt}
+                  onResolvedValue={(next) => {
+                    setShiftStartsAt(next);
+                    if (!shiftEndsAt || !shiftEndWasEdited) {
+                      setShiftEndsAt(
+                        addLocalDateTimeHours(next, SHIFT_DEFAULT_HOURS),
+                      );
+                    }
+                  }}
                 />
               </label>
               <label className="field-label">
@@ -679,6 +809,12 @@ export function RosterPage() {
                   name="endsAt"
                   className="input"
                   required
+                  value={shiftEndsAt}
+                  naturalDateAnchor={shiftStartsAt}
+                  onResolvedValue={(next) => {
+                    setShiftEndsAt(next);
+                    setShiftEndWasEdited(true);
+                  }}
                 />
               </label>
               <label className="field-label">
@@ -892,7 +1028,7 @@ export function RosterPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Person</th>
@@ -927,8 +1063,8 @@ export function RosterPage() {
                         </small>
                       ) : null}
                     </td>
-                    <td>{eventName(row.eventId)}</td>
-                    <td>
+                    <td data-label="Event">{eventName(row.eventId)}</td>
+                    <td data-label="Window">
                       {row.startsAt
                         ? `${formatDate(row.startsAt)} ${formatTime(row.startsAt)}`
                         : "—"}{" "}
@@ -937,7 +1073,7 @@ export function RosterPage() {
                         ? `${formatDate(row.endsAt)} ${formatTime(row.endsAt)}`
                         : "—"}
                     </td>
-                    <td>
+                    <td data-label="State">
                       <StatusChip status={String(row.status)} />
                       {row.cancellationReason ? (
                         <small>{row.cancellationReason}</small>

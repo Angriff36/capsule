@@ -114,6 +114,7 @@ export const referenceKinds = new Set([
   "quartermaster",
   "event_forms",
   "training",
+  "diagram",
 ]);
 const normalize = (s: string) =>
   s

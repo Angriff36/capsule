@@ -24,11 +24,12 @@
 // loop, so an interruption could leave stored totals for lines never persisted).
 // Mirrors proposalRevision.ts (guarded runMutation + internal restamp).
 
-import { internalMutation, mutation } from "../_generated/server";
+import { internalMutation, mutation, query } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
+import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import { getAuthContext } from "./authContext";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
@@ -64,18 +65,20 @@ export async function resolveCatalogPrice(
     !menuDish ||
     menuDish.deletedAt != null ||
     menuDish.addedAt == null ||
-    menuDish.tenantId !== tenantId ||
-    menuDish.sellingPrice == null
+    menuDish.tenantId !== tenantId
   ) {
     return null;
   }
+  // The price in force today — a dated price change applies from its day on.
+  const price = effectiveSellingPrice(menuDish, Date.now());
+  if (price == null) return null;
   const menu = await ctx.db.get(menuDish.menuId);
   if (!menu || menu.deletedAt != null || String(menu.status) !== "published") {
     return null;
   }
   const dish = await ctx.db.get(menuDish.dishId);
   if (!dish || String(dish.status) !== "active") return null;
-  return Number(menuDish.sellingPrice);
+  return price;
 }
 
 // Enforce a valid catalog link at write (throws on invalid). Thin throwing
@@ -94,6 +97,74 @@ export async function assertValidCatalogLink(
     );
   }
 }
+
+// AC-547: a rental/decor line names a rentable item of the SAME company that is
+// still in use (not removed, not retired). Null for anything else, so a foreign
+// or retired item id never reaches a proposal.
+export async function resolveRentalItem(
+  ctx: { db: any },
+  equipmentId: Id<"equipments"> | string | undefined | null,
+  tenantId: string,
+): Promise<{ name: string; ownership: string } | null> {
+  if (!equipmentId) return null;
+  const item = await ctx.db.get(equipmentId);
+  if (
+    !item ||
+    item.deletedAt != null ||
+    item.tenantId !== tenantId ||
+    String(item.status) !== "active"
+  ) {
+    return null;
+  }
+  return { name: item.name, ownership: String(item.ownership) };
+}
+
+export async function assertValidRentalLink(
+  ctx: { db: any },
+  equipmentId: Id<"equipments"> | undefined | null,
+  tenantId: string,
+): Promise<void> {
+  if (
+    equipmentId != null &&
+    (await resolveRentalItem(ctx, equipmentId, tenantId)) == null
+  ) {
+    throw new Error(
+      "That rental item is not in your equipment list. Pick an item from the list.",
+    );
+  }
+}
+
+export interface RentalItemChoice {
+  equipmentId: Id<"equipments">;
+  name: string;
+  category: string;
+  ownership: string;
+}
+
+// AC-547: the rental/decor items a salesperson can put on a proposal line -
+// name, kind and whether Mangia owns it or rents it in. Equipment itself is an
+// inventory/logistics record, so this read gives staff of the same company
+// only those facts - never value, condition or location.
+export const listRentalItems = query({
+  args: {},
+  handler: async (ctx): Promise<RentalItemChoice[]> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId) return [];
+    const items = await ctx.db
+      .query("equipments")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
+      .collect();
+    return items
+      .filter((item) => item.deletedAt == null && item.status === "active")
+      .map((item) => ({
+        equipmentId: item._id,
+        name: item.name,
+        category: item.category,
+        ownership: item.ownership,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  },
+});
 
 // Authoritative amount for ONE line against the proposal's active line set, so
 // the emitted ProposalLineItem{Added,Revised} event carries the real amount.
@@ -197,6 +268,9 @@ export const addProposalLineAndRecompute = mutation({
     notes: v.optional(v.string()),
     menuDishId: v.optional(v.id("menuDishes")),
     overrideReason: v.optional(v.string()),
+    equipmentId: v.optional(v.id("equipments")),
+    // The event's travel & delivery fee line (convex/travelFees.ts).
+    travelFee: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
@@ -207,6 +281,7 @@ export const addProposalLineAndRecompute = mutation({
       throw new Error("Proposal not found");
     }
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
+    await assertValidRentalLink(ctx, args.equipmentId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
       ctx,
       args.proposalId,
@@ -230,6 +305,8 @@ export const addProposalLineAndRecompute = mutation({
       notes: args.notes,
       menuDishId: args.menuDishId,
       overrideReason: args.overrideReason,
+      equipmentId: args.equipmentId,
+      travelFee: args.travelFee,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: args.proposalId,
@@ -253,6 +330,7 @@ export const reviseProposalLineAndRecompute = mutation({
     notes: v.optional(v.string()),
     menuDishId: v.optional(v.id("menuDishes")),
     overrideReason: v.optional(v.string()),
+    equipmentId: v.optional(v.id("equipments")),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
@@ -263,6 +341,7 @@ export const reviseProposalLineAndRecompute = mutation({
     const proposal = await ctx.db.get(line.proposalId);
     if (!proposal) throw new Error("Proposal not found");
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
+    await assertValidRentalLink(ctx, args.equipmentId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
       ctx,
       line.proposalId,
@@ -288,6 +367,7 @@ export const reviseProposalLineAndRecompute = mutation({
       notes: args.notes,
       menuDishId: args.menuDishId,
       overrideReason: args.overrideReason,
+      equipmentId: args.equipmentId,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: line.proposalId,

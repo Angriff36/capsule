@@ -1,11 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
   useGetPackList,
-  useListDish,
-  useListEvent,
   useListPerson,
   useListPackListItem,
   useListPackListTemplate,
@@ -13,7 +12,13 @@ import {
   usePackListDispatch,
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
+  usePackListItemSetBin,
+  usePackListItemAssignLoad,
+  usePackListItemSetUnitVolume,
+  usePackListItemSetUnitWeight,
+  usePackListItemExclude,
   usePackListItemRemove,
+  usePackListItemRestoreExcluded,
   usePackListApplyServiceStyleKit,
   usePackListRequestAssistance,
   usePackListResolveAssistance,
@@ -21,7 +26,12 @@ import {
   useListServiceStyleKitItem,
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
+  usePackListItemRecordChecked,
+  useListPackSectionClaim,
+  usePackSectionClaimRelease,
+  usePackListItemRecordLoaded,
   usePackListItemRecordPackedCount,
+  usePackListItemRecordReturn,
   usePackListItemRecordSentInstead,
   usePackListMarkLoaded,
   usePackListMarkPacked,
@@ -34,19 +44,40 @@ import {
   useBulkSelection,
 } from "../../ui/bulk-select";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { usePackSectionTake } from "../../lib/usePackSectionTake";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure } from "../events/CommandFailure";
+import { useEventsById } from "../facilities/useEventsById";
+import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PackListItemForm } from "./PackListItemForm";
-import { PackListItemTable } from "./PackListItemTable";
+import { PackListViews } from "./PackListViews";
+import { PACK_VIEWS, type PackViewKind } from "./packViews";
+import { usePackRigs } from "./usePackRigs";
+import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
+import { PackScanPanel } from "./PackScanPanel";
+import { PackFoodPackaging } from "./PackFoodPackaging";
+import { PackBinSheet } from "./PackBinSheet";
+import { PackListSourcePanel } from "./PackListSourcePanel";
+import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
-import { useApplyPackTemplate } from "../../lib/safeMaterialization";
+import {
+  useApplyPackTemplate,
+  useRefreshPackRules,
+} from "../../lib/safeMaterialization";
+import { PackReadinessNotice } from "./PackReadinessNotice";
+import { PackTemplatePreview } from "./PackTemplatePreview";
+import {
+  parseTemplateLines,
+  previewTemplateApplication,
+} from "../../lib/packTemplateLines";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -55,8 +86,13 @@ import {
 const policy = new LogisticsLifecyclePolicy();
 
 // Generated list hooks return `any`; this summary type keeps template handling checked.
+type TemplateId = NonNullable<
+  Parameters<ReturnType<typeof useApplyPackTemplate>>[0]["packListTemplateId"]
+>;
+
 type TemplateSummary = {
-  _id: string;
+  _id: TemplateId;
+  version: number;
   name: string;
   items: string;
   status: string;
@@ -71,14 +107,30 @@ export function PackListDetailPage() {
   const { id } = useParams();
   const packList = useRouteRecord(useGetPackList, id);
   const items = useListPackListItem();
-  const events = useListEvent();
-  const dishes = useListDish();
+  const events = useEventsById(
+    packList === undefined ? undefined : [packList?.eventId],
+  );
+  // Only the dishes this list's items name, never the whole dish list.
+  const dishes = useDishesByIds(
+    packList == null || items === undefined
+      ? undefined
+      : items
+          .filter((item) => item.packListId === packList._id)
+          .map((item) => item.dishId),
+  );
   const people = useListPerson();
   const createItem = useCreatePackListItem();
   const applyPackTemplate = useApplyPackTemplate();
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const annotateItem = usePackListItemAnnotate();
+  const setItemBin = usePackListItemSetBin();
+  const excludeItem = usePackListItemExclude();
+  const assignLoad = usePackListItemAssignLoad();
+  const setUnitWeight = usePackListItemSetUnitWeight();
+  const setUnitVolume = usePackListItemSetUnitVolume();
+  const restoreExcluded = usePackListItemRestoreExcluded();
+  const refreshPackRules = useRefreshPackRules();
   const removeItem = usePackListItemRemove();
   const applyKit = usePackListApplyServiceStyleKit();
   const requestAssistance = usePackListRequestAssistance();
@@ -88,6 +140,13 @@ export function PackListDetailPage() {
   const markItemPacked = usePackListItemMarkPacked();
   const recordPackedCount = usePackListItemRecordPackedCount();
   const recordSentInstead = usePackListItemRecordSentInstead();
+  const recordChecked = usePackListItemRecordChecked();
+  const sectionClaims = useListPackSectionClaim();
+  const authStatus = useAuthStatus();
+  const takeSection = usePackSectionTake();
+  const giveBackSection = usePackSectionClaimRelease();
+  const recordLoaded = usePackListItemRecordLoaded();
+  const recordReturn = usePackListItemRecordReturn();
   const markItemMissing = usePackListItemMarkMissing();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -95,10 +154,27 @@ export function PackListDetailPage() {
   const dispatch = usePackListDispatch();
   const cancel = usePackListCancel();
   const [showAdd, setShowAdd] = useState(false);
+  // The whole dish list only while the add-item form is open.
+  const formDishes = useWholeDishList(showAdd);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showScan, setShowScan] = useState(false);
+  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(
+    null,
+  );
+  // The dispatch board and the returns page open a list on one view.
+  const [searchParams] = useSearchParams();
+  const [view, setView] = useState<PackViewKind>(
+    () =>
+      PACK_VIEWS.find((option) => option.kind === searchParams.get("view"))
+        ?.kind ?? "all",
+  );
+  const rigs = usePackRigs(packList ? packList.eventId : null);
+  const transport = useEventTransport(packList ? packList.eventId : null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
+  // The row action that failed, so the row can offer "Try again" in place.
+  const [failureRetryKey, setFailureRetryKey] = useState<string | null>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(packList);
@@ -111,6 +187,7 @@ export function PackListDetailPage() {
   const selectableItems = (items ?? []).filter(
     (item) =>
       item.deletedAt == null &&
+      item.retiredAt == null &&
       item.packListId === packListId &&
       itemBulkable(item),
   );
@@ -127,9 +204,9 @@ export function PackListDetailPage() {
   if (packList === undefined) {
     return (
       <div className="operations-stage supply-stage order-folio">
-        <Link className="text-link" to="/logistics/packs">
+        <ReturnToListLink fallback="/logistics/packs" className="text-link">
           ← Pack lists
-        </Link>
+        </ReturnToListLink>
         <LogisticsWorkspaceNav />
         <QueryLoadState
           title="Pack list data is not loading"
@@ -149,8 +226,13 @@ export function PackListDetailPage() {
     );
   }
 
+  // A generated line nothing asks for any more stays in the data (it comes
+  // back if its source does) but not on the sheet.
   const listItems = (items ?? []).filter(
-    (item) => item.deletedAt == null && item.packListId === packList._id,
+    (item) =>
+      item.deletedAt == null &&
+      item.packListId === packList._id &&
+      item.retiredAt == null,
   );
   const eventTitle =
     events?.find((event) => event._id === packList.eventId)?.title ??
@@ -176,6 +258,7 @@ export function PackListDetailPage() {
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setFailureItemId(null);
+    setFailureRetryKey(null);
     setNotice(null);
     setBusy(key);
     try {
@@ -187,9 +270,73 @@ export function PackListDetailPage() {
       setFailureItemId(
         key.includes(":") ? key.slice(0, key.indexOf(":")) : null,
       );
+      setFailureRetryKey(
+        key.includes(":") ? key.slice(key.indexOf(":") + 1) : null,
+      );
     } finally {
       setBusy(null);
     }
+  };
+
+  // Who is packing which section of the warehouse walk. Taking a section
+  // stops nobody: anyone may still count a line in it.
+  const sectionAside = (group: { key: string; label: string }) => {
+    const claim = sectionClaims?.find(
+      (row) =>
+        row.deletedAt == null &&
+        row.packListId === packList._id &&
+        row.sectionKey === group.key &&
+        row.claimedAt != null &&
+        row.releasedAt == null,
+    );
+    const mine =
+      claim?.personId != null && claim.personId === authStatus?.personId;
+    // One save: whoever had the section gives it back and you take it.
+    const take = () =>
+      run(`section:${group.key}`, async () => {
+        await takeSection({
+          packListId: packList._id as never,
+          sectionKey: group.key,
+        });
+      });
+    return (
+      <div className="flex flex-wrap items-center gap-2 text-base text-ink-2">
+        {claim && (
+          <span>
+            {mine
+              ? "You are packing this"
+              : `${claim.personName?.trim() || packedByName(claim.personId) || "Someone"} is packing this`}
+          </span>
+        )}
+        {claim && mine && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy != null}
+            onClick={() =>
+              void run(`section:${group.key}`, async () => {
+                await giveBackSection({
+                  docId: claim._id,
+                  version: claim.version,
+                });
+              })
+            }
+          >
+            Give back
+          </button>
+        )}
+        {!mine && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy != null}
+            onClick={() => void take()}
+          >
+            {claim ? "Take over" : "I will pack this"}
+          </button>
+        )}
+      </div>
+    );
   };
 
   const submitItem = (event: FormEvent<HTMLFormElement>) => {
@@ -227,41 +374,8 @@ export function PackListDetailPage() {
     String(packList.status) !== "dispatched" &&
     String(packList.status) !== "cancelled";
 
-  const parseTemplateItems = (
-    raw: string | null | undefined,
-  ): { description: string; requiredQuantity: number; unit: string }[] => {
-    if (!raw) return [];
-    try {
-      const parsed = JSON.parse(raw) as unknown;
-      if (!Array.isArray(parsed)) return [];
-      return parsed
-        .filter(
-          (
-            it,
-          ): it is {
-            description: string;
-            requiredQuantity: number;
-            unit: string;
-          } =>
-            typeof it === "object" &&
-            it !== null &&
-            typeof (it as { description: unknown }).description === "string" &&
-            typeof (it as { requiredQuantity: unknown }).requiredQuantity ===
-              "number",
-        )
-        .map((it) => ({
-          description: it.description,
-          requiredQuantity: it.requiredQuantity,
-          unit: PACK_LIST_UNITS.includes(
-            it.unit as (typeof PACK_LIST_UNITS)[number],
-          )
-            ? it.unit
-            : "each",
-        }));
-    } catch {
-      return [];
-    }
-  };
+  const parseTemplateItems = (raw: string | null | undefined) =>
+    parseTemplateLines(raw, PACK_LIST_UNITS);
 
   // A template "matches" the event when every dimension it scopes is satisfied
   // (null dimension = unconstrained). Used only to badge suggestions; the
@@ -281,17 +395,30 @@ export function PackListDetailPage() {
     return styleOk && occasionOk && minOk && maxOk;
   };
 
+  const templatePreviewRows = (template: TemplateSummary) =>
+    previewTemplateApplication({
+      templateId: template._id,
+      templateVersion: template.version,
+      lines: parseTemplateItems(template.items),
+      listLines: listItems,
+    });
+
   const generateFromTemplate = (template: TemplateSummary) => {
     void run(`generate:${template._id}`, async () => {
-      const lines = parseTemplateItems(template.items).filter(
-        (it) => it.description.trim() !== "" && it.requiredQuantity > 0,
+      const lines = parseTemplateItems(template.items).map(
+        ({ description, requiredQuantity, unit }) => ({
+          description,
+          requiredQuantity,
+          unit,
+        }),
       );
       if (lines.length === 0) {
         throw new Error("This template has no valid items to generate.");
       }
-      const scope = `pack-template:${packList._id}:${template._id}`;
+      const scope = `pack-template:${packList._id}:${template._id}:${template.version}`;
       const pending = beginPendingOperation(scope, {
         packListId: packList._id,
+        packListTemplateId: template._id,
         items: lines,
       });
       const result = await applyPackTemplate({
@@ -299,6 +426,7 @@ export function PackListDetailPage() {
         operationKey: pending.key,
       });
       confirmPendingOperation(scope);
+      setPreviewTemplateId(null);
       setShowTemplates(false);
       setNotice(
         result.recovered
@@ -363,11 +491,22 @@ export function PackListDetailPage() {
       }
       void run(`list:${key}`, async () => {
         const args = { docId: packList._id, version: packList.version };
-        if (key === "startPacking") await startPacking(args);
-        if (key === "markPacked") await markPacked(args);
-        if (key === "markLoaded") await markLoaded(args);
-        if (key === "dispatch") await dispatch(args);
-        setNotice(`Pack list updated (${key}).`);
+        if (key === "startPacking") {
+          await startPacking(args);
+          setNotice("Packing started.");
+        }
+        if (key === "markPacked") {
+          await markPacked(args);
+          setNotice("Pack list marked packed.");
+        }
+        if (key === "markLoaded") {
+          await markLoaded(args);
+          setNotice("Pack list marked loaded.");
+        }
+        if (key === "dispatch") {
+          await dispatch(args);
+          setNotice("Pack list dispatched.");
+        }
       });
     })();
   };
@@ -393,9 +532,124 @@ export function PackListDetailPage() {
       status: unknown;
       note?: string | null;
       sentInstead?: string | null;
+      binNumber?: number | null;
+      checkedQuantity?: number | null;
+      loadedQuantity?: number | null;
+      returnedQuantity?: number | null;
+      usedQuantity?: number | null;
+      lostQuantity?: number | null;
+      damagedQuantity?: number | null;
+      returnFinding?: string | null;
     },
     key: string,
   ) => {
+    if (key === "secondCheck" || key === "onTruck") {
+      const check = key === "secondCheck";
+      const packed = Number(item.packedQuantity ?? 0);
+      const saved = check ? item.checkedQuantity : item.loadedQuantity;
+      const values = await prompt.askFields({
+        title: check ? "Second check" : "On the truck",
+        description: check
+          ? `${packed} packed. Count it again and enter what you found. Enter 0 to clear the check.`
+          : `${packed} packed. Enter how much of it is on the truck. Enter 0 to take it back off.`,
+        confirmLabel: check ? "Save check" : "Save",
+        fields: [
+          {
+            name: "amount",
+            label: check ? "Amount counted" : "Amount on the truck",
+            inputType: "number",
+            required: true,
+            defaultValue: String(saved ?? packed),
+          },
+        ],
+      });
+      if (!values) return;
+      const amount = Number(values.amount);
+      void run(`${item._id}:${key}`, async () => {
+        if (check)
+          await recordChecked({
+            docId: item._id,
+            version: item.version,
+            checkedQuantity: amount,
+          });
+        else
+          await recordLoaded({
+            docId: item._id,
+            version: item.version,
+            loadedQuantity: amount,
+          });
+        setNotice(
+          check
+            ? amount > 0
+              ? `Checked ${amount} of ${packed} packed.`
+              : "Check cleared."
+            : amount > 0
+              ? `${amount} of ${packed} on the truck.`
+              : "Taken off the truck.",
+        );
+      });
+      return;
+    }
+    if (key === "countReturn") {
+      const packed = packWentOut(item);
+      const values = await prompt.askFields({
+        title: "Count the return",
+        description: `${packed} went out. Enter what came back, what was used up, what was lost and what came back broken. You can save this again later.`,
+        confirmLabel: "Save return count",
+        fields: [
+          {
+            name: "returned",
+            label: "Came back",
+            inputType: "number",
+            required: true,
+            defaultValue: String(item.returnedQuantity ?? packed),
+          },
+          {
+            name: "used",
+            label: "Used up",
+            inputType: "number",
+            required: false,
+            defaultValue: String(item.usedQuantity ?? 0),
+          },
+          {
+            name: "lost",
+            label: "Lost",
+            inputType: "number",
+            required: false,
+            defaultValue: String(item.lostQuantity ?? 0),
+          },
+          {
+            name: "damaged",
+            label: "Came back broken",
+            inputType: "number",
+            required: false,
+            defaultValue: String(item.damagedQuantity ?? 0),
+          },
+          {
+            name: "finding",
+            label: "What you found (optional)",
+            inputType: "text",
+            required: false,
+            defaultValue: item.returnFinding ?? "",
+          },
+        ],
+      });
+      if (!values) return;
+      const amount = (raw: string | undefined) => Number(raw?.trim() || 0);
+      void run(`${item._id}:countReturn`, async () => {
+        await recordReturn({
+          docId: item._id,
+          version: item.version,
+          returnedQuantity: amount(values.returned),
+          usedQuantity: amount(values.used),
+          lostQuantity: amount(values.lost),
+          damagedQuantity: amount(values.damaged),
+          finding: values.finding?.trim() || undefined,
+        });
+        setNotice("Return count saved.");
+      });
+      return;
+    }
     if (key === "sentInstead") {
       const values = await prompt.askFields({
         title: "Sent instead",
@@ -428,6 +682,35 @@ export function PackListDetailPage() {
       });
       return;
     }
+    if (key === "bin") {
+      const values = await prompt.askFields({
+        title: "Which bin is it in?",
+        description:
+          "Write the number on the black bin this line went in, so the crew can find it onsite. Leave it empty to clear it.",
+        confirmLabel: "Save bin",
+        fields: [
+          {
+            name: "bin",
+            label: "Bin number",
+            inputType: "number",
+            required: false,
+            defaultValue: item.binNumber ? String(item.binNumber) : "",
+          },
+        ],
+      });
+      if (!values) return;
+      const raw = values.bin?.trim() ?? "";
+      const binNumber = raw === "" ? undefined : Math.round(Number(raw));
+      void run(`${item._id}:bin`, async () => {
+        await setItemBin({
+          docId: item._id,
+          version: item.version,
+          binNumber,
+        });
+        setNotice(binNumber ? `In bin ${binNumber}.` : "Bin number cleared.");
+      });
+      return;
+    }
     if (key === "note") {
       const values = await prompt.askFields({
         title: "Packer note",
@@ -452,6 +735,143 @@ export function PackListDetailPage() {
           note: values.note?.trim() || undefined,
         });
         setNotice("Note saved.");
+      });
+      return;
+    }
+    if (key === "leaveOff") {
+      const values = await prompt.askFields({
+        title: "Leave this off the truck",
+        description:
+          "The line stays on the list with your reason. For a must-have item, say what stands in for it or who brings it, or the list can't be marked packed.",
+        confirmLabel: "Leave off",
+        fields: [
+          { name: "reason", label: "Why", inputType: "text", required: true },
+          {
+            name: "replacement",
+            label: "Stand-in (optional)",
+            inputType: "text",
+            required: false,
+          },
+          {
+            name: "coveredBy",
+            label: "Who covers it",
+            required: false,
+            options: [
+              { value: "", label: "Nobody" },
+              { value: "equivalent", label: "Something else does the job" },
+              { value: "client", label: "The client brings it" },
+              { value: "vendor", label: "A vendor brings it" },
+            ],
+          },
+        ],
+      });
+      if (!values) return;
+      void run(`${item._id}:leaveOff`, async () => {
+        await excludeItem({
+          docId: item._id,
+          version: item.version,
+          reason: values.reason?.trim() ?? "",
+          replacementDescription: values.replacement?.trim() || undefined,
+          coveredBy: values.coveredBy || undefined,
+        });
+        setNotice("Left off. The reason stays on the list.");
+      });
+      return;
+    }
+    if (key === "truck") {
+      const values = await prompt.askFields({
+        title: "Which truck carries this?",
+        description: "Pick the truck, trailer or vendor drop on this event.",
+        confirmLabel: "Save",
+        fields: [
+          {
+            name: "rig",
+            label: "Truck",
+            required: false,
+            options: [
+              { value: "", label: "Not on a truck yet" },
+              ...rigs.map((rig) => ({ value: rig.id, label: rig.label })),
+            ],
+          },
+        ],
+      });
+      if (!values) return;
+      void run(`${item._id}:truck`, async () => {
+        await assignLoad({
+          docId: item._id,
+          version: item.version,
+          loadAssignmentId: values.rig || undefined,
+        });
+        setNotice(
+          values.rig
+            ? "Line placed on the truck."
+            : "Line taken off the truck.",
+        );
+      });
+      return;
+    }
+    if (key === "weight") {
+      const current = (item as { unitWeightKg?: number | null }).unitWeightKg;
+      const values = await prompt.askFields({
+        title: "How heavy is one?",
+        description:
+          "Weight of one unit in kg, so a truck is not loaded past what it can carry. Leave it empty if you do not know.",
+        confirmLabel: "Save weight",
+        fields: [
+          {
+            name: "kg",
+            label: "Weight of one (kg)",
+            inputType: "number",
+            required: false,
+            defaultValue: current == null ? "" : String(current),
+          },
+        ],
+      });
+      if (!values) return;
+      const kg = values.kg?.trim() ?? "";
+      void run(`${item._id}:weight`, async () => {
+        await setUnitWeight({
+          docId: item._id,
+          version: item.version,
+          unitWeightKg: kg === "" ? undefined : Number(kg),
+        });
+        setNotice(kg === "" ? "Weight cleared." : "Weight saved.");
+      });
+      return;
+    }
+    if (key === "size") {
+      const current = (item as { unitVolumeM3?: number | null }).unitVolumeM3;
+      const values = await prompt.askFields({
+        title: "How much space does one take?",
+        description:
+          "Space of one unit in cubic metres (a 60 × 40 × 40 cm crate is 0.1), so a truck is not loaded past the space it has. Leave it empty if you do not know.",
+        confirmLabel: "Save size",
+        fields: [
+          {
+            name: "m3",
+            label: "Space of one (m³)",
+            inputType: "number",
+            required: false,
+            defaultValue: current == null ? "" : String(current),
+          },
+        ],
+      });
+      if (!values) return;
+      const m3 = values.m3?.trim() ?? "";
+      void run(`${item._id}:size`, async () => {
+        await setUnitVolume({
+          docId: item._id,
+          version: item.version,
+          unitVolumeM3: m3 === "" ? undefined : Number(m3),
+        });
+        setNotice(m3 === "" ? "Size cleared." : "Size saved.");
+      });
+      return;
+    }
+    if (key === "putBack") {
+      void run(`${item._id}:putBack`, async () => {
+        await restoreExcluded({ docId: item._id, version: item.version });
+        setNotice("Back on the list.");
       });
       return;
     }
@@ -496,7 +916,7 @@ export function PackListDetailPage() {
         });
         setNotice(
           packedQuantity < required
-            ? `Recorded ${packedQuantity} of ${required}. This line stays open until the rest is packed.${started}`
+            ? `Packed ${packedQuantity} of ${required} so far. This line stays open until the rest is packed.${started}`
             : `Item marked packed.${started}`,
         );
       });
@@ -507,7 +927,7 @@ export function PackListDetailPage() {
         const started = await ensurePacking();
         await markItemMissing({ docId: item._id, version: item.version });
         setNotice(
-          `Item marked missing — resolve it in its owning system.${started}`,
+          `Item marked missing. Fix it wherever this item is tracked.${started}`,
         );
       });
       return;
@@ -584,9 +1004,9 @@ export function PackListDetailPage() {
 
   return (
     <div className="operations-stage supply-stage order-folio">
-      <Link className="text-link" to="/logistics/packs">
+      <ReturnToListLink fallback="/logistics/packs" className="text-link">
         ← Pack lists
-      </Link>
+      </ReturnToListLink>
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Load sheet</p>
@@ -632,6 +1052,33 @@ export function PackListDetailPage() {
               </button>
             </>
           ) : null}
+          {String(packList.status) !== "cancelled" ? (
+            <button
+              className="btn btn-ghost"
+              type="button"
+              aria-pressed={showScan}
+              onClick={() => setShowScan((value) => !value)}
+            >
+              {showScan ? "Close scan" : "Scan labels"}
+            </button>
+          ) : null}
+          {listIsLive ? (
+            <button
+              className="btn btn-ghost"
+              type="button"
+              disabled={busy != null}
+              onClick={() =>
+                void run("list:refresh", async () => {
+                  await refreshPackRules({ packListId: packList._id });
+                  setNotice(
+                    "Pack lines now match the event and the pack rules. Amounts you set by hand stay.",
+                  );
+                })
+              }
+            >
+              {busy === "list:refresh" ? "Working…" : "Update from the event"}
+            </button>
+          ) : null}
         </div>
       </header>
       <LogisticsWorkspaceNav />
@@ -642,6 +1089,7 @@ export function PackListDetailPage() {
         </p>
       ) : null}
       {host}
+      {listIsLive ? <PackReadinessNotice lines={listItems} /> : null}
       {listIsLive ? (
         <PackListKitAssistBar
           serviceStyleName={serviceStyle?.name ?? null}
@@ -699,9 +1147,29 @@ export function PackListDetailPage() {
         />
       ) : null}
 
+      {showScan && String(packList.status) !== "cancelled" ? (
+        <PackScanPanel
+          packList={{
+            _id: packList._id,
+            version: packList.version,
+            eventId: packList.eventId,
+            status: String(packList.status),
+          }}
+          eventNumber={event?.eventNumber}
+          lines={listItems.map((item) => ({
+            ...item,
+            status: String(item.status),
+            requiredQuantity: Number(item.requiredQuantity),
+            packedQuantity: Number(item.packedQuantity),
+            unit: String(item.unit),
+          }))}
+          rigs={rigs}
+        />
+      ) : null}
+
       {showAdd && canAddItems ? (
         <PackListItemForm
-          dishes={dishes ?? []}
+          dishes={formDishes ?? []}
           busy={busy === "add-item"}
           onSubmit={submitItem}
         />
@@ -721,10 +1189,16 @@ export function PackListDetailPage() {
           {activeTemplates.length === 0 ? (
             <p className="mt-2 text-base text-ink-3">
               No active pack list templates yet.{" "}
-              <Link className="link" to="/logistics/pack-templates">
+              <Link
+                className="link"
+                to="/logistics/pack-templates"
+                target="_blank"
+                rel="noopener"
+              >
                 Create one
-              </Link>
-              .
+              </Link>{" "}
+              (opens a new tab; this list stays as it is and the new template
+              shows up here right away).
             </p>
           ) : (
             <ul className="mt-2 grid gap-2">
@@ -753,12 +1227,25 @@ export function PackListDetailPage() {
                       type="button"
                       className="btn btn-primary btn-sm"
                       disabled={busy != null}
-                      onClick={() => generateFromTemplate(template)}
+                      onClick={() =>
+                        setPreviewTemplateId((current) =>
+                          current === template._id ? null : template._id,
+                        )
+                      }
                     >
-                      {busy === `generate:${template._id}`
-                        ? "Generating…"
-                        : "Generate"}
+                      Generate
                     </button>
+                    {previewTemplateId === template._id ? (
+                      <div className="w-full">
+                        <PackTemplatePreview
+                          templateName={template.name}
+                          rows={templatePreviewRows(template)}
+                          busy={busy === `generate:${template._id}`}
+                          onApply={() => generateFromTemplate(template)}
+                          onCancel={() => setPreviewTemplateId(null)}
+                        />
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}
@@ -775,13 +1262,20 @@ export function PackListDetailPage() {
           </div>
           <span>{formatCountNoun(listItems.length, "item")}</span>
         </div>
-        <PackListItemTable
+        <PackListViews
+          view={view}
+          onViewChange={setView}
+          sectionAside={sectionAside}
+          rigs={rigs}
+          transport={transport}
           loading={
             items === undefined || events === undefined || dishes === undefined
           }
           items={listItems}
           canAddItems={canAddItems}
           canEditLines={listIsLive}
+          canCount={String(packList.status) !== "cancelled"}
+          canCountReturn={String(packList.status) === "dispatched"}
           busy={busy}
           dishName={dishName}
           packedByName={packedByName}
@@ -791,6 +1285,8 @@ export function PackListDetailPage() {
               ? {
                   id: failureItemId,
                   message: classifyCommandFailure(failure).title,
+                  detail: classifyCommandFailure(failure).detail,
+                  retryKey: failureRetryKey,
                 }
               : null
           }
@@ -802,8 +1298,27 @@ export function PackListDetailPage() {
           onToggleItem={selection.toggle}
           onToggleAll={selection.toggleAll}
           selectableCount={selectableItems.length}
+          reviewEventId={String(packList.eventId)}
         />
       </section>
+
+      <PackBinSheet
+        packList={{
+          _id: packList._id,
+          version: packList.version,
+          binSheet: packList.binSheet,
+          status: String(packList.status),
+        }}
+        lines={listItems}
+      />
+
+      <PackFoodPackaging
+        eventId={packList.eventId}
+        serviceStyleId={event?.serviceStyleId ?? null}
+        serviceStyleName={serviceStyle?.name}
+      />
+
+      <PackListSourcePanel packListId={packList._id} />
 
       <BulkActionBar
         count={selection.count}

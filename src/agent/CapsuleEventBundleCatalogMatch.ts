@@ -4,6 +4,7 @@ import {
   isMenuDishLine,
   normalizeName,
 } from "./CapsuleEventBundleShared";
+import { finishVersionLabel } from "../lib/dishVersionLabel";
 
 /**
  * Suggests which tenant records a bundle already refers to, by exact
@@ -19,6 +20,9 @@ export interface CatalogCandidate {
   name: string;
   /** Other names the same record answers to (email, company, aliases). */
   aliases?: readonly string[];
+  /** Dishes only: the version (tab) name and the main dish it belongs to. */
+  versionLabel?: string | null;
+  versionOfId?: string | null;
 }
 
 export interface CatalogCandidates {
@@ -52,6 +56,34 @@ function findByName(
   return exact?.id;
 }
 
+/**
+ * A dish name can match a main dish and its versions ("Finish at Kitchen",
+ * "Drop Off"). Take the version the report says the kitchen finishes it as;
+ * otherwise the main dish; otherwise the first match.
+ */
+function findDish(
+  name: string,
+  finish: string | undefined,
+  candidates: readonly CatalogCandidate[],
+): string | undefined {
+  const wanted = dishKey(name);
+  if (wanted.length === 0) return undefined;
+  const matches = candidates.filter(
+    (candidate) =>
+      dishKey(candidate.name) === wanted ||
+      (candidate.aliases ?? []).some((alias) => dishKey(alias) === wanted),
+  );
+  if (matches.length === 0) return undefined;
+  const label = finishVersionLabel(finish, name);
+  const family = new Set(matches.map((m) => m.versionOfId ?? m.id));
+  const relatives = candidates.filter((c) => family.has(c.versionOfId ?? c.id));
+  return (
+    (label && relatives.find((c) => c.versionLabel === label)?.id) ??
+    matches.find((m) => m.versionOfId == null)?.id ??
+    matches[0]!.id
+  );
+}
+
 export function suggestCatalogMatches(
   bundle: EventBundle,
   catalog: CatalogCandidates,
@@ -62,7 +94,7 @@ export function suggestCatalogMatches(
     if (!isMenuDishLine(item)) continue;
     const key = dishKey(item.name);
     if (key in dishIds) continue;
-    const id = findByName(item.name, catalog.dishes, dishKey);
+    const id = findDish(item.name, item.finish, catalog.dishes);
     if (id !== undefined) dishIds[key] = id;
     else newDishNames.push(item.name);
   }

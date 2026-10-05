@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListEvent,
+  useListPerson,
   useListPrepTask,
   useListPrepTaskDependency,
   useListProductionBatch,
@@ -16,7 +16,15 @@ import {
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { TableSkeleton } from "../../ui/primitives";
+import { useEventsById, usePickerEvents } from "../facilities/useEventsById";
 import { BatchAllocationsPanel } from "./BatchAllocationsPanel";
+import { BatchCompletionFields } from "./BatchCompletionFields";
+import { BatchShortfallPanel } from "./BatchShortfallPanel";
+import { usePrepLabelPrint } from "./usePrepLabelPrint";
+import {
+  batchCompletionArgs,
+  type BatchCompletionEntry,
+} from "./batchCompletion";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
@@ -26,6 +34,13 @@ import {
   type PrepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { productionBatchLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
+import { NO_PREP_TIME, prepMadeSoFarLabel } from "../kitchen/prepTiming";
+import {
+  KitchenDisplayTaskFacts,
+  type KitchenDisplayTaskFactsProps,
+} from "./KitchenDisplayTaskFacts";
 import "./KitchenDisplayPage.css";
 
 const policy = new ProductionLifecyclePolicy();
@@ -53,7 +68,11 @@ type BoardItem = {
   status: string;
   dueAt: number | null;
   plannedYield?: number;
+  componentId?: string;
+  startedAt?: number | null;
+  preparedById?: string | null;
   dependency?: PrepTaskDependencySummary;
+  facts?: Omit<KitchenDisplayTaskFactsProps, "taskId" | "title" | "status">;
 };
 
 function urgencyRank(item: BoardItem, now: number): number {
@@ -63,7 +82,7 @@ function urgencyRank(item: BoardItem, now: number): number {
 }
 
 function dueLabel(dueAt: number | null, now: number): string {
-  if (dueAt == null) return "No due time";
+  if (dueAt == null) return NO_PREP_TIME;
   const minutes = Math.round((dueAt - now) / 60000);
   if (minutes < 0) return `${Math.abs(minutes)}m overdue`;
   if (minutes < 60) return `Due in ${minutes}m`;
@@ -79,8 +98,23 @@ export function KitchenDisplayPage() {
   const tasks = useListPrepTask();
   const dependencies = useListPrepTaskDependency();
   const batches = useListProductionBatch();
-  const events = useListEvent();
+  // The filter offers the picker's events (next 400, last 90 days, undated);
+  // the names on cards come from the events the board's own
+  // tasks and batches name, wherever they fall.
+  const events = usePickerEvents();
+  const boardEventIds = useMemo(
+    () =>
+      tasks && batches
+        ? [
+            ...tasks.map((task) => task.eventId),
+            ...batches.map((batch) => batch.eventId),
+          ]
+        : undefined,
+    [tasks, batches],
+  );
+  const namedEvents = useEventsById(boardEventIds);
   const components = useListComponent();
+  const people = useListPerson();
   const claim = usePrepTaskClaim();
   const start = usePrepTaskStart();
   const complete = usePrepTaskComplete();
@@ -90,9 +124,12 @@ export function KitchenDisplayPage() {
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [actualYields, setActualYields] = useState<Record<string, string>>({});
+  const [batchEntries, setBatchEntries] = useState<
+    Record<string, BatchCompletionEntry>
+  >({});
   const optimistic = useOptimisticStatus();
   const { prompt, host } = useActionPrompt(busy != null);
+  const labels = usePrepLabelPrint(prompt);
   const now = Date.now();
 
   const isLoading =
@@ -100,12 +137,26 @@ export function KitchenDisplayPage() {
     dependencies === undefined ||
     batches === undefined ||
     events === undefined ||
+    namedEvents === undefined ||
     components === undefined;
 
   const eventName = (id: string | null) =>
-    (id && events?.find((event) => event._id === id)?.title) || "House";
+    (id &&
+      (
+        namedEvents?.find((event) => event._id === id) ??
+        events?.find((event) => event._id === id)
+      )?.title) ||
+    "House";
   const componentName = (id: string) =>
     components?.find((component) => component._id === id)?.name ?? "Recipe";
+  const personName = (id: string | null | undefined) => {
+    if (!id) return null;
+    const person = people?.find((row) => row._id === id);
+    const name = person
+      ? `${person.givenName ?? ""} ${person.familyName ?? ""}`.trim()
+      : "";
+    return name || "Claimed";
+  };
 
   const items: BoardItem[] = [
     ...(tasks ?? [])
@@ -127,12 +178,20 @@ export function KitchenDisplayPage() {
           id: task._id,
           version: task.version,
           title: task.name?.trim() || "Prep task",
-          detail: `${prepQuantityLabel(task.quantity, String(task.unit))} ${task.unit}`,
+          detail: `${prepQuantityLabel(task.quantity, String(task.unit))} ${task.unit} to make`,
           station: task.station?.trim() || null,
           eventId: task.eventId,
           status: optimistic.statusOf(task._id, String(task.status)),
           dueAt: task.dueAt ?? null,
           dependency,
+          facts: {
+            owner: personName(task.assignedToId),
+            made: prepMadeSoFarLabel(task, tasks ?? []),
+            blockReason: task.blockReason ?? null,
+            componentId: task.componentId ?? null,
+            dishId: task.dishId ?? null,
+            instructions: task.specialInstructions ?? null,
+          },
         };
       }),
     ...(batches ?? [])
@@ -152,6 +211,9 @@ export function KitchenDisplayPage() {
         status: optimistic.statusOf(batch._id, String(batch.status)),
         dueAt: null,
         plannedYield: batch.plannedYield,
+        componentId: batch.componentId,
+        startedAt: batch.startedAt ?? null,
+        preparedById: batch.startedById ?? null,
       })),
   ]
     .filter(
@@ -199,20 +261,10 @@ export function KitchenDisplayPage() {
       } else if (action.key === "start") {
         await batchStart({ docId: item.id, version: item.version });
       } else {
-        const enteredYield = actualYields[item.id];
-        const actualYield = Number(enteredYield);
-        if (
-          enteredYield == null ||
-          enteredYield.trim() === "" ||
-          !Number.isFinite(actualYield) ||
-          actualYield < 0
-        ) {
-          throw new Error("Enter a nonnegative actual batch yield.");
-        }
         await batchComplete({
           docId: item.id,
           version: item.version,
-          actualYield,
+          ...batchCompletionArgs(batchEntries[item.id]),
         });
       }
     } catch (error) {
@@ -315,6 +367,14 @@ export function KitchenDisplayPage() {
                   {item.detail} · {eventName(item.eventId)}
                   {item.station ? ` · ${item.station}` : ""}
                 </p>
+                {item.facts ? (
+                  <KitchenDisplayTaskFacts
+                    taskId={item.id}
+                    title={item.title}
+                    status={item.status}
+                    {...item.facts}
+                  />
+                ) : null}
                 {item.kind === "task" &&
                 item.dependency &&
                 item.dependency.total > 0 ? (
@@ -333,24 +393,24 @@ export function KitchenDisplayPage() {
                   </p>
                 ) : null}
                 {item.kind === "batch" && bumpAction?.key === "complete" ? (
-                  <label className="kds-detail">
-                    Actual yield ({item.detail.split(" ").at(-1)})
-                    <input
-                      className="input"
-                      type="number"
-                      min="0"
-                      step="any"
-                      required
-                      aria-label={`Actual yield for ${item.title} in ${item.detail.split(" ").at(-1)}`}
-                      value={actualYields[item.id] ?? ""}
-                      onChange={(event) =>
-                        setActualYields((current) => ({
-                          ...current,
-                          [item.id]: event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
+                  <BatchCompletionFields
+                    title={item.title}
+                    unit={item.detail.split(" ").at(-1) ?? ""}
+                    entry={batchEntries[item.id]}
+                    onChange={(entry) =>
+                      setBatchEntries((current) => ({
+                        ...current,
+                        [item.id]: entry,
+                      }))
+                    }
+                  />
+                ) : null}
+                {item.kind === "batch" ? (
+                  <LifecycleStepper
+                    definition={productionBatchLifecycle}
+                    status={item.status}
+                    actions={[]}
+                  />
                 ) : null}
                 {bumpAction ? (
                   <button
@@ -385,11 +445,31 @@ export function KitchenDisplayPage() {
                     Cancel batch
                   </button>
                 ) : null}
+                {item.kind === "batch" ? (
+                  <button
+                    type="button"
+                    className="kds-secondary"
+                    disabled={busy != null || !labels.ready}
+                    aria-label={`Print container label for ${item.title}`}
+                    onClick={() =>
+                      void labels.print({
+                        product: item.title,
+                        detail: eventName(item.eventId),
+                        componentId: item.componentId,
+                        preparedAt: item.startedAt,
+                        preparedById: item.preparedById,
+                      })
+                    }
+                  >
+                    Print label
+                  </button>
+                ) : null}
               </li>
             );
           })}
         </ul>
       )}
+      <BatchShortfallPanel />
       <BatchAllocationsPanel />
     </main>
   );

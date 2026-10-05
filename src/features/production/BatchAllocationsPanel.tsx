@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   useListComponent,
-  useListEvent,
   useListProductionBatch,
   useListProductionBatchAllocation,
   useProductionBatchAllocationMarkPortioned,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { useEventsById } from "../facilities/useEventsById";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 
 const PORTIONABLE = "produced";
@@ -20,7 +20,14 @@ export function BatchAllocationsPanel() {
   const allocations = useListProductionBatchAllocation();
   const batches = useListProductionBatch();
   const components = useListComponent();
-  const events = useListEvent();
+  const eventIds = useMemo(
+    () =>
+      allocations === undefined
+        ? undefined
+        : allocations.map((row) => row.eventId),
+    [allocations],
+  );
+  const events = useEventsById(eventIds);
   const markPortioned = useProductionBatchAllocationMarkPortioned();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);

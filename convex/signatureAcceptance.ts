@@ -3,6 +3,7 @@ import { api } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
+import { insertStepEvent } from "./lib/commandAudit";
 
 /**
  * AUTHOR SEAM — public, token-authorized digital proposal acceptance (#115).
@@ -209,7 +210,7 @@ export const completeSignature = mutation({
       updatedAt: now,
       version: (request.version ?? 0) + 1,
     });
-    await ctx.db.insert("manifestEvents", {
+    await insertStepEvent(ctx, {
       type: "SignatureCompleted",
       entity: "SignatureRequest",
       entityId: request._id,

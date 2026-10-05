@@ -69,6 +69,83 @@ export async function retireUnusedAutomaticDraft(
   }
 }
 
+/**
+ * BE-10.5: when an event needs less after its order was sent, the weekly
+ * recalculation lands on a new draft with nothing to buy. A zero automatic
+ * line whose every contributing need is already on a sent order (none still
+ * open) holds no stock and no purchase, so it and its empty draft retire;
+ * the sent order shows the extra instead. Lines with an open need, a stock
+ * claim, or a buyer quantity stay.
+ */
+export async function retireCoveredZeroLine(
+  ctx: MutationCtx,
+  lineId: Id<"vendorOrderLines">,
+) {
+  const tenantId = requireTenant(await getAuthContext(ctx));
+  const line = await ctx.db.get(lineId);
+  if (
+    !line ||
+    line.tenantId !== tenantId ||
+    line.deletedAt != null ||
+    line.status !== "added" ||
+    line.quantityIsManual !== false ||
+    line.orderedQuantity !== 0 ||
+    line.plannedQuantity !== 0 ||
+    line.receivedQuantity !== 0 ||
+    (line.stockAppliedQuantity ?? 0) !== 0
+  )
+    return;
+  const order = await ctx.db.get(line.vendorOrderId);
+  if (
+    !order ||
+    order.tenantId !== tenantId ||
+    order.deletedAt != null ||
+    order.status !== "draft"
+  )
+    return;
+  const links = (
+    await ctx.db
+      .query("vendorOrderLineDemands")
+      .withIndex("by_vendorOrderLineId", (q) =>
+        q.eq("vendorOrderLineId", line._id),
+      )
+      .collect()
+  ).filter(
+    (link) =>
+      link.tenantId === tenantId &&
+      link.deletedAt == null &&
+      link.removedAt == null,
+  );
+  for (const link of links) {
+    const needs = await ctx.db
+      .query("purchaseNeeds")
+      .withIndex("by_ingredientDemandId", (q) =>
+        q.eq("ingredientDemandId", link.ingredientDemandId),
+      )
+      .collect();
+    const covered = needs.some(
+      (need) =>
+        need.tenantId === tenantId &&
+        need.deletedAt == null &&
+        (need.status === "ordered" || need.status === "fulfilled"),
+    );
+    const open = needs.some(
+      (need) =>
+        need.tenantId === tenantId &&
+        need.deletedAt == null &&
+        need.status === "open",
+    );
+    if (!covered || open) return;
+  }
+  for (const link of links)
+    await ctx.runMutation(api.mutations.VendorOrderLineDemand_retire, {
+      docId: link._id,
+      version: link.version,
+      reason: "Already covered by a sent order",
+    });
+  await retireUnusedAutomaticDraft(ctx, line._id);
+}
+
 async function draftQuantityProvenance(
   ctx: MutationCtx,
   line: Doc<"vendorOrderLines">,

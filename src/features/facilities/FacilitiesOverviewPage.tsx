@@ -15,6 +15,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
+import { RentalReportCard } from "./RentalReportCard";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_MS = 7 * DAY_MS;
@@ -159,6 +160,8 @@ export function FacilitiesOverviewPage() {
           </ul>
         )}
       </Section>
+
+      <RentalReportCard />
     </div>
   );
 }

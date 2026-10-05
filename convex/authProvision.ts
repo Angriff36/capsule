@@ -8,6 +8,7 @@ import { getAuthContext } from "./lib/authContext";
 import { ClerkStaffAccountDirectory } from "./lib/clerkStaffAccount";
 import { decrypt } from "./lib/encryption";
 import { StaffSignInPasswordFactory } from "./lib/staffSignInPassword";
+import { signInEmailErrorClass } from "./staffSignInEmail";
 
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 const CAN_PROVISION = new Set([...ADMIN_ROLES, "workforce_manager"]);
@@ -72,6 +73,9 @@ export const linkProvisionedSubject = internalMutation({
     if (!row || row.deletedAt != null || row.tenantId !== auth.tenantId) {
       throw new Error("Team member not found.");
     }
+    if (String(row.status) !== "active") {
+      throw new Error("Restore this person's access before sending a sign-in.");
+    }
     if (row.authSubjectId === authSubjectId) return;
     if (row.authSubjectId) {
       throw new Error(
@@ -125,23 +129,54 @@ export const provisionStaffSignIn = action({
     if (!appUrl)
       throw new Error("CAPSULE_PUBLIC_APP_URL is missing on this deployment.");
     const directory = new ClerkStaffAccountDirectory(secret);
-    const existing = await directory.findByEmail(person.email);
-    const passwords = new StaffSignInPasswordFactory();
-    let account = existing;
-    if (!account) {
-      account = await directory.createWithPassword({
-        email: person.email,
-        givenName: person.givenName,
-        familyName: person.familyName,
-        password: passwords.next(),
-      });
+    // A retry, or a resend after an email correction, keeps the sign-in this
+    // person already has: never look up or create a second account for them.
+    if (!person.authSubjectId) {
+      const existing = await directory.findByEmail(person.email);
+      if (existing) {
+        // Refuses (before any outside change) when that account already
+        // belongs to another team member.
+        await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
+          personId,
+          authSubjectId: existing.userId,
+        });
+      } else {
+        const created = await directory.createWithPassword({
+          email: person.email,
+          givenName: person.givenName,
+          familyName: person.familyName,
+          password: new StaffSignInPasswordFactory().next(),
+        });
+        try {
+          await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
+            personId,
+            authSubjectId: created.userId,
+          });
+        } catch (error) {
+          // Compensate: the account was made for this link only.
+          await directory.deleteUser(created.userId).catch(() => undefined);
+          throw error;
+        }
+      }
     }
 
-    await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
-      personId,
-      authSubjectId: account.userId,
-    });
-
+    // Saved before and after the send, so a failed or lost email stays on the
+    // team row as "not sent" and a manager can send it again. Sending again
+    // is safe: the sign-in service replaces this person's pending invitation.
+    const attemptId = crypto.randomUUID();
+    const record = (
+      outcome: "started" | "succeeded" | "failed",
+      errorClass?: string,
+    ) =>
+      ctx.runMutation(internal.staffSignInEmail.recordSignInEmail, {
+        tenantId: person.tenantId,
+        personId,
+        attemptId,
+        outcome,
+        requestedBy: auth.id,
+        ...(errorClass ? { errorClass } : {}),
+      });
+    await record("started");
     let emailed: boolean;
     try {
       emailed = await directory.sendOrganizationInvitation({
@@ -149,7 +184,9 @@ export const provisionStaffSignIn = action({
         email: person.email,
         appUrl,
       });
+      await record("succeeded");
     } catch (error) {
+      await record("failed", signInEmailErrorClass(error));
       throw new ConvexError(
         error instanceof Error
           ? error.message

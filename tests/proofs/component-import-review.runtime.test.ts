@@ -347,16 +347,18 @@ describe("runtime proof: component import review lifecycle", () => {
       ),
     ).rejects.toThrow(/Guard/);
 
-    // Foreign-tenant ingredient: the suggestion may be stored, but the
-    // confirmation refuses — no resolution write happens.
-    await proof.executeCommand(
-      kitchen,
-      api.mutations.ComponentImportLine_suggestExactMatch,
-      {
-        docId: lineOne,
-        matchedIngredientId: foreign.docId,
-      },
-    );
+    // Foreign-tenant ingredient: neither the suggestion nor the confirmation
+    // is stored — no resolution write happens.
+    await expect(
+      proof.executeCommand(
+        kitchen,
+        api.mutations.ComponentImportLine_suggestExactMatch,
+        {
+          docId: lineOne,
+          matchedIngredientId: foreign.docId,
+        },
+      ),
+    ).rejects.toThrow(/linked record was not found/);
     await expect(
       proof.executeCommand(
         kitchen,
@@ -366,12 +368,13 @@ describe("runtime proof: component import review lifecycle", () => {
           matchedIngredientId: foreign.docId,
         },
       ),
-    ).rejects.toThrow(/Guard/);
+    ).rejects.toThrow(/linked record was not found/);
     const afterForeignConfirm = await kitchen.run(async (ctx) =>
       ctx.db.get(lineOne as never),
     );
     expect(afterForeignConfirm?.resolvedAt).toBeFalsy();
-    expect(afterForeignConfirm?.matchStatus).toBe("exact");
+    expect(afterForeignConfirm?.matchStatus).toBe(before.line?.matchStatus);
+    expect(afterForeignConfirm?.matchedIngredientId).not.toBe(foreign.docId);
 
     // Recovery: suggest and confirm the tenant's own ingredient.
     await proof.executeCommand(
@@ -474,12 +477,23 @@ describe("runtime proof: component import review lifecycle", () => {
         docId: lineTwo,
       },
     );
-    // The foreign created-ingredient link is stored, but completion must
-    // refuse it: the link does not resolve to this tenant's live ingredient.
-    await proof.executeCommand(
-      kitchen,
-      api.mutations.ComponentImportLine_attachCreatedIngredient,
-      { docId: lineTwo, matchedIngredientId: foreignIngredient.docId },
+    // A foreign created-ingredient link is refused when sent. One stored
+    // before that check (older data) must still block completion: the link
+    // does not resolve to this tenant's live ingredient.
+    await expect(
+      proof.executeCommand(
+        kitchen,
+        api.mutations.ComponentImportLine_attachCreatedIngredient,
+        { docId: lineTwo, matchedIngredientId: foreignIngredient.docId },
+      ),
+    ).rejects.toThrow(/linked record was not found/);
+    await kitchen.run((ctx) =>
+      ctx.db.patch(
+        lineTwo as never,
+        {
+          matchedIngredientId: foreignIngredient.docId,
+        } as never,
+      ),
     );
     await proof.executeCommand(
       kitchen,
@@ -502,14 +516,25 @@ describe("runtime proof: component import review lifecycle", () => {
       },
     );
 
-    // Foreign component id: stored by recordComponent, refused at completion.
-    await proof.executeCommand(
-      kitchen,
-      api.mutations.ComponentImport_recordComponent,
-      {
-        docId: importId,
-        resultingComponentId: foreignComponent.docId,
-      },
+    // Foreign component id: refused when sent; one stored earlier is
+    // refused at completion.
+    await expect(
+      proof.executeCommand(
+        kitchen,
+        api.mutations.ComponentImport_recordComponent,
+        {
+          docId: importId,
+          resultingComponentId: foreignComponent.docId,
+        },
+      ),
+    ).rejects.toThrow(/linked record was not found/);
+    await kitchen.run((ctx) =>
+      ctx.db.patch(
+        importId as never,
+        {
+          resultingComponentId: foreignComponent.docId,
+        } as never,
+      ),
     );
     await expect(
       proof.executeCommand(kitchen, api.mutations.ComponentImport_complete, {

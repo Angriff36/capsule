@@ -4,13 +4,19 @@ import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDishTask,
   useDishTaskRetire,
+  useDishTaskRevise,
   useListDishComponent,
   useListDishIngredient,
   useListDishTask,
   useListDishTaskMaterial,
   useListComponent,
   useListIngredient,
+  useListStation,
 } from "../../lib/manifest-convex-react";
+import {
+  activeKitchenStations,
+  kitchenStationName,
+} from "./kitchenStationName";
 import {
   DishPrepTaskWorkControls,
   type PrepMaterialOption,
@@ -83,14 +89,18 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   const taskMaterials = useListDishTaskMaterial();
   const addTask = useCreateDishTask();
   const retireTask = useDishTaskRetire();
+  const reviseTask = useDishTaskRevise();
+  const stations = useListStation();
+  const stationChoices = activeKitchenStations(stations);
 
   const [busy, setBusy] = useState<string | null>(null);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
   // A dish's tasks come off one sheet, so they share a category and mostly
   // share a unit — those two hold their last value instead of resetting.
-  // Station is free text and clears with the rest of the form: a stale
-  // station silently mislabels the next row (issue #151 item 11).
+  // Station is typed (the kitchen station list is offered) and clears with
+  // the rest of the form: a stale station silently mislabels the next row
+  // (issue #151 item 11).
   // Fully controlled — never call form.reset(); native reset fights React
   // state on category/unit and silently snaps selects back to defaults.
   const [taskName, setTaskName] = useState("");
@@ -158,7 +168,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     event.preventDefault();
     const name = taskName.trim();
     if (!name) {
-      setError("A task name is required.");
+      setError("Give this task a name.");
       return;
     }
 
@@ -181,7 +191,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         dishId,
         name,
         category,
-        station: station.trim() || undefined,
+        station: kitchenStationName(station, stations),
         defaultQuantity: qtySave.defaultQuantity,
         defaultUnit: qtySave.defaultQuantity != null ? unit : undefined,
         taskType: qtySave.taskType,
@@ -230,6 +240,49 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     }
   }
 
+  // revise sets every field it is given and clears the ones left out, so the
+  // step's other stored values are passed back unchanged.
+  async function onSaveStation(task: (typeof rows)[number], typed: string) {
+    const next = kitchenStationName(typed, stations);
+    if ((next ?? "") === (task.station ?? "")) return;
+    setBusy(task._id);
+    setError(null);
+    setNotice(null);
+    try {
+      await reviseTask({
+        docId: task._id,
+        version: task.version,
+        name: task.name,
+        category: task.category,
+        taskType: task.taskType,
+        sortOrder: task.sortOrder,
+        ...(task.defaultQuantity != null
+          ? { defaultQuantity: task.defaultQuantity }
+          : {}),
+        ...(task.defaultUnit != null ? { defaultUnit: task.defaultUnit } : {}),
+        ...(next ? { station: next } : {}),
+        ...(task.componentId != null ? { componentId: task.componentId } : {}),
+        ...(task.ingredientId != null
+          ? { ingredientId: task.ingredientId }
+          : {}),
+        ...(task.instructions != null
+          ? { instructions: task.instructions }
+          : {}),
+      });
+      setNotice(
+        next
+          ? `Station saved: ${next}. Prep not started yet on current events moves with it.`
+          : "Station cleared.",
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not save the station.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <section className="culinary-section">
       <div className="culinary-section-heading">
@@ -238,6 +291,11 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       </div>
 
       {promptHost}
+      <datalist id="kitchen-station-names">
+        {stationChoices.map((choice) => (
+          <option key={choice._id} value={choice.name} />
+        ))}
+      </datalist>
       {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
         <p className="text-base text-ok" role="status">
@@ -304,6 +362,34 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                       {task.category}
                       {task.station ? ` · ${task.station}` : ""}
                     </p>
+                    <form
+                      className="flex flex-wrap items-end gap-2"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const typed = new FormData(event.currentTarget).get(
+                          "stepStation",
+                        );
+                        void onSaveStation(task, String(typed ?? ""));
+                      }}
+                    >
+                      <label className="block text-sm">
+                        <span className="meta-term">Station</span>
+                        <input
+                          name="stepStation"
+                          className="input mt-1"
+                          list="kitchen-station-names"
+                          defaultValue={task.station ?? ""}
+                          aria-label={`Station for ${task.name}`}
+                        />
+                      </label>
+                      <button
+                        type="submit"
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                      >
+                        {busy === task._id ? "Saving…" : "Save station"}
+                      </button>
+                    </form>
                     <button
                       type="button"
                       className="btn btn-ghost btn-sm"
@@ -355,7 +441,10 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             <input
               name="station"
               className="input mt-1"
-              placeholder="Apps - Passed - Finish at Event"
+              list="kitchen-station-names"
+              placeholder={
+                stationChoices[0]?.name ?? "Apps - Passed - Finish at Event"
+              }
               value={station}
               onChange={(event) => setStation(event.target.value)}
             />

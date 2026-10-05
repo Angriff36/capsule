@@ -36,7 +36,14 @@ export const listMyReviews = query({
     // manager-private.
     const reviewerName = new Map<string, string>();
     const eventTitle = new Map<string, string>();
+    const scorecardTitle = new Map<string, string>();
     for (const row of mine) {
+      if (row.scorecardId && !scorecardTitle.has(String(row.scorecardId))) {
+        const scorecard = await ctx.db.get(row.scorecardId);
+        if (scorecard && scorecard.tenantId === auth.tenantId) {
+          scorecardTitle.set(String(row.scorecardId), scorecard.title);
+        }
+      }
       if (!reviewerName.has(String(row.reviewerId))) {
         const reviewer = await ctx.db.get(row.reviewerId);
         if (reviewer) {
@@ -62,6 +69,15 @@ export const listMyReviews = query({
       reliabilityRating: row.reliabilityRating,
       qualityRating: row.qualityRating,
       teamworkRating: row.teamworkRating,
+      scorecardTitle: row.scorecardId
+        ? (scorecardTitle.get(String(row.scorecardId)) ?? null)
+        : null,
+      // Written for the person reviewed; `notes` stays manager-private.
+      strengths: row.strengths ?? null,
+      opportunities: row.opportunities ?? null,
+      comments: row.comments ?? null,
+      followUp: row.followUp ?? null,
+      followUpDue: row.followUpDue ?? null,
     }));
   },
 });

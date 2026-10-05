@@ -76,16 +76,7 @@ export function ShiftSwapRequestsPage() {
       <PageHeader
         title="Shift swap approvals"
         lead="Review swaps only after both staff members agree. Approval moves the scheduled shift to its new owner in the same transaction."
-        actions={
-          <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
-            <p className="text-3xl leading-none font-semibold text-brand">
-              {pending.length}
-            </p>
-            <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
-              Ready for review
-            </p>
-          </div>
-        }
+        facts={[{ label: "Ready for review", value: pending.length }]}
       />
 
       <WorkforceWorkspaceNav />

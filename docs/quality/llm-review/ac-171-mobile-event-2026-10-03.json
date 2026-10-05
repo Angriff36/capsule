@@ -1,0 +1,63 @@
+{
+  "acceptance": ["AC-171", "AC-185", "AC-250", "AC-251", "AC-252"],
+  "at": "2026-10-03T06:39:44.645Z",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "browserRuns": [
+    "scripts/loop-browser-check.mjs .artifacts/browser-checks/event-phone.mjs, signed in, 360x740 and 1280x800, all steps PASS (overview, menu, prep, staffing, equipment, timeline, keyboard focus, new event form)",
+    "scripts/loop-browser-check.mjs .artifacts/browser-checks/event-phone-ops.mjs, signed in, 360x740, all steps PASS (create event, headcount 40 -> 45, add staff, confirm power + water on site and reload, pack list, prep, proposals list, open proposal)",
+    "scripts/loop-browser-check.mjs .artifacts/browser-checks/event-a11y.mjs, signed in, 360x740 and 1280x800, all steps PASS (reduce motion: nothing animates; status regions; Edit event dialog takes focus, Escape closes, focus returns)",
+    "scripts/loop-browser-check.mjs .artifacts/browser-checks/allergy-note.mjs, signed in, 360x740 and 1280x800, all steps PASS"
+  ],
+  "base": "UX-01, catering operations app, 360px phone width. Audience: event managers and kitchen/field leads (Kayden, Josh) running events from a phone. Judge only this screen's own job. FAIL only on clipped or overlapping text that hides meaning, controls too small or covered to tap, broken layout, raw codes or jargon, or no clear next action for this screen's job. A tab strip that scrolls sideways is the app's normal pattern and is fine. The small orange tab with a number at the right edge opens reports and is fine.",
+  "results": {
+    "event heading (first screen)": {
+      "job": "See the event name, date, place, guests, allergy warning and the main actions (edit, approve, export).",
+      "pass": true
+    },
+    "Event at a glance and stage": {
+      "job": "See what is done and what is next before the event moves on.",
+      "pass": true
+    },
+    "Prep tab": {
+      "job": "See the prep work for this event and what is missing, and act (sync, open prep board).",
+      "pass": true
+    },
+    "Staffing tab": {
+      "job": "See how many are on the roster and how many shifts are open, and add staff.",
+      "pass": true
+    },
+    "Equipment tab, What this event needs": {
+      "job": "See each item the event needs, how many, where it comes from, where it stands and who is on it.",
+      "pass": true
+    },
+    "Menu tab": {
+      "job": "See the dishes on this event and add or change them.",
+      "pass": true
+    },
+    "Timeline tab": {
+      "job": "See the run of the day and change times.",
+      "pass": true
+    },
+    "New event form, middle": {
+      "job": "Fill headcount, start, end and the day-of contact.",
+      "pass": true
+    },
+    "Staffing tab after adding one person": {
+      "job": "Confirm the person is on the roster and add more.",
+      "pass": true
+    },
+    "Pack list": {
+      "job": "See the pack status and the items to pack, and switch the view.",
+      "pass": true
+    },
+    "One proposal opened": {
+      "job": "See title, client, total, status and act on it (download, email, signature, accept).",
+      "pass": true
+    }
+  },
+  "earlierRounds": [
+    "Equipment tab FAILED: the needs table was cut at 360px (From column one letter, item names cut). Fixed: the list is one card per item on a phone.",
+    "Event heading FAILED: the allergy note was cut with no sign more text existed. Fixed: the cut note ends with 'Read all' and the service sheet shows the whole allergy line."
+  ]
+}

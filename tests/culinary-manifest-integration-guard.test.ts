@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectCulinaryManifestIntegration,
-  inspectCulinarySource,
-} from "../scripts/check-culinary-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectCulinaryManifestIntegration = () =>
+  inspectManifestIntegration("culinary");
+const inspectCulinarySource = (file: string, source: string) =>
+  inspectManifestSource("culinary", file, source);
 
 describe("Culinary Manifest integration guard", () => {
   it("keeps current authored Culinary integration on approved generated surfaces", () => {

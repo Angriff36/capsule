@@ -1,0 +1,31 @@
+{
+  "acceptance": "AC-713, AC-720, AC-722, AC-723 (J legs)",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "results": {
+    "AC-713": {
+      "artifact": "docs/product/backend-completion-dossier.md section 01",
+      "criterion": "An owner reading this can see that a normal event goes from first inquiry to closed-out on one record without anyone typing the same facts again in another part of Capsule; each step is backed by a named proof; any step not covered is named plainly with what it waits on.",
+      "pass": true,
+      "judgedAt": "2026-10-04T02:25:25.271Z"
+    },
+    "AC-720": {
+      "artifact": "docs/product/backend-completion-dossier.md section 08",
+      "criterion": "For a standard event the section shows that the proposal, food plan, purchasing, prep, route-backed timeline, staffing, pack list, Final Lock answers, complete packet, billing and closeout all come from Capsule data, names the proof, and names any part not covered plainly.",
+      "pass": true,
+      "judgedAt": "2026-10-04T02:25:48.467Z"
+    },
+    "AC-722": {
+      "artifact": "Event workbook sheet with all Final Lock questions, signed-in browser 1280x800",
+      "criterion": "An office person preparing Final Lock is not asked to type any answer Capsule already knows: known answers show with where they came from, open questions say what is missing, and checks only staff on site can confirm are left for them and not shown as already done.",
+      "pass": true,
+      "judgedAt": "2026-10-04T02:50:29.818Z"
+    },
+    "AC-723": {
+      "artifact": "'Why is this here?' card on the event's Before approval sheet, signed-in browser 1280x800",
+      "criterion": "Each automatic result shown names what it came from and the rule that made it, and anything Capsule could not settle says exactly what a person has to decide, in plain words a catering manager understands.",
+      "pass": true,
+      "judgedAt": "2026-10-04T02:51:22.751Z"
+    }
+  }
+}

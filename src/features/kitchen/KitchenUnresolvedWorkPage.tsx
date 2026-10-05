@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { formatDate, formatMoney } from "../../lib/format";
 import {
+  costConfidenceText,
   recipeContentStatusLabel,
+  unresolvedItemText,
   unresolvedKindLabel,
   useKitchenUnresolvedReport,
 } from "../../lib/culinaryDemandClient";
@@ -51,7 +53,7 @@ function EventUnresolvedCard({ row }: { row: EventRow }) {
                 key={`${item.kind}:${item.eventDishId}:${item.refId}`}
                 className="text-base text-ink-2"
               >
-                {item.label} — {item.detail}
+                {unresolvedItemText(item)}
               </li>
             ))}
           </ul>
@@ -74,7 +76,8 @@ export function KitchenUnresolvedWorkPage() {
           <h1 className="display-title mt-2">Unresolved work</h1>
           <p className="mt-3 max-w-150 text-ink-2">
             Materials the plan cannot price or order yet, and recipes with no
-            method, no ingredients or no known cost.
+            method, no ingredients or no known cost. Nothing here stops the
+            kitchen from cooking: each line says what is not counted yet.
           </p>
         </div>
       </header>
@@ -120,9 +123,9 @@ export function KitchenUnresolvedWorkPage() {
                   <tr>
                     <th>Recipe</th>
                     <th>Content</th>
-                    <th>Cost confidence</th>
-                    <th>Known subtotal</th>
-                    <th>Unknown lines</th>
+                    <th>Priced</th>
+                    <th>Known cost</th>
+                    <th>Lines with no price</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -147,7 +150,7 @@ export function KitchenUnresolvedWorkPage() {
                           }
                         />
                       </td>
-                      <td>{recipe.costConfidence}</td>
+                      <td>{costConfidenceText(recipe.costConfidence)}</td>
                       <td>
                         {recipe.costConfidence === "none"
                           ? "Cost unknown"

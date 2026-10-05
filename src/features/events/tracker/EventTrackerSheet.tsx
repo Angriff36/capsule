@@ -4,17 +4,14 @@ import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import {
   useListClient,
-  useListEvent,
-  useListEventNumberAssignment,
-  useListEventVehicleAssignment,
   useListInvoice,
-  useListPackList,
   useListPerson,
-  useListReviewFlag,
   useListServiceStyle,
   useListTrailer,
   useListVehicle,
 } from "../../../lib/manifest-convex-react";
+import { useEventMonthRows } from "../../../lib/useEventMonthRows";
+import { useEventRecordsInRange } from "../../facilities/useEventsById";
 import { QueryLoadState } from "../../../ui/QueryLoadState";
 import { useSlowQuery } from "../../../ui/useSlowQuery";
 import { startOfDay } from "../../home/homeCalendar";
@@ -50,13 +47,23 @@ function rigLabel(row: { make: string; model: string; registration: string }) {
  */
 export function EventTrackerSheet() {
   const authStatus = useAuthStatus();
-  const events = useListEvent();
+  const [params, setParams] = useSearchParams();
+  const { year, month } = parseMonth(params.get("month"));
+  const bounds = monthBounds(year, month);
+  // Only the shown month's events are read.
+  const monthWindow = useMemo(
+    () => ({ from: bounds.start, to: bounds.end }),
+    [bounds.start, bounds.end],
+  );
+  const events = useEventRecordsInRange(monthWindow);
   const clients = useListClient();
   const invoices = useListInvoice();
-  const packLists = useListPackList();
-  const reviewFlags = useListReviewFlag();
-  const assignments = useListEventVehicleAssignment();
-  const numberAssignments = useListEventNumberAssignment();
+  // Pack lists, questions, trucks and numbers of the shown month's events.
+  const monthRows = useEventMonthRows(events?.map((event) => event._id));
+  const packLists = monthRows?.packLists;
+  const reviewFlags = monthRows?.reviewFlags;
+  const assignments = monthRows?.vehicleAssignments;
+  const numberAssignments = monthRows?.numberAssignments;
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
@@ -71,8 +78,6 @@ export function EventTrackerSheet() {
     resetKey,
     savedToast,
   } = useTrackerRowActions();
-  const [params, setParams] = useSearchParams();
-  const { year, month } = parseMonth(params.get("month"));
   const [search, setSearch] = useState("");
   const [showEmptyDays, setShowEmptyDays] = useState(true);
 
@@ -92,7 +97,6 @@ export function EventTrackerSheet() {
   ].some((value) => value === undefined);
   const { loadingTooLong } = useSlowQuery(loading ? undefined : true);
 
-  const bounds = monthBounds(year, month);
   const rows = useMemo(
     () =>
       loading

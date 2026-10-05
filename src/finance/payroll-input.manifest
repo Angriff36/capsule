@@ -36,15 +36,18 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   property finalizedAt: datetime?
   property voidedAt: datetime?
   property voidReason: string?
+  // PL-PAYROLL (spec §15.4): the approved time entries this input was made
+  // from. One entry belongs to at most one live input (server check).
+  property sourceTimeRecordIds: list<string> = []
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref shift: Shift fields [tenantId, shiftId] references [tenantId, id]
 
-  constraint payrollPreparedMinutesNonnegative: self.preparedAt == null or (self.regularMinutes >= 0 and self.overtimeMinutes >= 0 and self.totalMinutes >= 0) "Prepared payroll minutes cannot be negative"
-  constraint payrollTotalMinutesConsistent: self.preparedAt == null or self.totalMinutes == self.regularMinutes + self.overtimeMinutes "Total minutes must equal regular plus overtime"
-  constraint payrollPeriodOrder: self.preparedAt == null or self.periodEnd >= self.periodStart "Payroll period end must be at or after period start"
-  constraint payrollRatesNonnegative: self.preparedAt == null or ((self.hourlyRate == null or self.hourlyRate >= 0) and (self.overtimeRate == null or self.overtimeRate >= 0) and (self.grossAmount == null or self.grossAmount >= 0)) "Payroll rate and amount fields cannot be negative"
+  constraint payrollPreparedMinutesNonnegative: self.preparedAt == null or (self.regularMinutes >= 0 and self.overtimeMinutes >= 0 and self.totalMinutes >= 0) "This payroll input's minutes can't be negative. Use zero or more."
+  constraint payrollTotalMinutesConsistent: self.preparedAt == null or self.totalMinutes == self.regularMinutes + self.overtimeMinutes "This payroll input's total minutes has to equal regular plus overtime minutes."
+  constraint payrollPeriodOrder: self.preparedAt == null or self.periodEnd >= self.periodStart "This payroll input's period has to end on or after it starts."
+  constraint payrollRatesNonnegative: self.preparedAt == null or ((self.hourlyRate == null or self.hourlyRate >= 0) and (self.overtimeRate == null or self.overtimeRate >= 0) and (self.grossAmount == null or self.grossAmount >= 0)) "This payroll input's rate and amount fields can't be negative. Use zero or more."
 
   transition status from "draft" to ["prepared", "voided"]
   transition status from "prepared" to ["finalized", "voided"]
@@ -67,7 +70,8 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     optional hourlyRate: money(12, 2),
     optional overtimeRate: money(12, 2),
     optional grossAmount: money(12, 2),
-    optional notes: string
+    optional notes: string,
+    optional sourceTimeRecordIds: list<string>
   ) {
     guard self.status == "draft"
     guard self.preparedAt == null
@@ -76,10 +80,10 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     constraint preparePersonMatch: personId == self.personId "This payroll input is for a different person. Pick the person already on this payroll input."
     constraint prepareEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This payroll input is for a different event. Pick the event already on this payroll input."
     constraint prepareShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This payroll input is for a different shift. Pick the shift already on this payroll input."
-    constraint preparePeriodOrder: periodEnd >= periodStart "Payroll period end must be at or after period start"
-    constraint prepareMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes >= 0 "Payroll minutes cannot be negative"
-    constraint prepareTotalMinutes: totalMinutes == regularMinutes + overtimeMinutes "Total minutes must equal regular plus overtime"
-    constraint prepareRatesNonnegative: (hourlyRate == null or hourlyRate >= 0) and (overtimeRate == null or overtimeRate >= 0) and (grossAmount == null or grossAmount >= 0) "Payroll rate and amount fields cannot be negative"
+    constraint preparePeriodOrder: periodEnd >= periodStart "This payroll input's period has to end on or after it starts."
+    constraint prepareMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes >= 0 "This payroll input's minutes can't be negative. Use zero or more."
+    constraint prepareTotalMinutes: totalMinutes == regularMinutes + overtimeMinutes "This payroll input's total minutes has to equal regular plus overtime minutes."
+    constraint prepareRatesNonnegative: (hourlyRate == null or hourlyRate >= 0) and (overtimeRate == null or overtimeRate >= 0) and (grossAmount == null or grossAmount >= 0) "This payroll input's rate and amount fields can't be negative. Use zero or more."
     mutate personId = personId
     mutate periodStart = periodStart
     mutate periodEnd = periodEnd
@@ -92,6 +96,7 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     mutate overtimeRate = overtimeRate
     mutate grossAmount = grossAmount
     mutate notes = notes
+    mutate sourceTimeRecordIds = sourceTimeRecordIds != null ? sourceTimeRecordIds : self.sourceTimeRecordIds
     mutate status = "prepared"
     mutate preparedAt = now()
     emit PayrollInputPrepared {
@@ -102,6 +107,7 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
       periodStart: periodStart
       periodEnd: periodEnd
       totalMinutes: totalMinutes
+      sourceTimeRecordIds: sourceTimeRecordIds != null ? sourceTimeRecordIds : self.sourceTimeRecordIds
       status: "prepared"
     }
   }
@@ -127,7 +133,7 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   command markVoided(reason: string) {
     guard self.status == "draft" or self.status == "prepared" or self.status == "finalized"
     guard self.deletedAt == null
-    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Say why you're voiding this payroll input."
     mutate status = "voided"
     mutate voidedAt = now()
     mutate voidReason = reason
@@ -144,6 +150,155 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   store PayrollInput in durable
 }
 
+enum PayrollExportStatus {
+  exported
+  acknowledged
+  rejected
+}
+
+// PL-PAYROLL (AC-130, AC-510): the receipt of one person's hours sent for
+// one pay period. periodKey = personId|YYYY-MM-DD|YYYY-MM-DD stays the same
+// across exports; each change is the next revision with its difference from
+// the last total the provider did not reject. A rejection never touches the
+// approved time entries.
+entity PayrollExportRecord mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property required periodKey: string = ""
+  property required periodStart: string = ""
+  property required periodEnd: string = ""
+  property required processor: string = ""
+  property required revision: int = 1
+  property required regularMinutes: int = 0
+  property required overtimeMinutes: int = 0
+  property required totalMinutes: int = 0
+  property previousTotalMinutes: int?
+  property required deltaMinutes: int = 0
+  property required status: PayrollExportStatus = "exported"
+  property exportedAt: datetime?
+  property exportedById: uuid?
+  property acknowledgedAt: datetime?
+  property providerReference: string?
+  property rejectedAt: datetime?
+  property rejectionReason: string?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  transition status from "exported" to ["acknowledged", "rejected"]
+  transition status from "acknowledged" to ["rejected"]
+  transition status from "rejected" to []
+
+  default policy payrollExportRead read: roleAllows(user.role, "financeManageAccess") or roleAllows(user.role, "workforceManageAccess") "Finance and staffing managers may see payroll export receipts"
+  default policy payrollExportWrite write: roleAllows(user.role, "financeManageAccess") "Finance managers may update payroll export receipts"
+  default policy payrollExportExecute execute: roleAllows(user.role, "financeManageAccess") "Finance managers may change payroll export receipts"
+
+  command record(
+    personId: uuid,
+    periodKey: string,
+    periodStart: string,
+    periodEnd: string,
+    processor: string,
+    revision: number,
+    regularMinutes: number,
+    overtimeMinutes: number,
+    totalMinutes: number,
+    deltaMinutes: number,
+    optional previousTotalMinutes: number
+  ) {
+    guard self.exportedAt == null
+    guard self.deletedAt == null
+    guard self.person != null
+    constraint recordPersonMatch: personId == self.personId "This receipt is for a different person."
+    constraint recordRevisionPositive: revision >= 1 "The export revision starts at 1."
+    constraint recordMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes == regularMinutes + overtimeMinutes "The sent minutes can't be negative, and total has to equal regular plus overtime."
+    mutate periodKey = periodKey
+    mutate periodStart = periodStart
+    mutate periodEnd = periodEnd
+    mutate processor = processor
+    mutate revision = revision
+    mutate regularMinutes = regularMinutes
+    mutate overtimeMinutes = overtimeMinutes
+    mutate totalMinutes = totalMinutes
+    mutate previousTotalMinutes = previousTotalMinutes
+    mutate deltaMinutes = deltaMinutes
+    mutate exportedAt = now()
+    mutate exportedById = user.personId
+    emit PayrollExportRecorded {
+      payrollExportRecordId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      periodKey: periodKey
+      revision: revision
+      totalMinutes: totalMinutes
+      deltaMinutes: deltaMinutes
+    }
+  }
+
+  command acknowledge(optional providerReference: string) {
+    guard self.status == "exported"
+    guard self.deletedAt == null
+    mutate status = "acknowledged"
+    mutate acknowledgedAt = now()
+    mutate providerReference = providerReference
+    emit PayrollExportAcknowledged {
+      payrollExportRecordId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      periodKey: self.periodKey
+      revision: self.revision
+    }
+  }
+
+  command reject(reason: string) {
+    guard self.status == "exported" or self.status == "acknowledged"
+    guard self.deletedAt == null
+    constraint rejectReasonPresent: length(trim(reason)) > 0 "Say why the payroll provider turned this down."
+    mutate status = "rejected"
+    mutate rejectedAt = now()
+    mutate rejectionReason = reason
+    emit PayrollExportRejected {
+      payrollExportRecordId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      periodKey: self.periodKey
+      revision: self.revision
+      reason: reason
+    }
+  }
+
+  store PayrollExportRecord in durable
+}
+
+event PayrollExportRecorded: "payroll_export.recorded" {
+  payrollExportRecordId: string
+  tenantId: string
+  personId: string
+  periodKey: string
+  revision: number
+  totalMinutes: number
+  deltaMinutes: number
+}
+
+event PayrollExportAcknowledged: "payroll_export.acknowledged" {
+  payrollExportRecordId: string
+  tenantId: string
+  personId: string
+  periodKey: string
+  revision: number
+}
+
+event PayrollExportRejected: "payroll_export.rejected" {
+  payrollExportRecordId: string
+  tenantId: string
+  personId: string
+  periodKey: string
+  revision: number
+  reason: string
+}
+
 event PayrollInputPrepared: "payroll_input.prepared" {
   payrollInputId: string
   tenantId: string
@@ -152,6 +307,7 @@ event PayrollInputPrepared: "payroll_input.prepared" {
   periodStart: datetime
   periodEnd: datetime
   totalMinutes: number
+  sourceTimeRecordIds: list<string>?
   status: string
 }
 

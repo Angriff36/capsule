@@ -1,0 +1,255 @@
+// FieldConfirmation — one day-of form for one event (PL-FIELD-CONFIRMATION;
+// spec §1.4 + §14.2 "Questions Capsule must not auto-answer").
+//
+// Leaving the shop, before takeoff (two people), arrival, food waste, bins,
+// after the event, back at the shop, packing, buffet drawing and leaving the
+// event describe work that has to physically happen. The office prepares the
+// form (who, when, what to check, what proof to leave) but only a signed-in
+// staff member completes it, as themselves, with the time it really happened.
+// Printing the event workbook or answering office questions never completes
+// one (convex/lib/eventPacket/fieldConfirmations.ts prepares them; Final Lock
+// reads only completed rows).
+
+use "../foundation/base.manifest"
+
+enum FieldConfirmationStatus {
+  open
+  first_signed
+  done
+}
+
+// What proof the person leaves when they finish the form.
+enum FieldConfirmationEvidence {
+  none
+  note
+  photo
+}
+
+enum FieldConfirmationOutcome {
+  all_good
+  problem
+}
+
+entity FieldConfirmation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  // The Final Lock form this is, e.g. "field.arrival".
+  property required formKey: string = ""
+  property required label: string = ""
+  property required status: FieldConfirmationStatus = "open"
+  property required needsTwoPeople: boolean = false
+  property required evidence: FieldConfirmationEvidence = "none"
+  property dueAt: datetime?
+  // Planned people. Anyone signed in may do the work; the record keeps who did.
+  property responsiblePersonId: uuid?
+  property secondPersonId: uuid?
+  property instructions: string?
+  property expectedItems: string?
+  property preparedAt: datetime?
+
+  // The first (or only) person's sign-off.
+  property completedAt: datetime?
+  property observedAt: datetime?
+  property formCompletedById: uuid?
+  property outcome: FieldConfirmationOutcome?
+  property note: string?
+  property photoStorageId: string?
+
+  // Two-person forms: the second person's own check.
+  property secondCompletedAt: datetime?
+  property secondObservedAt: datetime?
+  property formCheckedById: uuid?
+  property secondNote: string?
+
+  // Someone chased a late form.
+  property escalatedAt: datetime?
+  property formEscalatedById: uuid?
+  property escalationNote: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo responsiblePerson: Person fields [tenantId, responsiblePersonId] references [tenantId, id]
+  belongsTo secondPerson: Person fields [tenantId, secondPersonId] references [tenantId, id]
+
+  transition status from "open" to ["first_signed", "done"]
+  transition status from "first_signed" to ["done"]
+  transition status from "done" to []
+
+  default policy fieldConfirmationRead read: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Event staff and crew may see the day-of forms"
+  default policy fieldConfirmationWrite write: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Event staff and crew may fill in the day-of forms"
+  default policy fieldConfirmationExecute execute: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Event staff and crew may fill in the day-of forms"
+
+  // The office sets the form up: nothing on it is checked yet.
+  command prepare(
+    eventId: uuid,
+    formKey: string,
+    label: string,
+    needsTwoPeople: boolean,
+    evidence: FieldConfirmationEvidence,
+    optional dueAt: datetime,
+    optional responsiblePersonId: uuid,
+    optional secondPersonId: uuid,
+    optional instructions: string,
+    optional expectedItems: string
+  ) {
+    guard self.preparedAt == null
+    guard self.deletedAt == null
+    constraint prepareFormOffice: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") "Only event or logistics managers set up day-of forms."
+    constraint prepareFormEvent: self.event != null "That event isn't in your list. Pick one of your events."
+    constraint prepareFormKey: length(trim(formKey)) > 0 and length(trim(label)) > 0 "Name the form."
+    constraint prepareFormPeople: (responsiblePersonId == null or self.responsiblePerson != null) and (secondPersonId == null or self.secondPerson != null) "Pick people from your own staff list."
+    constraint prepareFormTwo: responsiblePersonId == null or secondPersonId == null or responsiblePersonId != secondPersonId "The two-person check needs two different people."
+    mutate eventId = eventId
+    mutate formKey = formKey
+    mutate label = label
+    mutate needsTwoPeople = needsTwoPeople
+    mutate evidence = evidence
+    mutate dueAt = dueAt
+    mutate responsiblePersonId = responsiblePersonId
+    mutate secondPersonId = needsTwoPeople ? secondPersonId : null
+    mutate instructions = instructions
+    mutate expectedItems = expectedItems
+    mutate status = "open"
+    mutate preparedAt = now()
+    emit FieldConfirmationPrepared {
+      fieldConfirmationId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      formKey: formKey
+    }
+  }
+
+  // Change who does it, when, or what to check, until it is done.
+  command reassign(
+    optional dueAt: datetime,
+    optional responsiblePersonId: uuid,
+    optional secondPersonId: uuid,
+    optional instructions: string,
+    optional expectedItems: string
+  ) {
+    guard self.preparedAt != null
+    guard self.deletedAt == null
+    constraint reassignFormOffice: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") "Only event or logistics managers change who does a day-of form."
+    constraint reassignFormOpen: self.status != "done" "This form is already done."
+    // Another company's person id is refused before this runs (own-workspace links).
+    constraint reassignFormTwo: responsiblePersonId == null or responsiblePersonId != (secondPersonId != null ? secondPersonId : self.secondPersonId) "The two-person check needs two different people."
+    mutate dueAt = dueAt != null ? dueAt : self.dueAt
+    mutate responsiblePersonId = responsiblePersonId != null ? responsiblePersonId : self.responsiblePersonId
+    mutate secondPersonId = secondPersonId != null ? secondPersonId : self.secondPersonId
+    mutate instructions = instructions != null ? instructions : self.instructions
+    mutate expectedItems = expectedItems != null ? expectedItems : self.expectedItems
+    emit FieldConfirmationReassigned {
+      fieldConfirmationId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // The person who did the work signs it, with the time it really happened.
+  command complete(
+    outcome: FieldConfirmationOutcome,
+    optional observedAt: datetime,
+    optional note: string,
+    optional photoStorageId: string
+  ) {
+    guard self.preparedAt != null
+    guard self.deletedAt == null
+    constraint completeFormPerson: user.personId != null "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."
+    constraint completeFormOpen: self.status == "open" "This form is already signed."
+    constraint completeFormTime: observedAt == null or observedAt <= now() "The time it happened can't be in the future."
+    constraint completeFormNote: (self.evidence != "note" and outcome != "problem") or (note != null and length(trim(note)) > 0) "Write what you saw."
+    constraint completeFormPhoto: self.evidence != "photo" or (photoStorageId != null and length(trim(photoStorageId)) > 0) "Add a photo for this form."
+    mutate status = self.needsTwoPeople ? "first_signed" : "done"
+    mutate outcome = outcome
+    mutate observedAt = observedAt != null ? observedAt : now()
+    mutate completedAt = now()
+    mutate formCompletedById = user.personId
+    mutate note = note
+    mutate photoStorageId = photoStorageId
+    emit FieldConfirmationCompleted {
+      fieldConfirmationId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      formKey: self.formKey
+      photoStorageId: photoStorageId
+    }
+  }
+
+  // Two-person forms: a second, different person checks it too.
+  command countersign(optional observedAt: datetime, optional note: string) {
+    guard self.preparedAt != null
+    guard self.deletedAt == null
+    constraint countersignFormPerson: user.personId != null "Sign in as yourself to fill in a day-of form. The office can't fill it in for you."
+    constraint countersignFormReady: self.status == "first_signed" "The first person has to sign this form first."
+    constraint countersignFormOther: user.personId != self.formCompletedById "A second, different person has to do this check."
+    constraint countersignFormTime: observedAt == null or observedAt <= now() "The time it happened can't be in the future."
+    mutate status = "done"
+    mutate secondObservedAt = observedAt != null ? observedAt : now()
+    mutate secondCompletedAt = now()
+    mutate formCheckedById = user.personId
+    mutate secondNote = note
+    emit FieldConfirmationCountersigned {
+      fieldConfirmationId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      formKey: self.formKey
+    }
+  }
+
+  // A manager chased a late form; who and what was said is kept.
+  command escalate(note: string) {
+    guard self.preparedAt != null
+    guard self.deletedAt == null
+    constraint escalateFormOffice: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") "Only event or logistics managers chase day-of forms."
+    constraint escalateFormOpen: self.status != "done" "This form is already done."
+    constraint escalateFormNote: length(trim(note)) > 0 "Say who you told and what happens next."
+    mutate escalatedAt = now()
+    mutate formEscalatedById = user.personId
+    mutate escalationNote = note
+    emit FieldConfirmationEscalated {
+      fieldConfirmationId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      formKey: self.formKey
+    }
+  }
+
+  store FieldConfirmation in durable
+}
+
+event FieldConfirmationPrepared: "event.field_confirmation_prepared" {
+  fieldConfirmationId: string
+  tenantId: string
+  eventId: string
+  formKey: string
+}
+
+event FieldConfirmationReassigned: "event.field_confirmation_reassigned" {
+  fieldConfirmationId: string
+  tenantId: string
+  eventId: string
+}
+
+event FieldConfirmationCompleted: "event.field_confirmation_completed" {
+  fieldConfirmationId: string
+  tenantId: string
+  eventId: string
+  formKey: string
+  photoStorageId: string?
+}
+
+event FieldConfirmationCountersigned: "event.field_confirmation_countersigned" {
+  fieldConfirmationId: string
+  tenantId: string
+  eventId: string
+  formKey: string
+}
+
+event FieldConfirmationEscalated: "event.field_confirmation_escalated" {
+  fieldConfirmationId: string
+  tenantId: string
+  eventId: string
+  formKey: string
+}

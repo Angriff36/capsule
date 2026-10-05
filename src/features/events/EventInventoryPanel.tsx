@@ -4,12 +4,12 @@ import { useIssueEventStock } from "../../lib/operational-transactions";
 import {
   useCreateInventoryReservation,
   useListIngredient,
-  useListIngredientDemand,
   useListInventoryItem,
   useListInventoryLot,
   useListInventoryReservation,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { useEventIngredientDemands } from "../../lib/useEventRows";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventInventorySummaryAside } from "./EventInventorySummaryAside";
 import {
@@ -41,7 +41,7 @@ export function EventInventoryPanel({
   onBusy,
   onError,
 }: Props) {
-  const demands = useListIngredientDemand();
+  const demands = useEventIngredientDemands(eventId);
   const items = useListInventoryItem();
   const inventoryLots = useListInventoryLot();
   const reservations = useListInventoryReservation();
@@ -210,7 +210,9 @@ export function EventInventoryPanel({
           (row) => row._id === reservationId,
         );
         if (!reservation)
-          throw new Error("Reservation not found for this event");
+          throw new Error(
+            "This stock reservation isn't on this event. Refresh the page and try again.",
+          );
         const result = await issueEventStock({
           eventId: eventId as Id<"events">,
           reservationId: reservation._id,
@@ -219,8 +221,8 @@ export function EventInventoryPanel({
         });
         setLastIssue(
           result.fulfilledDemandId
-            ? `Issued ${result.consumedQuantity}; demand fulfilled.`
-            : `Issued ${result.consumedQuantity}; demand still open (${result.consumedForIngredient} consumed so far).`,
+            ? `Issued ${result.consumedQuantity}; this event now has all it needs.`
+            : `Issued ${result.consumedQuantity}; this event still needs more (${result.consumedForIngredient} used so far).`,
         );
       } catch (error) {
         onError(error);

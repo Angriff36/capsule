@@ -1,4 +1,9 @@
 import { displayCell, formatTppDate, formatTppDateTime } from "./formatters";
+import {
+  tppSummaryLines,
+  type TppReportSummary,
+  type TppSummaryLine,
+} from "./reportSummary";
 import type { TppColumn, TppReportResult, TppRow } from "./types";
 
 const FORMULA_PREFIX = /^[=+\-@]/;
@@ -67,13 +72,24 @@ function save(content: BlobPart, mime: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-export function downloadTppCsv(
+/** The run summary under the rows; with no summary, the result's own notices. */
+function summaryLines(
   result: TppReportResult,
-  filename: string,
-): void {
+  summary: TppReportSummary | undefined,
+): TppSummaryLine[] {
+  return summary
+    ? tppSummaryLines(summary)
+    : (result.notices ?? []).map((value) => ({ label: "Missing rows", value }));
+}
+
+export function tppCsvText(
+  result: TppReportResult,
+  summary?: TppReportSummary,
+): string {
   const data = tabular(result);
   if (!data)
     throw new Error("CSV export is available only for tabular reports.");
+  const footer = summaryLines(result, summary);
   const lines = [
     data.columns.map((column) => escapeCsvCell(column.label)).join(","),
     ...data.rows.map((row) =>
@@ -90,9 +106,26 @@ export function downloadTppCsv(
         })
         .join(","),
     ),
+    ...(footer.length
+      ? [
+          "",
+          ...footer.map(
+            (line) =>
+              `${escapeCsvCell(line.label)},${escapeCsvCell(line.value)}`,
+          ),
+        ]
+      : []),
   ];
+  return `\uFEFF${lines.join("\r\n")}`;
+}
+
+export function downloadTppCsv(
+  result: TppReportResult,
+  filename: string,
+  summary?: TppReportSummary,
+): void {
   save(
-    `\uFEFF${lines.join("\r\n")}`,
+    tppCsvText(result, summary),
     "text/csv;charset=utf-8",
     `${filename}.csv`,
   );
@@ -106,10 +139,10 @@ function xml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function downloadTppExcel(
+export function tppExcelXml(
   result: TppReportResult,
-  filename: string,
-): void {
+  summary?: TppReportSummary,
+): string {
   const data = tabular(result);
   if (!data)
     throw new Error("Excel export is available only for tabular reports.");
@@ -140,6 +173,25 @@ export function downloadTppExcel(
           .join("")}</Row>`,
     ),
   ];
-  const workbook = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Report"><Table>${rows.join("")}</Table></Worksheet></Workbook>`;
-  save(workbook, "application/vnd.ms-excel", `${filename}.xls`);
+  const footer = summaryLines(result, summary);
+  if (footer.length)
+    rows.push(
+      "<Row></Row>",
+      ...footer.map(
+        (line) => `<Row>${cell(line.label)}${cell(line.value)}</Row>`,
+      ),
+    );
+  return `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Report"><Table>${rows.join("")}</Table></Worksheet></Workbook>`;
+}
+
+export function downloadTppExcel(
+  result: TppReportResult,
+  filename: string,
+  summary?: TppReportSummary,
+): void {
+  save(
+    tppExcelXml(result, summary),
+    "application/vnd.ms-excel",
+    `${filename}.xls`,
+  );
 }

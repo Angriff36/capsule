@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  inspectProductionManifestIntegration,
-  inspectProductionSource,
-} from "../scripts/check-production-manifest-integration";
+  inspectManifestIntegration,
+  inspectManifestSource,
+} from "../scripts/check-manifest-integration";
+
+const inspectProductionManifestIntegration = () =>
+  inspectManifestIntegration("production");
+const inspectProductionSource = (file: string, source: string) =>
+  inspectManifestSource("production", file, source);
 
 describe("Production Manifest integration guard", () => {
   it("keeps current authored production integration on approved generated surfaces", () => {

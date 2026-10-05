@@ -1,6 +1,6 @@
 // Gatherer for src/lib/releaseBackendScope.ts. Used by scripts/deploy-production.sh.
 //
-//   bun scripts/release-backend-scope.ts --sha <release sha>
+//   bun scripts/release-backend-scope.ts --sha <release sha> [--since <sha>]
 //
 // Prints machine-readable lines:
 //   backend=required|unchanged
@@ -122,21 +122,38 @@ ${dirty}`,
   process.exit(2);
 }
 
-// The last commit that was released before this one (first-parent history).
-const previousRelease = (
-  git(
-    [
-      "log",
-      "--first-parent",
-      "-n",
-      "1",
-      "--format=%H",
-      String.raw`--grep=^\[release\] `,
-      `${sha}^1`,
-    ],
-    true,
-  ) ?? ""
-).trim();
+// --since <sha>: compare with that commit (the release receipt passes the
+// commit the running backend was deployed from). Default: the last commit
+// that was released before this one (first-parent history).
+const sinceIndex = process.argv.indexOf("--since");
+const since = sinceIndex >= 0 ? (process.argv[sinceIndex + 1] ?? "") : null;
+if (since !== null && !/^[0-9a-f]{40}$/.test(since)) {
+  console.error("release-backend-scope: --since needs a full 40-character sha");
+  process.exit(2);
+}
+if (
+  since !== null &&
+  git(["cat-file", "-e", `${since}^{commit}`], true) === null
+) {
+  console.error(`release-backend-scope: ${since} is not in this repository`);
+  process.exit(2);
+}
+const previousRelease =
+  since ??
+  (
+    git(
+      [
+        "log",
+        "--first-parent",
+        "-n",
+        "1",
+        "--format=%H",
+        String.raw`--grep=^\[release\] `,
+        `${sha}^1`,
+      ],
+      true,
+    ) ?? ""
+  ).trim();
 if (!/^[0-9a-f]{40}$/.test(previousRelease)) {
   console.log("backend=required");
   console.log("reason=no previous [release] commit on main to compare with");

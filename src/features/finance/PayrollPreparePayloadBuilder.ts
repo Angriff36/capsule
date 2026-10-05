@@ -5,6 +5,18 @@ const minutes = (value: FormDataEntryValue | null) => {
   return Number.isFinite(amount) ? Math.trunc(amount) : Number.NaN;
 };
 
+/** Approved time entry ids the form carries as JSON; bad input reads as none. */
+const sourceIds = (value: FormDataEntryValue | null): string[] => {
+  try {
+    const parsed: unknown = JSON.parse(String(value ?? "[]"));
+    return Array.isArray(parsed)
+      ? parsed.filter((id): id is string => typeof id === "string" && !!id)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 /**
  * Builds a PayrollInput.prepare payload from the prepare form.
  *
@@ -22,12 +34,14 @@ export class PayrollPreparePayloadBuilder {
     const overtimeMinutes = minutes(data.get("overtimeMinutes"));
     const eventId = String(data.get("eventId") || "").trim();
     if (!personId || !periodStartRaw || !periodEndRaw) {
-      throw new Error("Person and payroll period are required.");
+      throw new Error("Pick a person and set the payroll period.");
     }
     if (
       [regularMinutes, overtimeMinutes].some((n) => Number.isNaN(n) || n < 0)
     ) {
-      throw new Error("Regular and overtime minutes must be non-negative.");
+      throw new Error(
+        "Regular and overtime minutes can't be negative. Use zero or more.",
+      );
     }
     const periodStart = localDayStart(periodStartRaw);
     const periodEndExclusive = localDayEndExclusive(periodEndRaw);
@@ -36,12 +50,14 @@ export class PayrollPreparePayloadBuilder {
       !Number.isFinite(periodEndExclusive) ||
       periodEndExclusive <= periodStart
     ) {
-      throw new Error("Period end must be on or after period start.");
+      throw new Error("Set the period end on or after the period start.");
     }
     // Rates/grossAmount are private encrypted money in source; Convex schema
     // still projects them as number while encryption stores ciphertext — omit
     // until Manifest projects encrypted money storage correctly (issue #76).
+    const sourceTimeRecordIds = sourceIds(data.get("sourceTimeRecordIds"));
     return {
+      ...(sourceTimeRecordIds.length > 0 ? { sourceTimeRecordIds } : {}),
       personId,
       periodStart,
       periodEnd: periodEndExclusive - 1,

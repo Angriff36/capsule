@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
+  canReadCulinaryDemand,
+  unresolvedItemText,
   unresolvedKindLabel,
+  useApplyDemandRecalculation,
   useEventDemandReview,
-  useReconcileEventDemand,
 } from "../../lib/culinaryDemandClient";
 import { CHIP_TONE_CLASS } from "../../lib/statusLabels";
 import { StatusChip } from "../../ui/primitives";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
 
 /** What this event still cannot order or cook, straight from the one demand
  *  calculation. Silent when every material resolves and the total is whole. */
@@ -31,15 +34,21 @@ export function EventUnresolvedMaterialsNotice({
 }: {
   eventId: string;
 }) {
-  const review = useEventDemandReview(eventId);
-  const reconcile = useReconcileEventDemand();
+  const authStatus = useAuthStatus();
+  // Roles the server does not let read demand see nothing here rather than
+  // a refused read breaking the screen.
+  const review = useEventDemandReview(
+    eventId,
+    canReadCulinaryDemand(authStatus?.role),
+  );
+  const applyRecalculation = useApplyDemandRecalculation();
   // Recalculating writes purchasing rows, which need inventory or manager
   // access; only offer the button to roles the commands will accept.
-  const authStatus = useAuthStatus();
   const canRecalculate = RECALCULATE_ROLES.has(authStatus?.role ?? "");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   if (review === undefined || review === null) return null;
   const items = review.eventDishes.flatMap((line) => line.unresolved);
@@ -53,12 +62,12 @@ export function EventUnresolvedMaterialsNotice({
     byKind.set(item.kind, group);
   }
 
-  const recalculate = async () => {
+  const recalculate = async (fingerprint: string) => {
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      const result = await reconcile(eventId);
+      const result = await applyRecalculation(eventId, fingerprint);
       setNotice(
         `Demand recalculated: ${result.created} added, ${result.updated} changed, ${result.superseded} replaced, ${result.unchanged} unchanged. ${result.unresolvedCount} item${result.unresolvedCount === 1 ? "" : "s"} still unresolved.`,
       );
@@ -100,7 +109,7 @@ export function EventUnresolvedMaterialsNotice({
             type="button"
             className="btn btn-ghost btn-sm"
             disabled={busy}
-            onClick={() => void recalculate()}
+            onClick={() => setShowPreview(true)}
           >
             {busy ? "Working…" : "Recalculate demand"}
           </button>
@@ -127,12 +136,19 @@ export function EventUnresolvedMaterialsNotice({
                 key={`${item.kind}:${item.eventDishId}:${item.refId}`}
                 className="text-base text-ink-2"
               >
-                {item.label} — {item.detail}
+                {unresolvedItemText(item)}
               </li>
             ))}
           </ul>
         </div>
       ))}
+      {showPreview ? (
+        <DemandChangePreviewDialog
+          request={{ eventId, kind: "recalculate" }}
+          onClose={() => setShowPreview(false)}
+          onApply={recalculate}
+        />
+      ) : null}
     </section>
   );
 }

@@ -1,4 +1,6 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { ADD_NEW_CHOICE } from "./inlineCatalogChoice";
 import { VENDOR_CONTACT_ROLES } from "./vendorContactRoles";
 import { suggestOrderNumber } from "./vendorOrderNumber";
 import { useWorkingEventId } from "../events/workingEvent";
@@ -21,11 +23,93 @@ export type PurchasingCommandFormProps = {
   form: PurchasingFormKind;
   busy: boolean;
   activeVendors: VendorOption[];
+  /** True while the vendor list has not loaded yet. */
+  vendorsLoading?: boolean;
   events: EventOption[] | undefined;
   contactVendorId?: string | null;
   onCancel: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
+
+/** Field name the order form reads when a new vendor is typed inline. */
+export const NEW_VENDOR_FIELD = "newVendorName";
+
+/**
+ * Vendor for a new order. No vendors yet, or "New vendor…" picked: the field
+ * becomes a name box and the order creates that vendor first, so the rest of
+ * the order form stays filled in (PR04-09).
+ */
+function OrderVendorField({
+  vendors,
+  loading,
+}: {
+  vendors: VendorOption[];
+  loading: boolean;
+}) {
+  const [adding, setAdding] = useState(false);
+  if (loading) {
+    return (
+      <label className="field-label">
+        Vendor
+        <select name="vendorId" className="input" required disabled>
+          <option value="">Loading vendors…</option>
+        </select>
+      </label>
+    );
+  }
+  if (vendors.length === 0 || adding) {
+    return (
+      <label className="field-label">
+        Vendor
+        <input
+          name={NEW_VENDOR_FIELD}
+          className="input"
+          placeholder="e.g. Sysco"
+          autoComplete="off"
+          required
+          autoFocus
+          data-testid="order-new-vendor"
+        />
+        <span className="field-hint">
+          {vendors.length === 0
+            ? "No vendors yet. Name one here and this order adds it."
+            : "Name the new vendor. This order adds it; add contact details later."}
+          {vendors.length > 0 ? (
+            <>
+              {" "}
+              <button
+                type="button"
+                className="underline font-medium"
+                onClick={() => setAdding(false)}
+              >
+                Pick an existing vendor
+              </button>
+            </>
+          ) : null}
+        </span>
+      </label>
+    );
+  }
+  return (
+    <label className="field-label">
+      Vendor
+      <SearchSelect
+        name="vendorId"
+        required
+        recentsKey="vendor"
+        placeholder="Search vendors…"
+        defaultValue={vendors.length === 1 ? vendors[0]!._id : ""}
+        onChange={(id) => {
+          if (id === ADD_NEW_CHOICE) setAdding(true);
+        }}
+        options={[
+          ...vendors.map((vendor) => ({ id: vendor._id, label: vendor.name })),
+          { id: ADD_NEW_CHOICE, label: "New vendor…" },
+        ]}
+      />
+    </label>
+  );
+}
 
 const FORM_TITLES: Record<PurchasingFormKind, string> = {
   vendor: "Onboard vendor",
@@ -37,6 +121,7 @@ export function PurchasingCommandForm({
   form,
   busy,
   activeVendors,
+  vendorsLoading,
   events,
   contactVendorId,
   onCancel,
@@ -94,19 +179,17 @@ export function PurchasingCommandForm({
           <>
             <label className="field-label">
               Vendor
-              <select
+              <SearchSelect
                 name="vendorId"
-                className="input"
+                recentsKey="vendor"
+                placeholder="Search vendors…"
                 defaultValue={contactVendorId ?? ""}
                 required
-              >
-                <option value="">Select vendor</option>
-                {activeVendors.map((vendor) => (
-                  <option key={vendor._id} value={vendor._id}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
+                options={activeVendors.map((vendor) => ({
+                  id: vendor._id,
+                  label: vendor.name,
+                }))}
+              />
             </label>
             <label className="field-label">
               Contact name
@@ -137,19 +220,12 @@ export function PurchasingCommandForm({
           </>
         ) : (
           <>
-            <label className="field-label">
-              Vendor
-              <select name="vendorId" className="input" required autoFocus>
-                <option value="">Select vendor</option>
-                {activeVendors
-                  .filter((vendor) => vendor.status === "active")
-                  .map((vendor) => (
-                    <option key={vendor._id} value={vendor._id}>
-                      {vendor.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
+            <OrderVendorField
+              loading={vendorsLoading === true}
+              vendors={activeVendors.filter(
+                (vendor) => vendor.status === "active",
+              )}
+            />
             <label className="field-label">
               Event (optional)
               <select

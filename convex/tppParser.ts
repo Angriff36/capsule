@@ -2,6 +2,11 @@
 // Handles data type conversions and field mappings defined in import-dataset.manifest.
 
 import { v } from "convex/values";
+import {
+  classifyFinancialRow,
+  type FinancialRowClass,
+} from "../src/lib/financialRowClass";
+import { derivedSourceId } from "./lib/importIdentity";
 
 /**
  * TPP field mapping types from ImportDataset manifest
@@ -49,28 +54,70 @@ export interface TppEventRecord {
   AccessibilityNeeds?: string;
   CreatedDate?: string;
   ModifiedDate?: string;
+  /**
+   * TPP's event list report prints the client by name, with no ClientID
+   * ("Contact Company Name", "Contact First Name", "Contact Last Name"), and
+   * the occasion; src/lib/importSourceFile.ts reads those headings into these.
+   */
+  ClientCompanyName?: string;
+  ClientFirstName?: string;
+  ClientLastName?: string;
+  Occasion?: string;
+  /**
+   * PL-IMPORT-RESUME (AC-024): files that belong to the event (contract, BEO,
+   * floor plan). The bytes are uploaded first; the row carries the stored id.
+   */
+  Files?: TppEventFile[];
+}
+
+export interface TppEventFile {
+  FileName: string;
+  ContentType?: string;
+  FileSize?: number;
+  StorageId: string;
+}
+
+export interface ParsedEventFile {
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  storageId: string;
 }
 
 export interface TppContactRecord {
-  ContactID: string;
-  FirstName: string;
-  LastName: string;
+  // PL-SOURCE-IDENTITY: a row may lack its id or one of its names.
+  ContactID?: string;
+  FirstName?: string;
+  LastName?: string;
   Email?: string;
   Phone?: string;
   Mobile?: string;
   Title?: string;
   CompanyID?: string;
+  // The Address / Phone List prints a person's company by name ("Company").
+  CompanyName?: string;
   IsPrimary?: boolean;
   IsBilling?: boolean;
   Notes?: string;
   CreatedDate?: string;
+  // Address / Phone List and Birthday List report columns (PR02-07).
+  Address?: string;
+  City?: string;
+  State?: string;
+  ZipCode?: string;
+  Birthday?: string;
 }
 
 export interface TppCompanyRecord {
-  CompanyID: string;
+  // The Address / Phone List prints company rows with no id.
+  CompanyID?: string;
   CompanyName: string;
   ClientType?: string;
   BillingAddress?: string;
+  // Address / Phone List columns of a company row.
+  Address?: string;
+  Email?: string;
+  Phone?: string;
   City?: string;
   State?: string;
   ZipCode?: string;
@@ -98,7 +145,7 @@ export interface TppLeadRecord {
 }
 
 export interface TppVenueRecord {
-  VenueID: string;
+  VenueID?: string;
   VenueName: string;
   VenueType?: string;
   Address?: string;
@@ -157,6 +204,12 @@ export interface TppMenuRecord {
 /**
  * Parsed Capsule entity format
  */
+export interface ImportedClientName {
+  companyName?: string;
+  givenName?: string;
+  familyName?: string;
+}
+
 export interface ParsedCapsuleEvent {
   externalId: string;
   title: string;
@@ -171,6 +224,8 @@ export interface ParsedCapsuleEvent {
   venueName?: string;
   venueAddress?: string;
   clientId: string;
+  /** Set when the row names its client only by name (no ClientID). */
+  clientName?: ImportedClientName;
   primaryContactId?: string;
   assignedToId?: string;
   quotedRevenue?: number;
@@ -186,10 +241,13 @@ export interface ParsedCapsuleEvent {
   accessibilityNeeds?: string[];
   createdAt?: number;
   updatedAt?: number;
+  files?: ParsedEventFile[];
 }
 
 export interface ParsedCapsuleContact {
   externalId: string;
+  /** "derived": the row had no old-system id; externalId is built from it. */
+  identitySource?: "derived";
   givenName: string;
   familyName: string;
   email?: string;
@@ -197,14 +255,34 @@ export interface ParsedCapsuleContact {
   mobile?: string;
   title?: string;
   companyId?: string;
+  /** The person's company as printed, used when no company row is linked. */
+  companyName?: string;
   isPrimary?: boolean;
   isBillingContact?: boolean;
   notes?: string;
   createdAt?: number;
+  addressLine1?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  /** YYYY-MM-DD; a birthday the parser cannot read stays on the link only. */
+  birthday?: string;
+  /**
+   * A company row of the contacts dataset (TPP_COMPANY_MAPPINGS): becomes a
+   * company client. externalId is its CompanyID.
+   */
+  company?: {
+    name: string;
+    clientType?: string;
+    taxId?: string;
+    paymentTermsDays?: number;
+  };
 }
 
 export interface ParsedCapsuleVenue {
   externalId: string;
+  /** "derived": the row had no VenueID; externalId is built from it. */
+  identitySource?: "derived";
   name: string;
   venueType?: string;
   addressLine1?: string;
@@ -217,6 +295,9 @@ export interface ParsedCapsuleVenue {
   contactEmail?: string;
   accessNotes?: string;
   cateringNotes?: string;
+  loadInInstructions?: string;
+  /** TPP ParkingInfo: Venue keeps parking in its logistics notes. */
+  logisticsNotes?: string;
   createdAt?: number;
 }
 
@@ -228,6 +309,13 @@ export interface ParsedCapsulePayment {
   amount: number;
   method: string;
   notes?: string;
+  /** The source's own type column, kept as written. */
+  paymentType?: string;
+  /** The accounting system's transaction id: the same money in any report. */
+  providerTransactionId?: string;
+  rowClass: FinancialRowClass;
+  /** Money moving on its own; only these wait to be matched (AC-084). */
+  movesMoney: boolean;
 }
 
 export interface ParsedCapsuleLead {
@@ -338,6 +426,8 @@ export interface ParsedCapsuleMenu {
 export interface ParserResult<T> {
   success: boolean;
   records: T[];
+  /** Input row index of each entry in `records` (rows with errors drop out). */
+  sourceIndexes: number[];
   errors: Array<{ recordIndex: number; field: string; message: string }>;
   warnings: Array<{ recordIndex: number; field: string; message: string }>;
   totalCount: number;
@@ -355,7 +445,13 @@ export function parseTppDateTime(
   if (!dateStr) return undefined;
 
   try {
-    const date = new Date(dateStr);
+    // A bare "YYYY-MM-DD" is read as that calendar day on the same clock the
+    // time below is set on (new Date("YYYY-MM-DD") is UTC midnight, which
+    // setHours then moved to the day before west of UTC).
+    const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr.trim());
+    const date = day
+      ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3]))
+      : new Date(dateStr);
     if (isNaN(date.getTime())) return undefined;
 
     if (timeStr) {
@@ -379,7 +475,9 @@ export function parseTppMoney(value?: string | number): number | undefined {
   if (typeof value === "number") return value;
 
   const cleaned = String(value).replace(/[$,]/g, "").trim();
-  const parsed = parseFloat(cleaned);
+  // Accounting reports write a negative amount in brackets: (50.00).
+  const bracketed = /^\((.*)\)$/.exec(cleaned);
+  const parsed = bracketed ? -parseFloat(bracketed[1]) : parseFloat(cleaned);
   return isNaN(parsed) ? undefined : parsed;
 }
 
@@ -506,10 +604,19 @@ export function mapTppAllergens(value?: string): string[] {
 export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
   const startsAt = parseTppDateTime(record.EventDate, record.StartTime);
   const endsAt = parseTppDateTime(record.EventDate, record.EndTime);
+  const clientName = importedClientName(record);
+  const named = clientName
+    ? clientName.companyName ||
+      [clientName.givenName, clientName.familyName].filter(Boolean).join(" ")
+    : "";
 
   return {
     externalId: record.EventID,
-    title: record.EventName,
+    // The event list report has no event name: "<client> <occasion>".
+    title:
+      record.EventName ||
+      [named, record.Occasion || record.EventType].filter(Boolean).join(" "),
+    ...(clientName && !record.ClientID ? { clientName } : {}),
     occasionId: record.EventType
       ? record.EventType.toLowerCase().replace(/\s+/g, "_")
       : undefined,
@@ -544,7 +651,42 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
       record.AccessibilityNeeds?.split(",").map((s) => s.trim()) || [],
     createdAt: parseTppDateTime(record.CreatedDate),
     updatedAt: parseTppDateTime(record.ModifiedDate),
+    ...(record.Files && record.Files.length > 0
+      ? { files: parseTppEventFiles(record.Files) }
+      : {}),
   };
+}
+
+function importedClientName(
+  record: TppEventRecord,
+): ImportedClientName | undefined {
+  const companyName = record.ClientCompanyName?.trim() || undefined;
+  const givenName = record.ClientFirstName?.trim() || undefined;
+  const familyName = record.ClientLastName?.trim() || undefined;
+  return companyName || givenName || familyName
+    ? { companyName, givenName, familyName }
+    : undefined;
+}
+
+/** Event files (contracts, BEOs) whose bytes were uploaded before the import. */
+function parseTppEventFiles(files: TppEventFile[]): ParsedEventFile[] {
+  return files
+    .filter(
+      (file) =>
+        typeof file?.StorageId === "string" &&
+        file.StorageId.trim().length > 0 &&
+        typeof file.FileName === "string" &&
+        file.FileName.trim().length > 0,
+    )
+    .map((file) => ({
+      fileName: file.FileName.trim(),
+      contentType: file.ContentType?.trim() || "application/octet-stream",
+      fileSize:
+        typeof file.FileSize === "number" && file.FileSize >= 0
+          ? Math.round(file.FileSize)
+          : 0,
+      storageId: file.StorageId.trim(),
+    }));
 }
 
 /**
@@ -553,19 +695,111 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
 export function parseTppContact(
   record: TppContactRecord,
 ): ParsedCapsuleContact {
+  // A single-name person keeps that one name as the given name; the family
+  // name stays empty, never made up (AC-060).
+  const first = record.FirstName?.trim() ?? "";
+  const last = record.LastName?.trim() ?? "";
+  const givenName = first || last;
+  const familyName = first ? last : "";
+  const sourceId = record.ContactID?.trim() ?? "";
   return {
-    externalId: record.ContactID,
-    givenName: record.FirstName,
-    familyName: record.LastName,
+    // AC-179: a row with no ContactID gets a stable id from its own details.
+    externalId:
+      sourceId ||
+      derivedSourceId([
+        givenName,
+        familyName,
+        record.CompanyID,
+        record.Email,
+        record.Phone || record.Mobile,
+        record.ZipCode,
+      ]),
+    ...(sourceId ? {} : { identitySource: "derived" as const }),
+    givenName,
+    familyName,
     email: record.Email,
     phone: record.Phone,
     mobile: record.Mobile,
     title: record.Title,
     companyId: record.CompanyID,
+    companyName: record.CompanyName?.trim() || undefined,
     isPrimary: parseTppBoolean(record.IsPrimary),
     isBillingContact: parseTppBoolean(record.IsBilling),
     notes: record.Notes,
     createdAt: parseTppDateTime(record.CreatedDate),
+    addressLine1: record.Address,
+    city: record.City,
+    region: record.State,
+    postalCode: record.ZipCode,
+    birthday: parseTppBirthday(record.Birthday),
+  };
+}
+
+/** "YYYY-MM-DD" or "M/D/YYYY" → "YYYY-MM-DD"; anything else → undefined. */
+export function parseTppBirthday(value?: string): string | undefined {
+  const text = value?.trim();
+  if (!text) return undefined;
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text);
+  const us = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(text);
+  const [year, month, day] = iso
+    ? [iso[1], iso[2], iso[3]]
+    : us
+      ? [us[3], us[1], us[2]]
+      : [];
+  if (!year || !month || !day) return undefined;
+  const m = Number(month);
+  const d = Number(day);
+  if (m < 1 || m > 12 || d < 1 || d > 31) return undefined;
+  return `${year}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+/** A row of the contacts dataset that describes a company, not a person. */
+export function isTppCompanyRow(record: Record<string, unknown>): boolean {
+  return (
+    typeof record.CompanyName === "string" &&
+    record.CompanyName.trim().length > 0 &&
+    !record.ContactID &&
+    !record.FirstName &&
+    !record.LastName
+  );
+}
+
+/** TPP company row (TPP_COMPANY_MAPPINGS) → a company client. */
+export function parseTppCompany(
+  record: TppCompanyRecord,
+): ParsedCapsuleContact {
+  const terms = /(\d{1,3})/.exec(record.PaymentTerms ?? "");
+  const days = terms ? Number(terms[1]) : undefined;
+  const sourceId = record.CompanyID?.trim() ?? "";
+  const address = record.BillingAddress ?? record.Address;
+  return {
+    // AC-179: a company row with no CompanyID gets a stable id from its details.
+    externalId:
+      sourceId ||
+      derivedSourceId([
+        record.CompanyName,
+        address,
+        record.ZipCode,
+        record.Email,
+        record.Phone,
+      ]),
+    ...(sourceId ? {} : { identitySource: "derived" as const }),
+    givenName: "",
+    familyName: "",
+    email: record.Email,
+    phone: record.Phone,
+    notes: record.Notes,
+    createdAt: parseTppDateTime(record.CreatedDate),
+    addressLine1: address,
+    city: record.City,
+    region: record.State,
+    postalCode: record.ZipCode,
+    company: {
+      name: record.CompanyName.trim(),
+      clientType: record.ClientType,
+      taxId: record.TaxId,
+      paymentTermsDays: days !== undefined && days <= 365 ? days : undefined,
+    },
   };
 }
 
@@ -573,8 +807,15 @@ export function parseTppContact(
  * Parse TPP Venue record to Capsule format
  */
 export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
+  const sourceId = record.VenueID?.trim() ?? "";
   return {
-    externalId: record.VenueID,
+    // AC-179: a row with no VenueID gets a stable id from its name + address.
+    externalId:
+      sourceId ||
+      (record.VenueName?.trim()
+        ? derivedSourceId([record.VenueName, record.Address, record.ZipCode])
+        : ""),
+    ...(sourceId ? {} : { identitySource: "derived" as const }),
     name: record.VenueName,
     venueType: mapTppVenueType(record.VenueType),
     addressLine1: record.Address,
@@ -587,6 +828,8 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
     contactEmail: record.ContactEmail,
     accessNotes: record.AccessNotes,
     cateringNotes: record.CateringNotes,
+    loadInInstructions: record.LoadInInstructions,
+    logisticsNotes: record.ParkingInfo,
     createdAt: parseTppDateTime(record.CreatedDate),
   };
 }
@@ -597,14 +840,30 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
 export function parseTppPayment(
   record: TppPaymentRecord,
 ): ParsedCapsulePayment {
+  const amount = parseTppMoney(record.PaymentAmount) ?? Number.NaN;
+  const { rowClass, movesMoney } = classifyFinancialRow({
+    type: record.PaymentType,
+    id: record.PaymentID,
+    amount: Number.isFinite(amount) ? amount : 0,
+  });
+  // Report lines (totals, balances) often have no id of their own.
+  const externalId =
+    record.PaymentID ||
+    (rowClass === "aggregate_report" || rowClass === "balance_snapshot"
+      ? `report-line:${record.PaymentDate ?? ""}:${record.PaymentType ?? rowClass}:${amount}`
+      : "");
   return {
-    externalId: record.PaymentID,
+    externalId,
     invoiceId: record.InvoiceID,
     eventId: record.EventID,
     recordedAt: parseTppDateTime(record.PaymentDate),
-    amount: parseTppMoney(record.PaymentAmount) || 0,
-    method: mapTppPaymentMethod(record.PaymentMethod),
+    amount,
+    method: mapTppPaymentMethod(record.PaymentMethod ?? ""),
     notes: [record.Reference, record.Notes].filter(Boolean).join(" | "),
+    paymentType: record.PaymentType,
+    providerTransactionId: record.QuickBooksTransactionId,
+    rowClass,
+    movesMoney,
   };
 }
 
@@ -857,6 +1116,7 @@ export function parseTppEvents(
   records: TppEventRecord[],
 ): ParserResult<ParsedCapsuleEvent> {
   const result: ParsedCapsuleEvent[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -886,11 +1146,11 @@ export function parseTppEvents(
         });
         return;
       }
-      if (!parsed.clientId) {
+      if (!parsed.clientId && !parsed.clientName) {
         errors.push({
           recordIndex: index,
           field: "ClientID",
-          message: "ClientID is required",
+          message: "ClientID or the client's name is required",
         });
         return;
       }
@@ -903,6 +1163,7 @@ export function parseTppEvents(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -915,6 +1176,7 @@ export function parseTppEvents(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -931,6 +1193,7 @@ export function parseTppContacts(
   records: TppContactRecord[],
 ): ParserResult<ParsedCapsuleContact> {
   const result: ParsedCapsuleContact[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -939,37 +1202,57 @@ export function parseTppContacts(
     message: string;
   }> = [];
 
+  // Company rows commit first, so a person row's CompanyID finds its company
+  // in the same run.
+  const companies: ParsedCapsuleContact[] = [];
+  const companyIndexes: number[] = [];
+
   records.forEach((record, index) => {
     try {
-      const parsed = parseTppContact(record);
-
-      // Validate required fields
-      if (!parsed.externalId) {
-        errors.push({
-          recordIndex: index,
-          field: "ContactID",
-          message: "ContactID is required",
-        });
+      if (isTppCompanyRow(record as unknown as Record<string, unknown>)) {
+        const company = parseTppCompany(record as unknown as TppCompanyRecord);
+        if (!company.externalId) {
+          errors.push({
+            recordIndex: index,
+            field: "CompanyID",
+            message: "CompanyID is required",
+          });
+          return;
+        }
+        companies.push(company);
+        companyIndexes.push(index);
         return;
       }
+      const parsed = parseTppContact(record);
+
+      // AC-060: only a row with no name at all cannot become a person. A
+      // single name or a missing ContactID is kept and noted, never filled in.
       if (!parsed.givenName) {
         errors.push({
           recordIndex: index,
           field: "FirstName",
-          message: "FirstName is required",
+          message: "This contact has no name",
         });
         return;
       }
+      if (parsed.identitySource === "derived") {
+        warnings.push({
+          recordIndex: index,
+          field: "ContactID",
+          message:
+            "No contact id in the old system; Capsule knows this row by its name and details",
+        });
+      }
       if (!parsed.familyName) {
-        errors.push({
+        warnings.push({
           recordIndex: index,
           field: "LastName",
-          message: "LastName is required",
+          message: "Only one name; the family name is left empty",
         });
-        return;
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -982,11 +1265,12 @@ export function parseTppContacts(
 
   return {
     success: errors.length === 0,
-    records: result,
+    sourceIndexes: [...companyIndexes, ...sourceIndexes],
+    records: [...companies, ...result],
     errors,
     warnings,
     totalCount: records.length,
-    successCount: result.length,
+    successCount: companies.length + result.length,
     failureCount: errors.length,
   };
 }
@@ -998,6 +1282,7 @@ export function parseTppVenues(
   records: TppVenueRecord[],
 ): ParserResult<ParsedCapsuleVenue> {
   const result: ParsedCapsuleVenue[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1011,14 +1296,6 @@ export function parseTppVenues(
       const parsed = parseTppVenue(record);
 
       // Validate required fields
-      if (!parsed.externalId) {
-        errors.push({
-          recordIndex: index,
-          field: "VenueID",
-          message: "VenueID is required",
-        });
-        return;
-      }
       if (!parsed.name) {
         errors.push({
           recordIndex: index,
@@ -1027,8 +1304,17 @@ export function parseTppVenues(
         });
         return;
       }
+      if (parsed.identitySource === "derived") {
+        warnings.push({
+          recordIndex: index,
+          field: "VenueID",
+          message:
+            "No venue id in the old system; Capsule knows this row by its name and address",
+        });
+      }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1041,6 +1327,7 @@ export function parseTppVenues(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1057,6 +1344,7 @@ export function parseTppPayments(
   records: TppPaymentRecord[],
 ): ParserResult<ParsedCapsulePayment> {
   const result: ParsedCapsulePayment[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1078,7 +1366,9 @@ export function parseTppPayments(
         });
         return;
       }
-      if (!parsed.amount) {
+      // Zero and negative amounts are kept (PR05-02); only a missing or
+      // unreadable amount is an error.
+      if (!Number.isFinite(parsed.amount)) {
         errors.push({
           recordIndex: index,
           field: "PaymentAmount",
@@ -1086,7 +1376,7 @@ export function parseTppPayments(
         });
         return;
       }
-      if (!parsed.method) {
+      if (parsed.movesMoney && !parsed.method) {
         errors.push({
           recordIndex: index,
           field: "PaymentMethod",
@@ -1096,6 +1386,7 @@ export function parseTppPayments(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1108,6 +1399,7 @@ export function parseTppPayments(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1124,6 +1416,7 @@ export function parseTppLeads(
   records: TppLeadRecord[],
 ): ParserResult<ParsedCapsuleLead> {
   const result: ParsedCapsuleLead[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1155,6 +1448,7 @@ export function parseTppLeads(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1167,6 +1461,7 @@ export function parseTppLeads(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1183,6 +1478,7 @@ export function parseTppMenus(
   records: TppMenuRecord[],
 ): ParserResult<ParsedCapsuleMenu> {
   const result: ParsedCapsuleMenu[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1215,6 +1511,7 @@ export function parseTppMenus(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1227,6 +1524,7 @@ export function parseTppMenus(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,
@@ -1242,6 +1540,7 @@ export function parseTppPackLists(
   records: TppPackListRecord[],
 ): ParserResult<ParsedCapsulePackList> {
   const result: ParsedCapsulePackList[] = [];
+  const sourceIndexes: number[] = [];
   const errors: Array<{ recordIndex: number; field: string; message: string }> =
     [];
   const warnings: Array<{
@@ -1267,6 +1566,7 @@ export function parseTppPackLists(
       }
 
       result.push(parsed);
+      sourceIndexes.push(index);
     } catch (error) {
       errors.push({
         recordIndex: index,
@@ -1279,6 +1579,7 @@ export function parseTppPackLists(
 
   return {
     success: errors.length === 0,
+    sourceIndexes,
     records: result,
     errors,
     warnings,

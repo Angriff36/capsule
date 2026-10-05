@@ -8,14 +8,22 @@ import {
   type ActionCtx,
 } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import {
+  createCheckoutSession,
+  fetchCheckoutSession,
+  readCheckoutSession,
+} from "./lib/stripeCheckout";
+import { STRIPE_PAYMENT_RECORDED } from "./lib/invoiceStripeReconcile";
 
 // Stripe payment links per invoice. Link + reconciliation state live on the
 // invoice ledger (manifestEvents), matching the invoiceReminders precedent.
 // Inbound Stripe webhooks are blocked (issue #52: the generated Convex webhook
 // verifier cannot parse Stripe's `t=...,v1=...` signature and convex/http.ts is
 // generated/owned), so confirmation is pulled from Stripe by an authenticated
-// finance user and recorded through the governed Payment.record → Payment.settle
-// commands; the PaymentSettled reaction applies the amount to the invoice.
+// finance user (or by the client returning to the portal, see
+// convex/clientPortalPayments.ts) and recorded once per session by
+// convex/lib/invoiceStripeReconcile.ts through the governed Payment.record →
+// Payment.settle commands; the PaymentSettled reaction applies the amount.
 //
 // Funds settle to the TENANT, not the platform (issue #112): every Stripe call
 // carries a `Stripe-Account` header naming the tenant's Standard connected
@@ -29,7 +37,7 @@ const MAX_SESSIONS_CHECKED = 24;
 const EVENT = {
   linkCreated: "InvoicePaymentLinkCreated",
   reminderLinkPrepared: "InvoiceReminderPaymentLinkPrepared",
-  stripePaymentRecorded: "InvoiceStripePaymentRecorded",
+  stripePaymentRecorded: STRIPE_PAYMENT_RECORDED,
 } as const;
 
 export interface PaymentLinkView {
@@ -37,25 +45,30 @@ export interface PaymentLinkView {
   url: string;
   createdAt: number;
   amount: number;
+  /** Paid by card beyond what was owed on this invoice; refund it in Stripe. */
+  overpaidAmount?: number;
 }
 
 export interface StripeSyncResult {
   checked: number;
   recorded: number;
   recordedAmount: number;
+  /** Paid by card beyond what was owed; staff refund it in Stripe. */
+  overpaidAmount: number;
   failures: string[];
 }
 
-interface SessionRecord {
+export interface SessionRecord {
   sessionId: string;
   url: string;
   createdAt: number;
   amount: number;
 }
 
-interface LedgerView {
+export interface LedgerView {
   sessions: SessionRecord[];
   reconciledSessionIds: string[];
+  overpaidAmount: number;
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -68,7 +81,7 @@ function stringValue(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function requireStripeEnvironment(): {
+export function requireStripeEnvironment(): {
   stripeSecretKey: string;
   appOrigin: string;
 } {
@@ -94,7 +107,7 @@ function requireStripeEnvironment(): {
   return { stripeSecretKey, appOrigin };
 }
 
-function safeProviderMessage(cause: unknown): string {
+export function safeProviderMessage(cause: unknown): string {
   const message = cause instanceof Error ? cause.message : String(cause);
   return message.replace(/[\r\n]+/gu, " ").slice(0, 300);
 }
@@ -164,21 +177,24 @@ export const loadLedgerView = internalQuery({
       });
     }
 
-    const reconciledSessionIds = rows
-      .filter((row) => row.type === EVENT.stripePaymentRecorded)
+    const recordedRows = rows.filter(
+      (row) => row.type === EVENT.stripePaymentRecorded,
+    );
+    const reconciledSessionIds = recordedRows
       .map((row) => stringValue(asRecord(row.payload).sessionId))
       .filter((sessionId): sessionId is string => sessionId !== null);
+    const overpaidAmount = recordedRows.reduce((total, row) => {
+      const overpaid = asRecord(row.payload).overpaid;
+      return total + (typeof overpaid === "number" ? overpaid : 0);
+    }, 0);
 
-    return { sessions, reconciledSessionIds };
+    return { sessions, reconciledSessionIds, overpaidAmount };
   },
 });
 
 export const recordLedgerEvent = internalMutation({
   args: {
-    type: v.union(
-      v.literal(EVENT.linkCreated),
-      v.literal(EVENT.stripePaymentRecorded),
-    ),
+    type: v.literal(EVENT.linkCreated),
     invoiceId: v.id("invoices"),
     payload: v.any(),
   },
@@ -199,7 +215,7 @@ export const recordLedgerEvent = internalMutation({
  * the caterer, not to Capsule. Throws rather than silently charging into the
  * platform account.
  */
-async function requireConnectedAccountId(
+export async function requireConnectedAccountId(
   ctx: ActionCtx,
   tenantId: string,
 ): Promise<string> {
@@ -224,47 +240,40 @@ async function requireConnectedAccountId(
   return accountId;
 }
 
-function connectedAccountHeaders(
-  stripeSecretKey: string,
-  connectedAccountId: string,
-): Record<string, string> {
-  return {
-    Authorization: `Bearer ${stripeSecretKey}`,
-    "Stripe-Account": connectedAccountId,
-  };
-}
-
-async function fetchStripeSession(
+/**
+ * One paid-session check shared by staff sync and the client portal: read the
+ * session from Stripe, then record it once through recordPaidSession.
+ */
+export async function reconcileCheckoutSession(
+  ctx: ActionCtx,
+  invoice: Doc<"invoices">,
   sessionId: string,
   stripeSecretKey: string,
   connectedAccountId: string,
-): Promise<Record<string, unknown> | null> {
-  const query = new URLSearchParams({
-    "expand[]": "payment_intent.payment_method",
-  });
-  const response = await fetch(
-    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?${query}`,
-    { headers: connectedAccountHeaders(stripeSecretKey, connectedAccountId) },
+): Promise<{
+  outcome: "succeeded" | "pending" | "failed";
+  recorded: boolean;
+  applied: number;
+  overpaid: number;
+}> {
+  const view = readCheckoutSession(
+    await fetchCheckoutSession(sessionId, stripeSecretKey, connectedAccountId),
   );
-  if (response.status === 404) return null;
-  const body = asRecord(await response.json().catch(() => null));
-  if (!response.ok) {
-    const error = asRecord(body.error);
-    throw new Error(
-      stringValue(error.message) ||
-        `Stripe session lookup failed (${response.status}).`,
-    );
+  if (view.outcome !== "succeeded") {
+    return { outcome: view.outcome, recorded: false, applied: 0, overpaid: 0 };
   }
-  return body;
-}
-
-function paymentMethodKind(session: Record<string, unknown>): string {
-  const paymentIntent = asRecord(session.payment_intent);
-  const paymentMethod = asRecord(paymentIntent.payment_method);
-  const type = stringValue(paymentMethod.type);
-  if (type === "card") return "card";
-  if (type === "us_bank_account" || type === "customer_balance") return "ach";
-  return type ? "other" : "card";
+  const result: { recorded: boolean; applied: number; overpaid: number } =
+    await ctx.runMutation(
+      internal.lib.invoiceStripeReconcile.recordPaidSession,
+      {
+        invoiceId: invoice._id,
+        tenantId: invoice.tenantId,
+        sessionId,
+        amount: view.amount,
+        method: view.method,
+      },
+    );
+  return { outcome: "succeeded", ...result };
 }
 
 export const getPaymentLink = action({
@@ -276,7 +285,7 @@ export const getPaymentLink = action({
       { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
     );
     const latest = view.sessions[0];
-    return latest ?? null;
+    return latest ? { ...latest, overpaidAmount: view.overpaidAmount } : null;
   },
 });
 
@@ -294,8 +303,7 @@ export const createPaymentLink = action({
 
     const invoiceNumber = String(invoice.invoiceNumber || invoice._id);
     const amountDue = Number(invoice.amountDue);
-    const amountCents = Math.round(amountDue * 100);
-    if (amountCents <= 0) {
+    if (amountDue <= 0) {
       throw new ConvexError("Invoice has no payable balance.");
     }
 
@@ -303,44 +311,19 @@ export const createPaymentLink = action({
     returnUrl.searchParams.set("invoice_payment", "success");
     const cancelUrl = new URL(environment.appOrigin);
     cancelUrl.searchParams.set("invoice_payment", "cancelled");
-    const body = new URLSearchParams({
-      mode: "payment",
-      success_url: returnUrl.toString(),
-      cancel_url: cancelUrl.toString(),
-      client_reference_id: String(invoice._id),
-      "line_items[0][price_data][currency]": "usd",
-      "line_items[0][price_data][unit_amount]": String(amountCents),
-      "line_items[0][price_data][product_data][name]": `Invoice ${invoiceNumber} balance`,
-      "line_items[0][quantity]": "1",
-      "payment_intent_data[metadata][invoiceId]": String(invoice._id),
-      "payment_intent_data[metadata][tenantId]": invoice.tenantId,
-    });
-    const response = await fetch(
-      "https://api.stripe.com/v1/checkout/sessions",
-      {
-        method: "POST",
-        headers: {
-          ...connectedAccountHeaders(
-            environment.stripeSecretKey,
-            connectedAccountId,
-          ),
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body,
-      },
-    );
-    const responseBody = asRecord(await response.json().catch(() => null));
-    if (!response.ok) {
-      const error = asRecord(responseBody.error);
-      throw new ConvexError(
-        stringValue(error.message) ||
-          `Stripe payment link setup failed (${response.status}).`,
-      );
-    }
-    const sessionId = stringValue(responseBody.id);
-    const url = stringValue(responseBody.url);
-    if (!sessionId || !url) {
-      throw new ConvexError("Stripe did not return a payment link.");
+    let created: { sessionId: string; url: string };
+    try {
+      created = await createCheckoutSession({
+        stripeSecretKey: environment.stripeSecretKey,
+        connectedAccountId,
+        invoice,
+        amount: amountDue,
+        productName: `Invoice ${invoiceNumber} balance`,
+        successUrl: returnUrl.toString(),
+        cancelUrl: cancelUrl.toString(),
+      });
+    } catch (cause) {
+      throw new ConvexError(safeProviderMessage(cause));
     }
 
     await ctx.runMutation(internal.invoicePayments.recordLedgerEvent, {
@@ -348,13 +331,13 @@ export const createPaymentLink = action({
       invoiceId: args.invoiceId,
       payload: {
         tenantId: invoice.tenantId,
-        sessionId,
-        url,
+        sessionId: created.sessionId,
+        url: created.url,
         amount: amountDue,
         createdBy: auth.id,
       },
     });
-    return { sessionId, url, createdAt: Date.now(), amount: amountDue };
+    return { ...created, createdAt: Date.now(), amount: amountDue };
   },
 });
 
@@ -380,58 +363,23 @@ export const syncStripePayments = action({
       checked: pending.length,
       recorded: 0,
       recordedAmount: 0,
+      overpaidAmount: 0,
       failures: [],
     };
 
     for (const session of pending) {
       try {
-        const stripeSession = await fetchStripeSession(
+        const checked = await reconcileCheckoutSession(
+          ctx,
+          invoice,
           session.sessionId,
           environment.stripeSecretKey,
           connectedAccountId,
         );
-        if (!stripeSession || stripeSession.payment_status !== "paid") {
-          continue;
-        }
-        const amountTotal = Number(stripeSession.amount_total);
-        if (!Number.isFinite(amountTotal) || amountTotal <= 0) {
-          throw new Error("Stripe reported a paid session without an amount.");
-        }
-        const amount = amountTotal / 100;
-        const method = paymentMethodKind(stripeSession);
-
-        // Governed command path: record + settle. The PaymentSettled reaction
-        // applies the amount to the invoice balance and status. Command
-        // idempotency keys make retries safe if a prior sync partially failed.
-        const recordResult: { docId: Id<"payments"> } = await ctx.runMutation(
-          api.mutations.Payment_createViaRecord,
-          {
-            invoiceId: String(invoice._id),
-            clientId: String(invoice.clientId),
-            amount,
-            method,
-            ...(invoice.eventId ? { eventId: String(invoice.eventId) } : {}),
-            notes: `Stripe Checkout ${session.sessionId}`,
-            idempotencyKey: `stripe-checkout/${session.sessionId}/record`,
-          },
-        );
-        await ctx.runMutation(api.mutations.Payment_settle, {
-          docId: recordResult.docId,
-          idempotencyKey: `stripe-checkout/${session.sessionId}/settle`,
-        });
-        await ctx.runMutation(internal.invoicePayments.recordLedgerEvent, {
-          type: EVENT.stripePaymentRecorded,
-          invoiceId: args.invoiceId,
-          payload: {
-            tenantId: invoice.tenantId,
-            sessionId: session.sessionId,
-            paymentId: String(recordResult.docId),
-            amount,
-            method,
-          },
-        });
+        if (!checked.recorded) continue;
         result.recorded += 1;
-        result.recordedAmount += amount;
+        result.recordedAmount += checked.applied;
+        result.overpaidAmount += checked.overpaid;
       } catch (cause) {
         result.failures.push(
           `Session ${session.sessionId}: ${safeProviderMessage(cause)}`,

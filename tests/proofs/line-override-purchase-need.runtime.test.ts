@@ -198,6 +198,91 @@ describe("runtime proof: a kitchen substitution opens a purchase line", () => {
     expect(restored.get(shallot) ?? 0).toBe(0);
     expect(restored.has(butter)).toBe(false);
   });
+
+  // #401: a guest-count change keeps the swapped portions swapped.
+  it("keeps the stand-in portions when the guest count changes", async () => {
+    const proof = harness();
+    const role = (subject: string, r: string) =>
+      proof.asRole({ subject, role: r, tenantId: S.tenantId });
+    const sales = role("sales-headcount-swap", "sales_manager");
+    const events = role("events-headcount-swap", "event_manager");
+    const kitchen = role("kitchen-headcount-swap", "kitchen_staff");
+    const inventory = role("inventory-headcount-swap", "inventory_staff");
+
+    const onion = await introduce(proof, kitchen, "onion");
+    const shallot = await introduce(proof, kitchen, "shallot");
+    const dish = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Dish_createViaIntroduce,
+      {
+        name: "Onion tart",
+        portionSize: 1,
+        portionUnit: "portion",
+        category: "entree",
+      },
+    )) as { docId: string };
+    const onionLine = await addLine(proof, kitchen, dish.docId, onion);
+    const client = (await proof.executeCommand(
+      sales,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Headcount swap client" },
+    )) as { docId: string };
+    const event = (await proof.executeCommand(
+      sales,
+      api.mutations.Event_createViaPlanEngagement,
+      {
+        clientId: client.docId,
+        title: "Headcount swap lunch",
+        eventType: "catering",
+        startsAt: S.startsAt,
+        endsAt: S.endsAt,
+        expectedHeadcount: S.servings,
+        primaryContactName: "Pat Planner",
+        budgetAmount: 800,
+        quotedPrice: 1200,
+      },
+    )) as { docId: string; version?: number };
+    const eventDish = (await proof.executeCommand(
+      events,
+      api.mutations.EventDish_createViaAddToEvent,
+      {
+        eventId: event.docId,
+        dishId: dish.docId,
+        quantityServings: S.servings,
+      },
+    )) as { docId: string };
+    const onionDemand = await demandFor(inventory, onion);
+    await proof.executeCommand(
+      inventory,
+      api.mutations.IngredientDemand_confirm,
+      { docId: onionDemand!._id, version: onionDemand!.version },
+    );
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.EventDishLineOverride_createViaApply,
+      {
+        eventDishId: eventDish.docId,
+        eventId: event.docId,
+        kind: "replace",
+        targetDishIngredientId: onionLine,
+        ingredientId: shallot,
+        quantity: 1,
+        unit: "each",
+        portionsAffected: S.replacedPortions,
+        reason: "Guest cannot eat onions",
+      },
+    );
+
+    await proof.executeCommand(events, api.mutations.Event_changeHeadcount, {
+      docId: event.docId,
+      newHeadcount: 16,
+    });
+
+    const after = await liveNeeds(inventory);
+    // The stand-in still covers the same four portions; onion covers the rest.
+    expect(after.get(onion)).toBe(16 - S.replacedPortions);
+    expect(after.get(shallot)).toBe(S.replacedPortions);
+  });
 });
 
 async function introduce(

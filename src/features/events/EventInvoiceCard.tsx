@@ -82,9 +82,7 @@ export function EventInvoiceCard({
                   >
                     {number}
                   </Link>
-                  <span
-                    className={`chip ${closed ? "border-line-2 bg-inset text-ink-2" : ""}`}
-                  >
+                  <span className={`chip ${closed ? "chip-tone-mute" : ""}`}>
                     {formatStatusLabel(status)}
                   </span>
                 </div>

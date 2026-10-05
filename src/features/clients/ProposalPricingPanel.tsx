@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useListProposalLineItem } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { api, type Id } from "../../lib/api";
@@ -10,6 +10,7 @@ import {
   type PricingBasis,
 } from "../../lib/pricing";
 import { useCatalogDishes } from "./useCatalogDishes";
+import { ProposalTravelFee } from "./ProposalTravelFee";
 
 interface ProposalPricingPanelProps {
   proposalId: string;
@@ -35,6 +36,7 @@ interface LineEditor {
   unit: string;
   menuDishId: string;
   overrideReason: string;
+  equipmentId: string;
 }
 
 const emptyEditor = (id: string | "new"): LineEditor => ({
@@ -46,6 +48,7 @@ const emptyEditor = (id: string | "new"): LineEditor => ({
   unit: "",
   menuDishId: "",
   overrideReason: "",
+  equipmentId: "",
 });
 
 /**
@@ -71,6 +74,12 @@ export function ProposalPricingPanel({
   const lineItems = useListProposalLineItem();
   // Published-catalog dishes a line can be priced from (spec §5.4 L276).
   const catalog = useCatalogDishes();
+  // AC-547: rental/decor items a line can price.
+  const rentalItems = useQuery(api.lib.proposalPricing.listRentalItems, {});
+  const rentalName = (equipmentId: string | null | undefined) =>
+    equipmentId
+      ? rentalItems?.find((item) => item.equipmentId === equipmentId)?.name
+      : undefined;
   const addLine = useMutation(
     api.lib.proposalPricing.addProposalLineAndRecompute,
   );
@@ -129,6 +138,8 @@ export function ProposalPricingPanel({
     const menuDishId = (editor.menuDishId || undefined) as
       Id<"menuDishes"> | undefined;
     const overrideReason = editor.overrideReason.trim() || undefined;
+    const equipmentId = (editor.equipmentId || undefined) as
+      Id<"equipments"> | undefined;
 
     if (editor.id === "new") {
       const nextSortOrder =
@@ -144,6 +155,7 @@ export function ProposalPricingPanel({
           sortOrder: nextSortOrder,
           menuDishId,
           overrideReason,
+          equipmentId,
         }),
       );
     } else {
@@ -160,6 +172,7 @@ export function ProposalPricingPanel({
           sortOrder: target ? Number(target.sortOrder) : undefined,
           menuDishId,
           overrideReason,
+          equipmentId,
         }),
       );
     }
@@ -212,7 +225,7 @@ export function ProposalPricingPanel({
           No pricing lines on this proposal.
         </p>
       ) : (
-        <table className="data-table mt-2">
+        <table className="data-table phone-cards mt-2">
           <thead>
             <tr>
               <th>Description</th>
@@ -226,21 +239,31 @@ export function ProposalPricingPanel({
           <tbody>
             {rows.map((row, index) => (
               <tr key={row._id}>
-                <td>{row.description}</td>
                 <td>
+                  <strong>{row.description}</strong>
+                  {row.equipmentId ? (
+                    <span className="ml-2 text-2xs text-ink-3">
+                      Rental
+                      {rentalName(row.equipmentId)
+                        ? ` · ${rentalName(row.equipmentId)}`
+                        : ""}
+                    </span>
+                  ) : null}
+                </td>
+                <td data-label="Basis">
                   {PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="Price / %">
                   {Number(row.unitPrice).toFixed(2)}
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="Qty">
                   {row.pricingBasis === "per_unit"
                     ? Number(row.quantity)
                     : row.pricingBasis === "per_person"
                       ? `${guestCount} guests`
                       : "—"}
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="Amount">
                   {(recomputed.lines[index]?.amount ?? 0).toFixed(2)}
                 </td>
                 {editable ? (
@@ -259,6 +282,7 @@ export function ProposalPricingPanel({
                           unit: row.unit ?? "",
                           menuDishId: row.menuDishId ?? "",
                           overrideReason: row.overrideReason ?? "",
+                          equipmentId: row.equipmentId ?? "",
                         })
                       }
                     >
@@ -339,6 +363,35 @@ export function ProposalPricingPanel({
               ))}
             </select>
           </label>
+          <label className="min-w-[12rem]">
+            <span className="field-label">Rental item</span>
+            <select
+              className="input"
+              value={editor.equipmentId}
+              disabled={rentalItems === undefined}
+              onChange={(e) => {
+                const item = rentalItems?.find(
+                  (row) => row.equipmentId === e.target.value,
+                );
+                setEditor({
+                  ...editor,
+                  equipmentId: e.target.value,
+                  description:
+                    item && !editor.description.trim()
+                      ? item.name
+                      : editor.description,
+                });
+              }}
+            >
+              <option value="">— not a rental —</option>
+              {(rentalItems ?? []).map((item) => (
+                <option key={item.equipmentId} value={item.equipmentId}>
+                  {item.name} · {item.category}
+                  {item.ownership === "rented" ? " (rented in)" : ""}
+                </option>
+              ))}
+            </select>
+          </label>
           {editorIsOverride ? (
             <label className="flex-1 min-w-[16rem]">
               <span className="field-label">Why the price changed</span>
@@ -415,6 +468,10 @@ export function ProposalPricingPanel({
         >
           Add line
         </button>
+      ) : null}
+
+      {editable ? (
+        <ProposalTravelFee proposalId={proposalId} onFailure={onFailure} />
       ) : null}
 
       <p className="mt-2 text-base text-ink-2">

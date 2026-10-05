@@ -5,7 +5,7 @@ import { PersonEmailField } from "./PersonEmailField";
 import { PersonEmployeeNumberField } from "./PersonEmployeeNumberField";
 import { PersonIdentityField } from "./PersonIdentityField";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
-import { StaffSignInCell } from "./StaffSignInCell";
+import { StaffSignInCell, type SignInEmailState } from "./StaffSignInCell";
 import type { TeamPerson } from "./TeamPerson";
 
 export function TeamRolesTable({
@@ -17,7 +17,11 @@ export function TeamRolesTable({
   onSetPayRate,
   rateByPersonId,
   onSendSignIn,
+  signInEmailByPersonId,
   onUnlinkAccount,
+  myPersonId,
+  onPauseAccess,
+  onRestoreAccess,
   onNotice,
   onError,
   onBusy,
@@ -30,7 +34,13 @@ export function TeamRolesTable({
   onSetPayRate: (person: TeamPerson, hourlyRate: number) => Promise<void>;
   rateByPersonId: ReadonlyMap<string, number | null>;
   onSendSignIn: (person: TeamPerson) => Promise<void>;
+  /** Saved state of each person's newest sign-in email. */
+  signInEmailByPersonId?: ReadonlyMap<string, SignInEmailState>;
   onUnlinkAccount: (person: TeamPerson) => Promise<void>;
+  /** The signed-in person; their own row has no Pause (it would lock them out). */
+  myPersonId: string | null;
+  onPauseAccess: (person: TeamPerson) => Promise<void>;
+  onRestoreAccess: (person: TeamPerson) => Promise<void>;
   onNotice: (message: string | null) => void;
   onError: (message: string | null) => void;
   onBusy: (key: string | null) => void;
@@ -120,8 +130,13 @@ export function TeamRolesTable({
                   person={person}
                   canEdit={canEdit}
                   busy={busy === person._id}
+                  emailState={signInEmailByPersonId?.get(person._id)}
                   onSendSignIn={onSendSignIn}
                   onUnlink={onUnlinkAccount}
+                  onPause={
+                    person._id === myPersonId ? undefined : onPauseAccess
+                  }
+                  onRestore={onRestoreAccess}
                 />
               </td>
               <td className="border-b border-line px-3 py-3">
@@ -181,7 +196,7 @@ function PersonRoleCell({
 }>) {
   if (!canEdit) {
     return (
-      <span className="chip border-line-2 bg-inset text-ink-2">
+      <span className="chip chip-tone-mute">
         {PersonRoleDirectory.label(person.role)}
       </span>
     );
@@ -205,7 +220,7 @@ function PersonRoleCell({
   );
 }
 
-function PersonPayRateCell({
+export function PersonPayRateCell({
   person,
   rate,
   canEdit,

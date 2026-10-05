@@ -69,7 +69,9 @@ export function EquipmentBulkAddPanel({
     } catch {
       // The caller has already shown the failure; the rows that landed stay
       // in the catalog and the rest are still in the box to retry.
-      setProgress(null);
+      setProgress(
+        `Added ${added} of ${rows.length} before it stopped. Press add again for the rest; items already added are skipped.`,
+      );
       return;
     }
     setProgress(null);

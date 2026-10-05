@@ -1,0 +1,188 @@
+// Capsule closeout — what happened to the food left over after an event:
+// donated to an organization, returned to stock, or thrown out. One row per
+// batch of leftovers. Donated rows carry the recipient and the weight, so a
+// year of rows becomes the donation summary for tax records and Good
+// Samaritan Act files (src/features/finance/DonationSummaryPage.tsx).
+
+use "../foundation/base.manifest"
+
+enum LeftoverDispositionKind {
+  donated
+  returned_to_stock
+  discarded
+}
+
+entity LeftoverDisposition mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  property required disposition: LeftoverDispositionKind = "donated"
+  // What left the kitchen, e.g. "Chicken piccata, 2 hotel pans".
+  property required itemDescription: string = ""
+  // The local calendar day of the hand-off (YYYY-MM-DD). The yearly
+  // summary groups on this, so a late-night donation stays on its own day.
+  property indexed required dispositionDate: string = ""
+  property weightLb: decimal(10, 2)?
+  // Fair market value the caterer claims for the deduction.
+  property estimatedValue: money(12, 2)?
+  property recipientOrganization: string?
+  property recipientEin: string?
+  property recipientAddress: string?
+  property recipientContact: string?
+  // The receipt or acknowledgment letter number from the recipient.
+  property receiptReference: string?
+  // How the food was held and handed off (temperatures, time out of
+  // holding). Good Samaritan protection covers food donated in good faith.
+  property handlingNote: string?
+  property note: string?
+  property recordedAt: datetime?
+  property recordedByPersonId: uuid?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint leftoverDonationRecipient: self.recordedAt == null or self.disposition != "donated" or length(trim(self.recipientOrganization != null ? self.recipientOrganization : "")) > 0 "Name the organization that took the donated food."
+  constraint leftoverDonationWeight: self.recordedAt == null or self.disposition != "donated" or (self.weightLb != null and self.weightLb > 0) "Enter the weight of the donated food in pounds."
+  constraint leftoverAmountsNonnegative: (self.weightLb == null or self.weightLb >= 0) and (self.estimatedValue == null or self.estimatedValue >= 0) "Weight and value can't be negative. Use zero or more."
+
+  // The closeout crew records leftovers; kitchen, event and finance staff
+  // all touch the food or the paperwork.
+  default policy leftoverDispositionRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Finance, event and kitchen staff may see what happened to leftover food"
+  default policy leftoverDispositionWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Finance, event and kitchen staff may log what happened to leftover food"
+  default policy leftoverDispositionExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Finance, event and kitchen staff may log what happened to leftover food"
+
+  command record(
+    eventId: uuid,
+    disposition: LeftoverDispositionKind,
+    itemDescription: string,
+    dispositionDate: string,
+    optional weightLb: decimal(10, 2),
+    optional estimatedValue: money(12, 2),
+    optional recipientOrganization: string,
+    optional recipientEin: string,
+    optional recipientAddress: string,
+    optional recipientContact: string,
+    optional receiptReference: string,
+    optional handlingNote: string,
+    optional note: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only.
+    guard self.event != null and self.event.deletedAt == null
+    constraint recordLeftoverEventMatch: eventId == self.eventId "These leftovers are for a different event. Pick the event already on them."
+    constraint recordLeftoverItem: length(trim(itemDescription)) > 0 "Say what food this is."
+    constraint recordLeftoverDate: length(trim(dispositionDate)) > 0 "Pick the day the food left."
+    constraint recordLeftoverRecipient: disposition != "donated" or length(trim(recipientOrganization != null ? recipientOrganization : "")) > 0 "Name the organization that took the donated food."
+    constraint recordLeftoverWeight: disposition != "donated" or (weightLb != null and weightLb > 0) "Enter the weight of the donated food in pounds."
+    constraint recordLeftoverAmounts: (weightLb == null or weightLb >= 0) and (estimatedValue == null or estimatedValue >= 0) "Weight and value can't be negative. Use zero or more."
+    mutate disposition = disposition
+    mutate itemDescription = trim(itemDescription)
+    mutate dispositionDate = dispositionDate
+    mutate weightLb = weightLb
+    mutate estimatedValue = estimatedValue
+    mutate recipientOrganization = recipientOrganization
+    mutate recipientEin = recipientEin
+    mutate recipientAddress = recipientAddress
+    mutate recipientContact = recipientContact
+    mutate receiptReference = receiptReference
+    mutate handlingNote = handlingNote
+    mutate note = note
+    mutate recordedAt = now()
+    mutate recordedByPersonId = user.personId
+    emit LeftoverDispositionRecorded {
+      leftoverDispositionId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      disposition: disposition
+      dispositionDate: dispositionDate
+      weightLb: weightLb
+      recipientOrganization: recipientOrganization
+    }
+  }
+
+  // Fix a typo, add the receipt number when the letter arrives, or change
+  // what happened to the food. Records stay correctable at any time.
+  command revise(
+    disposition: LeftoverDispositionKind,
+    itemDescription: string,
+    dispositionDate: string,
+    optional weightLb: decimal(10, 2),
+    optional estimatedValue: money(12, 2),
+    optional recipientOrganization: string,
+    optional recipientEin: string,
+    optional recipientAddress: string,
+    optional recipientContact: string,
+    optional receiptReference: string,
+    optional handlingNote: string,
+    optional note: string
+  ) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint reviseLeftoverItem: length(trim(itemDescription)) > 0 "Say what food this is."
+    constraint reviseLeftoverDate: length(trim(dispositionDate)) > 0 "Pick the day the food left."
+    constraint reviseLeftoverRecipient: disposition != "donated" or length(trim(recipientOrganization != null ? recipientOrganization : "")) > 0 "Name the organization that took the donated food."
+    constraint reviseLeftoverWeight: disposition != "donated" or (weightLb != null and weightLb > 0) "Enter the weight of the donated food in pounds."
+    constraint reviseLeftoverAmounts: (weightLb == null or weightLb >= 0) and (estimatedValue == null or estimatedValue >= 0) "Weight and value can't be negative. Use zero or more."
+    mutate disposition = disposition
+    mutate itemDescription = trim(itemDescription)
+    mutate dispositionDate = dispositionDate
+    mutate weightLb = weightLb
+    mutate estimatedValue = estimatedValue
+    mutate recipientOrganization = recipientOrganization
+    mutate recipientEin = recipientEin
+    mutate recipientAddress = recipientAddress
+    mutate recipientContact = recipientContact
+    mutate receiptReference = receiptReference
+    mutate handlingNote = handlingNote
+    mutate note = note
+    emit LeftoverDispositionRevised {
+      leftoverDispositionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      disposition: disposition
+      dispositionDate: dispositionDate
+      weightLb: weightLb
+      recipientOrganization: recipientOrganization
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit LeftoverDispositionRemoved {
+      leftoverDispositionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  store LeftoverDisposition in durable
+}
+
+event LeftoverDispositionRecorded: "leftover_disposition.recorded" {
+  leftoverDispositionId: string
+  tenantId: string
+  eventId: string
+  disposition: string
+  dispositionDate: string
+  weightLb: number?
+  recipientOrganization: string?
+}
+
+event LeftoverDispositionRevised: "leftover_disposition.revised" {
+  leftoverDispositionId: string
+  tenantId: string
+  eventId: string
+  disposition: string
+  dispositionDate: string
+  weightLb: number?
+  recipientOrganization: string?
+}
+
+event LeftoverDispositionRemoved: "leftover_disposition.removed" {
+  leftoverDispositionId: string
+  tenantId: string
+  eventId: string
+}
