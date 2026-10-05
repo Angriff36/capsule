@@ -197,7 +197,7 @@ export function VenueSiteVisitPanel({ venue }: { venue: Doc<"venues"> }) {
               <label key={area.key} className="field-label">
                 <span>{area.label}</span>
                 <textarea
-                  className="input min-h-[4rem] py-2"
+                  className="input min-h-[6rem] py-2"
                   name={area.key}
                   placeholder={area.check}
                 />
