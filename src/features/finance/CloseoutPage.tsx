@@ -35,6 +35,7 @@ import { EventEquipmentProblems } from "../events/EventEquipmentProblems";
 import { canReadEventFoodCost } from "../../lib/culinaryDemandClient";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
+import { useActionPrompt } from "../../ui/action-prompt";
 import {
   closeoutListedCost,
   isCloseoutListProfitPending,
@@ -69,6 +70,7 @@ export function CloseoutPage() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [draft, setDraft] = useState<CloseoutDraft | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const { prompt, host: promptHost } = useActionPrompt(busy != null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const [summaryCloseoutId, setSummaryCloseoutId] = useState<string | null>(
@@ -201,7 +203,24 @@ export function CloseoutPage() {
       }
     };
 
-  const invokeFinalize = (row: { _id: string; version: number }) => {
+  const invokeFinalize = async (
+    row: Parameters<typeof isCloseoutListProfitPending>[0] & {
+      _id: string;
+      version: number;
+    },
+  ) => {
+    // A draft made when the event closed out has no costs until someone
+    // reconciles it; finalizing it as-is freezes $0 cost.
+    if (
+      isCloseoutListProfitPending(row) &&
+      !(await prompt.askConfirm({
+        title: "Finalize with no costs?",
+        description:
+          "Nobody has reconciled this closeout, so it has $0 cost: clocked time, purchases and rentals are not in it yet. Reconcile first to bring them in, or finalize it as it is.",
+        confirmLabel: "Finalize at $0 cost",
+      }))
+    )
+      return;
     void run(`${row._id}:finalize`, async () => {
       await finalize({ docId: row._id, version: row.version });
       setNotice("Closeout finalized. Numbers are frozen.");
@@ -398,7 +417,7 @@ export function CloseoutPage() {
                                   key={action.key}
                                   className="btn btn-ghost btn-sm"
                                   disabled={busy != null}
-                                  onClick={() => invokeFinalize(row)}
+                                  onClick={() => void invokeFinalize(row)}
                                 >
                                   {busy === `${row._id}:${action.key}`
                                     ? "Working…"
@@ -534,6 +553,7 @@ export function CloseoutPage() {
         </Link>{" "}
         for billing collection.
       </p>
+      {promptHost}
     </div>
   );
 }

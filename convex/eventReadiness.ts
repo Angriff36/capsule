@@ -200,9 +200,7 @@ export const getEventReadiness = query({
       inFlightPackListIds: packLists
         .filter(
           (row: any) =>
-            row.status !== "draft" &&
-            row.status !== "dispatched" &&
-            row.status !== "cancelled",
+            row.status !== "dispatched" && row.status !== "cancelled",
         )
         .map((row: any) => String(row._id)),
       inFlightDeliveryIds: deliveries

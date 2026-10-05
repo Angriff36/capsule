@@ -169,10 +169,12 @@ function executionChecks(
 ): StageGateCheck[] | undefined {
   if (!execution) return undefined;
   const { prepTaskIds, packListIds, deliveryIds } = execution;
+  // The readiness view lists only OPEN work, so "done" can also mean there
+  // is none: the done wording says "nothing open", never "packed".
   return [
     {
       key: "prep",
-      label: "Prep finished",
+      label: prepTaskIds.length ? "Prep finished" : "No prep left open",
       done: prepTaskIds.length === 0,
       required: false,
       detail: prepTaskIds.length
@@ -182,7 +184,9 @@ function executionChecks(
     },
     {
       key: "pack",
-      label: "Pack lists packed",
+      label: packListIds.length
+        ? "Pack lists packed"
+        : "No pack list left to pack",
       done: packListIds.length === 0,
       required: false,
       detail: packListIds.length
@@ -201,7 +205,9 @@ function executionChecks(
     },
     {
       key: "deliveries",
-      label: "Deliveries arrived",
+      label: deliveryIds.length
+        ? "Deliveries arrived"
+        : "No delivery still on the way",
       done: deliveryIds.length === 0,
       required: false,
       detail: deliveryIds.length

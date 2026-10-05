@@ -2,7 +2,7 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "b73f1686038a1b81cda7a985d3acf217a718fca2745666614425cd0131ee6c1d"
+      "sha256": "bfb97010770587194d9aaf513a6cd8295891bcf3f8f8b042f289f9248a1a257d"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
@@ -18,10 +18,10 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "e39eb03494a5a5b3d597cdc756b869353ef0a2a84288cd0c06c3168a8254d3c2"
+      "sha256": "1b4c7e4f582458341150fe82e2e88680247865d66fd0ff58324aaff9779d3a91"
     },
     "convex/queries.ts": {
-      "sha256": "2de2a60c811605ba4be0a334da3fe6e8e3d77c983fa443cc62e7d56f1a80ddb6"
+      "sha256": "b31c53634ea28fd730706f7bb2c39ee1fd31429d6e8cfa9b5f84f7d562abc60f"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -30,7 +30,7 @@
       "sha256": "5c06dc991337a26d8eacb53f018e9167e7c215d97288a4cab1946ff81725e7c9"
     },
     "manifest-context-summary.json": {
-      "sha256": "baeb058b77af2925bca65cb0c1440f283831f77c6da503061617448b9d75baaa"
+      "sha256": "ff27bb1c2cdda7447f0628ac29133eeec6a5d278aa40c59772dcac0d8ce89d1a"
     },
     "package.json": {
       "sha256": "8eaec7fa603c3cd1025cac03266f180f8bc33a69369ac3cb861bb3849981aa1c"
@@ -45,10 +45,10 @@
       "sha256": "a7f4abe86f06f54fd5400b7e8aaef07c9e11f0fa8aea6823c2ddf6d376052444"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "c65eb56261d1af1f41d24511fef78c3dea5bc4aaf9f06eba0ac4bec4d23ab1a3"
+      "sha256": "ae94ac4f380a8e7fc2f0c16f33a240e11548f561d01cb26b56b747a41c42084e"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "43a63446cf3f7c1f70d9a4d4c033f7d1a75df85ad5557857aae18b77b53f7736"
+      "sha256": "7898a472f03f1d5cb1189fb099a43b3fa175d21fe3f5a8d6ee45163d9d4c14dd"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "14a7302b007fd3ff133608075ba73169ed7fbb0e881848247a303bfa4eaf27e2"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "1e8581145e0c2df1b0c1084f86799b9f8776c691a55efa422451f8f8313d0b59"
+      "sha256": "655bc03773494742d5479d68e3a6ac50cde4d89a2372fbd1566c8127222bc757"
     }
   },
   "package": {

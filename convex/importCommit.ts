@@ -132,6 +132,7 @@ import {
   type LookAlikeVenue,
 } from "./lib/importIdentity";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
+import { eventLookupFields, type BatchLookups } from "./importEventLookups";
 import {
   matchClientByName,
   type ClientName,
@@ -1119,6 +1120,9 @@ export const commitImportRun = action({
       const delta: DeltaTally = { updated: 0, conflicted: 0 };
       // Read once per batch, only when a row names its client by name.
       let clientNames: ClientName[] | null = null;
+      // Read once per batch, only when a row prints an occasion, referral
+      // source or sales person (TPP's event list report).
+      let lookups: BatchLookups | null = null;
 
       for (const [index, event] of (
         parsed.records as ParsedCapsuleEvent[]
@@ -1332,6 +1336,25 @@ export const commitImportRun = action({
             })
           : null;
 
+        const printed = {
+          occasion: event.occasionName,
+          referralSource: event.referralSourceName,
+          owner: event.ownerName,
+        };
+        if (
+          !lookups &&
+          (printed.occasion || printed.referralSource || printed.owner)
+        )
+          lookups = {
+            ...(await ctx.runQuery(internal.importEventLookups.eventLookups, {
+              tenantId,
+            })),
+            refused: new Set<string>(),
+          };
+        const named = lookups
+          ? await eventLookupFields(ctx, lookups, printed)
+          : {};
+
         const idempotencyKey = `tenant-shared/import:${args.importRunId}:event:${event.externalId}`;
         try {
           const created = await ctx.runMutation(
@@ -1349,6 +1372,11 @@ export const commitImportRun = action({
               venueId,
               serviceStyleId: styleMatch?._id,
               serviceStyleName: styleMatch?.name,
+              occasionId: named.occasionId,
+              occasionName: named.occasionName,
+              referralSourceId: named.referralSourceId,
+              assignedToId: named.assignedToId,
+              ownerName: named.ownerName,
               venueName: event.venueName,
               venueAddress: event.venueAddress,
               accessibilityNeeds: event.accessibilityNeeds,

@@ -105,7 +105,7 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
   // [ \t]* not \s*: an empty server message must stay empty, not borrow the
   // first stack line below it.
   const uncaught = raw.match(
-    /Uncaught (?:DOMException|OperationError|Error):[ \t]*([^\r\n]*)/i,
+    /Uncaught (?:DOMException|OperationError|ConvexError|Error):[ \t]*([^\r\n]*)/i,
   )?.[1];
   const argumentValidation = raw.match(
     /ArgumentValidationError:\s*([^\r\n]+)/i,
@@ -122,7 +122,10 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
     .replace(/^\[CONVEX [^\]]+\]\s*/, "")
     .replace(/\[Request ID:\s*[^\]]+\]\s*/gi, "")
     .replace(/^Server Error\s*/i, "")
-    .replace(/^Uncaught (?:DOMException|OperationError|Error):\s*/i, "")
+    .replace(
+      /^Uncaught (?:DOMException|OperationError|ConvexError|Error):\s*/i,
+      "",
+    )
     .replace(/^Error:\s*/i, "")
     .replace(/\s*Called by client\s*$/i, "")
     .trim();

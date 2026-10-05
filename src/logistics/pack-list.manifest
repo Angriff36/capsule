@@ -199,13 +199,16 @@ entity PackList mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Also "Back to packing" from packed or loaded, so a crew can fix a line
+  // before the truck leaves (the declared transitions allow it). The first
+  // packing start time is kept.
   command startPacking() {
-    guard self.status == "draft"
+    guard self.status == "draft" or self.status == "packed" or self.status == "loaded"
     guard self.openedAt != null
     guard self.deletedAt == null
     compute previousStatus = self.status
     mutate status = "packing"
-    mutate packingStartedAt = now()
+    mutate packingStartedAt = self.packingStartedAt != null ? self.packingStartedAt : now()
     emit PackListPackingStarted {
       packListId: self.id
       tenantId: self.tenantId
