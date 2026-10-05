@@ -3141,6 +3141,13 @@ div.tpp-parameter-wide {
   font-size: 1.15rem;
 }
 
+.tpp-document-logo {
+  display: block;
+  max-width: 12rem;
+  max-height: 5rem;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
 .tpp-document dl > div {
   display: grid;
   grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);

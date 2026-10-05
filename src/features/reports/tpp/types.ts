@@ -137,6 +137,8 @@ export interface TppDocumentSection {
   heading?: string;
   headingLevel?: 3 | 4;
   printContext?: string;
+  /** The company's own logo, printed above the rows (letter and contract head). */
+  logoUrl?: string;
   rows: readonly {
     label?: string;
     value: string;

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { TPP_CONTACT_REPORTS } from "../../src/features/reports/tpp/catalog.contacts";
 import type {
+  TppDocumentSection,
   TppReportResult,
   TppRow,
 } from "../../src/features/reports/tpp/types";
@@ -143,11 +144,14 @@ function birthdayRows(
     }));
 }
 
-/** The company's printed name and address, as the letter and contract head. */
+/**
+ * The company's logo, printed name and address, as the letter and contract
+ * head. Null when the company has none of them.
+ */
 async function companyHeading(
   ctx: QueryCtx,
   tenantId: string,
-): Promise<{ value: string }[]> {
+): Promise<TppDocumentSection | null> {
   const organizations = await ctx.db
     .query("organizations")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -156,12 +160,20 @@ async function companyHeading(
     organizations.find(
       (row) => row.deletedAt == null && row.status === "active",
     ) ?? organizations.find((row) => row.deletedAt == null);
-  return [
+  const rows = [
     organization?.brandDisplayName?.trim() || organization?.name?.trim() || "",
     organization?.brandAddress?.trim() ?? "",
   ]
     .filter(Boolean)
     .map((value) => ({ value }));
+  const storageId = organization?.brandLogoStorageId;
+  const logoId =
+    typeof storageId === "string" && storageId
+      ? ctx.db.system.normalizeId("_storage", storageId)
+      : null;
+  const logoUrl = logoId ? await ctx.storage.getUrl(logoId) : null;
+  if (rows.length === 0 && !logoUrl) return null;
+  return { id: "company", rows, ...(logoUrl ? { logoUrl } : {}) };
 }
 
 /** The kitchen's own time zone, so printed times match the event clock. */
@@ -412,10 +424,10 @@ export const run = query({
       // Lines the writer left empty are left out of the letter.
       const lines = (rows: { label?: string; value: string }[]) =>
         rows.filter((row) => row.value !== "");
-      const companyRows =
+      const company =
         parameters.showCompanyInfo !== false
           ? await companyHeading(ctx, tenantId)
-          : [];
+          : null;
       const letterDate =
         parameters.noLetterDate === true
           ? ""
@@ -428,8 +440,7 @@ export const run = query({
               day: "numeric",
               year: "numeric",
             });
-      const sections = [
-        { id: "company", rows: companyRows },
+      const sections: TppDocumentSection[] = [
         { id: "date", rows: lines([{ value: letterDate }]) },
         {
           id: "recipient",
@@ -474,11 +485,10 @@ export const run = query({
         },
         { id: "cc", rows: lines([{ label: "CC", value: said("cc") }]) },
       ];
-      return document(
-        args.reportId,
-        "contact_letter",
-        sections.filter((section) => section.rows.length > 0),
-      );
+      return document(args.reportId, "contact_letter", [
+        ...(company ? [company] : []),
+        ...sections.filter((section) => section.rows.length > 0),
+      ]);
     }
 
     if (args.reportId === "order-activity-list") {
@@ -716,7 +726,7 @@ export const run = query({
         }));
       const total = proposal?.total ?? event.quotedPrice;
       return document(args.reportId, "contract", [
-        ...(company.length > 0 ? [{ id: "company", rows: company }] : []),
+        ...(company ? [company] : []),
         {
           id: "event",
           heading: "Contract for Service",

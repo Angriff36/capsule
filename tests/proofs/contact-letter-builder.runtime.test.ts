@@ -38,6 +38,13 @@ describe("runtime proof: Contact Letter Builder writes a full letter", () => {
         updatedAt: day,
         deletedAt: null,
       };
+      // The proof context types only db; the convex-test context also stores files.
+      const { storage } = ctx as unknown as {
+        storage: { store(blob: Blob): Promise<string> };
+      };
+      const logoId = await storage.store(
+        new Blob(["logo"], { type: "image/png" }),
+      );
       await ctx.db.insert(
         "organizations" as never,
         {
@@ -45,6 +52,7 @@ describe("runtime proof: Contact Letter Builder writes a full letter", () => {
           name: "Mangia Catering LLC",
           brandDisplayName: "Mangia Catering",
           brandAddress: "22425 East Appleway Ave, Liberty Lake, WA 99019",
+          brandLogoStorageId: String(logoId),
           status: "active",
         } as never,
       );
@@ -87,7 +95,10 @@ describe("runtime proof: Contact Letter Builder writes a full letter", () => {
         cc: "Venue office",
       },
     })) as TppReportResult;
-    expect(full.kind).toBe("document");
+    if (full.kind !== "document") throw new Error("expected a document");
+    // The company's own logo heads the letter, like the old system's letterhead.
+    expect(full.sections[0]?.id).toBe("company");
+    expect(full.sections[0]?.logoUrl).toBeTruthy();
     const text = JSON.stringify(full);
     for (const part of [
       "Mangia Catering",
