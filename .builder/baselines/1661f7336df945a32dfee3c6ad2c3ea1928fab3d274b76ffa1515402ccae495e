@@ -72630,7 +72630,7 @@ export const VenueNote_pin = mutation({
   },
 });
 
-async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, category, content, visibility, isPinned, version }: any, __creation = false) {
+async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, category, content, visibility, isPinned, rating, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -72644,6 +72644,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, c
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
+    if (!(((rating == null) || ((rating >= 1) && (rating <= 10))))) throw new Error("Give a score from 1 to 10");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -72657,6 +72658,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, c
       content: content,
       visibility: visibility,
       isPinned: isPinned,
+      rating: rating,
       postedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -72678,6 +72680,7 @@ export const VenueNote_post = mutation({
     content: v.string(),
     visibility: v.optional(v.any()),
     isPinned: v.optional(v.boolean()),
+    rating: v.optional(v.any()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -72705,6 +72708,7 @@ export const VenueNote_createViaPost = mutation({
     content: v.string(),
     visibility: v.optional(v.any()),
     isPinned: v.optional(v.boolean()),
+    rating: v.optional(v.any()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -72717,7 +72721,7 @@ export const VenueNote_createViaPost = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"venueId","table":"venues"},{"name":"eventId","table":"events"},{"name":"authorPersonId","table":"people"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { venueId, eventId, category, content, visibility, isPinned } = args;
+    const { venueId, eventId, category, content, visibility, isPinned, rating } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       isPinned: args.isPinned !== undefined ? args.isPinned : false,
@@ -72727,6 +72731,7 @@ export const VenueNote_createViaPost = mutation({
       category: args.category,
       content: args.content,
       eventId: args.eventId,
+      rating: args.rating,
       venueId: args.venueId
     };
     if (!((checkRole(user, "eventAccess") && ((__draft.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
@@ -72737,6 +72742,7 @@ export const VenueNote_createViaPost = mutation({
     if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((content).trim()).length > 0))) throw new Error("Write something in this note.");
+    if (!(((rating == null) || ((rating >= 1) && (rating <= 10))))) throw new Error("Give a score from 1 to 10");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -72750,6 +72756,7 @@ export const VenueNote_createViaPost = mutation({
     doc.content = content;
     doc.visibility = visibility;
     doc.isPinned = isPinned;
+    doc.rating = rating;
     doc.postedAt = Date.now();
     const docId = await ctx.db.insert("venueNotes", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, noteId: docId, tenantId: doc.tenantId, venueId: venueId, eventId: eventId, category: category, isPinned: isPinned, _subject: { entity: "VenueNote", command: "post", id: docId } };

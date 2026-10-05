@@ -4631,8 +4631,8 @@ const COMMAND_DISPATCH = {
   },
   "VenueNote.post": {
     ref: api.mutations.VenueNote_createViaPost,
-    params: ["venueId","eventId","category","content","visibility","isPinned","idempotencyKey"] as const,
-    paramMeta: [{"name":"venueId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"category","type":"VenueNoteCategory","required":true},{"name":"content","type":"string","required":true},{"name":"visibility","type":"VenueNoteVisibility","required":false},{"name":"isPinned","type":"boolean","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["venueId","eventId","category","content","visibility","isPinned","rating","idempotencyKey"] as const,
+    paramMeta: [{"name":"venueId","type":"uuid","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"category","type":"VenueNoteCategory","required":true},{"name":"content","type":"string","required":true},{"name":"visibility","type":"VenueNoteVisibility","required":false},{"name":"isPinned","type":"boolean","required":false},{"name":"rating","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VenueNote.remove": {
     ref: api.mutations.VenueNote_remove,

@@ -14,6 +14,12 @@ enum VenueNoteCategory {
   // problem or damage at the venue (Venue Partner Playbook sections 03-05, 13).
   check_in
   incident
+  // After-event follow-up at a partner venue (playbook section 13): the
+  // thank-you to the venue, the client's answers about the venue, and the
+  // team debrief.
+  thank_you
+  client_feedback
+  debrief
   other
 }
 
@@ -40,6 +46,9 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
   property isPinned: boolean = false
   property required visibility: VenueNoteVisibility = "internal"
   property postedAt: datetime?
+  // The client's 1-10 score for the venue and our food on a client_feedback
+  // note (venue scorecard "Client satisfaction").
+  property rating: int?
 
   belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
   belongsTo event: Event? fields [tenantId, eventId] references [tenantId, id]
@@ -59,13 +68,15 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
     category: VenueNoteCategory,
     content: string,
     optional visibility: VenueNoteVisibility,
-    optional isPinned: boolean
+    optional isPinned: boolean,
+    optional rating: number
   ) {
     guard self.postedAt == null
     guard self.deletedAt == null
     guard user.id != null
     guard user.personId != null
     constraint postVenueNoteContent: length(trim(content)) > 0 "Write something in this note."
+    constraint postVenueNoteRating: rating == null or (rating >= 1 and rating <= 10) "Give a score from 1 to 10"
     mutate venueId = venueId
     mutate eventId = eventId
     mutate authorPersonId = user.personId
@@ -75,6 +86,7 @@ entity VenueNote mixin TenantScoped, SoftDeletable {
     mutate content = content
     mutate visibility = visibility
     mutate isPinned = isPinned
+    mutate rating = rating
     mutate postedAt = now()
     emit VenueNotePosted {
       noteId: self.id

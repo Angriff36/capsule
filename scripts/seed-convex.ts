@@ -932,9 +932,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // VenueNote has multiple initialization commands (post, remove); using the selected initialization command: post.
   // VenueNote → api.mutations.VenueNote_createViaPost
   rowsAttempted += 1;
-  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-1", "eventId": "event-1", "category": "demo-category-1", "content": "demo-content-1", "isPinned": false, "visibility": "demo-visibility-1" } as any);
+  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-1", "eventId": "event-1", "category": "demo-category-1", "content": "demo-content-1", "isPinned": false, "visibility": "demo-visibility-1", "rating": 1 } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-2", "eventId": "event-2", "category": "demo-category-2", "content": "demo-content-2", "isPinned": false, "visibility": "demo-visibility-2" } as any);
+  await client.mutation(api.mutations.VenueNote_createViaPost, { "venueId": "venueId-venue-note-2", "eventId": "event-2", "category": "demo-category-2", "content": "demo-content-2", "isPinned": false, "visibility": "demo-visibility-2", "rating": 2 } as any);
   // VenueRoom has multiple initialization commands (add, remove); using the selected initialization command: add.
   // VenueRoom → api.mutations.VenueRoom_createViaAdd
   rowsAttempted += 1;

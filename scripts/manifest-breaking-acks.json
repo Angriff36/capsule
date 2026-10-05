@@ -2778,6 +2778,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Venue-exclusive menu items: optional venue a dish is offered only at; existing dishes stay offered anywhere."
+    },
+    {
+      "path": "VenueNote.rating",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "After-event venue follow-up: optional 1-10 client score on a client feedback note; existing notes stay valid with none."
+    },
+    {
+      "path": "post.parameters.rating",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "After-event venue follow-up: VenueNote.post takes an optional client score; existing callers send none."
     }
   ]
 }

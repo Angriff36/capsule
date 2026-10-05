@@ -5000,11 +5000,12 @@ export const VenueNoteSchema = z.object({
   authorPersonId: z.string().uuid(),
   authorName: z.string().default(""),
   authorAuthSubjectId: z.string().nullable().optional(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "other"]).default("other"),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "other"]).default("other"),
   content: z.string().default(""),
   isPinned: z.boolean().optional().default(false),
   visibility: z.enum(["public", "internal", "management_only"]).default("internal"),
   postedAt: z.coerce.date().nullable().optional(),
+  rating: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -13126,10 +13127,11 @@ export type VenueNotePinParams = z.infer<typeof VenueNotePinParamsSchema>;
 export const VenueNotePostParamsSchema = z.object({
   venueId: z.string().min(1),
   eventId: z.string().min(1).optional(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "other"]),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "other"]),
   content: z.string(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
   isPinned: z.boolean().optional(),
+  rating: z.number().optional(),
 });
 
 export type VenueNotePostParams = z.infer<typeof VenueNotePostParamsSchema>;
@@ -13142,7 +13144,7 @@ export type VenueNoteRemoveParams = z.infer<typeof VenueNoteRemoveParamsSchema>;
 // Command: revise on VenueNote
 export const VenueNoteReviseParamsSchema = z.object({
   content: z.string(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "other"]).optional(),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "other"]).optional(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
 });
 
