@@ -5018,6 +5018,10 @@ export const VenueNoteSchema = z.object({
   visibility: z.enum(["public", "internal", "management_only"]).default("internal"),
   postedAt: z.coerce.date().nullable().optional(),
   rating: z.number().int().nullable().optional(),
+  escalationLevel: z.number().int().nullable().optional(),
+  resolvedAt: z.coerce.date().nullable().optional(),
+  resolvedByName: z.string().nullable().optional(),
+  resolution: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -13166,6 +13170,13 @@ export const VenueLayoutTemplateReviseParamsSchema = z.object({
 
 export type VenueLayoutTemplateReviseParams = z.infer<typeof VenueLayoutTemplateReviseParamsSchema>;
 
+// Command: closeProblem on VenueNote
+export const VenueNoteCloseProblemParamsSchema = z.object({
+  resolution: z.string(),
+});
+
+export type VenueNoteCloseProblemParams = z.infer<typeof VenueNoteCloseProblemParamsSchema>;
+
 // Command: pin on VenueNote
 export const VenueNotePinParamsSchema = z.object({});
 
@@ -13180,6 +13191,7 @@ export const VenueNotePostParamsSchema = z.object({
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
   isPinned: z.boolean().optional(),
   rating: z.number().optional(),
+  escalationLevel: z.number().optional(),
 });
 
 export type VenueNotePostParams = z.infer<typeof VenueNotePostParamsSchema>;

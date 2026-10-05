@@ -2786,6 +2786,36 @@
       "reason": "After-event venue follow-up: optional 1-10 client score on a client feedback note; existing notes stay valid with none."
     },
     {
+      "path": "VenueNote.escalationLevel",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels (playbook section 14): optional level 1-4 on a problem note; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.resolution",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: optional text of how a problem was settled; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.resolvedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: optional time a problem was settled; existing notes stay valid with none."
+    },
+    {
+      "path": "VenueNote.resolvedByName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: optional name of who settled a problem; existing notes stay valid with none."
+    },
+    {
+      "path": "post.parameters.escalationLevel",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue problem levels: VenueNote.post takes an optional level; existing callers send none."
+    },
+    {
       "path": "post.parameters.rating",
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-05",

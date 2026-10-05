@@ -920,6 +920,7 @@ import {
   VenueLayoutTemplateDefineParamsSchema,
   VenueLayoutTemplateReactivateParamsSchema,
   VenueLayoutTemplateReviseParamsSchema,
+  VenueNoteCloseProblemParamsSchema,
   VenueNotePinParamsSchema,
   VenueNotePostParamsSchema,
   VenueNoteRemoveParamsSchema,
@@ -13869,6 +13870,16 @@ export function useGetVenueNote(id: string | "skip") {
   return useQuery(api.queries.getVenueNote, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for VenueNote.closeProblem. */
+export function useVenueNoteCloseProblem() {
+  const mutate = useMutation(api.mutations.VenueNote_closeProblem);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueNoteCloseProblemParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for VenueNote.pin. */
 export function useVenueNotePin() {
   const mutate = useMutation(api.mutations.VenueNote_pin);
@@ -14185,4 +14196,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1499 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1500 as const;
