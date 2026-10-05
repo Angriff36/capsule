@@ -1426,6 +1426,9 @@ export const EventGuestSchema = z.object({
   declineReason: z.string().nullable().optional(),
   checkedInAt: z.coerce.date().nullable().optional(),
   tableAssignment: z.string().nullable().optional(),
+  entreeEventDishId: z.string().uuid().nullable().optional(),
+  seatNumber: z.number().int().nullable().optional(),
+  placeCardName: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -7593,6 +7596,15 @@ export const EventDishLineOverrideRevokeParamsSchema = z.object({
 });
 
 export type EventDishLineOverrideRevokeParams = z.infer<typeof EventDishLineOverrideRevokeParamsSchema>;
+
+// Command: assignMeal on EventGuest
+export const EventGuestAssignMealParamsSchema = z.object({
+  entreeEventDishId: z.string().min(1).optional(),
+  seatNumber: z.number().int().optional(),
+  placeCardName: z.string().optional(),
+});
+
+export type EventGuestAssignMealParams = z.infer<typeof EventGuestAssignMealParamsSchema>;
 
 // Command: assignTable on EventGuest
 export const EventGuestAssignTableParamsSchema = z.object({
