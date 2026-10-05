@@ -459,6 +459,11 @@ const VenuesPage = lazy(() =>
     default: module.VenuesPage,
   })),
 );
+const VenuePartnersPage = lazy(() =>
+  import("../features/facilities/VenuePartnersPage").then((module) => ({
+    default: module.VenuePartnersPage,
+  })),
+);
 const VenueDetailPage = lazy(() =>
   import("../features/facilities/VenueDetailPage").then((module) => ({
     default: module.VenueDetailPage,
@@ -1502,6 +1507,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <VenueLayoutTemplatesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/partners"
+              element={
+                <SupplyRoute>
+                  <VenuePartnersPage />
                 </SupplyRoute>
               }
             />

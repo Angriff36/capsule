@@ -2,6 +2,11 @@ export const FACILITIES_SECTIONS = [
   { key: "equipment", label: "Equipment", path: "/facilities/equipment" },
   { key: "venues", label: "Venues", path: "/facilities/venues" },
   {
+    key: "venue-partners",
+    label: "Venue partners",
+    path: "/facilities/venues/partners",
+  },
+  {
     key: "layout-templates",
     label: "Layout Templates",
     path: "/facilities/venues/templates",
