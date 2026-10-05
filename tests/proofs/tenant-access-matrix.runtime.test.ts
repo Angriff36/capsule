@@ -221,6 +221,9 @@ const LINK_TABLE: Record<string, string> = {
   loadRuleId: "@outside",
   locationId: "storageLocations",
   locationIds: "storageLocations",
+  // Venue branding logo and the partner venue's relationship owner.
+  logoStorageId: "@file",
+  partnerOwnerPersonId: "people",
   // Dish versions (2026-10-04): the main dish a version belongs to.
   mainDishId: "dishes",
   maintenanceScheduleId: "vehicleMaintenanceSchedules",
