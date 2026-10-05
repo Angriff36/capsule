@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { createElement } from "react";
-import { expect, it } from "vitest";
+import { act, createElement } from "react";
+import { expect, it, vi } from "vitest";
 import {
   backend,
   button,
@@ -132,4 +132,42 @@ it("corrects a final closeout with a reason and lists the earlier results", asyn
     reason: "Late produce invoice",
     entered: { ingredient: 700, labor: 950 },
   });
+});
+
+it("asks before finalizing a closeout nobody has reconciled", async () => {
+  vi.useFakeTimers();
+  try {
+    backend.values.set("useListEvent", [
+      { _id: "event-a", title: "Harborview supper", stage: "closed_out" },
+    ]);
+    backend.values.set("useListEventCloseout", [
+      {
+        _id: "closeout-a",
+        eventId: "event-a",
+        version: 1,
+        status: "draft",
+        capturedAt: 1,
+        actualRevenue: 0,
+        totalActualCost: 0,
+        grossProfit: 0,
+      },
+    ]);
+    sourcesFor({ _id: "closeout-a", version: 1, status: "draft", revision: 0 });
+    const finalize = command("useEventCloseoutFinalize", {});
+    await mount(createElement(CloseoutPage));
+    await click(button("Finalize"));
+    const prompt = container.querySelector<HTMLFormElement>(
+      "[data-action-prompt]",
+    )!;
+    expect(prompt.textContent).toContain("Finalize with no costs?");
+    expect(finalize).not.toHaveBeenCalled();
+    await act(async () => vi.advanceTimersByTime(1000));
+    await click(button("Finalize at $0 cost", prompt));
+    expect(finalize).toHaveBeenCalledExactlyOnceWith({
+      docId: "closeout-a",
+      version: 1,
+    });
+  } finally {
+    vi.useRealTimers();
+  }
 });
