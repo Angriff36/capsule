@@ -8,6 +8,7 @@ import {
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
+import { inquiryVenueMatch } from "./lib/quoteInquiryVenue";
 import {
   quotePickValidator,
   resolveQuoteSelections,
@@ -834,6 +835,14 @@ export const processQuoteSubmission = action({
             Number.isFinite(rawEnd) && rawEnd > eventStart
               ? rawEnd
               : eventStart + 4 * 60 * 60 * 1000;
+          // The typed venue joins a saved venue only when one saved venue
+          // has that name and an address to drive to (lib/quoteInquiryVenue).
+          const savedVenue = submission.venueName?.trim()
+            ? inquiryVenueMatch(
+                submission.venueName,
+                await ctx.runQuery(api.queries.listVenue),
+              )
+            : null;
           const eventResult = await ctx.runMutation(
             api.mutations.Event_createViaPlanEngagement,
             {
@@ -850,6 +859,7 @@ export const processQuoteSubmission = action({
               occasionId: submission.occasionId ?? undefined,
               venueName: submission.venueName ?? undefined,
               venueAddress: submission.venueAddress ?? undefined,
+              venueId: savedVenue?._id ?? undefined,
               // The event keeps the lead's "how they heard about us", so
               // reports filtered by referral source and the venue partner
               // figures count it.
