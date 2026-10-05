@@ -140,7 +140,8 @@ export function EventRequirementsPanel({ eventId }: { eventId: Id<"events"> }) {
       </div>
       {kinds.length === 0 ? (
         <p className="text-sm text-ink-3">
-          Nothing listed yet. Add dishes, hold equipment or open the pack list.
+          Nothing listed yet. Food shows here from the ingredients in the
+          dishes' recipes; hold equipment or open the pack list for the rest.
         </p>
       ) : (
         kinds.map((group) => (
