@@ -7,7 +7,7 @@ export type ActionResult = {
   id: number;
   kind: ActionResultKind;
   message: string;
-  links?: ActionResultLink[];
+  links?: readonly ActionResultLink[];
 };
 
 type Listener = (result: ActionResult | null) => void;
@@ -40,7 +40,7 @@ export class ActionResultStore {
     return this.result;
   }
 
-  ok(message: string, links?: ActionResultLink[]): void {
+  ok(message: string, links?: readonly ActionResultLink[]): void {
     this.publish(message.trim(), "ok", OK_DISMISS_MS, links);
   }
 
@@ -58,7 +58,7 @@ export class ActionResultStore {
     message: string,
     kind: ActionResultKind,
     dismissMs: number,
-    links?: ActionResultLink[],
+    links?: readonly ActionResultLink[],
   ): void {
     if (!message) return;
     this.clearTimer();
@@ -87,7 +87,7 @@ export class ActionResultStore {
 
 export function reportActionOk(
   message: string,
-  links?: ActionResultLink[],
+  links?: readonly ActionResultLink[],
 ): void {
   ActionResultStore.shared.ok(message, links);
 }

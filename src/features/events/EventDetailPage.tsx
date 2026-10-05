@@ -109,6 +109,7 @@ import {
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
 import type { Doc } from "../../lib/api";
+import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -260,14 +261,17 @@ function EventDetailContent({
     setSearchParams(next, { replace: true, state: location.state });
   };
 
-  const run = async (work: () => Promise<unknown>, okMessage = "Saved") => {
+  const run = async (
+    work: () => Promise<unknown>,
+    okMessage: string | null = "Saved",
+  ) => {
     setFailure(null);
     setBusy(true);
     try {
       await work();
       setReasonFor(null);
       setReason("");
-      notifySuccess(okMessage);
+      if (okMessage) notifySuccess(okMessage);
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -844,11 +848,14 @@ function EventDetailContent({
           onClose={() => setCascadePreview(null)}
           onConfirm={() => {
             const args = { docId: event._id, version };
-            void run(
-              () =>
-                cascadePreview === "approve" ? approve(args) : closeOut(args),
-              "Stage updated",
-            );
+            if (cascadePreview === "approve")
+              void run(async () => {
+                await approve(args);
+                new AutomationCascadeFeedbackManager(
+                  notifySuccess,
+                ).eventApproved(event._id);
+              }, null);
+            else void run(() => closeOut(args), "Stage updated");
           }}
         />
       ) : null}
