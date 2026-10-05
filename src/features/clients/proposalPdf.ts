@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import {
+  formatCodeAsWords,
   formatCountNoun,
   formatMoneyExact,
   formatTime as formatTimeShared,
@@ -313,7 +314,12 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   const overview = [
     ["Event", String(proposal.title || "Catering event")],
     ["Date", dateText(proposal.eventDate)],
-    ["Format", String(proposal.eventType || "To be confirmed")],
+    [
+      "Format",
+      proposal.eventType
+        ? formatCodeAsWords(String(proposal.eventType))
+        : "To be confirmed",
+    ],
     ["Guests", String(Number(proposal.guestCount ?? 0) || "To be confirmed")],
     [
       "Venue",

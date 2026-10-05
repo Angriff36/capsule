@@ -1488,3 +1488,41 @@ describe("review fixes: adjust override and duplicate sub-recipe edges", () => {
     expect(plan.create).toHaveLength(2);
   });
 });
+
+describe("unwritten recipe reached twice in one dish", () => {
+  it("lists the recipe once", () => {
+    const sauce = component({ id: "cmp-sauce", name: "House sauce" });
+    const dish: DishLike = {
+      id: "dish-two-sauces",
+      name: "Chicken with house sauce",
+      kind: "food",
+      ingredientLines: [],
+      componentLines: [
+        {
+          id: "dc-sauce-a",
+          componentId: "cmp-sauce",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+          quantityBasis: "as_produced",
+        },
+        {
+          id: "dc-sauce-b",
+          componentId: "cmp-sauce",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+          quantityBasis: "as_produced",
+        },
+      ],
+      tasks: [],
+    };
+    const demand = expandEventDish(
+      eventDish({ id: "ed-two", dishId: dish.id, quantityServings: 10 }),
+      lookups({ dishes: [dish], components: [sauce] }),
+    );
+    expect(
+      demand.unresolved.filter(
+        (u) => u.kind === "recipe_content" && u.refId === "cmp-sauce",
+      ),
+    ).toHaveLength(1);
+  });
+});

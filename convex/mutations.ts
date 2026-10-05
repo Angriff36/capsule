@@ -51460,7 +51460,7 @@ async function __runProductionBatchPlan(ctx: MutationCtx, { docId, componentId, 
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "planned"))) throw new Error("Guard 1 failed");
     if (!(((doc.plannedAt == null) || (doc.componentId === componentId)))) throw new Error("Guard 2 failed");
-    if (!(((doc.plannedAt != null) || ((__rel_component != null) && (__rel_component.status === "published"))))) throw new Error("Guard 3 failed");
+    if (!(((doc.plannedAt != null) || (__rel_component != null)))) throw new Error("Guard 3 failed");
     if (!((componentId === doc.componentId))) throw new Error("This batch is for a different component. Pick the component already on this batch.");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This batch is for a different event. Pick the event already on this batch, or leave it blank.");
     if (!(((plannedYield > 0) || (doc.plannedYield > 0)))) throw new Error("Enter a planned yield more than zero.");
@@ -51557,7 +51557,7 @@ export const ProductionBatch_createViaPlan = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "planned"))) throw new Error("Guard 1 failed");
     if (!(((__draft.plannedAt == null) || (__draft.componentId === componentId)))) throw new Error("Guard 2 failed");
-    if (!(((__draft.plannedAt != null) || ((__rel_component != null) && (__rel_component.status === "published"))))) throw new Error("Guard 3 failed");
+    if (!(((__draft.plannedAt != null) || (__rel_component != null)))) throw new Error("Guard 3 failed");
     if (!((componentId === __draft.componentId))) throw new Error("This batch is for a different component. Pick the component already on this batch.");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This batch is for a different event. Pick the event already on this batch, or leave it blank.");
     if (!(((plannedYield > 0) || (__draft.plannedYield > 0)))) throw new Error("Enter a planned yield more than zero.");

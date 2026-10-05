@@ -352,7 +352,11 @@ function expandComponent(
     return;
   }
   const nextPath = [...path, component.id];
-  const status = componentContentStatus(component);
+  // A recipe reached by two paths in one dish is listed once.
+  const listed = out.unresolved.some(
+    (item) => item.kind === "recipe_content" && item.eventDishId === eventDish.id && item.refId === component.id,
+  );
+  const status = listed ? "complete" : componentContentStatus(component);
   if (status === "both_missing" || status === "ingredients_missing") {
     out.unresolved.push({
       kind: "recipe_content",
