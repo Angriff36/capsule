@@ -93,7 +93,7 @@ function LeftoverRows({
       </datalist>
       {rows.map(({ l, i }) => (
         <div key={i} className="flex flex-wrap items-end gap-2">
-          <label className="min-w-0 flex-1">
+          <label className="min-w-0 basis-full sm:basis-auto sm:flex-1">
             <span className="sr-only">Item</span>
             <input
               className="input block w-full"
@@ -250,6 +250,7 @@ export function MudaInput({
           brought back to the kitchen.
         </p>
         <LeftoverRows kind="main" muda={muda} menu={menu} onChange={onChange} />
+        <p className="pt-1 text-ink">How were the leftovers handled?</p>
         <div className="flex flex-wrap gap-4">
           {(Object.keys(LEFTOVER_HANDLING_LABEL) as LeftoverHandling[]).map(
             (key) => (
