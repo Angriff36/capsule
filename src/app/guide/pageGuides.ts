@@ -637,7 +637,20 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Closeout",
     purpose:
       "The financial wrap-up after each event — what it earned, what it cost.",
-    steps: ["Close out each event within a few days while it's fresh."],
+    steps: [
+      "Close out each event within a few days while it's fresh.",
+      "Open Leftovers on the closeout to record food donated, returned to stock, or thrown out.",
+    ],
+  },
+  {
+    prefix: "/finance/donations",
+    title: "Food donations",
+    purpose:
+      "A year of donated leftovers by recipient, for the tax file and Good Samaritan records.",
+    steps: [
+      "Pick the year and print the summary.",
+      "Chase any donation that still has no receipt number.",
+    ],
   },
   {
     prefix: "/finance/payroll",
