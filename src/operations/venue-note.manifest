@@ -22,6 +22,9 @@ enum VenueNoteCategory {
   debrief
   // The joint "featured at" social post after an event there (section 06).
   social_post
+  // A structured walk-through of the venue (section 08): load-in, kitchen,
+  // event space, bar, bathrooms, storage, parking, power, and concerns.
+  site_visit
   other
 }
 

@@ -4647,7 +4647,7 @@ export default defineSchema({
     authorPersonId: v.id("people"),
     authorName: v.string(),
     authorAuthSubjectId: v.optional(v.union(v.string(), v.null())),
-    category: v.union(v.literal("access"), v.literal("logistics"), v.literal("catering"), v.literal("equipment"), v.literal("staffing"), v.literal("restrictions"), v.literal("policies"), v.literal("weather_contingency"), v.literal("check_in"), v.literal("incident"), v.literal("thank_you"), v.literal("client_feedback"), v.literal("debrief"), v.literal("social_post"), v.literal("other")),
+    category: v.union(v.literal("access"), v.literal("logistics"), v.literal("catering"), v.literal("equipment"), v.literal("staffing"), v.literal("restrictions"), v.literal("policies"), v.literal("weather_contingency"), v.literal("check_in"), v.literal("incident"), v.literal("thank_you"), v.literal("client_feedback"), v.literal("debrief"), v.literal("social_post"), v.literal("site_visit"), v.literal("other")),
     content: v.string(),
     isPinned: v.optional(v.boolean()),
     visibility: v.union(v.literal("public"), v.literal("internal"), v.literal("management_only")),
