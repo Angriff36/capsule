@@ -68,6 +68,8 @@ export interface PartnerScorecard {
   contactOverdue: boolean;
   eventsLastYear: number;
   revenueLastYear: number;
+  /** Booked value of the 12 months before the last 12. */
+  revenuePriorYear: number;
   averagePerEvent: number;
   referralsSent: number;
   referralsBooked: number;
@@ -145,6 +147,25 @@ export function partnerScorecard(input: {
       (Number.isFinite(Number(row.quotedPrice)) ? Number(row.quotedPrice) : 0),
     0,
   );
+  // The 12 months before those, for the playbook's 40% drop sunset rule.
+  const revenuePriorYear = input.events
+    .filter(
+      (row) =>
+        row.deletedAt == null &&
+        String(row.venueId ?? "") === venueId &&
+        row.stage !== "cancelled" &&
+        typeof row.startsAt === "number" &&
+        now - row.startsAt > YEAR &&
+        now - row.startsAt <= 2 * YEAR,
+    )
+    .reduce(
+      (sum, row) =>
+        sum +
+        (Number.isFinite(Number(row.quotedPrice))
+          ? Number(row.quotedPrice)
+          : 0),
+      0,
+    );
 
   const sources = new Set(
     input.referralSources
@@ -183,6 +204,10 @@ export function partnerScorecard(input: {
     (lastReferralAt == null || now - lastReferralAt > HALF_YEAR)
   )
     warnings.push("No leads from this venue in 6 months");
+  if (revenuePriorYear > 0 && revenueLastYear <= revenuePriorYear * 0.6)
+    warnings.push(
+      `Booked value down ${Math.round((1 - revenueLastYear / revenuePriorYear) * 100)}% on the 12 months before`,
+    );
 
   return {
     lastContactAt,
@@ -191,6 +216,7 @@ export function partnerScorecard(input: {
       lastContactAt == null || (daysSinceContact ?? 0) > CONTACT_DAYS,
     eventsLastYear: yearEvents.length,
     revenueLastYear,
+    revenuePriorYear,
     averagePerEvent: yearEvents.length
       ? revenueLastYear / yearEvents.length
       : 0,

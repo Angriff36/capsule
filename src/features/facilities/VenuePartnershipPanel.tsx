@@ -7,6 +7,7 @@ import {
   useListLead,
   useListPerson,
   useListReferralSource,
+  useListVenue,
   useListVenueNote,
   useReferralSourceLinkVenue,
   useVenueSetPartnership,
@@ -21,6 +22,8 @@ import { useAllEventReportRows } from "./useEventsById";
 import { VenueBrandForm } from "./VenueBrandForm";
 import { VenueHandoffPanel } from "./VenueHandoffPanel";
 import { VenueOnboardingPanel } from "./VenueOnboardingPanel";
+import { VenueReferralsPanel } from "./VenueReferralsPanel";
+import { topReferringVenue } from "./venueReferrals";
 import { ownerProblem } from "./venueHandoff";
 import {
   CONTACT_DAYS,
@@ -70,6 +73,7 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
   const notes = useListVenueNote();
   const sources = useListReferralSource();
   const leads = useListLead();
+  const venues = useListVenue();
   const events = useAllEventReportRows();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -95,6 +99,18 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
   const linkedSource = (sources ?? []).find(
     (source) =>
       source.deletedAt == null && String(source.venueId ?? "") === venueId,
+  );
+  const topVenueId = useMemo(
+    () =>
+      topReferringVenue({
+        venueIds: (venues ?? [])
+          .filter((row) => row.deletedAt == null && row.partnerTier)
+          .map((row) => String(row._id)),
+        sources: sources ?? [],
+        leads: leads ?? [],
+        now: Date.now(),
+      }),
+    [venues, sources, leads],
   );
   const tier = venue.partnerTier as PartnerTier | null | undefined;
   const ownerWarning = ownerProblem({
@@ -411,10 +427,18 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
             <VenueBrandForm venue={venue} run={run} busy={busy} />
 
             {linkedSource ? (
-              <p className="text-sm text-ink-3">
-                Leads from this venue: pick the lead source “{linkedSource.name}
-                ” on the lead.
-              </p>
+              <>
+                <VenueReferralsPanel
+                  venueId={venueId}
+                  sources={sources ?? []}
+                  leads={leads ?? []}
+                  isTopVenue={topVenueId === venueId}
+                />
+                <p className="text-sm text-ink-3">
+                  Leads from this venue: pick the lead source “
+                  {linkedSource.name}” on the lead.
+                </p>
+              </>
             ) : (
               <button
                 className="btn btn-ghost"

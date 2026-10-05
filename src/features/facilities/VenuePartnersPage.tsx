@@ -13,6 +13,7 @@ import { venueDetailPath } from "./facilitiesRoutes";
 import { useAllEventReportRows } from "./useEventsById";
 import { handoffStatus, ownerProblem } from "./venueHandoff";
 import { onboardingStatus } from "./venueOnboarding";
+import { REWARDS, referralReport, topReferringVenue } from "./venueReferrals";
 import {
   CONTACT_DAYS,
   PARTNER_TIER_LABELS,
@@ -46,8 +47,16 @@ export function VenuePartnersPage() {
         .filter((person) => person.deletedAt == null)
         .map((person) => String(person._id)),
     );
-    return (venues ?? [])
-      .filter((venue) => venue.deletedAt == null && venue.partnerTier)
+    const partners = (venues ?? []).filter(
+      (venue) => venue.deletedAt == null && venue.partnerTier,
+    );
+    const topVenueId = topReferringVenue({
+      venueIds: partners.map((venue) => String(venue._id)),
+      sources: sources ?? [],
+      leads: leads ?? [],
+      now,
+    });
+    return partners
       .map((venue) => {
         const owner = (people ?? []).find(
           (person) =>
@@ -81,8 +90,18 @@ export function VenuePartnersPage() {
           now,
           formatDate,
         });
+        const referrals = referralReport({
+          venueId: String(venue._id),
+          sources: sources ?? [],
+          leads: leads ?? [],
+          now,
+        });
         return {
           venue,
+          reward:
+            String(venue._id) === topVenueId
+              ? ("elite" as const)
+              : referrals.reward,
           ownerName: owner
             ? [owner.givenName, owner.familyName].filter(Boolean).join(" ")
             : null,
@@ -91,6 +110,7 @@ export function VenuePartnersPage() {
             ...(ownerWarning ? [ownerWarning] : []),
             ...(handoff?.reminders ?? []),
             ...(onboarding?.reminders ?? []),
+            ...referrals.reminders,
             ...card.warnings,
           ],
         };
@@ -129,7 +149,7 @@ export function VenuePartnersPage() {
             {overdue > 0 ? ` · ${overdue} need a check-in` : ""}
           </p>
           <ul className="space-y-3">
-            {rows.map(({ venue, ownerName, card, warnings }) => (
+            {rows.map(({ venue, ownerName, card, warnings, reward }) => (
               <li
                 key={venue._id}
                 className={`rounded-sm border bg-panel p-4 ${card.contactOverdue ? "border-warn" : "border-line"}`}
@@ -148,6 +168,7 @@ export function VenuePartnersPage() {
                 <p className="text-sm text-ink-3">
                   {PARTNER_TIER_LABELS[venue.partnerTier as PartnerTier]} ·{" "}
                   {ownerName ?? "No owner yet"}
+                  {reward ? ` · Reward: ${REWARDS[reward].label}` : ""}
                 </p>
                 <dl className="mt-2 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-4">
                   <div>
