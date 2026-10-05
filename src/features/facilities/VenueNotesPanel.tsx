@@ -210,8 +210,19 @@ export function VenueNotesPanel({ venueId }: Props) {
                   </span>
                 </div>
                 <p className="text-base text-ink mt-1 whitespace-pre-line">
+                  {note.escalationLevel
+                    ? `Level ${note.escalationLevel}: `
+                    : ""}
                   {note.content}
                 </p>
+                {note.resolvedAt ? (
+                  <p className="mt-1 text-sm text-ink-2 whitespace-pre-line">
+                    Closed {formatDate(note.resolvedAt)}
+                    {note.resolvedByName
+                      ? ` by ${note.resolvedByName}`
+                      : ""}: {note.resolution}
+                  </p>
+                ) : null}
                 <p className="mt-1 font-mono text-xs text-ink-3">
                   {authorLabel(people, note)}
                   {note.postedAt

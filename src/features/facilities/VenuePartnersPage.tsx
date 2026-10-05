@@ -12,6 +12,7 @@ import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { venueDetailPath } from "./facilitiesRoutes";
 import { useAllEventReportRows } from "./useEventsById";
 import { handoffStatus, ownerProblem } from "./venueHandoff";
+import { problemStatus } from "./venueEscalation";
 import { onboardingStatus } from "./venueOnboarding";
 import { REWARDS, referralReport, topReferringVenue } from "./venueReferrals";
 import {
@@ -111,6 +112,13 @@ export function VenuePartnersPage() {
             ...(handoff?.reminders ?? []),
             ...(onboarding?.reminders ?? []),
             ...referrals.reminders,
+            ...problemStatus({
+              venueId: String(venue._id),
+              notes: notes ?? [],
+              contacts: notes ?? [],
+              now,
+              formatDate,
+            }).reminders,
             ...card.warnings,
           ],
         };

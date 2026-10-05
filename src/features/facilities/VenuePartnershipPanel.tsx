@@ -22,6 +22,7 @@ import { useAllEventReportRows } from "./useEventsById";
 import { VenueBrandForm } from "./VenueBrandForm";
 import { VenueHandoffPanel } from "./VenueHandoffPanel";
 import { VenueOnboardingPanel } from "./VenueOnboardingPanel";
+import { VenueProblemsPanel } from "./VenueProblemsPanel";
 import { VenueReferralsPanel } from "./VenueReferralsPanel";
 import { topReferringVenue } from "./venueReferrals";
 import { ownerProblem } from "./venueHandoff";
@@ -352,6 +353,13 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
               staff={staff}
               notes={notes ?? []}
               events={events ?? []}
+              run={run}
+              busy={busy}
+            />
+
+            <VenueProblemsPanel
+              venue={venue}
+              notes={notes ?? []}
               run={run}
               busy={busy}
             />
