@@ -295,7 +295,11 @@ export function DishIngredientsPanel({ dishId }: Props) {
           <label className="block text-sm sm:col-span-2">
             <span className="meta-term">Ingredient</span>
             <div className="mt-1">
-              <IngredientOptionPicker ingredients={ingredients} required />
+              <IngredientOptionPicker
+                ingredients={ingredients}
+                required
+                allowCreate
+              />
             </div>
           </label>
           <label className="block text-sm">
