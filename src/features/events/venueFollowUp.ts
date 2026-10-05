@@ -5,7 +5,8 @@
 
 const HOUR = 3_600_000;
 
-export type FollowUpKind = "thank_you" | "client_feedback" | "debrief";
+export type FollowUpKind =
+  "thank_you" | "client_feedback" | "debrief" | "social_post";
 
 export const FOLLOW_UP_STEPS: readonly {
   kind: FollowUpKind;
@@ -15,6 +16,8 @@ export const FOLLOW_UP_STEPS: readonly {
   { kind: "thank_you", title: "Thank the venue", hours: 24 },
   { kind: "debrief", title: "Team debrief", hours: 48 },
   { kind: "client_feedback", title: "Client feedback", hours: 72 },
+  // Playbook section 06: post within 48 hours, then send it to the venue.
+  { kind: "social_post", title: "Social post", hours: 48 },
 ];
 
 export interface FollowUpNoteRow {
@@ -107,6 +110,64 @@ export function thankYouText(input: {
   ]
     .filter(Boolean)
     .join(" ");
+}
+
+/** "#Spokane Valley" -> "#SpokaneValley"; empty when nothing is left. */
+const hashtag = (value: string) => {
+  const words = value.match(/[\p{L}\p{N}]+/gu) ?? [];
+  return words.length
+    ? `#${words.map((word) => word[0]!.toUpperCase() + word.slice(1)).join("")}`
+    : "";
+};
+
+/** The company name for its hashtag: "Mangia Catering Co." -> MangiaCatering. */
+const companyTag = (name: string) =>
+  hashtag(name.replace(/\b(co|inc|llc|ltd|company)\b\.?/giu, ""));
+
+/**
+ * Playbook section 06 "Post-event social post" caption: venue × company,
+ * one line about the event, the dish guests loved, then the venue tag and
+ * hashtags. Missing facts are left out, never shown as blanks.
+ */
+export function socialPostText(input: {
+  venueName: string;
+  companyName: string;
+  guestCount?: number | null;
+  occasion?: string | null;
+  dish: string;
+  socialHandle?: string | null;
+  city?: string | null;
+  eventType?: string | null;
+}): string {
+  const occasion = (input.occasion ?? "").trim();
+  const guests =
+    input.guestCount && input.guestCount > 0
+      ? `${input.guestCount} guests`
+      : "";
+  const about = occasion
+    ? `${occasion}${guests ? ` with ${guests}` : ""}`
+    : guests
+      ? `An event with ${guests}`
+      : "";
+  const dish = input.dish.trim();
+  const handle = (input.socialHandle ?? "").trim().replace(/^@+/u, "");
+  const cityTag = hashtag(input.city ?? "");
+  const tags = [
+    handle ? `@${handle}` : "",
+    companyTag(input.companyName),
+    cityTag ? `${cityTag}Events` : "",
+    hashtag(input.eventType ?? ""),
+  ].filter(Boolean);
+  return [
+    input.companyName.trim()
+      ? `${input.venueName} × ${input.companyName.trim()}`
+      : `What a night at ${input.venueName}!`,
+    about ? sentence(about) : "",
+    dish ? `Guests loved the ${dish.replace(/[.!]+$/u, "")}.` : "",
+    tags.join(" "),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 export const CLIENT_QUESTIONS = [

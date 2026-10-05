@@ -349,6 +349,9 @@ export function EventDashOverview({
           clientPhone={props.primaryContactPhone}
           clientEmail={props.primaryContactEmail}
           people={props.people}
+          guestCount={props.expectedHeadcount}
+          occasion={event.occasionName}
+          eventType={event.eventType}
         />
         <EventSourceProvenancePanel
           capsuleId={eventId}

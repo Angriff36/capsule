@@ -35,6 +35,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   thank_you: "Thank-you sent",
   client_feedback: "Client feedback",
   debrief: "Team debrief",
+  social_post: "Social post",
   other: "Other",
 };
 

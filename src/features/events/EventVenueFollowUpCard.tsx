@@ -3,6 +3,7 @@ import type { Doc } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateVenueNote,
+  useListOrganization,
   useListVenueNote,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -15,6 +16,7 @@ import {
   clientFeedbackNote,
   clientFeedbackRequest,
   debriefNote,
+  socialPostText,
   followUpApplies,
   followUpSteps,
   thankYouText,
@@ -72,10 +74,14 @@ export function EventVenueFollowUpCard(props: {
   people:
     | readonly { _id: string; givenName: string; familyName: string }[]
     | undefined;
+  guestCount?: number | null;
+  occasion?: string | null;
+  eventType?: string | null;
 }) {
   const { venue } = props;
   const notes = useListVenueNote();
   const postNote = useCreateVenueNote();
+  const organizations = useListOrganization();
   const auth = useAuthStatus();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -83,6 +89,7 @@ export function EventVenueFollowUpCard(props: {
     "The food and service went perfectly.",
   );
   const [issue, setIssue] = useState("");
+  const [dish, setDish] = useState("");
   const now = Date.now();
 
   if (
@@ -115,7 +122,19 @@ export function EventVenueFollowUpCard(props: {
     venueName: venue.name,
     repName,
   });
-  const [thankStep, debriefStep, feedbackStep] = followUpSteps({
+  const organization = organizations?.find((row) => row.deletedAt == null);
+  const caption = socialPostText({
+    venueName: venue.name,
+    companyName:
+      organization?.brandDisplayName?.trim() || organization?.name || "",
+    guestCount: props.guestCount,
+    occasion: props.occasion,
+    dish,
+    socialHandle: venue.socialHandle,
+    city: venue.city,
+    eventType: props.eventType,
+  });
+  const [thankStep, debriefStep, feedbackStep, postStep] = followUpSteps({
     venueId: String(venueId),
     eventId: props.eventId,
     endedAt: props.endsAt ?? props.startsAt ?? now,
@@ -136,7 +155,8 @@ export function EventVenueFollowUpCard(props: {
   };
 
   const post = (
-    category: "thank_you" | "client_feedback" | "debrief" | "incident",
+    category:
+      "thank_you" | "client_feedback" | "debrief" | "social_post" | "incident",
     content: string,
     rating?: number,
   ) =>
@@ -183,15 +203,19 @@ export function EventVenueFollowUpCard(props: {
 
   const thankSms = smsLink(venue.contactPhone, thanks);
   const requestSms = smsLink(props.clientPhone, request);
+  const postSms = smsLink(
+    venue.contactPhone,
+    `Here is our post from the event. Could you share it to your feed or story?\n\n${caption}`,
+  );
 
   return (
     <Section title={`Venue follow-up · ${venue.name}`}>
       <div className="space-y-5 p-4" data-testid="event-venue-follow-up">
         <p className="text-sm text-ink-3">
           {venue.name} is a partner venue. After every event there: thank the
-          venue within a day, debrief the team within two days, and ask the
-          client about the venue within three days. Each step is saved in the
-          venue file.
+          venue within a day, debrief the team and post about the event within
+          two days, and ask the client about the venue within three days. Each
+          step is saved in the venue file.
         </p>
         {failure ? <FailureBanner failure={failure} /> : null}
 
@@ -355,6 +379,61 @@ export function EventVenueFollowUpCard(props: {
                     {busy === "feedback" ? "Saving…" : "Save client answers"}
                   </button>
                 </form>
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {postStep ? (
+          <div className="space-y-2" data-testid="venue-social-post">
+            <StepHeader step={postStep} />
+            {postStep.done ? (
+              <DoneNote step={postStep} />
+            ) : (
+              <>
+                <label className="field-label">
+                  <span>Dish guests loved (optional)</span>
+                  <input
+                    className="input"
+                    name="dish"
+                    value={dish}
+                    onChange={(change) => setDish(change.target.value)}
+                    placeholder="Charcuterie tower"
+                  />
+                </label>
+                <p className="whitespace-pre-line rounded-sm bg-inset p-2 text-sm text-ink-2">
+                  {caption}
+                </p>
+                {venue.socialHandle ? null : (
+                  <p className="text-xs text-ink-3">
+                    Add the venue's social handle on the venue page so the post
+                    tags them.
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    onClick={() => void navigator.clipboard?.writeText(caption)}
+                  >
+                    Copy post
+                  </button>
+                  {postSms ? (
+                    <a className="btn btn-secondary" href={postSms}>
+                      Send it to {venue.contactName || "the venue"}
+                    </a>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={busy != null}
+                    onClick={() =>
+                      void run("post", () => post("social_post", caption))
+                    }
+                  >
+                    {busy === "post" ? "Saving…" : "Mark posted"}
+                  </button>
+                </div>
               </>
             )}
           </div>

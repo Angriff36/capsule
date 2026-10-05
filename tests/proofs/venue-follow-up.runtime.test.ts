@@ -52,11 +52,30 @@ describe("runtime proof: venue follow-up notes", () => {
     });
     const venueId = await registerVenue(proof, manager, "Kindred + Co.", 180);
     const eventId = await createEvent(proof, tenantId, "Kindred wedding");
+    // The venue's social handle is saved trimmed; a blank clears it.
+    await proof.executeCommand(manager, M.Venue_setSocialHandle, {
+      docId: venueId,
+      socialHandle: " kindredandco ",
+    });
+    const venueRow = async () =>
+      (
+        (await manager.query(api.queries.listVenue, {})) as {
+          _id: string;
+          socialHandle?: string | null;
+        }[]
+      ).find((row) => row._id === venueId);
+    expect((await venueRow())?.socialHandle).toBe("kindredandco");
+    await proof.executeCommand(manager, M.Venue_setSocialHandle, {
+      docId: venueId,
+      socialHandle: " ",
+    });
+    expect((await venueRow())?.socialHandle ?? null).toBeNull();
 
     for (const [category, content, rating] of [
       ["thank_you", "Hey Sarah, thanks for another great event.", undefined],
       ["debrief", "What went well: fast service", undefined],
       ["client_feedback", "Score: 9/10", 9],
+      ["social_post", "Kindred + Co. × Mangia Catering Co.", undefined],
     ] as const) {
       await proof.executeCommand(repActor, M.VenueNote_createViaPost, {
         venueId,
@@ -87,6 +106,7 @@ describe("runtime proof: venue follow-up notes", () => {
     expect(mine.map((note) => note.category).sort()).toEqual([
       "client_feedback",
       "debrief",
+      "social_post",
       "thank_you",
     ]);
     const feedback = mine.find((note) => note.category === "client_feedback")!;

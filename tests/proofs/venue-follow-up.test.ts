@@ -10,6 +10,7 @@ import {
   debriefNote,
   followUpApplies,
   followUpSteps,
+  socialPostText,
   thankYouText,
 } from "../../src/features/events/venueFollowUp";
 import { partnerScorecard } from "../../src/features/facilities/venuePartnership";
@@ -137,6 +138,50 @@ describe("venue follow-up", () => {
     expect(request).toContain(
       "4. Anything we could do better at this venue next time?",
     );
+  });
+
+  it("social post: due in 48h, playbook caption with venue tag and hashtags, blanks left out", () => {
+    const steps = followUpSteps({
+      venueId: "v1",
+      eventId: "e1",
+      endedAt: ended,
+      now: ended + HOUR,
+      notes: [
+        {
+          venueId: "v1",
+          eventId: "e1",
+          category: "social_post",
+          content: "Posted",
+          postedAt: ended + HOUR,
+        },
+      ],
+    });
+    const post = steps.find((step) => step.kind === "social_post")!;
+    expect(post.dueAt).toBe(ended + 48 * HOUR);
+    expect(post.done?.content).toBe("Posted");
+
+    expect(
+      socialPostText({
+        venueName: "Kindred + Co.",
+        companyName: "Mangia Catering Co.",
+        guestCount: 120,
+        occasion: "Ashley and Sam's wedding",
+        dish: "Kindred Charcuterie Tower",
+        socialHandle: "@kindredandco",
+        city: "Spokane",
+        eventType: "wedding",
+      }),
+    ).toBe(
+      "Kindred + Co. × Mangia Catering Co.\n\nAshley and Sam's wedding with 120 guests.\n\nGuests loved the Kindred Charcuterie Tower.\n\n@kindredandco #MangiaCatering #SpokaneEvents #Wedding",
+    );
+    expect(
+      socialPostText({
+        venueName: "SEL",
+        companyName: "",
+        dish: " ",
+        eventType: "corporate_event",
+      }),
+    ).toBe("What a night at SEL!\n\n#CorporateEvent");
   });
 
   it("builds the saved notes, leaving blank answers out", () => {

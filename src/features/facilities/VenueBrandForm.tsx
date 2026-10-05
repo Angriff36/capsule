@@ -4,7 +4,10 @@ import {
   useGenerateUploadUrl,
   useVenueLogoUrl,
 } from "../../lib/fileStorageClient";
-import { useVenueSetBrand } from "../../lib/manifest-convex-react";
+import {
+  useVenueSetBrand,
+  useVenueSetSocialHandle,
+} from "../../lib/manifest-convex-react";
 
 const HEX_COLOR = /^#[0-9a-f]{6}$/iu;
 
@@ -23,9 +26,11 @@ export function VenueBrandForm({
   busy: string | null;
 }) {
   const setBrand = useVenueSetBrand();
+  const setSocialHandle = useVenueSetSocialHandle();
   const generateUploadUrl = useGenerateUploadUrl();
   const logoUrl = useVenueLogoUrl(String(venue._id));
   const [color, setColor] = useState(venue.brandColor ?? "");
+  const [handle, setHandle] = useState(venue.socialHandle ?? "");
   const colorOk = color.trim() === "" || HEX_COLOR.test(color.trim());
 
   const save = (logoStorageId: string | null | undefined, nextColor: string) =>
@@ -139,6 +144,37 @@ export function VenueBrandForm({
             Write the colour like #1f3a5f, or leave it blank.
           </p>
         ) : null}
+      </form>
+      <form
+        className="flex flex-wrap items-end gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void run("handle", () =>
+            setSocialHandle({
+              docId: venue._id,
+              version: venue.version,
+              socialHandle: handle.trim().replace(/^@+/u, "") || undefined,
+            }),
+          );
+        }}
+      >
+        <label className="field-label">
+          <span>Venue social handle (tagged in event posts)</span>
+          <input
+            className="input w-48"
+            name="socialHandle"
+            value={handle}
+            placeholder="@kindredandco"
+            onChange={(event) => setHandle(event.target.value)}
+          />
+        </label>
+        <button
+          className="btn btn-secondary"
+          type="submit"
+          disabled={busy != null}
+        >
+          {busy === "handle" ? "Saving…" : "Save handle"}
+        </button>
       </form>
     </div>
   );
