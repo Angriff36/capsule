@@ -1948,9 +1948,21 @@ export function KitchenDashboardPage() {
                     {column.rows.length === 0 ? (
                       <div className="border-t border-line pt-3">
                         <p className="text-base text-ink-2">
-                          No prep built for this service yet.
+                          {model.selections(column.id).length === 0
+                            ? "No dishes on this event's menu yet, so there is no prep to build."
+                            : "No prep built for this service yet."}
                         </p>
-                        {boardBy === "service" ? (
+                        {boardBy === "service" &&
+                        model.selections(column.id).length === 0 ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <Link
+                              to={eventMenuRedirectPath(column.id)}
+                              className="btn btn-ghost btn-sm"
+                            >
+                              Add dishes
+                            </Link>
+                          </div>
+                        ) : boardBy === "service" ? (
                           <div className="mt-3 flex flex-wrap gap-2">
                             <button
                               type="button"
