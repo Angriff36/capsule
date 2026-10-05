@@ -5172,3 +5172,26 @@ div.tpp-parameter-wide {
     display: block;
   }
 }
+/* Natural-language schedule entry preserves the native picker as a visible
+   fallback. The resolved echo is compact operational metadata, not a new
+   card or status treatment. */
+.natural-date-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(9.5rem, auto);
+  gap: 0.35rem;
+}
+.natural-date-picker {
+  min-width: 0;
+}
+.natural-date-message {
+  grid-column: 1 / -1;
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.4;
+}
+@media (max-width: 520px) {
+  .natural-date-entry {
+    grid-template-columns: 1fr;
+  }
+}
