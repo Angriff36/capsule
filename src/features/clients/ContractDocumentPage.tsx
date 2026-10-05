@@ -7,6 +7,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatMoney, formatTime } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -37,8 +38,8 @@ const clientLabel = (row: {
 
 function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <section className="mt-6 break-inside-avoid">
-      <h2 className="border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
+    <section className="mt-6">
+      <h2 className="break-after-avoid border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
         {label}
       </h2>
       <div className="mt-2 text-base leading-relaxed">{children}</div>
@@ -65,7 +66,7 @@ function SignatureBlock({
   signedAt?: number | null;
 }) {
   return (
-    <div className="mt-6">
+    <div className="mt-6 break-inside-avoid">
       <p className="text-sm uppercase tracking-wide text-ink-2">{role}</p>
       <div className="mt-8 border-b border-ink" />
       <div className="mt-1 flex justify-between text-sm">
@@ -158,7 +159,7 @@ export function ContractDocumentPage() {
       </header>
 
       <article
-        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-8 text-ink"
+        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-8 text-ink print:mt-0 print:max-w-none"
         style={
           {
             "--document-primary": branding.primaryColor,
@@ -238,7 +239,11 @@ export function ContractDocumentPage() {
                   <Row label="Event" value={String(event.title || "—")} />
                   <Row
                     label="Event type"
-                    value={String(event.eventType || "—")}
+                    value={
+                      event.eventType
+                        ? formatStatusLabel(String(event.eventType))
+                        : "—"
+                    }
                   />
                   <Row
                     label="Date"
@@ -285,7 +290,11 @@ export function ContractDocumentPage() {
               <Row
                 label="Quoted price"
                 value={
-                  event ? formatMoney(Number(event.quotedPrice ?? 0)) : "—"
+                  event
+                    ? Number(event.quotedPrice ?? 0) > 0
+                      ? formatMoney(Number(event.quotedPrice))
+                      : "Not priced yet"
+                    : "—"
                 }
               />
               <Row
