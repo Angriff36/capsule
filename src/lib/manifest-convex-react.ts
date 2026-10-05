@@ -794,6 +794,8 @@ import {
   SignatureRequestExpireParamsSchema,
   SignatureRequestRequestSignatureParamsSchema,
   SignatureRequestRevokeParamsSchema,
+  SkillLevelChangeLevelParamsSchema,
+  SkillLevelRateParamsSchema,
   StaffChatReadCursorOpenParamsSchema,
   StaffChatReadCursorTouchParamsSchema,
   StaffMessageEditParamsSchema,
@@ -11801,6 +11803,47 @@ export function useCreateSignatureRequest() {
   };
 }
 
+/** Reactive list for SkillLevel. */
+export function useListSkillLevel() {
+  return useQuery(api.queries.listSkillLevel);
+}
+
+/** Reactive get-by-id for SkillLevel. Pass "skip" to suspend. */
+export function useGetSkillLevel(id: string | "skip") {
+  return useQuery(api.queries.getSkillLevel, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SkillLevel.changeLevel. */
+export function useSkillLevelChangeLevel() {
+  const mutate = useMutation(api.mutations.SkillLevel_changeLevel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SkillLevelChangeLevelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SkillLevel.rate. */
+export function useSkillLevelRate() {
+  const mutate = useMutation(api.mutations.SkillLevel_rate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SkillLevelRateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SkillLevel.rate. */
+export function useCreateSkillLevel() {
+  const mutate = useMutation(api.mutations.SkillLevel_createViaRate);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SkillLevelRateParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for StaffChatReadCursor. */
 export function useListStaffChatReadCursor() {
   return useQuery(api.queries.listStaffChatReadCursor);
@@ -14240,4 +14283,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1504 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1509 as const;

@@ -4111,6 +4111,23 @@ export const SignatureRequestSchema = z.object({
 
 export type SignatureRequest = z.infer<typeof SignatureRequestSchema>;
 
+// Entity: SkillLevel
+export const SkillLevelSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  trainingModuleId: z.string().uuid(),
+  level: z.number().int().default(0),
+  note: z.string().nullable().optional(),
+  ratedAt: z.coerce.date().nullable().optional(),
+  ratedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type SkillLevel = z.infer<typeof SkillLevelSchema>;
+
 // Entity: SoftDeletable
 export const SoftDeletableSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
@@ -11927,6 +11944,24 @@ export const SignatureRequestRevokeParamsSchema = z.object({
 });
 
 export type SignatureRequestRevokeParams = z.infer<typeof SignatureRequestRevokeParamsSchema>;
+
+// Command: changeLevel on SkillLevel
+export const SkillLevelChangeLevelParamsSchema = z.object({
+  level: z.number().int(),
+  note: z.string().optional(),
+});
+
+export type SkillLevelChangeLevelParams = z.infer<typeof SkillLevelChangeLevelParamsSchema>;
+
+// Command: rate on SkillLevel
+export const SkillLevelRateParamsSchema = z.object({
+  personId: z.string().min(1),
+  trainingModuleId: z.string().min(1),
+  level: z.number().int(),
+  note: z.string().optional(),
+});
+
+export type SkillLevelRateParams = z.infer<typeof SkillLevelRateParamsSchema>;
 
 // Command: open on StaffChatReadCursor
 export const StaffChatReadCursorOpenParamsSchema = z.object({

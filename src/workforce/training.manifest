@@ -153,6 +153,81 @@ entity TrainingCompletion mixin TenantScoped, SoftDeletable {
   store TrainingCompletion in durable
 }
 
+// Skills matrix (Mangia "Utility Skills Matrix Criteria", 10-24-22): how far
+// one person is in one area, 0 no knowledge, 1 beginner (works under a
+// trainer), 2 independent, 3 expert, 4 trainer. The area is a training
+// module. One row per person and module; a new rating changes it in place.
+entity SkillLevel mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required personId: uuid
+  property required trainingModuleId: uuid
+  property required level: int = 0
+  property note: string?
+  property ratedAt: datetime?
+  // Who gave the rating. Empty when that account is not linked to a staff
+  // profile; rating is never blocked for that.
+  property ratedByPersonId: uuid?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo trainingModule: TrainingModule fields [tenantId, trainingModuleId] references [tenantId, id]
+
+  constraint skillLevelRange: self.level >= 0 and self.level <= 4 "Pick a level from 0 to 4."
+
+  default policy skillLevelRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see skill levels"
+  default policy skillLevelWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update skill levels"
+  default policy skillLevelExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change skill levels"
+
+  command rate(
+    personId: uuid,
+    trainingModuleId: uuid,
+    level: int,
+    optional note: string
+  ) {
+    guard self.ratedAt == null
+    guard self.deletedAt == null
+    guard self.person != null
+    guard self.trainingModule != null and self.trainingModule.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint rateSkillLevelRange: level >= 0 and level <= 4 "Pick a level from 0 to 4."
+    mutate personId = personId
+    mutate trainingModuleId = trainingModuleId
+    mutate level = level
+    mutate note = note != null and length(trim(note)) > 0 ? trim(note) : null
+    mutate ratedAt = now()
+    mutate ratedByPersonId = user.personId
+    emit SkillLevelRated {
+      skillLevelId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      trainingModuleId: trainingModuleId
+      level: level
+    }
+  }
+
+  command changeLevel(level: int, optional note: string) {
+    guard self.ratedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint changeSkillLevelRange: level >= 0 and level <= 4 "Pick a level from 0 to 4."
+    mutate level = level
+    mutate note = note != null and length(trim(note)) > 0 ? trim(note) : null
+    mutate ratedAt = now()
+    mutate ratedByPersonId = user.personId
+    emit SkillLevelRated {
+      skillLevelId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      trainingModuleId: self.trainingModuleId
+      level: level
+    }
+  }
+
+  store SkillLevel in durable
+}
+
 entity ShiftType mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   unique [tenantId, name]
@@ -257,6 +332,14 @@ event TrainingCompleted: "training.completed" {
   trainingModuleId: string
   completedAt: datetime
   assessmentScore: int
+}
+
+event SkillLevelRated: "skill_level.rated" {
+  skillLevelId: string
+  tenantId: string
+  personId: string
+  trainingModuleId: string
+  level: int
 }
 
 event ShiftTypeDefined: "shift_type.defined" {
