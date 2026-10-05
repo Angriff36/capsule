@@ -20,6 +20,8 @@ enum VenueNoteCategory {
   thank_you
   client_feedback
   debrief
+  // The joint "featured at" social post after an event there (section 06).
+  social_post
   other
 }
 

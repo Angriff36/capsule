@@ -932,6 +932,7 @@ import {
   VenueSetBrandParamsSchema,
   VenueSetPartnershipParamsSchema,
   VenueSetSiteFactsParamsSchema,
+  VenueSetSocialHandleParamsSchema,
   VenueSetTimeZoneParamsSchema,
   VenueUpdateDetailsParamsSchema,
   VenueVendorRelationshipEstablishParamsSchema,
@@ -13683,6 +13684,16 @@ export function useVenueSetSiteFacts() {
   };
 }
 
+/** Mutation hook for Venue.setSocialHandle. */
+export function useVenueSetSocialHandle() {
+  const mutate = useMutation(api.mutations.Venue_setSocialHandle);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueSetSocialHandleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Venue.setTimeZone. */
 export function useVenueSetTimeZone() {
   const mutate = useMutation(api.mutations.Venue_setTimeZone);
@@ -14152,4 +14163,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1496 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1497 as const;

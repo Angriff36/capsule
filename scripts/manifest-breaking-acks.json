@@ -2802,6 +2802,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Co-branded proposals: optional venue brand colour; existing venues stay valid with none."
+    },
+    {
+      "path": "Venue.socialHandle",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "After-event social post: optional venue social handle for the tag; existing venues stay valid with none."
     }
   ]
 }

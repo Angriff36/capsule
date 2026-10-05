@@ -435,6 +435,9 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // proposal for an event at a partner venue. Set by setBrand only.
   property logoStorageId: string?
   property brandColor: string?
+  // The venue's social media handle, without "@" (playbook section 06: tag
+  // the venue in every post about an event there). Set by setSocialHandle.
+  property socialHandle: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
@@ -685,6 +688,15 @@ entity Venue mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate logoStorageId = logoStorageId != null and length(trim(logoStorageId)) > 0 ? trim(logoStorageId) : null
     mutate brandColor = brandColor != null and length(trim(brandColor)) > 0 ? trim(brandColor) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setSocialHandle(optional socialHandle: string) {
+    guard self.deletedAt == null
+    mutate socialHandle = socialHandle != null and length(trim(socialHandle)) > 0 ? trim(socialHandle) : null
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

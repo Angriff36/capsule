@@ -4932,6 +4932,7 @@ export const VenueSchema = z.object({
   relationshipScore: z.number().int().nullable().optional(),
   logoStorageId: z.string().nullable().optional(),
   brandColor: z.string().nullable().optional(),
+  socialHandle: z.string().nullable().optional(),
   status: z.enum(["active", "inactive"]).default("active"),
   registeredAt: z.coerce.date().nullable().optional(),
   deactivatedAt: z.coerce.date().nullable().optional(),
@@ -5002,7 +5003,7 @@ export const VenueNoteSchema = z.object({
   authorPersonId: z.string().uuid(),
   authorName: z.string().default(""),
   authorAuthSubjectId: z.string().nullable().optional(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "other"]).default("other"),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "social_post", "other"]).default("other"),
   content: z.string().default(""),
   isPinned: z.boolean().optional().default(false),
   visibility: z.enum(["public", "internal", "management_only"]).default("internal"),
@@ -13031,6 +13032,13 @@ export const VenueSetSiteFactsParamsSchema = z.object({
 
 export type VenueSetSiteFactsParams = z.infer<typeof VenueSetSiteFactsParamsSchema>;
 
+// Command: setSocialHandle on Venue
+export const VenueSetSocialHandleParamsSchema = z.object({
+  socialHandle: z.string().optional(),
+});
+
+export type VenueSetSocialHandleParams = z.infer<typeof VenueSetSocialHandleParamsSchema>;
+
 // Command: setTimeZone on Venue
 export const VenueSetTimeZoneParamsSchema = z.object({
   timeZone: z.string().optional(),
@@ -13137,7 +13145,7 @@ export type VenueNotePinParams = z.infer<typeof VenueNotePinParamsSchema>;
 export const VenueNotePostParamsSchema = z.object({
   venueId: z.string().min(1),
   eventId: z.string().min(1).optional(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "other"]),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "social_post", "other"]),
   content: z.string(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
   isPinned: z.boolean().optional(),
@@ -13154,7 +13162,7 @@ export type VenueNoteRemoveParams = z.infer<typeof VenueNoteRemoveParamsSchema>;
 // Command: revise on VenueNote
 export const VenueNoteReviseParamsSchema = z.object({
   content: z.string(),
-  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "other"]).optional(),
+  category: z.enum(["access", "logistics", "catering", "equipment", "staffing", "restrictions", "policies", "weather_contingency", "check_in", "incident", "thank_you", "client_feedback", "debrief", "social_post", "other"]).optional(),
   visibility: z.enum(["public", "internal", "management_only"]).optional(),
 });
 
