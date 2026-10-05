@@ -1,5 +1,6 @@
 # Findings and Decisions
 
+- Pending codebase mapping.
 ## Requirements
 - Calculate pack-list serving ware and smallwares from menu, event headcount, and service style.
 - Rules must be configurable by dish and guest basis.

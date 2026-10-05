@@ -1,5 +1,7 @@
 # Progress Log
 
+- Read project instructions, DESIGN.md, full Manifest reference, and selected implementation skills.
+- Started codebase mapping.
 ## Session: 2026-10-05
 
 ### Phase 1: Requirements and discovery

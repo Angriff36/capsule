@@ -290,6 +290,7 @@ import {
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
+  EventSetTravelFeeParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
   EventStaffNeedCancelParamsSchema,
   EventStaffNeedChangeCoverageParamsSchema,
@@ -519,6 +520,7 @@ import {
   OrganizationConfigureRoutePolicyParamsSchema,
   OrganizationConfigureStageMovesParamsSchema,
   OrganizationConfigureTimingPolicyParamsSchema,
+  OrganizationConfigureTravelFeeParamsSchema,
   OrganizationDeactivateParamsSchema,
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
@@ -4204,6 +4206,16 @@ export function useEventSetEventNumber() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventSetEventNumberParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.setTravelFee. */
+export function useEventSetTravelFee() {
+  const mutate = useMutation(api.mutations.Event_setTravelFee);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventSetTravelFeeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8057,6 +8069,16 @@ export function useOrganizationConfigureTimingPolicy() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationConfigureTimingPolicyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Organization.configureTravelFee. */
+export function useOrganizationConfigureTravelFee() {
+  const mutate = useMutation(api.mutations.Organization_configureTravelFee);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureTravelFeeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14641,4 +14663,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1547 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1549 as const;
