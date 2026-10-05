@@ -541,6 +541,7 @@ import {
   PackListItemRemoveParamsSchema,
   PackListItemRestoreExcludedParamsSchema,
   PackListItemRestoreImportedAssociationParamsSchema,
+  PackListItemSetBinParamsSchema,
   PackListItemSetResponsibilityParamsSchema,
   PackListItemSetUnitVolumeParamsSchema,
   PackListItemSetUnitWeightParamsSchema,
@@ -552,6 +553,7 @@ import {
   PackListRequestAssistanceParamsSchema,
   PackListRequestDishContainersParamsSchema,
   PackListResolveAssistanceParamsSchema,
+  PackListSetBinSheetParamsSchema,
   PackListStandDownWithEventParamsSchema,
   PackListStartPackingParamsSchema,
   PackListTemplateArchiveParamsSchema,
@@ -8124,6 +8126,16 @@ export function usePackListResolveAssistance() {
   };
 }
 
+/** Mutation hook for PackList.setBinSheet. */
+export function usePackListSetBinSheet() {
+  const mutate = useMutation(api.mutations.PackList_setBinSheet);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListSetBinSheetParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PackList.standDownWithEvent. */
 export function usePackListStandDownWithEvent() {
   const mutate = useMutation(api.mutations.PackList_standDownWithEvent);
@@ -8371,6 +8383,16 @@ export function usePackListItemRestoreImportedAssociation() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListItemRestoreImportedAssociationParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.setBin. */
+export function usePackListItemSetBin() {
+  const mutate = useMutation(api.mutations.PackListItem_setBin);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemSetBinParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14218,4 +14240,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1502 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1504 as const;

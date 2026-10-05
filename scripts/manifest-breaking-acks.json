@@ -2916,6 +2916,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Courses where guests pick one dish: optional list; existing menus read as none."
+    },
+    {
+      "path": "PackList.binSheet",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Bin sheet (lid colours, dirty bins) from the Perfect Packing memo: optional; existing pack lists read as no bin sheet."
+    },
+    {
+      "path": "PackListItem.binNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Bin number written on a pack line: optional; existing lines read as not in a bin."
     }
   ]
 }

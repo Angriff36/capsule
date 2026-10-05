@@ -2727,6 +2727,7 @@ export const PackListSchema = z.object({
   cancellationReason: z.string().nullable().optional(),
   assistanceRequestedAt: z.coerce.date().nullable().optional(),
   assistanceNote: z.string().nullable().optional(),
+  binSheet: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2748,6 +2749,7 @@ export const PackListItemSchema = z.object({
   productionBatchId: z.string().uuid().nullable().optional(),
   note: z.string().nullable().optional(),
   sentInstead: z.string().nullable().optional(),
+  binNumber: z.number().int().nullable().optional(),
   serviceStyleKitItemId: z.string().uuid().nullable().optional(),
   unitCorrectionSource: z.string().nullable().optional(),
   associationSource: z.string().nullable().optional(),
@@ -9669,6 +9671,13 @@ export const PackListResolveAssistanceParamsSchema = z.object({});
 
 export type PackListResolveAssistanceParams = z.infer<typeof PackListResolveAssistanceParamsSchema>;
 
+// Command: setBinSheet on PackList
+export const PackListSetBinSheetParamsSchema = z.object({
+  binSheet: z.string(),
+});
+
+export type PackListSetBinSheetParams = z.infer<typeof PackListSetBinSheetParamsSchema>;
+
 // Command: standDownWithEvent on PackList
 export const PackListStandDownWithEventParamsSchema = z.object({});
 
@@ -9868,6 +9877,13 @@ export const PackListItemRestoreImportedAssociationParamsSchema = z.object({
 });
 
 export type PackListItemRestoreImportedAssociationParams = z.infer<typeof PackListItemRestoreImportedAssociationParamsSchema>;
+
+// Command: setBin on PackListItem
+export const PackListItemSetBinParamsSchema = z.object({
+  binNumber: z.number().int().optional(),
+});
+
+export type PackListItemSetBinParams = z.infer<typeof PackListItemSetBinParamsSchema>;
 
 // Command: setResponsibility on PackListItem
 export const PackListItemSetResponsibilityParamsSchema = z.object({
