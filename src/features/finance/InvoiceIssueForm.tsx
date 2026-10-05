@@ -20,6 +20,7 @@ import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
 import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 type ClientOption = {
   _id: string;
@@ -186,22 +187,18 @@ export function InvoiceIssueForm({
       <div className="invoice-composer-basics">
         <label className="field-label">
           Client
-          <select
-            className="input"
+          <SearchSelect
             name="clientId"
             required
             value={selectedClientId}
-            onChange={(event) => setSelectedClientId(event.target.value)}
-          >
-            <option value="" disabled>
-              Select client
-            </option>
-            {clients.map((client) => (
-              <option key={client._id} value={client._id}>
-                {clientLabel(client)}
-              </option>
-            ))}
-          </select>
+            onChange={setSelectedClientId}
+            recentsKey="client"
+            placeholder="Search clients…"
+            options={clients.map((client) => ({
+              id: client._id,
+              label: clientLabel(client),
+            }))}
+          />
         </label>
         <label className="field-label">
           Invoice number

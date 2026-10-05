@@ -1,3 +1,5 @@
+import { useActionPrompt } from "../../ui/action-prompt";
+import { usePrepLabelPrint } from "../production/usePrepLabelPrint";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
@@ -98,6 +100,11 @@ export function KitchenDashboardPage() {
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  // Dated container labels from a prep step (same flow as the kitchen display).
+  const { prompt: labelPrompt, host: labelPromptHost } = useActionPrompt(
+    busy != null,
+  );
+  const labels = usePrepLabelPrint(labelPrompt);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [attentionAll, setAttentionAll] = useState(false);
@@ -855,6 +862,9 @@ export function KitchenDashboardPage() {
     }
 
     for (const event of horizonEvents) {
+      // With one event picked, other services would show "No prep built"
+      // only because the filter hides their steps; leave them out instead.
+      if (selectedEventId && event._id !== selectedEventId) continue;
       const rows = horizonTasks.filter((r) => r.event._id === event._id);
       const number = invoiceNumberFor(event._id);
       columns.push({
@@ -876,6 +886,7 @@ export function KitchenDashboardPage() {
     eventDishes,
     model,
     invoices,
+    selectedEventId,
   ]);
 
   const tickAll = (rows: LedgerRow[], on: boolean) =>
@@ -1027,6 +1038,29 @@ export function KitchenDashboardPage() {
                 {busy === `release:${id}` ? "Working…" : second.label}
               </button>
             ) : null}
+            {status !== "cancelled" ? (
+              <button
+                type="button"
+                disabled={!labels.ready}
+                aria-label={`Print container label for ${String(row.task.name)}`}
+                onClick={() =>
+                  void labels.print({
+                    product: stepText(row.task.name, itemName),
+                    detail: String(row.event.title),
+                    componentId: row.task.componentId,
+                    dish: row.task.dishId
+                      ? (dishes?.find((dish) => dish._id === row.task.dishId) ??
+                        null)
+                      : null,
+                    preparedAt: row.task.completedAt ?? row.task.startedAt,
+                    preparedById: row.task.assignedToId,
+                  })
+                }
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                Label
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -1120,6 +1154,7 @@ export function KitchenDashboardPage() {
 
   return (
     <div className="kitchen-command-deck pb-10">
+      {labelPromptHost}
       <div className="max-md:hidden">
         <KitchenBookNav />
       </div>
@@ -1913,9 +1948,21 @@ export function KitchenDashboardPage() {
                     {column.rows.length === 0 ? (
                       <div className="border-t border-line pt-3">
                         <p className="text-base text-ink-2">
-                          No prep built for this service yet.
+                          {model.selections(column.id).length === 0
+                            ? "No dishes on this event's menu yet, so there is no prep to build."
+                            : "No prep built for this service yet."}
                         </p>
-                        {boardBy === "service" ? (
+                        {boardBy === "service" &&
+                        model.selections(column.id).length === 0 ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <Link
+                              to={eventMenuRedirectPath(column.id)}
+                              className="btn btn-ghost btn-sm"
+                            >
+                              Add dishes
+                            </Link>
+                          </div>
+                        ) : boardBy === "service" ? (
                           <div className="mt-3 flex flex-wrap gap-2">
                             <button
                               type="button"

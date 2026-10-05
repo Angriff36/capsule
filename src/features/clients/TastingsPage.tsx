@@ -117,6 +117,9 @@ export function TastingsPage() {
         onSubmit={(event) => void schedule(event)}
       >
         <p className="eyebrow">Book a tasting</p>
+        <p className="text-sm text-ink-2">
+          Pick the lead or the proposal this tasting is for.
+        </p>
         <div className="supply-form-grid mt-3">
           <label className="field-label">
             Lead

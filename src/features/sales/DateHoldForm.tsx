@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { Doc } from "../../lib/api";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { clientDisplayName } from "../events/clientName";
 import { DateHoldCollisionNotice } from "./DateHoldCollisionNotice";
 import { DEFAULT_HOLD_DAYS } from "./dateHolds";
@@ -39,6 +40,7 @@ export function DateHoldForm({
       holdDays: Math.max(1, Number(holdDays) || DEFAULT_HOLD_DAYS),
     });
     if (saved) {
+      setDateKey("");
       setClientId("");
       setNote("");
     }
@@ -78,18 +80,16 @@ export function DateHoldForm({
         </label>
         <label className="field-label">
           Client
-          <select
-            className="input"
+          <SearchSelect
             value={clientId}
-            onChange={(event) => setClientId(event.target.value)}
-          >
-            <option value="">— Prospect, no client yet —</option>
-            {liveClients.map((client) => (
-              <option key={client._id} value={client._id}>
-                {clientDisplayName(client._id, liveClients)}
-              </option>
-            ))}
-          </select>
+            onChange={setClientId}
+            recentsKey="client"
+            placeholder="Prospect, no client yet — or search…"
+            options={liveClients.map((client) => ({
+              id: client._id,
+              label: clientDisplayName(client._id, [client]),
+            }))}
+          />
         </label>
         <label className="field-label">
           Prospect / note

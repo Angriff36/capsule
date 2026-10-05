@@ -92,6 +92,7 @@ export function LeftoverDispositionPanel({ eventId }: { eventId: string }) {
       {editing === "new" ? (
         <LeftoverForm
           busy={busy}
+          pastDonations={rows ?? []}
           onSubmit={submit(null)}
           onCancel={() => setEditing(null)}
         />
@@ -108,6 +109,7 @@ export function LeftoverDispositionPanel({ eventId }: { eventId: string }) {
                 <LeftoverForm
                   row={row}
                   busy={busy}
+                  pastDonations={rows ?? []}
                   onSubmit={submit(row)}
                   onCancel={() => setEditing(null)}
                 />
@@ -171,11 +173,13 @@ export function LeftoverDispositionPanel({ eventId }: { eventId: string }) {
 function LeftoverForm({
   row,
   busy,
+  pastDonations,
   onSubmit,
   onCancel,
 }: {
   row?: LeftoverDisposition;
   busy: boolean;
+  pastDonations: readonly LeftoverDisposition[];
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
 }) {
@@ -183,6 +187,26 @@ function LeftoverForm({
     row?.disposition ?? "donated",
   );
   const donated = kind === "donated";
+  // Kitchens donate to the same few food banks: offer them by name and fill
+  // in their tax ID, address and contact from the last donation to them.
+  const recipients = new Map<string, LeftoverDisposition>();
+  for (const past of pastDonations) {
+    const name = past.recipientOrganization?.trim();
+    if (name && past.deletedAt == null) recipients.set(name, past);
+  }
+  const fillRecipient = (input: HTMLInputElement) => {
+    const known = recipients.get(input.value.trim());
+    const form = input.form;
+    if (!known || !form) return;
+    const fill = (name: string, value: string | null | undefined) => {
+      const field = form.elements.namedItem(name) as HTMLInputElement | null;
+      if (field && !field.value && value) field.value = value;
+    };
+    fill("recipientEin", known.recipientEin);
+    fill("recipientAddress", known.recipientAddress);
+    fill("recipientContact", known.recipientContact);
+  };
+  const listId = `leftover-recipients-${row?._id ?? "new"}`;
   return (
     <form
       onSubmit={onSubmit}
@@ -259,9 +283,16 @@ function LeftoverForm({
                 name="recipientOrganization"
                 className="input"
                 required
+                list={listId}
                 defaultValue={row?.recipientOrganization ?? ""}
                 placeholder="e.g. City Harvest Food Bank"
+                onChange={(event) => fillRecipient(event.currentTarget)}
               />
+              <datalist id={listId}>
+                {[...recipients.keys()].map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
             </label>
             <label className="field-label">
               Recipient tax ID (EIN)

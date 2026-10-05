@@ -135,7 +135,10 @@ export function DateHoldsPage() {
   const today = localDateKey(now);
   const who = (row: { clientId?: string | null; note?: string | null }) =>
     row.clientId
-      ? clientDisplayName(row.clientId, clients)
+      ? // Keep the sales note next to the client so "call back Friday" shows.
+        [clientDisplayName(row.clientId, clients), row.note]
+          .filter(Boolean)
+          .join(" · ")
       : (row.note ?? "Unnamed prospect");
   const opened = openedDates(holds, waitlist, now);
   const dates = [
@@ -264,7 +267,13 @@ export function DateHoldsPage() {
                                 +{DEFAULT_HOLD_DAYS} days
                               </button>
                               <Link
-                                to="/events/new"
+                                to={`/events/new?${new URLSearchParams({
+                                  date: hold.holdDate,
+                                  holdId: hold._id,
+                                  ...(hold.clientId
+                                    ? { clientId: hold.clientId }
+                                    : {}),
+                                })}`}
                                 className="btn btn-ghost btn-sm"
                               >
                                 Book event

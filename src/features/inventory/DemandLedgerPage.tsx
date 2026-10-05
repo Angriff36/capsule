@@ -370,7 +370,11 @@ export function DemandLedgerPage() {
                           })()}
                         </td>
                         <td className="supply-number" data-label="Required">
-                          {demand.requiredQuantity} {demand.unit}
+                          {/* Two decimals: recipe math leaves float noise. */}
+                          {Number(
+                            Number(demand.requiredQuantity).toFixed(2),
+                          ).toLocaleString()}{" "}
+                          {demand.unit}
                           {(() => {
                             const anomaly = anomalies.get(demand._id);
                             if (!anomaly) return null;
@@ -400,7 +404,7 @@ export function DemandLedgerPage() {
                             <StatusChip status={String(need.status)} />
                           ) : (
                             <span className="supply-muted">
-                              Opens on Event approve
+                              Buying starts when the event is approved
                             </span>
                           )}
                         </td>

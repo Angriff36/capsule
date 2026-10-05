@@ -59,14 +59,26 @@ export const prepList = query({
         )
         .sort((a, b) => a.sortOrder - b.sortOrder);
       const components: TastingPrepDish["components"] = [];
+      // A dish can link the same recipe part more than once (version links);
+      // the kitchen makes it once, so list it once and add the pieces.
+      const byComponent = new Map<
+        string,
+        TastingPrepDish["components"][number]
+      >();
       for (const link of links) {
         const component = await ctx.db.get(link.componentId);
         if (!component || component.tenantId !== tenantId) continue;
-        components.push({
-          name: component.name,
-          piecesNeeded:
-            link.pieceCount != null ? link.pieceCount * row.portionCount : null,
-        });
+        const pieces =
+          link.pieceCount != null ? link.pieceCount * row.portionCount : null;
+        const seen = byComponent.get(String(link.componentId));
+        if (seen) {
+          if (pieces != null)
+            seen.piecesNeeded = (seen.piecesNeeded ?? 0) + pieces;
+          continue;
+        }
+        const entry = { name: component.name, piecesNeeded: pieces };
+        byComponent.set(String(link.componentId), entry);
+        components.push(entry);
       }
       const steps = (
         await ctx.db

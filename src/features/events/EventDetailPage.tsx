@@ -7,7 +7,6 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatCount,
   formatDate,
@@ -756,12 +755,6 @@ function EventDetailContent({
 
   return (
     <div ref={sectionScopeRef}>
-      <ReturnToListLink
-        fallback="/events"
-        className="text-link mb-4 inline-flex"
-      >
-        ← Back to events
-      </ReturnToListLink>
       <StickyRecordHeader
         title={event.title}
         facts={[

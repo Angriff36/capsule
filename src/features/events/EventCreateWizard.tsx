@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
   useListClient,
@@ -459,26 +460,41 @@ function BasicsStep({
     <div className="grid gap-3 sm:grid-cols-2">
       {field("Event title", "title")}
       {field("Event type", "eventType")}
-      {field("Start", "startsAt", "datetime-local")}
-      {field("End", "endsAt", "datetime-local")}
+      <label className="field-label">
+        Start
+        <BoundedDateTimeLocalInput
+          className="field-input"
+          value={draft.startsAt}
+          disabled={locked}
+          onChange={(event) => update({ startsAt: event.target.value })}
+        />
+      </label>
+      <label className="field-label">
+        End
+        <BoundedDateTimeLocalInput
+          className="field-input"
+          value={draft.endsAt}
+          naturalDateAnchor={draft.startsAt}
+          disabled={locked}
+          onChange={(event) => update({ endsAt: event.target.value })}
+        />
+      </label>
       <div className="sm:col-span-2">
         <DateHoldCollisionNotice dateKey={draft.startsAt.slice(0, 10)} />
       </div>
       <label className="field-label sm:col-span-2">
         Venue
-        <select
-          className="field-input"
+        <SearchSelect
           value={draft.venueId}
           disabled={locked}
-          onChange={(event) => update({ venueId: event.target.value })}
-        >
-          <option value="">Select a venue</option>
-          {venues.map((venue) => (
-            <option key={venue._id} value={venue._id}>
-              {venue.name}
-            </option>
-          ))}
-        </select>
+          onChange={(id) => update({ venueId: id })}
+          recentsKey="venue"
+          placeholder="Search venues…"
+          options={venues.map((venue) => ({
+            id: venue._id,
+            label: venue.name,
+          }))}
+        />
       </label>
     </div>
   );
@@ -519,7 +535,16 @@ function ClientHeadcountStep({
         <SearchSelect
           value={draft.clientId}
           disabled={locked}
-          onChange={(id) => update({ clientId: id })}
+          onChange={(id) => {
+            const client = clients.find((row) => row._id === id);
+            // Start the day-of contact as the client; edit it if it differs.
+            update({
+              clientId: id,
+              ...(!draft.primaryContactName && client
+                ? { primaryContactName: clientName(client) }
+                : {}),
+            });
+          }}
           recentsKey="client"
           placeholder="Search clients…"
           options={clients.map((client) => ({

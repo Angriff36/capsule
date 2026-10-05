@@ -176,12 +176,13 @@ export const ReasonCopy = {
   },
 
   supersedeDemand: {
-    title: "Supersede demand",
-    description: "Explain what replaces this demand signal.",
-    label: "Supersede reason",
+    title: "Retire this line",
+    description:
+      "This amount stops counting toward buying. Say why, e.g. the menu changed.",
+    label: "Why retire it",
     help: "supersedeDemand",
     placeholder: "e.g. Regenerated after menu change",
-    confirmLabel: "Supersede",
+    confirmLabel: "Retire line",
   },
   releaseReservation: {
     title: "Release reservation",

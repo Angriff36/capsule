@@ -46,6 +46,10 @@ it("explains a missing client, then enforces the required contact before sending
   expect(field("primaryContactName").closest("label")?.textContent).toContain(
     "Name *",
   );
+  // Picking the client starts the contact as that client; clearing it
+  // still blocks the save.
+  expect(field("primaryContactName").value).toBe("Client A");
+  input("primaryContactName", "");
   expect(field("primaryContactName").validity.valueMissing).toBe(true);
   await click(save);
   expect(create).not.toHaveBeenCalled();

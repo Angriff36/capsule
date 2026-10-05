@@ -24,7 +24,12 @@ export function TastingPrepList({ tastingId }: { tastingId: string }) {
               <p className="text-base font-semibold text-ink">
                 {dish.dishName} — {dish.portions}{" "}
                 {dish.portions === 1 ? "portion" : "portions"} (
-                {Number(dish.totalAmount.toFixed(2))} {dish.portionUnit} total)
+                {Number(dish.totalAmount.toFixed(2))}{" "}
+                {dish.totalAmount !== 1 &&
+                ["serving", "portion", "piece"].includes(dish.portionUnit)
+                  ? `${dish.portionUnit}s`
+                  : dish.portionUnit}{" "}
+                total)
               </p>
               {dish.allergens.length > 0 ? (
                 <p className="text-sm text-ink-2">
@@ -33,7 +38,7 @@ export function TastingPrepList({ tastingId }: { tastingId: string }) {
               ) : null}
               {dish.components.length > 0 ? (
                 <p className="text-sm text-ink-2">
-                  Make:{" "}
+                  Recipe parts:{" "}
                   {dish.components
                     .map((part) =>
                       part.piecesNeeded != null

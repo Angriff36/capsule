@@ -249,17 +249,17 @@ export function describeLineConversion(
   if (!catalogUnit?.trim()) return { status: "no-catalog-unit" };
   const normalizedCatalogUnit = normalizeUnit(catalogUnit);
   if (!normalizedCatalogUnit) {
-    return { status: "unresolved", reason: `Catalog unit "${catalogUnit}" is unknown or ambiguous.` };
+    return { status: "unresolved", reason: `This ingredient is stocked in "${catalogUnit}", which can't be converted. Enter it in ${catalogUnit}.` };
   }
   const conversion = convertQuantity(quantity, unit, normalizedCatalogUnit, mappings, scope);
   if (conversion.status === "resolved") {
     return { status: "resolved", quantity: conversion.quantity };
   }
   const reason = conversion.status === "unresolved_no_density"
-    ? "A density mapping is needed to convert between mass and volume."
+    ? `Can't turn a volume into a weight for this ingredient yet. Enter it in ${normalizedCatalogUnit}, or add how much a cup weighs on the ingredient.`
     : conversion.status === "unresolved_no_mapping"
-      ? "A count or pack mapping is needed for this ingredient."
-      : "The source unit is ambiguous.";
+      ? `Can't turn this into ${normalizedCatalogUnit} yet. Enter it in ${normalizedCatalogUnit}, or add how much one piece or pack is on the ingredient.`
+      : "That unit could mean more than one thing. Pick a clearer one, such as fl oz or oz.";
   return { status: "unresolved", reason };
 }
 
