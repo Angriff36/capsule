@@ -21,6 +21,7 @@ const FACT_ORDER: EventBundleSource[] = [
   "beo",
   "eventWorksheet",
   "proposal",
+  "eventMenu",
   "orderList",
   "packList",
   "productionWorksheet",
@@ -132,11 +133,15 @@ function mergeMenu(
     "eventWorksheet",
     "beo",
     "proposal",
+    "eventMenu",
     "battleBoard",
   ];
   for (const part of orderParts(parts, menuOrder)) {
     for (const item of part.menu ?? []) {
-      const key = normalizeName(item.name);
+      // A bracket tag one report adds ("(JAD)") does not make another dish.
+      const key =
+        normalizeName(item.name.replace(/\([^)]*\)/g, "")) ||
+        normalizeName(item.name);
       if (key.length === 0) continue;
 
       if (item.quantityServings !== undefined) {

@@ -11,6 +11,9 @@ import { beoPdfText, isBeoPdf } from "./beoPdfText";
 import { bundlePartFromSheets } from "./bundlePartFromSheets";
 import { parseEventWorksheet } from "./parseEventWorksheet";
 import { isEventWorksheetPdf, worksheetPdfRows } from "./worksheetPdfRows";
+import { isPackListPdf, parsePackListPdf } from "./packListPdf";
+import { isEventMenuPdf, parseEventMenuPdf } from "./eventMenuPdf";
+import { isRtf, rtfToText } from "./rtfToText";
 import { readPdfTextLines } from "./pdfTextReader";
 import { readXlsxWorkbook } from "./xlsxReader";
 import { XlsxReportGrid } from "./xlsxReportGrid";
@@ -42,6 +45,11 @@ export { detectWorkbookSource } from "./bundlePartFromSheets";
 
 function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   const lower = file.name.toLowerCase();
+  const head = file.contents.toString("latin1", 0, 128);
+  if (isRtf(head)) {
+    // TPP saves the BEO as Rich Text too (as the import page reads it).
+    return parseBeoText(rtfToText(file.contents.toString("latin1")));
+  }
   if (file.contents.toString("utf8", 0, 128).trimStart().startsWith("{")) {
     const packetEvidence = packetEvidenceFromText(
       file.contents.toString("utf8"),
@@ -51,11 +59,13 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
 
   if (lower.endsWith(".pdf")) {
     const lines = readPdfTextLines(file.contents);
-    // TPP prints the BEO and the event worksheet as PDF too; any other PDF
-    // is the battle board.
+    // TPP prints the BEO, the event worksheet and the pack list as PDF too;
+    // any other PDF is the battle board.
     if (isBeoPdf(lines)) return parseBeoText(beoPdfText(lines));
     if (isEventWorksheetPdf(lines))
       return parseEventWorksheet(worksheetPdfRows(lines));
+    if (isPackListPdf(lines)) return parsePackListPdf(lines);
+    if (isEventMenuPdf(lines)) return parseEventMenuPdf(lines);
     return parseBattleBoard(lines);
   }
   if (lower.endsWith(".xlsx")) {
