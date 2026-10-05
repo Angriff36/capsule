@@ -1,2 +1,2 @@
-# Fixes
+# Resolved issues
 

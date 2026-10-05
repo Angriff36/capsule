@@ -45,6 +45,7 @@ import {
 } from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
   InlineClientForm,
@@ -69,6 +70,8 @@ function optional(value: string): string | undefined {
   const trimmed = value.trim();
   return trimmed || undefined;
 }
+
+const EVENT_DEFAULT_HOURS = 4;
 
 function eventFieldRules(data: FormData): Record<string, string> {
   const start = String(data.get("startsAt") ?? "");
@@ -216,6 +219,22 @@ export function EventCreatePage() {
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
   const proposalPrefill = proposalEventPrefill.values(proposal);
+  const [startsAtValue, setStartsAtValue] = useState(
+    proposalPrefill.startsAtLocal,
+  );
+  const [endsAtValue, setEndsAtValue] = useState(proposalPrefill.endsAtLocal);
+  const [endWasEdited, setEndWasEdited] = useState(
+    Boolean(proposalPrefill.endsAtLocal),
+  );
+  useEffect(() => {
+    if (!startsAtValue && proposalPrefill.startsAtLocal) {
+      setStartsAtValue(proposalPrefill.startsAtLocal);
+    }
+    if (!endsAtValue && proposalPrefill.endsAtLocal) {
+      setEndsAtValue(proposalPrefill.endsAtLocal);
+      setEndWasEdited(true);
+    }
+  }, [proposalPrefill.endsAtLocal, proposalPrefill.startsAtLocal]);
   const proposalLinkable = proposalEventPrefill.canLinkOnCreate(proposal);
   const proposalMenuCount = proposalId
     ? (proposalDishSelections ?? []).filter(
@@ -463,6 +482,11 @@ export function EventCreatePage() {
     const saved = draftForm.restore();
     if (!saved) return;
     const pick = (key: string) => saved.values[key]?.trim() ?? "";
+    if (pick("startsAt")) setStartsAtValue(pick("startsAt"));
+    if (pick("endsAt")) {
+      setEndsAtValue(pick("endsAt"));
+      setEndWasEdited(true);
+    }
     if (pick("clientId")) setClientId(pick("clientId"));
     if (pick("venueId")) setVenueId(pick("venueId"));
     if (pick("occasionId")) setOccasionId(pick("occasionId"));
@@ -779,9 +803,17 @@ export function EventCreatePage() {
                 Starts *
                 <BoundedDateTimeLocalInput
                   name="startsAt"
-                  defaultValue={proposalPrefill.startsAtLocal}
+                  value={startsAtValue}
                   className="input"
                   required
+                  onResolvedValue={(next) => {
+                    setStartsAtValue(next);
+                    if (!endsAtValue || !endWasEdited) {
+                      setEndsAtValue(
+                        addLocalDateTimeHours(next, EVENT_DEFAULT_HOURS),
+                      );
+                    }
+                  }}
                 />
                 <FieldError name="startsAt" errors={errors} touched={touched} />
               </label>
@@ -789,9 +821,14 @@ export function EventCreatePage() {
                 Ends *
                 <BoundedDateTimeLocalInput
                   name="endsAt"
-                  defaultValue={proposalPrefill.endsAtLocal}
+                  value={endsAtValue}
                   className="input"
                   required
+                  naturalDateAnchor={startsAtValue}
+                  onResolvedValue={(next) => {
+                    setEndsAtValue(next);
+                    setEndWasEdited(true);
+                  }}
                 />
                 <FieldError name="endsAt" errors={errors} touched={touched} />
               </label>

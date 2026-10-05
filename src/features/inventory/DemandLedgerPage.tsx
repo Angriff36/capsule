@@ -11,6 +11,7 @@ import {
 import { useApplyDemandSupersede } from "../../lib/culinaryDemandClient";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { HoverPreview } from "../../ui/HoverPreview";
+import { FieldHelp } from "../../ui/FieldHelp";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { IngredientPreviewCard } from "../kitchen/IngredientPreviewCard";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
@@ -333,7 +334,12 @@ export function DemandLedgerPage() {
                   <th>Ingredient</th>
                   <th>Required</th>
                   <th>State</th>
-                  <th>Purchase</th>
+                  <th>
+                    <span className="field-label-row">
+                      Purchase
+                      <FieldHelp term="purchaseEligibility" />
+                    </span>
+                  </th>
                   <th aria-label="Actions" />
                 </tr>
               </thead>

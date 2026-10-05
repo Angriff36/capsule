@@ -51,6 +51,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import {
   RosterAttentionSection,
   type OpenStaffNeed,
@@ -60,6 +61,7 @@ import { findRosterConflicts } from "./rosterConflicts";
 const policy = new WorkforceLifecyclePolicy();
 const OVERTIME_THRESHOLD_STORAGE_KEY =
   "capsule.workforce.overtime-threshold-hours";
+const SHIFT_DEFAULT_HOURS = 8;
 
 const hours = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
@@ -128,6 +130,9 @@ export function RosterPage() {
   const [showForm, setShowForm] = useState<"assignment" | "shift" | null>(null);
   const [shiftPersonId, setShiftPersonId] = useState("");
   const [shiftTypeId, setShiftTypeId] = useState("");
+  const [shiftStartsAt, setShiftStartsAt] = useState("");
+  const [shiftEndsAt, setShiftEndsAt] = useState("");
+  const [shiftEndWasEdited, setShiftEndWasEdited] = useState(false);
   const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
     startOfScheduleWeek(Date.now()),
   );
@@ -396,6 +401,9 @@ export function RosterPage() {
         form.reset();
         setShiftPersonId("");
         setShiftTypeId("");
+        setShiftStartsAt("");
+        setShiftEndsAt("");
+        setShiftEndWasEdited(false);
         setShowForm(null);
       });
     })();
@@ -784,6 +792,15 @@ export function RosterPage() {
                   name="startsAt"
                   className="input"
                   required
+                  value={shiftStartsAt}
+                  onResolvedValue={(next) => {
+                    setShiftStartsAt(next);
+                    if (!shiftEndsAt || !shiftEndWasEdited) {
+                      setShiftEndsAt(
+                        addLocalDateTimeHours(next, SHIFT_DEFAULT_HOURS),
+                      );
+                    }
+                  }}
                 />
               </label>
               <label className="field-label">
@@ -792,6 +809,12 @@ export function RosterPage() {
                   name="endsAt"
                   className="input"
                   required
+                  value={shiftEndsAt}
+                  naturalDateAnchor={shiftStartsAt}
+                  onResolvedValue={(next) => {
+                    setShiftEndsAt(next);
+                    setShiftEndWasEdited(true);
+                  }}
                 />
               </label>
               <label className="field-label">

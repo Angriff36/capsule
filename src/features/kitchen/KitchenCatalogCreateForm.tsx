@@ -16,6 +16,7 @@ import { useIngredientLookupResolveCost } from "../../lib/ingredientLookupClient
 import { KITCHEN_SECTION_SINGULAR, type KitchenSection } from "./kitchenRoutes";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import type { NutritionFields } from "../../lib/nutritionUnitScale";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 const UNITS = SELECTABLE_UNITS;
 
@@ -337,7 +338,10 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
         {section === "components" ? (
           <>
             <label className="field-label">
-              Yield
+              <span className="field-label-row">
+                Yield
+                <FieldHelp term="yield" />
+              </span>
               <input
                 name="yieldQuantity"
                 type="number"
@@ -349,7 +353,10 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
             </label>
             <UnitField name="yieldUnit" label="Yield unit" />
             <label className="field-label">
-              Batch multiplier
+              <span className="field-label-row">
+                Batch multiplier
+                <FieldHelp term="batchMultiplier" />
+              </span>
               <input
                 name="batchMultiplier"
                 type="number"
