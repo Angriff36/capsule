@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { useEventActivity } from "../../lib/useEventActivity";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
@@ -93,6 +94,30 @@ export function EventHistoryTab({ eventId }: { eventId: Id<"events"> }) {
                       <span className="font-semibold">{row.text}</span>
                       {row.detail ? (
                         <span className="text-ink-2"> · {row.detail}</span>
+                      ) : null}
+                      {row.cascade ? (
+                        <span className="block text-sm text-ink-2">
+                          {"→ "}
+                          {row.cascade.map((group, index) => {
+                            const href = group.href ?? group.links[0]?.href;
+                            const text = `${group.count} ${group.label} ${group.verb}`;
+                            return (
+                              <span key={`${group.entity}:${group.verb}`}>
+                                {index > 0 ? ", " : null}
+                                {href ? (
+                                  <Link
+                                    to={href}
+                                    className="font-semibold text-accent underline-offset-2 hover:underline"
+                                  >
+                                    {text}
+                                  </Link>
+                                ) : (
+                                  text
+                                )}
+                              </span>
+                            );
+                          })}
+                        </span>
                       ) : null}
                     </span>
                     {row.person ? (

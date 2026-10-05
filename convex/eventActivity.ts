@@ -18,10 +18,13 @@ import { api } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { cascadeReceiptFor, type CascadeGroup } from "./lib/cascadeReceipt";
 
 /** Most day-of records of one kind read for one event. */
 const MAX_RECORDS = 1000;
 const MAX_ROWS = 250;
+/** The event's own newest steps that get what their follow-ups did. */
+const MAX_RECEIPTS = 20;
 
 const TEXT: Record<string, string> = {
   EventDraftCaptured: "Event drafted",
@@ -360,6 +363,18 @@ export const listEventActivity = query({
     ];
     const { rows: newest, more } = await newestAcross(ctx, ids, MAX_ROWS);
 
+    // A step on the event itself also says what its follow-ups made
+    // (purchase needs, a pack list, batches), so the receipt stays here.
+    const receipts = new Map<string, CascadeGroup[]>();
+    const steps = new Set<string>();
+    for (const row of newest
+      .filter((row) => row.entityId === String(id))
+      .slice(0, MAX_RECEIPTS)) {
+      const receipt = await cascadeReceiptFor(ctx, tenantId, row);
+      if (!receipt || steps.has(receipt.stepId)) continue;
+      steps.add(receipt.stepId);
+      receipts.set(String(row._id), receipt.groups);
+    }
     const rows = await Promise.all(
       newest.map(async (row) => ({
         id: String(row._id),
@@ -368,6 +383,7 @@ export const listEventActivity = query({
         text: TEXT[row.type] ?? plain(row.type),
         detail: detailOf(row.payload),
         person: await personNameOf(ctx, tenantId, row.payload),
+        cascade: receipts.get(String(row._id)) ?? null,
       })),
     );
     return { rows, truncated: cut || more };

@@ -45,6 +45,7 @@ import {
 import { useTrackRecent } from "../../lib/recents";
 import { DownloadIcon } from "../../ui/icons";
 import { eventVenueLabel } from "./eventVenueLabel";
+import { useCascadeReceiptToast } from "./useCascadeReceiptToast";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
@@ -82,6 +83,7 @@ import {
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
 import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
+import { CascadePreviewDialog } from "./CascadePreviewDialog";
 import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
@@ -163,6 +165,7 @@ function EventDetailContent({
     "USD",
   );
   useTrackRecent("Event", event?.title);
+  useCascadeReceiptToast(event._id);
   useEffect(() => {
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
@@ -214,6 +217,9 @@ function EventDetailContent({
     newHeadcount: number;
     version?: number;
   } | null>(null);
+  const [cascadePreview, setCascadePreview] = useState<
+    "approve" | "closeOut" | null
+  >(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
@@ -272,14 +278,13 @@ function EventDetailContent({
     const done = "Stage updated";
     if (key === "submitForApproval")
       void run(() => submitForApproval(args), done);
-    if (key === "approve") void run(() => approve(args), done);
+    if (key === "approve" || key === "closeOut") setCascadePreview(key);
     if (key === "lockForSales") void run(() => lockForSales(args), done);
     if (key === "confirmSalesLock")
       void run(() => confirmSalesLock(args), done);
     if (key === "finalizeEvent") void run(() => finalizeEvent(args), done);
     if (key === "beginExecution") void run(() => beginExecution(args), done);
     if (key === "complete") void run(() => complete(args), done);
-    if (key === "closeOut") void run(() => closeOut(args), done);
   };
 
   // One obvious next step: the first primary lifecycle action. Other stage
@@ -803,6 +808,21 @@ function EventDetailContent({
               expectedFingerprint,
             })
           }
+        />
+      ) : null}
+      {cascadePreview ? (
+        <CascadePreviewDialog
+          eventId={event._id}
+          action={cascadePreview}
+          onClose={() => setCascadePreview(null)}
+          onConfirm={() => {
+            const args = { docId: event._id, version };
+            void run(
+              () =>
+                cascadePreview === "approve" ? approve(args) : closeOut(args),
+              "Stage updated",
+            );
+          }}
         />
       ) : null}
     </div>
