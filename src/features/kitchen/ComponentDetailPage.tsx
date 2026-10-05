@@ -433,22 +433,32 @@ export function ComponentDetailPage() {
                 {editing ? "Close editor" : "Edit draft"}
               </button>
             ) : null}
-            {actions.map((action) => (
-              <button
-                key={action.key}
-                className={
-                  action.key === "publishVersion"
-                    ? "btn btn-primary"
-                    : "btn btn-ghost"
-                }
-                disabled={busy != null}
-                onClick={() => invokeLifecycle(action.key)}
-              >
-                {busy === action.key ? "Working." : action.label}
-              </button>
-            ))}
+            {actions
+              .filter((action) => action.key !== "publishVersion")
+              .map((action) => (
+                <button
+                  key={action.key}
+                  className="btn btn-ghost"
+                  disabled={busy != null}
+                  onClick={() => invokeLifecycle(action.key)}
+                >
+                  {busy === action.key ? "Working." : action.label}
+                </button>
+              ))}
           </>
         }
+        primaryAction={actions
+          .filter((action) => action.key === "publishVersion")
+          .map((action) => (
+            <button
+              key={action.key}
+              className="btn btn-primary"
+              disabled={busy != null}
+              onClick={() => invokeLifecycle(action.key)}
+            >
+              {busy === action.key ? "Working." : action.label}
+            </button>
+          ))}
         sentinelRef={headerSentinelRef}
         sectionScopeRef={sectionScopeRef}
         headingId="recipe-detail-title"

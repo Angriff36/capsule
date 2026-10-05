@@ -149,6 +149,7 @@ export function StickyRecordHeader({
   title,
   facts,
   actions,
+  primaryAction,
   sentinelRef,
   sectionScopeRef,
   sectionKey,
@@ -157,6 +158,8 @@ export function StickyRecordHeader({
   title: string;
   facts: StickyRecordFact[];
   actions?: ReactNode;
+  /** Stays visible at every width; secondary actions hide on phones. */
+  primaryAction?: ReactNode;
   sentinelRef: RefObject<HTMLElement | null>;
   sectionScopeRef: RefObject<HTMLElement | null>;
   sectionKey?: string;
@@ -245,25 +248,12 @@ export function StickyRecordHeader({
         ) : null}
         <button
           type="button"
-          className={
-            actions
-              ? "btn btn-ghost sticky-record-header-desktop-only"
-              : "btn btn-ghost"
-          }
+          className="btn btn-ghost sticky-record-header-desktop-only"
           onClick={backToTop}
         >
           Back to top
         </button>
-        {actions ? (
-          <div className="sticky-record-header-mobile-actions">
-            <ActionMenu label="More">
-              {actions}
-              <button type="button" onClick={backToTop}>
-                Back to top
-              </button>
-            </ActionMenu>
-          </div>
-        ) : null}
+        {primaryAction}
       </div>
     </div>
   );

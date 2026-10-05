@@ -5220,9 +5220,6 @@ div.tpp-parameter-wide {
   align-items: center;
   gap: 0.45rem;
 }
-.sticky-record-header-mobile-actions {
-  display: none;
-}
 .sticky-record-header .action-menu-list button.is-active {
   background: var(--color-brand-soft);
   color: var(--color-brand);
@@ -5251,9 +5248,6 @@ div.tpp-parameter-wide {
   .sticky-record-header-actions,
   .sticky-record-header-desktop-only {
     display: none;
-  }
-  .sticky-record-header-mobile-actions {
-    display: block;
   }
 }
 /* Natural-language schedule entry preserves the native picker as a visible
