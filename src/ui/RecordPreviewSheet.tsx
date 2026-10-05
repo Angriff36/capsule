@@ -2,6 +2,7 @@ import {
   useEffect,
   useId,
   useRef,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -134,7 +135,10 @@ export function RecordPreviewSheet({
   );
 }
 
-function trapTabKey(event: KeyboardEvent, panelRef: RefObject<HTMLElement>) {
+function trapTabKey(
+  event: KeyboardEvent | ReactKeyboardEvent,
+  panelRef: RefObject<HTMLElement>,
+) {
   const panel = panelRef.current;
   if (!panel) return;
   const focusable = Array.from(
