@@ -1,9 +1,13 @@
-# Progress
+# Progress: Field-level domain-term help
 
-- Began implementation repair and read primary design, Convex, and planning guidance.
-## 2026-10-04
+## 2026-10-05
+- Started discovery. Read project rules, design authority, component catalog, planning and browser-verification guidance.
+- Initial searches located likely culinary and inventory paths; focused code inspection is next.
+- Verified the calculation semantics for yield, batch multiplier, and par level from the existing demand and stock logic.
+- A focused source viewer failed once due to PowerShell colon interpolation; no repository files or runtime state were affected.
+- Completed discovery. The planned reusable help component will use portalled, click/tap-open content; it will be mounted at all authored entry surfaces and on the automatic Purchase status heading.
 
-- Preserved the existing dirty feature worktree and began a focused repair against the supplied independent-review findings.
-- Read the design, domain-gating, command-surface, proof-kit, and Convex guidance. The existing provenance query confirms the reported empty recalculation diff, zero-time supersession, hard-coded roles, and capped contribution scan.
-- Added the generated composite contribution index and inventory read policies, made provenance totals unit-safe, switched supersession history to its stored event time, and rendered ordered saved calculation steps.
-- Passed focused demand proofs (8 tests), typecheck, format check, and Vite build. Full check and regeneration drift check correctly require committing the existing generated diff. The requested disposable Playwright test was removed after its runner failed before test discovery because this worktree has no local runtime configuration and resolves incompatible parent Playwright packages.
+## Test Results
+| Check | Result |
+|---|---|
+| Not run yet | — |
