@@ -25,6 +25,9 @@ enum VenueNoteCategory {
   // A structured walk-through of the venue (section 08): load-in, kitchen,
   // event space, bar, bathrooms, storage, parking, power, and concerns.
   site_visit
+  // The outgoing owner's hand-over brief when a partner venue moves to a
+  // new owner (section 02 territory transfer).
+  handoff
   other
 }
 
