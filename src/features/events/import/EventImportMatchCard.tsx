@@ -81,6 +81,7 @@ export function EventImportMatchCard({
             placeholder="Search clients…"
             disabled={disabled}
             testId="event-import-client"
+            recentsKey="client"
           />
         </label>
         <label className="field-label">
@@ -131,6 +132,7 @@ export function EventImportMatchCard({
                   placeholder="Search catalog dishes…"
                   disabled={disabled}
                   testId={`event-import-dish-${line.key}`}
+                  recentsKey="dish"
                 />
               </label>
             ))}

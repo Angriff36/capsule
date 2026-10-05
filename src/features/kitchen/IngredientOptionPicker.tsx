@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useStorageUrls } from "../../lib/fileStorageClient";
+import {
+  pinRecents,
+  rankBySearch,
+  readRecents,
+  rememberRecent,
+} from "../../ui/pickerSearch";
 import type { IngredientCatalogRow } from "./IngredientCatalogLabel";
 
 const THUMB_CLASS =
@@ -65,6 +71,7 @@ export function IngredientOptionPicker({
 }: Props) {
   const [internalValue, setInternalValue] = useState("");
   const [filter, setFilter] = useState("");
+  const [recentIds, setRecentIds] = useState(() => readRecents("ingredient"));
   const selectedId = controlledValue ?? internalValue;
   const rows = useMemo(
     () =>
@@ -75,11 +82,22 @@ export function IngredientOptionPicker({
       ),
     [ingredients],
   );
-  const filteredRows = useMemo(() => {
-    const query = filter.trim().toLowerCase();
-    if (!query) return rows;
-    return rows.filter((row) => row.name.toLowerCase().includes(query));
-  }, [filter, rows]);
+  // Typing ranks fuzzy matches; an empty filter pins the five recent picks.
+  const { recentCount, filteredRows } = useMemo(() => {
+    if (filter.trim()) {
+      return {
+        recentCount: 0,
+        filteredRows: rankBySearch(rows, filter, (row) => ({
+          label: row.name,
+        })),
+      };
+    }
+    const pinned = pinRecents(rows, recentIds, (row) => row._id);
+    return {
+      recentCount: pinned.recent.length,
+      filteredRows: [...pinned.recent, ...pinned.rest],
+    };
+  }, [filter, rows, recentIds]);
   const storageIds = useMemo(
     () =>
       filteredRows
@@ -90,6 +108,7 @@ export function IngredientOptionPicker({
   const imageUrls = useStorageUrls(storageIds);
 
   const pick = (id: string) => {
+    if (id) setRecentIds(rememberRecent("ingredient", id));
     if (onChange) onChange(id);
     else setInternalValue(id);
   };
@@ -139,10 +158,21 @@ export function IngredientOptionPicker({
         role="listbox"
         aria-label="Choose ingredient"
       >
-        {filteredRows.map((row) => {
+        {filteredRows.map((row, index) => {
           const selected = row._id === selectedId;
+          const header =
+            recentCount && index === 0
+              ? "Recent"
+              : recentCount && index === recentCount
+                ? "All"
+                : null;
           return (
             <li key={row._id}>
+              {header ? (
+                <p className="px-2 pt-1.5 pb-0.5 text-xs font-medium tracking-wide text-ink-3 uppercase">
+                  {header}
+                </p>
+              ) : null}
               <button
                 type="button"
                 role="option"

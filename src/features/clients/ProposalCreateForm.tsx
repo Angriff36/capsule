@@ -10,6 +10,7 @@ import { useMutation } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api, type Doc, type Id } from "../../lib/api";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { useCatalogDishes } from "./useCatalogDishes";
@@ -589,21 +590,17 @@ export function ProposalCreateForm({
             ) : (
               <label className="field-label supply-span-2">
                 Client
-                <select
-                  className="input"
+                <SearchSelect
                   name="clientId"
                   required
                   defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select client
-                  </option>
-                  {activeClients.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {clientDisplayName(row._id, clients)}
-                    </option>
-                  ))}
-                </select>
+                  recentsKey="client"
+                  placeholder="Search clients…"
+                  options={activeClients.map((row) => ({
+                    id: row._id,
+                    label: clientDisplayName(row._id, clients),
+                  }))}
+                />
               </label>
             )}
             <label className="field-label">

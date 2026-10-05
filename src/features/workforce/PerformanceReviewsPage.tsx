@@ -153,31 +153,31 @@ export function PerformanceReviewsPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Person reviewed
-              <select
+              <SearchSelect
                 name="personId"
-                className="input"
                 required
+                recentsKey="staff"
+                placeholder="Select person"
                 value={personId}
-                onChange={(event) => pickPerson(event.target.value)}
-              >
-                <option value="">Select person</option>
-                {activePeople.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.givenName} {person.familyName}
-                  </option>
-                ))}
-              </select>
+                onChange={(id) => pickPerson(id)}
+                options={activePeople.map((person) => ({
+                  id: person._id,
+                  label: `${person.givenName} ${person.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Reviewer
-              <select name="reviewerId" className="input" required>
-                <option value="">Select reviewer</option>
-                {activePeople.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {person.givenName} {person.familyName}
-                  </option>
-                ))}
-              </select>
+              <SearchSelect
+                name="reviewerId"
+                required
+                recentsKey="staff"
+                placeholder="Select reviewer"
+                options={activePeople.map((person) => ({
+                  id: person._id,
+                  label: `${person.givenName} ${person.familyName}`,
+                }))}
+              />
             </label>
             <label className="field-label">
               Event (optional)

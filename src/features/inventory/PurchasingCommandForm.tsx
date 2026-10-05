@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { ADD_NEW_CHOICE } from "./inlineCatalogChoice";
 import { VENDOR_CONTACT_ROLES } from "./vendorContactRoles";
 import { suggestOrderNumber } from "./vendorOrderNumber";
@@ -92,24 +93,20 @@ function OrderVendorField({
   return (
     <label className="field-label">
       Vendor
-      <select
+      <SearchSelect
         name="vendorId"
-        className="input"
         required
-        autoFocus
+        recentsKey="vendor"
+        placeholder="Search vendors…"
         defaultValue={vendors.length === 1 ? vendors[0]!._id : ""}
-        onChange={(event) => {
-          if (event.target.value === ADD_NEW_CHOICE) setAdding(true);
+        onChange={(id) => {
+          if (id === ADD_NEW_CHOICE) setAdding(true);
         }}
-      >
-        <option value="">Select vendor</option>
-        {vendors.map((vendor) => (
-          <option key={vendor._id} value={vendor._id}>
-            {vendor.name}
-          </option>
-        ))}
-        <option value={ADD_NEW_CHOICE}>New vendor…</option>
-      </select>
+        options={[
+          ...vendors.map((vendor) => ({ id: vendor._id, label: vendor.name })),
+          { id: ADD_NEW_CHOICE, label: "New vendor…" },
+        ]}
+      />
     </label>
   );
 }
@@ -182,19 +179,17 @@ export function PurchasingCommandForm({
           <>
             <label className="field-label">
               Vendor
-              <select
+              <SearchSelect
                 name="vendorId"
-                className="input"
+                recentsKey="vendor"
+                placeholder="Search vendors…"
                 defaultValue={contactVendorId ?? ""}
                 required
-              >
-                <option value="">Select vendor</option>
-                {activeVendors.map((vendor) => (
-                  <option key={vendor._id} value={vendor._id}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
+                options={activeVendors.map((vendor) => ({
+                  id: vendor._id,
+                  label: vendor.name,
+                }))}
+              />
             </label>
             <label className="field-label">
               Contact name

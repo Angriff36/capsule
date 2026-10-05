@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 export const EQUIPMENT_CONDITIONS = [
   "excellent",
@@ -283,18 +284,19 @@ export function EquipmentForm({
         </label>
         <label className="field-label">
           Rented from
-          <select
+          <SearchSelect
             name="vendorId"
-            className="input"
+            recentsKey="vendor"
+            placeholder="Search vendors…"
             defaultValue={editItem?.vendorId ?? ""}
-          >
-            <option value="">No vendor</option>
-            {vendors.map((vendor) => (
-              <option key={vendor.vendorId} value={vendor.vendorId}>
-                {vendor.name}
-              </option>
-            ))}
-          </select>
+            options={[
+              { id: "", label: "No vendor" },
+              ...vendors.map((vendor) => ({
+                id: vendor.vendorId,
+                label: vendor.name,
+              })),
+            ]}
+          />
           <span className="field-hint">For items we rent, not own.</span>
         </label>
         {editing ? null : (
