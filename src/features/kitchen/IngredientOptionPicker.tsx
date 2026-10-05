@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useStorageUrls } from "../../lib/fileStorageClient";
+import {
+  InlineReferenceCreateSheet,
+  useCanCreateInlineReference,
+} from "../../ui/InlineReferenceCreateSheet";
 import type { IngredientCatalogRow } from "./IngredientCatalogLabel";
 
 const THUMB_CLASS =
@@ -65,6 +69,12 @@ export function IngredientOptionPicker({
 }: Props) {
   const [internalValue, setInternalValue] = useState("");
   const [filter, setFilter] = useState("");
+  const [createName, setCreateName] = useState<string | null>(null);
+  const [temporaryIngredient, setTemporaryIngredient] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const canCreateIngredient = useCanCreateInlineReference("ingredient");
   const selectedId = controlledValue ?? internalValue;
   const rows = useMemo(
     () =>
@@ -75,11 +85,22 @@ export function IngredientOptionPicker({
       ),
     [ingredients],
   );
+  const allRows = useMemo(() => {
+    if (
+      !temporaryIngredient ||
+      rows.some((row) => row._id === temporaryIngredient.id)
+    )
+      return rows;
+    return [
+      ...rows,
+      { _id: temporaryIngredient.id, name: temporaryIngredient.name },
+    ];
+  }, [rows, temporaryIngredient]);
   const filteredRows = useMemo(() => {
     const query = filter.trim().toLowerCase();
-    if (!query) return rows;
-    return rows.filter((row) => row.name.toLowerCase().includes(query));
-  }, [filter, rows]);
+    if (!query) return allRows;
+    return allRows.filter((row) => row.name.toLowerCase().includes(query));
+  }, [allRows, filter]);
   const storageIds = useMemo(
     () =>
       filteredRows
@@ -119,7 +140,7 @@ export function IngredientOptionPicker({
         onChange={(event) => pick(event.target.value)}
       >
         <option value="">Select ingredient</option>
-        {rows.map((row) => (
+        {allRows.map((row) => (
           <option key={row._id} value={row._id}>
             {row.name}
           </option>
@@ -164,6 +185,17 @@ export function IngredientOptionPicker({
             </li>
           );
         })}
+        {filteredRows.length === 0 && filter.trim() && canCreateIngredient ? (
+          <li>
+            <button
+              type="button"
+              className="w-full rounded-xs px-2 py-2 text-left text-sm font-semibold text-brand hover:bg-accent-soft"
+              onClick={() => setCreateName(filter.trim())}
+            >
+              + Create ingredient “{filter.trim()}”
+            </button>
+          </li>
+        ) : null}
       </ul>
       {!rows.length ? (
         <p className="text-sm text-ink-3">
@@ -171,6 +203,28 @@ export function IngredientOptionPicker({
         </p>
       ) : filteredRows.length === 0 ? (
         <p className="text-sm text-ink-3">No ingredients match that filter.</p>
+      ) : null}
+      {createName ? (
+        <InlineReferenceCreateSheet
+          kind="ingredient"
+          open
+          initialName={createName}
+          existingOptions={allRows.map((row) => ({
+            id: row._id,
+            label: row.name,
+          }))}
+          onClose={() => setCreateName(null)}
+          onUseExisting={(id) => {
+            pick(id);
+            setCreateName(null);
+          }}
+          onCreated={(record) => {
+            setTemporaryIngredient({ id: record.id, name: record.label });
+            pick(record.id);
+            setFilter("");
+            setCreateName(null);
+          }}
+        />
       ) : null}
     </div>
   );
