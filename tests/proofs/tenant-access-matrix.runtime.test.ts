@@ -157,11 +157,13 @@ const LINK_TABLE: Record<string, string> = {
   assignedById: "@sign-in",
   assignedToId: "people",
   assignedToPersonId: "people",
+  partnerOwnerPersonId: "people",
   assigneePersonIds: "people",
   authSubjectId: "@sign-in",
   authorAuthSubjectId: "@sign-in",
   authorId: "@sign-in",
   brandLogoStorageId: "@file",
+  logoStorageId: "@file",
   businessApprovedById: "@sign-in",
   cancelledById: "@sign-in",
   capsuleId: "events",
@@ -221,9 +223,6 @@ const LINK_TABLE: Record<string, string> = {
   loadRuleId: "@outside",
   locationId: "storageLocations",
   locationIds: "storageLocations",
-  // Venue branding logo and the partner venue's relationship owner.
-  logoStorageId: "@file",
-  partnerOwnerPersonId: "people",
   // Dish versions (2026-10-04): the main dish a version belongs to.
   mainDishId: "dishes",
   maintenanceScheduleId: "vehicleMaintenanceSchedules",

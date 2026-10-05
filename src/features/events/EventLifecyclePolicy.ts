@@ -85,15 +85,10 @@ const ACTIONS: ReadonlyArray<
     lifecycle: EventBeginExecutionLifecycle,
   },
   {
-    // The generated lifecycle lists every transition into "completed",
-    // including planning → completed, which belongs to recordPastCompletion
-    // (OldSystemStatusAction). complete itself only runs from final.
     key: "complete",
     label: "Complete",
     kind: "primary",
-    lifecycle: EventCompleteLifecycle.filter(
-      (transition) => transition.from !== "planning",
-    ),
+    lifecycle: EventCompleteLifecycle,
   },
   {
     key: "closeOut",
@@ -129,19 +124,27 @@ export class EventLifecyclePolicy {
     stage: string,
     planning?: { plannedAt?: number | null },
   ): EventLifecycleAction[] {
-    return ACTIONS.filter((action) =>
-      action.lifecycle.some(
-        (transition) =>
-          transition.property === "stage" && transition.from === stage,
-      ),
-    )
-      .filter(
-        (action) =>
-          action.key !== "submitForApproval" ||
-          planning === undefined ||
-          planning.plannedAt != null,
+    return (
+      ACTIONS.filter((action) =>
+        action.lifecycle.some(
+          (transition) =>
+            transition.property === "stage" && transition.from === stage,
+        ),
       )
-      .map(({ lifecycle: _lifecycle, ...action }) => action);
+        // Planning -> completed exists only for old-system events that are
+        // already over (Event.recordPastCompletion, its own button); a planned
+        // event is never finished from the stage buttons.
+        .filter(
+          (action) => !(action.key === "complete" && stage === "planning"),
+        )
+        .filter(
+          (action) =>
+            action.key !== "submitForApproval" ||
+            planning === undefined ||
+            planning.plannedAt != null,
+        )
+        .map(({ lifecycle: _lifecycle, ...action }) => action)
+    );
   }
 
   isEditableStage(stage: string): boolean {

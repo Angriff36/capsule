@@ -110,7 +110,6 @@ describe("plain words on leftover operations manifests", () => {
       "Event staff may see venue rooms",
       "Event staff may see venue layout templates",
       "Event staff may see venue suppliers",
-      // Kitchen staff see service styles too (recipe sheet packaging).
       "Staff may see service styles",
       "Event and sales staff may see occasions",
       "Event and sales staff may see event templates",
