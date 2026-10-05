@@ -2930,6 +2930,12 @@
       "reason": "Bin number written on a pack line: optional; existing lines read as not in a bin."
     },
     {
+      "path": "FieldConfirmation.answers",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "The filled-in paper form (ticked lines or food waste counts): optional; forms signed before read as no answers."
+    },
+    {
       "path": "TrainingModule.steps",
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",

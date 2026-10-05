@@ -1854,6 +1854,7 @@ export const FieldConfirmationSchema = z.object({
   outcome: z.enum(["all_good", "problem"]).nullable().optional(),
   note: z.string().nullable().optional(),
   photoStorageId: z.string().nullable().optional(),
+  answers: z.string().nullable().optional(),
   secondCompletedAt: z.coerce.date().nullable().optional(),
   secondObservedAt: z.coerce.date().nullable().optional(),
   formCheckedById: z.string().uuid().nullable().optional(),
@@ -8152,6 +8153,7 @@ export const FieldConfirmationCompleteParamsSchema = z.object({
   observedAt: z.coerce.date().optional(),
   note: z.string().optional(),
   photoStorageId: z.string().optional(),
+  answers: z.string().optional(),
 });
 
 export type FieldConfirmationCompleteParams = z.infer<typeof FieldConfirmationCompleteParamsSchema>;
