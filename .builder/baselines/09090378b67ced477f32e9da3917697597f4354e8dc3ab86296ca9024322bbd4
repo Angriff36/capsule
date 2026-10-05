@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0be6b50b59cb4405ceec66107fb813b3bef06b9640be7c651ef86466b34050d3:0de9704fea65de3dd0507201f452122ffe8da95472a64f22516f2c1a35cdfef8:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:266219a20c85bcddabf837083f7946119556cb9e1618bc781dabf73c8a183f07:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2adf0dbe2be7fc13031947e8cd8e615755a32824bde4d807c32d6b8a0ad1e0f7:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2e796a81fddaf309979e338ba3628067b5b7e9423ad15a9add3879866ea7ff0d:3306ebabf219c0cc21ad6e7bba1de138890a236c04f809451dbce4023259c19c:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a1d713bbed83912442bea89431772bd59b8b1018b9fb961e9bef0f553c899b9:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3d696c714047b0acae35e21b9b61e5a5d6218536f671d76c2e010d23018dfcbe:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4dd0f7d4d8b351c5060d0e1dbab0c6453c90be2fd5b0647a34fa06912a9be95d:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5596f820716ad9ea502ff771902f0ed450c21f88551ec4b00fd85156f3e1fe13:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:56f4459d4e1dbca44eded864fcdd82d2972967bc744b1a77003b44d2902d3c71:5860168b413a48233df8025f61a7392d76203d14e2c8bb11928dcae337249c79:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:62de9818c368bcad3552fe66b86a4f0ab8d33e817c1b3a44bf2dcc042b72bb82:657f7d679212dcccc4a8235419fdd1194c09e9911f37c125244a8cbad8947c70:6598d6818e668be874ad2f94c6aff0a448eae0974d97c8148bc20a29cb11c6f9:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:69c7ab127ec451978df4c40faec592c9f76c7a0e2938e451dfd0b1fc11de0fef:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:71eac31104529dc564ecb61beb7032d2db805e6107d6eef3704c64a6a659f4c6:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:79f46428192658c8673f4172030958646db2b132410c465350dc52d48a8f0700:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7e595b0b5bf54974b5cec7c15a38738b95850e23fb8e8506d0b7203c8be12b85:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8a9ebe36819523092f836ea0364594b56fa31acf8773df5417aeeede55e0d9be:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8c7f0296f1685ad02bf6bbf430cba6b9ddb38e411da31efa5f8c227e67368729:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a8c4ca758911e45a7ba884f109d86333b8f692e62091f8cc28ccc09e8ce52f95:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b850eb7ba1dd4b3df63dd238434fa4e43f3efe4796a1dd7234e32b26b0bbd2ca:b89f15fec1dc869221ea412eb407eb88f0862769308126bdb1f9c58d251ce25e:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:bc55b5a3cfd2ecc4b1dfb167b911951a4b9bacccf0aaa6a7d5c26049cc6a43de:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:da02086bab66b6571d8ef188ead9741931437eb4762484f276fa51f71677fb91:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e2efecbfb0d96bd763e8cde930dc50d60ad54c998e1380044e46f7ef5c2bab33:e31fe1e1e09c5145cf42a284c6b2feb57d3074397792bc94ad0f579ad1de54ab:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e50b3d0372bf29efef870f880714426dd3381160693fdf99785bb285a3747515:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe0a107f4e0c4b2d1519b30f851dc8a3b7ea6adfb67c25dbc9c02c0047d5e1:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:0be6b50b59cb4405ceec66107fb813b3bef06b9640be7c651ef86466b34050d3:0de9704fea65de3dd0507201f452122ffe8da95472a64f22516f2c1a35cdfef8:0df768c063f34e93596150a51893f119681ef955eee8db52aa9744c3615bac7c:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1a6ae92232818f81de420108b3f101bbe9003f81aa7bd3a34150fc41264087a0:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:266219a20c85bcddabf837083f7946119556cb9e1618bc781dabf73c8a183f07:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2adf0dbe2be7fc13031947e8cd8e615755a32824bde4d807c32d6b8a0ad1e0f7:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:2e796a81fddaf309979e338ba3628067b5b7e9423ad15a9add3879866ea7ff0d:3306ebabf219c0cc21ad6e7bba1de138890a236c04f809451dbce4023259c19c:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:3a1d713bbed83912442bea89431772bd59b8b1018b9fb961e9bef0f553c899b9:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3bfd02c05e381d8d0a45c8288a9201be3e86ff9707a09e07009d90cb16ac6cca:3d696c714047b0acae35e21b9b61e5a5d6218536f671d76c2e010d23018dfcbe:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:3fd83ae89e0cd997c91be570316cc9bc36b8d4ff53d7b670a80429e167299082:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:494e21f0c3cdb24baa31af0e88ea212deba3e8b7945babe98a6594c7e7373fa3:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4bc5d23a96fe7800e680f3a0e167dcb4123f7671aeffcaae55ccac7f711694c0:4dd0f7d4d8b351c5060d0e1dbab0c6453c90be2fd5b0647a34fa06912a9be95d:4df78e5aedf9bbe23d8c8025a9fa494f5fbe70837e08d7aaa04bd6a1a3589324:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5596f820716ad9ea502ff771902f0ed450c21f88551ec4b00fd85156f3e1fe13:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:56f4459d4e1dbca44eded864fcdd82d2972967bc744b1a77003b44d2902d3c71:5860168b413a48233df8025f61a7392d76203d14e2c8bb11928dcae337249c79:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5ef1165e1546583cc6c0d23b731ade7f7665b4b16c1a51ba9b95c077f792ea65:62de9818c368bcad3552fe66b86a4f0ab8d33e817c1b3a44bf2dcc042b72bb82:657f7d679212dcccc4a8235419fdd1194c09e9911f37c125244a8cbad8947c70:6598d6818e668be874ad2f94c6aff0a448eae0974d97c8148bc20a29cb11c6f9:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:66799d46b76d09af0c83ddbe7c2cc1d74e43597cdb72a8ea13e18511075d9d69:69c7ab127ec451978df4c40faec592c9f76c7a0e2938e451dfd0b1fc11de0fef:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:6fae0f99daa453c13d4f1be760546336642c8fd6765609fd94bff1164dabeeda:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:71eac31104529dc564ecb61beb7032d2db805e6107d6eef3704c64a6a659f4c6:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:7518a4f9d549ed73b804fd2da7cf7bfcb3f8dfd87b6f2f6fcaaa44db3e7d777e:75b6f11126a47276b5c3bfe20f52bf7d11ecd5f3a01b6ed4fedb5c55d6d6d5b2:793e274f722134add641d7ff20a9c26f8deb61c6570f2a95e4ec6412c5d6bbc0:79f46428192658c8673f4172030958646db2b132410c465350dc52d48a8f0700:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7e595b0b5bf54974b5cec7c15a38738b95850e23fb8e8506d0b7203c8be12b85:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8a9ebe36819523092f836ea0364594b56fa31acf8773df5417aeeede55e0d9be:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8c7f0296f1685ad02bf6bbf430cba6b9ddb38e411da31efa5f8c227e67368729:8cb80a737f9ab433cb84d4d92d966e632ff795ce6462c8408df3312ea23291a4:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:94586777dc329bcdc84fb33a08a4874085d658ed91f064e33726e387036251a7:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a8c4ca758911e45a7ba884f109d86333b8f692e62091f8cc28ccc09e8ce52f95:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b850eb7ba1dd4b3df63dd238434fa4e43f3efe4796a1dd7234e32b26b0bbd2ca:b89f15fec1dc869221ea412eb407eb88f0862769308126bdb1f9c58d251ce25e:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c193965fd0532d8b984db6064a0dc8a769ddeb6242c0d206f4587c4ae560c976:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d5e25622722681a0d9cc6ca3d2d6184228b6478c52ec112d340a2f3ee1966b0c:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:da02086bab66b6571d8ef188ead9741931437eb4762484f276fa51f71677fb91:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:defdfb0e89f2ce4997de29156c91f602d924f9a55e614d3c15e20a87b9f94086:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e2efecbfb0d96bd763e8cde930dc50d60ad54c998e1380044e46f7ef5c2bab33:e31fe1e1e09c5145cf42a284c6b2feb57d3074397792bc94ad0f579ad1de54ab:e4349005930c8bde3dd377df5eecbeb9ac65c6af2640fcf7da75abae8e78f891:e50b3d0372bf29efef870f880714426dd3381160693fdf99785bb285a3747515:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe0a107f4e0c4b2d1519b30f851dc8a3b7ea6adfb67c25dbc9c02c0047d5e1:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c:ff89af3904c56b41ff0b81f79ec54ac78bc0f6e353a56ed3f3d0b52ae8b4c88c";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -19884,6 +19884,20 @@ export const DishClassifyAllergensInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -20185,6 +20199,20 @@ export const DishClassifyKindInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -20463,6 +20491,20 @@ export const DishClearFinishTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -20717,6 +20759,20 @@ export const DishClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -20967,6 +21023,20 @@ export const DishDetachVersionInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -21233,6 +21303,20 @@ export const DishIntroduceInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -21683,6 +21767,20 @@ export const DishLabelVersionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -21943,6 +22041,20 @@ export const DishLinkAsEditionInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -22215,6 +22327,20 @@ export const DishMakeVersionOfInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -22479,6 +22605,20 @@ export const DishMergeIntoInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -22764,6 +22904,20 @@ export const DishPurgeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -23030,6 +23184,20 @@ export const DishReinstateInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -23302,6 +23470,20 @@ export const DishRetireInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -23585,6 +23767,20 @@ export const DishReviseDetailsInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -23879,6 +24075,20 @@ export const DishSaveRecipeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -24157,6 +24367,20 @@ export const DishSaveServiceInstructionsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -24424,6 +24648,20 @@ export const DishSetExclusiveVenueInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -24683,6 +24921,20 @@ export const DishSetFinishTimingInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -24964,6 +25216,20 @@ export const DishSetPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Venue",
     "queryKeyHint": "queryKeys.venue.lists()",
     "readId": "Venue.list",
@@ -25230,6 +25496,20 @@ export const DishUpdatePortioningInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -25603,6 +25883,20 @@ export const DishUseMainRecipeInvalidation = [
     "entity": "StylePackaging",
     "queryKeyHint": "queryKeys.stylePackaging.detail(id)",
     "readId": "StylePackaging.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   },
   {
@@ -34341,6 +34635,20 @@ export const EventApplyRouteTravelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -35342,6 +35650,20 @@ export const EventApplyTimingPolicyInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -36359,6 +36681,20 @@ export const EventApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -37359,6 +37695,20 @@ export const EventArchiveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -38346,6 +38696,20 @@ export const EventAssignOwnerInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -39339,6 +39703,20 @@ export const EventBeginExecutionInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -40339,6 +40717,20 @@ export const EventCancelInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -41413,6 +41805,20 @@ export const EventCaptureDraftInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -42523,6 +42929,20 @@ export const EventChangeHeadcountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -43512,6 +43932,20 @@ export const EventChangePricingInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -44509,6 +44943,20 @@ export const EventChangePrimaryContactInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -45515,6 +45963,20 @@ export const EventChangeRequirementsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -46516,6 +46978,20 @@ export const EventChangeServiceStyleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -47511,6 +47987,20 @@ export const EventChangeVenueInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -48520,6 +49010,20 @@ export const EventChooseOperatingLocationInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -49508,6 +50012,20 @@ export const EventClearBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -50486,6 +51004,20 @@ export const EventCloseOutInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -51484,6 +52016,20 @@ export const EventCompleteInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -52500,6 +53046,20 @@ export const EventConfigureRecurrenceInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -53557,6 +54117,20 @@ export const EventConfigureTimingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -54585,6 +55159,20 @@ export const EventConfirmSalesLockInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -55589,6 +56177,20 @@ export const EventCorrectCommercialInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -56583,6 +57185,20 @@ export const EventFinalizeEventInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -57589,6 +58205,20 @@ export const EventLinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -58583,6 +59213,20 @@ export const EventLockForSalesInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -59585,6 +60229,20 @@ export const EventMarkBinderBuiltInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -60568,6 +61226,20 @@ export const EventMoveToClientInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -61571,6 +62243,20 @@ export const EventNormalizePurchasingWeekInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -62586,6 +63272,20 @@ export const EventPlanEngagementInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -63726,6 +64426,20 @@ export const EventReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -64704,6 +65418,20 @@ export const EventReassignClientInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -65692,6 +66420,20 @@ export const EventRecordFinalVenueFactsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -66676,6 +67418,20 @@ export const EventRecordPastCompletionInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -67690,6 +68446,20 @@ export const EventRescheduleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -68681,6 +69451,20 @@ export const EventReturnToPlanningInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -69698,6 +70482,20 @@ export const EventSetEventNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -70685,6 +71483,20 @@ export const EventStageClientMergeInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -71682,6 +72494,20 @@ export const EventStopRecurrenceInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -72660,6 +73486,20 @@ export const EventSubmitForApprovalInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -73662,6 +74502,20 @@ export const EventUnlinkExternalChannelInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -74657,6 +75511,20 @@ export const EventUpdateDaySheetInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -75748,6 +76616,20 @@ export const EventUpdateImportDraftInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -76865,6 +77747,20 @@ export const EventUpdateSetupNotesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -77903,6 +78799,20 @@ export const EventUpdateTaskBreakdownInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeRecord",
     "queryKeyHint": "queryKeys.timeRecord.lists()",
     "readId": "TimeRecord.list",
@@ -78930,6 +79840,20 @@ export const EventUseCompanyTimingRuleInvalidation = [
     "entity": "StaffMessage",
     "queryKeyHint": "queryKeys.staffMessage.detail(id)",
     "readId": "StaffMessage.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -114631,6 +115555,20 @@ export const LeadCaptureInvalidation = [
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -114853,6 +115791,20 @@ export const LeadConfirmConversionInvalidation = [
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -115009,6 +115961,20 @@ export const LeadConfirmProposalSentInvalidation = [
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -115164,6 +116130,20 @@ export const LeadReassignClientInvalidation = [
     "entity": "ReferralSource",
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -115326,6 +116306,20 @@ export const LeadRecordSourceHistoryInvalidation = [
     "entity": "ReferralSource",
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -115532,6 +116526,20 @@ export const LeadReviseDetailsInvalidation = [
     "entity": "ReferralSource",
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -115748,6 +116756,20 @@ export const LeadStageClientMergeInvalidation = [
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -115918,6 +116940,20 @@ export const LeadStageConversionInvalidation = [
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -116087,6 +117123,20 @@ export const LeadStageProposalInvalidation = [
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -116255,6 +117305,20 @@ export const LeadUpdatePipelineInvalidation = [
     "entity": "ReferralSource",
     "queryKeyHint": "queryKeys.referralSource.detail(id)",
     "readId": "ReferralSource.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -116889,6 +117953,20 @@ export const MenuArchiveInvalidation = [
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -117017,6 +118095,20 @@ export const MenuDraftInvalidation = [
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -117144,6 +118236,20 @@ export const MenuMarkPublishedInvalidation = [
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -117245,6 +118351,20 @@ export const MenuRestoreInvalidation = [
     "entity": "ProposalDishSelection",
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -117360,6 +118480,20 @@ export const MenuReviseDetailsInvalidation = [
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -117470,6 +118604,20 @@ export const MenuSetSeasonInvalidation = [
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -117571,6 +118719,20 @@ export const MenuSetServiceInvalidation = [
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -117669,6 +118831,20 @@ export const MenuUnpublishInvalidation = [
     "entity": "ProposalDishSelection",
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -117793,6 +118969,20 @@ export const MenuUpdatePricingInvalidation = [
     "entity": "ProposalDishSelection",
     "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "readId": "ProposalDishSelection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -137074,6 +138264,20 @@ export const PersonAssignRoleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -137878,6 +139082,20 @@ export const PersonChangeAddressInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -138608,6 +139826,20 @@ export const PersonCorrectEmailInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -139316,6 +140548,20 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -140034,6 +141280,20 @@ export const PersonDeactivateInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -140764,6 +142024,20 @@ export const PersonHireInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -141626,6 +142900,20 @@ export const PersonLinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -142330,6 +143618,20 @@ export const PersonReactivateInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -143054,6 +144356,20 @@ export const PersonSetEmployeeNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -143761,6 +145077,20 @@ export const PersonSetPayRateInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -144475,6 +145805,20 @@ export const PersonSetSchedulingHoldInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -145185,6 +146529,20 @@ export const PersonSetSmsAlertsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -145891,6 +147249,20 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -146606,6 +147978,20 @@ export const PersonSetWorkPreferencesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "TimeOffRequest",
     "queryKeyHint": "queryKeys.timeOffRequest.lists()",
     "readId": "TimeOffRequest.list",
@@ -147317,6 +148703,20 @@ export const PersonTerminateInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -148048,6 +149448,20 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "StaffNeedWaitlistEntry",
     "queryKeyHint": "queryKeys.staffNeedWaitlistEntry.detail(id)",
     "readId": "StaffNeedWaitlistEntry.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
     "label": "related entity detail"
   },
   {
@@ -157720,6 +159134,34 @@ export const ProposalAcceptInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -157952,6 +159394,34 @@ export const ProposalConfirmChangeSourceInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -158149,6 +159619,34 @@ export const ProposalDeclineInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -158396,6 +159894,34 @@ export const ProposalDraftInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -158696,6 +160222,34 @@ export const ProposalExpireInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -158919,6 +160473,34 @@ export const ProposalFollowEventClientInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -159129,6 +160711,34 @@ export const ProposalFollowEventHeadcountInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -159358,6 +160968,34 @@ export const ProposalLinkEventInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -159555,6 +161193,34 @@ export const ProposalMarkViewedInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -159770,6 +161436,34 @@ export const ProposalReassignClientInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -159970,6 +161664,34 @@ export const ProposalRecordHistoricalAcceptanceInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -160186,6 +161908,34 @@ export const ProposalRefreshFromEventInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -160416,6 +162166,34 @@ export const ProposalSendInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -160633,6 +162411,34 @@ export const ProposalStageClientMergeInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -160844,6 +162650,34 @@ export const ProposalStageEventLinkInvalidation = [
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
     "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
   }
 ] as const;
 
@@ -161050,6 +162884,34 @@ export const ProposalSupersedeInvalidation = [
     "entity": "ShareLink",
     "queryKeyHint": "queryKeys.shareLink.detail(id)",
     "readId": "ShareLink.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
     "label": "related entity detail"
   }
 ] as const;
@@ -183031,6 +184893,1009 @@ export const SyncErrorReopenAction = {
     {
       "name": "rawPayload",
       "label": "Raw payload",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- Tasting.cancel ---
+export type TastingCancelClientInput = Record<string, never>;
+
+export const TastingCancelCapability = {
+  capabilityId: "Tasting.cancel",
+  entity: "Tasting",
+  command: "cancel",
+  route: "/api/manifest/Tasting/commands/cancel",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tastings"},{"kind":"policy_denial","message":"Sales staff may update tastings"},{"kind":"policy_denial","message":"Sales staff may manage tastings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Tasting not found"}],
+  emits: ["TastingCancelled"],
+} as const;
+
+export type TastingCancelResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Tasting.cancel.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingCancelInput(client: TastingCancelClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Tasting.cancel. */
+export const TastingCancelInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Tasting.cancel. Not a rendered control. */
+export const TastingCancelAction = {
+  "exposure": "human",
+  "label": "Cancel",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- Tasting.markSelectionsApplied ---
+export interface TastingMarkSelectionsAppliedClientInput {
+  proposalId: string;
+}
+
+export const TastingMarkSelectionsAppliedCapability = {
+  capabilityId: "Tasting.markSelectionsApplied",
+  entity: "Tasting",
+  command: "markSelectionsApplied",
+  route: "/api/manifest/Tasting/commands/markSelectionsApplied",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["proposalId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tastings"},{"kind":"policy_denial","message":"Sales staff may update tastings"},{"kind":"policy_denial","message":"Sales staff may manage tastings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Tasting not found"}],
+  emits: ["TastingSelectionsApplied"],
+} as const;
+
+export type TastingMarkSelectionsAppliedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Tasting.markSelectionsApplied.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingMarkSelectionsAppliedInput(client: TastingMarkSelectionsAppliedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Tasting.markSelectionsApplied. */
+export const TastingMarkSelectionsAppliedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Tasting.markSelectionsApplied. Not a rendered control. */
+export const TastingMarkSelectionsAppliedAction = {
+  "exposure": "human",
+  "label": "Mark selections applied",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "proposalId",
+      "label": "Proposal id",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- Tasting.markTasted ---
+export type TastingMarkTastedClientInput = Record<string, never>;
+
+export const TastingMarkTastedCapability = {
+  capabilityId: "Tasting.markTasted",
+  entity: "Tasting",
+  command: "markTasted",
+  route: "/api/manifest/Tasting/commands/markTasted",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tastings"},{"kind":"policy_denial","message":"Sales staff may update tastings"},{"kind":"policy_denial","message":"Sales staff may manage tastings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"Tasting not found"}],
+  emits: ["TastingCompleted"],
+} as const;
+
+export type TastingMarkTastedResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for Tasting.markTasted.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingMarkTastedInput(client: TastingMarkTastedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Tasting.markTasted. */
+export const TastingMarkTastedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Tasting.markTasted. Not a rendered control. */
+export const TastingMarkTastedAction = {
+  "exposure": "human",
+  "label": "Mark tasted",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- Tasting.schedule ---
+export interface TastingScheduleClientInput {
+  /** Must not be "". */
+  /** Bounds: 1..∞ */
+  scheduledAt: string & { readonly __nonEmpty?: true };
+  /** Bounds: 1..∞ */
+  durationMinutes: number;
+  /** Bounds: 1..∞ */
+  guestCount: number;
+  leadId?: string;
+  proposalId?: string;
+  eventId?: string;
+  location?: string;
+  attendeeNames?: string[];
+  notes?: string;
+}
+
+export const TastingScheduleCapability = {
+  capabilityId: "Tasting.schedule",
+  entity: "Tasting",
+  command: "schedule",
+  route: "/api/manifest/Tasting/commands/schedule",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["scheduledAt"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["scheduledAt","durationMinutes","guestCount","leadId","proposalId","eventId","location","attendeeNames","notes"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tastings"},{"kind":"policy_denial","message":"Sales staff may update tastings"},{"kind":"policy_denial","message":"Sales staff may manage tastings"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Attach this tasting to a lead or proposal"},{"kind":"constraint_block","message":"Choose a date and time, a positive duration, and at least one tasting guest"}],
+  emits: ["TastingScheduled"],
+} as const;
+
+export type TastingScheduleResult = { docId: string };
+
+/**
+ * Build command input for Tasting.schedule.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingScheduleInput(client: TastingScheduleClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Tasting.schedule. */
+export const TastingScheduleInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.lists()",
+    "readId": "Lead.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Lead",
+    "queryKeyHint": "queryKeys.lead.detail(id)",
+    "readId": "Lead.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer Tasting.schedule. Not a rendered control. */
+export const TastingScheduleAction = {
+  "exposure": "human",
+  "label": "Schedule",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "scheduledAt",
+      "label": "Scheduled at",
+      "required": true
+    },
+    {
+      "name": "durationMinutes",
+      "label": "Duration minutes",
+      "required": true
+    },
+    {
+      "name": "guestCount",
+      "label": "Guest count",
+      "required": true
+    },
+    {
+      "name": "leadId",
+      "label": "Lead id",
+      "required": false
+    },
+    {
+      "name": "proposalId",
+      "label": "Proposal id",
+      "required": false
+    },
+    {
+      "name": "eventId",
+      "label": "Event id",
+      "required": false
+    },
+    {
+      "name": "location",
+      "label": "Location",
+      "required": false
+    },
+    {
+      "name": "attendeeNames",
+      "label": "Attendee names",
+      "required": false
+    },
+    {
+      "name": "notes",
+      "label": "Notes",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- TastingDish.add ---
+export interface TastingDishAddClientInput {
+  tastingId: string;
+  menuId: string;
+  dishId: string;
+  /** Bounds: 1..∞ */
+  portionCount: number;
+  sortOrder?: number;
+}
+
+export const TastingDishAddCapability = {
+  capabilityId: "TastingDish.add",
+  entity: "TastingDish",
+  command: "add",
+  route: "/api/manifest/TastingDish/commands/add",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["tastingId","menuId","dishId","portionCount","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tasting dishes"},{"kind":"policy_denial","message":"Sales staff may update tasting dishes"},{"kind":"policy_denial","message":"Sales staff may manage tasting dishes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"constraint_block","message":"Add at least one portion"}],
+  emits: ["TastingDishAdded"],
+} as const;
+
+export type TastingDishAddResult = { docId: string };
+
+/**
+ * Build command input for TastingDish.add.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingDishAddInput(client: TastingDishAddClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful TastingDish.add. */
+export const TastingDishAddInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Menu",
+    "queryKeyHint": "queryKeys.menu.lists()",
+    "readId": "Menu.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Menu",
+    "queryKeyHint": "queryKeys.menu.detail(id)",
+    "readId": "Menu.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer TastingDish.add. Not a rendered control. */
+export const TastingDishAddAction = {
+  "exposure": "human",
+  "label": "Add",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "tastingId",
+      "label": "Tasting id",
+      "required": true
+    },
+    {
+      "name": "menuId",
+      "label": "Menu id",
+      "required": true
+    },
+    {
+      "name": "dishId",
+      "label": "Dish id",
+      "required": true
+    },
+    {
+      "name": "portionCount",
+      "label": "Portion count",
+      "required": true
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- TastingDish.markOnProposal ---
+export interface TastingDishMarkOnProposalClientInput {
+  proposalId: string;
+}
+
+export const TastingDishMarkOnProposalCapability = {
+  capabilityId: "TastingDish.markOnProposal",
+  entity: "TastingDish",
+  command: "markOnProposal",
+  route: "/api/manifest/TastingDish/commands/markOnProposal",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["proposalId"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tasting dishes"},{"kind":"policy_denial","message":"Sales staff may update tasting dishes"},{"kind":"policy_denial","message":"Sales staff may manage tasting dishes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"TastingDish not found"}],
+  emits: ["TastingDishApplied"],
+} as const;
+
+export type TastingDishMarkOnProposalResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for TastingDish.markOnProposal.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingDishMarkOnProposalInput(client: TastingDishMarkOnProposalClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful TastingDish.markOnProposal. */
+export const TastingDishMarkOnProposalInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Menu",
+    "queryKeyHint": "queryKeys.menu.lists()",
+    "readId": "Menu.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Menu",
+    "queryKeyHint": "queryKeys.menu.detail(id)",
+    "readId": "Menu.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer TastingDish.markOnProposal. Not a rendered control. */
+export const TastingDishMarkOnProposalAction = {
+  "exposure": "human",
+  "label": "Mark on proposal",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "proposalId",
+      "label": "Proposal id",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- TastingDish.recordFeedback ---
+export interface TastingDishRecordFeedbackClientInput {
+  /** Allowed: "pending" | "approved" | "rejected" | "maybe" */
+  decision: "pending" | "approved" | "rejected" | "maybe";
+  /** Bounds: 1..5 */
+  clientRating?: number;
+  clientFeedback?: string;
+}
+
+export const TastingDishRecordFeedbackCapability = {
+  capabilityId: "TastingDish.recordFeedback",
+  entity: "TastingDish",
+  command: "recordFeedback",
+  route: "/api/manifest/TastingDish/commands/recordFeedback",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["decision","clientRating","clientFeedback"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Sales staff may see tasting dishes"},{"kind":"policy_denial","message":"Sales staff may update tasting dishes"},{"kind":"policy_denial","message":"Sales staff may manage tasting dishes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Rating must be between 1 and 5"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"TastingDish not found"}],
+  emits: ["TastingDishFeedbackRecorded"],
+} as const;
+
+export type TastingDishRecordFeedbackResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for TastingDish.recordFeedback.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindTastingDishRecordFeedbackInput(client: TastingDishRecordFeedbackClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful TastingDish.recordFeedback. */
+export const TastingDishRecordFeedbackInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.lists()",
+    "readId": "TastingDish.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "TastingDish",
+    "queryKeyHint": "queryKeys.tastingDish.detail(id)",
+    "readId": "TastingDish.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "readId": "Dish.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "readId": "Dish.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Menu",
+    "queryKeyHint": "queryKeys.menu.lists()",
+    "readId": "Menu.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Menu",
+    "queryKeyHint": "queryKeys.menu.detail(id)",
+    "readId": "Menu.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.lists()",
+    "readId": "Proposal.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Proposal",
+    "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "readId": "Proposal.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.lists()",
+    "readId": "Tasting.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Tasting",
+    "queryKeyHint": "queryKeys.tasting.detail(id)",
+    "readId": "Tasting.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer TastingDish.recordFeedback. Not a rendered control. */
+export const TastingDishRecordFeedbackAction = {
+  "exposure": "human",
+  "label": "Record feedback",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "decision",
+      "label": "Decision",
+      "required": true,
+      "choices": [
+        {
+          "value": "pending",
+          "label": "pending"
+        },
+        {
+          "value": "approved",
+          "label": "approved"
+        },
+        {
+          "value": "rejected",
+          "label": "rejected"
+        },
+        {
+          "value": "maybe",
+          "label": "maybe"
+        }
+      ]
+    },
+    {
+      "name": "clientRating",
+      "label": "Client rating",
+      "required": false
+    },
+    {
+      "name": "clientFeedback",
+      "label": "Client feedback",
       "required": false
     }
   ]
@@ -206408,6 +209273,13 @@ export const ALL_CAPABILITY_IDS = [
   "SyncError.markResolved",
   "SyncError.record",
   "SyncError.reopen",
+  "Tasting.cancel",
+  "Tasting.markSelectionsApplied",
+  "Tasting.markTasted",
+  "Tasting.schedule",
+  "TastingDish.add",
+  "TastingDish.markOnProposal",
+  "TastingDish.recordFeedback",
   "TaxRate.define",
   "TaxRate.revise",
   "TaxRate.setActive",
@@ -207434,6 +210306,20 @@ export const ALL_READ_IDS = [
   "SyncError.byTenantId",
   "SyncError.get",
   "SyncError.list",
+  "Tasting.byCreatedByPersonId",
+  "Tasting.byEventId",
+  "Tasting.byLeadId",
+  "Tasting.byProposalId",
+  "Tasting.byTenantId",
+  "Tasting.get",
+  "Tasting.list",
+  "TastingDish.byAppliedToProposalId",
+  "TastingDish.byDishId",
+  "TastingDish.byMenuId",
+  "TastingDish.byTastingId",
+  "TastingDish.byTenantId",
+  "TastingDish.get",
+  "TastingDish.list",
   "TaxRate.byTenantId",
   "TaxRate.get",
   "TaxRate.list",
@@ -210260,6 +213146,48 @@ export type getSyncErrorResult = { _id: string; _creationTime: number; tenantId:
 
 export const listSyncErrorRead = {"entity":"SyncError","readId":"SyncError.list","exportName":"listSyncError","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: string; recordType: string; externalId: string; status: \"pending\" | \"resolved\"; kind: \"parse_failed\" | \"missing_field\" | \"unknown\"; errorMessage: string; rawPayload: string; attempts: number; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listSyncErrorResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; sourceSystem: string; recordType: string; externalId: string; status: "pending" | "resolved"; kind: "parse_failed" | "missing_field" | "unknown"; errorMessage: string; rawPayload: string; attempts: number; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingByCreatedByPersonIdRead = {"entity":"Tasting","readId":"Tasting.byCreatedByPersonId","exportName":"listTastingByCreatedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"createdByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingByCreatedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingByEventIdRead = {"entity":"Tasting","readId":"Tasting.byEventId","exportName":"listTastingByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingByLeadIdRead = {"entity":"Tasting","readId":"Tasting.byLeadId","exportName":"listTastingByLeadId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"leadId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingByLeadIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingByProposalIdRead = {"entity":"Tasting","readId":"Tasting.byProposalId","exportName":"listTastingByProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"proposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingByProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingByTenantIdRead = {"entity":"Tasting","readId":"Tasting.byTenantId","exportName":"listTastingByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getTastingRead = {"entity":"Tasting","readId":"Tasting.get","exportName":"getTasting","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getTastingResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listTastingRead = {"entity":"Tasting","readId":"Tasting.list","exportName":"listTasting","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: \"scheduled\" | \"completed\" | \"selectionsApplied\" | \"cancelled\"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadId: string | null; proposalId: string | null; eventId: string | null; scheduledAt: number; durationMinutes: number; location: string | null; guestCount: number; attendeeNames: string[] | null; notes: string | null; createdByPersonId: string | null; status: "scheduled" | "completed" | "selectionsApplied" | "cancelled"; completedAt: number | null; cancelledAt: number | null; selectionsAppliedAt: number | null; bookedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingDishByAppliedToProposalIdRead = {"entity":"TastingDish","readId":"TastingDish.byAppliedToProposalId","exportName":"listTastingDishByAppliedToProposalId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"appliedToProposalId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingDishByAppliedToProposalIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingDishByDishIdRead = {"entity":"TastingDish","readId":"TastingDish.byDishId","exportName":"listTastingDishByDishId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"dishId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingDishByDishIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingDishByMenuIdRead = {"entity":"TastingDish","readId":"TastingDish.byMenuId","exportName":"listTastingDishByMenuId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"menuId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingDishByMenuIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingDishByTastingIdRead = {"entity":"TastingDish","readId":"TastingDish.byTastingId","exportName":"listTastingDishByTastingId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tastingId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingDishByTastingIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listTastingDishByTenantIdRead = {"entity":"TastingDish","readId":"TastingDish.byTenantId","exportName":"listTastingDishByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingDishByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getTastingDishRead = {"entity":"TastingDish","readId":"TastingDish.get","exportName":"getTastingDish","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getTastingDishResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listTastingDishRead = {"entity":"TastingDish","readId":"TastingDish.list","exportName":"listTastingDish","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: \"pending\" | \"approved\" | \"rejected\" | \"maybe\"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listTastingDishResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; tastingId: string; menuId: string; dishId: string; portionCount: number; sortOrder: number; clientRating: number | null; clientFeedback: string | null; decision: "pending" | "approved" | "rejected" | "maybe"; appliedToProposalId: string | null; appliedAt: number | null; addedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listTaxRateByTenantIdRead = {"entity":"TaxRate","readId":"TaxRate.byTenantId","exportName":"listTaxRateByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; percentage: number; appliesToFood: boolean; appliesToService: boolean; appliesToRental: boolean; active: boolean; configuredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listTaxRateByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; percentage: number; appliesToFood: boolean; appliesToService: boolean; appliesToRental: boolean; active: boolean; configuredAt: number | null; createdAt: number; updatedAt: number }>;

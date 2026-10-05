@@ -410,6 +410,11 @@ const ClientDetailPage = lazy(() =>
     default: module.ClientDetailPage,
   })),
 );
+const TastingsPage = lazy(() =>
+  import("../features/clients/TastingsPage").then((module) => ({
+    default: module.TastingsPage,
+  })),
+);
 const ProposalsPage = lazy(() =>
   import("../features/clients/ProposalsPage").then((module) => ({
     default: module.ProposalsPage,
@@ -1447,6 +1452,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ProposalTemplatesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/tastings"
+              element={
+                <SupplyRoute>
+                  <TastingsPage />
                 </SupplyRoute>
               }
             />
