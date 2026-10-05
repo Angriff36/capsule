@@ -18,6 +18,8 @@ export type PrepTaskLike = {
   notes?: string | null;
   dueAt?: number | null;
   componentId?: string | null;
+  startedAt?: number | null;
+  completedAt?: number | null;
   deletedAt?: number | null;
 };
 
