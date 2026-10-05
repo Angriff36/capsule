@@ -1,3 +1,2 @@
-# Fixes
+# Resolved issues
 
-No resolved implementation issues yet.

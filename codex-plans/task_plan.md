@@ -1,40 +1,20 @@
-# Task Plan: Field-level domain-term help
+# Staff-to-guest staffing ratios plan
 
 ## Goal
-Add reusable, accessible, plain-language help for each real editable batch multiplier, yield, par-level, and purchase-eligibility field, with worked-example links.
-
-## Current Phase
-Phase 1 - Requirements and discovery
+Implement tenant-scoped staffing ratio rules and use them to synchronize safe, draft staffing suggestions for confirmed/accepted events, with settings and event UI.
 
 ## Phases
+- [complete] Inspect current manifests, staffing shifts, event acceptance, and UI patterns.
+- [in_progress] Design source-backed changes and update authored manifest/seams/UI.
+- [pending] Regenerate contracts and fix integration/type issues.
+- [pending] Run focused verification, required checks, and temporary Playwright verification.
+- [pending] Review final diff and prepare handoff.
 
-### Phase 1: Requirements and discovery
-- [x] Read project and UI constraints.
-- [x] Locate domain definitions and all authored entry surfaces.
-- [x] Record findings.
-- **Status:** complete
+## Constraints
+- Preserve unrelated work and generated-file ownership.
+- Do not deploy, push, or commit.
+- Add only feature-focused tests required by the request and acceptance contract.
+- Use `bun run manifest:regen` for generated artifacts.
 
-### Phase 2: Design and implementation
-- [ ] Reuse or add the smallest appropriate shared UI pattern.
-- [ ] Add a single source of help copy and a linked in-app example surface.
-- [ ] Add help at every identified editable field.
-- **Status:** in_progress
-
-### Phase 3: Verification and handoff
-- [ ] Run targeted static checks and required repository gate.
-- [ ] Run a temporary Playwright verification and remove it.
-- [ ] Inspect diff for independent review readiness.
-- **Status:** pending
-
-## Decisions Made
-| Decision | Rationale |
-|---|---|
-| No backend, Manifest, or generated-file changes unless discovery proves required | The requested behavior is presentation-only. |
-| Add an additive `help` slot to ActionPrompt fields | The Par-level edit dialog is an authored entry path and needs the same help affordance. |
-| Explain purchase eligibility on the Demand Ledger Purchase heading | It is a computed, non-editable condition; a new control would be misleading. |
-
-## Errors Encountered
-| Error | Attempt | Resolution |
-|---|---:|---|
-| None | 0 | — |
-| PowerShell interpolation failed in a targeted line viewer | 1 | Use `${path}` to delimit the variable before a colon. |
+## Design decision
+- Reuse `StaffingTemplate` and `EventStaffNeed`: they already model per-style per-guest rules and safe unfilled scheduling drafts. Extend their selection from one whole-template winner to per-role precedence, so service-style rules win for the same role while any-style rules still contribute other roles.
