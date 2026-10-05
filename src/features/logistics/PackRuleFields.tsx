@@ -1,4 +1,5 @@
 import { PACK_EVENT_FACTS } from "../../lib/packRules";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { packCategoryLabel } from "./packLineExplanation";
 import {
@@ -69,17 +70,22 @@ export function PackRuleFields({
   return (
     <>
       {select("When", t, [...PACK_RULE_TRIGGERS], (trigger) => ({ trigger }))}
-      {t === "dish" || t === "production_note"
-        ? select(
-            t === "dish" ? "Dish" : "Only for this dish (optional)",
-            draft.dishId,
-            [
-              { value: "", label: t === "dish" ? "Pick a dish" : "Any dish" },
-              ...dishes.map((dish) => ({ value: dish._id, label: dish.name })),
-            ],
-            (dishId) => ({ dishId }),
-          )
-        : null}
+      {t === "dish" || t === "production_note" ? (
+        // Thousands of dishes: search, not a dropdown.
+        <label className="field-label">
+          <span>{t === "dish" ? "Dish" : "Only for this dish (optional)"}</span>
+          <SearchSelect
+            value={draft.dishId}
+            disabled={disabled}
+            onChange={(dishId) => onChange({ dishId })}
+            recentsKey="dish"
+            placeholder={
+              t === "dish" ? "Search dishes…" : "Any dish — or search…"
+            }
+            options={dishes.map((dish) => ({ id: dish._id, label: dish.name }))}
+          />
+        </label>
+      ) : null}
       {t === "service_style"
         ? select(
             "Service style",
