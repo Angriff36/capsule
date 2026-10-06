@@ -1,3 +1,4 @@
+import { packListName } from "./packListName";
 import { useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ReturnToListLink } from "../list-state/listOrigin";
@@ -1010,7 +1011,9 @@ export function PackListDetailPage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Load sheet</p>
-          <h1 className="display-title mt-2">{packList.name || "Pack list"}</h1>
+          <h1 className="display-title mt-2">
+            {packListName(packList.name, eventTitle)}
+          </h1>
           <p className="mt-3 max-w-160 text-ink-2">
             {eventTitle}
             {packList.purpose ? ` · ${packList.purpose}` : ""}
@@ -1022,7 +1025,15 @@ export function PackListDetailPage() {
             <button
               key={action.key}
               className="btn btn-ghost"
-              disabled={busy != null}
+              disabled={
+                busy != null ||
+                (action.key === "startPacking" && listItems.length === 0)
+              }
+              title={
+                action.key === "startPacking" && listItems.length === 0
+                  ? "Add items before packing."
+                  : undefined
+              }
               onClick={() => invokeList(action.key)}
             >
               {busy === `list:${action.key}` ? "Working…" : action.label}

@@ -1,3 +1,4 @@
+import { packListName } from "./packListName";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
@@ -191,7 +192,7 @@ export function PackingFloorPage() {
             ({ list, event, lines, open, missing, packers, percent }) => {
               const status = String(list.status);
               const needsHelp = list.assistanceRequestedAt != null;
-              const label = list.name || "Pack list";
+              const label = packListName(list.name, event?.title);
               const args = { docId: list._id, version: list.version };
               return (
                 <li
