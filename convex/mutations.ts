@@ -21154,6 +21154,11 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
         await __runEventIngredientContributionRecord(ctx, { docId: __elseId, ...__elseArgs } as any, true);
       }
     }
+    const fanRows2 = (await ctx.db.query("packLists").filter((q) => q.eq(q.field("activeEventId"), payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows2) {
+      const target = __row;
+      await __runPackListRequestDishContainers(ctx, { docId: (__row as any)._id, eventDishId: payload.eventDishId, dishId: payload.dishId, quantityServings: payload.quantityServings } as any);
+    }
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "confirmFromProposal", emitIndex: 0 });
     return { ...doc, ...updates };
 }
