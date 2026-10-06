@@ -265,7 +265,7 @@ export function PackListsPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Dispatch trace</p>
+            <p className="eyebrow">Every list</p>
             <h2>Pack lists</h2>
           </div>
           <span>{formatCountNoun(visibleRows.length, "list")}</span>

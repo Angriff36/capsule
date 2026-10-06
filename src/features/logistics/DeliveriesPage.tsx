@@ -399,7 +399,7 @@ export function DeliveriesPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Transit</p>
+            <p className="eyebrow">On the schedule</p>
             <h2>Deliveries</h2>
           </div>
           <span>

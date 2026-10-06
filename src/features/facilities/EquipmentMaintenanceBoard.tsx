@@ -157,11 +157,11 @@ export function EquipmentMaintenanceBoard({
     >
       <header className="maintenance-board__header">
         <div>
-          <p className="maintenance-board__kicker">Service control · live</p>
+          <p className="maintenance-board__kicker">Repairs and upkeep</p>
           <h2 id="maintenance-board-title">Maintenance log</h2>
           <p>
-            Put every asset on a recurring service rhythm, then log who did the
-            work, what it cost, and what they found.
+            Set how often each item gets serviced, then log who did the work,
+            what it cost, and what they found.
           </p>
         </div>
         <div className="maintenance-board__header-side">
@@ -224,7 +224,7 @@ export function EquipmentMaintenanceBoard({
           data-testid="maintenance-schedule-form"
         >
           <div className="maintenance-form__stamp">
-            <span>Recurring work order</span>
+            <span>Repeat service</span>
             <strong>Set the rhythm</strong>
           </div>
           <label className="field-label maintenance-form__asset">

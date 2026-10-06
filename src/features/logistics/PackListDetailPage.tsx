@@ -1268,7 +1268,7 @@ export function PackListDetailPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Ruled load sheet</p>
+            <p className="eyebrow">What to pack</p>
             <h2>Pack items</h2>
           </div>
           <span>{formatCountNoun(listItems.length, "item")}</span>

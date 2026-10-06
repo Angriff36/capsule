@@ -409,9 +409,8 @@ export function VehicleFleetPage() {
           <p className="eyebrow">Logistics · Fleet</p>
           <h1 className="display-title mt-2">Vehicle fleet</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Keep owned and leased delivery vehicles and trailers ready for
-            dispatch with registration, insurance, payload capacity, and current
-            operational status in one source catalog.
+            Your own and leased vans, trucks and trailers: plates, insurance,
+            how much each can carry, and whether it is free to go out.
           </p>
         </div>
         <div className="supply-masthead-actions">
@@ -490,12 +489,12 @@ export function VehicleFleetPage() {
         <section className="working-ledger">
           <div className="ledger-heading">
             <div>
-              <p className="eyebrow">Dispatch source</p>
+              <p className="eyebrow">What can go out</p>
               <h2>Vehicle catalog</h2>
             </div>
             <span>
               {availableVehicles.length} available ·{" "}
-              {activeVehicleCapacity.toLocaleString()} kg active capacity
+              {activeVehicleCapacity.toLocaleString()} kg they can carry
             </span>
           </div>
 
@@ -618,12 +617,12 @@ export function VehicleFleetPage() {
         <section className="working-ledger">
           <div className="ledger-heading">
             <div>
-              <p className="eyebrow">Dispatch source</p>
+              <p className="eyebrow">What can go out</p>
               <h2>Trailer catalog</h2>
             </div>
             <span>
               {availableTrailers.length} available ·{" "}
-              {activeTrailerCapacity.toLocaleString()} kg active capacity
+              {activeTrailerCapacity.toLocaleString()} kg they can carry
             </span>
           </div>
 
@@ -1012,7 +1011,7 @@ function ComplianceForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Fleet compliance</p>
+          <p className="eyebrow">Papers</p>
           <h2>
             Registration &amp; insurance —{" "}
             {kind === "vehicle" ? "vehicle" : "trailer"}

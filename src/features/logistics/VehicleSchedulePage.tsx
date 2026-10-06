@@ -261,7 +261,7 @@ export function VehicleSchedulePage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Dispatch queue</p>
+            <p className="eyebrow">Waiting to go out</p>
             <h2>Runs without a vehicle</h2>
           </div>
           <span>{unassignedRuns.length} waiting</span>

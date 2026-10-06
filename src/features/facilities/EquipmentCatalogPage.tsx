@@ -241,9 +241,9 @@ export function EquipmentCatalogPage() {
           <p className="eyebrow">Facilities · Equipment</p>
           <h1 className="display-title mt-2">Equipment catalog</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Owned and rented kitchen and service equipment — chafing dishes,
-            ovens, tents, linens — with asset tag, quantity, value, and current
-            condition. The basis for maintenance and event checkout.
+            Kitchen and service equipment you own or rent — chafing dishes,
+            ovens, tents, linens — with tag number, count, value, and condition.
+            Repairs and event check-out use this list.
           </p>
         </div>
         <div className="supply-masthead-actions">
@@ -357,7 +357,7 @@ export function EquipmentCatalogPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Asset register</p>
+            <p className="eyebrow">Everything you have</p>
             <h2>Catalog</h2>
           </div>
           <span>

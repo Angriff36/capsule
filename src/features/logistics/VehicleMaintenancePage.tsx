@@ -368,7 +368,7 @@ export function VehicleMaintenancePage() {
         >
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">Recurring work order</p>
+              <p className="eyebrow">Repeat service</p>
               <h2>Schedule maintenance</h2>
             </div>
             <div className="supply-row-actions">
@@ -569,7 +569,7 @@ export function VehicleMaintenancePage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Service board</p>
+            <p className="eyebrow">Service due</p>
             <h2>Maintenance schedules</h2>
           </div>
           <span>{activeSchedules.length} scheduled</span>
