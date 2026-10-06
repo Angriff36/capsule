@@ -310,6 +310,33 @@ it("prints the booked commercial seed on the budget card, not a later proposal t
   expect(card.textContent).not.toContain("$9,999");
 });
 
+it("says a $0 budget and $0 price are not given, never over or under budget", async () => {
+  backend.values.set("useGetEvent", {
+    _id: eventId,
+    title: "Garden dinner",
+    eventType: "dinner",
+    stage: "planning",
+    clientId: "client-a",
+    startsAt: Date.UTC(2099, 6, 4, 17),
+    endsAt: Date.UTC(2099, 6, 4, 22),
+    expectedHeadcount: 40,
+    budgetAmount: 0,
+    quotedPrice: 0,
+    version: 3,
+  });
+  await mount(page(), `/events/${eventId}`);
+  const tile = container.querySelector(
+    '[data-testid="event-dash-tile-money"]',
+  )!;
+  expect(tile.textContent).toContain("Not priced yet");
+  expect(tile.textContent).toContain("no budget given");
+  await openTile("money", "event-budget-card");
+  const card = container.querySelector('[data-testid="event-budget-card"]')!;
+  expect(card.textContent).toContain("Not given");
+  expect(card.textContent).toContain("Not priced yet");
+  expect(card.textContent).not.toMatch(/Over budget|Under budget|\$0/);
+});
+
 it("prints the live nine-domain readiness summary, not a frozen Event readiness name", async () => {
   backend.values.set("useGetEvent", {
     _id: eventId,
