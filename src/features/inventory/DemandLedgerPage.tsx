@@ -285,13 +285,15 @@ export function DemandLedgerPage() {
               <Link to="/events" className="btn btn-primary btn-sm">
                 Go to events
               </Link>
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => setShowCreate(true)}
-              >
-                Add a line by hand
-              </button>
+              {showCreate ? null : (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setShowCreate(true)}
+                >
+                  Add a line by hand
+                </button>
+              )}
             </div>
           </div>
         ) : (

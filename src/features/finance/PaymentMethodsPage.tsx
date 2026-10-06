@@ -296,13 +296,15 @@ export function PaymentMethodsPage() {
             <p>No payment methods yet.</p>
             <span>Register an instrument for a client before collecting.</span>
             <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowRegister(true)}
-              >
-                Register method
-              </button>
+              {showRegister ? null : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowRegister(true)}
+                >
+                  Register method
+                </button>
+              )}
             </div>
           </div>
         ) : (

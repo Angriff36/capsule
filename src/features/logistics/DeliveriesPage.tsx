@@ -419,13 +419,15 @@ export function DeliveriesPage() {
               to pack an event first, then schedule the run here.
             </span>
             <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowCreate(true)}
-              >
-                Schedule delivery
-              </button>
+              {showCreate ? null : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowCreate(true)}
+                >
+                  Schedule delivery
+                </button>
+              )}
             </div>
           </div>
         ) : (

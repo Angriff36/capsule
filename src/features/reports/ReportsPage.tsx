@@ -363,13 +363,15 @@ function SavedReportsPage() {
                 Create one to open live operational results immediately.
               </span>
               <div className="mt-3 flex justify-center">
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => setShowCreate(true)}
-                >
-                  New report
-                </button>
+                {showCreate ? null : (
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setShowCreate(true)}
+                  >
+                    New report
+                  </button>
+                )}
               </div>
             </div>
           ) : (
