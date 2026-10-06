@@ -156,6 +156,7 @@ export function ProposalsPage() {
   const emailProposal = useEmailProposal();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [find, setFind] = useState("");
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -273,11 +274,24 @@ export function ProposalsPage() {
 
   const activeRows = (proposals ?? []).filter((row) => row.deletedAt == null);
   // Keep accepted proposals visible — operators create the Event from them.
-  const visibleRows = showTerminal
+  const openRows = showTerminal
     ? activeRows
     : activeRows.filter(
         (row) => !["declined", "expired"].includes(String(row.status)),
       );
+  // Find by title or client; a proposal opened by link always stays listed.
+  const needle = find.trim().toLowerCase();
+  const visibleRows = needle
+    ? openRows.filter(
+        (row) =>
+          row._id === focusedProposalId ||
+          [row.title, clientDisplayName(row.clientId, clients)].some((value) =>
+            String(value ?? "")
+              .toLowerCase()
+              .includes(needle),
+          ),
+      )
+    : openRows;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -769,8 +783,20 @@ export function ProposalsPage() {
           </div>
           <span>{visibleRows.length}</span>
         </div>
+        {openRows.length > 0 ? (
+          <input
+            type="search"
+            className="input my-3 min-h-10 w-full max-w-sm"
+            placeholder="Find by title or client"
+            aria-label="Find a proposal"
+            value={find}
+            onChange={(event) => setFind(event.target.value)}
+          />
+        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
+        ) : visibleRows.length === 0 && needle ? (
+          <p className="p-4 text-base text-ink-2">Nothing matches.</p>
         ) : visibleRows.length === 0 ? (
           <EmptyState
             title="No open proposals."
