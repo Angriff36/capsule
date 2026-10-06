@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { copyText } from "../../lib/copyText";
 import type { Doc } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import {
@@ -90,6 +91,19 @@ export function EventVenueFollowUpCard(props: {
   );
   const [issue, setIssue] = useState("");
   const [dish, setDish] = useState("");
+  // Which text was copied ("thanks" / "request" / "post"), or the browser refused.
+  const [copyNote, setCopyNote] = useState<{
+    key: string;
+    copied: boolean;
+  } | null>(null);
+  const copy = (key: string, value: string) =>
+    void copyText(value).then((copied) => setCopyNote({ key, copied }));
+  const copyLabel = (key: string, label: string) =>
+    copyNote?.key === key
+      ? copyNote.copied
+        ? "Copied"
+        : "Select the text above and copy it"
+      : label;
   const now = Date.now();
 
   if (
@@ -264,9 +278,9 @@ export function EventVenueFollowUpCard(props: {
                   <button
                     type="button"
                     className="btn btn-ghost"
-                    onClick={() => void navigator.clipboard?.writeText(thanks)}
+                    onClick={() => copy("thanks", thanks)}
                   >
-                    Copy text
+                    {copyLabel("thanks", "Copy text")}
                   </button>
                   <button
                     type="button"
@@ -341,9 +355,9 @@ export function EventVenueFollowUpCard(props: {
                   <button
                     type="button"
                     className="btn btn-ghost"
-                    onClick={() => void navigator.clipboard?.writeText(request)}
+                    onClick={() => copy("request", request)}
                   >
-                    Copy questions
+                    {copyLabel("request", "Copy questions")}
                   </button>
                 </div>
                 <form className="space-y-2" onSubmit={saveFeedback}>
@@ -414,9 +428,9 @@ export function EventVenueFollowUpCard(props: {
                   <button
                     type="button"
                     className="btn btn-ghost"
-                    onClick={() => void navigator.clipboard?.writeText(caption)}
+                    onClick={() => copy("post", caption)}
                   >
-                    Copy post
+                    {copyLabel("post", "Copy post")}
                   </button>
                   {postSms ? (
                     <a className="btn btn-secondary" href={postSms}>

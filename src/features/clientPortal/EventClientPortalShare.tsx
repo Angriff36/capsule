@@ -2,6 +2,7 @@ import { useAction } from "convex/react";
 import { useState } from "react";
 import type { Id } from "../../lib/api";
 import { api } from "../../lib/api";
+import { copyText } from "../../lib/copyText";
 import { useActionPrompt } from "../../ui/action-prompt";
 
 type ShareState =
@@ -27,10 +28,7 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
       ).toString();
       // The new link already replaced the old one: when the browser will not
       // copy, show it to copy by hand instead of losing it behind an error.
-      const copied = await copyText(url).then(
-        () => true,
-        () => false,
-      );
+      const copied = await copyText(url);
       setState({ kind: "ready", url, copied });
     } catch (error) {
       setState({
@@ -137,23 +135,4 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
       </span>
     </div>
   );
-}
-
-async function copyText(value: string): Promise<void> {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = value;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.append(textarea);
-  textarea.select();
-  const copied = document.execCommand("copy");
-  textarea.remove();
-  if (!copied)
-    throw new Error("Copy failed. Open Preview and copy the address.");
 }

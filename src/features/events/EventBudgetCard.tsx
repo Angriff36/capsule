@@ -38,10 +38,11 @@ export function EventBudgetCard({
   readonly marginHref: string;
   readonly locked: boolean;
 }) {
-  const variance =
-    budgetAmount == null || quotedPrice == null
-      ? null
-      : quotedPrice - budgetAmount;
+  // New events save "not given" as 0; a $0 budget or price is not a real one.
+  const budget = budgetAmount != null && budgetAmount > 0 ? budgetAmount : null;
+  const quotedRaw = eventCommercialQuotedPrice({ quotedPrice });
+  const quoted = quotedRaw != null && quotedRaw > 0 ? quotedRaw : null;
+  const variance = budget == null || quoted == null ? null : quoted - budget;
   return (
     <EventOverviewCard
       title="Budget & pricing"
@@ -63,14 +64,17 @@ export function EventBudgetCard({
       <div className="event-money-grid">
         <Tile
           label="Client budget"
-          value={formatMoney(budgetAmount, currencyCode)}
+          value={
+            budget == null ? "Not given" : formatMoney(budget, currencyCode)
+          }
         />
         <Tile
           label="Quoted price"
-          value={formatMoney(
-            eventCommercialQuotedPrice({ quotedPrice }),
-            currencyCode,
-          )}
+          value={
+            quoted == null
+              ? "Not priced yet"
+              : formatMoney(quoted, currencyCode)
+          }
         />
         <Tile
           label={
@@ -80,10 +84,11 @@ export function EventBudgetCard({
                 ? "Over budget"
                 : "Under budget"
           }
-          value={formatMoney(
-            variance == null ? null : Math.abs(variance),
-            currencyCode,
-          )}
+          value={
+            variance == null
+              ? "Nothing to compare"
+              : formatMoney(Math.abs(variance), currencyCode)
+          }
           tone={variance == null ? undefined : variance > 0 ? "warn" : "ok"}
         />
       </div>

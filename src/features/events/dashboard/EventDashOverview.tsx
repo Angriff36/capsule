@@ -264,11 +264,19 @@ export function EventDashOverview({
           index={next()}
           onOpen={onOpen}
           big={
-            <div className="evd-big">
-              {formatMoney(props.quotedPrice, props.currencyCode)}
-            </div>
+            props.quotedPrice != null && props.quotedPrice > 0 ? (
+              <div className="evd-big">
+                {formatMoney(props.quotedPrice, props.currencyCode)}
+              </div>
+            ) : (
+              <div className="evd-big small q">Not priced yet</div>
+            )
           }
-          hint={`Quoted · ${formatMoney(props.budgetAmount, props.currencyCode)} budget · ${
+          hint={`${props.quotedPrice != null && props.quotedPrice > 0 ? "Quoted · " : ""}${
+            props.budgetAmount != null && props.budgetAmount > 0
+              ? `${formatMoney(props.budgetAmount, props.currencyCode)} budget`
+              : "no budget given"
+          } · ${
             invoice
               ? `${formatStatusLabel(String(invoice.status)).toLowerCase()} invoice`
               : "no invoice yet"

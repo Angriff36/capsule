@@ -5246,7 +5246,7 @@ div.tpp-parameter-wide {
   backdrop-filter: blur(10px);
 }
 .sticky-record-header-title {
-  min-width: 0;
+  min-width: min(12rem, 40%);
   max-width: 28rem;
   overflow: hidden;
   color: var(--color-ink);
@@ -5263,9 +5263,13 @@ div.tpp-parameter-wide {
   align-items: baseline;
   gap: 0.85rem;
   overflow: hidden;
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
 }
+/* Facts keep their own width instead of squeezing into each other; the row
+   fades out where it is cut. */
 .sticky-record-header-facts > div {
   display: flex;
+  flex: none;
   min-width: 0;
   align-items: baseline;
   gap: 0.3rem;
@@ -5301,21 +5305,31 @@ div.tpp-parameter-wide {
     gap: 0.5rem;
     padding: 6px 10px;
   }
+  /* A phone has room for the record's name and one action: the facts give
+     way, the name takes the rest, and the action button stays compact. */
   .sticky-record-header-title {
-    max-width: 9rem;
+    flex: 1 1 auto;
+    max-width: none;
     font-size: var(--text-base);
   }
   .sticky-record-header-facts {
-    gap: 0.45rem;
-  }
-  .sticky-record-header-facts > div:not(:first-child) {
-    display: none;
-  }
-  .sticky-record-header-facts dt {
     display: none;
   }
   .sticky-record-header-controls {
     margin-left: auto;
+  }
+  .sticky-record-header-controls
+    > .btn:not(.sticky-record-header-desktop-only) {
+    /* block, not flex: a flex button cannot end its text with "…" */
+    display: block;
+    min-height: 36px;
+    line-height: 36px;
+    max-width: 10rem;
+    overflow: hidden;
+    padding: 0 0.75rem;
+    font-size: var(--text-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .sticky-record-header-actions,
   .sticky-record-header-desktop-only {

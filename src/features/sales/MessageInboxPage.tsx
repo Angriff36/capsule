@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
+import { copyText } from "../../lib/copyText";
 import { useSendEmailReply } from "../../lib/messageReplyActions";
 import {
   useCreateMessage,
@@ -228,16 +229,14 @@ export function MessageInboxPage() {
     setFailure(null);
     setNotice(null);
     setSending(true);
-    try {
-      await navigator.clipboard.writeText(body);
-      setNotice(
-        "Reply copied. Paste it into the app the client used and send it from there; Capsule did not send it.",
-      );
-    } catch (e) {
-      fail(e);
-    } finally {
-      setSending(false);
-    }
+    // The typed reply stays in the box either way.
+    const copied = await copyText(body);
+    setNotice(
+      copied
+        ? "Reply copied. Paste it into the app the client used and send it from there; Capsule did not send it."
+        : "This browser would not copy. Select your reply in the box, copy it, and send it from the app the client used; Capsule did not send it.",
+    );
+    setSending(false);
   };
 
   const submitLogInbound = async () => {
