@@ -9,6 +9,7 @@ export { isUnreconciledCloseout } from "./eventCostSummary";
 type CloseoutMoneyRow = {
   status?: string | null;
   actualRevenue?: number | null;
+  capturedAt?: number | null;
 };
 
 function billingParts(billing: EventBillingRollup): string[] {
@@ -47,9 +48,12 @@ export function CloseoutRevenueNote({
   if (parts.length === 0 && billing.billedTotal === 0) {
     return <small>Not reconciled — nothing billed yet</small>;
   }
+  // Reconciled and saved, just not finalized yet: say that, not the opposite.
+  const label =
+    row.capturedAt != null ? "Reconciled, ready to finalize" : "Not reconciled";
   return (
     <small>
-      Not reconciled
+      {label}
       {parts.length > 0 ? ` — ${parts.join(" · ")}` : ""}
     </small>
   );

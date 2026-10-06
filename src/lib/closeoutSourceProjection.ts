@@ -54,6 +54,8 @@ export type ProjectionInvoice = Versioned & {
   status: string;
   invoiceNumber?: string | null;
   total: number;
+  /** Sales tax on the bill: collected for the state, not earned. */
+  taxAmount?: number | null;
   amountPaid?: number | null;
   amountDue?: number | null;
   creditMemoAmount?: number | null;
@@ -212,19 +214,22 @@ function revenueLine(input: CloseoutProjectionInput) {
   let earned = 0;
   let billedCents = 0;
   let outstanding = 0;
-  // Revenue = billed invoice totals less the credits given back on them
+  // Revenue = billed invoice totals less their sales tax (owed to the state,
+  // not earned) and less the credits given back on them
   // (Invoice.creditMemoAmount). The credit rows are listed so the sources
   // add up to the line; payments are the collected side, listed apart.
   for (const invoice of billed) {
-    earned += cents(invoice.total) - cents(invoice.creditMemoAmount);
+    const beforeTax = cents(invoice.total) - cents(invoice.taxAmount);
+    earned += beforeTax - cents(invoice.creditMemoAmount);
     billedCents += cents(invoice.total);
     outstanding += cents(invoice.amountDue);
     sources.push(
       ref(
         "invoices",
         invoice,
-        cents(invoice.total),
-        `Invoice ${invoice.invoiceNumber || ""}`.trim(),
+        beforeTax,
+        `Invoice ${invoice.invoiceNumber || ""}`.trim() +
+          (cents(invoice.taxAmount) > 0 ? " (before sales tax)" : ""),
       ),
     );
   }

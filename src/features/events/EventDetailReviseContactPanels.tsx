@@ -73,7 +73,7 @@ export function EventDetailReviseContactPanels({
 
       <EventFormCluster title="Primary contact" hint="Who we call on the day">
         <form
-          key={`contact-${version}`}
+          key={`contact-${primaryContactName}-${primaryContactEmail}-${primaryContactPhone}`}
           className="grid gap-3 sm:grid-cols-3"
           onSubmit={(formEvent) => {
             formEvent.preventDefault();
@@ -137,7 +137,7 @@ export function EventDetailReviseContactPanels({
         hint="Accessibility, service, and ops notes"
       >
         <form
-          key={`requirements-${version}`}
+          key={`requirements-${(accessibilityNeeds ?? []).join("|")}-${serviceRequirements}-${operationalRequirements}`}
           className="grid gap-3 sm:grid-cols-2"
           onSubmit={(formEvent) => {
             formEvent.preventDefault();

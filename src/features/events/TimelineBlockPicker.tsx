@@ -48,8 +48,8 @@ export function TimelineBlockPicker({
         Choose timeline blocks
       </h2>
       <p className="mt-2 text-base text-ink-2">
-        Add the work this event needs. Times stay blank until planned; crew can
-        still mark work done.
+        Add the work this event needs. Each block gets a usual time from the
+        event's arrival, service and end; move any that differ.
       </p>
       <form
         onSubmit={(event) => {
