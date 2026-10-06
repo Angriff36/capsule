@@ -284,7 +284,7 @@ export function PasteIncomingMessageForm({
           className="btn btn-ghost"
           onClick={() => setMode("json")}
         >
-          Advanced: paste raw JSON
+          Paste a message export instead
         </button>
       </div>
     </form>
