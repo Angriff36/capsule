@@ -194,7 +194,11 @@ describe("plain words on leftover import manifests", () => {
     expect(visible).not.toContain("Parallel run");
     expect(visible).not.toContain("Reconcile records");
 
-    for (const fresh of ["Compare events with TPP", "Match leftover items"]) {
+    for (const fresh of [
+      "Compare events with TPP",
+      "Compare payments with TPP",
+      "Match leftover items",
+    ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);
     }

@@ -9272,6 +9272,7 @@ export const LeadCaptureParamsSchema = z.object({
   phone: z.string().optional(),
   probability: z.number().optional(),
   notes: z.string().optional(),
+  eventDate: z.coerce.date().optional(),
 });
 
 export type LeadCaptureParams = z.infer<typeof LeadCaptureParamsSchema>;

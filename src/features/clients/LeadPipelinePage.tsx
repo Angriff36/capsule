@@ -50,6 +50,7 @@ interface LeadRow {
   email?: string | null;
   phone?: string | null;
   source: string;
+  eventDate?: number | null;
   referralSourceId?: string | null;
   estimatedValue: number;
   stage: LeadStage;
@@ -188,6 +189,17 @@ export function LeadPipelinePage() {
       return;
     }
     const referralSourceId = optional(data.get("referralSourceId"));
+    // "Where they came from": what was typed, else the referral picked.
+    const source =
+      String(data.get("source") ?? "").trim() ||
+      activeReferralSources.find((row) => row._id === referralSourceId)?.name ||
+      "";
+    if (!source) {
+      setFailure(
+        new Error("Say where this lead came from, or pick who referred them."),
+      );
+      return;
+    }
     void run("capture", async () => {
       await createLead({
         leadType,
@@ -196,11 +208,12 @@ export function LeadPipelinePage() {
         familyName: optional(data.get("familyName")),
         email: optional(data.get("email")),
         phone: optional(data.get("phone")),
-        source: String(data.get("source") ?? "").trim(),
+        source,
         referralSourceId,
         estimatedValue,
         probability,
         notes: optional(data.get("notes")),
+        eventDate: dateValue(data.get("eventDate")),
       });
       form.reset();
       setLeadType("company");
@@ -345,9 +358,6 @@ export function LeadPipelinePage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link className="text-link" to={CLIENTS_ROUTES.quoteRequests}>
-            Quote requests
-          </Link>
           <button
             className="btn btn-primary"
             type="button"
@@ -455,11 +465,15 @@ export function LeadPipelinePage() {
               </>
             ) : null}
             <label>
-              Source
-              <input name="source" required />
+              Event date
+              <BoundedDateInput name="eventDate" />
             </label>
             <label>
-              Referral source
+              Where they came from
+              <input name="source" placeholder="e.g. Phone call, website" />
+            </label>
+            <label>
+              Referred by
               <select name="referralSourceId">
                 <option value="">None</option>
                 {activeReferralSources.map((source) => (
@@ -751,7 +765,17 @@ export function LeadPipelinePage() {
                           </label>
                           <label>
                             Event date
-                            <BoundedDateInput name="eventDate" />
+                            <BoundedDateInput
+                              name="eventDate"
+                              defaultValue={
+                                lead.eventDate
+                                  ? // en-CA reads as YYYY-MM-DD in local time.
+                                    new Date(lead.eventDate).toLocaleDateString(
+                                      "en-CA",
+                                    )
+                                  : undefined
+                              }
+                            />
                           </label>
                         </div>
                         <button

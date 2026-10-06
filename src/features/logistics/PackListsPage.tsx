@@ -1,3 +1,4 @@
+import { packListName } from "./packListName";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { listOriginState, useListOrigin } from "../list-state/listOrigin";
@@ -305,7 +306,7 @@ export function PackListsPage() {
                         to={`/logistics/packs/${row._id}`}
                         state={listOriginState(listOrigin)}
                       >
-                        <strong>{row.name || "Untitled pack list"}</strong>
+                        <strong>{packListName(row.name)}</strong>
                       </Link>
                       {row.purpose ? <small>{row.purpose}</small> : null}
                     </td>

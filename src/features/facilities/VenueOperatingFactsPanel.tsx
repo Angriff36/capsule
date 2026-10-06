@@ -86,7 +86,7 @@ export function VenueOperatingFactsPanel({ venue }: Props) {
                 min="0"
                 step="1"
                 defaultValue={venue.seatedCapacity ?? ""}
-                className="input mt-1 block w-full"
+                className="input mt-1"
               />
             </label>
             <label className="block text-xs font-medium text-ink-2">
@@ -97,7 +97,7 @@ export function VenueOperatingFactsPanel({ venue }: Props) {
                 min="0"
                 step="1"
                 defaultValue={venue.standingCapacity ?? ""}
-                className="input mt-1 block w-full"
+                className="input mt-1"
               />
             </label>
             <label className="block text-xs font-medium text-ink-2">
@@ -105,7 +105,7 @@ export function VenueOperatingFactsPanel({ venue }: Props) {
               <select
                 name="hasOven"
                 defaultValue={yesNoValue(venue.hasOven)}
-                className="input mt-1 block w-full"
+                className="input mt-1"
               >
                 <option value="">Not known</option>
                 <option value="true">Yes</option>
@@ -117,7 +117,7 @@ export function VenueOperatingFactsPanel({ venue }: Props) {
               <select
                 name="hasRefrigeration"
                 defaultValue={yesNoValue(venue.hasRefrigeration)}
-                className="input mt-1 block w-full"
+                className="input mt-1"
               >
                 <option value="">Not known</option>
                 <option value="true">Yes</option>
@@ -130,7 +130,7 @@ export function VenueOperatingFactsPanel({ venue }: Props) {
                 type="time"
                 name="loadInFrom"
                 defaultValue={venue.loadInFrom ?? ""}
-                className="input mt-1 block w-full"
+                className="input mt-1"
               />
             </label>
             <label className="block text-xs font-medium text-ink-2">
@@ -139,7 +139,7 @@ export function VenueOperatingFactsPanel({ venue }: Props) {
                 type="time"
                 name="loadOutBy"
                 defaultValue={venue.loadOutBy ?? ""}
-                className="input mt-1 block w-full"
+                className="input mt-1"
               />
             </label>
           </div>

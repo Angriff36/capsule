@@ -44,7 +44,7 @@ export function VenueCoordinatesFields({
           name="latitude"
           className={inputClass}
           inputMode="decimal"
-          placeholder="47.01359"
+          placeholder="e.g. 47.01359"
           value={latitude}
           onChange={(event) => setLatitude(event.target.value)}
           onPaste={fillFromPaste}
@@ -62,7 +62,7 @@ export function VenueCoordinatesFields({
           name="longitude"
           className={inputClass}
           inputMode="decimal"
-          placeholder="-116.52979"
+          placeholder="e.g. -116.52979"
           value={longitude}
           onChange={(event) => setLongitude(event.target.value)}
           onPaste={fillFromPaste}

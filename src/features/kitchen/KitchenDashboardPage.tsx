@@ -1,4 +1,8 @@
 import { useActionPrompt } from "../../ui/action-prompt";
+import {
+  prepTaskDependencyLabel,
+  prepTaskDependencySummary,
+} from "../production/PrepTaskDependencies";
 import { usePrepLabelPrint } from "../production/usePrepLabelPrint";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -13,7 +17,13 @@ import {
   usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
+  useCreatePrepTaskDependency,
+  useCreateQualityCheck,
+  useListPrepTaskDependency,
+  useListQualityCheck,
   usePrepTaskMarkBlocked,
+  useQualityCheckFail,
+  useQualityCheckPass,
   usePrepTaskRelease,
   usePrepTaskUnblock,
   usePrepTaskRevise,
@@ -81,6 +91,13 @@ import { prepTimeLabel } from "./prepTiming";
 export function KitchenDashboardPage() {
   const components = useListComponent();
   const tasks = useListPrepTask();
+  // Step order ("do after") and quality checks live on the board itself.
+  const dependencies = useListPrepTaskDependency();
+  const qualityChecks = useListQualityCheck();
+  const createDependency = useCreatePrepTaskDependency();
+  const openQualityCheck = useCreateQualityCheck();
+  const passQualityCheck = useQualityCheckPass();
+  const failQualityCheck = useQualityCheckFail();
   const invoices = useListInvoice();
   const people = useListPerson();
   const venues = useListVenue();
@@ -314,6 +331,107 @@ export function KitchenDashboardPage() {
       () => unblock({ docId: task._id, version: task.version }),
       "Back on the board",
     );
+  const liveTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
+  // The summary itself skips released "do after" links.
+  const liveDependencies = dependencies ?? [];
+  const orderFor = (taskId: string) =>
+    prepTaskDependencySummary(
+      taskId,
+      liveTasks as never,
+      liveDependencies as never,
+    );
+  const openCheckFor = (taskId: string) =>
+    (qualityChecks ?? []).find(
+      (check) =>
+        check.deletedAt == null &&
+        check.prepTaskId === taskId &&
+        String(check.status) === "pending",
+    );
+  const onOrderTask = async (task: PrepTaskLike) => {
+    const others = liveTasks.filter(
+      (other) =>
+        other.eventId === task.eventId &&
+        other._id !== task._id &&
+        !["cancelled", "completed"].includes(String(other.status)),
+    );
+    if (others.length === 0) {
+      showToast("No other open steps on this event to follow.");
+      return;
+    }
+    const values = await labelPrompt.askFields({
+      title: "Do this step after another",
+      description: `${String(task.name)} cannot start until the step you pick is done.`,
+      fields: [
+        {
+          name: "predecessor",
+          label: "Do after",
+          required: true,
+          options: others.map((other) => ({
+            value: String(other._id),
+            label: String(other.name),
+          })),
+        },
+      ],
+      confirmLabel: "Set order",
+    });
+    const predecessorTaskId = values?.predecessor;
+    if (!predecessorTaskId) return;
+    void run(
+      `order:${task._id}`,
+      () =>
+        createDependency({
+          dependentTaskId: task._id,
+          predecessorTaskId,
+        }),
+      "Order set",
+    );
+  };
+  const onQualityCheck = (task: PrepTaskLike) => {
+    const open = openCheckFor(String(task._id));
+    if (!open) {
+      void run(
+        `check:${task._id}`,
+        () => openQualityCheck({ prepTaskId: task._id }),
+        "Quality check opened",
+      );
+      return;
+    }
+    void (async () => {
+      const values = await labelPrompt.askFields({
+        title: "Quality check",
+        description: `Did ${String(task.name)} pass? A fail blocks the step.`,
+        fields: [
+          {
+            name: "result",
+            label: "Result",
+            required: true,
+            options: [
+              { value: "pass", label: "Pass" },
+              { value: "fail", label: "Fail" },
+            ],
+          },
+          { name: "notes", label: "Notes", multiline: true, required: false },
+        ],
+        confirmLabel: "Save check",
+      });
+      if (!values?.result) return;
+      const args = {
+        docId: open._id,
+        version: open.version,
+        notes: values.notes?.trim() || undefined,
+      };
+      void run(
+        `check:${task._id}`,
+        () =>
+          values.result === "pass"
+            ? passQualityCheck(args)
+            : failQualityCheck(args),
+        values.result === "pass"
+          ? "Check passed"
+          : "Check failed, step blocked",
+      );
+    })();
+  };
   const onCompleteTask = (task: PrepTaskLike) =>
     void run(
       `complete:${task._id}`,
@@ -470,8 +588,11 @@ export function KitchenDashboardPage() {
     }
     if (status === "in_progress")
       return { label: "Complete", run: () => onCompleteTask(row.task) };
-    if (status === "claimed")
+    if (status === "claimed") {
+      // A step that must follow another waits until that one is done.
+      if (orderFor(String(row.task._id)).isBlocked) return null;
       return { label: "Start", run: () => onStartTask(row.task) };
+    }
     if (!row.task.assignedToId)
       return { label: "Claim", run: () => onClaimTask(row.task) };
     return { label: "Start", run: () => onStartTask(row.task) };
@@ -1031,6 +1152,21 @@ export function KitchenDashboardPage() {
               {displayEventMenuNotes(row.task.specialInstructions)}
             </p>
           ) : null}
+          {(() => {
+            const order = orderFor(id);
+            const check = openCheckFor(id);
+            return order.total > 0 || check ? (
+              <p className="mt-0.5 text-sm text-ink-2">
+                {order.total > 0 ? (
+                  <span className={order.isBlocked ? "text-warn" : undefined}>
+                    {prepTaskDependencyLabel(order)}
+                  </span>
+                ) : null}
+                {order.total > 0 && check ? " · " : null}
+                {check ? "Quality check open" : null}
+              </p>
+            ) : null;
+          })()}
           {blocked ? (
             <p className="mt-0.5 text-sm text-danger">
               {String(
@@ -1066,6 +1202,26 @@ export function KitchenDashboardPage() {
                 className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
               >
                 {busy === `release:${id}` ? "Working…" : second.label}
+              </button>
+            ) : null}
+            {["pending", "claimed", "in_progress"].includes(status) ? (
+              <button
+                type="button"
+                disabled={busy === `order:${id}`}
+                onClick={() => void onOrderTask(row.task)}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                Do after…
+              </button>
+            ) : null}
+            {["in_progress", "completed"].includes(status) ? (
+              <button
+                type="button"
+                disabled={busy === `check:${id}`}
+                onClick={() => onQualityCheck(row.task)}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                {openCheckFor(id) ? "Record check" : "Check"}
               </button>
             ) : null}
             {["pending", "claimed", "in_progress"].includes(status) ? (

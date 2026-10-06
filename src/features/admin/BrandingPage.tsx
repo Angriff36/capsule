@@ -319,7 +319,7 @@ export function BrandingPage() {
                     pattern="#[0-9A-Fa-f]{6}"
                     defaultValue={branding.primaryColor}
                     disabled={!canEdit || busy}
-                    className="font-mono uppercase"
+                    className="input font-mono uppercase"
                     onInput={(event) => {
                       const value = event.currentTarget.value;
                       if (isValidBrandColor(value)) {
@@ -360,7 +360,7 @@ export function BrandingPage() {
                     pattern="#[0-9A-Fa-f]{6}"
                     defaultValue={branding.accentColor}
                     disabled={!canEdit || busy}
-                    className="font-mono uppercase"
+                    className="input font-mono uppercase"
                     onInput={(event) => {
                       const value = event.currentTarget.value;
                       if (isValidBrandColor(value)) {
