@@ -44,7 +44,7 @@ import {
 import {
   ensureTemplateStaffNeeds, placeFromWaitlist, validateDescribedDemand, validateWaitlistJoin,
   validateNewEventStaffing, validateScheduledShift, validateShiftWindow,
-  validatePayrollInputSources, validateTimeRecordClockIn,
+  validatePayrollInputSources, validateTimeRecordClockIn, clockShiftTime,
 } from "./shiftSchedulingEvents";
 import {
   adoptLegacyDraftQuantity,
@@ -228,6 +228,10 @@ export async function handleManifestEvent(
     if (event.type === "ShiftRescheduled")
       await reflectManualEventShiftTiming(ctx, event.entityId as Id<"shifts">);
     else await validateAutomaticEventShift(ctx, event.entityId as Id<"shifts">, "schedule");
+    return;
+  }
+  if (event.entity === "Shift" && (event.type === "ShiftStarted" || event.type === "ShiftCompleted")) {
+    await clockShiftTime(ctx, event.entityId as Id<"shifts">, event.type === "ShiftStarted" ? "in" : "out");
     return;
   }
   if (event.entity === "Shift" && event.type === "ShiftEventTimingPlanned") {

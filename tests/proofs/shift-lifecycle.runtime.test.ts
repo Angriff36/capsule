@@ -130,6 +130,20 @@ describe("runtime proof: Shift schedule -> start -> complete", () => {
         payload.personId === personId &&
         payload.status === "completed",
     });
+
+    // Start and finish alone record the worked time (one tap, not two).
+    const records = await person.run(async (ctx) =>
+      ctx.db.query("timeRecords").collect(),
+    );
+    expect(records).toEqual([
+      expect.objectContaining({
+        personId,
+        shiftId: created.docId,
+        status: "closed",
+        clockInAt: expect.any(Number),
+        clockOutAt: expect.any(Number),
+      }),
+    ]);
   });
 
   it("denies kitchen staff and leaves no partial shift", async () => {

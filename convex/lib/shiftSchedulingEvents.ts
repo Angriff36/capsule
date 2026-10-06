@@ -14,6 +14,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { getAuthContext } from "./authContext";
 import type { MutationCtx } from "../_generated/server";
 import { readCrewWindow } from "./eventStaffingOperations";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 const day = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -344,4 +345,42 @@ export async function validateShiftWindow(
     throw new ConvexError("Shift end must be after its start.");
   }
   return shift;
+}
+
+/**
+ * Starting a shift clocks the person in, and finishing it clocks them out,
+ * so one tap records worked time for pay and the event's labor cost. A
+ * person already clocked in (or already clocked out) is left as they are.
+ */
+export async function clockShiftTime(
+  ctx: MutationCtx,
+  shiftId: Id<"shifts">,
+  direction: "in" | "out",
+): Promise<void> {
+  const shift = await ctx.db.get(shiftId);
+  if (!shift || shift.deletedAt != null || !shift.personId) return;
+  const records = await ctx.db.query("timeRecords")
+    .withIndex("by_personId", (q) => q.eq("personId", shift.personId)).collect();
+  const open = records.filter((row) => row.tenantId === shift.tenantId &&
+    row.deletedAt == null && row.status === "open" &&
+    row.clockInAt != null && row.clockOutAt == null);
+  const system = TenantSystemCommandRunner.forTenant(ctx, shift.tenantId).context;
+  if (direction === "in") {
+    if (open.length > 0) return;
+    await system.runMutation(api.mutations.TimeRecord_createViaClockIn, {
+      personId: shift.personId,
+      shiftId: shift._id,
+      ...(shift.eventId ? { eventId: shift.eventId } : {}),
+      idempotencyKey: `shift-clock-in:${shift._id}`,
+    });
+    return;
+  }
+  const record = open.find((row) => String(row.shiftId ?? "") === String(shift._id)) ??
+    (open.length === 1 ? open[0] : undefined);
+  if (!record) return;
+  await system.runMutation(api.mutations.TimeRecord_clockOut, {
+    docId: record._id,
+    version: record.version,
+    idempotencyKey: `shift-clock-out:${shift._id}`,
+  });
 }
