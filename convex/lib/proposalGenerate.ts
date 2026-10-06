@@ -55,8 +55,20 @@ export const generateProposalDraft = mutation({
 
     let proposal = await findGeneratedDraft(ctx, event);
     const created = proposal == null;
+    // A new draft starts from the template made for the event's service style,
+    // the same pick the New proposal form makes.
+    const template = created ? await templateForStyle(ctx, event) : null;
     if (!proposal) {
       const draft = await ctx.runMutation(api.mutations.Proposal_createViaDraft, {
+        ...(template
+          ? {
+              terms: template.defaultTerms ?? undefined,
+              notes: template.defaultNotes ?? undefined,
+              visibleSections: template.visibleSections ?? undefined,
+              sectionOrder: template.sectionOrder ?? undefined,
+              expiresAt: Date.now() + (template.validityDays ?? 14) * 86_400_000,
+            }
+          : {}),
         clientId: event.clientId,
         title: event.title,
         subtotal: 0,
@@ -120,7 +132,23 @@ export const generateProposalDraft = mutation({
       });
       lines.push(generated(source, String(added.docId)));
     }
-    const linesChanged = plan.add.length + plan.revise.length + plan.remove.length > 0;
+    if (created) await selectEventDishes(ctx, event, proposalId);
+    const serviceRate = Number(template?.defaultServiceChargePercent ?? 0);
+    if (serviceRate > 0) {
+      // Typed-by-hand line, so rebuilds leave it as staff set it.
+      await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
+        proposalId,
+        description: "Service charge",
+        pricingBasis: "percentage",
+        unitPrice: Math.round(serviceRate * 10_000) / 100,
+        amount: 0,
+        quantity: 1,
+        unit: "%",
+        sortOrder: 10_000,
+      });
+    }
+    const linesChanged =
+      plan.add.length + plan.revise.length + plan.remove.length > 0 || serviceRate > 0;
     if (linesChanged) {
       await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
         proposalId,
@@ -161,6 +189,81 @@ export const generateProposalDraft = mutation({
     };
   },
 });
+
+/**
+ * A new draft shows the client the event's dishes as its menu. Acceptance
+ * matches these back onto the same event dishes, so nothing doubles.
+ */
+async function selectEventDishes(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  proposalId: Id<"proposals">,
+): Promise<void> {
+  const rows = (
+    await ctx.db
+      .query("eventDishes")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect()
+  )
+    .filter(
+      (row) =>
+        row.tenantId === event.tenantId &&
+        row.deletedAt == null &&
+        row.removedAt == null &&
+        Number(row.quantityServings) > 0,
+    )
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a._creationTime - b._creationTime);
+  for (const row of rows) {
+    const dish = await ctx.db.get(row.dishId);
+    if (!dish || dish.tenantId !== event.tenantId || dish.status !== "active") continue;
+    let menuId: Id<"menus"> | null = null;
+    for (const line of await ctx.db
+      .query("menuDishes")
+      .withIndex("by_dishId", (q) => q.eq("dishId", row.dishId))
+      .collect()) {
+      if (line.tenantId !== event.tenantId || line.deletedAt != null || line.removedAt != null) continue;
+      const menu = await ctx.db.get(line.menuId);
+      if (menu && menu.deletedAt == null && String(menu.status) === "published") {
+        menuId = menu._id;
+        break;
+      }
+    }
+    if (!menuId) continue;
+    await ctx.runMutation(api.mutations.ProposalDishSelection_createViaSelect, {
+      proposalId,
+      menuId,
+      dishId: row.dishId,
+      quantityServings: Math.trunc(Number(row.quantityServings)),
+      course: row.course ?? undefined,
+      serviceStyle: row.serviceStyle ?? undefined,
+    });
+  }
+}
+
+async function templateForStyle(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+): Promise<Doc<"proposalTemplates"> | null> {
+  // The style's own template first; otherwise one made for any service style.
+  const pick = async (styleId: Id<"serviceStyles"> | null) =>
+    (
+      await ctx.db
+        .query("proposalTemplates")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
+        .collect()
+    )
+      .filter(
+        (row) =>
+          row.deletedAt == null &&
+          row.status === "active" &&
+          (row.serviceStyleId ?? null) === styleId,
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))[0] ?? null;
+  return (
+    (event.serviceStyleId ? await pick(event.serviceStyleId as Id<"serviceStyles">) : null) ??
+    (await pick(null))
+  );
+}
 
 function generated(source: LineSource, lineId: string): GeneratedLine {
   return { sourceKey: source.sourceKey, lineId, values: source.values, fingerprint: source.fingerprint };

@@ -255,7 +255,9 @@ export function ProposalPricingPanel({
                   {PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
                 <td className="tabular-nums" data-label="Price / %">
-                  {formatMoneyExact(Number(row.unitPrice))}
+                  {row.pricingBasis === "percentage"
+                    ? `${Number(row.unitPrice)}%`
+                    : formatMoneyExact(Number(row.unitPrice))}
                 </td>
                 <td className="tabular-nums" data-label="Qty">
                   {row.pricingBasis === "per_unit"
