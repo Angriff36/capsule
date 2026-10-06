@@ -468,13 +468,15 @@ export function PaymentsPage() {
                 >
                   {ledger.showSettledLabel(settledSummary)}
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setShowRecord(true)}
-                >
-                  Add payment
-                </button>
+                {showRecord ? null : (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setShowRecord(true)}
+                  >
+                    Add payment
+                  </button>
+                )}
               </div>
             ) : (
               <>

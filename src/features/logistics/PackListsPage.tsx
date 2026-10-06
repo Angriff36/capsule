@@ -277,13 +277,15 @@ export function PackListsPage() {
             <p>No pack lists are open.</p>
             <span>Open a pack list for an event to start packing.</span>
             <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowCreate(true)}
-              >
-                Open pack list
-              </button>
+              {showCreate ? null : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowCreate(true)}
+                >
+                  Open pack list
+                </button>
+              )}
             </div>
           </div>
         ) : (

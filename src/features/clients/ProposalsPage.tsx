@@ -774,13 +774,15 @@ export function ProposalsPage() {
             title="No open proposals."
             hint="Draft an offer to start the sales conversation."
             action={
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={() => setShowDraft(true)}
-              >
-                New proposal
-              </button>
+              showDraft ? undefined : (
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => setShowDraft(true)}
+                >
+                  New proposal
+                </button>
+              )
             }
           />
         ) : (
