@@ -178,15 +178,20 @@ export function ProposalAcceptancePage({
                       <div>
                         <p className="text-ink">{line.description}</p>
                         <p className="text-2xs text-ink-3">
-                          {line.pricingBasis === "per_person"
-                            ? `${formatMoneyExact(line.unitPrice)} per guest × ${pending.proposal.guestCount} guests`
-                            : line.pricingBasis === "per_unit"
-                              ? `${formatMoneyExact(line.unitPrice)} × ${line.quantity}${line.unit ? ` ${line.unit}` : ""}`
-                              : line.pricingBasis === "percentage"
-                                ? `${line.unitPrice}%`
-                                : (PRICING_BASIS_LABELS[
-                                    line.pricingBasis as PricingBasis
-                                  ] ?? line.pricingBasis)}
+                          {/* A server not yet updated sends no unit price: name the basis only. */}
+                          {typeof line.unitPrice !== "number"
+                            ? (PRICING_BASIS_LABELS[
+                                line.pricingBasis as PricingBasis
+                              ] ?? line.pricingBasis)
+                            : line.pricingBasis === "per_person"
+                              ? `${formatMoneyExact(line.unitPrice)} per guest × ${pending.proposal.guestCount} guests`
+                              : line.pricingBasis === "per_unit"
+                                ? `${formatMoneyExact(line.unitPrice)} × ${line.quantity}${line.unit ? ` ${line.unit}` : ""}`
+                                : line.pricingBasis === "percentage"
+                                  ? `${line.unitPrice}%`
+                                  : (PRICING_BASIS_LABELS[
+                                      line.pricingBasis as PricingBasis
+                                    ] ?? line.pricingBasis)}
                         </p>
                       </div>
                       <span className="font-medium text-ink whitespace-nowrap">
