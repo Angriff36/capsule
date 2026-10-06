@@ -77044,7 +77044,7 @@ async function __runWeeklyScheduleNoticeAcknowledge(ctx: MutationCtx, { docId, v
     if (!((doc.acknowledgedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.personId === user.personId) || (((user.personId == null) && (doc.recipientAuthSubjectId != null)) && (doc.recipientAuthSubjectId === user.id))))) throw new Error("Guard 4 failed");
+    if (!(((doc.personId === user.personId) || ((doc.recipientAuthSubjectId != null) && (doc.recipientAuthSubjectId === user.id))))) throw new Error("Guard 4 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
