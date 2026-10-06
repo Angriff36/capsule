@@ -46,6 +46,19 @@ const clientLabel = (row: ClientOption) => {
   return row.companyName?.trim() || "Client";
 };
 
+/** Next INV-<year>-<nnn> after the highest one used this year. */
+function nextInvoiceNumber(
+  used: readonly (string | null | undefined)[],
+): string {
+  const year = new Date().getFullYear();
+  const pattern = new RegExp(`^INV-${year}-([0-9]+)$`);
+  const highest = used.reduce((max, number) => {
+    const match = String(number ?? "").match(pattern);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return `INV-${year}-${String(highest + 1).padStart(3, "0")}`;
+}
+
 const categoryLabel = (category: InvoiceLineCategory) =>
   category.charAt(0).toUpperCase() + category.slice(1);
 
@@ -66,6 +79,7 @@ export function InvoiceIssueForm({
   defaultClientId = "",
   defaultEventId = "",
   functionalCurrencyCode = "USD",
+  existingInvoiceNumbers = [],
 }: {
   clients: ClientOption[];
   events: EventOption[];
@@ -75,6 +89,8 @@ export function InvoiceIssueForm({
   defaultClientId?: string;
   defaultEventId?: string;
   functionalCurrencyCode?: string;
+  /** Numbers already used, so the form can suggest the next one. */
+  existingInvoiceNumbers?: readonly (string | null | undefined)[];
 }) {
   const clientDefault =
     defaultClientId && clients.some((row) => row._id === defaultClientId)
@@ -206,6 +222,7 @@ export function InvoiceIssueForm({
             className="input"
             name="invoiceNumber"
             required
+            defaultValue={nextInvoiceNumber(existingInvoiceNumbers)}
             placeholder="INV-2026-001"
           />
         </label>
