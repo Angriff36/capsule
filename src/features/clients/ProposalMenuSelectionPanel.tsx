@@ -4,6 +4,7 @@ import {
   useListMenu,
   useListMenuDish,
   useListProposalDishSelection,
+  useListProposalLineItem,
   useProposalDishSelectionAdjustServings,
   useProposalDishSelectionRemove,
 } from "../../lib/manifest-convex-react";
@@ -34,6 +35,7 @@ export function ProposalMenuSelectionPanel({
   const menuDishes = useListMenuDish();
   const dishes = useWholeDishList();
   const selections = useListProposalDishSelection();
+  const lineItems = useListProposalLineItem();
   const createSelection = useCreateProposalDishSelection();
   const adjustServings = useProposalDishSelectionAdjustServings();
   const removeSelection = useProposalDishSelectionRemove();
@@ -72,6 +74,39 @@ export function ProposalMenuSelectionPanel({
       row.proposalId === proposalId,
   );
   const selectedDishIds = new Set(activeSelections.map((row) => row.dishId));
+
+  // A dish added after the price was built (a tasting, a pick here) is on the
+  // menu but in no price line, so the client would get it free. A per-guest
+  // menu line covers every dish of that menu; a catalog line covers its dish.
+  const priceLines = (lineItems ?? []).filter(
+    (line) => line.proposalId === proposalId && line.deletedAt == null,
+  );
+  const coveredDishIds = new Set<string>();
+  for (const line of priceLines) {
+    const linked = (menuDishes ?? []).find((md) => md._id === line.menuDishId);
+    if (linked) coveredDishIds.add(String(linked.dishId));
+    const menu = (menus ?? []).find(
+      (m) =>
+        String(line.pricingBasis) === "per_person" &&
+        line.description === `${m.name} (per guest)`,
+    );
+    if (menu)
+      for (const md of menuDishes ?? [])
+        if (md.menuId === menu._id && md.deletedAt == null)
+          coveredDishIds.add(String(md.dishId));
+  }
+  // A custom line named after the dish prices it too.
+  const lineNames = new Set(
+    priceLines.map((line) => line.description.trim().toLowerCase()),
+  );
+  const unpriced =
+    priceLines.length === 0
+      ? []
+      : activeSelections.filter(
+          (row) =>
+            !coveredDishIds.has(String(row.dishId)) &&
+            !lineNames.has(dishName(row.dishId).trim().toLowerCase()),
+        );
 
   const publishedMenus = (menus ?? []).filter(
     (row) => row.deletedAt == null && String(row.status) === "published",
@@ -121,6 +156,16 @@ export function ProposalMenuSelectionPanel({
         Dishes picked from your menu catalog. When the proposal is accepted with
         a linked event, the menu copies onto that event automatically.
       </p>
+
+      {unpriced.length > 0 ? (
+        <p role="status" className="mt-3 text-base text-warn">
+          Not in the price yet:{" "}
+          {unpriced.map((row) => dishName(row.dishId)).join(", ")}. No price
+          line covers {unpriced.length === 1 ? "it" : "them"}, so the client
+          would get {unpriced.length === 1 ? "it" : "them"} free. Add a line
+          under Pricing.
+        </p>
+      ) : null}
 
       {activeSelections.length === 0 ? (
         <p className="mt-3 text-base text-ink-2">No dishes selected yet.</p>

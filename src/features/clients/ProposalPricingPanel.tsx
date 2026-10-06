@@ -356,14 +356,22 @@ export function ProposalPricingPanel({
               onChange={(e) => pickDishForEditor(e.target.value)}
             >
               <option value="">— custom line —</option>
-              {catalog.lines.map((dish) => (
-                <option key={dish.menuDishId} value={dish.menuDishId}>
-                  {dish.name}
-                  {dish.sellingPrice == null
-                    ? ""
-                    : ` · ${formatMoneyExact(dish.sellingPrice)}`}
-                </option>
-              ))}
+              {/* Only priced dishes can be linked (the save refuses the
+                  rest); price an unpriced dish as a custom line. */}
+              {catalog.lines
+                .filter(
+                  (dish) =>
+                    dish.sellingPrice != null ||
+                    dish.menuDishId === editor.menuDishId,
+                )
+                .map((dish) => (
+                  <option key={dish.menuDishId} value={dish.menuDishId}>
+                    {dish.name}
+                    {dish.sellingPrice == null
+                      ? ""
+                      : ` · ${formatMoneyExact(dish.sellingPrice)}`}
+                  </option>
+                ))}
             </select>
           </label>
           <label className="min-w-[12rem]">
