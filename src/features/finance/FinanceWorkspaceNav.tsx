@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 import { FINANCE_ROUTES, FINANCE_SECTIONS } from "./financeRoutes";
 
 const financeNavigation = [
@@ -19,8 +20,13 @@ const financeNavigation = [
 ] as const;
 
 export function FinanceWorkspaceNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Finance workspace">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Finance workspace"
+    >
       {financeNavigation.map((section) => (
         <NavLink
           key={section.key}

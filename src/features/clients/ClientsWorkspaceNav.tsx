@@ -1,9 +1,15 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 import { CLIENTS_PIPELINE_SECTION, CLIENTS_SECTIONS } from "./clientsRoutes";
 
 export function ClientsWorkspaceNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Clients workspace">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Clients workspace"
+    >
       {[CLIENTS_PIPELINE_SECTION, ...CLIENTS_SECTIONS].map((section) => (
         <NavLink
           key={section.key}

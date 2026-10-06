@@ -1,9 +1,15 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 import { PRODUCTION_SECTIONS } from "./productionRoutes";
 
 export function ProductionWorkspaceNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Production workspace">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Production workspace"
+    >
       {PRODUCTION_SECTIONS.map((section) => (
         <NavLink
           key={section.key}

@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 
 /** Every report and dashboard in one menu. Finance keeps day-to-day money
  *  work (invoices, payments, closeout); reading the numbers lives here. */
@@ -17,8 +18,13 @@ const sections = [
 ] as const;
 
 export function ReportsWorkspaceNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Reports workspace">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Reports workspace"
+    >
       {sections.map((section) => (
         <NavLink
           key={section.path}

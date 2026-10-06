@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 
 const sections = [
   { label: "Permissions", path: "/admin" },
@@ -18,8 +19,13 @@ const sections = [
 ] as const;
 
 export function AdminWorkspaceNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Administration workspace">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Administration workspace"
+    >
       {sections.map((section) => (
         <NavLink
           key={section.path}

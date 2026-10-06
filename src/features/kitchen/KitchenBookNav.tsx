@@ -1,11 +1,17 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 import "./culinary-studio/CulinaryStudio.css";
 import "./culinary-studio/CulinaryStudioSurfaces.css";
 import { KITCHEN_SECTIONS } from "./kitchenRoutes";
 
 export function KitchenBookNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Culinary book sections">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Culinary book sections"
+    >
       {KITCHEN_SECTIONS.map((section) => (
         <NavLink
           key={section.key}
