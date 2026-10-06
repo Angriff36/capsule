@@ -183,14 +183,15 @@ export function ProposalsPage() {
           String(l.status) === "active",
       )
       .sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0))[0];
-  const copyShareUrl = async (id: string) => {
+  // The link shows at once; the clipboard is a bonus. A clipboard that never
+  // answers (window in the background) must not keep the page busy.
+  const copyShareUrl = (id: string) => {
     const url = `${window.location.origin}/share/${id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      setNotice("Share link copied to clipboard.");
-    } catch {
-      setNotice(`Share link: ${url}`);
-    }
+    setNotice(`Share link: ${url}`);
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => setNotice(`Share link copied to clipboard: ${url}`))
+      .catch(() => undefined);
   };
   const [searchParams, setSearchParams] = useSearchParams();
   // One button builds the draft from the event, or brings the draft it built
@@ -391,7 +392,7 @@ export function ProposalsPage() {
         // otherwise create one pinned to the latest published revision.
         const existing = activeShareLinkFor(row._id);
         if (existing) {
-          void copyShareUrl(existing._id);
+          copyShareUrl(existing._id);
           return;
         }
         const revision = latestRevisionFor(row._id);
@@ -409,7 +410,7 @@ export function ProposalsPage() {
           })) as { _id?: string; id?: string } | undefined;
           const id = result?._id ?? result?.id;
           if (!id) throw new Error("Failed to create share link");
-          await copyShareUrl(id);
+          copyShareUrl(id);
         });
         return;
       }

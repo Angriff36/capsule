@@ -132,6 +132,7 @@ export const generateProposalDraft = mutation({
       });
       lines.push(generated(source, String(added.docId)));
     }
+    if (created) await selectEventDishes(ctx, event, proposalId);
     const serviceRate = Number(template?.defaultServiceChargePercent ?? 0);
     if (serviceRate > 0) {
       // Typed-by-hand line, so rebuilds leave it as staff set it.
@@ -188,6 +189,56 @@ export const generateProposalDraft = mutation({
     };
   },
 });
+
+/**
+ * A new draft shows the client the event's dishes as its menu. Acceptance
+ * matches these back onto the same event dishes, so nothing doubles.
+ */
+async function selectEventDishes(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  proposalId: Id<"proposals">,
+): Promise<void> {
+  const rows = (
+    await ctx.db
+      .query("eventDishes")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect()
+  )
+    .filter(
+      (row) =>
+        row.tenantId === event.tenantId &&
+        row.deletedAt == null &&
+        row.removedAt == null &&
+        Number(row.quantityServings) > 0,
+    )
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || a._creationTime - b._creationTime);
+  for (const row of rows) {
+    const dish = await ctx.db.get(row.dishId);
+    if (!dish || dish.tenantId !== event.tenantId || dish.status !== "active") continue;
+    let menuId: Id<"menus"> | null = null;
+    for (const line of await ctx.db
+      .query("menuDishes")
+      .withIndex("by_dishId", (q) => q.eq("dishId", row.dishId))
+      .collect()) {
+      if (line.tenantId !== event.tenantId || line.deletedAt != null || line.removedAt != null) continue;
+      const menu = await ctx.db.get(line.menuId);
+      if (menu && menu.deletedAt == null && String(menu.status) === "published") {
+        menuId = menu._id;
+        break;
+      }
+    }
+    if (!menuId) continue;
+    await ctx.runMutation(api.mutations.ProposalDishSelection_createViaSelect, {
+      proposalId,
+      menuId,
+      dishId: row.dishId,
+      quantityServings: Math.trunc(Number(row.quantityServings)),
+      course: row.course ?? undefined,
+      serviceStyle: row.serviceStyle ?? undefined,
+    });
+  }
+}
 
 async function templateForStyle(
   ctx: MutationCtx,
