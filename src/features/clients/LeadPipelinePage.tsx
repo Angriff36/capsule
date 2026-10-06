@@ -555,7 +555,9 @@ export function LeadPipelinePage() {
                   <h2 id={`lead-stage-${stage.key}`}>{stage.label}</h2>
                   <p>{stage.caption}</p>
                 </div>
-                <strong>{currency.format(stageValue)}</strong>
+                <strong>
+                  {stageValue > 0 ? currency.format(stageValue) : "—"}
+                </strong>
               </header>
 
               <div className="lead-pipeline-stack">
@@ -625,7 +627,8 @@ export function LeadPipelinePage() {
                           type="number"
                           min="0"
                           step="0.01"
-                          defaultValue={lead.estimatedValue}
+                          defaultValue={lead.estimatedValue || ""}
+                          placeholder="Not priced"
                           aria-label={`${leadName(lead)} estimated value`}
                         />
                       </label>
