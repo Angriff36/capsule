@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useCreateClient,
   useCreateClientMerge,
@@ -80,6 +80,30 @@ export function ClientsPage() {
   const [primaryClientId, setPrimaryClientId] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy);
 
+  // Warn (never block) when a new client matches one already on file.
+  const [draftIdentity, setDraftIdentity] = useState({ name: "", email: "" });
+  const draftName = draftIdentity.name.trim().toLowerCase();
+  const draftEmail = draftIdentity.email.trim().toLowerCase();
+  const sameEmail = draftEmail
+    ? (clients ?? []).find(
+        (row) =>
+          row.deletedAt == null &&
+          String(row.email ?? "")
+            .trim()
+            .toLowerCase() === draftEmail,
+      )
+    : undefined;
+  const sameName =
+    !sameEmail && draftName
+      ? (clients ?? []).find(
+          (row) =>
+            row.deletedAt == null &&
+            clientDisplayName(row._id, [row]).trim().toLowerCase() ===
+              draftName,
+        )
+      : undefined;
+  const sameClient = sameEmail ?? sameName;
+  const sameClientBy = sameEmail ? "email" : "name";
   const registered = (clients ?? []).filter(
     (row) => row.deletedAt == null && row.registeredAt != null,
   );
@@ -301,7 +325,24 @@ export function ClientsPage() {
       ) : null}
 
       {showRegister ? (
-        <form className="supply-form" onSubmit={submitRegister}>
+        <form
+          className="supply-form"
+          onSubmit={submitRegister}
+          onChange={(event) => {
+            const form = event.currentTarget;
+            const read = (name: string) =>
+              String(
+                (form.elements.namedItem(name) as HTMLInputElement | null)
+                  ?.value ?? "",
+              );
+            setDraftIdentity({
+              name:
+                read("companyName") ||
+                `${read("givenName")} ${read("familyName")}`,
+              email: read("email"),
+            });
+          }}
+        >
           <div className="supply-form-heading">
             <div>
               <p className="eyebrow">New</p>
@@ -365,6 +406,19 @@ export function ClientsPage() {
             Notes
             <textarea name="notes" rows={2} className="input" />
           </label>
+          {sameClient ? (
+            <p className="text-sm text-warn" role="status">
+              {clientDisplayName(sameClient._id, [sameClient])} is already a
+              client with this {sameClientBy}.{" "}
+              <Link
+                className="text-link"
+                to={CLIENTS_ROUTES.detail(sameClient._id)}
+              >
+                Open them
+              </Link>{" "}
+              instead, or save if this is someone else.
+            </p>
+          ) : null}
           <button className="btn btn-primary" type="submit" disabled={busy}>
             {busy ? "Saving…" : "Save client"}
           </button>
