@@ -51,6 +51,8 @@ interface LeadRow {
   phone?: string | null;
   source: string;
   eventDate?: number | null;
+  guestCount?: number | null;
+  eventType?: string | null;
   referralSourceId?: string | null;
   estimatedValue: number;
   stage: LeadStage;
@@ -217,6 +219,8 @@ export function LeadPipelinePage() {
         probability,
         notes: optional(data.get("notes")),
         eventDate: dateValue(data.get("eventDate")),
+        guestCount: Number(data.get("guestCount") || 0) || undefined,
+        eventType: optional(data.get("eventType")),
       });
       form.reset();
       setLeadType("company");
@@ -471,6 +475,17 @@ export function LeadPipelinePage() {
             <label>
               Event date
               <BoundedDateInput name="eventDate" />
+            </label>
+            <label>
+              Guests
+              <input name="guestCount" type="number" min="0" step="1" />
+            </label>
+            <label>
+              Event type
+              <input
+                name="eventType"
+                placeholder="e.g. Wedding, retirement party"
+              />
             </label>
             <label>
               Where they came from
@@ -781,14 +796,17 @@ export function LeadPipelinePage() {
                               name="guestCount"
                               type="number"
                               min="0"
-                              defaultValue="0"
+                              defaultValue={lead.guestCount ?? 0}
                             />
                           </label>
                         </div>
                         <div>
                           <label>
                             Event type
-                            <input name="eventType" />
+                            <input
+                              name="eventType"
+                              defaultValue={lead.eventType ?? ""}
+                            />
                           </label>
                           <label>
                             Event date

@@ -15,6 +15,8 @@ export interface LeadDetailsRow {
   referralSourceId?: string | null;
   notes?: string | null;
   eventDate?: number | null;
+  guestCount?: number | null;
+  eventType?: string | null;
 }
 
 interface LeadDetailsFormProps {
@@ -75,6 +77,8 @@ export function LeadDetailsForm({
         phone: optional(data.get("phone")),
         notes: optional(data.get("notes")),
         eventDate: dateValue(data.get("eventDate")),
+        guestCount: Number(data.get("guestCount") || 0) || undefined,
+        eventType: optional(data.get("eventType")),
       });
       onSaved("Lead details saved.");
       onClose();
@@ -157,6 +161,20 @@ export function LeadDetailsForm({
                 : undefined
             }
           />
+        </label>
+        <label>
+          Guests
+          <input
+            name="guestCount"
+            type="number"
+            min="0"
+            step="1"
+            defaultValue={lead.guestCount ?? ""}
+          />
+        </label>
+        <label>
+          Event type
+          <input name="eventType" defaultValue={lead.eventType ?? ""} />
         </label>
         <label className="lead-edit-form-span-2">
           Inquiry notes
