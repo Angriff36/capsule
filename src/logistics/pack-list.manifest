@@ -1374,6 +1374,17 @@ on EventDishAdded fanOut PackList where activeEventId = payload.eventId
     quantityServings: payload.quantityServings
   }
 
+// A dish that arrives from an accepted proposal (a tasting pick) needs its
+// containers on the pack list too; ensureContainer matches, so a line that
+// already has them is left alone.
+on EventDishConfirmedFromProposal fanOut PackList where activeEventId = payload.eventId
+  run requestDishContainers
+  params {
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    quantityServings: payload.quantityServings
+  }
+
 event PackListItemRequirementSynced: "pack_list_item.requirement_synced" {
   packListId: string
   tenantId: string
