@@ -4,8 +4,14 @@ import { formatMoney } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
+  InlineReferenceCreateSheet,
+  useCanCreateInlineReference,
+} from "../../ui/InlineReferenceCreateSheet";
+import {
   useListClient,
   useListDish,
+  useListMenu,
+  useListMenuDish,
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
@@ -444,6 +450,19 @@ function BasicsStep({
   update: (changes: Partial<EventWizardDraft>) => void;
   locked: boolean;
 }) {
+  // A venue that is new to the book is made right here, not on another page.
+  const canCreateVenue = useCanCreateInlineReference("venue");
+  const [newVenueName, setNewVenueName] = useState<string | null>(null);
+  const [madeVenue, setMadeVenue] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const venueOptions = [
+    ...venues.map((venue) => ({ id: String(venue._id), label: venue.name })),
+    ...(madeVenue && !venues.some((venue) => venue._id === madeVenue.id)
+      ? [madeVenue]
+      : []),
+  ];
   const field = (label: string, key: keyof EventWizardDraft, type = "text") => (
     <label className="field-label">
       {label}
@@ -490,12 +509,29 @@ function BasicsStep({
           onChange={(id) => update({ venueId: id })}
           recentsKey="venue"
           placeholder="Search venues…"
-          options={venues.map((venue) => ({
-            id: venue._id,
-            label: venue.name,
-          }))}
+          onCreate={canCreateVenue ? setNewVenueName : undefined}
+          createLabel={(name) => `Create venue “${name}”`}
+          options={venueOptions}
         />
       </label>
+      {newVenueName != null ? (
+        <InlineReferenceCreateSheet
+          kind="venue"
+          open
+          initialName={newVenueName}
+          existingOptions={venueOptions}
+          onClose={() => setNewVenueName(null)}
+          onUseExisting={(id) => {
+            update({ venueId: id });
+            setNewVenueName(null);
+          }}
+          onCreated={(record) => {
+            setMadeVenue(record);
+            update({ venueId: record.id });
+            setNewVenueName(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -510,6 +546,23 @@ function ClientHeadcountStep({
   update: (changes: Partial<EventWizardDraft>) => void;
   locked: boolean;
 }) {
+  // A client who is new is made right here, not on another page.
+  const canCreateClient = useCanCreateInlineReference("client");
+  const [newClientName, setNewClientName] = useState<string | null>(null);
+  const [madeClient, setMadeClient] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const clientOptions = [
+    ...clients.map((client) => ({
+      id: String(client._id),
+      label: clientName(client),
+      hint: [client.email, client.phone].filter(Boolean).join(" · ") || null,
+    })),
+    ...(madeClient && !clients.some((client) => client._id === madeClient.id)
+      ? [madeClient]
+      : []),
+  ];
   const field = (
     label: string,
     key: keyof EventWizardDraft,
@@ -547,14 +600,34 @@ function ClientHeadcountStep({
           }}
           recentsKey="client"
           placeholder="Search clients…"
-          options={clients.map((client) => ({
-            id: client._id,
-            label: clientName(client),
-            hint:
-              [client.email, client.phone].filter(Boolean).join(" · ") || null,
-          }))}
+          onCreate={canCreateClient ? setNewClientName : undefined}
+          createLabel={(name) => `Create client “${name}”`}
+          options={clientOptions}
         />
       </label>
+      {newClientName != null ? (
+        <InlineReferenceCreateSheet
+          kind="client"
+          open
+          initialName={newClientName}
+          existingOptions={clientOptions}
+          onClose={() => setNewClientName(null)}
+          onUseExisting={(id) => {
+            update({ clientId: id });
+            setNewClientName(null);
+          }}
+          onCreated={(record) => {
+            setMadeClient(record);
+            update({
+              clientId: record.id,
+              ...(!draft.primaryContactName
+                ? { primaryContactName: record.label }
+                : {}),
+            });
+            setNewClientName(null);
+          }}
+        />
+      ) : null}
       {field("Primary contact", "primaryContactName")}
       {field("Headcount", "expectedHeadcount", "number", "1")}
       {field("Budget", "budgetAmount", "number", "0")}
@@ -571,6 +644,8 @@ function DishStep({
   dishes: readonly any[];
   update: (changes: Partial<EventWizardDraft>) => void;
 }) {
+  const menus = useListMenu();
+  const menuDishes = useListMenuDish();
   const add = (id: string) => {
     const dish = dishes.find((item) => item._id === id);
     if (dish)
@@ -581,8 +656,63 @@ function DishStep({
         ],
       });
   };
+  // One pick brings in every dish on a menu, and a per-guest price when the
+  // event has no quote yet. Dishes already on the event are not added twice.
+  const publishedMenus = (menus ?? []).filter(
+    (menu) => menu.deletedAt == null && String(menu.status) === "published",
+  );
+  const addMenu = (menuId: string) => {
+    const menu = publishedMenus.find((item) => item._id === menuId);
+    if (!menu) return;
+    const have = new Set(draft.dishes.map((line) => line.dishId));
+    const added = (menuDishes ?? [])
+      .filter(
+        (line) =>
+          line.menuId === menuId &&
+          line.deletedAt == null &&
+          line.removedAt == null,
+      )
+      .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder))
+      .map((line) => dishes.find((dish) => dish._id === line.dishId))
+      .filter((dish) => dish != null && !have.has(dish._id))
+      .map((dish) => ({
+        lineId: lineId(),
+        dishId: String(dish._id),
+        dishName: String(dish.name),
+      }));
+    const headcount = Number(draft.expectedHeadcount);
+    const perPerson = Number(menu.pricePerPerson ?? 0);
+    const quote =
+      Number(draft.quotedPrice) > 0 || !(headcount > 0) || !(perPerson > 0)
+        ? {}
+        : {
+            quotedPrice: String(
+              Number(menu.basePrice ?? 0) + perPerson * headcount,
+            ),
+          };
+    update({ dishes: [...draft.dishes, ...added], ...quote });
+  };
   return (
     <div className="space-y-3">
+      {publishedMenus.length ? (
+        <label className="field-label">
+          Start from a menu
+          <SearchSelect
+            value=""
+            onChange={(id) => addMenu(id)}
+            recentsKey="menu"
+            placeholder="Search menus…"
+            options={publishedMenus.map((menu) => ({
+              id: String(menu._id),
+              label: String(menu.name),
+              hint:
+                Number(menu.pricePerPerson ?? 0) > 0
+                  ? `${formatMoney(Number(menu.pricePerPerson))} per guest`
+                  : null,
+            }))}
+          />
+        </label>
+      ) : null}
       <label className="field-label">
         Add a catalog dish
         <SearchSelect

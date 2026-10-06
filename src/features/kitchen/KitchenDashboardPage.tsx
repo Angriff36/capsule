@@ -1877,13 +1877,13 @@ export function KitchenDashboardPage() {
               </select>
             </label>
             <label className="kcd-field">
-              <span>Arm cook</span>
+              <span>Tap tasks to give to</span>
               <select
                 value={armedPersonId ?? ""}
                 onChange={(e) => setArmedPersonId(e.target.value || null)}
                 aria-label="Arm a cook for assignment"
               >
-                <option value="">Nobody armed</option>
+                <option value="">Nobody (off)</option>
                 {crewRows.map((crew) => (
                   <option
                     key={String(crew.person._id)}
@@ -1930,26 +1930,6 @@ export function KitchenDashboardPage() {
                       {model.personLabel(person)}
                     </option>
                   ))}
-              </select>
-            </label>
-            {/* Arming a cook was desktop-only, so a phone could never hand
-                work out. Same control, same state. */}
-            <label className="kcd-field">
-              <span>Arm cook</span>
-              <select
-                value={armedPersonId ?? ""}
-                onChange={(e) => setArmedPersonId(e.target.value || null)}
-                aria-label="Arm a cook for assignment"
-              >
-                <option value="">Nobody armed</option>
-                {crewRows.map((crew) => (
-                  <option
-                    key={String(crew.person._id)}
-                    value={String(crew.person._id)}
-                  >
-                    {model.personLabel(crew.person)} ({crew.load} open)
-                  </option>
-                ))}
               </select>
             </label>
           </div>
