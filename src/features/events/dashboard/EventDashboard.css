@@ -582,6 +582,9 @@
 }
 .evd-sheet-body {
   display: grid;
+  /* minmax(0): a wide card (the stage steps) widened every card past the
+     sheet's right edge. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
 }
 .evd-note {

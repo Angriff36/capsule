@@ -85,7 +85,7 @@ export function DonationSummaryPage() {
       {rows === undefined ? (
         <TableSkeleton rows={5} />
       ) : (
-        <article className="mt-6 space-y-6">
+        <article className="print-sheet mt-6 space-y-6">
           <header>
             <h2 className="text-xl font-semibold">
               Food donations · {summary.year}
