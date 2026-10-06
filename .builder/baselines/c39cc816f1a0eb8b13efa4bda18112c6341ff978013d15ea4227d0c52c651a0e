@@ -64185,7 +64185,7 @@ async function __runStockCountLineConfirmLedgerMatch(ctx: MutationCtx, { docId, 
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_session != null) && (__rel_session.status === "in_progress")))) throw new Error("Guard 2 failed");
     if (!(((__rel_inventoryItem != null) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 3 failed");
-    if (!((doc.countedQuantity === __rel_inventoryItem.quantityOnHand))) throw new Error("Guard 4 failed");
+    if (!((Math.round((doc.countedQuantity * 10000)) === Math.round((__rel_inventoryItem.quantityOnHand * 10000))))) throw new Error("Guard 4 failed");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -64408,7 +64408,7 @@ async function __runStockCountLineReconcileVariance(ctx: MutationCtx, { docId, r
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_session != null) && (__rel_session.status === "in_progress")))) throw new Error("Guard 2 failed");
     if (!(((__rel_inventoryItem != null) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 3 failed");
-    if (!((doc.countedQuantity !== __rel_inventoryItem.quantityOnHand))) throw new Error("Guard 4 failed");
+    if (!((Math.round((doc.countedQuantity * 10000)) !== Math.round((__rel_inventoryItem.quantityOnHand * 10000))))) throw new Error("Guard 4 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why this count doesn't match what's on hand.");
     const ledgerQuantity = __rel_inventoryItem.quantityOnHand;
     const adjustmentQuantity = (doc.countedQuantity - ledgerQuantity);

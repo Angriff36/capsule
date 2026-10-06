@@ -313,8 +313,24 @@ export function StockCountPage() {
       countNote: countNote.trim() || undefined,
     };
     void run(`${activeLine._id}:count`, async () => {
-      if (String(activeLine.status) === "pending") await recordCount(payload);
-      else await reviseCount(payload);
+      const saved = (
+        String(activeLine.status) === "pending"
+          ? await recordCount(payload)
+          : await reviseCount(payload)
+      ) as { version?: number } | undefined;
+      // A shelf that matches the book needs no review: close the line now
+      // so the count moves straight on to the next one.
+      if (
+        quantity(nextQuantity) === ledgerQuantity &&
+        typeof saved?.version === "number"
+      ) {
+        await confirmLedgerMatch({
+          docId: activeLine._id,
+          version: saved.version,
+        });
+        setNotice("Count matches the stock book. On to the next line.");
+        return;
+      }
       setNotice(
         String(activeLine.status) === "pending"
           ? "Physical count saved. Review the variance, then reconcile this line."
