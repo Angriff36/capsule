@@ -486,7 +486,7 @@ export function ClientsPage() {
             <thead>
               <tr>
                 <th className="th w-full">Client</th>
-                <th className="th">Contact</th>
+                <th className="th hidden sm:table-cell">Contact</th>
                 <th className="th text-right">Upcoming</th>
                 <th className="th">Last event</th>
                 <th className="th text-right">Lifetime value</th>
@@ -510,15 +510,15 @@ export function ClientsPage() {
                     }
                     className="cursor-pointer transition-colors hover:bg-inset/60"
                   >
-                    <td className="td w-full min-w-[10rem] max-w-0 truncate">
+                    <td className="td w-full min-w-[10rem] max-w-0 whitespace-normal break-words sm:truncate">
                       <span className="font-medium">
                         {clientDisplayName(row._id, clients)}
                       </span>
-                      <span className="ml-2 text-sm text-ink-3">
+                      <span className="ml-2 text-sm whitespace-nowrap text-ink-3">
                         {formatStatusLabel(String(row.clientType))}
                       </span>
                     </td>
-                    <td className="td max-w-[16rem] truncate text-sm text-ink-3">
+                    <td className="td hidden max-w-[16rem] truncate text-sm text-ink-3 sm:table-cell">
                       {contactLine || "—"}
                     </td>
                     <td className="td text-right font-mono">
