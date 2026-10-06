@@ -238,6 +238,8 @@ const LINK_TABLE: Record<string, string> = {
   // PL-INBOX: the conversation a duplicate thread was merged into.
   mergedIntoThreadId: "messageThreads",
   targetThreadId: "messageThreads",
+  // TPP whole-account import: the upload a stored part belongs to.
+  uploadId: "tppUploads",
   missingByPersonId: "people",
   nativeTargetId: "events",
   observationId: "@outside",

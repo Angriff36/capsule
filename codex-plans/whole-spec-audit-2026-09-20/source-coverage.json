@@ -6993,22 +6993,22 @@
       "key": "CF-6.2-01",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§6.2 bullet 'Existing 2,103 Events and the documented 27-field mapping'",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "A recorded full 2,103-event run needs the real TPP export (production data).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/event-mapping-parity.runtime.test.ts — 'the executed event mapping covers exactly the 27 documented fields and preserves literal EventStatus' + a recorded full-dataset import run as the AC-style proof"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/event-mapping-parity.runtime.test.ts — 'the executed event mapping covers exactly the 27 documented fields and preserves literal EventStatus' + a recorded full-dataset import run as the AC-style proof Green 2026-10-06 (PL-SOURCE-DATASETS, 2fdfd912): tests/proofs/event-mapping-parity.runtime.test.ts 2/2 - src/lib/tppEventListColumns.ts names the 27 documented export columns, the reader fills exactly the listed fields and keeps the rest with the row on the import link; bare status codes map verbatim from the data map (3 Final, 9 Cancelled, 0 Quote, 2 Sales Lock, 1 Confirmed, 00 Closed) and the literal code stays on the link. Recorded full-dataset run: the real history file (work/tpp-raw-master-2021-2026.csv, 2,505 events - the newer export, larger than the 2,103 the map counted) after the real contact list (3,314 rows, 3,303 clients): 2,505 import links, 2,483 events with their client (2,144 completed, 334 cancelled, 5 planning), 22 waiting with a plain note (21 two clients of one name, 1 no client of that name), 0 read errors, 11.5 min."
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "a77035ab"
     },
     {
       "id": "AC-275",

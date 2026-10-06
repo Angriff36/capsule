@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useProposalReviseDraft } from "../../lib/manifest-convex-react";
 import { formatDate } from "../../lib/format";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 interface ProposalTermsPanelProps {
   proposal: {
@@ -112,9 +113,8 @@ export function ProposalTermsPanel({
       </label>
       <label className="field-label">
         Valid until
-        <input
+        <BoundedDateInput
           className="input"
-          type="date"
           name="expiresAt"
           defaultValue={dateInput(proposal.expiresAt)}
         />
