@@ -14,6 +14,7 @@ import {
   useListInventoryLot,
   useListItemUnitMapping,
   useListPurchaseNeed,
+  useListInventoryItem,
   useListStorageLocation,
   useListVendor,
   useListVendorContact,
@@ -82,6 +83,7 @@ export function VendorOrderPage() {
   const inventoryLots = useListInventoryLot();
   const unitMappings = useListItemUnitMapping();
   const locations = useListStorageLocation();
+  const stockLines = useListInventoryItem();
   const createLocation = useCreateStorageLocation();
   const createLine = useCreateVendorOrderLine();
   const submitOrder = useVendorOrderSubmit();
@@ -289,6 +291,45 @@ export function VendorOrderPage() {
     });
   };
 
+  // Most deliveries arrive as ordered: one slip number receives every open
+  // line in full, each into the place that ingredient is already kept.
+  // A short or damaged line is fixed on its own row afterwards.
+  const receiveAllAsOrdered = (lines: any[]) => {
+    void (async () => {
+      const slip = await prompt.askReason({
+        title: "Receive everything as ordered",
+        description:
+          "Every open line is received in full at its order price. Fix any short or damaged line on its own row afterwards.",
+        label: "Delivery slip or lot number",
+        placeholder: "e.g. FR-102614",
+        confirmLabel: "Receive all",
+      });
+      if (!slip) return;
+      void run("order:receiveAll", async () => {
+        const fallback = activeLocations(locations)[0]?._id;
+        for (const line of lines) {
+          const stocked = (stockLines ?? []).find(
+            (item) =>
+              item.deletedAt == null && item.ingredientId === line.ingredientId,
+          )?.locationId;
+          const locationId = line.locationId ?? stocked ?? fallback;
+          if (!locationId)
+            throw new Error("Add a storage location first, then receive.");
+          await recordReceipt({
+            docId: line._id,
+            version: line.version,
+            quantity:
+              Number(line.orderedQuantity) - Number(line.receivedQuantity),
+            locationId: String(locationId),
+            unitPrice: Number(line.unitCost),
+            supplierLotNumber: slip,
+            deliveryReference: slip,
+          });
+        }
+      });
+    })();
+  };
+
   const invokeOrderAction = (key: string) => {
     void (async () => {
       if (key === "cancel") {
@@ -385,7 +426,11 @@ export function VendorOrderPage() {
           <h1 className="display-title mt-2">{vendorOrderTitle(order)}</h1>
           <p className="mt-3 text-ink-2">
             {vendor?.name ?? "Unknown vendor"} ·{" "}
-            {order.eventId ? "Event order" : "General stock"}
+            {order.eventId
+              ? "Event order"
+              : order.sourceRangeStart != null
+                ? `Weekly order · week of ${new Date(Number(order.sourceRangeStart)).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" })}`
+                : "General stock"}
           </p>
         </div>
         <div className="order-state">
@@ -572,7 +617,29 @@ export function VendorOrderPage() {
             <p className="eyebrow">Receipt progress</p>
             <h2>Order lines</h2>
           </div>
-          <span>{orderLines.length} lines</span>
+          <span className="flex items-center gap-3">
+            {(() => {
+              const open = orderLines.filter(
+                (line) =>
+                  (line.status === "added" || line.status === "receiving") &&
+                  Number(line.orderedQuantity) - Number(line.receivedQuantity) >
+                    0,
+              );
+              return (String(order.status) === "confirmed" ||
+                String(order.status) === "partially_received") &&
+                open.length > 0 ? (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  disabled={busy != null}
+                  onClick={() => receiveAllAsOrdered(open)}
+                >
+                  Receive all as ordered
+                </button>
+              ) : null;
+            })()}
+            {orderLines.length} lines
+          </span>
         </div>
         {lines === undefined ||
         demandLinks === undefined ||
