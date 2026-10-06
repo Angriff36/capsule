@@ -599,6 +599,9 @@ export function ProposalCreateForm({
                   options={activeClients.map((row) => ({
                     id: row._id,
                     label: clientDisplayName(row._id, clients),
+                    hint:
+                      [row.email, row.phone].filter(Boolean).join(" · ") ||
+                      null,
                   }))}
                 />
               </label>

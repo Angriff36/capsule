@@ -29,6 +29,8 @@ type ClientOption = {
   givenName?: string | null;
   familyName?: string | null;
   displayName?: string | null;
+  email?: string | null;
+  phone?: string | null;
   taxExempt?: boolean | null;
 };
 
@@ -213,6 +215,9 @@ export function InvoiceIssueForm({
             options={clients.map((client) => ({
               id: client._id,
               label: clientLabel(client),
+              hint:
+                [client.email, client.phone].filter(Boolean).join(" · ") ||
+                null,
             }))}
           />
         </label>

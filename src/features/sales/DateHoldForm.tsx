@@ -88,6 +88,9 @@ export function DateHoldForm({
             options={liveClients.map((client) => ({
               id: client._id,
               label: clientDisplayName(client._id, [client]),
+              hint:
+                [client.email, client.phone].filter(Boolean).join(" · ") ||
+                null,
             }))}
           />
         </label>
