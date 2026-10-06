@@ -1922,6 +1922,24 @@
   text-align: left;
   white-space: nowrap;
 }
+/* A group of rows in one menu item (client link: copy, turn off, preview,
+   notes). As one 32px row its notes ran over each other. */
+.action-menu-list > .action-menu-group {
+  display: grid;
+  height: auto;
+  max-width: 18rem;
+  cursor: default;
+  gap: 0;
+  padding: 0;
+  white-space: normal;
+}
+.action-menu-group > span,
+.action-menu-group > a {
+  padding: 2px 10px 4px;
+}
+.action-menu-list > .action-menu-group:hover:not(:disabled) {
+  background: transparent;
+}
 .action-menu-list > *:hover:not(:disabled) {
   background: var(--color-inset);
   transform: none;
@@ -1943,9 +1961,22 @@
 }
 
 @media (max-width: 767px) {
+  /* Long labels kept the menu one line wide, so it ran off the left edge of
+     a phone; now it is never wider than the screen and labels wrap. */
   .action-menu-list {
     right: 0;
     left: auto;
+    width: max-content;
+    max-width: min(20rem, calc(100vw - 24px));
+  }
+  .action-menu-list > :not(.action-menu-rule),
+  .action-menu-list .btn {
+    height: auto;
+    min-height: 32px;
+    white-space: normal;
+  }
+  .action-menu-list > .action-menu-group {
+    max-width: none;
   }
 }
 

@@ -502,10 +502,18 @@ export function ProposalsPage() {
           const callbackToken = result.docId; // The entity ID is the callback token
           const acceptanceUrl = generateAcceptanceUrl(callbackToken);
 
-          // Copy to clipboard and show success
-          await navigator.clipboard.writeText(acceptanceUrl);
+          // The request exists now; a browser that will not copy must not
+          // turn that into an error that hides the link.
+          const copied = await Promise.resolve()
+            .then(() => navigator.clipboard.writeText(acceptanceUrl))
+            .then(
+              () => true,
+              () => false,
+            );
           setNotice(
-            `Signature request created. Acceptance URL copied to clipboard: ${acceptanceUrl}`,
+            copied
+              ? `Signature request created. Acceptance URL copied to clipboard: ${acceptanceUrl}`
+              : `Signature request created. Copy the acceptance link: ${acceptanceUrl}`,
           );
         });
         return;
