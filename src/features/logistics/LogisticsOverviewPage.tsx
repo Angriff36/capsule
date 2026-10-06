@@ -53,8 +53,16 @@ export function LogisticsOverviewPage() {
   const liveDeliveries = (deliveries ?? []).filter(
     (row) => row.deletedAt == null && String(row.status) !== "cancelled",
   );
+  // Pack lists of events that are already over are history, not work.
+  const eventOver = (id: string) => {
+    const event = events?.find((row) => row._id === id);
+    return Number(event?.endsAt ?? event?.startsAt ?? Infinity) < now;
+  };
   const livePackLists = (packLists ?? []).filter(
-    (row) => row.deletedAt == null && String(row.status) !== "cancelled",
+    (row) =>
+      row.deletedAt == null &&
+      String(row.status) !== "cancelled" &&
+      !eventOver(row.eventId),
   );
   const eventName = (id: string) =>
     events?.find((event) => event._id === id)?.title ?? "Unknown event";

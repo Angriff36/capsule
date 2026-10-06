@@ -735,9 +735,19 @@ export const kitchenUnresolvedReport = query({
   handler: async (ctx): Promise<UnresolvedWorkReport> => {
     const tenantId = requireCulinaryReader(await getAuthContext(ctx));
     const catalog = await loadCatalog(ctx, tenantId);
-    const events = (await byTenant(ctx, "events", tenantId)).filter((e) =>
-      OPEN_STAGES.has(e.stage),
-    );
+    // An event that is already over (but never closed out) needs nothing
+    // ordered or cooked any more, so its gaps are not kitchen work.
+    const now = Date.now();
+    const events = (await byTenant(ctx, "events", tenantId))
+      .filter(
+        (e) =>
+          OPEN_STAGES.has(e.stage) &&
+          Number(e.endsAt ?? e.startsAt ?? Infinity) >= now,
+      )
+      .sort(
+        (a, b) =>
+          Number(a.startsAt ?? Infinity) - Number(b.startsAt ?? Infinity),
+      );
     const eventRows: UnresolvedWorkReport["events"] = [];
     for (const event of events) {
       const eventDishes = await loadEventDishes(ctx, tenantId, event._id);
