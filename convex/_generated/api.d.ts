@@ -8,6 +8,11 @@
  * @module
  */
 
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
 import type * as apiKeys from "../apiKeys.js";
 import type * as archiveDisposition from "../archiveDisposition.js";
 import type * as archiveInventory from "../archiveInventory.js";
@@ -251,7 +256,9 @@ import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
 import type * as lib_tenantSystemCommandRunner from "../lib/tenantSystemCommandRunner.js";
 import type * as lib_timingFollowUp from "../lib/timingFollowUp.js";
+import type * as lib_tppAccountNative from "../lib/tppAccountNative.js";
 import type * as lib_tppHistoryRows from "../lib/tppHistoryRows.js";
+import type * as lib_tppUploadContract from "../lib/tppUploadContract.js";
 import type * as lib_travelLegEvents from "../lib/travelLegEvents.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_typicalKitchenDensity from "../lib/typicalKitchenDensity.js";
@@ -324,6 +331,8 @@ import type * as tppReports_financial from "../tppReports/financial.js";
 import type * as tppReports_general from "../tppReports/general.js";
 import type * as tppReports_options from "../tppReports/options.js";
 import type * as tppReports_shared from "../tppReports/shared.js";
+import type * as tppUpload from "../tppUpload.js";
+import type * as tppUploadFiles from "../tppUploadFiles.js";
 import type * as travelFees from "../travelFees.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as vendorNames from "../vendorNames.js";
@@ -335,12 +344,14 @@ import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
-
+/**
+ * A utility for referencing Convex functions in your app's API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
   archiveDisposition: typeof archiveDisposition;
@@ -585,7 +596,9 @@ declare const fullApi: ApiFromModules<{
   "lib/teamChatScan": typeof lib_teamChatScan;
   "lib/tenantSystemCommandRunner": typeof lib_tenantSystemCommandRunner;
   "lib/timingFollowUp": typeof lib_timingFollowUp;
+  "lib/tppAccountNative": typeof lib_tppAccountNative;
   "lib/tppHistoryRows": typeof lib_tppHistoryRows;
+  "lib/tppUploadContract": typeof lib_tppUploadContract;
   "lib/travelLegEvents": typeof lib_travelLegEvents;
   "lib/twilio": typeof lib_twilio;
   "lib/typicalKitchenDensity": typeof lib_typicalKitchenDensity;
@@ -658,6 +671,8 @@ declare const fullApi: ApiFromModules<{
   "tppReports/general": typeof tppReports_general;
   "tppReports/options": typeof tppReports_options;
   "tppReports/shared": typeof tppReports_shared;
+  tppUpload: typeof tppUpload;
+  tppUploadFiles: typeof tppUploadFiles;
   travelFees: typeof travelFees;
   vehicleAssignment: typeof vehicleAssignment;
   vendorNames: typeof vendorNames;
@@ -669,31 +684,11 @@ declare const fullApi: ApiFromModules<{
   webhookIntegrations: typeof webhookIntegrations;
   workforceScheduling: typeof workforceScheduling;
 }>;
-
-/**
- * A utility for referencing Convex functions in your app's public API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
 >;
-
-/**
- * A utility for referencing Convex functions in your app's internal API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = internal.myModule.myFunction;
- * ```
- */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
-
-export declare const components: {};

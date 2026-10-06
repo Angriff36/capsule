@@ -565,6 +565,11 @@ const ImportRunsListPage = lazy(() =>
     default: module.ImportRunsListPage,
   })),
 );
+const TppUploadPage = lazy(() =>
+  import("../features/admin/import/TppUploadPage").then((module) => ({
+    default: module.TppUploadPage,
+  })),
+);
 const ImportRunDetailPage = lazy(() =>
   import("../features/admin/import/ImportRunDetailPage").then((module) => ({
     default: module.ImportRunDetailPage,
@@ -1723,6 +1728,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ImportRunDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/imports/tpp"
+              element={
+                <SupplyRoute>
+                  <TppUploadPage />
                 </SupplyRoute>
               }
             />

@@ -66,6 +66,8 @@ export type PackRuleInput = {
   baseQuantity: number;
   scaleBy: PackRuleScale;
   perUnits?: number | null;
+  quantityPerUnit?: number | null;
+  aggregateDishQuantity?: boolean | null;
   sparePercent: number;
   ownership: PackOwnership;
   returnRequired: boolean;
@@ -80,6 +82,7 @@ export type PackDishInput = {
   dishName: string;
   servings: number;
   note?: string | null;
+  packingAlreadyRecorded?: boolean | null;
 };
 
 export type PackRentalInput = {
@@ -200,7 +203,7 @@ function roundUp(value: number): number {
 export function ruleQuantity(
   rule: Pick<
     PackRuleInput,
-    "baseQuantity" | "scaleBy" | "perUnits" | "sparePercent"
+    "baseQuantity" | "scaleBy" | "perUnits" | "sparePercent" | "quantityPerUnit"
   >,
   amount: { servings?: number; guests?: number },
 ): { quantity: number; formula: string } {
@@ -212,10 +215,11 @@ export function ruleQuantity(
     rule.scaleBy === "servings" ? (amount.servings ?? 0) : (amount.guests ?? 0),
   );
   const noun = rule.scaleBy === "servings" ? "servings" : "guests";
-  const grown = roundUp(count / rule.perUnits);
+  const multiplier = Math.max(0, rule.quantityPerUnit ?? 1);
+  const grown = roundUp((count * multiplier) / rule.perUnits);
   const spare = Math.max(0, rule.sparePercent);
   const withSpare = spare > 0 ? roundUp((grown * (100 + spare)) / 100) : grown;
-  let formula = `${count} ${noun} / ${rule.perUnits} each = ${grown}`;
+  let formula = `${count} ${noun} × ${multiplier} / ${rule.perUnits} = ${grown}`;
   if (spare > 0) formula += `, +${spare}% spare = ${withSpare}`;
   if (base > 0) formula += `, +${base} always = ${base + withSpare}`;
   return { quantity: base + withSpare, formula };
@@ -277,15 +281,28 @@ function ruleSources(
   };
   const guests = event.headcount;
   switch (rule.trigger) {
-    case "dish":
-      return dishes
-        .filter((dish) => dish.dishId === rule.dishId && dish.servings > 0)
-        .map((dish) =>
-          make("dish", dish.eventDishId, dish.dishName, {
-            servings: dish.servings,
+    case "dish": {
+      const matched = dishes.filter(
+        (dish) =>
+          dish.dishId === rule.dishId &&
+          dish.servings > 0 &&
+          !dish.packingAlreadyRecorded,
+      );
+      if (rule.aggregateDishQuantity && matched.length) {
+        return [
+          make("dish", matched[0].eventDishId, matched[0].dishName, {
+            servings: matched.reduce((total, dish) => total + dish.servings, 0),
             guests,
           }),
-        );
+        ];
+      }
+      return matched.map((dish) =>
+        make("dish", dish.eventDishId, dish.dishName, {
+          servings: dish.servings,
+          guests,
+        }),
+      );
+    }
     case "production_note":
       return dishes
         .filter(

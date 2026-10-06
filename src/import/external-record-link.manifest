@@ -17,6 +17,17 @@ enum ExternalSourceSystem {
 
 // Capsule entity types that can be linked to external records
 enum CapsuleEntityType {
+  source_record
+  equipment
+  equipment_reservation
+  menu_dish
+  attachment
+  event_assignment
+  event_staff_need
+  event_timeline_activity
+  pack_list_item
+  occasion
+  referral_source
   event_record
   contact
   lead
