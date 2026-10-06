@@ -208,8 +208,10 @@ export function MenuDetailPage() {
         })),
         priceObservations: priceObservations ?? [],
         unitMappings: RecordedUnitMappings.fromRows(itemUnitMappings),
+        menuPricePerPerson: Number(menu?.pricePerPerson ?? 0),
       }),
     [
+      menu?.pricePerPerson,
       dishes,
       dishComponents,
       components,

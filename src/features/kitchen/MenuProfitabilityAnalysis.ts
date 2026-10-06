@@ -110,6 +110,8 @@ export interface BuildMenuProfitabilityInput {
   priceObservations: IngredientPriceObservationInput[];
   unitMappings?: readonly RecordedUnitMapping[];
   grossMarginTarget?: number;
+  /** A menu sold per guest: one price covers one serving of every dish. */
+  menuPricePerPerson?: number | null;
 }
 
 function isActive(value: Deletable): boolean {
@@ -147,6 +149,7 @@ export function buildMenuProfitability({
   priceObservations,
   unitMappings,
   grossMarginTarget,
+  menuPricePerPerson,
 }: BuildMenuProfitabilityInput): MenuProfitabilityAnalysis {
   const linePricer = new EventMenuLinePricer(unitMappings);
   const target = clampTarget(grossMarginTarget);
@@ -338,16 +341,22 @@ export function buildMenuProfitability({
     (total, row) => total + row.componentCost,
     0,
   );
-  const portfolioMarginAmount = totalSellingPrice - totalComponentCost;
+  // With no dish prices, a per-guest menu is still measured: the guest
+  // price against one serving of every dish's cost.
+  const perGuest = Number(menuPricePerPerson ?? 0);
+  const perGuestMenu =
+    totalSellingPrice === 0 && perGuest > 0 && rows.length > 0;
+  const portfolioMarginAmount = perGuestMenu
+    ? perGuest - rows.reduce((total, row) => total + row.componentCost, 0)
+    : totalSellingPrice - totalComponentCost;
+  const marginBase = perGuestMenu ? perGuest : totalSellingPrice;
 
   return {
     rows,
     grossMarginTarget: target,
     portfolioMarginAmount,
     portfolioMarginPercent:
-      totalSellingPrice > 0
-        ? (portfolioMarginAmount / totalSellingPrice) * 100
-        : null,
+      marginBase > 0 ? (portfolioMarginAmount / marginBase) * 100 : null,
     rankedDishCount,
     lowMarginCount: rows.filter((row) => row.status === "low_margin").length,
     unrankedDishCount: rows.length - rankedDishCount,

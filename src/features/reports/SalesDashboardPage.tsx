@@ -83,7 +83,14 @@ export function SalesDashboardPage() {
   const conversionMetrics = useMemo(() => {
     const all = leads ?? [];
     const totalLeads = all.length;
-    const converted = all.filter((l) => l.stage === "converted").length;
+    // A lead has no "converted" stage: it is converted once it became a
+    // client account.
+    const converted = all.filter(
+      (l) =>
+        String(l.stage) === "converted" ||
+        l.convertedAt != null ||
+        l.clientId != null,
+    ).length;
     const qualified = all.filter(isQualifiedLead).length;
 
     return {

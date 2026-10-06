@@ -123,7 +123,9 @@ export function MenuProfitabilityPanel({
               <small>
                 {analysis.rankedDishCount
                   ? `${formatMoneyExact(analysis.portfolioMarginAmount)} across priced dishes`
-                  : "Waiting on complete price and cost data"}
+                  : analysis.portfolioMarginPercent != null
+                    ? `${formatMoneyExact(analysis.portfolioMarginAmount)} per guest at the menu's per-guest price`
+                    : "Waiting on complete price and cost data"}
               </small>
             </div>
             <div className={analysis.lowMarginCount ? "is-alert" : undefined}>
