@@ -42,9 +42,13 @@ export function PaymentsPage() {
   const fail = usePaymentFail();
   const refund = usePaymentRefund();
   const reverse = usePaymentReverse();
-  const [showRecord, setShowRecord] = useState(false);
+  // "Add payment" on an invoice lands here with ?invoice=<id>: the form is
+  // open with that invoice picked.
+  const invoiceFromLink =
+    new URLSearchParams(window.location.search).get("invoice") ?? "";
+  const [showRecord, setShowRecord] = useState(invoiceFromLink !== "");
   const [showTerminal, setShowTerminal] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState(invoiceFromLink);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();

@@ -5,6 +5,7 @@ import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatDate,
   formatMoney,
+  formatMoneyExact,
   formatTime,
   normalizeCurrencyCode,
 } from "../../lib/format";
@@ -266,8 +267,11 @@ export function InvoiceDetailPage() {
     ? Number(invoice.amountDue ?? 0) * exchangeRate
     : null;
 
+  // A bill shows cents: $8,240.40, not $8,240.
   const usd = (value: unknown) =>
-    formatMoney(Number(value ?? 0), invoiceCurrencyCode);
+    normalizeCurrencyCode(invoiceCurrencyCode) === "USD"
+      ? formatMoneyExact(Number(value ?? 0))
+      : formatMoney(Number(value ?? 0), invoiceCurrencyCode);
   const depositAmount = Number(invoice.depositAmount ?? 0);
   const depositPaidAt =
     invoice.depositPaidAt != null ? Number(invoice.depositPaidAt) : null;
@@ -702,7 +706,10 @@ export function InvoiceDetailPage() {
           </>
         }
         primaryAction={
-          <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
+          <Link
+            className="btn btn-primary"
+            to={`${FINANCE_ROUTES.payments}?invoice=${invoice._id}`}
+          >
             Record payment
           </Link>
         }
@@ -783,7 +790,10 @@ export function InvoiceDetailPage() {
             >
               {busy === "emailInvoice" ? "Emailing…" : "Email the invoice"}
             </button>
-            <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
+            <Link
+              className="btn btn-primary"
+              to={`${FINANCE_ROUTES.payments}?invoice=${invoice._id}`}
+            >
               Add payment
             </Link>
           </div>
@@ -1522,7 +1532,7 @@ export function InvoiceDetailPage() {
                 action: (
                   <Link
                     className="btn btn-ghost btn-sm"
-                    to={FINANCE_ROUTES.payments}
+                    to={`${FINANCE_ROUTES.payments}?invoice=${invoice._id}`}
                   >
                     Add payment
                   </Link>
