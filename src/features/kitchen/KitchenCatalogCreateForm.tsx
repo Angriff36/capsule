@@ -1,3 +1,4 @@
+import { formatMoneyExact } from "../../lib/format";
 import type { FormEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import {
@@ -135,7 +136,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
         });
         setLookupCostNote(
           hint.suggestedCostPerUnit != null && hint.suggestedCostPerUnit > 0
-            ? `${hint.costNote} Suggested: ${hint.suggestedCostPerUnit.toFixed(2)}.`
+            ? `${hint.costNote} Suggested: ${formatMoneyExact(hint.suggestedCostPerUnit)}.`
             : hint.costNote,
         );
         if (
