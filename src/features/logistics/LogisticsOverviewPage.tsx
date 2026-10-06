@@ -78,13 +78,12 @@ export function LogisticsOverviewPage() {
 
   const attention: AttentionRow[] = [];
   for (const row of liveDeliveries) {
-    // A delivery whose window already closed cannot get a driver now.
-    const windowOpen =
-      Number(row.windowEndsAt ?? row.windowStartsAt ?? Infinity) >= now;
+    // A delivery whose window is over no longer needs a driver.
+    const windowOver = (row.windowEndsAt ?? row.windowStartsAt ?? now) < now;
     if (
       String(row.status) === "scheduled" &&
       row.driverId == null &&
-      windowOpen
+      !windowOver
     ) {
       attention.push({
         key: `driver-${row._id}`,
@@ -178,7 +177,7 @@ export function LogisticsOverviewPage() {
         ) : attentionRows.length === 0 ? (
           <EmptyState
             title="Nothing is stuck."
-            hint="Every scheduled delivery has a driver and every packed list has a run."
+            hint="Every upcoming delivery has a driver and every packed list has a run."
             action={
               <Link className="btn btn-ghost btn-sm" to="/logistics/deliveries">
                 Open deliveries
