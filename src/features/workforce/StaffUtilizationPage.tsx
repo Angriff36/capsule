@@ -208,8 +208,8 @@ export function StaffUtilizationDashboard({
           <p className="eyebrow">Staff · Hours</p>
           <h1 className="display-title mt-2">How staff time is used.</h1>
           <p className="mt-3 max-w-180 text-ink-2">
-            Compare committed shifts with confirmed work, see how much time was
-            event-billable, and spot thin schedules before service gets busy.
+            Compare planned shifts with confirmed work, see how much time was
+            worked on events, and spot thin schedules before service gets busy.
           </p>
         </div>
         <div className="staff-utilization-range" aria-label="Displayed period">
