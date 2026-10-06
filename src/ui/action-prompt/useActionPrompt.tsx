@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -90,6 +91,15 @@ export function useActionPrompt(busy = false): {
     [controller],
   );
 
+  // A screen that opens the prompt from inside its own busy step is already
+  // busy on the first render that shows the prompt. Locking then left both
+  // buttons disabled for good, so only work that starts after the prompt
+  // opened locks it.
+  const openedRef = useRef<{ pending: unknown; busy: boolean } | null>(null);
+  if (pending && openedRef.current?.pending !== pending)
+    openedRef.current = { pending, busy };
+  const busyAtOpen = openedRef.current?.busy ?? false;
+
   useEffect(() => {
     if (!notice) return;
     const timer = window.setTimeout(() => setNotice(null), 4000);
@@ -114,7 +124,7 @@ export function useActionPrompt(busy = false): {
       {pending ? (
         <ActionPromptPanel
           request={pending.request}
-          busy={busy}
+          busy={busy && !busyAtOpen}
           onDismiss={() => controller.dismiss()}
           onConfirm={(payload) =>
             controller.confirm({ status: "confirmed", ...payload })
