@@ -35,7 +35,6 @@ export class EventGuestPolicy {
     return (
       EventGuestCheckInCapability.capabilityId === "EventGuest.checkIn" &&
       guest.deletedAt == null &&
-      guest.rsvpStatus === "confirmed" &&
       guest.checkedInAt == null
     );
   }

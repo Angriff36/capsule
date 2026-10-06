@@ -22539,14 +22539,28 @@ async function __runEventGuestCheckIn(ctx: MutationCtx, { docId, version }: any,
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see guest attendance");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
-    if (!((doc.rsvpStatus === "confirmed"))) throw new Error("Guard 0 failed");
-    if (!((doc.checkedInAt == null))) throw new Error("Guard 1 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((doc.checkedInAt == null))) throw new Error("Guard 0 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     const checkInTime = Date.now();
+    {
+      const __cur = doc.rsvpStatus;
+      if (__cur !== undefined) {
+        const __from = String(__cur);
+        const __to = "confirmed";
+        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": ["confirmed"] };
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
+          throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
+        }
+      }
+    }
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
+      rsvpStatus: "confirmed",
+      respondedAt: ((doc.respondedAt != null) ? doc.respondedAt : checkInTime),
+      declineReason: null,
       checkedInAt: checkInTime,
       version: ((doc as any).version ?? 0) + 1
     };
@@ -22600,7 +22614,7 @@ async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, e
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "pending";
-        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": ["confirmed"] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -22744,14 +22758,13 @@ async function __runEventGuestRsvpConfirm(ctx: MutationCtx, { docId, version }: 
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see guest attendance");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
-    if (!(((doc.rsvpStatus === "pending") || (doc.rsvpStatus === "confirmed")))) throw new Error("Guard 0 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     {
       const __cur = doc.rsvpStatus;
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "confirmed";
-        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": ["confirmed"] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -22816,7 +22829,7 @@ async function __runEventGuestRsvpDecline(ctx: MutationCtx, { docId, reason, ver
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "declined";
-        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": ["confirmed"] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
