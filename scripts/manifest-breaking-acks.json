@@ -3096,6 +3096,42 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Optional (json?, nullable in IR) list of event ids written by one command; old audit rows stay valid with none."
+    },
+    {
+      "path": "configureSubstitutes.parameters.substituteIngredientIds",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "configureSubstitutes.parameters.substituteIngredientIds",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "Ingredient.preferredVendorIds",
+      "category": "property-type-changed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "Ingredient.substituteIngredientIds",
+      "category": "property-type-changed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "setPreferredVendors.parameters.preferredVendorIds",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "setPreferredVendors.parameters.preferredVendorIds",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
     }
   ]
 }
