@@ -20,6 +20,7 @@ import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 import { isDerivedSourceId } from "../../../../convex/lib/importIdentity";
 import { sourceSummary } from "../../../../convex/lib/importResolution";
 import { ResolveImportItem } from "./ResolveImportItem";
+import { LookAlikeNote } from "./LookAlikeNote";
 import {
   BulkActionPreview,
   type BulkAction,
@@ -499,7 +500,10 @@ export function ExternalRecordsReconcilePage() {
                           the same name as a client Capsule already has). */}
                       {record.resolutionNote ? (
                         <p className="mt-1 max-w-80 text-2xs text-ink-2">
-                          {record.resolutionNote}
+                          <LookAlikeNote
+                            note={record.resolutionNote}
+                            capsuleEntity={record.capsuleEntity}
+                          />
                         </p>
                       ) : null}
                     </td>
