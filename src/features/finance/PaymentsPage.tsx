@@ -368,13 +368,24 @@ export function PaymentsPage() {
               <div className="supply-form-grid">
                 <label className="field-label">
                   Amount
+                  {/* Starts at what the picked invoice still owes; edit it
+                      for a partial payment. */}
                   <input
+                    key={selectedInvoiceId}
                     className="input"
                     name="amount"
                     type="number"
                     min="0.01"
                     step="0.01"
                     required
+                    defaultValue={(() => {
+                      const due = Number(
+                        payableInvoices.find(
+                          (invoice) => invoice._id === selectedInvoiceId,
+                        )?.amountDue ?? 0,
+                      );
+                      return due > 0 ? due.toFixed(2) : undefined;
+                    })()}
                   />
                 </label>
                 <label className="field-label">
