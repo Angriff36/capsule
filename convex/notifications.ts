@@ -28,9 +28,11 @@ import { CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
 
 const ALL_ACCESS = [
   "eventAccess",
+  "eventManageAccess",
   "financeAccess",
   "inventoryAccess",
   "kitchenAccess",
+  "logisticsAccess",
   "manageAccess",
   "procurementAccess",
   "salesAccess",
@@ -46,8 +48,13 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   system: ALL_ACCESS,
   manager: ["manageAccess", "staffAccess"],
   staff: ["staffAccess"],
-  driver: ["staffAccess"],
-  event_manager: ["eventAccess", "manageAccess", "staffAccess"],
+  driver: ["logisticsAccess", "staffAccess"],
+  event_manager: [
+    "eventAccess",
+    "eventManageAccess",
+    "manageAccess",
+    "staffAccess",
+  ],
   event_staff: ["eventAccess", "staffAccess"],
   finance_manager: ["financeAccess", "manageAccess", "staffAccess"],
   finance_staff: ["financeAccess", "staffAccess"],
@@ -61,8 +68,8 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   kitchen_lead: ["kitchenAccess", "staffAccess"],
   kitchen_manager: ["kitchenAccess", "manageAccess", "staffAccess"],
   kitchen_staff: ["kitchenAccess", "staffAccess"],
-  logistics_manager: ["manageAccess", "staffAccess"],
-  logistics_staff: ["staffAccess"],
+  logistics_manager: ["logisticsAccess", "manageAccess", "staffAccess"],
+  logistics_staff: ["logisticsAccess", "staffAccess"],
   procurement_staff: ["inventoryAccess", "procurementAccess", "staffAccess"],
   sales_manager: ["manageAccess", "salesAccess", "staffAccess"],
   sales_staff: ["salesAccess", "staffAccess"],
@@ -125,6 +132,7 @@ export const listNotifications = query({
       dateHolds,
       dateWaitlistEntries,
       reviewFlags,
+      equipmentIssues,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -311,7 +319,43 @@ export const listNotifications = query({
           .collect()
           .then((rows) => rows.filter((row) => row.status === "open")),
       ),
+      // Open equipment problems (listEquipmentIssue read guard).
+      when(
+        can(
+          auth,
+          "inventoryAccess",
+          "logisticsAccess",
+          "eventManageAccess",
+          "financeAccess",
+        ),
+        () =>
+          ctx.db
+            .query("equipmentIssues")
+            .withIndex("by_tenantId", byTenant)
+            .collect()
+            .then((rows) =>
+              rows.filter(
+                (row) => row.status === "open" && row.deletedAt == null,
+              ),
+            ),
+      ),
     ]);
+
+    // Names of the equipment those problems are about, tenant-checked.
+    const equipmentNames: Record<string, string> = {};
+    await Promise.all(
+      [
+        ...new Set(
+          (equipmentIssues ?? [])
+            .filter((row) => row.equipmentId)
+            .map((row) => String(row.equipmentId)),
+        ),
+      ].map(async (id) => {
+        const equipmentId = ctx.db.normalizeId("equipments", id);
+        const row = equipmentId ? await ctx.db.get(equipmentId) : null;
+        if (row && row.tenantId === tenantId) equipmentNames[id] = row.name;
+      }),
+    );
 
     // Names of waiting clients, tenant-checked, for the date-opened prompt.
     const clientNames: Record<string, string> = {};
@@ -465,6 +509,8 @@ export const listNotifications = query({
       dateWaitlistEntries,
       clientNames,
       reviewFlags,
+      equipmentIssues,
+      equipmentNames,
     });
   },
 });

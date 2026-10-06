@@ -1,3 +1,4 @@
+import { SearchSelect } from "../../ui/SearchSelect";
 import { useState, type FormEvent } from "react";
 import {
   useCreateEquipmentIssue,
@@ -150,14 +151,18 @@ export function EquipmentRepairsPanel({
         <form className="grid gap-3 sm:grid-cols-2" onSubmit={submit}>
           <label className="field-label">
             Equipment
-            <select name="equipmentId" className="input" required>
-              <option value="">Choose equipment</option>
-              {active.map((row) => (
-                <option key={row._id} value={row._id}>
-                  {row.name} · {row.assetTag}
-                </option>
-              ))}
-            </select>
+            <SearchSelect
+              name="equipmentId"
+              required
+              placeholder="Type a name or tag…"
+              aria-label="Equipment"
+              recentsKey="equipment-repair"
+              options={active.map((row) => ({
+                id: row._id,
+                label: row.name,
+                hint: row.assetTag,
+              }))}
+            />
           </label>
           <label className="field-label">
             What is wrong
