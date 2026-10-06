@@ -109,7 +109,7 @@ it("keeps unreconciled costs and profit unknown and carries the event into invoi
     [...container.querySelectorAll("tbody tr:first-child td")].map(
       (cell) => cell.textContent,
     );
-  expect(cells().slice(1, 5)).toEqual(["$900.00", "—", "—", "—/40"]);
+  expect(cells().slice(1, 6)).toEqual(["$900.00", "—", "—", "—", "—/40"]);
   expect(
     container.querySelector(
       'a[href="/finance/invoices?issue=1&clientId=client-a&eventId=event-a"]',
@@ -128,7 +128,8 @@ it("keeps unreconciled costs and profit unknown and carries the event into invoi
   ]);
   await mount(createElement(CloseoutPage));
   await click(button("Show finalized"));
-  expect(cells().slice(1, 5)).toEqual([
+  expect(cells().slice(1, 6)).toEqual([
+    "$900.00",
     "$900.00",
     "$300.00",
     "$600.00",

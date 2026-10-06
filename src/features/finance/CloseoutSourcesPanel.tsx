@@ -122,11 +122,10 @@ export function CloseoutSourcesPanel({
                       min="0"
                       step={line.key === "headcount" ? "1" : "0.01"}
                       aria-label={`${line.label} to use`}
-                      placeholder={
-                        line.actual == null
-                          ? "Enter amount"
-                          : String(line.actual)
-                      }
+                      // Starts at what the records or the plan already say;
+                      // change it only when the real figure was different.
+                      defaultValue={line.actual ?? line.planned ?? undefined}
+                      placeholder="Enter amount"
                     />
                   </label>
                 )}

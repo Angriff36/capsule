@@ -346,7 +346,8 @@ export function CloseoutPage() {
               <thead>
                 <tr>
                   <th>Event</th>
-                  <th>Billed</th>
+                  <th>Billed (with tax)</th>
+                  <th>Revenue</th>
                   <th>Cost</th>
                   <th>Gross profit</th>
                   <th>Headcount</th>
@@ -387,6 +388,11 @@ export function CloseoutPage() {
                           <CloseoutRevenueNote row={row} billing={billing} />
                         </td>
                         <td>{formatMoneyExact(billing.billedTotal)}</td>
+                        <td>
+                          {isCloseoutListProfitPending(row)
+                            ? "—"
+                            : formatMoneyExact(Number(row.actualRevenue ?? 0))}
+                        </td>
                         <td>
                           {listedCost == null
                             ? "—"
@@ -512,7 +518,7 @@ export function CloseoutPage() {
                       </tr>
                       {correctingId === row._id ? (
                         <tr>
-                          <td colSpan={7} className="!p-3">
+                          <td colSpan={8} className="!p-3">
                             <CloseoutCorrectionPanel
                               closeoutId={row._id}
                               eventId={String(row.eventId)}
@@ -524,7 +530,7 @@ export function CloseoutPage() {
                       ) : null}
                       {leftoverCloseoutId === row._id ? (
                         <tr>
-                          <td colSpan={7} className="!p-3">
+                          <td colSpan={8} className="!p-3">
                             <LeftoverDispositionPanel
                               eventId={String(row.eventId)}
                             />
@@ -533,7 +539,7 @@ export function CloseoutPage() {
                       ) : null}
                       {photoCloseoutId === row._id ? (
                         <tr>
-                          <td colSpan={7} className="!p-3">
+                          <td colSpan={8} className="!p-3">
                             <RecordPhotoCapture
                               parentType="closeout"
                               parentId={row._id}
