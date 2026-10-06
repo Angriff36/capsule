@@ -15,6 +15,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { openActionsForNextMeeting } from "./oneOnOneCarryOver";
 import { effectiveScorecard } from "./scorecardVersions";
 
@@ -42,6 +43,7 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
 
 export function OneOnOnesPage() {
   const meetings = useListOneOnOne();
+  const authStatus = useAuthStatus();
   const actions = useListOneOnOneAction();
   const people = useListPerson();
   const scorecards = useListRoleScorecard();
@@ -217,6 +219,8 @@ export function OneOnOnesPage() {
               <SearchSelect
                 name="leadPersonId"
                 required
+                // Usually the manager holding the meeting.
+                defaultValue={authStatus?.personId ?? ""}
                 recentsKey="staff"
                 placeholder="Select lead"
                 options={activePeople.map((person) => ({
@@ -259,7 +263,12 @@ export function OneOnOnesPage() {
             </label>
             <label className="field-label">
               Meeting date
-              <BoundedDateInput name="meetingDate" className="input" required />
+              <BoundedDateInput
+                name="meetingDate"
+                className="input"
+                required
+                defaultValue={new Date().toLocaleDateString("en-CA")}
+              />
             </label>
             <label className="field-label col-span-2">
               Agenda
