@@ -176,6 +176,34 @@ export async function ensureEventDraftInvoice(
   );
 }
 
+/**
+ * The client accepted a proposal booked onto an event: the event's quoted
+ * price becomes the accepted total, so the money pages and the untouched
+ * draft invoice show what the client agreed to. Only while the price can
+ * still change (planning to approved); later stages keep their own process.
+ */
+export async function followAcceptedProposalPrice(
+  ctx: MutationCtx,
+  proposalId: Id<"proposals">,
+): Promise<void> {
+  const proposal = await ctx.db.get(proposalId);
+  if (!proposal?.eventId || proposal.status !== "accepted") return;
+  const event = await ctx.db.get(proposal.eventId);
+  if (!event || event.deletedAt != null || event.tenantId !== proposal.tenantId) return;
+  if (!["planning", "pending_approval", "approved"].includes(event.stage)) return;
+  const total = Number(proposal.total ?? 0);
+  if (!(total > 0) || Number(event.quotedPrice ?? 0) === total) return;
+  await TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context.runMutation(
+    api.mutations.Event_changePricing,
+    {
+      docId: event._id,
+      budgetAmount: Number(event.budgetAmount ?? 0),
+      quotedPrice: total,
+      idempotencyKey: `accepted-proposal-price:${proposalId}`,
+    },
+  );
+}
+
 /** The newest accepted proposal booked onto this event, if any. */
 async function acceptedProposalFor(ctx: MutationCtx, event: Doc<"events">) {
   const proposals = await ctx.db
