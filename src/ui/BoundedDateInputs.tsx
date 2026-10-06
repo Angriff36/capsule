@@ -77,6 +77,19 @@ function NaturalDateInput({
     if (value !== undefined) setText(display(String(value ?? "")));
   }, [value]);
 
+  // A cleared form clears the words shown too, not only the hidden value.
+  useEffect(() => {
+    const form = nativeRef.current?.form;
+    if (!form || value !== undefined) return;
+    const onReset = () => {
+      setText(display(String(defaultValue ?? "")));
+      setMessage("");
+    };
+    form.addEventListener("reset", onReset);
+    return () => form.removeEventListener("reset", onReset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value === undefined, defaultValue]);
+
   const writeNative = (next: string) => {
     if (nativeRef.current && nativeRef.current.value !== next) {
       // The prototype setter bypasses React's value tracker, so the dispatched
