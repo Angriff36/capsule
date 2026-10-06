@@ -868,8 +868,12 @@ export const processQuoteSubmission = action({
             api.mutations.Event_createViaPlanEngagement,
             {
               clientId,
-              title: `Quote Request: ${clientName}`,
-              eventType: "Catering Inquiry",
+              // Named for what it is ("Company holiday party - Sarah
+              // Lindqvist"), not for the form it came through.
+              title: submission.occasionText?.trim()
+                ? `${submission.occasionText.trim()} - ${clientName}`
+                : `${clientName} event`,
+              eventType: submission.occasionText?.trim() || "Catering Inquiry",
               startsAt: eventStart,
               endsAt: eventEnd,
               expectedHeadcount: submission.guestCount ?? 0,
