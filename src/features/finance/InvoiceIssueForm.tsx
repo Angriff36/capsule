@@ -37,6 +37,7 @@ type ClientOption = {
 type EventOption = {
   _id: string;
   title?: string | null;
+  clientId?: string | null;
   deletedAt?: number | null;
 };
 
@@ -66,10 +67,10 @@ const categoryLabel = (category: InvoiceLineCategory) =>
 
 const initialLine = (): InvoiceLineDraft => ({
   id: "line-1",
-  description: "Catering package",
+  description: "",
   category: "food",
   quantity: 1,
-  unitPrice: 1000,
+  unitPrice: 0,
 });
 
 export function InvoiceIssueForm({
@@ -209,7 +210,17 @@ export function InvoiceIssueForm({
             name="clientId"
             required
             value={selectedClientId}
-            onChange={setSelectedClientId}
+            onChange={(clientId) => {
+              setSelectedClientId(clientId);
+              // Another client's event must not stay picked. A client with
+              // one event gets it picked for them.
+              const theirs = events.filter(
+                (row) => row.deletedAt == null && row.clientId === clientId,
+              );
+              if (!theirs.some((row) => row._id === selectedEventId)) {
+                setSelectedEventId(theirs.length === 1 ? theirs[0]._id : "");
+              }
+            }}
             recentsKey="client"
             placeholder="Search clients…"
             options={clients.map((client) => ({
@@ -241,7 +252,11 @@ export function InvoiceIssueForm({
           >
             <option value="">No linked event</option>
             {events
-              .filter((row) => row.deletedAt == null)
+              .filter(
+                (row) =>
+                  row.deletedAt == null &&
+                  (!selectedClientId || row.clientId === selectedClientId),
+              )
               .map((event) => (
                 <option key={event._id} value={event._id}>
                   {event.title}
