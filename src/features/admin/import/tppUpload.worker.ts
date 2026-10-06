@@ -9,19 +9,30 @@ import {
 import { inferTppFilePackages } from "../../../lib/tppPackageImport";
 let file: File;
 let index: TppFileIndex;
-let acknowledge: (() => void) | undefined;
+const pending = new Map<number, number>();
+let wake: (() => void) | undefined;
+const waitForCapacity = () =>
+  new Promise<void>((resolve) => {
+    wake = resolve;
+  });
 const send = (value: unknown) => self.postMessage(value);
 setInterval(() => send({ type: "heartbeat" }), 5000);
-async function upload(resumePart: number) {
+async function upload(resumePart: number, received: number[] = []) {
+  const saved = new Set(received);
   let sequence = 0;
   async function emit(collection: string, blob: Blob) {
-    if (sequence >= resumePart) {
+    if (sequence >= resumePart && !saved.has(sequence)) {
+      // Keep the uplink busy without retaining an unbounded number of blobs.
+      while (
+        pending.size >= 12 ||
+        (pending.size &&
+          [...pending.values()].reduce((a, b) => a + b, 0) + blob.size >
+            48 * 1024 * 1024)
+      )
+        await waitForCapacity();
       const checksum = await digestHex(await blob.arrayBuffer());
-      const waiting = new Promise<void>((resolve) => {
-        acknowledge = resolve;
-      });
+      pending.set(sequence, blob.size);
       send({ type: "part", sequence, collection, blob, checksum });
-      await waiting;
     }
     sequence++;
   }
@@ -41,7 +52,7 @@ async function upload(resumePart: number) {
       size = 0;
     const flush = async () => {
       if (ranges.length) {
-        if (sequence < resumePart) sequence++;
+        if (sequence < resumePart || saved.has(sequence)) sequence++;
         else {
           const rows = await readTppBatch(file, ranges);
           await emit(
@@ -73,13 +84,15 @@ async function upload(resumePart: number) {
     offset += 4 * 1024 * 1024
   )
     await emit("__provenance", file.slice(offset, offset + 4 * 1024 * 1024));
+  while (pending.size) await waitForCapacity();
   send({ type: "done", parts: sequence });
 }
 self.onmessage = async (event: MessageEvent) => {
   try {
     if (event.data.type === "ack") {
-      const done = acknowledge;
-      acknowledge = undefined;
+      pending.delete(event.data.sequence);
+      const done = wake;
+      wake = undefined;
       done?.();
       return;
     }
@@ -101,7 +114,7 @@ self.onmessage = async (event: MessageEvent) => {
         ),
       });
     } else if (event.data.type === "upload")
-      await upload(event.data.resumePart);
+      await upload(event.data.resumePart, event.data.received);
   } catch (error) {
     send({
       type: "error",

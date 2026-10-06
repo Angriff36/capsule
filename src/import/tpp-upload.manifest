@@ -15,6 +15,13 @@ entity TppUpload mixin TenantScoped, SoftDeletable {
   property required counts: string = "{}"
   property required actorId: string
   property required timeZone: string
+  // Transfer receipts are independent of the ordered import checkpoint.
+  property uploadedParts: int?
+  property uploadedBytes: int?
+  property totalParts: int?
+  property processorToken: string?
+  property processorLeaseUntil: datetime?
+  property processingError: string?
   default policy uploadRead read: false "Use the organization-scoped TPP import page."
   default policy uploadWrite write: false "Use the TPP upload seam."
   default policy uploadExecute execute: false "Use the TPP upload seam."
@@ -33,6 +40,8 @@ entity TppUploadPart mixin TenantScoped, SoftDeletable {
   property required byteSize: int
   property required rowCount: int
   property required outcome: string
+  // Absent on old receipts = already imported.
+  property status: string?
   default policy partRead read: false "Use the organization-scoped TPP import page."
   default policy partWrite write: false "Use the TPP upload seam."
   default policy partExecute execute: false "Use the TPP upload seam."

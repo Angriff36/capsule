@@ -26,6 +26,8 @@ export type ImportTelemetry = {
   savedBytes: number;
   savedBatches: number;
   attempt: number;
+  activeUploads?: number;
+  processedBatches?: number;
 };
 const initial = (): ImportTelemetry => ({
   stage: "idle",

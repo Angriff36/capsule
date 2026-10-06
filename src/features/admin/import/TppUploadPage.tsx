@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  useAction,
   useMutation,
   useQuery,
   useConvex,
@@ -13,7 +12,11 @@ import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import type { TppFileIndex } from "../../../lib/tppAccountFile";
 import { useTppUploadTelemetry } from "./useTppUploadTelemetry";
-import { importTimeout, uploadTppPart } from "./tppUploadDiagnostics";
+import {
+  importTimeout,
+  uploadTppPart,
+  retryImportTransfer,
+} from "./tppUploadDiagnostics";
 import { TppUploadStatus } from "./TppUploadStatus";
 import { TppImportReport } from "./TppImportReport";
 
@@ -78,8 +81,10 @@ function SourceParts({ id }: { id: Id<"tppUploads"> }) {
         return (
           <details key={part._id} className="border-b border-line py-2">
             <summary>
-              {part.collection} · batch {part.sequence + 1} · {part.rowCount}{" "}
-              records
+              {part.collection} · batch {part.sequence + 1} ·{" "}
+              {part.status === "queued"
+                ? "uploaded; waiting to import"
+                : `${part.rowCount} records processed`}
               {details.failures?.length
                 ? ` · ${details.failures.length} exceptions`
                 : ""}
@@ -110,13 +115,15 @@ function SourceParts({ id }: { id: Id<"tppUploads"> }) {
   );
 }
 export function TppUploadPage() {
+  const convex = useConvex();
   const telemetry = useTppUploadTelemetry();
   const auth = useAuthStatus();
   const { organization } = useOrganization();
   const start = useMutation(tppUploadApi.start),
     uploadUrl = useMutation(tppUploadApi.uploadUrl),
-    commit = useAction(tppUploadApi.commit),
-    finish = useMutation(tppUploadApi.finish);
+    enqueue = useMutation(tppUploadApi.enqueue),
+    seal = useMutation(tppUploadApi.seal),
+    resumeProcessing = useMutation(tppUploadApi.resumeProcessing);
   const recent = useQuery(tppUploadApi.recent, auth?.tenantId ? {} : "skip");
   const worker = useRef<Worker | null>(null),
     job = useRef<Doc<"tppUploads"> | null>(null),
@@ -134,13 +141,80 @@ export function TppUploadPage() {
   // importing computer, which may be in a different region.
   const [timeZone, setTimeZone] = useState("America/Denver");
   const [viewId, setViewId] = useState<Id<"tppUploads"> | null>(null);
+  const liveJob = useQuery(tppUploadApi.get, viewId ? { id: viewId } : "skip");
+  const transfers = useRef(new Map<number, { size: number; sent: number }>());
+  const transferProgress = () => {
+    const rows = [...transfers.current.values()];
+    telemetry.update("uploading", {
+      activeUploads: rows.length,
+      batchBytes: rows.reduce((s, r) => s + r.size, 0),
+      sentBytes: rows.reduce((s, r) => s + r.sent, 0),
+    });
+  };
   const stop = () => {
     generation.current++;
     worker.current?.terminate();
     worker.current = null;
     abort.current?.abort();
+    transfers.current.clear();
     setBusy(false);
   };
+  useEffect(() => {
+    if (
+      !liveJob ||
+      liveJob.tenantId !== auth?.tenantId ||
+      (job.current && liveJob.version < job.current.version)
+    )
+      return;
+    const previous = job.current;
+    job.current = liveJob;
+    setCounts(JSON.parse(liveJob.counts));
+    const progressed =
+      !previous ||
+      liveJob.nextPart > previous.nextPart ||
+      (liveJob.uploadedParts ?? 0) > (previous.uploadedParts ?? 0);
+    const stage = worker.current
+      ? telemetry.current.current.stage
+      : liveJob.processingError
+        ? "failed"
+        : liveJob.status === "completed"
+          ? "complete"
+          : liveJob.status === "completed_with_exceptions"
+            ? "exceptions"
+            : liveJob.totalParts != null
+              ? "importing"
+              : telemetry.current.current.stage === "failed"
+                ? "failed"
+                : "paused";
+    telemetry.update(
+      stage,
+      {
+        savedBatches: liveJob.uploadedParts ?? liveJob.nextPart,
+        savedBytes: liveJob.uploadedBytes ?? liveJob.bytesReceived,
+        processedBatches: liveJob.nextPart,
+      },
+      progressed,
+    );
+    if (liveJob.processingError) {
+      setError(
+        `Server import stopped: ${liveJob.processingError}. Uploaded batches are saved.`,
+      );
+      if (!worker.current) setBusy(false);
+    } else if (liveJob.status !== "uploading") {
+      setComplete(true);
+      setBusy(false);
+      setPhase(
+        liveJob.status === "completed"
+          ? "Import complete."
+          : "Import complete with mapping exceptions. Download the report for details.",
+      );
+    } else if (!worker.current && liveJob.totalParts != null) {
+      setBusy(true);
+      setPhase(
+        "Upload saved. The server is importing in the background; you can close this tab.",
+      );
+    }
+  }, [liveJob, auth?.tenantId]);
   useEffect(
     () => () => {
       generation.current++;
@@ -210,7 +284,7 @@ export function TppUploadPage() {
       try {
         if (data.type === "heartbeat") telemetry.heartbeat();
         else if (data.type === "preparing") {
-          telemetry.update("preparing", {
+          telemetry.update(transfers.current.size ? "uploading" : "preparing", {
             collection: data.collection,
             batch: data.sequence,
           });
@@ -231,7 +305,11 @@ export function TppUploadPage() {
         } else if (data.type === "part") {
           const active = job.current;
           if (!active) throw new Error("Import session is missing.");
-          telemetry.update("preparing", {
+          transfers.current.set(data.sequence, {
+            size: data.blob.size,
+            sent: 0,
+          });
+          telemetry.update("uploading", {
             batch: data.sequence,
             collection: data.collection,
             batchBytes: data.blob.size,
@@ -242,60 +320,83 @@ export function TppUploadPage() {
               ? "Saving source history…"
               : data.collection === "__packages_v1"
                 ? "Creating inferred packages and packing defaults…"
-                : `Importing ${data.collection}…`,
+                : `Uploading ${data.collection}; saved batches import in the background…`,
           );
-          const url = await importTimeout(
-            uploadUrl({ id: active._id }),
-            "Obtaining an upload URL",
-            undefined,
-            abort.current?.signal,
-          );
-          if (ticket !== generation.current) return;
-          telemetry.update("uploading");
           if (!abort.current) throw new Error("Upload controller is missing.");
-          const storageId = await uploadTppPart(
-            url,
-            data.blob,
-            abort.current.signal,
-            (bytes) => {
-              if (ticket === generation.current)
-                telemetry.update("uploading", { sentBytes: bytes });
+          const signal = abort.current.signal;
+          let stored: string | undefined;
+          const result = await retryImportTransfer(
+            async () => {
+              if (!stored) {
+                const url = await importTimeout(
+                  uploadUrl({ id: active._id }),
+                  "Obtaining an upload URL",
+                  undefined,
+                  signal,
+                );
+                if (signal.aborted)
+                  throw new DOMException("Import paused", "AbortError");
+                stored = await uploadTppPart(
+                  url,
+                  data.blob,
+                  signal,
+                  (bytes) => {
+                    if (ticket === generation.current) {
+                      transfers.current.set(data.sequence, {
+                        size: data.blob.size,
+                        sent: bytes,
+                      });
+                      transferProgress();
+                    }
+                  },
+                );
+              }
+              return await importTimeout(
+                enqueue({
+                  id: active._id,
+                  sequence: data.sequence,
+                  collection: data.collection,
+                  storageId: stored as Id<"_storage">,
+                  checksum: data.checksum,
+                  byteSize: data.blob.size,
+                }),
+                "Saving the upload receipt",
+                undefined,
+                signal,
+              );
+            },
+            signal,
+            (failure, attempt) => {
+              telemetry.events.current.push({
+                at: new Date().toISOString(),
+                batch: data.sequence,
+                retryAttempt: attempt,
+                error: message(failure),
+              });
+              setPhase(
+                `Retrying upload batch ${data.sequence + 1} (attempt ${attempt}/3); other uploads continue.`,
+              );
             },
           );
           if (ticket !== generation.current) return;
-          telemetry.update("importing", { sentBytes: data.blob.size });
-          const result = await importTimeout(
-            commit({
-              id: active._id,
-              sequence: data.sequence,
-              collection: data.collection,
-              storageId: storageId as Id<"_storage">,
-              checksum: data.checksum,
-              byteSize: data.blob.size,
-            }),
-            "Importing the uploaded batch",
-            undefined,
-            abort.current.signal,
-          );
-          if (ticket !== generation.current) return;
-          setCounts(JSON.parse(result.counts));
-          job.current = {
-            ...active,
-            nextPart: result.nextPart,
-            counts: result.counts,
-            bytesReceived: active.bytesReceived + data.blob.size,
-          };
-          telemetry.update("preparing", {
-            savedBatches: result.nextPart,
-            savedBytes: job.current.bytesReceived,
-          });
-          w.postMessage({ type: "ack" });
+          transfers.current.delete(data.sequence);
+          transferProgress();
+          if (result.version >= (job.current?.version ?? 0)) {
+            job.current = result;
+            setCounts(JSON.parse(result.counts));
+            telemetry.update("uploading", {
+              savedBatches: result.uploadedParts ?? result.nextPart,
+              savedBytes: result.uploadedBytes ?? result.bytesReceived,
+              processedBatches: result.nextPart,
+            });
+          }
+          w.postMessage({ type: "ack", sequence: data.sequence });
         } else if (data.type === "done") {
           if (!job.current) throw new Error("Import session is missing.");
           telemetry.update("finalizing");
           setPhase("Checking that all source records have been received…");
-          const status = await importTimeout(
-            finish({
+          const saved = await importTimeout(
+            seal({
               id: job.current._id,
               parts: data.parts,
             }),
@@ -304,16 +405,25 @@ export function TppUploadPage() {
             abort.current?.signal,
           );
           if (ticket !== generation.current) return;
-          setPhase(
-            status === "completed"
-              ? "Import complete."
-              : "Upload complete. Review the preserved records and mapping exceptions below.",
-          );
-          setBusy(false);
-          setComplete(true);
-          telemetry.update(status === "completed" ? "complete" : "exceptions");
           w.terminate();
           worker.current = null;
+          job.current = saved;
+          setPhase(
+            saved.status === "uploading"
+              ? "Upload saved. The server continues importing even if you close this tab."
+              : "Import complete. Review any mapping exceptions below.",
+          );
+          setBusy(saved.status === "uploading" && !saved.processingError);
+          setComplete(saved.status !== "uploading");
+          telemetry.update(
+            saved.processingError
+              ? "failed"
+              : saved.status === "uploading"
+                ? "importing"
+                : saved.status === "completed"
+                  ? "complete"
+                  : "exceptions",
+          );
         }
       } catch (e) {
         failed(e);
@@ -360,8 +470,9 @@ export function TppUploadPage() {
       setViewId(active._id);
       setCounts(JSON.parse(active.counts));
       telemetry.update("preparing", {
-        savedBatches: active.nextPart,
-        savedBytes: active.bytesReceived,
+        savedBatches: active.uploadedParts ?? active.nextPart,
+        savedBytes: active.uploadedBytes ?? active.bytesReceived,
+        processedBatches: active.nextPart,
       });
       if (active.status !== "uploading") {
         setPhase(
@@ -376,9 +487,48 @@ export function TppUploadPage() {
         worker.current = null;
         return;
       }
+      await importTimeout(
+        resumeProcessing({ id: active._id }),
+        "Resuming server processing",
+        undefined,
+        abort.current.signal,
+      );
+      if (ticket !== generation.current) return;
+      if (active.totalParts != null) {
+        activeWorker.terminate();
+        worker.current = null;
+        telemetry.update("importing");
+        setPhase(
+          "Upload already saved. The server is importing in the background.",
+        );
+        return;
+      }
+      const received: number[] = [];
+      let cursor: string | null = null;
+      do {
+        const page: {
+          page: number[];
+          isDone: boolean;
+          continueCursor: string;
+        } = await importTimeout(
+          convex.query(tppUploadApi.received, {
+            id: active._id,
+            from: active.nextPart,
+            paginationOpts: { numItems: 1000, cursor },
+          }),
+          "Reading saved upload receipts",
+          undefined,
+          abort.current.signal,
+        );
+        if (ticket !== generation.current) return;
+        received.push(...page.page);
+        if (page.isDone) break;
+        cursor = page.continueCursor;
+      } while (true);
       activeWorker.postMessage({
         type: "upload",
         resumePart: active.nextPart,
+        received,
       });
     } catch (e) {
       if (ticket === generation.current) {
@@ -403,7 +553,23 @@ export function TppUploadPage() {
   const pause = () => {
     stop();
     telemetry.update("paused", {}, false);
-    setPhase("Paused. Resume from the last saved batch when ready.");
+    setPhase("Uploads paused. Saved batches continue importing on the server.");
+  };
+  const retry = async () => {
+    if (job.current?.totalParts != null) {
+      try {
+        await importTimeout(
+          resumeProcessing({ id: job.current._id }),
+          "Resuming the server import",
+        );
+        setError(null);
+        setBusy(true);
+        telemetry.update("importing");
+      } catch (e) {
+        setError(message(e));
+        telemetry.fail(e);
+      }
+    } else if (file) select(file, true);
   };
   return (
     <div className="space-y-6">
@@ -437,9 +603,10 @@ export function TppUploadPage() {
           />
         </label>
         <p className="text-sm text-ink-3">
-          Large exports are read in small batches. Keep this page open while
-          importing. If interrupted, select the same file to resume without
-          duplicating completed records.
+          Uploads run in parallel while the server imports saved batches. Keep
+          this page open until the upload is saved; importing continues after
+          you close it. Interrupted uploads resume without resending saved
+          batches.
         </p>
         {file && (
           <p>
@@ -520,10 +687,11 @@ export function TppUploadPage() {
               issues={issues}
               preserved={preserved}
               onPause={pause}
-              onRetry={() => {
-                if (file) select(file, true);
-              }}
-              retryAvailable={Boolean(file)}
+              onRetry={() => void retry()}
+              retryAvailable={Boolean(file || job.current?.totalParts != null)}
+              background={Boolean(
+                job.current?.totalParts != null && !worker.current,
+              )}
             />
             {!file && telemetry.stats.stage === "paused" && (
               <p className="text-sm text-warning">

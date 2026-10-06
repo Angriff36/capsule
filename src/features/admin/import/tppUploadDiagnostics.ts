@@ -3,6 +3,35 @@
  * wait, not a Convex transaction; resume uses the durable batch receipt. */
 export const TPP_STALL_MS = 45_000;
 export const TPP_REQUEST_TIMEOUT_MS = 180_000;
+export async function retryImportTransfer<T>(
+  task: () => Promise<T>,
+  signal: AbortSignal,
+  onRetry: (error: unknown, attempt: number) => void,
+): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    if (signal.aborted) throw new DOMException("Import paused", "AbortError");
+    try {
+      return await task();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (
+        signal.aborted ||
+        attempt >= 3 ||
+        !/connection|network|timed out|did not respond|HTTP (408|429|5\d\d)/i.test(
+          message,
+        )
+      )
+        throw error;
+      onRetry(error, attempt + 1);
+      await importTimeout(
+        new Promise<void>((resolve) => setTimeout(resolve, 250 * attempt)),
+        "Retry delay",
+        2000,
+        signal,
+      );
+    }
+  }
+}
 
 export function importTimeout<T>(
   operation: Promise<T>,

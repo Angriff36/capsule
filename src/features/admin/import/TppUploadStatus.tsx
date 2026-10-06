@@ -30,6 +30,7 @@ export function TppUploadStatus({
   onPause,
   onRetry,
   retryAvailable,
+  background = false,
 }: {
   stats: ImportTelemetry;
   now: number;
@@ -40,6 +41,7 @@ export function TppUploadStatus({
   onPause: () => void;
   onRetry: () => void;
   retryAvailable: boolean;
+  background?: boolean;
 }) {
   const stalled = busy && now - stats.lastProgressAt >= TPP_STALL_MS;
   const warning =
@@ -91,6 +93,16 @@ export function TppUploadStatus({
           <dd>{stats.savedBatches.toLocaleString()}</dd>
         </div>
         <div>
+          <dt className="text-ink-3">Imported batches</dt>
+          <dd>
+            {(stats.processedBatches ?? stats.savedBatches).toLocaleString()}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-ink-3">Concurrent uploads</dt>
+          <dd>{stats.activeUploads ?? 0} / 12</dd>
+        </div>
+        <div>
           <dt className="text-ink-3">Saved upload data</dt>
           <dd>{bytes(stats.savedBytes)}</dd>
         </div>
@@ -111,7 +123,8 @@ export function TppUploadStatus({
       {stats.stage === "uploading" && (
         <div>
           <p className="text-sm">
-            This batch: {bytes(stats.sentBytes)} / {bytes(stats.batchBytes)}
+            Active transfers: {bytes(stats.sentBytes)} /{" "}
+            {bytes(stats.batchBytes)}
           </p>
           <progress
             className="w-full"
@@ -123,16 +136,18 @@ export function TppUploadStatus({
       )}
       {stats.stage === "importing" && (
         <p className="text-sm text-ink-2">
-          The batch has uploaded. Waiting for the server to confirm its imported
-          records ({duration(now - stats.stageStartedAt)}).
+          Uploaded batches are importing in the background. The server keeps
+          working if you close this tab.
         </p>
       )}
       {stalled && (
         <p role="alert" className="text-warning">
           No confirmed progress for {duration(now - stats.lastProgressAt)}.{" "}
-          {stats.workerSeenAt && now - stats.workerSeenAt < 15_000
-            ? "The file worker is responding; the server has not confirmed new progress."
-            : "The file worker has not reported recent activity."}{" "}
+          {background
+            ? "Waiting for the server's next import checkpoint."
+            : stats.workerSeenAt && now - stats.workerSeenAt < 15_000
+              ? "The file worker is responding; the server has not confirmed new progress."
+              : "The file worker has not reported recent activity."}{" "}
           You can pause and retry safely. A server request may still finish
           after you pause.
         </p>
@@ -161,7 +176,7 @@ export function TppUploadStatus({
         </p>
       )}
       <div className="flex flex-wrap gap-3">
-        {busy && (
+        {busy && !background && (
           <button type="button" className="btn-ghost" onClick={onPause}>
             Pause import
           </button>
