@@ -551,10 +551,10 @@ export function RevenueTrendsDashboard({
         <span className="eyebrow">Method</span>
         <p>
           Revenue counts only invoices billed to a client — sent, viewed,
-          overdue, partially paid, or paid — using the invoice total on the
-          issued date (created date as a legacy fallback). Drafts, voided,
-          written-off, and deleted invoices are left out. Prior-year weekly
-          comparisons use the same weekday-aligned week.
+          overdue, partially paid, or paid — using the invoice total less sales
+          tax on the issued date (created date as a legacy fallback). Drafts,
+          voided, written-off, and deleted invoices are left out. Prior-year
+          weekly comparisons use the same weekday-aligned week.
         </p>
         {breakdown === "service_line" ? (
           <p role="note">

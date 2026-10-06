@@ -12,6 +12,8 @@ export type RevenueInvoice = {
   clientId?: string | null;
   eventId?: string | null;
   total?: number | null;
+  /** Sales tax on the invoice: collected for the state, not revenue. */
+  taxAmount?: number | null;
   status?: string | null;
   issuedAt?: DateValue;
   createdAt?: DateValue;
@@ -236,8 +238,12 @@ function categoryFor(
     return { key: "unlinked", label: "Unlinked invoices" };
   }
   const event = eventsById.get(String(invoice.eventId));
-  const label = event?.eventType?.trim() || "Unclassified event";
-  return { key: `event-type:${label}`, label };
+  const typed = event?.eventType?.trim();
+  // "Wedding" and "wedding" are one type of work.
+  const label = typed
+    ? typed.charAt(0).toUpperCase() + typed.slice(1)
+    : "Unclassified event";
+  return { key: `event-type:${label.toLowerCase()}`, label };
 }
 
 export function buildRevenueTrend({
@@ -271,7 +277,9 @@ export function buildRevenueTrend({
     .trim()
     .toUpperCase();
   const annotatedInvoices: RevenueInvoiceWithFx[] = invoices.map((invoice) => {
-    const total = Number(invoice.total ?? 0);
+    // Revenue is what the client paid us for, before sales tax.
+    const total =
+      Number(invoice.total ?? 0) - Math.max(0, Number(invoice.taxAmount ?? 0));
     const rawRate = Number(invoice.exchangeRate ?? 1);
     const rate = Number.isFinite(rawRate) && rawRate > 0 ? rawRate : 1;
     const invoiceCode = String(invoice.currencyCode ?? "")
