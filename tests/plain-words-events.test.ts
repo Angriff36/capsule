@@ -188,7 +188,7 @@ describe("plain words on event screens", () => {
       "on the client page",
       "Add contacts on the client page",
       "Capacity not on file",
-      "Capacity on file",
+      "Venues hold",
       "No guests are on the list for this event",
       "expected guests are on the list",
       "Add them on the event",
