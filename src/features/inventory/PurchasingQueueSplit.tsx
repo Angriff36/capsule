@@ -261,7 +261,7 @@ export function PurchasingQueueSplit({
           <TableSkeleton rows={4} />
         ) : activeVendors.length === 0 ? (
           <div className="document-empty">
-            <p>No vendors onboarded.</p>
+            <p>No vendors yet.</p>
             <span>Add a supplier before opening an order folio.</span>
             <div className="mt-3 flex justify-center">
               <button

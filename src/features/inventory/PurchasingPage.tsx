@@ -374,7 +374,7 @@ export function PurchasingPage() {
                 options: vendorOptions,
               },
         ],
-        confirmLabel: "Set default vendor",
+        confirmLabel: "Set usual vendor",
       });
       const typedName = String(values?.vendorName ?? "").trim();
       if (!values?.vendorId && !typedName) return;
@@ -533,7 +533,7 @@ export function PurchasingPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">All weeks</p>
-            <h2>Auto-maintained drafts</h2>
+            <h2>Weekly drafts</h2>
           </div>
           <span>{shownWeeklyDrafts.length} drafts</span>
         </div>
@@ -543,9 +543,9 @@ export function PurchasingPage() {
           <div className="document-empty">
             <p>No weekly drafts yet</p>
             <span>
-              Approved events with dish demand consolidate into one weekly draft
-              here — no manual step. Set a default vendor so purchasing knows
-              where to route.
+              Each approved event with dishes adds what it needs to one weekly
+              draft here by itself. Set a usual vendor so Capsule knows who the
+              draft goes to.
             </span>
             <div className="mt-3 flex justify-center gap-2">
               <Link to="/events" className="btn btn-primary btn-sm">
@@ -672,7 +672,7 @@ export function PurchasingPage() {
             <p>No vendor orders yet</p>
             <span>
               Weekly drafts appear here automatically once you approve an event
-              with demand. Onboard a vendor to be ready.
+              with dishes. Add a vendor to be ready.
             </span>
             <div className="mt-3 flex justify-center gap-2">
               <Link to="/events" className="btn btn-primary btn-sm">
