@@ -47,7 +47,7 @@ entity Contract mixin TenantScoped, SoftDeletable {
   constraint contractDraftComplete: self.draftedAt == null or length(trim(self.title)) > 0 "Give this contract a title"
 
   transition status from "draft" to ["sent"]
-  transition status from "sent" to ["viewed", "expired", "voided"]
+  transition status from "sent" to ["viewed", "signed", "expired", "voided"]
   transition status from "viewed" to ["signed", "expired", "voided"]
   transition status from "signed" to []
   transition status from "expired" to []
@@ -119,12 +119,15 @@ entity Contract mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A signed copy coming back proves the client saw it: no separate
+  // "viewed" step first.
   command sign(signedBy: string) {
-    guard self.status == "viewed"
+    guard self.status == "sent" or self.status == "viewed"
     guard self.deletedAt == null
     constraint signerPresent: length(trim(signedBy)) > 0 "Give the name of who signed"
     compute signedAtValue = now()
     mutate status = "signed"
+    mutate viewedAt = self.viewedAt != null ? self.viewedAt : signedAtValue
     mutate signedBy = signedBy
     mutate signedAt = signedAtValue
     emit ContractSigned {

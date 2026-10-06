@@ -7915,7 +7915,7 @@ async function __runContractExpire(ctx: MutationCtx, { docId, version }: any, __
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "expired";
-        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "signed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -8026,7 +8026,7 @@ async function __runContractMarkViewed(ctx: MutationCtx, { docId, version }: any
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "viewed";
-        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "signed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -8089,7 +8089,7 @@ async function __runContractMarkVoided(ctx: MutationCtx, { docId, reason, versio
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "voided";
-        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "signed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -8217,7 +8217,7 @@ async function __runContractSend(ctx: MutationCtx, { docId, version }: any, __cr
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "sent";
-        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "signed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -8272,7 +8272,7 @@ async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }:
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
-    if (!((doc.status === "viewed"))) throw new Error("Guard 0 failed");
+    if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((signedBy).trim()).length > 0))) throw new Error("Give the name of who signed");
     const signedAtValue = Date.now();
@@ -8281,7 +8281,7 @@ async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }:
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "signed";
-        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "signed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -8293,6 +8293,7 @@ async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }:
     }
     const updates = {
       status: "signed",
+      viewedAt: ((doc.viewedAt != null) ? doc.viewedAt : signedAtValue),
       signedBy: signedBy,
       signedAt: signedAtValue,
       version: ((doc as any).version ?? 0) + 1
