@@ -3,7 +3,6 @@
   --maintenance-paper: #eee9dc;
   --maintenance-signal: #ed6a32;
   --maintenance-warning: #b93624;
-  overflow-x: auto;
   margin-bottom: 22px;
   border: 1px solid color-mix(in srgb, var(--line) 65%, var(--maintenance-ink));
   border-radius: 12px;
@@ -130,6 +129,11 @@
   font-size: 12px;
 }
 
+/* Theme label colours are for dark cards; on the paper card they fade. */
+.maintenance-form .field-label {
+  color: var(--maintenance-ink);
+}
+
 .maintenance-form {
   display: grid;
   align-items: end;
@@ -211,8 +215,11 @@
   font-size: 12px;
 }
 
+/* Only the wide ledger scrolls sideways; the form's search list must not
+   be cut off by the card. */
 .maintenance-ledger {
   display: grid;
+  overflow-x: auto;
 }
 
 .maintenance-ticket {

@@ -1,3 +1,4 @@
+import { SearchSelect } from "../../ui/SearchSelect";
 import { useMemo, useState, type FormEvent } from "react";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import {
@@ -229,14 +230,19 @@ export function EquipmentMaintenanceBoard({
           </div>
           <label className="field-label maintenance-form__asset">
             Equipment
-            <select name="equipmentId" className="input" required autoFocus>
-              <option value="">Choose an asset</option>
-              {activeEquipment.map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.name} · {item.assetTag}
-                </option>
-              ))}
-            </select>
+            <SearchSelect
+              name="equipmentId"
+              required
+              autoFocus
+              placeholder="Type a name or tag…"
+              aria-label="Equipment"
+              recentsKey="equipment-maintenance"
+              options={activeEquipment.map((item) => ({
+                id: item._id,
+                label: item.name,
+                hint: item.assetTag,
+              }))}
+            />
           </label>
           <label className="field-label">
             Maintenance task
