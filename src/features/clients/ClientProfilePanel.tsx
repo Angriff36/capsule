@@ -155,7 +155,7 @@ export function ClientProfilePanel({
           />
           <span className="field-hint">Days to pay, 0 to 365.</span>
         </label>
-        <label className="supply-check">
+        <label className="supply-check mt-3">
           <input
             name="taxExempt"
             type="checkbox"

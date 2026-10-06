@@ -511,9 +511,14 @@ export function ClientsPage() {
                     className="cursor-pointer transition-colors hover:bg-inset/60"
                   >
                     <td className="td w-full min-w-[10rem] max-w-0 whitespace-normal break-words sm:truncate">
-                      <span className="font-medium">
+                      <Link
+                        to={CLIENTS_ROUTES.detail(row._id)}
+                        state={listOriginState(listOrigin)}
+                        onClick={(event) => event.stopPropagation()}
+                        className="font-medium text-ink hover:underline"
+                      >
                         {clientDisplayName(row._id, clients)}
-                      </span>
+                      </Link>
                       <span className="ml-2 text-sm whitespace-nowrap text-ink-3">
                         {formatStatusLabel(String(row.clientType))}
                       </span>
