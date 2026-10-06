@@ -154,7 +154,7 @@ export function PersonalDataExportView({
                 value={search}
                 onChange={(event) => onSearchChange(event.currentTarget.value)}
                 placeholder="Search client contacts and staff"
-                className="mt-1 w-full"
+                className="input mt-1 w-full"
               />
             </div>
 
