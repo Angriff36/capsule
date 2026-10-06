@@ -13,7 +13,7 @@
 // never touched; a generated line staff changed keeps their version; a line
 // staff removed stays out; lines typed by hand are never touched.
 
-import { mutation, type MutationCtx } from "../_generated/server";
+import { mutation, type MutationCtx, type QueryCtx } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
@@ -133,7 +133,9 @@ export const generateProposalDraft = mutation({
       lines.push(generated(source, String(added.docId)));
     }
     if (created) await selectEventDishes(ctx, event, proposalId);
-    const serviceRate = Number(template?.defaultServiceChargePercent ?? 0);
+    // Only a new draft gets the template's service charge; a rebuild keeps
+    // the one already there (or the one staff removed) as it is.
+    const serviceRate = created ? Number(template?.defaultServiceChargePercent ?? 0) : 0;
     if (serviceRate > 0) {
       // Typed-by-hand line, so rebuilds leave it as staff set it.
       await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
@@ -240,8 +242,8 @@ async function selectEventDishes(
   }
 }
 
-async function templateForStyle(
-  ctx: MutationCtx,
+export async function templateForStyle(
+  ctx: { db: QueryCtx["db"] },
   event: Doc<"events">,
 ): Promise<Doc<"proposalTemplates"> | null> {
   // The style's own template first; otherwise one made for any service style.
