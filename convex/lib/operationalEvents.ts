@@ -52,7 +52,10 @@ import {
   retireCoveredZeroLine,
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
-import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import {
+  moveEventPurchasingWeek,
+  moveIngredientNeedsToPreferredVendor,
+} from "./purchasingReschedule";
 import { openNeedForApprovedEventDemand } from "./approvedDemandPurchasing";
 import { holdApprovedRentals } from "./acceptedRentalHolds";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
@@ -455,6 +458,15 @@ export async function handleManifestEvent(
   if (event.entity === "ExternalRecordLink" &&
     (event.type === "ExternalRecordLinked" || event.type === "ExternalRecordCapsuleIdUpdated")) {
     await assertImportedPaymentMatchedOnce(ctx, event.entityId as Id<"externalRecordLinks">);
+    return;
+  }
+  if (
+    event.entity === "Ingredient" &&
+    (event.type === "IngredientPreferredVendorsSet" ||
+      event.type === "IngredientPreferredVendorSet")
+  ) {
+    // Open needs follow the new first-choice vendor, so nothing is ordered twice.
+    await moveIngredientNeedsToPreferredVendor(ctx, event.entityId as Id<"ingredients">);
     return;
   }
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {

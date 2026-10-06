@@ -306,6 +306,31 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The ingredient's first-choice vendor changed: an open need leaves its
+  // editable weekly draft and re-opens for the new vendor in the same week, so
+  // one ingredient is never on two vendors' drafts for the same week.
+  command moveToVendor(optional preferredVendorId: uuid) {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    compute onEditableDraft = self.vendorOrder != null and self.vendorOrder.status == "draft"
+    mutate vendorOrderId = onEditableDraft ? null : self.vendorOrderId
+    mutate vendorOrderLineId = onEditableDraft ? null : self.vendorOrderLineId
+    mutate preferredVendorId = preferredVendorId
+    emit PurchaseNeedOpened {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      preferredVendorId: preferredVendorId
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+      status: "open"
+    }
+  }
+
   // Retired demand links retain the draft's provenance; active pointers must no
   // longer make submission try to mark a cancelled need as ordered.
   command releaseCancelledDraft() {
