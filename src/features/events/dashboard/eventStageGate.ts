@@ -160,6 +160,14 @@ function salesLockChecks(facts: StageGateFacts): StageGateCheck[] {
       required: true,
       fix: basicsFix(facts, "Set headcount"),
     },
+    // Event.lockForSales refuses an event with no service style.
+    {
+      key: "style",
+      label: "Service style picked",
+      done: Boolean(facts.hasServiceStyle),
+      required: true,
+      fix: { label: "Pick style", to: { kind: "sheet", sheet: "edit" } },
+    },
   ];
 }
 

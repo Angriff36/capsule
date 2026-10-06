@@ -24,7 +24,7 @@ export function eventWizardEventArgs(
     title: draft.title,
     eventTypeRaw: draft.eventType,
     occasionId: "",
-    serviceStyleId: "",
+    serviceStyleId: draft.serviceStyleId ?? "",
     salespersonId: "",
     referralSourceId: "",
     startsAtRaw: draft.startsAt,

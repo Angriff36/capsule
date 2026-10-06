@@ -38,6 +38,8 @@ export type EventWizardDraft = {
   primaryContactName: string;
   venueId: string;
   eventType: string;
+  /** Plated, buffet, drop off… Sales lock needs it; drafts saved before it existed lack it. */
+  serviceStyleId?: string;
   startsAt: string;
   endsAt: string;
   expectedHeadcount: string;
@@ -146,6 +148,7 @@ export function createEventWizardDraft(draftKey: string): EventWizardDraft {
     title: "",
     primaryContactName: "",
     venueId: "",
+    serviceStyleId: "",
     eventType: "",
     startsAt: "",
     endsAt: "",

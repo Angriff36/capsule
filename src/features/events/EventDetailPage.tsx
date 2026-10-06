@@ -108,6 +108,7 @@ import {
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
 import type { Doc } from "../../lib/api";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
 
 export function EventDetailPage() {
@@ -144,6 +145,7 @@ function EventDetailContent({
   event: Doc<"events">;
   id: string | undefined;
 }) {
+  const authStatus = useAuthStatus();
   const headerSentinelRef = useRef<HTMLDivElement>(null);
   const sectionScopeRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -310,10 +312,17 @@ function EventDetailContent({
 
   // One obvious next step: the first primary lifecycle action. Other stage
   // moves and every utility live under "More"; destructive moves sit last.
-  const lifecycle = eventLifecyclePolicy.availableActions(
-    String(event.stage),
-    event,
-  );
+  // Sales and event staff each have their own command for starting the
+  // event; offer one button, the one this person's role uses.
+  const salesRole = /^sales_/.test(String(authStatus?.role ?? ""));
+  const lifecycle = eventLifecyclePolicy
+    .availableActions(String(event.stage), event)
+    .filter((action, _index, all) =>
+      all.some((a) => a.key === "beginExecution") &&
+      all.some((a) => a.key === "confirmSalesLock")
+        ? action.key !== (salesRole ? "beginExecution" : "confirmSalesLock")
+        : true,
+    );
   const primaryAction = lifecycle.find((action) => action.kind === "primary");
   const secondaryActions = lifecycle.filter(
     (action) => action !== primaryAction && action.kind !== "danger",

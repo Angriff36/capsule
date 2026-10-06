@@ -13,6 +13,7 @@ import {
   useListMenu,
   useListMenuDish,
   useListPerson,
+  useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import {
@@ -450,6 +451,7 @@ function BasicsStep({
   update: (changes: Partial<EventWizardDraft>) => void;
   locked: boolean;
 }) {
+  const serviceStyles = useListServiceStyle();
   // A venue that is new to the book is made right here, not on another page.
   const canCreateVenue = useCanCreateInlineReference("venue");
   const [newVenueName, setNewVenueName] = useState<string | null>(null);
@@ -501,6 +503,24 @@ function BasicsStep({
       <div className="sm:col-span-2">
         <DateHoldCollisionNotice dateKey={draft.startsAt.slice(0, 10)} />
       </div>
+      <label className="field-label sm:col-span-2">
+        Service style
+        <select
+          className="field-input"
+          value={draft.serviceStyleId ?? ""}
+          disabled={locked}
+          onChange={(event) => update({ serviceStyleId: event.target.value })}
+        >
+          <option value="">Choose later</option>
+          {(serviceStyles ?? [])
+            .filter((style) => style.deletedAt == null)
+            .map((style) => (
+              <option key={style._id} value={style._id}>
+                {style.name}
+              </option>
+            ))}
+        </select>
+      </label>
       <label className="field-label sm:col-span-2">
         Venue
         <SearchSelect
