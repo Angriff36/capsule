@@ -117,6 +117,9 @@ export function LeadPipelinePage() {
   const [leadType, setLeadType] = useState<"company" | "person">("company");
   const [proposalLeadId, setProposalLeadId] = useState<string | null>(null);
   const [editLeadId, setEditLeadId] = useState<string | null>(null);
+  // One quick "move or price" form open at a time: a form on every card made
+  // the board thousands of pixels long on a phone.
+  const [moveLeadId, setMoveLeadId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -244,6 +247,7 @@ export function LeadPipelinePage() {
         estimatedValue,
         probability,
       });
+      setMoveLeadId(null);
       setNotice(`${leadName(lead)} pipeline updated.`);
     });
   };
@@ -602,57 +606,19 @@ export function LeadPipelinePage() {
                       <p className="lead-card-notes">{lead.notes}</p>
                     ) : null}
 
-                    <form
-                      className="lead-card-editor"
-                      onSubmit={(event) => submitPipelineUpdate(lead, event)}
-                    >
-                      <label>
-                        <span>Stage</span>
-                        <select
-                          name="stage"
-                          defaultValue={lead.stage}
-                          aria-label={`${leadName(lead)} stage`}
-                        >
-                          {STAGES.map((option) => (
-                            <option key={option.key} value={option.key}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label>
-                        <span>Value</span>
-                        <input
-                          name="estimatedValue"
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          defaultValue={lead.estimatedValue || ""}
-                          placeholder="Not priced"
-                          aria-label={`${leadName(lead)} estimated value`}
-                        />
-                      </label>
-                      <label>
-                        <span>Chance</span>
-                        <input
-                          name="probability"
-                          type="number"
-                          min="0"
-                          max="100"
-                          defaultValue={lead.probability}
-                          aria-label={`${leadName(lead)} probability`}
-                        />
-                      </label>
+                    <div className="lead-card-actions">
                       <button
                         className="btn btn-ghost"
-                        type="submit"
+                        type="button"
+                        onClick={() =>
+                          setMoveLeadId((current) =>
+                            current === lead._id ? null : lead._id,
+                          )
+                        }
                         disabled={busy != null}
                       >
-                        Save
+                        {moveLeadId === lead._id ? "Close" : "Move or price"}
                       </button>
-                    </form>
-
-                    <div className="lead-card-actions">
                       <button
                         className="btn btn-ghost"
                         type="button"
@@ -710,6 +676,58 @@ export function LeadPipelinePage() {
                         </>
                       )}
                     </div>
+
+                    {moveLeadId === lead._id ? (
+                      <form
+                        className="lead-card-editor"
+                        onSubmit={(event) => submitPipelineUpdate(lead, event)}
+                      >
+                        <label>
+                          <span>Stage</span>
+                          <select
+                            name="stage"
+                            defaultValue={lead.stage}
+                            aria-label={`${leadName(lead)} stage`}
+                          >
+                            {STAGES.map((option) => (
+                              <option key={option.key} value={option.key}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          <span>Value</span>
+                          <input
+                            name="estimatedValue"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            defaultValue={lead.estimatedValue || ""}
+                            placeholder="Not priced"
+                            aria-label={`${leadName(lead)} estimated value`}
+                          />
+                        </label>
+                        <label>
+                          <span>Chance</span>
+                          <input
+                            name="probability"
+                            type="number"
+                            min="0"
+                            max="100"
+                            defaultValue={lead.probability}
+                            aria-label={`${leadName(lead)} probability`}
+                          />
+                        </label>
+                        <button
+                          className="btn btn-ghost"
+                          type="submit"
+                          disabled={busy != null}
+                        >
+                          Save
+                        </button>
+                      </form>
+                    ) : null}
 
                     {editLeadId === lead._id ? (
                       <LeadDetailsForm
