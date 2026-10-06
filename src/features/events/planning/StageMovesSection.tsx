@@ -76,7 +76,7 @@ export function StageMovesSection({
           onSubmit={submit}
         >
           <div className="supply-table-wrap mt-3">
-            <table className="supply-table">
+            <table className="supply-table phone-cards">
               <thead>
                 <tr>
                   <th>Stage</th>
@@ -91,7 +91,7 @@ export function StageMovesSection({
                       <strong>{move.label}</strong>
                     </td>
                     <td>{move.when}</td>
-                    <td>
+                    <td data-label="How">
                       <select
                         name={move.to}
                         className="input"

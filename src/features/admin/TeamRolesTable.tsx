@@ -58,7 +58,7 @@ export function TeamRolesTable({
   }
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-180 border-collapse text-left">
+      <table className="phone-cards w-full border-collapse text-left md:min-w-180">
         <thead>
           <tr>
             <th className="th">Member</th>
@@ -125,7 +125,10 @@ export function TeamRolesTable({
                   />
                 </span>
               </td>
-              <td className="border-b border-line px-3 py-3 text-xs">
+              <td
+                className="border-b border-line px-3 py-3 text-xs"
+                data-label="Sign-in"
+              >
                 <StaffSignInCell
                   person={person}
                   canEdit={canEdit}
@@ -139,7 +142,10 @@ export function TeamRolesTable({
                   onRestore={onRestoreAccess}
                 />
               </td>
-              <td className="border-b border-line px-3 py-3">
+              <td
+                className="border-b border-line px-3 py-3"
+                data-label="Capsule role"
+              >
                 <PersonRoleCell
                   person={person}
                   canEdit={canEdit}
@@ -147,7 +153,10 @@ export function TeamRolesTable({
                   onAssignRole={onAssignRole}
                 />
               </td>
-              <td className="border-b border-line px-3 py-3">
+              <td
+                className="border-b border-line px-3 py-3"
+                data-label="Employee number"
+              >
                 <PersonEmployeeNumberField
                   personId={person._id}
                   personName={`${person.givenName} ${person.familyName}`}
@@ -166,7 +175,10 @@ export function TeamRolesTable({
                   onError={onError}
                 />
               </td>
-              <td className="border-b border-line px-3 py-3">
+              <td
+                className="border-b border-line px-3 py-3"
+                data-label="Hourly rate"
+              >
                 <PersonPayRateCell
                   person={person}
                   rate={rateByPersonId.get(person._id) ?? null}

@@ -144,7 +144,7 @@ export function ApiKeysPage() {
         ) : live.length === 0 ? (
           <p className="text-ink-2">No active keys.</p>
         ) : (
-          <table className="w-full border-collapse text-left">
+          <table className="phone-cards w-full border-collapse text-left">
             <thead>
               <tr>
                 <th className="th">Name</th>
@@ -157,8 +157,12 @@ export function ApiKeysPage() {
               {live.map((k) => (
                 <tr key={k.id}>
                   <td className="td">{k.name}</td>
-                  <td className="td">{when(k.createdAt)}</td>
-                  <td className="td">{when(k.lastUsedAt)}</td>
+                  <td className="td" data-label="Created">
+                    {when(k.createdAt)}
+                  </td>
+                  <td className="td" data-label="Last used">
+                    {when(k.lastUsedAt)}
+                  </td>
                   <td className="td text-right">
                     <button
                       type="button"

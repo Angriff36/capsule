@@ -496,7 +496,7 @@ export function VenuesPage() {
             total={rows.length}
           />
           <div className="overflow-hidden rounded-sm border border-line">
-            <table className="min-w-full divide-y divide-line">
+            <table className="phone-cards min-w-full divide-y divide-line">
               <thead className="bg-inset">
                 <tr>
                   <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
@@ -548,18 +548,27 @@ export function VenuesPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-2">
+                    <td
+                      className="px-4 py-3 text-xs text-ink-2"
+                      data-label="Type"
+                    >
                       {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
                         venue.venueType}
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-2">
+                    <td
+                      className="px-4 py-3 text-xs text-ink-2"
+                      data-label="Capacity"
+                    >
                       {largestKnownCapacity(venue) || "Not known"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-2">
+                    <td
+                      className="px-4 py-3 text-xs text-ink-2"
+                      data-label="Location"
+                    >
                       {[venue.city, venue.region].filter(Boolean).join(", ") ||
                         "—"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" data-label="Status">
                       <StatusChip
                         status={
                           venue.status === "active" ? "active" : "inactive"
