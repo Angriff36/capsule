@@ -91,6 +91,10 @@ entity PackRule mixin TenantScoped, SoftDeletable {
   property required scaleBy: PackRuleScale = "fixed"
   // One more for each N servings or guests.
   property perUnits: int?
+  // Quantity for each group of perUnits (default 1 for older rules).
+  property quantityPerUnit: int?
+  // A package rule counts all matching event rows together, once per event.
+  property aggregateDishQuantity: boolean?
   // Extra on the part that grows with servings or guests (10 = 10% spare).
   property required sparePercent: int = 0
   property required ownership: PackOwnership = "owned"
@@ -140,6 +144,8 @@ entity PackRule mixin TenantScoped, SoftDeletable {
     optional baseQuantity: int,
     optional scaleBy: PackRuleScale,
     optional perUnits: int,
+    optional quantityPerUnit: int,
+    optional aggregateDishQuantity: boolean,
     optional sparePercent: int,
     optional ownership: PackOwnership,
     optional returnRequired: boolean,
@@ -161,6 +167,8 @@ entity PackRule mixin TenantScoped, SoftDeletable {
     mutate baseQuantity = baseQuantity != null ? baseQuantity : (perUnits != null ? 0 : 1)
     mutate scaleBy = scaleBy != null ? scaleBy : "fixed"
     mutate perUnits = perUnits
+    mutate quantityPerUnit = quantityPerUnit
+    mutate aggregateDishQuantity = aggregateDishQuantity
     mutate sparePercent = sparePercent != null ? sparePercent : 0
     mutate ownership = ownership != null ? ownership : "owned"
     mutate returnRequired = returnRequired != null ? returnRequired : true
@@ -190,6 +198,8 @@ entity PackRule mixin TenantScoped, SoftDeletable {
     baseQuantity: int,
     scaleBy: PackRuleScale,
     optional perUnits: int,
+    optional quantityPerUnit: int,
+    optional aggregateDishQuantity: boolean,
     sparePercent: int,
     ownership: PackOwnership,
     returnRequired: boolean,
@@ -210,6 +220,8 @@ entity PackRule mixin TenantScoped, SoftDeletable {
     mutate baseQuantity = baseQuantity
     mutate scaleBy = scaleBy
     mutate perUnits = perUnits
+    mutate quantityPerUnit = quantityPerUnit
+    mutate aggregateDishQuantity = aggregateDishQuantity
     mutate sparePercent = sparePercent
     mutate ownership = ownership
     mutate returnRequired = returnRequired

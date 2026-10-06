@@ -1,4 +1,5 @@
 // Capsule root program — intentional compile entry.
+use "./import/tpp-upload.manifest"
 use "./admin/announcement.manifest"
 use "./admin/assistant.manifest"
 use "./admin/capability-setting.manifest"

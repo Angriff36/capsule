@@ -12973,6 +12973,26 @@ export function useGetTppReportFavorite(id: string | "skip") {
   return useQuery(api.queries.getTppReportFavorite, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Reactive list for TppUpload. */
+export function useListTppUpload() {
+  return useQuery(api.queries.listTppUpload);
+}
+
+/** Reactive get-by-id for TppUpload. Pass "skip" to suspend. */
+export function useGetTppUpload(id: string | "skip") {
+  return useQuery(api.queries.getTppUpload, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for TppUploadPart. */
+export function useListTppUploadPart() {
+  return useQuery(api.queries.listTppUploadPart);
+}
+
+/** Reactive get-by-id for TppUploadPart. Pass "skip" to suspend. */
+export function useGetTppUploadPart(id: string | "skip") {
+  return useQuery(api.queries.getTppUploadPart, id === "skip" ? "skip" : { id: id as any });
+}
+
 /** Reactive list for Trailer. */
 export function useListTrailer() {
   return useQuery(api.queries.listTrailer);
@@ -14739,4 +14759,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1557 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1561 as const;
