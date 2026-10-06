@@ -327,7 +327,7 @@ export function PlanningSetupPage() {
             onSubmit={submitChecks}
           >
             <div className="supply-table-wrap mt-3">
-              <table className="supply-table">
+              <table className="supply-table phone-cards">
                 <thead>
                   <tr>
                     <th>Check</th>
@@ -342,7 +342,7 @@ export function PlanningSetupPage() {
                         <strong>{check.label}</strong>
                       </td>
                       <td>{check.hint}</td>
-                      <td>
+                      <td data-label="Level">
                         <select
                           name={check.key}
                           className="input"
