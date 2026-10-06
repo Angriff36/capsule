@@ -608,11 +608,10 @@ export function StockBookPage() {
         <aside className="supply-degraded" role="note">
           <strong>Live stock facts</strong>
           <span>
-            Available stock is what's on hand minus what's reserved for events.
-            Low-stock alerts follow on-hand vs a tracked reorder point (same
-            predicate as home and the bell). Suggested purchase still uses PAR
-            minus available. Search and exact decimals can be slightly
-            imprecise.
+            Available stock is what's on hand minus what's held for events. A
+            line shows as low when on hand drops below its reorder point, the
+            same as on Home and in alerts. The suggested buy is the usual amount
+            to keep (par) minus what's available.
           </span>
         </aside>
         {failure ? <SupplyFailureBanner error={failure} /> : null}

@@ -424,8 +424,7 @@ export const PAGE_GUIDES: PageGuide[] = [
   {
     prefix: "/staff/roster",
     title: "Roster",
-    purpose:
-      "Assign people to events and build the weekly shift schedule, then publish it.",
+    purpose: "Assign people to events and build the weekly shift schedule.",
     steps: [
       "Add assignments for upcoming events.",
       "Build the week's shifts, then publish so staff see them.",

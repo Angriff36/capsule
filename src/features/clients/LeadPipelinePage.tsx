@@ -152,6 +152,9 @@ export function LeadPipelinePage() {
     );
     return {
       count: activeLeads.length,
+      pricedCount: activeLeads.filter(
+        (lead) => Number(lead.estimatedValue || 0) > 0,
+      ).length,
       faceValue,
       weightedValue,
       proposalCount: activeLeads.filter((lead) => lead.proposalId != null)
@@ -365,13 +368,25 @@ export function LeadPipelinePage() {
         </article>
         <article>
           <span>Pipeline value</span>
-          <strong>{currency.format(metrics.faceValue)}</strong>
-          <small>Unweighted opportunity</small>
+          <strong>
+            {metrics.pricedCount > 0
+              ? currency.format(metrics.faceValue)
+              : "Not priced yet"}
+          </strong>
+          <small>
+            {metrics.pricedCount < metrics.count
+              ? `${metrics.pricedCount} of ${metrics.count} inquiries have a value`
+              : "If every inquiry books"}
+          </small>
         </article>
         <article className="is-forecast">
           <span>Weighted forecast</span>
-          <strong>{currency.format(metrics.weightedValue)}</strong>
-          <small>Value × close probability</small>
+          <strong>
+            {metrics.pricedCount > 0
+              ? currency.format(metrics.weightedValue)
+              : "Not priced yet"}
+          </strong>
+          <small>Each value × its chance of booking</small>
         </article>
         <article>
           <span>Formal proposals</span>

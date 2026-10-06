@@ -816,15 +816,16 @@ export function ProposalsPage() {
                       </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>
                       <td className="supply-number">
-                        {formatMoneyExact(Number(row.total ?? 0))}
                         {Number(row.total ?? 0) === 0 &&
                         !["declined", "expired"].includes(
                           String(row.status),
                         ) ? (
-                          <span className="ml-2 text-xs text-warn">
-                            no price yet
+                          <span className="text-xs text-warn">
+                            Not priced yet
                           </span>
-                        ) : null}
+                        ) : (
+                          formatMoneyExact(Number(row.total ?? 0))
+                        )}
                       </td>
                       <td>
                         <StatusChip status={String(row.status)} />
