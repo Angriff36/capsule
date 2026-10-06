@@ -72,6 +72,7 @@ export function ClientsPage() {
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
+  const [find, setFind] = useState("");
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
@@ -134,9 +135,18 @@ export function ClientsPage() {
   }, [events]);
 
   const visible = useMemo(() => {
-    const list = showArchived
-      ? registered
-      : registered.filter((row) => String(row.status) !== "archived");
+    const needle = find.trim().toLowerCase();
+    const list = (
+      showArchived
+        ? registered
+        : registered.filter((row) => String(row.status) !== "archived")
+    ).filter(
+      (row) =>
+        !needle ||
+        [clientDisplayName(row._id, [row]), row.email, row.phone].some(
+          (value) => value?.toLowerCase().includes(needle),
+        ),
+    );
     return [...list].sort((a, b) => {
       const aStats = statsByClient.get(String(a._id)) ?? EMPTY_STATS;
       const bStats = statsByClient.get(String(b._id)) ?? EMPTY_STATS;
@@ -148,7 +158,7 @@ export function ClientsPage() {
         clientDisplayName(b._id, [b]),
       );
     });
-  }, [registered, showArchived, statsByClient]);
+  }, [registered, showArchived, statsByClient, find]);
 
   const reviewCandidate = (candidate: ClientDuplicateCandidate) => {
     setSelectedCandidateId(candidate.id);
@@ -442,9 +452,21 @@ export function ClientsPage() {
         />
       ) : null}
 
+      {registered.length > 0 ? (
+        <input
+          type="search"
+          className="input min-h-10 w-full max-w-sm"
+          placeholder="Find by name, email or phone"
+          aria-label="Find a client"
+          value={find}
+          onChange={(event) => setFind(event.target.value)}
+        />
+      ) : null}
       <div className="card overflow-x-auto">
         {clients === undefined ? (
           <TableSkeleton rows={5} />
+        ) : visible.length === 0 && find.trim() ? (
+          <p className="p-4 text-base text-ink-2">Nothing matches.</p>
         ) : visible.length === 0 ? (
           <EmptyState
             title="No clients yet"
